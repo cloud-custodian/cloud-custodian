@@ -232,13 +232,12 @@ def generate(resource_types=()):
                     'type': 'array'
                 },
                 #
-                # unclear if this should be allowed, it kills resource
-                # cache coherency between policies, and we need to
-                # generalize server side query mechanisms, currently
-                # this only for ec2 instance queries. limitations
-                # in json schema inheritance prevent us from doing this
-                # on a type specific basis
-                # https://stackoverflow.com/questions/22689900/json-schema-allof-with-additionalproperties
+                # TODO: source queries should really move under
+                # source. This was initially used for describe sources
+                # to expose server side query mechanisms, however its
+                # important to note it also prevents resource cache
+                # utilization between policies that have different
+                # queries.
                 'query': {
                     'type': 'array', 'items': {'type': 'object'}}
 

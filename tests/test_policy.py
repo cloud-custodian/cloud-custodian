@@ -175,7 +175,7 @@ class PolicyPermissions(BaseTest):
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
-            'support-case', 'transit-attachment'))
+            'support-case', 'transit-attachment', 'config-recorder'))
 
         missing_method = []
         for k, v in manager.resources.items():

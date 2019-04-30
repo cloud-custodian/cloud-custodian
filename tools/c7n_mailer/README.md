@@ -174,6 +174,8 @@ Delivery via tag has been tested with webhooks but should support all delivery m
 c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.yml -s .
 ```
 
+Note: You can set the profile via environment variable e.g. `export AWS_DEFAULT_PROFILE=foo`
+
 You should see output similar to the following:
 
 ```
