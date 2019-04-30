@@ -19,7 +19,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, 
 from c7n.utils import local_session
 
 
-@resources.register('appengine-app')
+@resources.register('app-engine')
 class AppEngineApp(QueryResourceManager):
 
     class resource_type(TypeInfo):
@@ -40,7 +40,7 @@ class AppEngineApp(QueryResourceManager):
         return {'appsId': local_session(self.session_factory).get_default_project()}
 
 
-@resources.register('appengine-certificate')
+@resources.register('app-engine-certificate')
 class AppEngineCertificate(ChildResourceManager):
 
     def _get_parent_resource_info(self, child_instance):
@@ -55,7 +55,7 @@ class AppEngineCertificate(ChildResourceManager):
         scope = None
         id = 'id'
         parent_spec = {
-            'resource': 'appengine-app',
+            'resource': 'app-engine',
             'child_enum_params': {
                 ('id', 'appsId')
             }
@@ -69,7 +69,7 @@ class AppEngineCertificate(ChildResourceManager):
                                                 'authorizedCertificatesId': cert_id})
 
 
-@resources.register('appengine-domain')
+@resources.register('app-engine-domain')
 class AppEngineDomain(ChildResourceManager):
 
     class resource_type(ChildTypeInfo):
@@ -80,14 +80,14 @@ class AppEngineDomain(ChildResourceManager):
         scope = None
         id = 'id'
         parent_spec = {
-            'resource': 'appengine-app',
+            'resource': 'app-engine',
             'child_enum_params': {
                 ('id', 'appsId')
             }
         }
 
 
-@resources.register('appengine-domain-mapping')
+@resources.register('app-engine-domain-mapping')
 class AppEngineDomainMapping(ChildResourceManager):
 
     def _get_parent_resource_info(self, child_instance):
@@ -102,7 +102,7 @@ class AppEngineDomainMapping(ChildResourceManager):
         scope = None
         id = 'id'
         parent_spec = {
-            'resource': 'appengine-app',
+            'resource': 'app-engine',
             'child_enum_params': {
                 ('id', 'appsId')
             }
@@ -116,7 +116,7 @@ class AppEngineDomainMapping(ChildResourceManager):
                                                 'domainMappingsId': mapping_id})
 
 
-@resources.register('appengine-firewall-ingress-rule')
+@resources.register('app-engine-firewall-ingress-rule')
 class AppEngineFirewallIngressRule(ChildResourceManager):
 
     def _get_parent_resource_info(self, child_instance):
@@ -131,7 +131,7 @@ class AppEngineFirewallIngressRule(ChildResourceManager):
         scope = None
         id = 'id'
         parent_spec = {
-            'resource': 'appengine-app',
+            'resource': 'app-engine',
             'child_enum_params': {
                 ('id', 'appsId')
             }
