@@ -70,8 +70,7 @@ from c7n import tags
 from c7n.tags import universal_augment, register_universal_tags
 
 from c7n.utils import (
-    local_session, type_schema,
-    get_retry, chunks, generate_arn, snapshot_identifier)
+    local_session, type_schema, get_retry, chunks, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
 
 log = logging.getLogger('custodian.rds')

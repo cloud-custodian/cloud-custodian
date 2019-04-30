@@ -13,12 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
-
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import (RemoveTag, Tag, universal_augment)
-from c7n.utils import generate_arn
 
 
 @resources.register('cloudhsm-cluster')

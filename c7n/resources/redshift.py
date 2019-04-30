@@ -13,17 +13,16 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
 import json
 import itertools
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
-from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter,
+    ValueFilter, DefaultVpcBase, AgeFilter,
     CrossAccountAccessFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
@@ -603,7 +602,6 @@ class RedshiftSubnetGroup(QueryResourceManager):
 class RedshiftSnapshot(QueryResourceManager):
     """Resource manager for Redshift snapshots.
     """
-
 
     class resource_type(TypeInfo):
         service = 'redshift'

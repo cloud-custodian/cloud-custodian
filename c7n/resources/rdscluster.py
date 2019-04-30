@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-import functools
 
 from concurrent.futures import as_completed
 
@@ -27,8 +26,8 @@ from c7n import tags
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks,
-    get_retry, generate_arn)
+    type_schema, local_session, snapshot_identifier, chunks)
+
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -510,7 +509,7 @@ class RDSClusterSnapshotDelete(BaseAction):
     permissions = ('rds:DeleteDBClusterSnapshot',)
 
     def process(self, snapshots):
-        log.info("Deleting %d RDS cluster snapshots", len(snapshots))
+        self.log.info("Deleting %d RDS cluster snapshots", len(snapshots))
         client = local_session(self.manager.session_factory).client('rds')
         error = None
         with self.executor_factory(max_workers=2) as w:

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-import functools
 
 from c7n.actions import Action
 from c7n.filters.kms import KmsRelatedFilter
@@ -20,7 +19,7 @@ from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.tags import universal_augment, register_universal_tags
-from c7n.utils import local_session, type_schema, get_retry, generate_arn
+from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('efs')

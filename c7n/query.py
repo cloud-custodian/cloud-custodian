@@ -700,7 +700,8 @@ class TypeMeta(type):
 class TypeInfo(object):
     """Resource Type Metadata"""
 
-    ## Required
+    ###########
+    # Required
 
     # id field, should be the identifier used for apis
     id = None
@@ -714,9 +715,8 @@ class TypeInfo(object):
     # used to query the resource by describe-sources
     enum_spec = None
 
-
     ###########
-    ## Optional
+    # Optional
 
     # arn resource attribute, when describe format has arn
     arn = None

@@ -45,9 +45,8 @@ class OutputXrayTracerTest(BaseTest):
 class ArnResolverTest(BaseTest):
 
     table = [
-        # ('arn:aws:elasticbeanstalk:us-east-1:123456789012:environment/My App/MyEnv', '')
         ('arn:aws:waf::123456789012:webacl/3bffd3ed-fa2e-445e-869f-a6a7cf153fd3', 'waf'),
-        ('arn:aws:waf-regional:us-east-1:123456789012:webacl/3bffd3ed-fa2e-445e-869f-a6a7cf153fd3', 'waf-regional'),
+        ('arn:aws:waf-regional:us-east-1:123456789012:webacl/3bffd3ed-fa2e-445e-869f-a6a7cf153fd3', 'waf-regional'), # NOQA
         ('arn:aws:acm:region:account-id:certificate/certificate-id', 'acm-certificate'),
         ('arn:aws:cloudwatch:region:account-id:alarm:alarm-name', 'alarm'),
         ('arn:aws:logs:us-east-1:123456789012:log-group:my-log-group', 'log-group'),
@@ -59,14 +58,14 @@ class ArnResolverTest(BaseTest):
         ('arn:aws:ec2:region:account-id:instance/instance-id', 'ec2'),
         ('arn:aws:ec2:region:account-id:vpc/vpc-id', 'vpc'),
         ('arn:aws:ds:region:account-id:directory/directoryId', 'directory'),
-        ('arn:aws:elasticbeanstalk:region:account-id:application/applicationname', 'elasticbeanstalk'),
+        ('arn:aws:elasticbeanstalk:region:account-id:application/applicationname', 'elasticbeanstalk'), # NOQA
         ('arn:aws:ecr:region:account-id:repository/repository-name', 'ecr'),
         ('arn:aws:elasticache:us-east-2:123456789012:cluster:myCluster', 'cache-cluster'),
         ('arn:aws:es:us-east-1:123456789012:domain/streaming-logs', 'elasticsearch'),
         ('arn:aws:elasticfilesystem:region:account-id:file-system/file-system-id', 'efs'),
-        ('arn:aws:ecs:us-east-1:123456789012:task/my-cluster/1abf0f6d-a411-4033-b8eb-a4eed3ad252a', 'ecs-task'),
-        ('arn:aws:autoscaling:region:account-id:autoScalingGroup:groupid:autoScalingGroupName/groupfriendlyname', 'asg')
-        ] # NOQA
+        ('arn:aws:ecs:us-east-1:123456789012:task/my-cluster/1abf0f6d-a411-4033-b8eb-a4eed3ad252a', 'ecs-task'), # NOQA
+        ('arn:aws:autoscaling:region:account-id:autoScalingGroup:groupid:autoScalingGroupName/groupfriendlyname', 'asg') # NOQA
+    ]
 
     def test_arn_meta(self):
 
@@ -84,10 +83,6 @@ class ArnResolverTest(BaseTest):
 
 
 class ArnTest(BaseTest):
-
-    def test_stack_arn(self):
-        arn = aws.Arn.parse(
-            "arn:aws:cloudformation:us-east-1:123456789012:stack/MyProductionStack/abc9dbf0-43c2-11e3-a6e8-50fa526be49c")
 
     def test_eb_arn(self):
         arn = aws.Arn.parse(

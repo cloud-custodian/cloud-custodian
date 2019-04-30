@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
 import jmespath
 import json
 import six
@@ -29,7 +28,7 @@ from c7n.manager import resources
 from c7n import query
 from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, generate_arn
+from c7n.utils import local_session, type_schema
 
 ErrAccessDenied = "AccessDeniedException"
 
@@ -424,6 +423,7 @@ class LambdaLayerVersion(query.QueryResourceManager):
         date = 'CreatedDate'
         arn = "LayerVersionArn"
         arn_type = "layer"
+
     def augment(self, resources):
         versions = {}
         for r in resources:

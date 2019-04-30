@@ -17,7 +17,6 @@ Elastic Load Balancers
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from concurrent.futures import as_completed
-import logging
 import re
 
 from botocore.exceptions import ClientError
@@ -33,11 +32,10 @@ from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
-from c7n.utils import local_session, chunks, type_schema, get_retry, generate_arn
+from c7n.utils import local_session, chunks, type_schema
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
-log = logging.getLogger('custodian.elb')
 
 filters = FilterRegistry('elb.filters')
 actions = ActionRegistry('elb.actions')
@@ -257,7 +255,7 @@ class SetSslListenerPolicy(BaseAction):
 
             for f in as_completed(futures):
                 if f.exception():
-                    log.error(
+                    self.log.error(
                         "set-ssl-listener-policy error on lb:%s error:%s",
                         futures[f][rid], f.exception())
                     error = f.exception()

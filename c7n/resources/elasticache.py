@@ -13,11 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
-import logging
-import re
-
 from datetime import datetime
+import re
 
 from concurrent.futures import as_completed
 from dateutil.tz import tzutc
@@ -31,10 +28,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, generate_arn,
-    get_retry, chunks, snapshot_identifier, type_schema)
-
-log = logging.getLogger('custodian.elasticache')
+    local_session, chunks, snapshot_identifier, type_schema)
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
@@ -360,7 +354,7 @@ class DeleteElastiCacheSnapshot(BaseAction):
     permissions = ('elasticache:DeleteSnapshot',)
 
     def process(self, snapshots):
-        log.info("Deleting %d ElastiCache snapshots", len(snapshots))
+        self.log.info("Deleting %d ElastiCache snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
             futures = []
             client = local_session(self.manager.session_factory).client('elasticache')

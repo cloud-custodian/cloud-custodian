@@ -20,7 +20,7 @@ from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import local_session, get_retry, type_schema
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('codecommit')
