@@ -123,11 +123,9 @@ class SqlUser(ChildResourceManager):
 class SqlBackupRun(ChildResourceManager):
 
     def _get_parent_resource_info(self, child_instance):
-        mappings = {}
-        project_param_re = re.compile('.*?/projects/(.*?)/instances/.*')
-        mappings['project'] = project_param_re.match(child_instance['selfLink']).group(1)
-        mappings['name'] = child_instance['instance']
-        return mappings
+        return {'project_id': re.match('.*?/projects/(.*?)/instances/.*',
+                                    child_instance['selfLink']).group(1),
+                'database_id': child_instance['instance']}
 
     class resource_type(ChildTypeInfo):
         service = 'sqladmin'
@@ -155,11 +153,9 @@ class SqlBackupRun(ChildResourceManager):
 class SqlSslCert(ChildResourceManager):
 
     def _get_parent_resource_info(self, child_instance):
-        mappings = {}
-        project_param_re = re.compile('.*?/projects/(.*?)/instances/.*')
-        mappings['project'] = project_param_re.match(child_instance['selfLink']).group(1)
-        mappings['name'] = child_instance['instance']
-        return mappings
+        return {'project_id': re.match('.*?/projects/(.*?)/instances/.*',
+                                    child_instance['selfLink']).group(1),
+                'database_id': child_instance['instance']}
 
     class resource_type(ChildTypeInfo):
         service = 'sqladmin'
