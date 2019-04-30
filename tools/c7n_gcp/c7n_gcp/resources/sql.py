@@ -119,13 +119,31 @@ class SqlUser(ChildResourceManager):
         }
 
 
-@resources.register('sql-backup-run')
-class SqlBackupRun(ChildResourceManager):
+class SqlInstanceChildWithSelfLink(ChildResourceManager):
+    """A ChildResourceManager for resources that reference SqlInstance in selfLink.
+    """
 
     def _get_parent_resource_info(self, child_instance):
+        """
+        :param child_instance: a dictionary to get parent parameters from
+        :return: project_id and database_id extracted from child_instance
+        """
         return {'project_id': re.match('.*?/projects/(.*?)/instances/.*',
                                     child_instance['selfLink']).group(1),
                 'database_id': child_instance['instance']}
+
+    @staticmethod
+    def _get_base_query_parameters(resource_info):
+        """
+        :param resource_info: a dictionary to get query parameters from
+        :return: project and instance extracted from resource_info
+        """
+        return {'project': resource_info['project_id'],
+                'instance': resource_info['database_id'].split(':')[1]}
+
+
+@resources.register('sql-backup-run')
+class SqlBackupRun(SqlInstanceChildWithSelfLink):
 
     class resource_type(ChildTypeInfo):
         service = 'sqladmin'
@@ -142,20 +160,13 @@ class SqlBackupRun(ChildResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            return client.execute_command(
-                'get', {'project': resource_info['project_id'],
-                        'id': resource_info['backup_run_id'],
-                        'instance': resource_info['database_id'].split(':')[1]}
-            )
+            parameters = SqlInstanceChildWithSelfLink._get_base_query_parameters(resource_info)
+            parameters['id'] = resource_info['backup_run_id']
+            return client.execute_command('get', parameters)
 
 
 @resources.register('sql-ssl-cert')
-class SqlSslCert(ChildResourceManager):
-
-    def _get_parent_resource_info(self, child_instance):
-        return {'project_id': re.match('.*?/projects/(.*?)/instances/.*',
-                                    child_instance['selfLink']).group(1),
-                'database_id': child_instance['instance']}
+class SqlSslCert(SqlInstanceChildWithSelfLink):
 
     class resource_type(ChildTypeInfo):
         service = 'sqladmin'
@@ -172,8 +183,6 @@ class SqlSslCert(ChildResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            return client.execute_command(
-                'get', {'project': resource_info['project_id'],
-                        'sha1Fingerprint': resource_info['sha_1_fingerprint'],
-                        'instance': resource_info['database_id'].split(':')[1]}
-            )
+            parameters = SqlInstanceChildWithSelfLink._get_base_query_parameters(resource_info)
+            parameters['sha1Fingerprint'] = resource_info['sha_1_fingerprint']
+            return client.execute_command('get', parameters)
