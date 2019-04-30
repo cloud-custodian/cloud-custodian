@@ -45,18 +45,6 @@ class ElasticFileSystem(QueryResourceManager):
         return universal_augment(
             self, super(ElasticFileSystem, self).augment(resources))
 
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                'elasticfilesystem',
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type='file-system',
-                separator='/')
-        return self._generate_arn
-
 
 register_universal_tags(
     ElasticFileSystem.filter_registry,

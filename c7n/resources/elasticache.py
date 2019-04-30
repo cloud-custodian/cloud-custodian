@@ -48,6 +48,7 @@ class ElastiCacheCluster(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'elasticache'
         arn_type = 'cluster'
+        arn_separator = ":"
         enum_spec = ('describe_cache_clusters',
                      'CacheClusters[]', None)
         name = id = 'CacheClusterId'
@@ -59,22 +60,8 @@ class ElastiCacheCluster(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    _generate_arn = None
-    retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('elasticache:ListTagsForResource',)
     augment = universal_augment
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                'elasticache',
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type='cluster',
-                separator=':')
-        return self._generate_arn
 
 
 @filters.register('security-group')
@@ -294,6 +281,7 @@ class ElastiCacheSnapshot(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'elasticache'
         arn_type = 'snapshot'
+        arn_separator = ":"
         enum_spec = ('describe_snapshots', 'Snapshots', None)
         name = id = 'SnapshotName'
         filter_name = 'SnapshotName'
@@ -303,23 +291,9 @@ class ElastiCacheSnapshot(QueryResourceManager):
         universal_taggable = True
 
     permissions = ('elasticache:ListTagsForResource',)
-    filter_registry = FilterRegistry('elasticache-snapshot.filters')
-    action_registry = ActionRegistry('elasticache-snapshot.actions')
-    _generate_arn = None
-    retry = staticmethod(get_retry(('Throttled',)))
-    augment = universal_augment
 
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                'elasticache',
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type='snapshot',
-                separator=':')
-        return self._generate_arn
+    def augment(self, resources):
+        return universal_augment(self, resources)
 
 
 @ElastiCacheSnapshot.filter_registry.register('age')

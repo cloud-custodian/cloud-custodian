@@ -34,16 +34,8 @@ class Workspace(QueryResourceManager):
         name = id = dimension = 'WorkspaceId'
         filter_name = None
 
-    augment = universal_augment
-    _generate_arn = None
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'workspaces', region=self.config.region,
-                account_id=self.account_id, resource_type='workspace', separator='/')
-        return self._generate_arn
+    def augment(self, resources):
+        return universal_augment(self, resources)
 
 
 register_universal_tags(Workspace.filter_registry, Workspace.action_registry)

@@ -55,6 +55,7 @@ class ELB(QueryResourceManager):
         service = 'elb'
         resource_type = 'elasticloadbalancing:loadbalancer'
         arn_type = 'loadbalancer'
+        arn_service = 'elasticloadbalancing'
         enum_spec = ('describe_load_balancers',
                      'LoadBalancerDescriptions', None)
         detail_spec = None
@@ -74,24 +75,12 @@ class ELB(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    retry = staticmethod(get_retry(('Throttling',)))
 
     @classmethod
     def get_permissions(cls):
         return ('elasticloadbalancing:DescribeLoadBalancers',
                 'elasticloadbalancing:DescribeLoadBalancerAttributes',
                 'elasticloadbalancing:DescribeTags')
-
-    def get_arn(self, r):
-        return generate_arn(
-            account_id=self.config.account_id,
-            service='elasticloadbalancing',
-            resource_type='loadbalancer',
-            resource=r[self.resource_type.id],
-            region=self.config.region)
-
-    def get_arns(self, resources):
-        return map(self.get_arn, resources)
 
     def get_source(self, source_type):
         if source_type == 'describe':

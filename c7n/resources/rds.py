@@ -88,6 +88,7 @@ class RDS(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'rds'
         arn_type = 'db'
+        arn_separator = ':'
         enum_spec = ('describe_db_instances', 'DBInstances', None)
         id = 'DBInstanceIdentifier'
         name = 'Endpoint.Address'
@@ -111,18 +112,6 @@ class RDS(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    _generate_arn = None
-
-    def __init__(self, data, options):
-        super(RDS, self).__init__(data, options)
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='db', separator=':')
-        return self._generate_arn
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -971,7 +960,8 @@ class RDSSnapshot(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'rds'
-        arn_type = 'rds-snapshot'
+        arn_type = 'snapshot'
+        arn_separator = ':'
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
         name = id = 'DBSnapshotIdentifier'
         filter_name = None
@@ -981,21 +971,6 @@ class RDSSnapshot(QueryResourceManager):
         config_type = "AWS::RDS::DBSnapshot"
         # Need resource_type for Universal Tagging
         resource_type = "rds:snapshot"
-
-    filter_registry = FilterRegistry('rds-snapshot.filters')
-    action_registry = ActionRegistry('rds-snapshot.actions')
-
-    _generate_arn = None
-    retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='snapshot',
-                separator=':')
-        return self._generate_arn
 
     def get_source(self, source_type):
         if source_type == 'describe':

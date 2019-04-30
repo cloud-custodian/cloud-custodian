@@ -157,6 +157,18 @@ class PolicyPermissions(BaseTest):
         if bad:
             self.fail("%s have config types but no config source" % (", ".join(bad)))
 
+    def test_resource_arn_override_generator(self):
+        overrides = set()
+        for k, v in manager.resources.items():
+            arn_gen = bool(v.__dict__.get('get_arns') or v.__dict__.get('generate_arn'))
+
+            if arn_gen:
+                overrides.add(k)
+
+        overrides = overrides.difference(set(('account', 's3', 'hostedzone', 'log-group')))
+        if overrides:
+            raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
+
     def test_resource_name(self):
         names = []
         for k, v in manager.resources.items():
