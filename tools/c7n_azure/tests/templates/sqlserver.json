@@ -38,7 +38,79 @@
             "maxSizeBytes": 2147483648,
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false
-         }
+         },
+         "resources": [
+            {
+               "name": "default",
+               "type": "backupShortTermRetentionPolicies",
+               "apiVersion": "2018-06-01-preview",
+               "properties": {
+                  "retentionDays": 14
+               },
+               "dependsOn": [
+                  "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_cctestsqlserver_name'), 'cctestdb')]"
+               ]
+            },
+            {
+               "name": "default",
+               "type": "backupLongTermRetentionPolicies",
+               "apiVersion": "2017-03-01-preview",
+               "properties": {
+                  "weeklyRetention": "P14D",
+                  "monthlyRetention": "P3M",
+                  "yearlyRetention": "P2Y",
+                  "weekOfYear": 20
+               },
+               "dependsOn": [
+                  "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_cctestsqlserver_name'), 'cctestdb')]"
+               ]
+            }
+         ]
+      },
+      {
+         "type": "Microsoft.Sql/servers/databases",
+         "apiVersion": "2017-03-01-preview",
+         "name": "[concat(parameters('servers_cctestsqlserver_name'), '/cclongtermretentiondb')]",
+         "location": "eastus2",
+         "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', parameters('servers_cctestsqlserver_name'))]"
+         ],
+         "sku": {
+            "name": "S0",
+            "tier": "Standard"
+         },
+         "kind": "v12.0,user",
+         "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "maxSizeBytes": 268435456000,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false
+         },
+         "resources": [
+            {
+               "name": "default",
+               "type": "backupShortTermRetentionPolicies",
+               "apiVersion": "2018-06-01-preview",
+               "properties": {
+                  "retentionDays": 35
+               },
+               "dependsOn": [
+                  "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_cctestsqlserver_name'), 'cclongtermretentiondb')]"
+               ]
+            },
+            {
+               "name": "default",
+               "type": "backupLongTermRetentionPolicies",
+               "apiVersion": "2017-03-01-preview",
+               "properties": {
+                  "weeklyRetention": "P1M",
+                  "monthlyRetention": "P12M"
+               },
+               "dependsOn": [
+                  "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_cctestsqlserver_name'), 'cclongtermretentiondb')]"
+               ]
+            }
+         ]
       }
    ],
    "outputs": {}
