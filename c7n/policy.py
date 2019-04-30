@@ -843,7 +843,7 @@ class Policy(object):
         # various filter/action local vocabularies. Where possible defer
         # by using a format string.
         #
-        # See https://github.com/capitalone/cloud-custodian/issues/2330
+        # See https://github.com/cloud-custodian/cloud-custodian/issues/2330
         if not variables:
             variables = {}
 

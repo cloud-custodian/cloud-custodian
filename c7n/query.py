@@ -109,7 +109,7 @@ class ResourceQuery(object):
         resources = self.filter(resource_manager, **params)
         if client_filter:
             # This logic was added to prevent the issue from:
-            # https://github.com/capitalone/cloud-custodian/issues/1398
+            # https://github.com/cloud-custodian/cloud-custodian/issues/1398
             if all(map(lambda r: isinstance(r, six.string_types), resources)):
                 resources = [r for r in resources if r in identities]
             else:
