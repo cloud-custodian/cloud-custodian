@@ -33,7 +33,7 @@ class AppEngineApp(QueryResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_query(
-                'get', {'appsId': re.compile('apps/(.*)').match(
+                'get', {'appsId': re.match('apps/(.*)',
                     resource_info['resourceName']).group(1)})
 
     def get_resource_query(self):
@@ -44,8 +44,8 @@ class AppEngineApp(QueryResourceManager):
 class AppEngineCertificate(ChildResourceManager):
 
     def _get_parent_resource_info(self, child_instance):
-        return {'resourceName': re.compile(
-            '(apps/.*?)/authorizedCertificates/.*').match(child_instance['name']).group(1)}
+        return {'resourceName': re.match(
+            '(apps/.*?)/authorizedCertificates/.*', child_instance['name']).group(1)}
 
     class resource_type(ChildTypeInfo):
         service = 'appengine'
@@ -63,8 +63,8 @@ class AppEngineCertificate(ChildResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            name_param_re = re.compile('apps/(.*?)/authorizedCertificates/(.*)')
-            apps_id, cert_id = name_param_re.match(resource_info['resourceName']).groups()
+            apps_id, cert_id = re.match('apps/(.*?)/authorizedCertificates/(.*)',
+                                        resource_info['resourceName']).groups()
             return client.execute_query('get', {'appsId': apps_id,
                                                 'authorizedCertificatesId': cert_id})
 
@@ -91,8 +91,8 @@ class AppEngineDomain(ChildResourceManager):
 class AppEngineDomainMapping(ChildResourceManager):
 
     def _get_parent_resource_info(self, child_instance):
-        return {'resourceName': re.compile(
-            '(apps/.*?)/domainMappings/.*').match(child_instance['name']).group(1)}
+        return {'resourceName': re.match(
+            '(apps/.*?)/domainMappings/.*', child_instance['name']).group(1)}
 
     class resource_type(ChildTypeInfo):
         service = 'appengine'
@@ -110,8 +110,8 @@ class AppEngineDomainMapping(ChildResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            name_param_re = re.compile('apps/(.*?)/domainMappings/(.*)')
-            apps_id, mapping_id = name_param_re.match(resource_info['resourceName']).groups()
+            apps_id, mapping_id = re.match('apps/(.*?)/domainMappings/(.*)',
+                                           resource_info['resourceName']).groups()
             return client.execute_query('get', {'appsId': apps_id,
                                                 'domainMappingsId': mapping_id})
 
@@ -139,8 +139,8 @@ class AppEngineFirewallIngressRule(ChildResourceManager):
 
         @staticmethod
         def get(client, resource_info):
-            rule_re = re.compile('apps/(.*?)/firewall/ingressRules/(.*)')
-            apps_id, ingress_rules_id = rule_re.match(resource_info['resourceName']).groups()
+            apps_id, ingress_rules_id = re.match('apps/(.*?)/firewall/ingressRules/(.*)',
+                                                 resource_info['resourceName']).groups()
             return client.execute_query(
                 'get', {'appsId': apps_id,
                         'ingressRulesId': ingress_rules_id})
