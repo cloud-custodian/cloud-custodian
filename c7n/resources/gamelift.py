@@ -14,13 +14,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 
 
 @resources.register('gamelift-build')
 class GameLiftBuild(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'gamelift'
         enum_spec = ('list_builds', 'Builds', None)
         id = 'BuildId'
@@ -34,7 +34,7 @@ class GameLiftBuild(QueryResourceManager):
 @resources.register('gamelift-fleet')
 class GameLiftFleet(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'gamelift'
         enum_spec = ('list_fleets', 'FleetIds', None)
         id = 'FleetId'

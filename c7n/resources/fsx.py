@@ -13,9 +13,8 @@
 # limitations under the License.
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
-from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry
+from c7n.query import QueryResourceManager, TypeInfo
+from c7n.actions import BaseAction
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, coalesce_copy_user_tags, TagActionFilter
 from c7n.utils import local_session, type_schema
 from c7n.filters.kms import KmsRelatedFilter
@@ -23,10 +22,8 @@ from c7n.filters.kms import KmsRelatedFilter
 
 @resources.register('fsx')
 class FSx(QueryResourceManager):
-    filter_registry = FilterRegistry('fsx.filters')
-    action_registry = ActionRegistry('fsx.actions')
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'fsx'
         enum_spec = ('describe_file_systems', 'FileSystems', None)
         name = id = 'FileSystemId'
@@ -38,10 +35,8 @@ class FSx(QueryResourceManager):
 
 @resources.register('fsx-backup')
 class FSxBackup(QueryResourceManager):
-    filter_registry = FilterRegistry('fsx-baackup.filters')
-    action_registry = ActionRegistry('fsx-baackup.actions')
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'fsx'
         enum_spec = ('describe_backups', 'Backups', None)
         name = id = 'BackupId'

@@ -37,9 +37,10 @@ ErrAccessDenied = "AccessDeniedException"
 @resources.register('lambda')
 class AWSLambda(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'lambda'
-        type = 'function'
+        arn_type = 'function'
+        arn_separator = ":"
         enum_spec = ('list_functions', 'Functions', None)
         name = id = 'FunctionName'
         filter_name = None
@@ -47,20 +48,6 @@ class AWSLambda(query.QueryResourceManager):
         dimension = 'FunctionName'
         config_type = "AWS::Lambda::Function"
         universal_taggable = object()
-
-    @property
-    def generate_arn(self):
-        """ Generates generic arn if ID is not already arn format.
-        """
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                self.get_model().service,
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type=self.get_model().type,
-                separator=':')
-        return self._generate_arn
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -430,16 +417,13 @@ class LambdaLayerVersion(query.QueryResourceManager):
 
     """
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'lambda'
-        type = 'function'
         enum_spec = ('list_layers', 'Layers', None)
         name = id = 'LayerName'
-        filter_name = None
         date = 'CreatedDate'
-        dimension = None
-        config_type = None
-
+        arn = "LayerVersionArn"
+        arn_type = "layer"
     def augment(self, resources):
         versions = {}
         for r in resources:

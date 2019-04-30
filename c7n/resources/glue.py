@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
@@ -26,7 +26,7 @@ from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 @resources.register('glue-connection')
 class GlueConnection(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('get_connections', 'ConnectionList', None)
         detail_spec = None
@@ -87,7 +87,7 @@ class DeleteConnection(BaseAction):
 @resources.register('glue-dev-endpoint')
 class GlueDevEndpoint(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('get_dev_endpoints', 'DevEndpoints', None)
         detail_spec = None

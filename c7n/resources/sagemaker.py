@@ -18,7 +18,7 @@ import six
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
@@ -27,7 +27,7 @@ from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 @resources.register('sagemaker-notebook')
 class NotebookInstance(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'sagemaker'
         enum_spec = ('list_notebook_instances', 'NotebookInstances', None)
         detail_spec = (
@@ -62,7 +62,7 @@ NotebookInstance.filter_registry.register('marked-for-op', TagActionFilter)
 @resources.register('sagemaker-job')
 class SagemakerJob(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'sagemaker'
         enum_spec = ('list_training_jobs', 'TrainingJobSummaries', None)
         detail_spec = (
@@ -108,8 +108,8 @@ class SagemakerJob(QueryResourceManager):
 @resources.register('sagemaker-transform-job')
 class SagemakerTransformJob(QueryResourceManager):
 
-    class resource_type(object):
-        type = 'None'
+    class resource_type(TypeInfo):
+        arn_type = "transform-job"
         service = 'sagemaker'
         enum_spec = ('list_transform_jobs', 'TransformJobSummaries', None)
         detail_spec = (
@@ -215,7 +215,7 @@ class QueryFilter(object):
 @resources.register('sagemaker-endpoint')
 class SagemakerEndpoint(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'sagemaker'
         enum_spec = ('list_endpoints', 'Endpoints', None)
         detail_spec = (
@@ -249,7 +249,7 @@ SagemakerEndpoint.filter_registry.register('marked-for-op', TagActionFilter)
 @resources.register('sagemaker-endpoint-config')
 class SagemakerEndpointConfig(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'sagemaker'
         enum_spec = ('list_endpoint_configs', 'EndpointConfigs', None)
         detail_spec = (
@@ -281,7 +281,8 @@ SagemakerEndpointConfig.filter_registry.register('marked-for-op', TagActionFilte
 
 @resources.register('sagemaker-model')
 class Model(QueryResourceManager):
-    class resource_type(object):
+
+    class resource_type(TypeInfo):
         service = 'sagemaker'
         enum_spec = ('list_models', 'Models', None)
         detail_spec = (

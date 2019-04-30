@@ -86,7 +86,7 @@ class RelatedResourceFilter(ValueFilter):
             if robj is None:
                 self.log.warning(
                     "Resource %s:%s references non existant %s: %s",
-                    model.type,
+                    self.manager.type,
                     resource[model.id],
                     self.RelatedResource.rsplit('.', 1)[-1],
                     rid)

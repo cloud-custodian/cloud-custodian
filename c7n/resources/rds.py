@@ -65,7 +65,7 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n import tags
 from c7n.tags import universal_augment, register_universal_tags
 
@@ -85,9 +85,9 @@ class RDS(QueryResourceManager):
     """Resource manager for RDS DB instances.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'rds'
-        type = 'db'
+        arn_type = 'db'
         enum_spec = ('describe_db_instances', 'DBInstances', None)
         id = 'DBInstanceIdentifier'
         name = 'Endpoint.Address'
@@ -947,9 +947,9 @@ class RDSSetPublicAvailability(BaseAction):
 @resources.register('rds-subscription')
 class RDSSubscription(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'rds'
-        type = 'rds-subscription'
+        arn_type = 'rds-subscription'
         enum_spec = (
             'describe_event_subscriptions', 'EventSubscriptionsList', None)
         name = id = "EventSubscriptionArn"
@@ -969,9 +969,9 @@ class RDSSnapshot(QueryResourceManager):
     """Resource manager for RDS DB snapshots.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'rds'
-        type = 'rds-snapshot'
+        arn_type = 'rds-snapshot'
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
         name = id = 'DBSnapshotIdentifier'
         filter_name = None
@@ -1410,9 +1410,9 @@ class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 class RDSSubnetGroup(QueryResourceManager):
     """RDS subnet group."""
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'rds'
-        type = 'rds-subnet-group'
+        arn_type = 'rds-subnet-group'
         id = name = 'DBSubnetGroupName'
         enum_spec = (
             'describe_db_subnet_groups', 'DBSubnetGroups', None)

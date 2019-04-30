@@ -61,6 +61,7 @@ class Account(ResourceManager):
         id = 'account_id'
         name = 'account_name'
         filter_name = None
+        global_resource = True
 
     @classmethod
     def get_permissions(cls):

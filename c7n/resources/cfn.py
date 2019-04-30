@@ -19,7 +19,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag
 
@@ -29,9 +29,9 @@ log = logging.getLogger('custodian.cfn')
 @resources.register('cfn')
 class CloudFormation(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudformation'
-        type = 'stack'
+        arn_type = 'stack'
         enum_spec = ('describe_stacks', 'Stacks[]', None)
         id = 'StackName'
         filter_name = 'StackName'

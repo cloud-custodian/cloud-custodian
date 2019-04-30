@@ -32,7 +32,7 @@ from datetime import datetime
 from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource
+from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.utils import local_session, chunks, type_schema, get_retry, generate_arn
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
@@ -51,10 +51,10 @@ filters.register('shield-metrics', ShieldMetrics)
 @resources.register('elb')
 class ELB(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elb'
         resource_type = 'elasticloadbalancing:loadbalancer'
-        type = 'loadbalancer'
+        arn_type = 'loadbalancer'
         enum_spec = ('describe_load_balancers',
                      'LoadBalancerDescriptions', None)
         detail_spec = None

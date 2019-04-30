@@ -52,7 +52,7 @@ def ecs_taggable(model, r):
 @resources.register('ecs')
 class ECSCluster(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         enum_spec = ('list_clusters', 'clusterArns', None)
         batch_detail_spec = (
@@ -160,7 +160,7 @@ class Service(query.ChildResourceManager):
 
     chunk_size = 10
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         name = 'serviceName'
         arn = id = 'serviceArn'
@@ -390,9 +390,10 @@ class Task(query.ChildResourceManager):
 
     chunk_size = 100
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         arn = id = name = 'taskArn'
+        arn_type = 'task'
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
         dimension = None
@@ -465,7 +466,7 @@ class StopTask(BaseAction):
 @resources.register('ecs-task-definition')
 class TaskDefinition(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
@@ -531,7 +532,7 @@ class ContainerInstance(query.ChildResourceManager):
 
     chunk_size = 100
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         id = name = 'containerInstance'
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)

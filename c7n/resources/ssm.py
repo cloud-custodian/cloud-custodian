@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 from c7n.exceptions import PolicyValidationError
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, local_session, type_schema
 from c7n.actions import Action
@@ -26,7 +26,8 @@ from .ec2 import EC2
 
 @resources.register('ssm-parameter')
 class SSMParameter(QueryResourceManager):
-    class resource_type(object):
+
+    class resource_type(TypeInfo):
         service = 'ssm'
         enum_spec = ('describe_parameters', 'Parameters', None)
         name = "Name"
@@ -34,7 +35,7 @@ class SSMParameter(QueryResourceManager):
         filter_name = None
         dimension = None
         universal_taggable = True
-        type = "parameter"
+        arn_type = "parameter"
 
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('ssm:GetParameters',
@@ -43,7 +44,8 @@ class SSMParameter(QueryResourceManager):
 
 @resources.register('ssm-managed-instance')
 class ManagedInstance(QueryResourceManager):
-    class resource_type(object):
+
+    class resource_type(TypeInfo):
         service = 'ssm'
         enum_spec = ('describe_instance_information', 'InstanceInformationList', None)
         id = 'InstanceId'
@@ -51,7 +53,7 @@ class ManagedInstance(QueryResourceManager):
         date = 'RegistrationDate'
         dimension = None
         filter_name = None
-        type = "managed-instance"
+        arn_type = "managed-instance"
 
     permissions = ('ssm:DescribeInstanceInformation',)
 
@@ -132,7 +134,8 @@ class SendCommand(Action):
 
 @resources.register('ssm-activation')
 class SSMActivation(QueryResourceManager):
-    class resource_type(object):
+
+    class resource_type(TypeInfo):
         service = 'ssm'
         enum_spec = ('describe_activations', 'ActivationList', None)
         id = 'ActivationId'
@@ -141,6 +144,7 @@ class SSMActivation(QueryResourceManager):
         dimension = None
         filter_name = None
         arn = False
+
     permissions = ('ssm:DescribeActivations',)
 
 

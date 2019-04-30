@@ -37,9 +37,9 @@ from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 @resources.register('vpc')
 class Vpc(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc'
+        arn_type = 'vpc'
         enum_spec = ('describe_vpcs', 'Vpcs', None)
         name = id = 'VpcId'
         filter_name = 'VpcIds'
@@ -433,9 +433,9 @@ class DhcpOptionsFilter(Filter):
 @resources.register('subnet')
 class Subnet(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'subnet'
+        arn_type = 'subnet'
         enum_spec = ('describe_subnets', 'Subnets', None)
         name = id = 'SubnetId'
         filter_name = 'SubnetIds'
@@ -452,9 +452,9 @@ Subnet.filter_registry.register('flow-logs', FlowLogFilter)
 @resources.register('security-group')
 class SecurityGroup(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'security-group'
+        arn_type = 'security-group'
         enum_spec = ('describe_security_groups', 'SecurityGroups', None)
         detail_spec = None
         name = id = 'GroupId'
@@ -1253,9 +1253,9 @@ class RemovePermissions(BaseAction):
 @resources.register('eni')
 class NetworkInterface(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'eni'
+        arn_type = 'eni'
         enum_spec = ('describe_network_interfaces', 'NetworkInterfaces', None)
         name = id = 'NetworkInterfaceId'
         filter_name = 'NetworkInterfaceIds'
@@ -1378,9 +1378,9 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 @resources.register('route-table')
 class RouteTable(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'route-table'
+        arn_type = 'route-table'
         enum_spec = ('describe_route_tables', 'RouteTables', None)
         name = id = 'RouteTableId'
         filter_name = 'RouteTableIds'
@@ -1450,7 +1450,7 @@ class Route(ValueFilter):
 @resources.register('transit-gateway')
 class TransitGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
         enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
         dimension = None
@@ -1480,7 +1480,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
 
     child_source = 'transit-attachment'
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
         enum_spec = ('describe_transit_gateway_attachments', 'TransitGatewayAttachments', None)
         parent_spec = ('transit-gateway', 'transit-gateway-id', None)
@@ -1494,9 +1494,9 @@ class TransitGatewayAttachment(query.ChildResourceManager):
 @resources.register('peering-connection')
 class PeeringConnection(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc-peering-connection'
+        arn_type = 'vpc-peering-connection'
         enum_spec = ('describe_vpc_peering_connections',
                      'VpcPeeringConnections', None)
         name = id = 'VpcPeeringConnectionId'
@@ -1505,7 +1505,6 @@ class PeeringConnection(query.QueryResourceManager):
         date = None
         dimension = None
         id_prefix = "pcx-"
-        type = "vpc-peering-connection"
 
 
 @PeeringConnection.filter_registry.register('cross-account')
@@ -1578,9 +1577,9 @@ class MissingRoute(Filter):
 @resources.register('network-acl')
 class NetworkAcl(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'network-acl'
+        arn_type = 'network-acl'
         enum_spec = ('describe_network_acls', 'NetworkAcls', None)
         name = id = 'NetworkAclId'
         filter_name = 'NetworkAclIds'
@@ -1671,9 +1670,9 @@ class AclAwsS3Cidrs(Filter):
 @resources.register('network-addr')
 class NetworkAddress(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'eip-allocation'
+        arn_type = 'eip-allocation'
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
@@ -1751,9 +1750,9 @@ class AddressRelease(BaseAction):
 @resources.register('customer-gateway')
 class CustomerGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'customer-gateway'
+        arn_type = 'customer-gateway'
         enum_spec = ('describe_customer_gateways', 'CustomerGateways', None)
         detail_spec = None
         id = 'CustomerGatewayId'
@@ -1768,9 +1767,9 @@ class CustomerGateway(query.QueryResourceManager):
 @resources.register('internet-gateway')
 class InternetGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'internet-gateway'
+        arn_type = 'internet-gateway'
         enum_spec = ('describe_internet_gateways', 'InternetGateways', None)
         name = id = 'InternetGatewayId'
         filter_name = 'InternetGatewayIds'
@@ -1784,9 +1783,9 @@ class InternetGateway(query.QueryResourceManager):
 @resources.register('nat-gateway')
 class NATGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'nat-gateway'
+        arn_type = 'nat-gateway'
         enum_spec = ('describe_nat_gateways', 'NatGateways', None)
         name = id = 'NatGatewayId'
         filter_name = 'NatGatewayIds'
@@ -1811,9 +1810,9 @@ class DeleteNATGateway(BaseAction):
 @resources.register('vpn-connection')
 class VPNConnection(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc-connection'
+        arn_type = 'vpc-connection'
         enum_spec = ('describe_vpn_connections', 'VpnConnections', None)
         name = id = 'VpnConnectionId'
         filter_name = 'VpnConnectionIds'
@@ -1827,9 +1826,9 @@ class VPNConnection(query.QueryResourceManager):
 @resources.register('vpn-gateway')
 class VPNGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc-gateway'
+        arn_type = 'vpc-gateway'
         enum_spec = ('describe_vpn_gateways', 'VpnGateways', None)
         name = id = 'VpnGatewayId'
         filter_name = 'VpnGatewayIds'
@@ -1843,9 +1842,9 @@ class VPNGateway(query.QueryResourceManager):
 @resources.register('vpc-endpoint')
 class VpcEndpoint(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc-endpoint'
+        arn_type = 'vpc-endpoint'
         enum_spec = ('describe_vpc_endpoints', 'VpcEndpoints', None)
         name = id = 'VpcEndpointId'
         date = 'CreationTimestamp'
@@ -1885,9 +1884,9 @@ class EndpointVpcFilter(net_filters.VpcFilter):
 @resources.register('key-pair')
 class KeyPair(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'key-pair'
+        arn_type = 'key-pair'
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
         detail_spec = None
         id = 'KeyName'
@@ -1992,7 +1991,7 @@ class CreateFlowLogs(BaseAction):
             self.delete_flow_logs(client, params['ResourceIds'])
             return
 
-        params['ResourceType'] = self.RESOURCE_ALIAS[model.type]
+        params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
         params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
 
         try:

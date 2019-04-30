@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.tags import Tag, RemoveTag, universal_augment
@@ -23,7 +23,7 @@ from c7n.tags import Tag, RemoveTag, universal_augment
 @resources.register('directory')
 class Directory(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = "ds"
         enum_spec = ("describe_directories", "DirectoryDescriptions", None)
         name = "Name"
@@ -31,7 +31,7 @@ class Directory(QueryResourceManager):
         dimension = None
         filter_name = 'DirectoryIds'
         filter_type = 'list'
-        type = "directory"
+        arn_type = "directory"
 
     permissions = ('ds:ListTagsForResource',)
 
@@ -124,14 +124,14 @@ class DirectoryRemoveTag(RemoveTag):
 @resources.register('cloud-directory')
 class CloudDirectory(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = "clouddirectory"
         enum_spec = ("list_directories", "Directories", {'state': 'ENABLED'})
         arn = id = "DirectoryArn"
         name = "Name"
         dimension = None
         filter_name = None
-        type = "directory"
+        arn_type = "directory"
         universal_taggable = object()
 
     augment = universal_augment

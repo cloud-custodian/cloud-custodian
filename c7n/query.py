@@ -400,9 +400,9 @@ class QueryResourceManager(ResourceManager):
 
     @classmethod
     def has_arn(cls):
-        if getattr(cls.resource_type, 'arn', None):
-            return True
-        elif getattr(cls.resource_type, 'type', None) is not None:
+        if cls.resource_type.arn is not None:
+            return bool(cls.resource_type.arn)
+        elif getattr(cls.resource_type, 'arn_type', None) is not None:
             return True
         elif cls.__dict__.get('get_arns'):
             return True
@@ -553,9 +553,9 @@ class QueryResourceManager(ResourceManager):
             self._generate_arn = functools.partial(
                 generate_arn,
                 self.get_model().service,
-                region=self.config.region,
+                region=not self.resource_type.global_resource and self.config.region or "",
                 account_id=self.account_id,
-                resource_type=self.get_model().type,
+                resource_type=self.get_model().arn_type,
                 separator='/')
         return self._generate_arn
 
@@ -679,3 +679,99 @@ class RetryPageIterator(PageIterator):
 
     def _make_request(self, current_kwargs):
         return self.retry(self._method, **current_kwargs)
+
+
+class TypeMeta(type):
+
+    def __repr__(cls):
+        identifier = None
+        if cls.config_type:
+            identifier = cls.config_type
+        elif cls.arn_type:
+            identifier = "AWS::%s::%s" % (cls.service.title(), cls.arn_type.title())
+        elif cls.enum_spec:
+            identifier = "AWS::%s::%s" % (cls.service.title(), cls.enum_spec[1])
+        else:
+            identifier = "AWS::%s::%s" % (cls.service.title(), cls.id)
+        return "<TypeInfo %s>" % identifier
+
+
+@six.add_metaclass(TypeMeta)
+class TypeInfo(object):
+    """Resource Type Metadata"""
+
+    ## Required
+
+    # id field, should be the identifier used for apis
+    id = None
+
+    # name field, used for display
+    name = None
+
+    # which aws service (per sdk) has the api for this resource.
+    service = None
+
+    # used to query the resource by describe-sources
+    enum_spec = None
+
+
+    ###########
+    ## Optional
+
+    # arn resource attribute, when describe format has arn
+    arn = None
+
+    # type, used for arn construction
+    arn_type = None
+
+    # how arn type is separated from rest of arn
+    arn_separator = "/"
+
+    # for services that need custom labeling for arns
+    arn_service = None
+
+    # filter_name, when fetching a single resource via enum_spec
+    # technically optional, but effectively required for serverless
+    # event policies else we have to enumerate the population.
+    filter_name = None
+
+    # filter_type, scalar or list
+    filter_type = None
+
+    # used to enrich the resource descriptions returned by enum_spec
+    detail_spec = None
+
+    # used when the api supports getting resource details enmasse
+    batch_detail_spec = None
+
+    # used for reporting, array of fields
+    default_report_fields = ()
+
+    # date, latest date associated to resource, generally references
+    # either create date or modified date.
+    date = None
+
+    # dimension, defines that resource has cloud watch metrics and the
+    # resource id can be passed as this value. further customizations
+    # of dimensions require subclass metrics filter.
+    dimension = None
+
+    # AWS Config Service resource type name
+    config_type = None
+
+    # Whether or not resource group tagging api can be used, in which
+    # case we'll automatically register tag actions/filters.
+    #
+    # Note values of True will register legacy tag filters/actions, values
+    # of object() will just register current standard tag/filters/actions.
+    universal_taggable = False
+
+    # Denotes if this resource exists across all regions (iam, cloudfront, r53)
+    global_resource = False
+
+    # Generally we utilize a service to namespace mapping in the metrics filter
+    # however some resources have a type specific namespace (ig. ebs)
+    metrics_namespace = None
+
+    # ??? used for universal tagging when service name doesn't match arn service
+    resource_type = None

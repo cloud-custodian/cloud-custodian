@@ -31,7 +31,7 @@ from c7n.filters.kms import KmsRelatedFilter
 
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, generate_arn, get_retry,
@@ -47,9 +47,9 @@ filters.register('marked-for-op', tags.TagActionFilter)
 @resources.register('redshift')
 class Redshift(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'redshift'
-        type = 'cluster'
+        arn_type = 'cluster'
         enum_spec = ('describe_clusters', 'Clusters', None)
         detail_spec = None
         name = id = 'ClusterIdentifier'
@@ -591,9 +591,9 @@ class TagTrim(tags.TagTrim):
 class RedshiftSubnetGroup(QueryResourceManager):
     """Redshift subnet group."""
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'redshift'
-        type = 'redshift-subnet-group'
+        arn_type = 'redshift-subnet-group'
         id = name = 'ClusterSubnetGroupName'
         enum_spec = (
             'describe_cluster_subnet_groups', 'ClusterSubnetGroups', None)
@@ -625,9 +625,9 @@ class RedshiftSnapshot(QueryResourceManager):
                 separator=':')
         return self._generate_arn
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'redshift'
-        type = 'redshift-snapshot'
+        arn_type = 'redshift-snapshot'
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
         name = id = 'SnapshotIdentifier'
         filter_name = None

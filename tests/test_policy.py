@@ -25,7 +25,7 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
-from c7n.query import ConfigSource
+from c7n.query import ConfigSource, TypeInfo
 
 from .common import BaseTest, event_data, Bag, TestConfig as Config
 
@@ -165,6 +165,38 @@ class PolicyPermissions(BaseTest):
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
 
+    def test_resource_meta_with_resourcetag_type(self):
+        found = set()
+        for k, v in manager.resources.items():
+            if k in ('rest-account', 'account'):
+                continue
+            if v.resource_type.resource_type:
+                found.add(k)
+        found = found.difference(set(('rds-snapshot', 'cloudhsm-cluster', 'efs', 'elb')))
+        if found:
+            raise SyntaxError("resource type metadata %s" % (', '.join(found)))
+
+    def test_resource_meta_with_class(self):
+        missing = set()
+        for k, v in manager.resources.items():
+            if k in ('rest-account', 'account'):
+                continue
+            if not issubclass(v.resource_type, TypeInfo):
+                missing.add(k)
+        if missing:
+            raise SyntaxError("missing type info class %s" % (', '.join(missing)))
+
+    def test_resource_legacy_type(self):
+        legacy = set()
+        marker = object()
+        for k, v in manager.resources.items():
+            if k in ('rest-account', 'account'):
+                continue
+            if getattr(v.resource_type, 'type', marker) is not marker:
+                legacy.add(k)
+        if legacy:
+            raise SyntaxError("legacy arn type info %s" % (', '.join(legacy)))
+
     def test_resource_arn_info(self):
         missing = []
         whitelist_missing = set((
@@ -175,6 +207,7 @@ class PolicyPermissions(BaseTest):
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
+            'healthcheck', 'event-rule-target',
             'support-case', 'transit-attachment', 'config-recorder'))
 
         missing_method = []
@@ -191,6 +224,8 @@ class PolicyPermissions(BaseTest):
             if getattr(rtype, 'arn', None) is not None:
                 continue
             if getattr(rtype, 'type', None) is not None:
+                continue
+            if getattr(rtype, 'arn_type', None) is not None:
                 continue
             missing.append(k)
 

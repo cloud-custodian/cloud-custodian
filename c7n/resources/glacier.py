@@ -19,7 +19,7 @@ import json
 
 from c7n.actions import RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.utils import get_retry, local_session
 
@@ -30,7 +30,7 @@ class Glacier(QueryResourceManager):
     permissions = ('glacier:ListTagsForVault',)
     retry = staticmethod(get_retry(('Throttled',)))
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'glacier'
         enum_spec = ('list_vaults', 'VaultList', None)
         name = "VaultName"

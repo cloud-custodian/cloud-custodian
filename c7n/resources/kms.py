@@ -16,24 +16,21 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from botocore.exceptions import ClientError
 
 import json
-import logging
 
 from c7n.actions import RemovePolicyBase, BaseAction
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, RetryPageIterator
+from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import universal_augment
-
-log = logging.getLogger('custodian.kms')
 
 
 @resources.register('kms')
 class KeyAlias(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'kms'
-        type = 'key-alias'
+        arn_type = 'alias'
         enum_spec = ('list_aliases', 'Aliases', None)
         name = "AliasName"
         id = "AliasArn"
@@ -47,9 +44,9 @@ class KeyAlias(QueryResourceManager):
 @resources.register('kms-key')
 class Key(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'kms'
-        type = "key"
+        arn_type = "key"
         enum_spec = ('list_keys', 'Keys', None)
         name = "KeyId"
         id = "KeyArn"

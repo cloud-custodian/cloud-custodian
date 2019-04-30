@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import (RemoveTag, Tag, universal_augment)
 from c7n.utils import generate_arn
 
@@ -24,9 +24,9 @@ from c7n.utils import generate_arn
 @resources.register('cloudhsm-cluster')
 class CloudHSMCluster(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudhsmv2'
-        type = 'cluster'
+        arn_type = 'cluster'
         resource_type = 'cloudhsm'
         enum_spec = ('describe_clusters', 'Clusters', None)
         id = name = 'ClusterId'
@@ -109,10 +109,11 @@ class RemoveTag(RemoveTag):
 @resources.register('hsm')
 class CloudHSM(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudhsm'
         enum_spec = ('list_hsms', 'HsmList', None)
         arn = id = 'HsmArn'
+        arn_type = 'cluster'
         name = 'Name'
         date = dimension = None
         detail_spec = (
@@ -123,7 +124,7 @@ class CloudHSM(QueryResourceManager):
 @resources.register('hsm-hapg')
 class PartitionGroup(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudhsm'
         enum_spec = ('list_hapgs', 'HapgList', None)
         detail_spec = ('describe_hapg', 'HapgArn', None, None)
@@ -137,7 +138,7 @@ class PartitionGroup(QueryResourceManager):
 @resources.register('hsm-client')
 class HSMClient(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudhsm'
         enum_spec = ('list_luna_clients', 'ClientList', None)
         detail_spec = ('describe_luna_client', 'ClientArn', None, None)

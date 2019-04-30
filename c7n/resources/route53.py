@@ -21,7 +21,7 @@ import os
 
 from botocore.paginate import Paginator
 
-from c7n.query import QueryResourceManager, ChildResourceManager
+from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
@@ -42,7 +42,7 @@ class Route53Base(object):
             self._generate_arn = functools.partial(
                 generate_arn,
                 self.get_model().service,
-                resource_type=self.get_model().type)
+                resource_type=self.get_model().arn_type)
         return self._generate_arn
 
     def get_arn(self, r):
@@ -70,7 +70,7 @@ def _describe_route53_tags(
         for resource_batch in chunks(list(resource_map.keys()), 10):
             results = retry(
                 client.list_tags_for_resources,
-                ResourceType=model.type,
+                ResourceType=model.arn_type,
                 ResourceIds=resource_batch)
             for resource_tag_set in results['ResourceTagSets']:
                 if ('ResourceId' in resource_tag_set and
@@ -84,9 +84,9 @@ def _describe_route53_tags(
 @resources.register('hostedzone')
 class HostedZone(Route53Base, QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'route53'
-        type = 'hostedzone'
+        arn_type = 'hostedzone'
         enum_spec = ('list_hosted_zones', 'HostedZones', None)
         # detail_spec = ('get_hosted_zone', 'Id', 'Id', None)
         id = 'Id'
@@ -113,9 +113,9 @@ HostedZone.action_registry.register('set-shield', SetShieldProtection)
 @resources.register('healthcheck')
 class HealthCheck(Route53Base, QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'route53'
-        type = 'healthcheck'
+        arn_type = 'healthcheck'
         enum_spec = ('list_health_checks', 'HealthChecks', None)
         name = id = 'Id'
         filter_name = None
@@ -127,9 +127,9 @@ class HealthCheck(Route53Base, QueryResourceManager):
 @resources.register('rrset')
 class ResourceRecordSet(ChildResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'route53'
-        type = 'rrset'
+        arn_type = 'rrset'
         parent_spec = ('hostedzone', 'HostedZoneId', None)
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
@@ -141,9 +141,9 @@ class ResourceRecordSet(ChildResourceManager):
 @resources.register('r53domain')
 class Route53Domain(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'route53domains'
-        type = 'r53domain'
+        arn_type = 'r53domain'
         enum_spec = ('list_domains', 'Domains', None)
         name = id = 'DomainName'
         filter_name = None

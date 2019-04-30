@@ -28,7 +28,7 @@ from c7n.actions import (
 from c7n.filters import FilterRegistry, AgeFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import (
     local_session, generate_arn,
@@ -45,9 +45,9 @@ TTYPE = re.compile('cache.t1')
 @resources.register('cache-cluster')
 class ElastiCacheCluster(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elasticache'
-        type = 'cluster'
+        arn_type = 'cluster'
         enum_spec = ('describe_cache_clusters',
                      'CacheClusters[]', None)
         name = id = 'CacheClusterId'
@@ -276,9 +276,9 @@ class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 @resources.register('cache-subnet-group')
 class ElastiCacheSubnetGroup(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elasticache'
-        type = 'subnet-group'
+        arn_type = 'subnet-group'
         enum_spec = ('describe_cache_subnet_groups',
                      'CacheSubnetGroups', None)
         name = id = 'CacheSubnetGroupName'
@@ -291,9 +291,9 @@ class ElastiCacheSubnetGroup(QueryResourceManager):
 @resources.register('cache-snapshot')
 class ElastiCacheSnapshot(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elasticache'
-        type = 'snapshot'
+        arn_type = 'snapshot'
         enum_spec = ('describe_snapshots', 'Snapshots', None)
         name = id = 'SnapshotName'
         filter_name = 'SnapshotName'

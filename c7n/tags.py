@@ -101,8 +101,8 @@ def universal_augment(self, resources):
 
     if not resource_type:
         resource_type = self.get_model().service
-        if self.get_model().type:
-            resource_type += ":" + self.get_model().type
+        if self.get_model().arn_type:
+            resource_type += ":" + self.get_model().arn_type
 
     resource_tag_map_list = list(itertools.chain(
         *[p['ResourceTagMappingList'] for p in paginator.paginate(

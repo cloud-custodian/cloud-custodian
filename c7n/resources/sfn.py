@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import Tag, RemoveTag
 
 
@@ -22,10 +22,11 @@ from c7n.tags import Tag, RemoveTag
 class StepFunction(QueryResourceManager):
     """AWS Step Functions State Machine"""
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'stepfunctions'
         enum_spec = ('list_state_machines', 'stateMachines', None)
         arn = id = 'stateMachineArn'
+        arn_type = 'stateMachine'
         name = 'name'
         date = 'creationDate'
         dimension = None

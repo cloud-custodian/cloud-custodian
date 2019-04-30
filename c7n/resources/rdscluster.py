@@ -22,7 +22,7 @@ from c7n.actions import BaseAction
 from c7n.filters import AgeFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
@@ -38,27 +38,17 @@ class RDSCluster(QueryResourceManager):
     """Resource manager for RDS clusters.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
 
         service = 'rds'
-        type = 'cluster'
+        arn_type = 'cluster'
+        arn_separator = ":"
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
         filter_name = None
         filter_type = None
         dimension = 'DBClusterIdentifier'
         date = None
-
-    retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id,
-                resource_type=self.resource_type.type, separator=':')
-        return self._generate_arn
 
     def augment(self, dbs):
         return list(filter(None, _rds_cluster_tags(
@@ -457,10 +447,10 @@ class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
 
         service = 'rds'
-        type = 'rds-cluster-snapshot'
+        arn_type = 'cluster-snapshot'
         enum_spec = (
             'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
         name = id = 'DBClusterSnapshotIdentifier'
