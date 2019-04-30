@@ -196,3 +196,18 @@ class MailerSqsQueueProcessor(object):
             except Exception:
                 traceback.print_exc()
                 pass
+
+        # this section sends the full event to a Splunk HTTP Event Collector (HEC)
+        if any(
+            e.startswith('splunkhec://')
+            for e in sqs_message.get('action', ()).get('to')
+        ):
+            from .splunk_delivery import SplunkHecDelivery
+            splunk_delivery = SplunkHecDelivery(self.config, self.session, self.logger)
+            splunk_messages = splunk_delivery.get_splunk_events(sqs_message)
+
+            try:
+                splunk_delivery.deliver_splunk_messages(splunk_messages, sqs_message)
+            except Exception:
+                traceback.print_exc()
+                pass

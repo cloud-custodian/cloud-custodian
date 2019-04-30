@@ -172,6 +172,37 @@ Slack delivery can also be set via a resource's tag name. For example, using "sl
 
 Delivery via tag has been tested with webhooks but should support all delivery methods.
 
+### Splunk HTTP Event Collector (HEC)
+
+The Custodian mailer supports delivery to the HTTP Event Collector (HEC) endpoint of a Splunk instance as a separate notification mechanism for the SQS transport method. To enable Splunk HEC integration, you must specify the URL to the HEC endpoint as well as a valid username and token:
+
+```yaml
+queue_url: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+role: arn:aws:iam::123456790:role/c7n-mailer-test
+splunk_hec_url: https://http-inputs-foo.splunkcloud.com/services/collector/event
+splunk_hec_username: myUser
+splunk_hec_token: 268b3cc2-f32e-4a19-a1e8-aee08d86ca7f
+```
+
+To send events for a policy to the Splunk HEC endpoint, add a ``to`` address notify action specifying the name of the Splunk index to send events to in the form ``splunkhec://indexName``:
+
+```
+policies:
+  - name: c7n-mailer-test
+    resource: ebs
+    filters:
+     - Attachments: []
+    actions:
+      - type: notify
+        to:
+          - splunkhec://myIndexName
+        transport:
+          type: sqs
+          queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+```
+
+The ``splunkhec://indexName`` address type can be combined in the same notify action with other destination types (e.g. email, Slack, DataDog, etc).
+
 ### Now run:
 
 ```
@@ -303,6 +334,15 @@ These fields are not necessary if c7n_mailer is run in a instance/lambda/etc wit
 |:---------:|:--------------------------|:-----------------|:------------------------------------|
 |           | `sendgrid_api_key`        | string           | SendGrid API token |
 SendGrid is only supported for Azure Cloud use with Azure Storage Queue currently.
+
+#### Splunk HEC Config
+
+The following configuration items are *all* optional. The ones marked "Required for Splunk" are only required if you're sending notifications to ``splunkhec://`` destinations.
+
+| Required for Splunk? | Key                       | Type             | Notes                               |
+|:---------:|:--------------------------|:-----------------|:------------------------------------|
+| &#x2705;       | `splunk_hec_url`        | string             | URL to your Splunk HTTP Event Collector endpoint |
+| &#x2705;       | `splunk_hec_token` | string | Splunk HEC authentication token for specified username |
 
 #### SDK Config
 
