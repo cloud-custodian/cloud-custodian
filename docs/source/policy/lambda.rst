@@ -69,7 +69,7 @@ event subscriptions need two additional fields:
    the resources can be queried.
 
 For very common API calls for policies, some `shortcuts
-<https://github.com/capitalone/cloud-custodian/blob/master/c7n/cwe.py#L28-L69>`_
+<https://github.com/cloud-custodian/cloud-custodian/blob/master/c7n/cwe.py#L28-L69>`_
 have been defined to allow for easier policy writing as for the
 ``RunInstances`` API call above, which expands to:
 
