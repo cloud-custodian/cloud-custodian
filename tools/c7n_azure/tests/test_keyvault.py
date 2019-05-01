@@ -165,10 +165,6 @@ class KeyVaultTest(BaseTest):
             p.run()
 
         self.assertEqual(403, e.exception.status_code)
-        self.assertEqual("Operation failed with status: 'Forbidden'. Details: 403 Client Error: "
-                         "Forbidden for url: https://graph.windows.net/"
-                         "ea42f556-5106-4743-99b0-c129bfa71a47/getObjectsByObjectIds?"
-                         "api-version=1.6", e.exception.message)
 
     def test_update_access_policy_action(self):
         with patch(self._get_key_vault_client_string() + '.update_access_policy')\
