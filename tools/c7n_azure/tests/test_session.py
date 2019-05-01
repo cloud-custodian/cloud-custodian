@@ -64,7 +64,10 @@ class SessionTest(BaseTest):
 
             self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
             self.assertEqual(s.get_subscription_id(), CUSTOM_SUBSCRIPTION_ID)
-            self.assertEqual(s.get_tenant_id(), 'tenant')
+
+            # will vary between recorded/live auth options but useful to ensure
+            # we ended up with one of the valid values
+            self.assertTrue(s.get_tenant_id() in [DEFAULT_TENANT_ID, 'tenant'])
 
     def test_initialize_session_principal(self):
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
