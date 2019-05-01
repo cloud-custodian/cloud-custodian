@@ -44,8 +44,6 @@ class Vpc(query.QueryResourceManager):
         name = id = 'VpcId'
         filter_name = 'VpcIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = 'AWS::EC2::VPC'
         id_prefix = "vpc-"
 
@@ -440,8 +438,6 @@ class Subnet(query.QueryResourceManager):
         name = id = 'SubnetId'
         filter_name = 'SubnetIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
 
@@ -456,12 +452,9 @@ class SecurityGroup(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'security-group'
         enum_spec = ('describe_security_groups', 'SecurityGroups', None)
-        detail_spec = None
         name = id = 'GroupId'
         filter_name = "GroupIds"
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = "AWS::EC2::SecurityGroup"
         id_prefix = "sg-"
 
@@ -1260,8 +1253,6 @@ class NetworkInterface(query.QueryResourceManager):
         name = id = 'NetworkInterfaceId'
         filter_name = 'NetworkInterfaceIds'
         filter_type = 'list'
-        dimension = None
-        date = None
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
 
@@ -1385,8 +1376,6 @@ class RouteTable(query.QueryResourceManager):
         name = id = 'RouteTableId'
         filter_name = 'RouteTableIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         id_prefix = "rtb-"
 
 
@@ -1453,7 +1442,6 @@ class TransitGateway(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = 'ec2'
         enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
-        dimension = None
         name = id = 'TransitGatewayId'
         arn = "TransitGatewayArn"
         filter_name = 'TransitGatewayIds'
@@ -1484,10 +1472,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         service = 'ec2'
         enum_spec = ('describe_transit_gateway_attachments', 'TransitGatewayAttachments', None)
         parent_spec = ('transit-gateway', 'transit-gateway-id', None)
-        dimension = None
         name = id = 'TransitGatewayAttachmentId'
-        filter_name = None
-        filter_type = None
         arn = False
 
 
@@ -1502,8 +1487,6 @@ class PeeringConnection(query.QueryResourceManager):
         name = id = 'VpcPeeringConnectionId'
         filter_name = 'VpcPeeringConnectionIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         id_prefix = "pcx-"
 
 
@@ -1584,8 +1567,6 @@ class NetworkAcl(query.QueryResourceManager):
         name = id = 'NetworkAclId'
         filter_name = 'NetworkAclIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = "AWS::EC2::NetworkAcl"
         id_prefix = "acl-"
 
@@ -1678,8 +1659,6 @@ class NetworkAddress(query.QueryResourceManager):
         id = 'AllocationId'
         filter_name = 'PublicIps'
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = "AWS::EC2::EIP"
 
 
@@ -1754,13 +1733,10 @@ class CustomerGateway(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'customer-gateway'
         enum_spec = ('describe_customer_gateways', 'CustomerGateways', None)
-        detail_spec = None
         id = 'CustomerGatewayId'
         filter_name = 'CustomerGatewayIds'
         filter_type = 'list'
         name = 'CustomerGatewayId'
-        date = None
-        dimension = None
         id_prefix = "cgw-"
 
 
@@ -1774,8 +1750,6 @@ class InternetGateway(query.QueryResourceManager):
         name = id = 'InternetGatewayId'
         filter_name = 'InternetGatewayIds'
         filter_type = 'list'
-        dimension = None
-        date = None
         config_type = "AWS::EC2::InternetGateway"
         id_prefix = "igw-"
 
@@ -1790,7 +1764,6 @@ class NATGateway(query.QueryResourceManager):
         name = id = 'NatGatewayId'
         filter_name = 'NatGatewayIds'
         filter_type = 'list'
-        dimension = None
         date = 'CreateTime'
         id_prefix = "nat-"
 
@@ -1817,8 +1790,6 @@ class VPNConnection(query.QueryResourceManager):
         name = id = 'VpnConnectionId'
         filter_name = 'VpnConnectionIds'
         filter_type = 'list'
-        dimension = None
-        date = None
         config_type = 'AWS::EC2::VPNConnection'
         id_prefix = "vpn-"
 
@@ -1833,8 +1804,6 @@ class VPNGateway(query.QueryResourceManager):
         name = id = 'VpnGatewayId'
         filter_name = 'VpnGatewayIds'
         filter_type = 'list'
-        dimension = None
-        date = None
         config_type = 'AWS::EC2::VPNGateway'
         id_prefix = "vgw-"
 
@@ -1850,7 +1819,6 @@ class VpcEndpoint(query.QueryResourceManager):
         date = 'CreationTimestamp'
         filter_name = 'VpcEndpointIds'
         filter_type = 'list'
-        dimension = None
         id_prefix = "vpce-"
         taggable = False
 
@@ -1888,12 +1856,8 @@ class KeyPair(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'key-pair'
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
-        detail_spec = None
-        id = 'KeyName'
+        name = id = 'KeyName'
         filter_name = 'KeyNames'
-        name = 'KeyName'
-        date = None
-        dimension = None
         taggable = False
 
 

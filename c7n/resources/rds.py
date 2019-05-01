@@ -943,13 +943,10 @@ class RDSSubscription(QueryResourceManager):
         name = id = "EventSubscriptionArn"
         date = "SubscriptionCreateTime"
         config_type = "AWS::DB::EventSubscription"
-        dimension = None
         # SubscriptionName isn't part of describe events results?! all the
         # other subscription apis.
         # filter_name = 'SubscriptionName'
         # filter_type = 'scalar'
-        filter_name = None
-        filter_type = None
 
 
 @resources.register('rds-snapshot')
@@ -963,13 +960,11 @@ class RDSSnapshot(QueryResourceManager):
         arn_separator = ':'
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
         name = id = 'DBSnapshotIdentifier'
-        filter_name = None
-        filter_type = None
-        dimension = None
         date = 'SnapshotCreateTime'
         config_type = "AWS::RDS::DBSnapshot"
         # Need resource_type for Universal Tagging
         resource_type = "rds:snapshot"
+        filter_name = "DBSnapshotIdentifier"
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -1392,8 +1387,6 @@ class RDSSubnetGroup(QueryResourceManager):
             'describe_db_subnet_groups', 'DBSubnetGroups', None)
         filter_name = 'DBSubnetGroupName'
         filter_type = 'scalar'
-        dimension = None
-        date = None
 
     def augment(self, resources):
         _db_subnet_group_tags(

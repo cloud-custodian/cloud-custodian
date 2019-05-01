@@ -28,8 +28,6 @@ class SnowballCluster(QueryResourceManager):
         id = 'ClusterId'
         name = 'Description'
         date = 'CreationDate'
-        dimension = None
-        filter_name = None
         arn = False
 
 
@@ -44,6 +42,4 @@ class Snowball(QueryResourceManager):
         id = 'JobId'
         name = 'Description'
         date = 'CreationDate'
-        dimension = None
-        filter_name = None
         arn = False

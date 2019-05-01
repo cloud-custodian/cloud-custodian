@@ -34,10 +34,7 @@ class SNS(QueryResourceManager):
         detail_spec = (
             'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
         id = 'TopicArn'
-        filter_name = None
-        filter_type = None
         name = 'DisplayName'
-        date = None
         dimension = 'TopicName'
         default_report_fields = (
             'TopicArn',

@@ -33,8 +33,6 @@ class EKS(QueryResourceManager):
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'
-        dimension = None
-        filter_name = None
 
 
 @EKS.filter_registry.register('subnet')

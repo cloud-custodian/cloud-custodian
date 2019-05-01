@@ -36,7 +36,6 @@ class ElasticSearchDomain(QueryResourceManager):
         id = 'DomainName'
         name = 'Name'
         dimension = "DomainName"
-        filter_name = None
 
     def get_resources(self, resource_ids):
         client = local_session(self.session_factory).client('es')

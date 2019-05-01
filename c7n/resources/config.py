@@ -29,7 +29,6 @@ class ConfigRecorder(QueryResourceManager):
         id = name = "name"
         filter_name = 'ConfigurationRecorderNames'
         filter_type = 'list'
-        dimension = None
         arn = False
 
     def augment(self, resources):
@@ -61,7 +60,6 @@ class ConfigRule(QueryResourceManager):
         id = name = "ConfigRuleName"
         arn = "ConfigRuleArn"
         arn_type = 'config-rule'
-        dimension = None
         filter_name = 'ConfigRuleNames'
         filter_type = 'list'
 

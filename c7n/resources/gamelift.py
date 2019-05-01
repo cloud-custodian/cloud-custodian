@@ -26,8 +26,6 @@ class GameLiftBuild(QueryResourceManager):
         id = 'BuildId'
         name = 'Name'
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
         arn = False
 
 
@@ -41,7 +39,6 @@ class GameLiftFleet(QueryResourceManager):
         arn = "FleetArn"
         name = 'Name'
         date = 'CreationTime'
-        dimension = None
         batch_detail_spec = (
             "describe_fleet_attributes", "FleetIds", None, "FleetAttributes", None)
-        filter_name = None
+

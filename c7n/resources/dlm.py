@@ -28,5 +28,4 @@ class DLMPolicy(QueryResourceManager):
         detail_spec = ('get_lifecycle_policy', 'PolicyId', 'PolicyId', 'Policy')
         filter_name = 'PolicyIds'
         filter_type = 'list'
-        dimension = None
         arn = False

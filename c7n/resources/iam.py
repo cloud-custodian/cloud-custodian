@@ -53,11 +53,8 @@ class Group(QueryResourceManager):
         service = 'iam'
         arn_type = 'group'
         enum_spec = ('list_groups', 'Groups', None)
-        detail_spec = None
-        filter_name = None
         id = name = 'GroupName'
         date = 'CreateDate'
-        dimension = None
         config_type = "AWS::IAM::Group"
         # Denotes this resource type exists across regions
         global_resource = True
@@ -86,10 +83,8 @@ class Role(QueryResourceManager):
         arn_type = 'role'
         enum_spec = ('list_roles', 'Roles', None)
         detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
-        filter_name = None
         id = name = 'RoleName'
         date = 'CreateDate'
-        dimension = None
         config_type = "AWS::IAM::Role"
         # Denotes this resource type exists across regions
         global_resource = True
@@ -132,10 +127,8 @@ class User(QueryResourceManager):
         arn_type = 'user'
         detail_spec = ('get_user', 'UserName', 'UserName', 'User')
         enum_spec = ('list_users', 'Users', None)
-        filter_name = None
         id = name = 'UserName'
         date = 'CreateDate'
-        dimension = None
         config_type = "AWS::IAM::User"
         # Denotes this resource type exists across regions
         global_resource = True
@@ -203,9 +196,7 @@ class Policy(QueryResourceManager):
         id = 'PolicyId'
         name = 'PolicyName'
         date = 'CreateDate'
-        dimension = None
         config_type = "AWS::IAM::Policy"
-        filter_name = None
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
@@ -258,10 +249,8 @@ class InstanceProfile(QueryResourceManager):
         arn_type = 'instance-profile'
         enum_spec = ('list_instance_profiles', 'InstanceProfiles', None)
         id = 'InstanceProfileId'
-        filter_name = None
         name = 'InstanceProfileId'
         date = 'CreateDate'
-        dimension = None
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
@@ -277,10 +266,8 @@ class ServerCertificate(QueryResourceManager):
                      'ServerCertificateMetadataList',
                      None)
         id = 'ServerCertificateId'
-        filter_name = None
         name = 'ServerCertificateName'
         date = 'Expiration'
-        dimension = None
         # Denotes this resource type exists across regions
         global_resource = True
 

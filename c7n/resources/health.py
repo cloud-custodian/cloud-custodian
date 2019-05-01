@@ -34,9 +34,6 @@ class HealthEvents(QueryResourceManager):
         enum_spec = ('describe_events', 'events', None)
         name = 'eventTypeCode'
         id = 'arn'
-        filter_name = None
-        filter_type = None
-        dimension = None
         date = 'startTime'
 
     permissions = (

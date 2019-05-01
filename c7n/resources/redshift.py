@@ -43,7 +43,6 @@ class Redshift(QueryResourceManager):
         arn_type = 'cluster'
         arn_separator = ":"
         enum_spec = ('describe_clusters', 'Clusters', None)
-        detail_spec = None
         name = id = 'ClusterIdentifier'
         filter_name = 'ClusterIdentifier'
         filter_type = 'scalar'
@@ -593,8 +592,6 @@ class RedshiftSubnetGroup(QueryResourceManager):
             'describe_cluster_subnet_groups', 'ClusterSubnetGroups', None)
         filter_name = 'ClusterSubnetGroupName'
         filter_type = 'scalar'
-        dimension = None
-        date = None
         config_type = "AWS::Redshift::ClusterSubnetGroup"
 
 
@@ -609,9 +606,6 @@ class RedshiftSnapshot(QueryResourceManager):
         arn_separator = ':'
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
         name = id = 'SnapshotIdentifier'
-        filter_name = None
-        filter_type = None
-        dimension = None
         date = 'SnapshotCreateTime'
         config_type = "AWS::Redshift::ClusterSnapshot"
 

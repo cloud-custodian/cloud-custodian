@@ -28,7 +28,6 @@ class Directory(QueryResourceManager):
         enum_spec = ("describe_directories", "DirectoryDescriptions", None)
         name = "Name"
         id = "DirectoryId"
-        dimension = None
         filter_name = 'DirectoryIds'
         filter_type = 'list'
         arn_type = "directory"
@@ -129,8 +128,6 @@ class CloudDirectory(QueryResourceManager):
         enum_spec = ("list_directories", "Directories", {'state': 'ENABLED'})
         arn = id = "DirectoryArn"
         name = "Name"
-        dimension = None
-        filter_name = None
         arn_type = "directory"
         universal_taggable = object()
 

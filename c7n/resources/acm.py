@@ -29,12 +29,10 @@ class Certificate(QueryResourceManager):
         id = 'CertificateArn'
         name = 'DomainName'
         date = 'CreatedAt'
-        dimension = None
         detail_spec = (
             "describe_certificate", "CertificateArn",
             'CertificateArn', 'Certificate')
         config_type = "AWS::ACM::Certificate"
-        filter_name = None
         arn_type = 'certificate'
         universal_taggable = object()
 

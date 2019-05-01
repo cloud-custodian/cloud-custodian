@@ -265,8 +265,6 @@ class ElastiCacheSubnetGroup(QueryResourceManager):
         name = id = 'CacheSubnetGroupName'
         filter_name = 'CacheSubnetGroupName'
         filter_type = 'scalar'
-        date = None
-        dimension = None
 
 
 @resources.register('cache-snapshot')
@@ -281,7 +279,6 @@ class ElastiCacheSnapshot(QueryResourceManager):
         filter_name = 'SnapshotName'
         filter_type = 'scalar'
         date = 'StartTime'
-        dimension = None
         universal_taggable = True
 
     permissions = ('elasticache:ListTagsForResource',)

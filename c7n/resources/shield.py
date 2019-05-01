@@ -31,8 +31,6 @@ class ShieldProtection(QueryResourceManager):
         enum_spec = ('list_protections', 'Protections', None)
         id = 'Id'
         name = 'Name'
-        dimension = None
-        filter_name = None
         arn = False
 
 
@@ -46,7 +44,6 @@ class ShieldAttack(QueryResourceManager):
             'describe_attack', 'AttackId', 'AttackId', 'Attack')
         name = id = 'AttackId'
         date = 'StartTime'
-        dimension = None
         filter_name = 'ResourceArns'
         filter_type = 'list'
         arn = False

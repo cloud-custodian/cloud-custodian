@@ -30,7 +30,6 @@ class CloudHSMCluster(QueryResourceManager):
         id = name = 'ClusterId'
         filter_name = 'Filters'
         filter_type = 'scalar'
-        dimension = None
         # universal_taggable = True
         # Note: resourcegroupstaggingapi still points to hsm-classic
 
@@ -100,10 +99,7 @@ class CloudHSM(QueryResourceManager):
         arn = id = 'HsmArn'
         arn_type = 'cluster'
         name = 'Name'
-        date = dimension = None
-        detail_spec = (
-            "describe_hsm", "HsmArn", None, None)
-        filter_name = None
+        detail_spec = ("describe_hsm", "HsmArn", None, None)
 
 
 @resources.register('hsm-hapg')
@@ -116,8 +112,6 @@ class PartitionGroup(QueryResourceManager):
         arn = id = 'HapgArn'
         name = 'HapgSerial'
         date = 'LastModifiedTimestamp'
-        dimension = None
-        filter_name = None
 
 
 @resources.register('hsm-client')
@@ -129,5 +123,4 @@ class HSMClient(QueryResourceManager):
         detail_spec = ('describe_luna_client', 'ClientArn', None, None)
         arn = id = 'ClientArn'
         name = 'Label'
-        date = dimension = None
-        filter_name = None
+

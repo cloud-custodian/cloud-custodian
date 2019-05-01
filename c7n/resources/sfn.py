@@ -29,11 +29,9 @@ class StepFunction(QueryResourceManager):
         arn_type = 'stateMachine'
         name = 'name'
         date = 'creationDate'
-        dimension = None
         detail_spec = (
             "describe_state_machine", "stateMachineArn",
             'stateMachineArn', None)
-        filter_name = None
 
 
 @StepFunction.action_registry.register('tag')

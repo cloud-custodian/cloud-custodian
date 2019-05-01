@@ -38,7 +38,6 @@ class Table(query.QueryResourceManager):
         enum_spec = ('list_tables', 'TableNames', None)
         detail_spec = ("describe_table", "TableName", None, "Table")
         id = 'TableName'
-        filter_name = None
         name = 'TableName'
         date = 'CreationDateTime'
         dimension = 'TableName'
@@ -318,9 +317,7 @@ class Backup(query.QueryResourceManager):
         service = 'dynamodb'
         arn = 'BackupArn'
         enum_spec = ('list_backups', 'BackupSummaries', None)
-        detail_spec = None
         id = 'BackupArn'
-        filter_name = None
         name = 'BackupName'
         date = 'BackupCreationDateTime'
 
@@ -388,12 +385,6 @@ class Stream(query.QueryResourceManager):
         arn = id = 'StreamArn'
         arn_type = 'stream'
 
-        # TODO, we default to filtering by id, but the api takes table names, which
-        # require additional client side filtering as multiple streams may be present
-        # per table.
-        # filter_name = 'TableName'
-        filter_name = None
-
         name = 'TableName'
         date = 'CreationDateTime'
         dimension = 'TableName'
@@ -406,13 +397,9 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         service = 'dax'
         arn_type = 'cluster'
         enum_spec = ('describe_clusters', 'Clusters', None)
-        detail_spec = None
         id = 'ClusterArn'
         name = 'ClusterName'
         config_type = 'AWS::DAX::Cluster'
-        filter_name = None
-        dimension = None
-        date = None
 
     permissions = ('dax:ListTags',)
 

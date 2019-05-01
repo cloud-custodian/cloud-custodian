@@ -125,7 +125,6 @@ class RestApi(query.QueryResourceManager):
         arn_type = 'restapis'
         enum_spec = ('get_rest_apis', 'items', None)
         id = 'id'
-        filter_name = None
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
@@ -190,7 +189,6 @@ class RestStage(query.ChildResourceManager):
         enum_spec = ('get_stages', 'item', None)
         name = id = 'stageName'
         date = 'createdDate'
-        dimension = None
         universal_taggable = True
         config_type = "AWS::ApiGateway::Stage"
 

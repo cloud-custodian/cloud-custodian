@@ -26,8 +26,6 @@ class Instance(QueryResourceManager):
         arn = id = 'arn'
         name = 'name'
         date = 'createdAt'
-        dimension = None
-        filter_name = None
 
 
 @resources.register('lightsail-db')
@@ -39,8 +37,6 @@ class Database(QueryResourceManager):
         name = 'name'
         arn = id = 'arn'
         date = 'createdAt'
-        dimension = None
-        filter_name = None
 
 
 @resources.register('lightsail-elb')
@@ -52,5 +48,4 @@ class LoadBalancer(QueryResourceManager):
         name = 'name'
         arn = id = 'arn'
         date = 'createdAt'
-        dimension = None
-        filter_name = None
+

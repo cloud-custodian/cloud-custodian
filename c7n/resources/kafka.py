@@ -29,7 +29,6 @@ class Kafka(QueryResourceManager):
         arn = id = 'ClusterArn'
         name = 'ClusterName'
         date = 'CreationTime'
-        dimension = None
         filter_name = 'ClusterNameFilter'
         filter_type = 'scalar'
 

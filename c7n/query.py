@@ -718,6 +718,9 @@ class TypeInfo(object):
     ###########
     # Optional
 
+    ###########
+    # Arn handling / generation metadata
+
     # arn resource attribute, when describe format has arn
     arn = None
 
@@ -729,6 +732,9 @@ class TypeInfo(object):
 
     # for services that need custom labeling for arns
     arn_service = None
+
+    ##########
+    # Resource retrieval
 
     # filter_name, when fetching a single resource via enum_spec
     # technically optional, but effectively required for serverless
@@ -743,6 +749,9 @@ class TypeInfo(object):
 
     # used when the api supports getting resource details enmasse
     batch_detail_spec = None
+
+    ##########
+    # Misc
 
     # used for reporting, array of fields
     default_report_fields = ()
@@ -772,6 +781,9 @@ class TypeInfo(object):
     # Generally we utilize a service to namespace mapping in the metrics filter
     # however some resources have a type specific namespace (ig. ebs)
     metrics_namespace = None
+
+    # specific to ec2 service resources used to disambiguate a resource by its id
+    id_prefix = None
 
     # ??? used for universal tagging when service name doesn't match arn service
     resource_type = None

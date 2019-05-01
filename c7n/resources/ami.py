@@ -40,12 +40,10 @@ class AMI(QueryResourceManager):
         arn_type = 'image'
         enum_spec = (
             'describe_images', 'Images', None)
-        detail_spec = None
         id = 'ImageId'
         filter_name = 'ImageIds'
         filter_type = 'list'
         name = 'Name'
-        dimension = None
         date = 'CreationDate'
 
     def resources(self, query=None):

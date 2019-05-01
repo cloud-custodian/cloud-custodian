@@ -38,7 +38,6 @@ class Distribution(QueryResourceManager):
         date = 'LastModifiedTime'
         dimension = "DistributionId"
         universal_taggable = True
-        filter_name = None
         config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
@@ -70,7 +69,6 @@ class StreamingDistribution(QueryResourceManager):
         date = 'LastModifiedTime'
         dimension = "DistributionId"
         universal_taggable = True
-        filter_name = None
         config_type = "AWS::CloudFront::StreamingDistribution"
 
     def get_source(self, source_type):

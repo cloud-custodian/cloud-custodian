@@ -25,5 +25,3 @@ class StorageGateway(QueryResourceManager):
         enum_spec = ('list_gateways', 'Gateways', None)
         arn = id = 'GatewayARN'
         name = 'GatewayName'
-        dimension = None
-        filter_name = None

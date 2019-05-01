@@ -59,8 +59,6 @@ class ECSCluster(query.QueryResourceManager):
             'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
         arn = id = "clusterArn"
-        dimension = None
-        filter_name = None
 
     def augment(self, resources):
         resources = super(ECSCluster, self).augment(resources)
@@ -166,9 +164,7 @@ class Service(query.ChildResourceManager):
         arn = id = 'serviceArn'
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
-        dimension = None
         supports_trailevents = True
-        filter_name = None
 
     @property
     def source_type(self):
@@ -396,9 +392,7 @@ class Task(query.ChildResourceManager):
         arn_type = 'task'
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
-        dimension = None
         supports_trailevents = True
-        filter_name = None
 
     @property
     def source_type(self):
@@ -470,9 +464,7 @@ class TaskDefinition(query.QueryResourceManager):
         service = 'ecs'
         arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
-        dimension = None
-        filter_name = None
-        filter_type = None
+
 
     def get_resources(self, ids, cache=True):
         if cache:
@@ -537,7 +529,6 @@ class ContainerInstance(query.ChildResourceManager):
         id = name = 'containerInstance'
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
-        dimension = None
         arn = "containerInstanceArn"
 
     @property

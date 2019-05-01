@@ -36,7 +36,6 @@ class ElasticFileSystem(QueryResourceManager):
         arn_service = 'elasticfilesystem'
         # resource type for resource tagging api
         resource_type = 'elasticfilesystem:file-system'
-        detail_spec = None
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
 
@@ -58,8 +57,6 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         parent_spec = ('efs', 'FileSystemId', None)
         enum_spec = ('describe_mount_targets', 'MountTargets', None)
         name = id = 'MountTargetId'
-        date = None
-        dimension = None
         filter_name = 'MountTargetId'
         filter_type = 'scalar'
         arn = False

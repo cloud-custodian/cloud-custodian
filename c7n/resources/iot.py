@@ -25,7 +25,6 @@ class IoT(QueryResourceManager):
         name = "thingName"
         id = "thingName"
         arn = "thingArn"
-        dimension = None
         default_report_fields = (
             'thingName',
             'thingTypeName'

@@ -33,7 +33,6 @@ class ECR(QueryResourceManager):
         name = "repositoryName"
         arn = id = "repositoryArn"
         arn_type = 'repository'
-        dimension = None
         filter_name = 'repositoryNames'
         filter_type = 'list'
 

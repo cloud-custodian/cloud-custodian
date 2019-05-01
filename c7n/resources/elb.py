@@ -56,7 +56,6 @@ class ELB(QueryResourceManager):
         arn_service = 'elasticloadbalancing'
         enum_spec = ('describe_load_balancers',
                      'LoadBalancerDescriptions', None)
-        detail_spec = None
         id = 'LoadBalancerName'
         filter_name = 'LoadBalancerNames'
         filter_type = 'list'

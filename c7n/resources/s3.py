@@ -97,7 +97,6 @@ class S3(query.QueryResourceManager):
         enum_spec = ('list_buckets', 'Buckets[]', None)
         detail_spec = ('list_objects', 'Bucket', 'Contents[]')
         name = id = 'Name'
-        filter_name = None
         date = 'CreationDate'
         dimension = 'BucketName'
         config_type = 'AWS::S3::Bucket'

@@ -28,8 +28,6 @@ class SimpleDB(QueryResourceManager):
         service = "sdb"
         enum_spec = ("list_domains", "DomainNames", None)
         id = name = "DomainName"
-        dimension = None
-        filter_name = None
         arn_type = "domain"
 
     permissions = ('sdb:DomainMetadata',)

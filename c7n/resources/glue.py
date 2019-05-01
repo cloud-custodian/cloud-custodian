@@ -29,11 +29,8 @@ class GlueConnection(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('get_connections', 'ConnectionList', None)
-        detail_spec = None
         id = name = 'Name'
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
         arn = False
 
     permissions = ('glue:GetConnections',)
@@ -90,11 +87,8 @@ class GlueDevEndpoint(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('get_dev_endpoints', 'DevEndpoints', None)
-        detail_spec = None
         id = name = 'EndpointName'
         date = 'CreatedTimestamp'
-        dimension = None
-        filter_name = None
         arn = False
 
     permissions = ('glue:GetDevEndpoints',)

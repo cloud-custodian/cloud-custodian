@@ -56,7 +56,6 @@ class EC2(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'instance'
         enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
-        detail_spec = None
         id = 'InstanceId'
         filter_name = 'InstanceIds'
         filter_type = 'list'

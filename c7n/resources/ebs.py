@@ -57,13 +57,11 @@ class Snapshot(QueryResourceManager):
         arn_type = 'snapshot'
         enum_spec = (
             'describe_snapshots', 'Snapshots', None)
-        detail_spec = None
         id = 'SnapshotId'
         filter_name = 'SnapshotIds'
         filter_type = 'list'
         name = 'SnapshotId'
         date = 'StartTime'
-        dimension = None
 
         default_report_fields = (
             'SnapshotId',

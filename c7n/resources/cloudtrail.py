@@ -38,7 +38,6 @@ class CloudTrail(QueryResourceManager):
         filter_type = 'list'
         arn = id = 'TrailARN'
         name = 'Name'
-        dimension = None
         config_type = "AWS::CloudTrail::Trail"
 
 

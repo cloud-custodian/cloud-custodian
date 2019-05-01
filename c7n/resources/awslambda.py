@@ -42,7 +42,6 @@ class AWSLambda(query.QueryResourceManager):
         arn_separator = ":"
         enum_spec = ('list_functions', 'Functions', None)
         name = id = 'FunctionName'
-        filter_name = None
         date = 'LastModified'
         dimension = 'FunctionName'
         config_type = "AWS::Lambda::Function"

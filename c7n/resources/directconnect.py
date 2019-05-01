@@ -26,5 +26,4 @@ class DirectConnect(QueryResourceManager):
         id = 'connectionId'
         name = 'connectionName'
         filter_name = 'connectionId'
-        dimension = None
         arn_type = "dxcon"

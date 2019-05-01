@@ -168,7 +168,6 @@ class OpsworksCM(QueryResourceManager):
         filter_type = 'scalar'
         name = id = 'ServerName'
         date = 'CreatedAt'
-        dimension = None
         arn = "ServerArn"
 
 

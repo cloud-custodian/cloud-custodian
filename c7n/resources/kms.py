@@ -34,8 +34,6 @@ class KeyAlias(QueryResourceManager):
         enum_spec = ('list_aliases', 'Aliases', None)
         name = "AliasName"
         id = "AliasArn"
-        dimension = None
-        filter_name = None
 
     def augment(self, resources):
         return [r for r in resources if 'TargetKeyId' in r]
@@ -50,8 +48,6 @@ class Key(QueryResourceManager):
         enum_spec = ('list_keys', 'Keys', None)
         name = "KeyId"
         id = "KeyArn"
-        dimension = None
-        filter_name = None
         universal_taggable = True
 
     def augment(self, resources):

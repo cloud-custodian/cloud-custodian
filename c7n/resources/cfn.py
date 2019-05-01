@@ -38,7 +38,6 @@ class CloudFormation(QueryResourceManager):
         filter_type = 'scalar'
         name = 'StackName'
         date = 'CreationTime'
-        dimension = None
         config_type = 'AWS::CloudFormation::Stack'
 
 

@@ -25,7 +25,7 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
-from c7n.query import ConfigSource, TypeInfo
+from c7n.query import ConfigSource, TypeInfo, DescribeSource
 
 from .common import BaseTest, event_data, Bag, TestConfig as Config
 
@@ -58,7 +58,7 @@ class DummyResource(manager.ResourceManager):
         return [_a(p1), _a(p2)]
 
 
-class PolicyPermissions(BaseTest):
+class PolicyMeta(BaseTest):
 
     def test_policy_detail_spec_permissions(self):
         policy = self.load_policy(
@@ -102,17 +102,6 @@ class PolicyPermissions(BaseTest):
                 )
             ),
         )
-
-    def xtest_resource_filter_name(self):
-        # resources without a filter name won't play nice in
-        # lambda policies
-        missing = []
-        marker = object
-        for k, v in manager.resources.items():
-            if getattr(v.resource_type, "filter_name", marker) is marker:
-                missing.append(k)
-        if missing:
-            self.fail("Missing filter name %s" % (", ".join(missing)))
 
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
@@ -198,12 +187,21 @@ class PolicyPermissions(BaseTest):
         if missing:
             raise SyntaxError("missing type info class %s" % (', '.join(missing)))
 
+    def test_resource_type_empty_metadata(self):
+        empty = set()
+        for k, v in manager.resources.items():
+            if k in ('rest-account', 'account'):
+                continue
+            for rk, rv in v.resource_type.__dict__.items():
+                if rk[0].isalnum() and rv is None:
+                    empty.add(k)
+        if empty:
+            raise ValueError("Empty Resource Metadata %s" % (', '.join(empty)))
+
     def test_resource_legacy_type(self):
         legacy = set()
         marker = object()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account'):
-                continue
             if getattr(v.resource_type, 'type', marker) is not marker:
                 legacy.add(k)
         if legacy:

@@ -32,8 +32,6 @@ class SSMParameter(QueryResourceManager):
         enum_spec = ('describe_parameters', 'Parameters', None)
         name = "Name"
         id = "Name"
-        filter_name = None
-        dimension = None
         universal_taggable = True
         arn_type = "parameter"
 
@@ -51,8 +49,6 @@ class ManagedInstance(QueryResourceManager):
         id = 'InstanceId'
         name = 'Name'
         date = 'RegistrationDate'
-        dimension = None
-        filter_name = None
         arn_type = "managed-instance"
 
     permissions = ('ssm:DescribeInstanceInformation',)
@@ -141,8 +137,6 @@ class SSMActivation(QueryResourceManager):
         id = 'ActivationId'
         name = 'Description'
         date = 'CreatedDate'
-        dimension = None
-        filter_name = None
         arn = False
 
     permissions = ('ssm:DescribeActivations',)

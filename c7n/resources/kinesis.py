@@ -35,9 +35,6 @@ class KinesisStream(QueryResourceManager):
         detail_spec = (
             'describe_stream', 'StreamName', None, 'StreamDescription')
         name = id = 'StreamName'
-        filter_name = None
-        filter_type = None
-        date = None
         dimension = 'StreamName'
         universal_taggable = True
 
@@ -102,8 +99,6 @@ class DeliveryStream(QueryResourceManager):
             'describe_delivery_stream', 'DeliveryStreamName', None,
             'DeliveryStreamDescription')
         name = id = 'DeliveryStreamName'
-        filter_name = None
-        filter_type = None
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
 
@@ -223,9 +218,6 @@ class AnalyticsApp(QueryResourceManager):
                        'ApplicationName', 'ApplicationDetail')
         name = "ApplicationName"
         arn = id = "ApplicationARN"
-        dimension = None
-        filter_name = None
-        filter_type = None
 
 
 @AnalyticsApp.action_registry.register('delete')

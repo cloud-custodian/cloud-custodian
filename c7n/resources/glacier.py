@@ -35,8 +35,6 @@ class Glacier(QueryResourceManager):
         enum_spec = ('list_vaults', 'VaultList', None)
         name = "VaultName"
         arn = id = "VaultARN"
-        filter_name = None
-        dimension = None
         universal_taggable = True
 
     def augment(self, resources):

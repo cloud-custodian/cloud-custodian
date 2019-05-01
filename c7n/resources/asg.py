@@ -1655,7 +1655,6 @@ class LaunchConfig(query.QueryResourceManager):
         arn_type = 'launchConfiguration'
         id = name = 'LaunchConfigurationName'
         date = 'CreatedTime'
-        dimension = None
         enum_spec = (
             'describe_launch_configurations', 'LaunchConfigurations', None)
         filter_name = 'LaunchConfigurationNames'

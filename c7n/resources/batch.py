@@ -56,7 +56,6 @@ class JobDefinition(QueryResourceManager):
         filter_type = 'list'
         arn = "jobDefinitionArn"
         arn_type = 'job-definition'
-        dimension = None
         id = name = "jobDefinitionName"
         enum_spec = (
             'describe_job_definitions', 'jobDefinitions', None)

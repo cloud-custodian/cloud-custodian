@@ -29,8 +29,6 @@ class FSx(QueryResourceManager):
         name = id = 'FileSystemId'
         arn = "ResourceARN"
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
 
 
 @resources.register('fsx-backup')
@@ -42,8 +40,6 @@ class FSxBackup(QueryResourceManager):
         name = id = 'BackupId'
         arn = "ResourceARN"
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
 
 
 @FSxBackup.action_registry.register('delete')

@@ -44,10 +44,7 @@ class RDSCluster(QueryResourceManager):
         arn_separator = ":"
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
-        filter_name = None
-        filter_type = None
         dimension = 'DBClusterIdentifier'
-        date = None
 
     def augment(self, dbs):
         return list(filter(None, _rds_cluster_tags(
@@ -453,9 +450,6 @@ class RDSClusterSnapshot(QueryResourceManager):
         enum_spec = (
             'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
         name = id = 'DBClusterSnapshotIdentifier'
-        filter_name = None
-        filter_type = None
-        dimension = None
         date = 'SnapshotCreateTime'
 
 

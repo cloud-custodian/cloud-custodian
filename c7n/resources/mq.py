@@ -34,9 +34,7 @@ class MessageBroker(QueryResourceManager):
         id = 'BrokerId'
         arn = 'BrokerArn'
         name = 'BrokerName'
-        date = None
         dimension = 'Broker'
-        filter_name = None
         metrics_namespace = 'AWS/AmazonMQ'
 
     def augment(self, resources):

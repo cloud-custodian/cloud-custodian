@@ -845,10 +845,6 @@ class AppELBTargetGroup(QueryResourceManager):
         enum_spec = ('describe_target_groups', 'TargetGroups', None)
         name = 'TargetGroupName'
         id = 'TargetGroupArn'
-        filter_name = None
-        filter_type = None
-        dimension = None
-        date = None
 
     filter_registry = FilterRegistry('app-elb-target-group.filters')
     action_registry = ActionRegistry('app-elb-target-group.actions')

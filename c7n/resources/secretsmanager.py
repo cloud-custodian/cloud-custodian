@@ -29,8 +29,6 @@ class SecretsManager(QueryResourceManager):
         detail_spec = ('describe_secret', 'SecretId', 'ARN', None)
         arn = id = 'ARN'
         name = 'Name'
-        dimension = None
-        filter_name = None
 
 
 SecretsManager.filter_registry.register('marked-for-op', TagActionFilter)

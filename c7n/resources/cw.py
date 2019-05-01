@@ -39,7 +39,6 @@ class Alarm(QueryResourceManager):
         filter_type = 'list'
         name = 'AlarmName'
         date = 'AlarmConfigurationUpdatedTimestamp'
-        dimension = None
         config_type = 'AWS::CloudWatch::Alarm'
 
     retry = staticmethod(get_retry(('Throttled',)))
@@ -91,7 +90,6 @@ class EventRule(QueryResourceManager):
         id = "Name"
         filter_name = "NamePrefix"
         filter_type = "scalar"
-        dimension = None
 
 
 @EventRule.filter_registry.register('metrics')
@@ -111,8 +109,6 @@ class EventRuleTarget(ChildResourceManager):
         enum_spec = ('list_targets_by_rule', 'Targets', None)
         parent_spec = ('event-rule', 'Rule', True)
         name = id = 'Id'
-        dimension = None
-        filter_type = filter_name = None
 
 
 @EventRuleTarget.filter_registry.register('cross-account')

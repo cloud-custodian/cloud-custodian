@@ -35,10 +35,6 @@ class ReplicationInstance(QueryResourceManager):
         name = id = 'ReplicationInstanceIdentifier'
         arn = 'ReplicationInstanceArn'
         date = 'InstanceCreateTime'
-        dimension = None
-
-        # The api supports filtering which we handle via describe source.
-        filter_name = filter_type = None
 
     filters = FilterRegistry('dms-instance.filters')
     filters.register('marked-for-op', TagActionFilter)
@@ -57,12 +53,8 @@ class DmsEndpoints(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'dms'
         enum_spec = ('describe_endpoints', 'Endpoints', None)
-        detail_spec = None
         arn = id = 'EndpointArn'
         name = 'EndpointIdentifier'
-        date = None
-        dimension = None
-        filter_name = None
 
 
 class InstanceDescribe(DescribeSource):

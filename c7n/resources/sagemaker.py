@@ -36,8 +36,6 @@ class NotebookInstance(QueryResourceManager):
         arn = id = 'NotebookInstanceArn'
         name = 'NotebookInstanceName'
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
 
     permissions = ('sagemaker:ListTags',)
 
@@ -70,8 +68,6 @@ class SagemakerJob(QueryResourceManager):
         arn = id = 'TrainingJobArn'
         name = 'TrainingJobName'
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
 
     permissions = (
         'sagemaker:ListTrainingJobs', 'sagemaker:DescribeTrainingJobs',
@@ -117,7 +113,6 @@ class SagemakerTransformJob(QueryResourceManager):
         arn = id = 'TransformJobArn'
         name = 'TransformJobName'
         date = 'CreationTime'
-        dimension = None
         filter_name = 'TransformJobArn'
 
     permissions = (
@@ -224,8 +219,6 @@ class SagemakerEndpoint(QueryResourceManager):
         arn = id = 'EndpointArn'
         name = 'EndpointName'
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
 
     permissions = ('sagemaker:ListTags',)
 
@@ -258,8 +251,6 @@ class SagemakerEndpointConfig(QueryResourceManager):
         arn = id = 'EndpointConfigArn'
         name = 'EndpointConfigName'
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
 
     permissions = ('sagemaker:ListTags',)
 
@@ -291,8 +282,6 @@ class Model(QueryResourceManager):
         arn = id = 'ModelArn'
         name = 'ModelName'
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
 
     permissions = ('sagemaker:ListTags',)
 

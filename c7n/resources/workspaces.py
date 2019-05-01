@@ -32,7 +32,6 @@ class Workspace(QueryResourceManager):
         enum_spec = ('describe_workspaces', 'Workspaces', None)
         arn_type = 'workspace'
         name = id = dimension = 'WorkspaceId'
-        filter_name = None
 
     def augment(self, resources):
         return universal_augment(self, resources)

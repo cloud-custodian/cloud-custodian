@@ -90,10 +90,7 @@ class HostedZone(Route53Base, QueryResourceManager):
         enum_spec = ('list_hosted_zones', 'HostedZones', None)
         # detail_spec = ('get_hosted_zone', 'Id', 'Id', None)
         id = 'Id'
-        filter_name = None
         name = 'Name'
-        date = None
-        dimension = None
         universal_taggable = True
         # Denotes this resource type exists across regions
         global_resource = True
@@ -118,9 +115,6 @@ class HealthCheck(Route53Base, QueryResourceManager):
         arn_type = 'healthcheck'
         enum_spec = ('list_health_checks', 'HealthChecks', None)
         name = id = 'Id'
-        filter_name = None
-        date = None
-        dimension = None
         universal_taggable = True
 
 
@@ -133,9 +127,6 @@ class ResourceRecordSet(ChildResourceManager):
         parent_spec = ('hostedzone', 'HostedZoneId', None)
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
-        filter_name = None
-        date = None
-        dimension = None
 
 
 @resources.register('r53domain')
@@ -146,9 +137,6 @@ class Route53Domain(QueryResourceManager):
         arn_type = 'r53domain'
         enum_spec = ('list_domains', 'Domains', None)
         name = id = 'DomainName'
-        filter_name = None
-        date = None
-        dimension = None
 
     permissions = ('route53domains:ListTagsForDomain',)
 

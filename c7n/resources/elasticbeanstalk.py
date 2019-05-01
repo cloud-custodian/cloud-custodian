@@ -34,7 +34,6 @@ class ElasticBeanstalk(QueryResourceManager):
         id = "ApplicationName"
         arn = "ApplicationArn"
         arn_type = 'application'
-        dimension = None
         default_report_fields = (
             'ApplicationName',
             'DateCreated',
@@ -53,7 +52,6 @@ class ElasticBeanstalkEnvironment(QueryResourceManager):
         service = 'elasticbeanstalk'
         enum_spec = ('describe_environments', 'Environments', None)
         name = id = "EnvironmentName"
-        dimension = None
         arn = "EnvironmentArn"
         arn_type = 'environment'
         default_report_fields = (
