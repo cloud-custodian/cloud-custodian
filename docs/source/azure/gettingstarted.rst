@@ -31,7 +31,7 @@ Option 2: Install latest from the repository
 
 .. code-block:: bash
 
-    $ git clone https://github.com/capitalone/cloud-custodian.git
+    $ git clone https://github.com/cloud-custodian/cloud-custodian.git
     $ cd cloud-custodian
     $ pip install -e ./cloud-custodian
     $ pip install -e ./cloud-custodian/tools/c7n_azure

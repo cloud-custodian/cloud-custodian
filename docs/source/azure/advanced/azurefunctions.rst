@@ -188,7 +188,7 @@ when any event is triggered in the subscription. Cloud custodian filters to the 
 ignores all other events.
 
 In order to subscribe on an event you need to provide the resource provider and the action, or provide the string
-of one of the `shortcuts <https://github.com/capitalone/cloud-custodian/blob/master/tools/c7n_azure/c7n_azure/azure_events.py>`_.
+of one of the `shortcuts <https://github.com/cloud-custodian/cloud-custodian/blob/master/tools/c7n_azure/c7n_azure/azure_events.py>`_.
 
 .. code-block:: yaml
 

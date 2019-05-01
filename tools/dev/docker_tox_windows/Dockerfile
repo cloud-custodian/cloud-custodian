@@ -1,5 +1,6 @@
 # This is a Windows container and must run in Windows.
 # Build and run this with context set to the root of the repository.
+#
 # Change working directory to the repository root and run:
 # docker build -t custodian_tox_win . -f tools/dev/docker_tox_windows/Dockerfile && docker run -it custodian_tox_win
 

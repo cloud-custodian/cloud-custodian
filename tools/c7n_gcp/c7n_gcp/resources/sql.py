@@ -27,15 +27,15 @@ class SqlInstance(QueryResourceManager):
         service = 'sqladmin'
         version = 'v1beta4'
         component = 'instances'
-        enum_spec = ('list', "items[]", None)
+        enum_spec = ('list', 'items[]', None)
         scope = 'project'
         id = 'name'
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
-                'get', {'project': resource_info['project'],
-                        'instance': resource_info['name']})
+                'get', {'project': resource_info['project_id'],
+                        'instance': resource_info['database_id'].rsplit(':', 1)[-1]})
 
 
 class SqlInstanceAction(MethodAction):
@@ -73,6 +73,13 @@ class SqlInstanceStop(MethodAction):
 @resources.register('sql-database')
 class SqlDatabase(ChildResourceManager):
 
+    def _get_parent_resource_info(self, child_instance):
+        project = child_instance['project']
+        return {
+            'project_id': child_instance['project'],
+            'database_id': '{}:{}'.format(project, child_instance['instance'])
+        }
+
     class resource_type(ChildTypeInfo):
         service = 'sqladmin'
         version = 'v1beta4'
@@ -83,10 +90,6 @@ class SqlDatabase(ChildResourceManager):
             'resource': 'sql-instance',
             'child_enum_params': [
                 ('name', 'instance')
-            ],
-            'parent_get_params': [
-                ('project', 'project'),
-                ('instance', 'name')
             ]
         }
 

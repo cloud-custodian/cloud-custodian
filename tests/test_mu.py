@@ -802,7 +802,7 @@ class PolicyLambdaProvision(BaseTest):
                 "Role": "",
                 "Runtime": "python3.7",
                 "Tags": {},
-                "Timeout": 60,
+                "Timeout": 900,
                 "TracingConfig": {"Mode": "PassThrough"},
                 "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
             },

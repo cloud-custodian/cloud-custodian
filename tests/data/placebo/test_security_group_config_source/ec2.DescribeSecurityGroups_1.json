@@ -1,67 +1,63 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "SecurityGroups": [
             {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "PrefixListIds": [], 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "Ipv6Ranges": []
-                    }
-                ], 
-                "Description": "default VPC security group", 
-                "Tags": [
-                    {
-                        "Value": "", 
-                        "Key": "Name"
-                    }, 
-                    {
-                        "Value": "c7n-test-val", 
-                        "Key": "c7n-test-tag"
-                    }
-                ], 
+                "Description": "default VPC security group",
+                "GroupName": "default",
                 "IpPermissions": [
                     {
-                        "IpProtocol": "-1", 
-                        "PrefixListIds": [], 
+                        "IpProtocol": "-1",
                         "IpRanges": [
                             {
                                 "CidrIp": "108.56.181.242/32"
                             }
-                        ], 
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
                         "UserIdGroupPairs": [
                             {
-                                "UserId": "644160558196", 
-                                "GroupId": "sg-6c7fa917"
+                                "GroupId": "sg-6c7fa917",
+                                "UserId": "644160558196"
                             }
-                        ], 
-                        "Ipv6Ranges": []
+                        ]
                     }
-                ], 
-                "GroupName": "default", 
-                "VpcId": "vpc-d2d616b5", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-6c7fa917"
+                ],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-6c7fa917",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Private"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5"
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "55726307-1840-4bae-bea0-8c3cfec65e62", 
+            "RequestId": "19b191a7-beba-49b6-9122-4a8eb943d279",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 17 Aug 2017 13:30:06 GMT"
-            }
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "accept-encoding",
+                "date": "Sun, 28 Apr 2019 11:42:21 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
         }
     }
 }
