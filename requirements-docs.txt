@@ -1,0 +1,5 @@
+-r tools/c7n_sphinxext/requirements.txt
+
+# Tools packages in editable setup
+# Local package required for Sphinx docs
+-e tools/c7n_sphinxext
