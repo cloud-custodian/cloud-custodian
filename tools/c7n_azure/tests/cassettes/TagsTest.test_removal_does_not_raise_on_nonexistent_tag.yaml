@@ -21,32 +21,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3781,Microsoft.Compute/LowCostGet30Min;31029"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:55 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3837,Microsoft.Compute/LowCostGet30Min;31214"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:25 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "2256"
+                        "2291"
                     ]
                 },
                 "body": {
@@ -70,7 +70,7 @@
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                     },
                                     "diskSizeGB": 30
                                 },
@@ -82,7 +82,7 @@
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                         },
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
@@ -100,7 +100,7 @@
                             "networkProfile": {
                                 "networkInterfaces": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                     }
                                 ]
                             },
@@ -114,8 +114,10 @@
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
-                        "tags": {},
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "tags": {
+                            "CreatorEmail": "Unknown"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "name": "cctestvm"
                     }
                 }
@@ -141,32 +143,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGet3Min;116,Microsoft.Compute/HighCostGet30Min;646"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:47:01 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;131,Microsoft.Compute/HighCostGet30Min;686"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:25 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "14629"
+                        "14672"
                     ]
                 },
                 "body": {
@@ -176,7 +178,7 @@
                                 "properties": {
                                     "vmId": "814966a3-72e9-4606-a087-dfdbfa9fc24b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -219,7 +221,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -227,7 +229,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -238,14 +240,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
                                 "name": "k8s-agent-A61AD475-0"
                             },
                             {
                                 "properties": {
                                     "vmId": "de77098d-d5e5-4959-87f7-deb81d90f95b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -288,7 +290,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
                                             }
                                         ]
                                     },
@@ -296,7 +298,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -307,14 +309,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
                                 "name": "k8s-agent-A61AD475-1"
                             },
                             {
                                 "properties": {
                                     "vmId": "be6ad948-1465-497e-9755-fbb6a73a29e9",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -357,7 +359,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
                                             }
                                         ]
                                     },
@@ -365,7 +367,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -376,14 +378,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
                                 "name": "k8s-agent-A61AD475-2"
                             },
                             {
                                 "properties": {
                                     "vmId": "3e88b117-904e-4e47-abdd-ec3b5df6ed78",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -438,7 +440,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -446,7 +448,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -457,7 +459,7 @@
                                     "poolName": "master",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
                                 "name": "k8s-master-A61AD475-0"
                             },
                             {
@@ -480,7 +482,7 @@
                                             "caching": "ReadWrite",
                                             "managedDisk": {
                                                 "storageAccountType": "Standard_LRS",
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                             },
                                             "diskSizeGB": 30
                                         },
@@ -492,7 +494,7 @@
                                                 "caching": "None",
                                                 "managedDisk": {
                                                     "storageAccountType": "Standard_LRS",
-                                                    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                                 },
                                                 "diskSizeGB": 1023,
                                                 "toBeDetached": false
@@ -510,7 +512,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                             }
                                         ]
                                     },
@@ -524,8 +526,10 @@
                                 },
                                 "type": "Microsoft.Compute/virtualMachines",
                                 "location": "southcentralus",
-                                "tags": {},
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "tags": {
+                                    "CreatorEmail": "Unknown"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
                                 "name": "cctestvm"
                             }
                         ]
@@ -553,32 +557,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3780,Microsoft.Compute/LowCostGet30Min;31028"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:56 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3835,Microsoft.Compute/LowCostGet30Min;31212"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:26 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "2256"
+                        "2291"
                     ]
                 },
                 "body": {
@@ -602,7 +606,7 @@
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                     },
                                     "diskSizeGB": 30
                                 },
@@ -614,7 +618,7 @@
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                         },
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
@@ -632,7 +636,7 @@
                             "networkProfile": {
                                 "networkInterfaces": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                     }
                                 ]
                             },
@@ -646,8 +650,10 @@
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
-                        "tags": {},
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "tags": {
+                            "CreatorEmail": "Unknown"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "name": "cctestvm"
                     }
                 }
@@ -673,32 +679,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3779,Microsoft.Compute/LowCostGet30Min;31027"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:55 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3834,Microsoft.Compute/LowCostGet30Min;31211"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:26 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "2256"
+                        "2291"
                     ]
                 },
                 "body": {
@@ -722,7 +728,7 @@
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                     },
                                     "diskSizeGB": 30
                                 },
@@ -734,7 +740,7 @@
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                         },
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
@@ -752,7 +758,7 @@
                             "networkProfile": {
                                 "networkInterfaces": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                     }
                                 ]
                             },
@@ -766,8 +772,10 @@
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
-                        "tags": {},
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "tags": {
+                            "CreatorEmail": "Unknown"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "name": "cctestvm"
                     }
                 }

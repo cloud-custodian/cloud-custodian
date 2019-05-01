@@ -28,4 +28,4 @@ class StorageAccountUnit(DeploymentUnit):
                     'location': params['location']}
         return self.client.storage_accounts.create(params['resource_group_name'],
                                                    params['name'],
-                                                   sa_params).result(timeout=30)
+                                                   sa_params).result()

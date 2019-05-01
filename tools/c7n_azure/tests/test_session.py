@@ -25,7 +25,7 @@ import sys
 
 from azure.common.credentials import ServicePrincipalCredentials, BasicTokenAuthentication
 from msrestazure.azure_active_directory import MSIAuthentication
-from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
+from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID
 from c7n_azure import constants
 from c7n_azure.session import Session
 from mock import patch
@@ -71,7 +71,7 @@ class SessionTest(BaseTest):
                    autospec=True, return_value=None):
             with patch.dict(os.environ,
                             {
-                                constants.ENV_TENANT_ID: 'tenant',
+                                constants.ENV_TENANT_ID: DEFAULT_TENANT_ID,
                                 constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
                                 constants.ENV_CLIENT_ID: 'client',
                                 constants.ENV_CLIENT_SECRET: 'secret'
@@ -81,7 +81,7 @@ class SessionTest(BaseTest):
 
                 self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
                 self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
-                self.assertEqual(s.get_tenant_id(), 'tenant')
+                self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
 
     def test_initialize_msi_auth_system(self):
         with patch('msrestazure.azure_active_directory.MSIAuthentication.__init__',

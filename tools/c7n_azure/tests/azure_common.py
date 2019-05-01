@@ -12,33 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import datetime
-import os
-import re
 import email.utils as eut
 import json
+import os
+import re
 
+import msrest.polling
+from azure_serializer import AzureSerializer
 from c7n_azure import constants, actions
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
 from mock import patch
+from msrest.pipeline import ClientRawResponse
+from msrest.serialization import Model
+from msrest.service_client import ServiceClient
 from vcr_unittest import VCRTestCase
-from azure_serializer import AzureSerializer
 
 from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
-
-import msrest.polling
-from msrest.serialization import Model
-from msrest.service_client import ServiceClient
-from msrest.pipeline import ClientRawResponse
 
 load_resources()
 
 C7N_SCHEMA = generate()
 DEFAULT_SUBSCRIPTION_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
 CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
-DEFAULT_TENANT_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
+DEFAULT_USER_OBJECT_ID = '00000000-0000-0000-0000-000000000002'
+DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000003'
+
+GRAPH_RESPONSE = {
+    "value": [
+        {
+            "NOTE": "THIS RESPONSE FAKED BY AZURE_COMMON.PY",
+            "odata.type": "Microsoft.DirectoryServices.User",
+            "objectType": "User",
+            "objectId": DEFAULT_USER_OBJECT_ID,
+            "displayName": "John Doe",
+            "mail": "john@doe.com",
+            "refreshTokensValidFromDateTime": "2018-08-22T20:37:43Z",
+            "userPrincipalName": "john@doe.com"
+        }
+    ]
+}
 
 
 class AzureVCRBaseTest(VCRTestCase):
@@ -63,7 +78,9 @@ class AzureVCRBaseTest(VCRTestCase):
                         'x-ms-served-by',
                         'x-aspnet-version',
                         'x-content-type-options',
-                        'x-powered-by']
+                        'x-powered-by',
+                        'ocp-aad-diagnostics-server-name',
+                        'ocp-aad-session-key']
 
     def _get_vcr_kwargs(self):
         return super(VCRTestCase, self)._get_vcr_kwargs(
@@ -92,14 +109,8 @@ class AzureVCRBaseTest(VCRTestCase):
                 k for k in set(r2.query) if k[0] != 'api-version']:
             return False
 
-        r1_path = re.sub(
-            r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
-            DEFAULT_SUBSCRIPTION_ID,
-            r1.path)
-        r2_path = re.sub(
-            r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
-            DEFAULT_SUBSCRIPTION_ID,
-            r2.path)
+        r1_path = AzureVCRBaseTest._replace_subscription_id(r1.path)
+        r2_path = AzureVCRBaseTest._replace_subscription_id(r2.path)
 
         r1_path = r1_path.replace('//', '/')
         r2_path = r2_path.replace('//', '/')
@@ -108,11 +119,9 @@ class AzureVCRBaseTest(VCRTestCase):
 
     def _request_callback(self, request):
         """Modify requests before saving"""
-        if "/subscriptions/" in request.url:
-            request.uri = re.sub(
-                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
-                DEFAULT_SUBSCRIPTION_ID,
-                request.url)
+        request.uri = AzureVCRBaseTest._replace_subscription_id(request.url)
+        request.uri = AzureVCRBaseTest._replace_tenant_id(request.uri)
+
         if request.body:
             request.body = b'mock_body'
         if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
@@ -140,47 +149,84 @@ class AzureVCRBaseTest(VCRTestCase):
         if not content_type or 'application/json' not in content_type:
             return response
 
-        body = response['body'].pop('string')
+        body = response['body'].pop('string').decode('utf-8')
+
+        # Clean up subscription IDs in body
+        body = AzureVCRBaseTest._replace_subscription_id(body)
+
         response['body']['data'] = json.loads(body)
 
+        # Replace Graph API responses
+        odata_metadata = response['body']['data'].get('odata.metadata', None)
+        if odata_metadata and "directoryObjects" in odata_metadata:
+            response['body']['data'] = GRAPH_RESPONSE
+
         return response
+
+    @staticmethod
+    def _replace_subscription_id(s):
+        if "subscriptions" in s:
+            return re.sub(
+                r"(?P<prefix>(/|%2F)subscriptions(/|%2F))"
+                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
+                r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
+        return s
+
+    @staticmethod
+    def _replace_tenant_id(s):
+        if "graph.windows.net" in s:
+            return re.sub(
+                r"(?P<prefix>(/|%2F)graph.windows.net(/|%2F))"
+                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
+                r"\g<prefix>" + DEFAULT_TENANT_ID, s)
+        return s
 
 
 class BaseTest(TestUtils, AzureVCRBaseTest):
     """ Azure base testing class.
     """
+    def __init__(self, *args, **kwargs):
+        super(BaseTest, self).__init__(*args, **kwargs)
+        self._requires_polling = False
 
     def setUp(self):
         super(BaseTest, self).setUp()
         ThreadHelper.disable_multi_threading = True
 
-        # Patch Poller with constructor that always disables polling
-        self._lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_init)
-        self._lro_patch.start()
+        if not self._requires_polling:
+            # Patch Poller with constructor that always disables polling
+            # This breaks blocking on long running operations (resource creation).
+            self._lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_init)
+            self._lro_patch.start()
+            self.addCleanup(self._lro_patch.stop)
+        elif hasattr(self, 'cassette') or os.path.isfile(self.cassette._path):
+            # If using polling we need to monkey patch the timeout during playback
+            # or we'll have long sleeps introduced into our test runs
+            Session._old_client = Session.client
+            Session.client = BaseTest.session_client_wrapper
+            self.addCleanup(BaseTest.session_client_cleanup)
 
         self._utc_patch = patch.object(actions, 'utcnow', BaseTest.get_test_date)
         self._utc_patch.start()
+        self.addCleanup(self._utc_patch.stop)
 
-    def tearDown(self):
-        super(BaseTest, self).tearDown()
-        self._lro_patch.stop()
-        self._utc_patch.stop()
+        if constants.ENV_ACCESS_TOKEN in os.environ:
+            self._tenant_patch = patch('c7n_azure.session.Session.get_tenant_id',
+                                       return_value=DEFAULT_TENANT_ID)
+            self._tenant_patch.start()
+            self.addCleanup(self._tenant_patch.stop)
 
     def get_test_date(self):
-        header_date = self.cassette.responses[0]['headers'].get('date') if self.cassette.responses else None
+        if self.cassette.responses:
+            header_date = self.cassette.responses[0]['headers'].get('date')
+        else:
+            header_date = None
 
         if header_date:
             test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
         else:
             test_date = datetime.datetime.now()
         return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
-
-        # test_date = self.cassette.requests[0]['headers'].get('test-date')
-        # if test_date:
-        #     return datetime.datetime(*eut.parsedate(test_date[0])[:6])
-        # else:
-        #     current_date = datetime.datetime.now()
-        #     self.cassette.requests[0]['headers']['test-date'] =
 
     @staticmethod
     def setup_account():
@@ -221,6 +267,16 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         self._done = None
         self._exception = None
 
+    @staticmethod
+    def session_client_cleanup():
+        Session.client = Session._old_client
+
+    @staticmethod
+    def session_client_wrapper(self, client):
+        client = Session._old_client(self, client)
+        client.config.long_running_operation_timeout = 0
+        return client
+
 
 def arm_template(template):
     def decorator(func):
@@ -231,3 +287,15 @@ def arm_template(template):
             return func(*args, **kwargs)
         return wrapper
     return decorator
+
+
+def requires_arm_polling(cls):
+    orig_init = cls.__init__
+    # Make copy of original __init__, so we can call it without recursion
+
+    def __init__(self, *args, **kws):
+        orig_init(self, *args, **kws)  # Call the original __init__
+        self._requires_polling = True
+
+    cls.__init__ = __init__  # Set the class' __init__ to the new one
+    return cls

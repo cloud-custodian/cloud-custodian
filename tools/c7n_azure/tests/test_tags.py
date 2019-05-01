@@ -43,28 +43,29 @@ class TagsTest(BaseTest):
 
     def tearDown(self):
         self.after_tags = self.get_tags(self.rg_name, self.vm_name)
+        tags_to_remove = [k for k in self.after_tags.keys() if k not in self.before_tags.keys()]
 
-        if (self.after_tags != self.before_tags):
-            p = self.load_policy({
-                'name': 'test-azure-tag',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'}
-                ],
-                'actions': [
-                    {'type': 'untag',
-                     'tags':
-                         [k for k in self.after_tags.keys() if k not in self.before_tags.keys()]}
-                ],
-            })
-            p.run()
-            self.after_tags = self.get_tags(self.rg_name, self.vm_name)
+        if tags_to_remove:
+            if (self.after_tags != self.before_tags):
+                p = self.load_policy({
+                    'name': 'test-azure-tag',
+                    'resource': 'azure.vm',
+                    'filters': [
+                        {'type': 'value',
+                         'key': 'name',
+                         'op': 'eq',
+                         'value_type': 'normalize',
+                         'value': 'cctestvm'}
+                    ],
+                    'actions': [
+                        {'type': 'untag',
+                         'tags':
+                             tags_to_remove}
+                    ],
+                })
+                p.run()
+                self.after_tags = self.get_tags(self.rg_name, self.vm_name)
 
-        self.assertEqual(self.before_tags, self.after_tags)
         super(TagsTest, self).tearDown()
 
     def get_tags(self, rg_name=rg_name, vm_name=vm_name):
@@ -393,6 +394,7 @@ class TagsTest(BaseTest):
         """Adds CreatorEmail to a resource group."""
         with patch('c7n_azure.actions.utcnow') as utc_patch:
             utc_patch.return_value = self.get_test_date()
+
             p = self.load_policy({
                 'name': 'test-azure-tag',
                 'resource': 'azure.vm',
@@ -406,7 +408,8 @@ class TagsTest(BaseTest):
                 'actions': [
                     {'type': 'auto-tag-user',
                      'tag': 'CreatorEmail',
-                     'days': 2},
+                     'days': 10,
+                     'update': True},
                 ],
             })
             p.run()

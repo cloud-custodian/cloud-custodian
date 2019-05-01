@@ -21,30 +21,30 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "pragma": [
-                        "no-cache"
+                    "expires": [
+                        "-1"
+                    ],
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:55 GMT"
                     ],
                     "content-length": [
-                        "9813"
+                        "8686"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:09:31 GMT"
+                    "pragma": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "x-ms-original-request-ids": [
-                        "5fd8d1cd-11bc-484f-8594-8fcd053127c2",
-                        "66e271bb-e10f-4028-97cd-d9b4a0e483c4"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "expires": [
-                        "-1"
+                        "c77a491e-9926-44bc-a3c7-7fe3f1367ad1",
+                        "2b907952-eff6-4643-9721-2a195b918ba4"
                     ]
                 },
                 "body": {
@@ -190,50 +190,6 @@
                                     "tier": "Standard"
                                 },
                                 "kind": "Storage",
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Storage/storageAccounts/45mqcga7pkswisalinuxvm",
-                                "name": "45mqcga7pkswisalinuxvm",
-                                "type": "Microsoft.Storage/storageAccounts",
-                                "location": "southcentralus",
-                                "tags": {},
-                                "properties": {
-                                    "networkAcls": {
-                                        "bypass": "AzureServices",
-                                        "virtualNetworkRules": [],
-                                        "ipRules": [],
-                                        "defaultAction": "Allow"
-                                    },
-                                    "supportsHttpsTrafficOnly": false,
-                                    "encryption": {
-                                        "services": {
-                                            "file": {
-                                                "enabled": true,
-                                                "lastEnabledTime": "2019-04-25T16:16:12.9516858Z"
-                                            },
-                                            "blob": {
-                                                "enabled": true,
-                                                "lastEnabledTime": "2019-04-25T16:16:12.9516858Z"
-                                            }
-                                        },
-                                        "keySource": "Microsoft.Storage"
-                                    },
-                                    "provisioningState": "Succeeded",
-                                    "creationTime": "2019-04-25T16:16:12.8579241Z",
-                                    "primaryEndpoints": {
-                                        "blob": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/",
-                                        "queue": "https://45mqcga7pkswisalinuxvm.queue.core.windows.net/",
-                                        "table": "https://45mqcga7pkswisalinuxvm.table.core.windows.net/",
-                                        "file": "https://45mqcga7pkswisalinuxvm.file.core.windows.net/"
-                                    },
-                                    "primaryLocation": "southcentralus",
-                                    "statusOfPrimary": "available"
-                                }
-                            },
-                            {
-                                "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
-                                },
-                                "kind": "Storage",
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
                                 "name": "cctstoragey6akyqpagdt3o",
                                 "type": "Microsoft.Storage/storageAccounts",
@@ -267,6 +223,50 @@
                                         "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
                                         "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
                                         "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "southcentralus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Storage/storageAccounts/45mqcga7pkswisalinuxvm",
+                                "name": "45mqcga7pkswisalinuxvm",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": false,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "enabled": true,
+                                                "lastEnabledTime": "2019-04-25T16:16:12.9516858Z"
+                                            },
+                                            "blob": {
+                                                "enabled": true,
+                                                "lastEnabledTime": "2019-04-25T16:16:12.9516858Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2019-04-25T16:16:12.8579241Z",
+                                    "primaryEndpoints": {
+                                        "blob": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/",
+                                        "queue": "https://45mqcga7pkswisalinuxvm.queue.core.windows.net/",
+                                        "table": "https://45mqcga7pkswisalinuxvm.table.core.windows.net/",
+                                        "file": "https://45mqcga7pkswisalinuxvm.file.core.windows.net/"
                                     },
                                     "primaryLocation": "southcentralus",
                                     "statusOfPrimary": "available"
@@ -402,50 +402,6 @@
                                     "primaryLocation": "westus2",
                                     "statusOfPrimary": "available"
                                 }
-                            },
-                            {
-                                "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
-                                },
-                                "kind": "Storage",
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182748",
-                                "name": "custodianaccount47182748",
-                                "type": "Microsoft.Storage/storageAccounts",
-                                "location": "westus2",
-                                "tags": {},
-                                "properties": {
-                                    "networkAcls": {
-                                        "bypass": "AzureServices",
-                                        "virtualNetworkRules": [],
-                                        "ipRules": [],
-                                        "defaultAction": "Allow"
-                                    },
-                                    "supportsHttpsTrafficOnly": false,
-                                    "encryption": {
-                                        "services": {
-                                            "file": {
-                                                "enabled": true,
-                                                "lastEnabledTime": "2019-04-26T18:07:51.0937719Z"
-                                            },
-                                            "blob": {
-                                                "enabled": true,
-                                                "lastEnabledTime": "2019-04-26T18:07:51.0937719Z"
-                                            }
-                                        },
-                                        "keySource": "Microsoft.Storage"
-                                    },
-                                    "provisioningState": "Creating",
-                                    "creationTime": "2019-04-26T18:07:50.9999889Z",
-                                    "primaryEndpoints": {
-                                        "blob": "https://custodianaccount47182748.blob.core.windows.net/",
-                                        "queue": "https://custodianaccount47182748.queue.core.windows.net/",
-                                        "table": "https://custodianaccount47182748.table.core.windows.net/",
-                                        "file": "https://custodianaccount47182748.file.core.windows.net/"
-                                    },
-                                    "primaryLocation": "westus2",
-                                    "statusOfPrimary": "available"
-                                }
                             }
                         ]
                     }
@@ -454,45 +410,45 @@
         },
         {
             "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/operationresults/eyJqb2JJZCI6IlJFU09VUkNFR1JPVVBERUxFVElPTkpPQi1DVVNUT0RJQU46MkRURVNUOjJEREVQTE9ZTUVOVDoyRFVOSVRTLVdFU1RVUzIiLCJqb2JMb2NhdGlvbiI6Indlc3R1czIifQ?api-version=2018-05-01",
+                "method": "PUT",
+                "uri": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/testcontainer?restype=container",
                 "body": null,
                 "headers": {
-                    "Accept-Encoding": [
-                        "gzip, deflate"
+                    "x-ms-version": [
+                        "2018-03-28"
                     ],
-                    "Accept": [
-                        "application/json"
+                    "x-ms-date": [
+                        "Mon, 29 Apr 2019 18:24:54 GMT"
+                    ],
+                    "Content-Length": [
+                        "0"
                     ]
                 }
             },
             "response": {
                 "status": {
-                    "code": 202,
-                    "message": "Accepted"
+                    "code": 409,
+                    "message": "The specified container already exists."
                 },
                 "headers": {
-                    "pragma": [
-                        "no-cache"
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:58 GMT"
                     ],
                     "content-length": [
-                        "0"
+                        "230"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:09:29 GMT"
+                    "x-ms-error-code": [
+                        "ContainerAlreadyExists"
                     ],
-                    "location": [
-                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/operationresults/eyJqb2JJZCI6IlJFU09VUkNFR1JPVVBERUxFVElPTkpPQi1DVVNUT0RJQU46MkRURVNUOjJEREVQTE9ZTUVOVDoyRFVOSVRTLVdFU1RVUzIiLCJqb2JMb2NhdGlvbiI6Indlc3R1czIifQ?api-version=2018-05-01"
+                    "x-ms-version": [
+                        "2018-03-28"
                     ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "expires": [
-                        "-1"
+                    "content-type": [
+                        "application/xml"
                     ]
                 },
                 "body": {
-                    "string": ""
+                    "string": "\ufeff<?xml version=\"1.0\" encoding=\"utf-8\"?><Error><Code>ContainerAlreadyExists</Code><Message>The specified container already exists.\nRequestId:0d3ecd45-201e-001c-45b8-fef5e9000000\nTime:2019-04-29T18:24:59.4064188Z</Message></Error>"
                 }
             }
         }

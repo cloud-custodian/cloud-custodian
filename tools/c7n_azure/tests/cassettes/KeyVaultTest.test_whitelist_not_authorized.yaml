@@ -24,50 +24,43 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "pragma": [
+                    "cache-control": [
                         "no-cache"
                     ],
                     "content-length": [
-                        "742"
+                        "539"
                     ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:08:30 GMT"
+                    "expires": [
+                        "-1"
+                    ],
+                    "pragma": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "expires": [
-                        "-1"
+                    "date": [
+                        "Tue, 30 Apr 2019 17:51:44 GMT"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1asdf",
-                                "name": "cckeyvault1asdf",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
+                                "name": "cckeyvault1c6ra5qqpkhceo",
                                 "type": "Microsoft.KeyVault/vaults",
                                 "location": "southcentralus",
                                 "tags": {}
                             },
                             {
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2kme24fgeaqvqk",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2kme24fgeaqvqk",
                                 "name": "cckeyvault2kme24fgeaqvqk",
                                 "type": "Microsoft.KeyVault/vaults",
                                 "location": "southcentralus",
-                                "tags": {}
-                            },
-                            {
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/wesyao-test-kv/providers/Microsoft.KeyVault/vaults/wesyao-kv",
-                                "name": "wesyao-kv",
-                                "type": "Microsoft.KeyVault/vaults",
-                                "location": "westus",
                                 "tags": {}
                             }
                         ]
@@ -78,7 +71,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1asdf?api-version=2018-02-14",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo?api-version=2018-02-14",
                 "body": null,
                 "headers": {
                     "Accept-Encoding": [
@@ -98,38 +91,38 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "pragma": [
+                    "cache-control": [
                         "no-cache"
-                    ],
-                    "vary": [
-                        "Accept-Encoding"
                     ],
                     "x-ms-keyvault-service-version": [
                         "1.1.0.244"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:08:31 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "vary": [
+                        "Accept-Encoding"
                     ],
                     "expires": [
                         "-1"
                     ],
-                    "cache-control": [
+                    "pragma": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Tue, 30 Apr 2019 17:51:44 GMT"
+                    ],
                     "content-length": [
-                        "1119"
+                        "1315"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1asdf",
-                        "name": "cckeyvault1asdf",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
+                        "name": "cckeyvault1c6ra5qqpkhceo",
                         "type": "Microsoft.KeyVault/vaults",
                         "location": "southcentralus",
                         "tags": {},
@@ -142,7 +135,7 @@
                             "accessPolicies": [
                                 {
                                     "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
-                                    "objectId": "de4152e3-335e-41b5-9b56-f8f2e043e3ee",
+                                    "objectId": "139efc82-0e5b-4998-b30a-ce40b9b942db",
                                     "permissions": {
                                         "keys": [
                                             "Get",
@@ -183,100 +176,36 @@
                                 },
                                 {
                                     "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
-                                    "objectId": "7fdd2c82-ee08-430a-8493-963071fd30bc",
+                                    "objectId": "cc851160-f3f3-4d8a-860f-7f1dcfe1b2f7",
                                     "permissions": {
                                         "keys": [
-                                            "Get"
-                                        ]
+                                            "Get",
+                                            "List",
+                                            "Update",
+                                            "Create",
+                                            "Import",
+                                            "Delete",
+                                            "Recover",
+                                            "Backup",
+                                            "Restore",
+                                            "Decrypt",
+                                            "Encrypt",
+                                            "UnwrapKey",
+                                            "WrapKey",
+                                            "Verify",
+                                            "Sign",
+                                            "Purge"
+                                        ],
+                                        "secrets": [],
+                                        "certificates": []
                                     }
                                 }
                             ],
                             "enabledForDeployment": false,
                             "enabledForDiskEncryption": false,
                             "enabledForTemplateDeployment": false,
-                            "vaultUri": "https://cckeyvault1asdf.vault.azure.net/",
+                            "vaultUri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/",
                             "provisioningState": "Succeeded"
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "POST",
-                "uri": "https://graph.windows.net/ea42f556-5106-4743-99b0-c129bfa71a47/getObjectsByObjectIds?api-version=1.6",
-                "body": "mock_body",
-                "headers": {
-                    "Accept-Encoding": [
-                        "gzip, deflate"
-                    ],
-                    "Accept": [
-                        "application/json"
-                    ],
-                    "Content-Type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "Content-Length": [
-                        "137"
-                    ]
-                }
-            },
-            "response": {
-                "status": {
-                    "code": 400,
-                    "message": "Bad Request"
-                },
-                "headers": {
-                    "ocp-aad-diagnostics-server-name": [
-                        "1lVR5teXsZbdZmPF11gm59KMWRaNjPR269e9leNdeAg="
-                    ],
-                    "ocp-aad-session-key": [
-                        "denuNWdQgQHcDyk6BUl8bTeVfRnOfi-yaTm02E-iSY5vF7yPzG5vHRd-uI_mJi9oLwArH2PKvc9LJ9Gb_5mDsZ6cdNE9SRJo22TnTmEDrOlY8Jc2xr7pwv0Lp9pJtVHN.A11zcVkVNE-IxRAXkTe-hmdHSQPD905yZ2rq7TEUQ0c"
-                    ],
-                    "dataserviceversion": [
-                        "3.0;"
-                    ],
-                    "pragma": [
-                        "no-cache"
-                    ],
-                    "duration": [
-                        "2142857"
-                    ],
-                    "content-length": [
-                        "199"
-                    ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:08:33 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; odata=minimalmetadata; streaming=true; charset=utf-8"
-                    ],
-                    "request-id": [
-                        "efb12ba2-3ce9-40f3-9df2-e742a66d3fd6"
-                    ],
-                    "x-ms-dirapi-data-contract-version": [
-                        "1.6"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "access-control-allow-origin": [
-                        "*"
-                    ],
-                    "expires": [
-                        "-1"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "odata.error": {
-                            "code": "Request_BadRequest",
-                            "message": {
-                                "lang": "en",
-                                "value": "Invalid domain name in the request url."
-                            },
-                            "requestId": "efb12ba2-3ce9-40f3-9df2-e742a66d3fd6",
-                            "date": "2019-04-26T18:08:33"
                         }
                     }
                 }

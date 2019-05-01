@@ -13,12 +13,13 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest, arm_template, requires_arm_polling
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.session import Session
 from c7n_azure.utils import ResourceIdParser
 
 
+@requires_arm_polling
 class StorageUtilsTest(BaseTest):
     def setUp(self):
         super(StorageUtilsTest, self).setUp()
@@ -55,12 +56,19 @@ class StorageUtilsTest(BaseTest):
         self.assertEqual(queue_name, "testcc")
 
     @arm_template('storage.json')
-    def test_create_queue_from_storage_account(self):
+    def test_create_delete_queue_from_storage_account(self):
         account = self.setup_account()
         queue_name = 'testqueuecc'
+
         queue = \
             StorageUtilities.create_queue_from_storage_account(account, queue_name, self.session)
+
         self.assertTrue(queue)
+
+        result = \
+            StorageUtilities.delete_queue_from_storage_account(account, queue_name, self.session)
+
+        self.assertTrue(result)
 
     @arm_template('storage.json')
     def test_cycle_queue_message_by_uri(self):

@@ -21,32 +21,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3800,Microsoft.Compute/LowCostGet30Min;31048"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:46 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3856,Microsoft.Compute/LowCostGet30Min;31233"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:16 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "2256"
+                        "2291"
                     ]
                 },
                 "body": {
@@ -70,7 +70,7 @@
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                     },
                                     "diskSizeGB": 30
                                 },
@@ -82,7 +82,7 @@
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                         },
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
@@ -100,7 +100,7 @@
                             "networkProfile": {
                                 "networkInterfaces": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                     }
                                 ]
                             },
@@ -114,8 +114,10 @@
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
-                        "tags": {},
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "tags": {
+                            "CreatorEmail": "Unknown"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "name": "cctestvm"
                     }
                 }
@@ -141,32 +143,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGet3Min;120,Microsoft.Compute/HighCostGet30Min;650"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:56 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;135,Microsoft.Compute/HighCostGet30Min;690"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:15 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "14629"
+                        "14672"
                     ]
                 },
                 "body": {
@@ -176,7 +178,7 @@
                                 "properties": {
                                     "vmId": "814966a3-72e9-4606-a087-dfdbfa9fc24b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -219,7 +221,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -227,7 +229,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -238,14 +240,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
                                 "name": "k8s-agent-A61AD475-0"
                             },
                             {
                                 "properties": {
                                     "vmId": "de77098d-d5e5-4959-87f7-deb81d90f95b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -288,7 +290,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
                                             }
                                         ]
                                     },
@@ -296,7 +298,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -307,14 +309,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
                                 "name": "k8s-agent-A61AD475-1"
                             },
                             {
                                 "properties": {
                                     "vmId": "be6ad948-1465-497e-9755-fbb6a73a29e9",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -357,7 +359,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
                                             }
                                         ]
                                     },
@@ -365,7 +367,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -376,14 +378,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
                                 "name": "k8s-agent-A61AD475-2"
                             },
                             {
                                 "properties": {
                                     "vmId": "3e88b117-904e-4e47-abdd-ec3b5df6ed78",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -438,7 +440,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -446,7 +448,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -457,7 +459,7 @@
                                     "poolName": "master",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
                                 "name": "k8s-master-A61AD475-0"
                             },
                             {
@@ -480,7 +482,7 @@
                                             "caching": "ReadWrite",
                                             "managedDisk": {
                                                 "storageAccountType": "Standard_LRS",
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                             },
                                             "diskSizeGB": 30
                                         },
@@ -492,7 +494,7 @@
                                                 "caching": "None",
                                                 "managedDisk": {
                                                     "storageAccountType": "Standard_LRS",
-                                                    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                                 },
                                                 "diskSizeGB": 1023,
                                                 "toBeDetached": false
@@ -510,7 +512,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                             }
                                         ]
                                     },
@@ -524,8 +526,10 @@
                                 },
                                 "type": "Microsoft.Compute/virtualMachines",
                                 "location": "southcentralus",
-                                "tags": {},
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "tags": {
+                                    "CreatorEmail": "Unknown"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
                                 "name": "cctestvm"
                             }
                         ]
@@ -556,28 +560,28 @@
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:47 GMT"
-                    ],
-                    "expires": [
-                        "-1"
+                    "content-length": [
+                        "25497"
                     ],
                     "pragma": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:16 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "content-length": [
-                        "25497"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Compute",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute",
                         "namespace": "Microsoft.Compute",
                         "authorizations": [
                             {
@@ -2463,7 +2467,7 @@
                         "application/json; charset=utf-8"
                     ],
                     "Content-Length": [
-                        "1618"
+                        "1668"
                     ]
                 }
             },
@@ -2476,38 +2480,38 @@
                     "azure-asyncnotification": [
                         "Enabled"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/PutVM3Min;212,Microsoft.Compute/PutVM30Min;1143"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:47:03 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1196"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/PutVM3Min;229,Microsoft.Compute/PutVM30Min;1184"
                     ],
                     "pragma": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
                     "azure-asyncoperation": [
-                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Compute/locations/southcentralus/operations/1241368e-293d-47c1-b8e0-d8f5d76d07e0?api-version=2019-03-01"
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Compute/locations/southcentralus/operations/33af6158-49e7-4bba-8042-f606bfa0b0bb?api-version=2019-03-01"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:17 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "2333"
+                        "2365"
                     ]
                 },
                 "body": {
@@ -2531,7 +2535,7 @@
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                     },
                                     "diskSizeGB": 30
                                 },
@@ -2543,7 +2547,7 @@
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                         },
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
@@ -2561,7 +2565,7 @@
                             "networkProfile": {
                                 "networkInterfaces": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                     }
                                 ]
                             },
@@ -2576,9 +2580,10 @@
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
                         "tags": {
-                            "custodian_status": "Resource does not meet policy: stop@2019/05/06"
+                            "CreatorEmail": "Unknown",
+                            "custodian_status": "Resource does not meet policy: stop@2019/05/11"
                         },
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "name": "cctestvm"
                     }
                 }
@@ -2604,32 +2609,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGet3Min;119,Microsoft.Compute/HighCostGet30Min;649"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:48 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;134,Microsoft.Compute/HighCostGet30Min;689"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:18 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "14715"
+                        "14751"
                     ]
                 },
                 "body": {
@@ -2639,7 +2644,7 @@
                                 "properties": {
                                     "vmId": "814966a3-72e9-4606-a087-dfdbfa9fc24b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -2682,7 +2687,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -2690,7 +2695,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -2701,14 +2706,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
                                 "name": "k8s-agent-A61AD475-0"
                             },
                             {
                                 "properties": {
                                     "vmId": "de77098d-d5e5-4959-87f7-deb81d90f95b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -2751,7 +2756,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
                                             }
                                         ]
                                     },
@@ -2759,7 +2764,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -2770,14 +2775,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
                                 "name": "k8s-agent-A61AD475-1"
                             },
                             {
                                 "properties": {
                                     "vmId": "be6ad948-1465-497e-9755-fbb6a73a29e9",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -2820,7 +2825,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
                                             }
                                         ]
                                     },
@@ -2828,7 +2833,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -2839,14 +2844,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
                                 "name": "k8s-agent-A61AD475-2"
                             },
                             {
                                 "properties": {
                                     "vmId": "3e88b117-904e-4e47-abdd-ec3b5df6ed78",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -2901,7 +2906,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -2909,7 +2914,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -2920,7 +2925,7 @@
                                     "poolName": "master",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
                                 "name": "k8s-master-A61AD475-0"
                             },
                             {
@@ -2943,7 +2948,7 @@
                                             "caching": "ReadWrite",
                                             "managedDisk": {
                                                 "storageAccountType": "Standard_LRS",
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                             },
                                             "diskSizeGB": 30
                                         },
@@ -2955,7 +2960,7 @@
                                                 "caching": "None",
                                                 "managedDisk": {
                                                     "storageAccountType": "Standard_LRS",
-                                                    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                                 },
                                                 "diskSizeGB": 1023,
                                                 "toBeDetached": false
@@ -2973,7 +2978,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                             }
                                         ]
                                     },
@@ -2988,9 +2993,10 @@
                                 "type": "Microsoft.Compute/virtualMachines",
                                 "location": "southcentralus",
                                 "tags": {
-                                    "custodian_status": "Resource does not meet policy: stop@2019/05/06"
+                                    "CreatorEmail": "Unknown",
+                                    "custodian_status": "Resource does not meet policy: stop@2019/05/11"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
                                 "name": "cctestvm"
                             }
                         ]
@@ -3018,32 +3024,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGet3Min;118,Microsoft.Compute/HighCostGet30Min;648"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:50 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;133,Microsoft.Compute/HighCostGet30Min;688"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:19 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "14715"
+                        "14751"
                     ]
                 },
                 "body": {
@@ -3053,7 +3059,7 @@
                                 "properties": {
                                     "vmId": "814966a3-72e9-4606-a087-dfdbfa9fc24b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -3096,7 +3102,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -3104,7 +3110,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -3115,14 +3121,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
                                 "name": "k8s-agent-A61AD475-0"
                             },
                             {
                                 "properties": {
                                     "vmId": "de77098d-d5e5-4959-87f7-deb81d90f95b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -3165,7 +3171,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
                                             }
                                         ]
                                     },
@@ -3173,7 +3179,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -3184,14 +3190,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
                                 "name": "k8s-agent-A61AD475-1"
                             },
                             {
                                 "properties": {
                                     "vmId": "be6ad948-1465-497e-9755-fbb6a73a29e9",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -3234,7 +3240,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
                                             }
                                         ]
                                     },
@@ -3242,7 +3248,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -3253,14 +3259,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
                                 "name": "k8s-agent-A61AD475-2"
                             },
                             {
                                 "properties": {
                                     "vmId": "3e88b117-904e-4e47-abdd-ec3b5df6ed78",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -3315,7 +3321,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -3323,7 +3329,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -3334,7 +3340,7 @@
                                     "poolName": "master",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
                                 "name": "k8s-master-A61AD475-0"
                             },
                             {
@@ -3357,7 +3363,7 @@
                                             "caching": "ReadWrite",
                                             "managedDisk": {
                                                 "storageAccountType": "Standard_LRS",
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                             },
                                             "diskSizeGB": 30
                                         },
@@ -3369,7 +3375,7 @@
                                                 "caching": "None",
                                                 "managedDisk": {
                                                     "storageAccountType": "Standard_LRS",
-                                                    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                                 },
                                                 "diskSizeGB": 1023,
                                                 "toBeDetached": false
@@ -3387,7 +3393,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                             }
                                         ]
                                     },
@@ -3402,9 +3408,10 @@
                                 "type": "Microsoft.Compute/virtualMachines",
                                 "location": "southcentralus",
                                 "tags": {
-                                    "custodian_status": "Resource does not meet policy: stop@2019/05/06"
+                                    "CreatorEmail": "Unknown",
+                                    "custodian_status": "Resource does not meet policy: stop@2019/05/11"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
                                 "name": "cctestvm"
                             }
                         ]
@@ -3432,32 +3439,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3797,Microsoft.Compute/LowCostGet30Min;31045"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:50 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3850,Microsoft.Compute/LowCostGet30Min;31227"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:20 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "2334"
+                        "2366"
                     ]
                 },
                 "body": {
@@ -3481,7 +3488,7 @@
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                     },
                                     "diskSizeGB": 30
                                 },
@@ -3493,7 +3500,7 @@
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                         },
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
@@ -3511,7 +3518,7 @@
                             "networkProfile": {
                                 "networkInterfaces": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                     }
                                 ]
                             },
@@ -3526,9 +3533,10 @@
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
                         "tags": {
-                            "custodian_status": "Resource does not meet policy: stop@2019/05/06"
+                            "CreatorEmail": "Unknown",
+                            "custodian_status": "Resource does not meet policy: stop@2019/05/11"
                         },
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "name": "cctestvm"
                     }
                 }
@@ -3554,32 +3562,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/HighCostGet3Min;117,Microsoft.Compute/HighCostGet30Min;647"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:47 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;132,Microsoft.Compute/HighCostGet30Min;687"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:20 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "14715"
+                        "14751"
                     ]
                 },
                 "body": {
@@ -3589,7 +3597,7 @@
                                 "properties": {
                                     "vmId": "814966a3-72e9-4606-a087-dfdbfa9fc24b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -3632,7 +3640,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -3640,7 +3648,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -3651,14 +3659,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-0",
                                 "name": "k8s-agent-A61AD475-0"
                             },
                             {
                                 "properties": {
                                     "vmId": "de77098d-d5e5-4959-87f7-deb81d90f95b",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -3701,7 +3709,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-1"
                                             }
                                         ]
                                     },
@@ -3709,7 +3717,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1/extensions/cse1"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -3720,14 +3728,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-1",
                                 "name": "k8s-agent-A61AD475-1"
                             },
                             {
                                 "properties": {
                                     "vmId": "be6ad948-1465-497e-9755-fbb6a73a29e9",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/AGENT-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -3770,7 +3778,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-A61AD475-nic-2"
                                             }
                                         ]
                                     },
@@ -3778,7 +3786,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2/extensions/cse2"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -3789,14 +3797,14 @@
                                     "poolName": "agent",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-agent-A61AD475-2",
                                 "name": "k8s-agent-A61AD475-2"
                             },
                             {
                                 "properties": {
                                     "vmId": "3e88b117-904e-4e47-abdd-ec3b5df6ed78",
                                     "availabilitySet": {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/availabilitySets/MASTER-AVAILABILITYSET-A61AD475"
                                     },
                                     "hardwareProfile": {
                                         "vmSize": "Standard_D2_v2"
@@ -3851,7 +3859,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-A61AD475-nic-0"
                                             }
                                         ]
                                     },
@@ -3859,7 +3867,7 @@
                                 },
                                 "resources": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0/extensions/cse0"
                                     }
                                 ],
                                 "type": "Microsoft.Compute/virtualMachines",
@@ -3870,7 +3878,7 @@
                                     "poolName": "master",
                                     "resourceNameSuffix": "A61AD475"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.Compute/virtualMachines/k8s-master-A61AD475-0",
                                 "name": "k8s-master-A61AD475-0"
                             },
                             {
@@ -3893,7 +3901,7 @@
                                             "caching": "ReadWrite",
                                             "managedDisk": {
                                                 "storageAccountType": "Standard_LRS",
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                             },
                                             "diskSizeGB": 30
                                         },
@@ -3905,7 +3913,7 @@
                                                 "caching": "None",
                                                 "managedDisk": {
                                                     "storageAccountType": "Standard_LRS",
-                                                    "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                                 },
                                                 "diskSizeGB": 1023,
                                                 "toBeDetached": false
@@ -3923,7 +3931,7 @@
                                     "networkProfile": {
                                         "networkInterfaces": [
                                             {
-                                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                             }
                                         ]
                                     },
@@ -3938,12 +3946,1927 @@
                                 "type": "Microsoft.Compute/virtualMachines",
                                 "location": "southcentralus",
                                 "tags": {
-                                    "custodian_status": "Resource does not meet policy: stop@2019/05/06"
+                                    "CreatorEmail": "Unknown",
+                                    "custodian_status": "Resource does not meet policy: stop@2019/05/11"
                                 },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
                                 "name": "cctestvm"
                             }
                         ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute?api-version=2018-05-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "content-length": [
+                        "25497"
+                    ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:20 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "expires": [
+                        "-1"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute",
+                        "namespace": "Microsoft.Compute",
+                        "authorizations": [
+                            {
+                                "applicationId": "60e6cd67-9c8c-4951-9b3c-23c25a2169af",
+                                "roleDefinitionId": "e4770acb-272e-4dc8-87f3-12f44a612224"
+                            },
+                            {
+                                "applicationId": "a303894e-f1d8-4a37-bf10-67aa654a0596",
+                                "roleDefinitionId": "903ac751-8ad5-4e5a-bfc2-5e49f450a241"
+                            },
+                            {
+                                "applicationId": "a8b6bf88-1d1a-4626-b040-9a729ea93c65",
+                                "roleDefinitionId": "45c8267c-80ba-4b96-9a43-115b8f49fccd"
+                            },
+                            {
+                                "applicationId": "184909ca-69f1-4368-a6a7-c558ee6eb0bd",
+                                "roleDefinitionId": "45c8267c-80ba-4b96-9a43-115b8f49fccd"
+                            },
+                            {
+                                "applicationId": "5e5e43d4-54da-4211-86a4-c6e7f3715801",
+                                "roleDefinitionId": "ffcd6e5b-8772-457d-bb17-89703c03428f"
+                            },
+                            {
+                                "applicationId": "ce6ff14a-7fdc-4685-bbe0-f6afdfcfa8e0",
+                                "roleDefinitionId": "cb17cddc-dbac-4ae0-ae79-8db34eddfca0"
+                            },
+                            {
+                                "applicationId": "372140e0-b3b7-4226-8ef9-d57986796201",
+                                "roleDefinitionId": "cb17cddc-dbac-4ae0-ae79-8db34eddfca0"
+                            }
+                        ],
+                        "resourceTypes": [
+                            {
+                                "resourceType": "availabilitySets",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "defaultApiVersion": "2018-06-01",
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "virtualMachines",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "defaultApiVersion": "2018-06-01",
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ],
+                                "zoneMappings": [
+                                    {
+                                        "location": "East US 2",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Central US",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "West Europe",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "France Central",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Southeast Asia",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "West US 2",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "North Europe",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "East US",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "UK South",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Japan East",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Australia East",
+                                        "zones": []
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove, SystemAssignedResourceIdentity"
+                            },
+                            {
+                                "resourceType": "virtualMachines/extensions",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "defaultApiVersion": "2018-06-01",
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-10-30-preview",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "defaultApiVersion": "2018-06-01",
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ],
+                                "zoneMappings": [
+                                    {
+                                        "location": "East US 2",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Central US",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "West Europe",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "France Central",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Southeast Asia",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "West US 2",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "North Europe",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "East US",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "UK South",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Japan East",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Australia East",
+                                        "zones": []
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove, SystemAssignedResourceIdentity"
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/extensions",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-10-30-preview",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "defaultApiVersion": "2015-06-15",
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-10-30-preview",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/networkInterfaces",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-09-01",
+                                    "2016-08-01",
+                                    "2016-07-01",
+                                    "2016-06-01",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines/networkInterfaces",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-09-01",
+                                    "2016-08-01",
+                                    "2016-07-01",
+                                    "2016-06-01",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/publicIPAddresses",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "locations",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/operations",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-10-30-preview",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/vmSizes",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/runCommands",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/usages",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/virtualMachines",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30"
+                                ],
+                                "defaultApiVersion": "2018-06-01",
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/publishers",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2017-03-09-profile",
+                                        "apiVersion": "2016-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-12-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "operations",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-03-30",
+                                    "2015-06-15",
+                                    "2015-05-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections",
+                                "locations": [
+                                    "Southeast Asia",
+                                    "East US 2",
+                                    "Central US",
+                                    "West Europe",
+                                    "East US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "West US",
+                                    "North Europe",
+                                    "East Asia",
+                                    "Brazil South",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK West",
+                                    "UK South",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "Central India",
+                                    "South India",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "West India",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30"
+                                ],
+                                "capabilities": "None"
+                            },
+                            {
+                                "resourceType": "restorePointCollections/restorePoints",
+                                "locations": [
+                                    "Southeast Asia",
+                                    "East US 2",
+                                    "Central US",
+                                    "West Europe",
+                                    "East US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "West US",
+                                    "North Europe",
+                                    "East Asia",
+                                    "Brazil South",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK West",
+                                    "UK South",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "Central India",
+                                    "South India",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "West India",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/metricDefinitions",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2014-04-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "sharedVMImages",
+                                "locations": [
+                                    "West Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Southeast Asia",
+                                    "West Europe",
+                                    "West US",
+                                    "East US",
+                                    "Canada Central",
+                                    "North Europe",
+                                    "North Central US",
+                                    "Brazil South",
+                                    "UK West",
+                                    "West India",
+                                    "East Asia",
+                                    "Australia East",
+                                    "Japan East",
+                                    "Korea South",
+                                    "West US 2",
+                                    "Canada East",
+                                    "UK South",
+                                    "Central India",
+                                    "South India",
+                                    "Australia Southeast",
+                                    "Japan West",
+                                    "Korea Central",
+                                    "France Central",
+                                    "Central US"
+                                ],
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ],
+                                "capabilities": "None"
+                            },
+                            {
+                                "resourceType": "sharedVMImages/versions",
+                                "locations": [
+                                    "West Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Southeast Asia",
+                                    "West Europe",
+                                    "West US",
+                                    "East US",
+                                    "Canada Central",
+                                    "North Europe",
+                                    "North Central US",
+                                    "Brazil South",
+                                    "UK West",
+                                    "West India",
+                                    "East Asia",
+                                    "Australia East",
+                                    "Japan East",
+                                    "Korea South",
+                                    "West US 2",
+                                    "Canada East",
+                                    "UK South",
+                                    "Central India",
+                                    "South India",
+                                    "Australia Southeast",
+                                    "Japan West",
+                                    "Korea Central",
+                                    "France Central",
+                                    "Central US"
+                                ],
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ],
+                                "capabilities": "None"
+                            },
+                            {
+                                "resourceType": "locations/artifactPublishers",
+                                "locations": [
+                                    "West Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Southeast Asia",
+                                    "West Europe",
+                                    "West US",
+                                    "East US",
+                                    "Canada Central",
+                                    "North Europe",
+                                    "North Central US",
+                                    "Brazil South",
+                                    "UK West",
+                                    "West India",
+                                    "East Asia",
+                                    "Australia East",
+                                    "Japan East",
+                                    "Korea South",
+                                    "West US 2",
+                                    "Canada East",
+                                    "UK South",
+                                    "Central India",
+                                    "South India",
+                                    "Australia Southeast",
+                                    "Japan West",
+                                    "Korea Central",
+                                    "France Central",
+                                    "Central US"
+                                ],
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/capsoperations",
+                                "locations": [
+                                    "West Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Southeast Asia",
+                                    "West Europe",
+                                    "West US",
+                                    "East US",
+                                    "Canada Central",
+                                    "North Europe",
+                                    "North Central US",
+                                    "Brazil South",
+                                    "UK West",
+                                    "West India",
+                                    "East Asia",
+                                    "Australia East",
+                                    "Japan East",
+                                    "Korea South",
+                                    "West US 2",
+                                    "Canada East",
+                                    "UK South",
+                                    "Central India",
+                                    "South India",
+                                    "Australia Southeast",
+                                    "Japan West",
+                                    "Korea Central",
+                                    "France Central",
+                                    "Central US"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-06-01",
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries",
+                                "locations": [
+                                    "West Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Southeast Asia",
+                                    "West Europe",
+                                    "West US",
+                                    "East US",
+                                    "Canada Central",
+                                    "North Europe",
+                                    "North Central US",
+                                    "Brazil South",
+                                    "UK West",
+                                    "West India",
+                                    "East Asia",
+                                    "Australia East",
+                                    "Japan East",
+                                    "Korea South",
+                                    "West US 2",
+                                    "Canada East",
+                                    "UK South",
+                                    "Central India",
+                                    "South India",
+                                    "Australia Southeast",
+                                    "Japan West",
+                                    "Korea Central",
+                                    "France Central",
+                                    "Central US"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-06-01"
+                                ],
+                                "capabilities": "None"
+                            },
+                            {
+                                "resourceType": "galleries/images",
+                                "locations": [
+                                    "West Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Southeast Asia",
+                                    "West Europe",
+                                    "West US",
+                                    "East US",
+                                    "Canada Central",
+                                    "North Europe",
+                                    "North Central US",
+                                    "Brazil South",
+                                    "UK West",
+                                    "West India",
+                                    "East Asia",
+                                    "Australia East",
+                                    "Japan East",
+                                    "Korea South",
+                                    "West US 2",
+                                    "Canada East",
+                                    "UK South",
+                                    "Central India",
+                                    "South India",
+                                    "Australia Southeast",
+                                    "Japan West",
+                                    "Korea Central",
+                                    "France Central",
+                                    "Central US"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-06-01"
+                                ],
+                                "capabilities": "None"
+                            },
+                            {
+                                "resourceType": "galleries/images/versions",
+                                "locations": [
+                                    "West Central US",
+                                    "South Central US",
+                                    "East US 2",
+                                    "Southeast Asia",
+                                    "West Europe",
+                                    "West US",
+                                    "East US",
+                                    "Canada Central",
+                                    "North Europe",
+                                    "North Central US",
+                                    "Brazil South",
+                                    "UK West",
+                                    "West India",
+                                    "East Asia",
+                                    "Australia East",
+                                    "Japan East",
+                                    "Korea South",
+                                    "West US 2",
+                                    "Canada East",
+                                    "UK South",
+                                    "Central India",
+                                    "South India",
+                                    "Australia Southeast",
+                                    "Japan West",
+                                    "Korea Central",
+                                    "France Central",
+                                    "Central US"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-06-01"
+                                ],
+                                "capabilities": "None"
+                            },
+                            {
+                                "resourceType": "disks",
+                                "locations": [
+                                    "Southeast Asia",
+                                    "East US 2",
+                                    "Central US",
+                                    "West Europe",
+                                    "East US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "West US",
+                                    "North Europe",
+                                    "East Asia",
+                                    "Brazil South",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK West",
+                                    "UK South",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "Central India",
+                                    "South India",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "West India",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2018-09-30",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-03-30",
+                                    "2016-04-30-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-04-01"
+                                    }
+                                ],
+                                "zoneMappings": [
+                                    {
+                                        "location": "East US 2",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Central US",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "West Europe",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "France Central",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Southeast Asia",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "West US 2",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "North Europe",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "East US",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "UK South",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Japan East",
+                                        "zones": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
+                                    {
+                                        "location": "Australia East",
+                                        "zones": []
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "snapshots",
+                                "locations": [
+                                    "Southeast Asia",
+                                    "East US 2",
+                                    "Central US",
+                                    "West Europe",
+                                    "East US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "West US",
+                                    "North Europe",
+                                    "East Asia",
+                                    "Brazil South",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK West",
+                                    "UK South",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "Central India",
+                                    "South India",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "West India",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2018-09-30",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-03-30",
+                                    "2016-04-30-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-04-01"
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "locations/diskoperations",
+                                "locations": [
+                                    "Southeast Asia",
+                                    "East US 2",
+                                    "Central US",
+                                    "West Europe",
+                                    "East US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "West US",
+                                    "North Europe",
+                                    "East Asia",
+                                    "Brazil South",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK West",
+                                    "UK South",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "Central India",
+                                    "South India",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "West India",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2018-09-30",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-03-30",
+                                    "2016-04-30-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-04-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "images",
+                                "locations": [
+                                    "Southeast Asia",
+                                    "East US 2",
+                                    "Central US",
+                                    "West Europe",
+                                    "East US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "West US",
+                                    "North Europe",
+                                    "East Asia",
+                                    "Brazil South",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK West",
+                                    "UK South",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "Central India",
+                                    "South India",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "West India",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01",
+                                    "2017-03-30",
+                                    "2016-08-30",
+                                    "2016-04-30-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-03-01-hybrid",
+                                        "apiVersion": "2017-03-30"
+                                    },
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-04-01"
+                                    }
+                                ],
+                                "capabilities": "CrossResourceGroupResourceMove, CrossSubscriptionResourceMove"
+                            },
+                            {
+                                "resourceType": "locations/logAnalytics",
+                                "locations": [
+                                    "East US",
+                                    "East US 2",
+                                    "West US",
+                                    "Central US",
+                                    "North Central US",
+                                    "South Central US",
+                                    "North Europe",
+                                    "West Europe",
+                                    "East Asia",
+                                    "Southeast Asia",
+                                    "Japan East",
+                                    "Japan West",
+                                    "Australia East",
+                                    "Australia Southeast",
+                                    "Brazil South",
+                                    "South India",
+                                    "Central India",
+                                    "West India",
+                                    "Canada Central",
+                                    "Canada East",
+                                    "West US 2",
+                                    "West Central US",
+                                    "UK South",
+                                    "UK West",
+                                    "Korea Central",
+                                    "Korea South",
+                                    "France Central",
+                                    "South Africa North"
+                                ],
+                                "apiVersions": [
+                                    "2019-03-01",
+                                    "2018-10-01",
+                                    "2018-06-01",
+                                    "2018-04-01",
+                                    "2017-12-01"
+                                ]
+                            }
+                        ],
+                        "registrationState": "Registered"
                     }
                 }
             }
@@ -3964,7 +5887,7 @@
                         "application/json; charset=utf-8"
                     ],
                     "Content-Length": [
-                        "1550"
+                        "1598"
                     ]
                 }
             },
@@ -3977,38 +5900,38 @@
                     "azure-asyncnotification": [
                         "Enabled"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/PutVM3Min;211,Microsoft.Compute/PutVM30Min;1142"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:57 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1195"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/PutVM3Min;228,Microsoft.Compute/PutVM30Min;1183"
                     ],
                     "pragma": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
                     "azure-asyncoperation": [
-                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Compute/locations/southcentralus/operations/537ae19c-635a-4e48-89c7-a2586d52e756?api-version=2019-03-01"
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Compute/locations/southcentralus/operations/462707f5-d301-4241-af50-c66e2923c6f5?api-version=2019-03-01"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:21 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "2255"
+                        "2290"
                     ]
                 },
                 "body": {
@@ -4032,7 +5955,7 @@
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                     },
                                     "diskSizeGB": 30
                                 },
@@ -4044,7 +5967,7 @@
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                         },
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
@@ -4062,7 +5985,7 @@
                             "networkProfile": {
                                 "networkInterfaces": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                     }
                                 ]
                             },
@@ -4076,8 +5999,10 @@
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
-                        "tags": {},
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "tags": {
+                            "CreatorEmail": "Unknown"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "name": "cctestvm"
                     }
                 }
@@ -4103,32 +6028,32 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3793,Microsoft.Compute/LowCostGet30Min;31041"
-                    ],
                     "vary": [
                         "Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:46:51 GMT"
-                    ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3848,Microsoft.Compute/LowCostGet30Min;31225"
                     ],
                     "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 01 May 2019 15:23:22 GMT"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "transfer-encoding": [
                         "chunked"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "expires": [
+                        "-1"
                     ],
                     "content-length": [
-                        "2256"
+                        "2291"
                     ]
                 },
                 "body": {
@@ -4152,7 +6077,7 @@
                                     "caching": "ReadWrite",
                                     "managedDisk": {
                                         "storageAccountType": "Standard_LRS",
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_536102b2a8fd4d0baf288f89a0dcc215"
                                     },
                                     "diskSizeGB": 30
                                 },
@@ -4164,7 +6089,7 @@
                                         "caching": "None",
                                         "managedDisk": {
                                             "storageAccountType": "Standard_LRS",
-                                            "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_56efd8d3574f403c8693d834542ae790"
                                         },
                                         "diskSizeGB": 1023,
                                         "toBeDetached": false
@@ -4182,7 +6107,7 @@
                             "networkProfile": {
                                 "networkInterfaces": [
                                     {
-                                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
                                     }
                                 ]
                             },
@@ -4196,8 +6121,10 @@
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
-                        "tags": {},
-                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "tags": {
+                            "CreatorEmail": "Unknown"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
                         "name": "cctestvm"
                     }
                 }

@@ -21,30 +21,30 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "pragma": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "9813"
-                    ],
-                    "vary": [
-                        "Accept-Encoding"
-                    ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:08:06 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-ms-original-request-ids": [
-                        "8b183818-7a15-4cf6-88d6-e95ead75ede5",
-                        "337a1ea9-73d8-4035-85ba-856557e1f42b"
+                    "expires": [
+                        "-1"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "expires": [
-                        "-1"
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 29 Apr 2019 19:21:59 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "a31cb861-d94f-4b93-b6de-3f4c615fda2d",
+                        "641cfdef-465e-4b8c-8419-b3c9cfa15e62"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "8686"
                     ]
                 },
                 "body": {
@@ -190,50 +190,6 @@
                                     "tier": "Standard"
                                 },
                                 "kind": "Storage",
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Storage/storageAccounts/45mqcga7pkswisalinuxvm",
-                                "name": "45mqcga7pkswisalinuxvm",
-                                "type": "Microsoft.Storage/storageAccounts",
-                                "location": "southcentralus",
-                                "tags": {},
-                                "properties": {
-                                    "networkAcls": {
-                                        "bypass": "AzureServices",
-                                        "virtualNetworkRules": [],
-                                        "ipRules": [],
-                                        "defaultAction": "Allow"
-                                    },
-                                    "supportsHttpsTrafficOnly": false,
-                                    "encryption": {
-                                        "services": {
-                                            "file": {
-                                                "enabled": true,
-                                                "lastEnabledTime": "2019-04-25T16:16:12.9516858Z"
-                                            },
-                                            "blob": {
-                                                "enabled": true,
-                                                "lastEnabledTime": "2019-04-25T16:16:12.9516858Z"
-                                            }
-                                        },
-                                        "keySource": "Microsoft.Storage"
-                                    },
-                                    "provisioningState": "Succeeded",
-                                    "creationTime": "2019-04-25T16:16:12.8579241Z",
-                                    "primaryEndpoints": {
-                                        "blob": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/",
-                                        "queue": "https://45mqcga7pkswisalinuxvm.queue.core.windows.net/",
-                                        "table": "https://45mqcga7pkswisalinuxvm.table.core.windows.net/",
-                                        "file": "https://45mqcga7pkswisalinuxvm.file.core.windows.net/"
-                                    },
-                                    "primaryLocation": "southcentralus",
-                                    "statusOfPrimary": "available"
-                                }
-                            },
-                            {
-                                "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
-                                },
-                                "kind": "Storage",
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
                                 "name": "cctstoragey6akyqpagdt3o",
                                 "type": "Microsoft.Storage/storageAccounts",
@@ -267,6 +223,50 @@
                                         "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
                                         "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
                                         "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "southcentralus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_vm/providers/Microsoft.Storage/storageAccounts/45mqcga7pkswisalinuxvm",
+                                "name": "45mqcga7pkswisalinuxvm",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": false,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "enabled": true,
+                                                "lastEnabledTime": "2019-04-25T16:16:12.9516858Z"
+                                            },
+                                            "blob": {
+                                                "enabled": true,
+                                                "lastEnabledTime": "2019-04-25T16:16:12.9516858Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2019-04-25T16:16:12.8579241Z",
+                                    "primaryEndpoints": {
+                                        "blob": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/",
+                                        "queue": "https://45mqcga7pkswisalinuxvm.queue.core.windows.net/",
+                                        "table": "https://45mqcga7pkswisalinuxvm.table.core.windows.net/",
+                                        "file": "https://45mqcga7pkswisalinuxvm.file.core.windows.net/"
                                     },
                                     "primaryLocation": "southcentralus",
                                     "statusOfPrimary": "available"
@@ -402,50 +402,6 @@
                                     "primaryLocation": "westus2",
                                     "statusOfPrimary": "available"
                                 }
-                            },
-                            {
-                                "sku": {
-                                    "name": "Standard_LRS",
-                                    "tier": "Standard"
-                                },
-                                "kind": "Storage",
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182748",
-                                "name": "custodianaccount47182748",
-                                "type": "Microsoft.Storage/storageAccounts",
-                                "location": "westus2",
-                                "tags": {},
-                                "properties": {
-                                    "networkAcls": {
-                                        "bypass": "AzureServices",
-                                        "virtualNetworkRules": [],
-                                        "ipRules": [],
-                                        "defaultAction": "Allow"
-                                    },
-                                    "supportsHttpsTrafficOnly": false,
-                                    "encryption": {
-                                        "services": {
-                                            "file": {
-                                                "enabled": true,
-                                                "lastEnabledTime": "2019-04-26T18:07:51.0937719Z"
-                                            },
-                                            "blob": {
-                                                "enabled": true,
-                                                "lastEnabledTime": "2019-04-26T18:07:51.0937719Z"
-                                            }
-                                        },
-                                        "keySource": "Microsoft.Storage"
-                                    },
-                                    "provisioningState": "Creating",
-                                    "creationTime": "2019-04-26T18:07:50.9999889Z",
-                                    "primaryEndpoints": {
-                                        "blob": "https://custodianaccount47182748.blob.core.windows.net/",
-                                        "queue": "https://custodianaccount47182748.queue.core.windows.net/",
-                                        "table": "https://custodianaccount47182748.table.core.windows.net/",
-                                        "file": "https://custodianaccount47182748.file.core.windows.net/"
-                                    },
-                                    "primaryLocation": "westus2",
-                                    "statusOfPrimary": "available"
-                                }
                             }
                         ]
                     }
@@ -462,7 +418,7 @@
                         "2018-03-28"
                     ],
                     "x-ms-date": [
-                        "Fri, 26 Apr 2019 18:08:04 GMT"
+                        "Mon, 29 Apr 2019 19:21:51 GMT"
                     ],
                     "Content-Length": [
                         "0"
@@ -475,14 +431,14 @@
                     "message": "No Content"
                 },
                 "headers": {
-                    "content-length": [
-                        "0"
-                    ],
                     "x-ms-version": [
                         "2018-03-28"
                     ],
                     "date": [
-                        "Fri, 26 Apr 2019 18:08:06 GMT"
+                        "Mon, 29 Apr 2019 19:21:51 GMT"
+                    ],
+                    "content-length": [
+                        "0"
                     ]
                 },
                 "body": {
@@ -516,29 +472,29 @@
                     "message": "Created"
                 },
                 "headers": {
+                    "expires": [
+                        "-1"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "pragma": [
                         "no-cache"
                     ],
-                    "content-length": [
-                        "1017"
-                    ],
                     "date": [
-                        "Fri, 26 Apr 2019 18:08:12 GMT"
+                        "Mon, 29 Apr 2019 19:21:51 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1197"
+                        "1199"
+                    ],
+                    "content-length": [
+                        "1017"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "azure-asyncoperation": [
-                        "https://management.azure.com:443/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/operationsStatus/FF045662-9B82-4074-89DA-48FB5548FA64?api-version=2018-09-15-preview"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "expires": [
-                        "-1"
+                        "https://management.azure.com:443/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/operationsStatus/090F3B64-D4C6-4B0C-8141-886CF741B89B?api-version=2018-09-15-preview"
                     ]
                 },
                 "body": {
@@ -595,29 +551,29 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "pragma": [
-                        "no-cache"
-                    ],
-                    "vary": [
-                        "Accept-Encoding"
-                    ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:08:04 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
                     "expires": [
                         "-1"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 29 Apr 2019 19:21:48 GMT"
+                    ],
                     "transfer-encoding": [
                         "chunked"
                     ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "content-length": [
-                        "11985"
+                        "11986"
                     ]
                 },
                 "body": {
@@ -1023,7 +979,7 @@
                                     "destination": {
                                         "properties": {
                                             "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
-                                            "queueName": "cctestevensub"
+                                            "queueName": "cctesteventsub"
                                         },
                                         "endpointType": "StorageQueue"
                                     },
@@ -1074,462 +1030,54 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "pragma": [
-                        "no-cache"
-                    ],
-                    "vary": [
-                        "Accept-Encoding"
-                    ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:08:15 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "expires": [
+                    "Expires": [
                         "-1"
                     ],
-                    "cache-control": [
+                    "Cache-Control": [
                         "no-cache"
                     ],
-                    "transfer-encoding": [
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Date": [
+                        "Mon, 29 Apr 2019 19:21:49 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Transfer-Encoding": [
                         "chunked"
                     ],
+                    "x-ms-request-id": [
+                        "3306df0d-7416-47d5-a024-9ccf892bdcab"
+                    ],
+                    "Server": [
+                        "Microsoft-HTTPAPI/2.0"
+                    ],
+                    "x-ms-correlation-request-id": [
+                        "ec2037e7-3718-4804-8105-ded03cb81868"
+                    ],
+                    "Vary": [
+                        "Accept-Encoding"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-reads": [
+                        "11997"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-routing-request-id": [
+                        "WESTUS2:20190429T192150Z:ec2037e7-3718-4804-8105-ded03cb81868"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000; includeSubDomains"
+                    ],
                     "content-length": [
-                        "11985"
+                        "11986"
                     ]
                 },
                 "body": {
-                    "data": {
-                        "value": [
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100",
-                                            "queueName": "tag-rg-consumption-d0e15100"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema"
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption-d0e15100",
-                                "name": "tag-rg-consumption-d0e15100",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100",
-                                            "queueName": "tag-rg-consumption2-d0e15100"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption2-d0e15100",
-                                "name": "tag-rg-consumption2-d0e15100",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsump-west/providers/Microsoft.Storage/storageAccounts/custodian2205d8c9",
-                                            "queueName": "tag-rg-consumption-2205d8c9"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption-2205d8c9",
-                                "name": "tag-rg-consumption-2205d8c9",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nevent/providers/Microsoft.Storage/storageAccounts/custodian9f3072fd",
-                                            "queueName": "auto-tag-rg-demo-9f3072fd"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/auto-tag-rg-demo-9f3072fd",
-                                "name": "auto-tag-rg-demo-9f3072fd",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100",
-                                            "queueName": "trg-consumption-d0e15100"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/trg-consumption-d0e15100",
-                                "name": "trg-consumption-d0e15100",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-1/providers/Microsoft.Storage/storageAccounts/kirilstorage12314",
-                                            "queueName": "testeventgrid-cbec5b50"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema"
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-cbec5b50",
-                                "name": "testeventgrid-cbec5b50",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-2/providers/Microsoft.Storage/storageAccounts/kirilstorage1278123",
-                                            "queueName": "testeventgrid-4c10b70f"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-4c10b70f",
-                                "name": "testeventgrid-4c10b70f",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-3/providers/Microsoft.Storage/storageAccounts/kirilstorage18249",
-                                            "queueName": "testeventgrid-375f185a"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-375f185a",
-                                "name": "testeventgrid-375f185a",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-4/providers/Microsoft.Storage/storageAccounts/kirilstorage127",
-                                            "queueName": "testeventgrid-e85e1c4c"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-e85e1c4c",
-                                "name": "testeventgrid-e85e1c4c",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-5/providers/Microsoft.Storage/storageAccounts/kirilstorage3525",
-                                            "queueName": "testeventgrid-c7c155ae"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema"
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-c7c155ae",
-                                "name": "testeventgrid-c7c155ae",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Updating",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
-                                            "queueName": "cctestevensub"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema"
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/custodiantestsubscription",
-                                "name": "custodiantestsubscription",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            }
-                        ]
-                    }
+                    "string": "{\"value\":[{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100\",\"queueName\":\"tag-rg-consumption-d0e15100\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\"},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption-d0e15100\",\"name\":\"tag-rg-consumption-d0e15100\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100\",\"queueName\":\"tag-rg-consumption2-d0e15100\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption2-d0e15100\",\"name\":\"tag-rg-consumption2-d0e15100\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsump-west/providers/Microsoft.Storage/storageAccounts/custodian2205d8c9\",\"queueName\":\"tag-rg-consumption-2205d8c9\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption-2205d8c9\",\"name\":\"tag-rg-consumption-2205d8c9\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nevent/providers/Microsoft.Storage/storageAccounts/custodian9f3072fd\",\"queueName\":\"auto-tag-rg-demo-9f3072fd\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/auto-tag-rg-demo-9f3072fd\",\"name\":\"auto-tag-rg-demo-9f3072fd\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100\",\"queueName\":\"trg-consumption-d0e15100\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/trg-consumption-d0e15100\",\"name\":\"trg-consumption-d0e15100\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-1/providers/Microsoft.Storage/storageAccounts/kirilstorage12314\",\"queueName\":\"testeventgrid-cbec5b50\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\"},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-cbec5b50\",\"name\":\"testeventgrid-cbec5b50\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-2/providers/Microsoft.Storage/storageAccounts/kirilstorage1278123\",\"queueName\":\"testeventgrid-4c10b70f\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-4c10b70f\",\"name\":\"testeventgrid-4c10b70f\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-3/providers/Microsoft.Storage/storageAccounts/kirilstorage18249\",\"queueName\":\"testeventgrid-375f185a\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-375f185a\",\"name\":\"testeventgrid-375f185a\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-4/providers/Microsoft.Storage/storageAccounts/kirilstorage127\",\"queueName\":\"testeventgrid-e85e1c4c\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-e85e1c4c\",\"name\":\"testeventgrid-e85e1c4c\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-5/providers/Microsoft.Storage/storageAccounts/kirilstorage3525\",\"queueName\":\"testeventgrid-c7c155ae\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\"},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-c7c155ae\",\"name\":\"testeventgrid-c7c155ae\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Updating\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o\",\"queueName\":\"cctesteventsub\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\"},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/custodiantestsubscription\",\"name\":\"custodiantestsubscription\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"}]}"
                 }
             }
         },
@@ -1552,27 +1100,51 @@
             },
             "response": {
                 "status": {
-                    "code": 409,
-                    "message": "Conflict"
+                    "code": 202,
+                    "message": "Accepted"
                 },
                 "headers": {
-                    "pragma": [
+                    "Expires": [
+                        "-1"
+                    ],
+                    "Retry-After": [
+                        "10"
+                    ],
+                    "Cache-Control": [
                         "no-cache"
                     ],
-                    "content-length": [
-                        "0"
+                    "Pragma": [
+                        "no-cache"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:08:05 GMT"
+                    "Date": [
+                        "Mon, 29 Apr 2019 19:21:51 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
                     ],
                     "x-ms-ratelimit-remaining-subscription-deletes": [
                         "14999"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "Server": [
+                        "Microsoft-HTTPAPI/2.0"
                     ],
-                    "expires": [
-                        "-1"
+                    "x-ms-request-id": [
+                        "ee224b80-2aff-4574-846a-c9b49ddadbbc"
+                    ],
+                    "x-ms-correlation-request-id": [
+                        "ee224b80-2aff-4574-846a-c9b49ddadbbc"
+                    ],
+                    "x-ms-routing-request-id": [
+                        "WESTUS2:20190429T192151Z:ee224b80-2aff-4574-846a-c9b49ddadbbc"
+                    ],
+                    "Content-Length": [
+                        "0"
+                    ],
+                    "Location": [
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/operationResults/2B1BAC42-4541-4403-AF99-B64581223519?api-version=2018-09-15-preview"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000; includeSubDomains"
                     ]
                 },
                 "body": {
@@ -1600,462 +1172,54 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "pragma": [
-                        "no-cache"
-                    ],
-                    "vary": [
-                        "Accept-Encoding"
-                    ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:08:10 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "expires": [
+                    "Expires": [
                         "-1"
                     ],
-                    "cache-control": [
+                    "Cache-Control": [
                         "no-cache"
                     ],
-                    "transfer-encoding": [
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Date": [
+                        "Mon, 29 Apr 2019 19:22:02 GMT"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Transfer-Encoding": [
                         "chunked"
                     ],
+                    "x-ms-request-id": [
+                        "e7f06491-5195-405b-a623-8228976a4254"
+                    ],
+                    "Server": [
+                        "Microsoft-HTTPAPI/2.0"
+                    ],
+                    "x-ms-correlation-request-id": [
+                        "2812bce9-2d37-481e-854d-40e7c857cb0c"
+                    ],
+                    "Vary": [
+                        "Accept-Encoding"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-reads": [
+                        "11999"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-routing-request-id": [
+                        "WESTUS2:20190429T192202Z:2812bce9-2d37-481e-854d-40e7c857cb0c"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000; includeSubDomains"
+                    ],
                     "content-length": [
-                        "11985"
+                        "10884"
                     ]
                 },
                 "body": {
-                    "data": {
-                        "value": [
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100",
-                                            "queueName": "tag-rg-consumption-d0e15100"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema"
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption-d0e15100",
-                                "name": "tag-rg-consumption-d0e15100",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100",
-                                            "queueName": "tag-rg-consumption2-d0e15100"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption2-d0e15100",
-                                "name": "tag-rg-consumption2-d0e15100",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsump-west/providers/Microsoft.Storage/storageAccounts/custodian2205d8c9",
-                                            "queueName": "tag-rg-consumption-2205d8c9"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption-2205d8c9",
-                                "name": "tag-rg-consumption-2205d8c9",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nevent/providers/Microsoft.Storage/storageAccounts/custodian9f3072fd",
-                                            "queueName": "auto-tag-rg-demo-9f3072fd"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/auto-tag-rg-demo-9f3072fd",
-                                "name": "auto-tag-rg-demo-9f3072fd",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100",
-                                            "queueName": "trg-consumption-d0e15100"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.Resources/subscriptions/resourceGroups/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/trg-consumption-d0e15100",
-                                "name": "trg-consumption-d0e15100",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-1/providers/Microsoft.Storage/storageAccounts/kirilstorage12314",
-                                            "queueName": "testeventgrid-cbec5b50"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema"
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-cbec5b50",
-                                "name": "testeventgrid-cbec5b50",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-2/providers/Microsoft.Storage/storageAccounts/kirilstorage1278123",
-                                            "queueName": "testeventgrid-4c10b70f"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-4c10b70f",
-                                "name": "testeventgrid-4c10b70f",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-3/providers/Microsoft.Storage/storageAccounts/kirilstorage18249",
-                                            "queueName": "testeventgrid-375f185a"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-375f185a",
-                                "name": "testeventgrid-375f185a",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-4/providers/Microsoft.Storage/storageAccounts/kirilstorage127",
-                                            "queueName": "testeventgrid-e85e1c4c"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema",
-                                    "retryPolicy": {
-                                        "maxDeliveryAttempts": 30,
-                                        "eventTimeToLiveInMinutes": 1440
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-e85e1c4c",
-                                "name": "testeventgrid-e85e1c4c",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Succeeded",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-5/providers/Microsoft.Storage/storageAccounts/kirilstorage3525",
-                                            "queueName": "testeventgrid-c7c155ae"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ],
-                                        "advancedFilters": [
-                                            {
-                                                "values": [
-                                                    "Microsoft.KeyVault/vaults/write"
-                                                ],
-                                                "operatorType": "StringIn",
-                                                "key": "Data.OperationName"
-                                            }
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema"
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-c7c155ae",
-                                "name": "testeventgrid-c7c155ae",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            },
-                            {
-                                "properties": {
-                                    "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "provisioningState": "Updating",
-                                    "destination": {
-                                        "properties": {
-                                            "resourceId": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
-                                            "queueName": "cctestevensub"
-                                        },
-                                        "endpointType": "StorageQueue"
-                                    },
-                                    "filter": {
-                                        "subjectBeginsWith": "",
-                                        "subjectEndsWith": "",
-                                        "includedEventTypes": [
-                                            "Microsoft.Resources.ResourceWriteSuccess",
-                                            "Microsoft.Resources.ResourceWriteFailure",
-                                            "Microsoft.Resources.ResourceWriteCancel",
-                                            "Microsoft.Resources.ResourceDeleteSuccess",
-                                            "Microsoft.Resources.ResourceDeleteFailure",
-                                            "Microsoft.Resources.ResourceDeleteCancel",
-                                            "Microsoft.Resources.ResourceActionSuccess",
-                                            "Microsoft.Resources.ResourceActionFailure",
-                                            "Microsoft.Resources.ResourceActionCancel"
-                                        ]
-                                    },
-                                    "labels": null,
-                                    "eventDeliverySchema": "EventGridSchema"
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/custodiantestsubscription",
-                                "name": "custodiantestsubscription",
-                                "type": "Microsoft.EventGrid/eventSubscriptions"
-                            }
-                        ]
-                    }
+                    "string": "{\"value\":[{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100\",\"queueName\":\"tag-rg-consumption-d0e15100\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\"},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption-d0e15100\",\"name\":\"tag-rg-consumption-d0e15100\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100\",\"queueName\":\"tag-rg-consumption2-d0e15100\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption2-d0e15100\",\"name\":\"tag-rg-consumption2-d0e15100\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsump-west/providers/Microsoft.Storage/storageAccounts/custodian2205d8c9\",\"queueName\":\"tag-rg-consumption-2205d8c9\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/tag-rg-consumption-2205d8c9\",\"name\":\"tag-rg-consumption-2205d8c9\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nevent/providers/Microsoft.Storage/storageAccounts/custodian9f3072fd\",\"queueName\":\"auto-tag-rg-demo-9f3072fd\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/auto-tag-rg-demo-9f3072fd\",\"name\":\"auto-tag-rg-demo-9f3072fd\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/c7nconsumption/providers/Microsoft.Storage/storageAccounts/custodiand0e15100\",\"queueName\":\"trg-consumption-d0e15100\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"advancedFilters\":[{\"values\":[\"Microsoft.Resources/subscriptions/resourceGroups/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/trg-consumption-d0e15100\",\"name\":\"trg-consumption-d0e15100\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-1/providers/Microsoft.Storage/storageAccounts/kirilstorage12314\",\"queueName\":\"testeventgrid-cbec5b50\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\"},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-cbec5b50\",\"name\":\"testeventgrid-cbec5b50\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-2/providers/Microsoft.Storage/storageAccounts/kirilstorage1278123\",\"queueName\":\"testeventgrid-4c10b70f\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-4c10b70f\",\"name\":\"testeventgrid-4c10b70f\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-3/providers/Microsoft.Storage/storageAccounts/kirilstorage18249\",\"queueName\":\"testeventgrid-375f185a\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-375f185a\",\"name\":\"testeventgrid-375f185a\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-4/providers/Microsoft.Storage/storageAccounts/kirilstorage127\",\"queueName\":\"testeventgrid-e85e1c4c\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\",\"retryPolicy\":{\"maxDeliveryAttempts\":30,\"eventTimeToLiveInMinutes\":1440}},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-e85e1c4c\",\"name\":\"testeventgrid-e85e1c4c\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"},{\"properties\":{\"topic\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e\",\"provisioningState\":\"Succeeded\",\"destination\":{\"properties\":{\"resourceId\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/kiril-test-event-grid-5/providers/Microsoft.Storage/storageAccounts/kirilstorage3525\",\"queueName\":\"testeventgrid-c7c155ae\"},\"endpointType\":\"StorageQueue\"},\"filter\":{\"subjectBeginsWith\":\"\",\"subjectEndsWith\":\"\",\"includedEventTypes\":[\"Microsoft.Resources.ResourceWriteSuccess\",\"Microsoft.Resources.ResourceWriteFailure\",\"Microsoft.Resources.ResourceWriteCancel\",\"Microsoft.Resources.ResourceDeleteSuccess\",\"Microsoft.Resources.ResourceDeleteFailure\",\"Microsoft.Resources.ResourceDeleteCancel\",\"Microsoft.Resources.ResourceActionSuccess\",\"Microsoft.Resources.ResourceActionFailure\",\"Microsoft.Resources.ResourceActionCancel\"],\"advancedFilters\":[{\"values\":[\"Microsoft.KeyVault/vaults/write\"],\"operatorType\":\"StringIn\",\"key\":\"Data.OperationName\"}]},\"labels\":null,\"eventDeliverySchema\":\"EventGridSchema\"},\"id\":\"/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/eventSubscriptions/testeventgrid-c7c155ae\",\"name\":\"testeventgrid-c7c155ae\",\"type\":\"Microsoft.EventGrid/eventSubscriptions\"}]}"
                 }
             }
         }

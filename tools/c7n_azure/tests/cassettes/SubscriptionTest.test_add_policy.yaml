@@ -21,26 +21,26 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "expires": [
+                        "-1"
+                    ],
                     "pragma": [
                         "no-cache"
                     ],
                     "content-length": [
                         "320"
                     ],
-                    "vary": [
-                        "Accept-Encoding"
-                    ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:09:33 GMT"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "expires": [
-                        "-1"
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:10 GMT"
                     ]
                 },
                 "body": {
@@ -79,54 +79,34 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "pragma": [
+                    "transfer-encoding": [
+                        "chunked"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "vary": [
                         "Accept-Encoding,Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:09:30 GMT"
+                    "expires": [
+                        "-1"
+                    ],
+                    "pragma": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "transfer-encoding": [
-                        "chunked"
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:13 GMT"
                     ],
                     "content-length": [
-                        "5052"
+                        "4459"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
-                            {
-                                "sku": {
-                                    "name": "A0",
-                                    "tier": "Free"
-                                },
-                                "properties": {
-                                    "displayName": "cctestpolicy",
-                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/06a78e20-9358-41c9-923c-fb736d382a4d",
-                                    "scope": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
-                                    "metadata": {
-                                        "createdBy": "3857c640-b81d-4a7b-b006-ca39332fddb2",
-                                        "createdOn": "2019-04-25T16:22:42.5596116Z",
-                                        "updatedBy": null,
-                                        "updatedOn": null
-                                    }
-                                },
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization/policyAssignments/cctestpolicy",
-                                "type": "Microsoft.Authorization/policyAssignments",
-                                "name": "cctestpolicy"
-                            },
                             {
                                 "sku": {
                                     "name": "A1",
@@ -314,26 +294,26 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "pragma": [
+                    "transfer-encoding": [
+                        "chunked"
+                    ],
+                    "cache-control": [
                         "no-cache"
                     ],
                     "vary": [
                         "Accept-Encoding,Accept-Encoding"
                     ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:09:35 GMT"
+                    "expires": [
+                        "-1"
+                    ],
+                    "pragma": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "expires": [
-                        "-1"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "transfer-encoding": [
-                        "chunked"
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:09 GMT"
                     ],
                     "content-length": [
                         "370736"
@@ -18863,38 +18843,947 @@
             },
             "response": {
                 "status": {
-                    "code": 400,
-                    "message": "Bad Request"
+                    "code": 201,
+                    "message": "Created"
                 },
                 "headers": {
-                    "pragma": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "394"
-                    ],
-                    "date": [
-                        "Fri, 26 Apr 2019 18:09:30 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1197"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "expires": [
                         "-1"
+                    ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "594"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:13 GMT"
                     ]
                 },
                 "body": {
                     "data": {
-                        "error": {
-                            "code": "InvalidPolicyDefinitionIdUpdate",
-                            "message": "The policy assignment 'cctestpolicy' create request is invalid. Cannot update existing assignment's policy definition '/providers/Microsoft.Authorization/policyDefinitions/06a78e20-9358-41c9-923c-fb736d382a4d' with new policy definition '/providers/Microsoft.Authorization/policyDefinitions/37e0d2fe-28a5-43d6-a273-67d37d1f5606'."
-                        }
+                        "sku": {
+                            "name": "A0",
+                            "tier": "Free"
+                        },
+                        "properties": {
+                            "displayName": "cctestpolicydn",
+                            "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/37e0d2fe-28a5-43d6-a273-67d37d1f5606",
+                            "scope": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                            "metadata": {
+                                "createdBy": "3857c640-b81d-4a7b-b006-ca39332fddb2",
+                                "createdOn": "2019-04-29T18:24:16.8250776Z",
+                                "updatedBy": null,
+                                "updatedOn": null
+                            }
+                        },
+                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization/policyAssignments/cctestpolicy",
+                        "type": "Microsoft.Authorization/policyAssignments",
+                        "name": "cctestpolicy"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2016-06-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "expires": [
+                        "-1"
+                    ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "320"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:15 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                        "subscriptionId": "aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                        "displayName": "Cloud Custodian",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Internal_2014-09-01",
+                            "quotaId": "Internal_2014-09-01",
+                            "spendingLimit": "Off"
+                        },
+                        "authorizationSource": "Legacy"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments?api-version=2018-03-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "transfer-encoding": [
+                        "chunked"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "vary": [
+                        "Accept-Encoding,Accept-Encoding"
+                    ],
+                    "expires": [
+                        "-1"
+                    ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:20 GMT"
+                    ],
+                    "content-length": [
+                        "5054"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "A0",
+                                    "tier": "Free"
+                                },
+                                "properties": {
+                                    "displayName": "cctestpolicydn",
+                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/37e0d2fe-28a5-43d6-a273-67d37d1f5606",
+                                    "scope": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                                    "metadata": {
+                                        "createdBy": "3857c640-b81d-4a7b-b006-ca39332fddb2",
+                                        "createdOn": "2019-04-29T18:24:16.8250776Z",
+                                        "updatedBy": null,
+                                        "updatedOn": null
+                                    }
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization/policyAssignments/cctestpolicy",
+                                "type": "Microsoft.Authorization/policyAssignments",
+                                "name": "cctestpolicy"
+                            },
+                            {
+                                "sku": {
+                                    "name": "A1",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "displayName": "ASC DataProtection (subscription: aa98974b-5d2a-4d98-a78a-382f3715d07e)",
+                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/9cb3cc7a-b39b-4b82-bc89-e5a5d9ff7b97",
+                                    "scope": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                                    "description": "This policy assignment was automatically created by Azure Security Center",
+                                    "metadata": {
+                                        "assignedBy": "Security Center",
+                                        "createdBy": "6878917f-bc1d-4e4e-bb24-12924205b215",
+                                        "createdOn": "2019-03-04T15:23:23.8847211Z",
+                                        "updatedBy": null,
+                                        "updatedOn": null
+                                    }
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization/policyAssignments/DataProtectionSecurityCenter",
+                                "type": "Microsoft.Authorization/policyAssignments",
+                                "name": "DataProtectionSecurityCenter"
+                            },
+                            {
+                                "sku": {
+                                    "name": "A1",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "displayName": "ASC Default (subscription: aa98974b-5d2a-4d98-a78a-382f3715d07e)",
+                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                    "scope": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                                    "parameters": {
+                                        "diagnosticsLogsInServiceFabricMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "systemUpdatesMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "systemConfigurationsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "endpointProtectionMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diskEncryptionMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "networkSecurityGroupsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "webApplicationFirewallMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "sqlAuditingMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "sqlEncryptionMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "nextGenerationFirewallMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "vulnerabilityAssesmentMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "storageEncryptionMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "jitNetworkAccessMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "adaptiveApplicationControlsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityDesignateLessThanOwnersMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityDesignateMoreThanOneOwnerMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityEnableMFAForOwnerPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityEnableMFAForWritePermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityEnableMFAForReadPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveDeprecatedAccountWithOwnerPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveDeprecatedAccountMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveExternalAccountWithOwnerPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveExternalAccountWithWritePermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveExternalAccountWithReadPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "secureTransferToStorageAccountMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "aadAuthenticationInSqlServerMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInRedisCacheMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "clusterProtectionLevelInServiceFabricMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "aadAuthenticationInServiceFabricMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "diagnosticsLogsInServiceBusMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInDataLakeAnalyticsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInDataLakeStoreMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInBatchAccountMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInEventHubMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "metricAlertsInBatchAccountMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "namespaceAuthorizationRulesInServiceBusMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "disableUnrestrictedNetworkToStorageAccountMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "classicComputeVMsMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "classicStorageAccountsMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "sqlDbVulnerabilityAssesmentMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        }
+                                    },
+                                    "description": "This policy assignment was automatically created by Azure Security Center",
+                                    "metadata": {
+                                        "assignedBy": "Security Center"
+                                    }
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization/policyAssignments/SecurityCenterBuiltIn",
+                                "type": "Microsoft.Authorization/policyAssignments",
+                                "name": "SecurityCenterBuiltIn"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments?api-version=2018-03-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "transfer-encoding": [
+                        "chunked"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "vary": [
+                        "Accept-Encoding,Accept-Encoding"
+                    ],
+                    "expires": [
+                        "-1"
+                    ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:11 GMT"
+                    ],
+                    "content-length": [
+                        "5054"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "A0",
+                                    "tier": "Free"
+                                },
+                                "properties": {
+                                    "displayName": "cctestpolicydn",
+                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/37e0d2fe-28a5-43d6-a273-67d37d1f5606",
+                                    "scope": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                                    "metadata": {
+                                        "createdBy": "3857c640-b81d-4a7b-b006-ca39332fddb2",
+                                        "createdOn": "2019-04-29T18:24:16.8250776Z",
+                                        "updatedBy": null,
+                                        "updatedOn": null
+                                    }
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization/policyAssignments/cctestpolicy",
+                                "type": "Microsoft.Authorization/policyAssignments",
+                                "name": "cctestpolicy"
+                            },
+                            {
+                                "sku": {
+                                    "name": "A1",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "displayName": "ASC DataProtection (subscription: aa98974b-5d2a-4d98-a78a-382f3715d07e)",
+                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/9cb3cc7a-b39b-4b82-bc89-e5a5d9ff7b97",
+                                    "scope": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                                    "description": "This policy assignment was automatically created by Azure Security Center",
+                                    "metadata": {
+                                        "assignedBy": "Security Center",
+                                        "createdBy": "6878917f-bc1d-4e4e-bb24-12924205b215",
+                                        "createdOn": "2019-03-04T15:23:23.8847211Z",
+                                        "updatedBy": null,
+                                        "updatedOn": null
+                                    }
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization/policyAssignments/DataProtectionSecurityCenter",
+                                "type": "Microsoft.Authorization/policyAssignments",
+                                "name": "DataProtectionSecurityCenter"
+                            },
+                            {
+                                "sku": {
+                                    "name": "A1",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "displayName": "ASC Default (subscription: aa98974b-5d2a-4d98-a78a-382f3715d07e)",
+                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                    "scope": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                                    "parameters": {
+                                        "diagnosticsLogsInServiceFabricMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "systemUpdatesMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "systemConfigurationsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "endpointProtectionMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diskEncryptionMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "networkSecurityGroupsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "webApplicationFirewallMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "sqlAuditingMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "sqlEncryptionMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "nextGenerationFirewallMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "vulnerabilityAssesmentMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "storageEncryptionMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "jitNetworkAccessMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "adaptiveApplicationControlsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityDesignateLessThanOwnersMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityDesignateMoreThanOneOwnerMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityEnableMFAForOwnerPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityEnableMFAForWritePermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityEnableMFAForReadPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveDeprecatedAccountWithOwnerPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveDeprecatedAccountMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveExternalAccountWithOwnerPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveExternalAccountWithWritePermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveExternalAccountWithReadPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "secureTransferToStorageAccountMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "aadAuthenticationInSqlServerMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInRedisCacheMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "clusterProtectionLevelInServiceFabricMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "aadAuthenticationInServiceFabricMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "diagnosticsLogsInServiceBusMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInDataLakeAnalyticsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInDataLakeStoreMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInBatchAccountMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInEventHubMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "metricAlertsInBatchAccountMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "namespaceAuthorizationRulesInServiceBusMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "disableUnrestrictedNetworkToStorageAccountMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "classicComputeVMsMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "classicStorageAccountsMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "sqlDbVulnerabilityAssesmentMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        }
+                                    },
+                                    "description": "This policy assignment was automatically created by Azure Security Center",
+                                    "metadata": {
+                                        "assignedBy": "Security Center"
+                                    }
+                                },
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization/policyAssignments/SecurityCenterBuiltIn",
+                                "type": "Microsoft.Authorization/policyAssignments",
+                                "name": "SecurityCenterBuiltIn"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization?api-version=2018-05-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "vary": [
+                        "Accept-Encoding"
+                    ],
+                    "expires": [
+                        "-1"
+                    ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "3506"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:20 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization",
+                        "namespace": "Microsoft.Authorization",
+                        "resourceTypes": [
+                            {
+                                "resourceType": "roleAssignments",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-12-01-preview",
+                                    "2018-09-01-preview",
+                                    "2018-01-01-preview",
+                                    "2017-10-01-preview",
+                                    "2017-09-01",
+                                    "2017-05-01",
+                                    "2016-07-01",
+                                    "2015-07-01",
+                                    "2015-06-01",
+                                    "2015-05-01-preview",
+                                    "2014-10-01-preview",
+                                    "2014-07-01-preview",
+                                    "2014-04-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-09-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "roleDefinitions",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-01-01-preview",
+                                    "2017-09-01",
+                                    "2017-05-01",
+                                    "2016-07-01",
+                                    "2015-07-01",
+                                    "2015-06-01",
+                                    "2015-05-01-preview",
+                                    "2014-10-01-preview",
+                                    "2014-07-01-preview",
+                                    "2014-04-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-05-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "classicAdministrators",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2015-06-01",
+                                    "2015-05-01-preview",
+                                    "2014-10-01-preview",
+                                    "2014-07-01-preview",
+                                    "2014-04-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2015-06-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "permissions",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-01-01-preview",
+                                    "2017-05-01",
+                                    "2016-07-01",
+                                    "2015-07-01",
+                                    "2015-06-01",
+                                    "2015-05-01-preview",
+                                    "2014-10-01-preview",
+                                    "2014-07-01-preview",
+                                    "2014-04-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-05-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "denyAssignments",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2019-03-01-preview",
+                                    "2018-07-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locks",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2017-04-01",
+                                    "2016-09-01",
+                                    "2015-06-01",
+                                    "2015-05-01-preview",
+                                    "2015-01-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-04-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "operations",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2017-05-01",
+                                    "2016-07-01",
+                                    "2015-07-01",
+                                    "2015-01-01",
+                                    "2014-10-01-preview",
+                                    "2014-06-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-05-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "policyDefinitions",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2019-01-01",
+                                    "2018-05-01",
+                                    "2018-03-01",
+                                    "2016-12-01",
+                                    "2016-04-01",
+                                    "2015-10-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-03-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "policySetDefinitions",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2019-01-01",
+                                    "2018-05-01",
+                                    "2018-03-01",
+                                    "2017-06-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-03-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "policyAssignments",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2019-01-01",
+                                    "2018-05-01",
+                                    "2018-03-01",
+                                    "2017-06-01-preview",
+                                    "2016-12-01",
+                                    "2016-04-01",
+                                    "2015-10-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-03-01"
+                                    }
+                                ],
+                                "capabilities": "SystemAssignedResourceIdentity"
+                            },
+                            {
+                                "resourceType": "dataAliases",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-06-01-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "providerOperations",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-01-01-preview",
+                                    "2017-05-01",
+                                    "2016-07-01",
+                                    "2015-07-01-preview",
+                                    "2015-07-01"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-05-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "elevateAccess",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2017-05-01",
+                                    "2016-07-01",
+                                    "2015-07-01",
+                                    "2015-06-01",
+                                    "2015-05-01-preview",
+                                    "2014-10-01-preview",
+                                    "2014-07-01-preview",
+                                    "2014-04-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2017-05-01"
+                                    }
+                                ]
+                            },
+                            {
+                                "resourceType": "checkAccess",
+                                "locations": [],
+                                "apiVersions": [
+                                    "2018-09-01-preview"
+                                ],
+                                "apiProfiles": [
+                                    {
+                                        "profileVersion": "2018-06-01-profile",
+                                        "apiVersion": "2018-09-01-preview"
+                                    }
+                                ]
+                            }
+                        ],
+                        "registrationState": "Registered"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/cctestpolicy?api-version=2019-01-01",
+                "body": null,
+                "headers": {
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ],
+                    "Accept": [
+                        "application/json"
+                    ],
+                    "Content-Length": [
+                        "0"
+                    ]
+                }
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "transfer-encoding": [
+                        "chunked"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "vary": [
+                        "Accept-Encoding,Accept-Encoding"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "14999"
+                    ],
+                    "expires": [
+                        "-1"
+                    ],
+                    "pragma": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 29 Apr 2019 18:24:16 GMT"
+                    ],
+                    "content-length": [
+                        "594"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "A0",
+                            "tier": "Free"
+                        },
+                        "properties": {
+                            "displayName": "cctestpolicydn",
+                            "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/37e0d2fe-28a5-43d6-a273-67d37d1f5606",
+                            "scope": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                            "metadata": {
+                                "createdBy": "3857c640-b81d-4a7b-b006-ca39332fddb2",
+                                "createdOn": "2019-04-29T18:24:16.8250776Z",
+                                "updatedBy": null,
+                                "updatedOn": null
+                            }
+                        },
+                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Authorization/policyAssignments/cctestpolicy",
+                        "type": "Microsoft.Authorization/policyAssignments",
+                        "name": "cctestpolicy"
                     }
                 }
             }

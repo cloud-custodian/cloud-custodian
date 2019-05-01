@@ -28,9 +28,6 @@ class ContainerServiceTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
-    # Container service arm template requires SP id/secret, so please use az cli to deploy it
-    # az acs create -n cctestacs -d cctestacsdns
-    #               -g $rgName --generate-ssh-keys --orchestrator-type kubernetes
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-containerservice',
@@ -40,7 +37,7 @@ class ContainerServiceTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'cctest-containerservice'}],
+                 'value': 'cctestacs'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
