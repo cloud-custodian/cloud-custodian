@@ -51,7 +51,6 @@ class ELB(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'elb'
-        resource_type = 'elasticloadbalancing:loadbalancer'
         arn_type = 'loadbalancer'
         arn_service = 'elasticloadbalancing'
         enum_spec = ('describe_load_balancers',

@@ -34,8 +34,6 @@ class ElasticFileSystem(QueryResourceManager):
         dimension = 'FileSystemId'
         arn_type = 'file-system'
         arn_service = 'elasticfilesystem'
-        # resource type for resource tagging api
-        resource_type = 'elasticfilesystem:file-system'
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
 

@@ -25,7 +25,7 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
-from c7n.query import ConfigSource, TypeInfo, DescribeSource
+from c7n.query import ConfigSource, TypeInfo
 
 from .common import BaseTest, event_data, Bag, TestConfig as Config
 
@@ -165,17 +165,6 @@ class PolicyMeta(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
-
-    def test_resource_meta_with_resourcetag_type(self):
-        found = set()
-        for k, v in manager.resources.items():
-            if k in ('rest-account', 'account'):
-                continue
-            if v.resource_type.resource_type:
-                found.add(k)
-        found = found.difference(set(('rds-snapshot', 'cloudhsm-cluster', 'efs', 'elb')))
-        if found:
-            raise SyntaxError("resource type metadata %s" % (', '.join(found)))
 
     def test_resource_meta_with_class(self):
         missing = set()

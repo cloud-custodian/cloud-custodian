@@ -784,6 +784,3 @@ class TypeInfo(object):
 
     # specific to ec2 service resources used to disambiguate a resource by its id
     id_prefix = None
-
-    # ??? used for universal tagging when service name doesn't match arn service
-    resource_type = None

@@ -962,8 +962,6 @@ class RDSSnapshot(QueryResourceManager):
         name = id = 'DBSnapshotIdentifier'
         date = 'SnapshotCreateTime'
         config_type = "AWS::RDS::DBSnapshot"
-        # Need resource_type for Universal Tagging
-        resource_type = "rds:snapshot"
         filter_name = "DBSnapshotIdentifier"
 
     def get_source(self, source_type):

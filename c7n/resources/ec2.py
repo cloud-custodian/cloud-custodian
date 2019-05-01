@@ -1811,7 +1811,6 @@ class LaunchTemplate(query.QueryResourceManager):
         name = 'LaunchTemplateName'
         service = 'ec2'
         date = 'CreateTime'
-        dimension = None
         enum_spec = (
             'describe_launch_templates', 'LaunchTemplates', None)
         filter_name = 'LaunchTemplateIds'
@@ -1896,5 +1895,4 @@ class ReservedInstance(query.QueryResourceManager):
             'describe_reserved_instances', 'ReservedInstances', None)
         filter_name = 'ReservedInstancesIds'
         filter_type = 'list'
-        dimension = None
         arn_type = "reserved-instances"

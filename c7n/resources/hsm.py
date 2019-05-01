@@ -25,7 +25,6 @@ class CloudHSMCluster(QueryResourceManager):
         service = 'cloudhsmv2'
         arn_type = 'cluster'
         arn_service = 'cloudhsm'
-        resource_type = 'cloudhsm'
         enum_spec = ('describe_clusters', 'Clusters', None)
         id = name = 'ClusterId'
         filter_name = 'Filters'
