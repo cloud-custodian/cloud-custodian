@@ -31,10 +31,10 @@ jobs:
     matrix:
       Python27:
         python.version: '2.7'
-        TOXENV: py27-cov
+        TOXENV: py27
       Python36:
         python.version: '3.6'
-        TOXENV: py36
+        TOXENV: py36-cov
       Python37:
         python.version: '3.7'
         TOXENV: py37
