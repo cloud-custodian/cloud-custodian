@@ -15,7 +15,7 @@ is why multi-account policy runs wouldn't work.  Both policies trigger off the c
 modification of any DMS endpoints so if a user tries to disable the SSL it would re-enable the
 SSL or delete the users endpoint and then email them depending on SSL modes supported.
 For the notify action in the second policy to work you must have setup the c7n_mailer tool:
-https://github.com/capitalone/cloud-custodian/tree/master/tools/c7n_mailer
+https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer
 
 
 

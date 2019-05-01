@@ -129,4 +129,4 @@ Using both policies allows you to check both new and existing peering connection
              region: us-east-1
 
 
-Note that for email delivery to work with the ``notify`` action, the cloud custodian mailer tool must be installed, configured, and running.  See https://github.com/capitalone/cloud-custodian/tree/master/tools/c7n_mailer for docs.
+Note that for email delivery to work with the ``notify`` action, the cloud custodian mailer tool must be installed, configured, and running.  See https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer for docs.
