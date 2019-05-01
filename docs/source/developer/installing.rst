@@ -45,7 +45,7 @@ First, clone the repository:
 
 .. code-block:: bash
 
-    $ git clone https://github.com/capitalone/cloud-custodian.git
+    $ git clone https://github.com/cloud-custodian/cloud-custodian.git
     $ cd cloud-custodian
 
 Then build the software with `tox <https://tox.readthedocs.io/en/latest/>`_:

@@ -9,8 +9,8 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
-        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
+      - python/3.6.8 (Windows-10-10.0.17763-SP0) msrest/0.6.6 msrest_azure/0.6.0 azure-mgmt-sql/0.12.0
+        Azure-SDK-For-Python
       accept-language:
       - en-US
     method: GET
@@ -22,41 +22,42 @@ interactions:
         VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
         uc4/evS9X/zR22I5++jRR5e7e+Odj0YfrepqlddtkTcfPfrFH2WzRbEsmrbO2qp+Xl0US2o6XTdt
         NSuyJTW/zOumqPCpvt+0WUuAP3qVZ7Nr+vt8XZbXP7HOyuK8yGdPq0VWLF9kCzSZTtu8aZtfVDZ5
-        TXDeVsv1vU/Xl+u8qffHs6zNJlmTj68Iv+qqGS/z9qNfMvqorKZZKz3mWdOumz3qpMAI7jbrSTOt
-        ixW+bu7ODh48PD/fn2wfTGYPt/fvHxxsP5xMdrbv7+Z7Bw/v53v79z+9W+dNta6n+ed1tV41d4HP
-        728Ruku0uCxmNMK7XxTTumqq83b8+heVd+Xr5u6mARBWy5uHSa3a6xVaRXv46Jd8/5f8P1Clfeis
-        AQAA
+        TXCKWZ5XV/PmfrGeVeNZ1maTrMnHV4RfddWMl3n70S8ZfVRW06yVHvOsadfNHnVSYAR3m/WkmdbF
+        Cl83d/eyTyf7O7OH27ufTifb+58++HT74NOdh9uz+9nu7Hx3d+dg597dOm+qdT3NP6+r9aq5C3x+
+        f4vQXaLFJWFVN3e/KKZ11VTn7fj1LyrvytfN3U0DIKyWNw+TWrXXK7SK9kAD/joTVFx+8NwAhJ3n
+        20wG0bGdT/MlYVKuGwLeZhfAkFp9U7MDnK4WN84KmlnUCRGdhu7Hm+n+/V/y/wCaPmUvJAMAAA==
     headers:
       Cache-Control:
       - no-cache
       Content-Encoding:
       - gzip
+      Content-Length:
+      - '454'
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 23 Apr 2019 17:57:10 GMT
+      - Tue, 30 Apr 2019 18:18:19 GMT
       Expires:
       - '-1'
       Pragma:
       - no-cache
-      Server:
-      - Microsoft-HTTPAPI/2.0
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
-      Transfer-Encoding:
-      - chunked
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 47ecc565-74ac-4b99-aba7-21bca3e7b8a9
+      - cc6a66b8-5073-412d-8c3a-3436ac960b5c
+      x-ms-original-request-ids:
+      - e357edcf-8620-42a8-ac1e-cef746afb323
+      - e19b6906-4bda-45be-8da1-4f4c47374533
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11998'
+      - '11997'
       x-ms-request-id:
-      - 8f9671b4-b8aa-4a6c-b5b8-24dfa71a789a
+      - cc6a66b8-5073-412d-8c3a-3436ac960b5c
       x-ms-routing-request-id:
-      - WESTUS2:20190423T175711Z:47ecc565-74ac-4b99-aba7-21bca3e7b8a9
+      - WESTUS2:20190430T181819Z:cc6a66b8-5073-412d-8c3a-3436ac960b5c
     status:
       code: 200
       message: OK

@@ -208,7 +208,7 @@ c7n-mailer: error: argument -c/--config is required
 ```
 
 Fundamentally what `c7n-mailer` does is deploy a Lambda (using
-[Mu](http://www.capitalone.io/cloud-custodian/docs/policy/mu.html)) based on
+[Mu](http://cloudcustodian.io/docs/policy/mu.html)) based on
 configuration you specify in a YAML file.  Here is [the
 schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 [an example config](./example.yml), and here is a description of the options:
@@ -494,7 +494,7 @@ The following extra jinja filters are available:
 
 Clone the repository:
 ```
-$ git clone https://github.com/capitalone/cloud-custodian
+$ git clone https://github.com/cloud-custodian/cloud-custodian
 ```
 Install dependencies (with virtualenv):
 ```

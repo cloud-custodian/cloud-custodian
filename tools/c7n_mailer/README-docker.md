@@ -1,7 +1,7 @@
 
 # Cloud Custodian Mailer
 
-The Cloud Custodian [`c7n_mailer`](https://github.com/capitalone/cloud-custodian/tree/master/tools/c7n_mailer) is a simple tool for sending notifications with [Cloud Custodian](https://github.com/capitalone/cloud-custodian). This image allows you to run the `c7n_mailer` purely in a Docker container, avoiding the need to install Python requirements.
+The Cloud Custodian [`c7n_mailer`](https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer) is a simple tool for sending notifications with [Cloud Custodian](https://github.com/cloud-custodian/cloud-custodian). This image allows you to run the `c7n_mailer` purely in a Docker container, avoiding the need to install Python requirements.
 
 # How to use this image
 

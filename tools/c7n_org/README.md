@@ -79,7 +79,7 @@ projects:
 We also distribute scripts to generate the necessary config file in the `scripts` folder.
 
 **Note** Currently these are distributed only via git, per
-https://github.com/capitalone/cloud-custodian/issues/2420 we'll
+https://github.com/cloud-custodian/cloud-custodian/issues/2420 we'll
 be looking to incorporate them into a new c7n-org subcommand.
 
 - For **AWS**, the script `orgaccounts.py` generates a config file

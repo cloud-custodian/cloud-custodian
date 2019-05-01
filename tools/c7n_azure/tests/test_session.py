@@ -209,7 +209,7 @@ class SessionTest(BaseTest):
                                 constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
                                 constants.ENV_CLIENT_ID: 'client',
                                 constants.ENV_CLIENT_SECRET: 'secret',
-                                constants.ENV_FUNCTION_MANAGED_GROUP_NAME: 'test'
+                                constants.ENV_FUNCTION_MANAGEMENT_GROUP_NAME: 'test'
                             }, clear=True):
                 with patch('c7n_azure.utils.ManagedGroupHelper.get_subscriptions_list',
                            return_value=[]):
