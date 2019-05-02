@@ -473,6 +473,8 @@ The following variables are available when rendering templates:
 | `action` | `notify` action that generated this SQS message |
 | `policy` | policy that triggered this notify action |
 | `account` | short name of the aws account |
+| `region`  | region the policy was executing in |
+| `execution_start` | The time policy started executing |
 
 The following extra global functions are available:
 
@@ -481,6 +483,9 @@ The following extra global functions are available:
 | `format_struct(struct)` | pretty print a json structure |
 | `resource_tag(resource, key)` | retrieve a tag value from a resource or return an empty string, aliased as get_resource_tag_value |
 | `format_resource(resource, resource_type)` | renders a one line summary of a resource |
+| `date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z')`| customize rendering of an utc datetime string |
+| `seach(expression, value)` | jmespath search value using expression |
+| `yaml_safe(value)` | yaml dumper |
 
 The following extra jinja filters are available:
 
