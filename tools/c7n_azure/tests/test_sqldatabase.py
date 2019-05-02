@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import mock
 from azure_common import BaseTest, arm_template
-from c7n_azure.resources.sqldatabase import BackupRetentionPolicyFilter
-from c7n_azure.query import ChildResourceQuery
 
 
 class SqlDatabaseTest(BaseTest):
@@ -72,49 +69,6 @@ class SqlDatabaseTest(BaseTest):
         self.assertEqual(db.get('name'), 'cctestdb')
 
 
-class BackupRetentionPolicyFilterTest(BaseTest):
-
-    def setUp(self):
-        super(BackupRetentionPolicyFilterTest, self).setUp()
-
-        self.resouce_group = "test_sqlserver"
-        self.parent_key = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/"
-        "test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserver"
-        self.name = "cctestdb"
-
-        manager = mock.Mock()
-        self.filter = BackupRetentionPolicyFilter('op-prop', 0, {}, manager)
-
-    def test_raises_key_error_without_resource_group(self):
-        with self.assertRaises(KeyError):
-            self.filter.process([{
-                ChildResourceQuery.parent_key: self.parent_key,
-                'name': self.name
-            }])
-
-    def test_raises_key_error_without_parent_key(self):
-        with self.assertRaises(KeyError):
-            self.filter.process([{
-                'resourceGroup': self.resouce_group,
-                'name': self.name
-            }])
-
-    def test_raises_key_error_without_name(self):
-        with self.assertRaises(KeyError):
-            self.filter.process([{
-                'resourceGroup': self.resouce_group,
-                ChildResourceQuery.parent_key: self.parent_key
-            }])
-
-    def test_raises_value_error_when_cannot_determine_sql_server_name(self):
-        with self.assertRaises(ValueError):
-            self.filter.process([{
-                'resourceGroup': self.resouce_group,
-                ChildResourceQuery.parent_key: "invalidResourceId",
-                'name': self.name
-            }])
-
-
 class ShortTermBackupRetentionPolicyFilterTest(BaseTest):
 
     def test_validate_short_term_backup_retention_policy_filter_schema_validate(self):
@@ -138,21 +92,31 @@ class ShortTermBackupRetentionPolicyFilterTest(BaseTest):
             'resource': 'azure.sqldatabase',
             'filters': [
                 {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cctestdb'
+                },
+                {
                     'type': 'short-term-backup-retention-policy',
                     'retention-period-days': 14
                 }
             ]
         })
         resources = p.run()
-        db = next((r for r in resources if r.get('name') == 'cctestdb'), None)
-        self.assertIsNotNone(db)
-        self.assertEqual(db.get('name'), 'cctestdb')
+        self.assertEqual(len(resources), 1)
 
     def test_filter_database_with_short_term_retention_at_14_days(self):
         p = self.load_policy({
             'name': 'find-database-with-short-term-retention-at-14-days',
             'resource': 'azure.sqldatabase',
             'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cctestdb'
+                },
                 {
                     'type': 'short-term-backup-retention-policy',
                     'op': 'ne',
@@ -161,8 +125,7 @@ class ShortTermBackupRetentionPolicyFilterTest(BaseTest):
             ]
         })
         resources = p.run()
-        db = next((r for r in resources if r.get('name') == 'cctestdb'), None)
-        self.assertIsNone(db)
+        self.assertEqual(len(resources), 0)
 
 
 class LongTermBackupRetentionPolicyFilterTest(BaseTest):
@@ -191,6 +154,12 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
             'resource': 'azure.sqldatabase',
             'filters': [
                 {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cclongtermretentiondb',
+                },
+                {
                     'type': 'long-term-backup-retention-policy',
                     'backup-type': 'weekly',
                     'op': 'lt',
@@ -201,9 +170,7 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
         })
 
         resources = p.run()
-        db = next((r for r in resources if r.get('name') == 'cclongtermretentiondb'), None)
-        self.assertIsNotNone(db)
-        self.assertEqual(db.get('name'), 'cclongtermretentiondb')
+        self.assertEqual(len(resources), 1)
 
     def test_filter_database_with_yearly_backup_retention_more_than_18_months(self):
 
@@ -211,6 +178,12 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
             'name': 'filter-db-with-yearly-backup-retention-more-than-18-months',
             'resource': 'azure.sqldatabase',
             'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cctestdb'
+                },
                 {
                     'type': 'long-term-backup-retention-policy',
                     'backup-type': 'yearly',
@@ -222,8 +195,7 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
         })
 
         resources = p.run()
-        db = next((r for r in resources if r.get('name') == 'cctestdb'), None)
-        self.assertIsNone(db)
+        self.assertEqual(len(resources), 0)
 
     def test_find_database_with_long_term_policy_using_filter_or_operator(self):
 
@@ -231,6 +203,12 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
             'name': 'test-find-database-with-long-term-policy-using-filter-or-operator',
             'resource': 'azure.sqldatabase',
             'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cclongtermretentiondb'
+                },
                 {
                     'or': [
                         {
@@ -253,9 +231,7 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
         })
 
         resources = p.run()
-        db = next((r for r in resources if r.get('name') == 'cclongtermretentiondb'), None)
-        self.assertIsNotNone(db)
-        self.assertEqual(db.get('name'), 'cclongtermretentiondb')
+        self.assertEqual(len(resources), 1)
 
     def test_filter_database_with_retention_period_unit_mismatch(self):
 
@@ -263,6 +239,12 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
             'name': 'test-filter-database-with-retention-period-unit-mismatch',
             'resource': 'azure.sqldatabase',
             'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cctestdb'
+                },
                 {
                     'type': 'long-term-backup-retention-policy',
                     'backup-type': 'weekly',

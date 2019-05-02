@@ -34,7 +34,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 30 Apr 2019 16:28:43 GMT
+      - Thu, 02 May 2019 21:11:42 GMT
       Expires:
       - '-1'
       Pragma:
@@ -50,13 +50,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 53777a8f-2c4f-4c0e-8770-08fb984c4b9a
+      - c75a418b-f21c-4767-b545-577dbbb767c1
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11989'
+      - '11994'
       x-ms-request-id:
-      - da5acdd0-758c-4d36-a5cf-17e473cbaad7
+      - 15f61fd2-7632-4650-a0ec-d7cdab249587
       x-ms-routing-request-id:
-      - WESTUS2:20190430T162843Z:53777a8f-2c4f-4c0e-8770-08fb984c4b9a
+      - WESTUS2:20190502T211142Z:c75a418b-f21c-4767-b545-577dbbb767c1
     status:
       code: 200
       message: OK
@@ -83,19 +83,20 @@ interactions:
         VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
         uc4/evS9X/xR83b90aNf/NEyW9DfH71us+Usq2cfjT5qi7wOP5lmq2xatNcfPdrd+SWjj94Wyxk1
         uNzdG++M1g21Hn20qqtVXtOrDYBOq7LM2qJaUrPXP/H8939Ofyx3f//P82VeZ+Xvf/Jy9/c/Ofv9
-        j1/Ti4vs3eviB/mT6xav7n16sH/v/v79T3d2dkYfNW3WrunTj75clsUyp9azrM0mWZOfAYH9T3fy
-        nYcHB9uf7u4dbO9/+uDh9uTTgwfbs093z/d3Z+cH92f36J1pnVP31fJp1mKkezu7D7d39rfv7bzZ
-        /fTR3r1H93fGe5/+FBqu6zpftq/z+rKY5l9OfjqftsVl/kIptENN6vwXrfOmzWebGs3y82xdEpxp
-        BQpeP6+mjAB9PyX4RAEaFHVHYymri5Pb0+oH1TJ/lc/WBHXZfvToPCubfPRRntUl0b19Rf+v6jw6
-        zPveMIkcs9fTrESrp0WTTcock4yPX+WrsphmJ9Ua8GkGDEm+Jq8Qs5Ru8HnW0HTuUaMC03e3WU+a
-        aV2s8HVzd3bw4OH5+f5k+2Aye7i9f5/m9eFksrN9fzffO3h4P98jrrhb5021rqf553W1XjV3iWfa
-        37/5RUSG+jKv7xITXhazvG7uflFM66qpztvx619U3pWvm7vTKV6w7d9Wy/W9T9eXNKP1/l3DWmhW
-        VsuLNq8Xdd7S6Am92YSw1uEPfd1er/B1vGsL/aNfMurK3ss6XxTrBUAIOd0HHjX37hM1fzZFb3f/
-        wf7BvU/3D24UvGw6fXieP5yRzE1pqvbP97YfPtjf3b63//De+ae7+w+n+7cSvIfjPTCkYTIiVUSk
-        Xu5Sk5vkjhv9v1TudJREDCt2p8thqdslDJUgX49LiE3+Pyl0aMaCpAP2PvnaovX6mpgGJFKa2b8d
-        yXoWrTFtFtkyu8hnT6jR/8voRsjR69+E1N/b29vd27u//2CPtP0NYj97sLOzt0sG9t7k4ZTEfney
-        /fBg92B77+H9ndmnB/fu7WWf0jubxX7v0f298YN9SIRhcxpfRKRlqsC4Nwm/a/lD1gA0UCvSX8+S
-        Mub0Cs3jIHsSf/5/UJ4XhCeNyUqz/fu2svz9X/L/APFHOqyuCgAA
+        j1/Ti4vs3eviB/mT6xav7n16sH/v/v79T3d2dkYfNW3WrunTj75clsUyp9azrM0mWZOfAYH797Od
+        nemnD7c/nc2y7f3ZZHf7IL832c4fZPv3750/mO3cP6B3pnVO3VfLp1mLke7t7D7c3rm/vbP7Zvfh
+        o73dR/cejnd27/0UWq7rOl+2r/P6spjmX05+Op+2xWX+Qkm0Q03q/Bet86bNZ5sazfLzbF0SnGkF
+        El4/r6aMAX0/JfhEAhoVdUeDKauLk9sT6wfVMn+Vz9YEddl+9Og8K5t89FGe1SURvn1F/6/qPDrO
+        ezuPdg/G9/cfYJxEkNnraVai2dOiySZljmnGx6/yVVlMs5NqjQ5oDgxNvia3ELuUbvR51tCE7lGj
+        AhN4t1lPmmldrPB1c3d28ODh+fn+ZPtgMnu4vX//4GD74WSys31/N987eHg/3yO+uFvnTbWup/nn
+        dbVeNXeJa9rfv/lFRIf6Mq/vEhteFrO8bu5+UUzrqqnO2/HrX1Tela+bu9MpXrDt31bL9b1P15c0
+        pfX+XcNcaFZWy4s2rxd13tLoCb3ZhLDW4Q993V6v8HW8awv9o18y6krfyzpfFOsFQAg53QceNffu
+        EzV/NoVvd//B/sG9T/cPbhQ9ajm5N83ubU/Pd3a393d37m1PPt3d3d7Zm+zf39vJP304Y1YglgIm
+        UZbc23u0fzDe32GWNGxGxIpI1ctdanKT6HGj/xeK3t7+o53d8b0HrGKIIFb0TpfDkrdLOCpJvh6n
+        EKv8f1Lw0IyFSQfsffK1xev1NbENSKQ0s387kvXsWmPaLLJldpHPnlCj/5fRjZCj178Jyb+3t7e7
+        t0fWYY80/g2i/+n57sEs393b3skOJtv7+YOd7QnZz+2DB9OHewfTbHLw8CG9s1n0dx7tfzr+9BaS
+        L1MFxr1J/F3LH7IOoIFakf561pQxp1doHgfZk/jz/4PyvCA8aUxWmu3ft5Xl7/+S/wdjpQSmtAoA
+        AA==
     headers:
       Cache-Control:
       - no-cache
@@ -104,7 +105,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 30 Apr 2019 16:28:43 GMT
+      - Thu, 02 May 2019 21:11:42 GMT
       Expires:
       - '-1'
       Pragma:
@@ -120,73 +121,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 63be0983-4f1c-41e9-97ae-e0d01968752a
+      - e600747f-6579-4819-8db4-e48db02fda42
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11991'
+      - '11999'
       x-ms-request-id:
-      - 6b185ba2-743c-41c0-ae8c-0335f77960c3
+      - 17d484b6-17d9-48af-b12a-7e5111b7f16c
       x-ms-routing-request-id:
-      - WESTUS2:20190430T162844Z:63be0983-4f1c-41e9-97ae-e0d01968752a
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
-        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
-      accept-language:
-      - en-US
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cclongtermretentiondb/backupShortTermRetentionPolicies/default?api-version=2017-10-01-preview
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR6u6
-        WuV1W+TNR49+8Ud13ubLtqiWT7Nr+uDe/V8y+qiYffToo7vNetJM62KFL5u7s4MHD8/P9yfbB5PZ
-        w+39+wcH2w8nk53t+7v53sHD+/ne/v1P79Z5U63raf55Xa1Xzd02b9rfv/lFZZPXl3l9lzq+LGZ5
-        3dz9opjWVVOdt+PXv6i8K183d6dTvGDbv62W63ufri/XeVPv351lbTbJmhzNymp50eb1wuI+m9yd
-        ZNO369XreVW3b+irV+arl1VZTGmsd2f5ebYu249GHy2zRU4DdB+01yt8EMfKdXxTFx/9kv8HjO6I
-        Jl0BAAA=
-    headers:
-      Cache-Control:
-      - no-cache
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Tue, 30 Apr 2019 16:28:43 GMT
-      Expires:
-      - '-1'
-      Pragma:
-      - no-cache
-      Server:
-      - Microsoft-HTTPAPI/2.0
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Content-Type-Options:
-      - nosniff
-      x-ms-correlation-request-id:
-      - a86a07a1-14cf-49e2-9ee7-3caf95796ab4
-      x-ms-ratelimit-remaining-subscription-reads:
-      - '11994'
-      x-ms-request-id:
-      - b14eb760-875c-44a3-a1c6-bc11748b4f55
-      x-ms-routing-request-id:
-      - WESTUS2:20190430T162844Z:a86a07a1-14cf-49e2-9ee7-3caf95796ab4
+      - WESTUS2:20190502T211143Z:e600747f-6579-4819-8db4-e48db02fda42
     status:
       code: 200
       message: OK
@@ -223,7 +164,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 30 Apr 2019 16:28:44 GMT
+      - Thu, 02 May 2019 21:11:42 GMT
       Expires:
       - '-1'
       Pragma:
@@ -239,66 +180,14 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - b9c83ecd-7982-4522-90b7-b85d3e606ff8
+      - 036e332c-9625-46af-b4c0-1205b743f1ad
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11986'
+      - '11999'
       x-ms-request-id:
-      - 7bfed5ee-92bd-499f-99df-cbe87904d349
+      - c9e742e4-d78a-47a5-947a-8cbfe5c7f12b
       x-ms-routing-request-id:
-      - WESTUS2:20190430T162844Z:b9c83ecd-7982-4522-90b7-b85d3e606ff8
+      - WESTUS2:20190502T211143Z:036e332c-9625-46af-b4c0-1205b743f1ad
     status:
       code: 200
       message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
-        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
-      accept-language:
-      - en-US
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/master/backupShortTermRetentionPolicies/default?api-version=2017-10-01-preview
-  response:
-    body:
-      string: '{"error":{"code":"ResourceNotFound","message":"The requested resource
-        of type ''Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies''
-        with name ''Microsoft.SqlServer.Management.Service.Workflows.Interfaces.DatabaseResourceIdentifier''
-        was not found."}}'
-    headers:
-      Cache-Control:
-      - no-cache
-      Content-Length:
-      - '261'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Tue, 30 Apr 2019 16:28:44 GMT
-      Expires:
-      - '-1'
-      Pragma:
-      - no-cache
-      Server:
-      - Microsoft-HTTPAPI/2.0
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      X-Content-Type-Options:
-      - nosniff
-      x-ms-correlation-request-id:
-      - b52feaa4-5847-48aa-b7a5-271fb7d0cbe9
-      x-ms-ratelimit-remaining-subscription-reads:
-      - '11996'
-      x-ms-request-id:
-      - 13367a69-2318-408f-9030-4c56aa8be23b
-      x-ms-routing-request-id:
-      - WESTUS2:20190430T162844Z:b52feaa4-5847-48aa-b7a5-271fb7d0cbe9
-    status:
-      code: 404
-      message: Not Found
 version: 1

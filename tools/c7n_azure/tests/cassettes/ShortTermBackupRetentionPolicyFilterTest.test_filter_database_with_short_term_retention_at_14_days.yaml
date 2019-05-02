@@ -34,7 +34,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 30 Apr 2019 16:28:42 GMT
+      - Thu, 02 May 2019 21:11:39 GMT
       Expires:
       - '-1'
       Pragma:
@@ -50,13 +50,13 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - eb6fab44-1e7e-4937-ad6d-b1069da655ac
+      - 701d6f86-b343-4917-884f-630f9c181c09
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11947'
+      - '11999'
       x-ms-request-id:
-      - 18959d9c-5d7d-481e-ab67-b77c931f86bb
+      - f14cf467-2d7e-4fb3-bd6b-6892df287539
       x-ms-routing-request-id:
-      - WESTUS2:20190430T162842Z:eb6fab44-1e7e-4937-ad6d-b1069da655ac
+      - WESTUS2:20190502T211140Z:701d6f86-b343-4917-884f-630f9c181c09
     status:
       code: 200
       message: OK
@@ -78,33 +78,16 @@ interactions:
     uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases?api-version=2017-10-01-preview
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR5dZ
-        uc4/evS9X/xR83b90aNf/NEyW9DfH71us+Usq2cfjT5qi7wOP5lmq2xatNcfPdrd+SWjj94Wyxk1
-        uNzdG++M1g21Hn20qqtVXtOrDYBOq7LM2qJaUrPXP/H8939Ofyx3f//P82VeZ+Xvf/Jy9/c/Ofv9
-        j1/Ti4vs3eviB/mT6xav7n16sH/v/v79T3d2dkYfNW3WrunTj75clsUyp9azrM0mWZOfAYH9T3fy
-        nYcHB9uf7u4dbO9/+uDh9uTTgwfbs093z/d3Z+cH92f36J1pnVP31fJp1mKkezu7D7d39rfv7bzZ
-        /fTR3r1H93fGe5/+FBqu6zpftq/z+rKY5l9OfjqftsVl/kIptENN6vwXrfOmzWebGs3y82xdEpxp
-        BQpeP6+mjAB9PyX4RAEaFHVHYymri5Pb0+oH1TJ/lc/WBHXZfvToPCubfPRRntUl0b19Rf+v6jw6
-        zPveMIkcs9fTrESrp0WTTcock4yPX+WrsphmJ9Ua8GkGDEm+Jq8Qs5Ru8HnW0HTuUaMC03e3WU+a
-        aV2s8HVzd3bw4OH5+f5k+2Aye7i9f5/m9eFksrN9fzffO3h4P98jrrhb5021rqf553W1XjV3iWfa
-        37/5RUSG+jKv7xITXhazvG7uflFM66qpztvx619U3pWvm7vTKV6w7d9Wy/W9T9eXNKP1/l3DWmhW
-        VsuLNq8Xdd7S6Am92YSw1uEPfd1er/B1vGsL/aNfMurK3ss6XxTrBUAIOd0HHjX37hM1fzZFb3f/
-        wf7BvU/3D24UvGw6fXieP5yRzE1pqvbP97YfPtjf3b63//De+ae7+w+n+7cSvIfjPTCkYTIiVUSk
-        Xu5Sk5vkjhv9v1TudJREDCt2p8thqdslDJUgX49LiE3+Pyl0aMaCpAP2PvnaovX6mpgGJFKa2b8d
-        yXoWrTFtFtkyu8hnT6jR/8voRsjR69+E1N/b29vd27u//2CPtP0NYj97sLOzt0sG9t7k4ZTEfney
-        /fBg92B77+H9ndmnB/fu7WWf0jubxX7v0f298YN9SIRhcxpfRKRlqsC4Nwm/a/lD1gA0UCvSX8+S
-        Mub0Cs3jIHsSf/5/UJ4XhCeNyUqz/fu2svz9X/L/APFHOqyuCgAA
+      string: '{"value":[{"sku":{"name":"Standard","tier":"Standard","capacity":10},"kind":"v12.0,user","properties":{"collation":"SQL_Latin1_General_CP1_CI_AS","maxSizeBytes":268435456000,"status":"Online","databaseId":"55a00c69-6dda-4db1-8e3b-e7a453f7d058","creationDate":"2019-05-01T19:21:39.013Z","currentServiceObjectiveName":"S0","requestedServiceObjectiveName":"S0","defaultSecondaryLocation":"centralus","catalogCollation":"SQL_Latin1_General_CP1_CI_AS","zoneRedundant":false,"earliestRestoreDate":"2019-05-01T19:30:18.547Z","readScale":"Disabled","readReplicaCount":0,"currentSku":{"name":"Standard","tier":"Standard","capacity":10}},"location":"eastus2","id":"/subscriptions/d879ff4b-8bd9-4588-9bb0-51e2895e2456/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cclongtermretentiondb","name":"cclongtermretentiondb","type":"Microsoft.Sql/servers/databases"},{"sku":{"name":"Premium","tier":"Premium","capacity":125},"kind":"v12.0,user","properties":{"collation":"SQL_Latin1_General_CP1_CI_AS","maxSizeBytes":2147483648,"status":"Online","databaseId":"147b3ca3-cf01-4103-b611-02b4520e69dd","creationDate":"2019-05-01T19:22:48.407Z","currentServiceObjectiveName":"P1","requestedServiceObjectiveName":"P1","defaultSecondaryLocation":"centralus","catalogCollation":"SQL_Latin1_General_CP1_CI_AS","zoneRedundant":false,"earliestRestoreDate":"2019-05-01T19:24:01.373Z","readScale":"Enabled","readReplicaCount":1,"currentSku":{"name":"Premium","tier":"Premium","capacity":125}},"location":"eastus2","id":"/subscriptions/d879ff4b-8bd9-4588-9bb0-51e2895e2456/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cctestdb","name":"cctestdb","type":"Microsoft.Sql/servers/databases"},{"sku":{"name":"System","tier":"System","capacity":0},"kind":"v12.0,system","managedBy":"/subscriptions/d879ff4b-8bd9-4588-9bb0-51e2895e2456/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4","properties":{"collation":"SQL_Latin1_General_CP1_CI_AS","maxSizeBytes":32212254720,"status":"Online","databaseId":"6f18de12-0a8b-4e70-b013-87c928cab899","creationDate":"2019-05-01T19:20:46.67Z","currentServiceObjectiveName":"System2","requestedServiceObjectiveName":"System2","defaultSecondaryLocation":"centralus","catalogCollation":"SQL_Latin1_General_CP1_CI_AS","zoneRedundant":false,"readScale":"Disabled","readReplicaCount":0,"currentSku":{"name":"System","tier":"System","capacity":0}},"location":"eastus2","id":"/subscriptions/d879ff4b-8bd9-4588-9bb0-51e2895e2456/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/master","name":"master","type":"Microsoft.Sql/servers/databases"}]}'
     headers:
       Cache-Control:
       - no-cache
-      Content-Encoding:
-      - gzip
+      Content-Length:
+      - '2740'
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 30 Apr 2019 16:28:42 GMT
+      - Thu, 02 May 2019 21:11:41 GMT
       Expires:
       - '-1'
       Pragma:
@@ -113,80 +96,16 @@ interactions:
       - Microsoft-HTTPAPI/2.0
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - 96ac7dbd-4997-4fca-8cf1-1f5e61058068
+      - 95905de8-1399-41fc-a3d9-8ae45abb53c8
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11974'
+      - '11990'
       x-ms-request-id:
-      - da8d4a98-a538-402b-956a-b82267637d4c
+      - 2f7107b9-36fb-4687-ab3f-350b839f5575
       x-ms-routing-request-id:
-      - WESTUS2:20190430T162842Z:96ac7dbd-4997-4fca-8cf1-1f5e61058068
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
-        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
-      accept-language:
-      - en-US
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/cclongtermretentiondb/backupShortTermRetentionPolicies/default?api-version=2017-10-01-preview
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAEAO29B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcpl
-        VmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/In7xR6u6
-        WuV1W+TNR49+8Ud13ubLtqiWT7Nr+uDe/V8y+qiYffToo7vNetJM62KFL5u7s4MHD8/P9yfbB5PZ
-        w+39+wcH2w8nk53t+7v53sHD+/ne/v1P79Z5U63raf55Xa1Xzd02b9rfv/lFZZPXl3l9lzq+LGZ5
-        3dz9opjWVVOdt+PXv6i8K183d6dTvGDbv62W63ufri/XeVPv351lbTbJmhzNymp50eb1wuI+m9yd
-        ZNO369XreVW3b+irV+arl1VZTGmsd2f5ebYu249GHy2zRU4DdB+01yt8EMfKdXxTFx/9kv8HjO6I
-        Jl0BAAA=
-    headers:
-      Cache-Control:
-      - no-cache
-      Content-Encoding:
-      - gzip
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Tue, 30 Apr 2019 16:28:42 GMT
-      Expires:
-      - '-1'
-      Pragma:
-      - no-cache
-      Server:
-      - Microsoft-HTTPAPI/2.0
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Content-Type-Options:
-      - nosniff
-      x-ms-correlation-request-id:
-      - 9a5cea35-21a7-4033-a7a7-2c2388b1c7f4
-      x-ms-ratelimit-remaining-subscription-reads:
-      - '11971'
-      x-ms-request-id:
-      - 4b93d66c-2754-45a4-a170-fb4b1ae34b5d
-      x-ms-routing-request-id:
-      - WESTUS2:20190430T162842Z:9a5cea35-21a7-4033-a7a7-2c2388b1c7f4
+      - WESTUS2:20190502T211141Z:95905de8-1399-41fc-a3d9-8ae45abb53c8
     status:
       code: 200
       message: OK
@@ -223,7 +142,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 30 Apr 2019 16:28:42 GMT
+      - Thu, 02 May 2019 21:11:42 GMT
       Expires:
       - '-1'
       Pragma:
@@ -239,66 +158,14 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       x-ms-correlation-request-id:
-      - b9a38eb0-42b4-48c7-8b67-145a24c5fd4c
+      - cf2637c0-72b4-4f14-910e-020d330ffab2
       x-ms-ratelimit-remaining-subscription-reads:
-      - '11998'
+      - '11999'
       x-ms-request-id:
-      - 582dbe1a-9359-4976-869a-153908b14eea
+      - f0c7b8da-849e-4c43-81ed-057004e8639e
       x-ms-routing-request-id:
-      - WESTUS2:20190430T162843Z:b9a38eb0-42b4-48c7-8b67-145a24c5fd4c
+      - WESTUS2:20190502T211142Z:cf2637c0-72b4-4f14-910e-020d330ffab2
     status:
       code: 200
       message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python/3.7.3 (Darwin-18.5.0-x86_64-i386-64bit) msrest/0.6.6 msrest_azure/0.6.0
-        azure-mgmt-sql/0.12.0 Azure-SDK-For-Python
-      accept-language:
-      - en-US
-    method: GET
-    uri: https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverkonu36uvuesr4/databases/master/backupShortTermRetentionPolicies/default?api-version=2017-10-01-preview
-  response:
-    body:
-      string: '{"error":{"code":"ResourceNotFound","message":"The requested resource
-        of type ''Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies''
-        with name ''Microsoft.SqlServer.Management.Service.Workflows.Interfaces.DatabaseResourceIdentifier''
-        was not found."}}'
-    headers:
-      Cache-Control:
-      - no-cache
-      Content-Length:
-      - '261'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Tue, 30 Apr 2019 16:28:42 GMT
-      Expires:
-      - '-1'
-      Pragma:
-      - no-cache
-      Server:
-      - Microsoft-HTTPAPI/2.0
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains
-      X-Content-Type-Options:
-      - nosniff
-      x-ms-correlation-request-id:
-      - 27354396-3368-403c-a49d-0d3f99fb174c
-      x-ms-ratelimit-remaining-subscription-reads:
-      - '11974'
-      x-ms-request-id:
-      - 22442e1c-2d59-4a1f-a1c2-e52a10c98332
-      x-ms-routing-request-id:
-      - WESTUS2:20190430T162843Z:27354396-3368-403c-a49d-0d3f99fb174c
-    status:
-      code: 404
-      message: Not Found
 version: 1
