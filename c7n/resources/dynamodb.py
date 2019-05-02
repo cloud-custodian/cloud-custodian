@@ -80,26 +80,6 @@ class ConfigTable(query.ConfigSource):
 
 class DescribeTable(query.DescribeSource):
 
-    def get_resources(self, ids, *args, **kw):
-        # Dynamodb tables aren't taggable while pending creation, even
-        # attempting to fetch tags for a table will return not found errors.
-        # In order to resolve on several user reported issues  #3361, #3171, #3514
-        # When subscribing to create table events, wait for the table to exist
-        # leaving at least a 15s margin before our configured timeout.
-        if (self.manager.ctx.policy.execution_mode == 'cloudtrail' and
-                'CreateTable' in self.manager.data['mode']['events']):
-            waiter, waiter_config = self.get_waiter()
-            for tid in ids:
-                waiter.wait(TableName=tid, WaiterConfig=waiter_config)
-        return super(DescribeTable, self).get_resources(ids, *args, **kw)
-
-    def get_waiter(self):
-        timeout = self.manager.data['mode'].get('timeout', 60)
-        waiter_config = {'Delay': 15, 'MaxAttempts': int((timeout - 15) / 15)}
-        return local_session(
-            self.manager.session_factory).client(
-                'dynamodb').get_waiter('table_exists'), waiter_config
-
     def augment(self, resources):
         return universal_augment(
             self.manager,

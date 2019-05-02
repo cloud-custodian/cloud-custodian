@@ -34,3 +34,4 @@ results.xml
 .pytest_cache/
 pyvenv.cfg
 junit
+/.vs

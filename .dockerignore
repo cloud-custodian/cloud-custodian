@@ -8,18 +8,14 @@ lib/
 bin/
 dist/
 man/
-lib64
-.Python
-pip-selfcheck.json
+lib64/
 coverage/
-.coverage
 tmp/
 docs/source/generated/
 docs/build/
 cache/
 policies/
 local/
-*~
 share/
 out/
 .DS_STORE
@@ -29,3 +25,7 @@ results.xml
 .vscode/
 !.vscode/*.sample
 .pytest_cache/
+.Python
+pip-selfcheck.json
+.coverage
+*~

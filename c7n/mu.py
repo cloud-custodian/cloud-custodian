@@ -72,11 +72,18 @@ class PythonPackageArchive(object):
         self.add_modules(None, *modules)
 
     def __del__(self):
-        if not self._closed:
-            self.close()
-        if self._temp_archive_file:
-            self._temp_archive_file.close()
-            os.unlink(self.path)
+        try:
+            if not self._closed:
+                self.close()
+            if self._temp_archive_file:
+                self._temp_archive_file.close()
+                os.unlink(self.path)
+        except AttributeError:
+            # Finalizers in python are fairly problematic, especially when
+            # breaking cycle references, there are no ordering guaranteees
+            # so our tempfile may already be gc'd before this ref'd version
+            # is called.
+            pass
 
     @property
     def path(self):
@@ -807,7 +814,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def timeout(self):
-        return self.policy.data['mode'].get('timeout', 60)
+        return self.policy.data['mode'].get('timeout', 900)
 
     @property
     def security_groups(self):

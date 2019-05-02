@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest, arm_template, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
@@ -31,7 +31,9 @@ class AzureEventSubscriptionsTest(BaseTest):
         StorageUtilities.create_queue_from_storage_account(account, queue_name, self.session)
         event_sub_destination = StorageQueueEventSubscriptionDestination(
             resource_id=account.id, queue_name=queue_name)
-        AzureEventSubscription.create(event_sub_destination, self.event_sub_name)
+        AzureEventSubscription.create(event_sub_destination,
+                                      self.event_sub_name,
+                                      DEFAULT_SUBSCRIPTION_ID)
 
     def test_event_subscription_schema_validate(self):
         with self.sign_out_patch():

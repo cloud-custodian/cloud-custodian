@@ -330,7 +330,7 @@ class Not(BooleanGroupFilter):
 class AnnotationSweeper(object):
     """Support clearing annotations set within a block filter.
 
-    See https://github.com/capitalone/cloud-custodian/issues/2116
+    See https://github.com/cloud-custodian/cloud-custodian/issues/2116
     """
     def __init__(self, id_key, resources):
         self.id_key = id_key

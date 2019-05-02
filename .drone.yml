@@ -5,7 +5,7 @@ build:
        - git config --global user.email "cibot@cloud-custodian.io"
        - git config --global user.name "Custodian CI"
        - pip install tox
-       - tox -e py37 --notest
+       - tox -e doc --notest
        - make sphinx
        - git remote update origin --prune
        - make ghpages

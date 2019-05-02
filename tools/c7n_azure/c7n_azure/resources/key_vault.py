@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from azure.graphrbac import GraphRbacManagementClient
+from c7n_azure.actions import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
 
@@ -21,6 +22,9 @@ from c7n.utils import type_schema
 from c7n_azure.utils import GraphHelper
 
 from c7n_azure.resources.arm import ArmResourceManager
+
+import logging
+log = logging.getLogger('custodian.azure.keyvault')
 
 
 @resources.register('keyvault')
@@ -122,3 +126,76 @@ class WhiteListFilter(Filter):
                 policy['principalName'] = GraphHelper.get_principal_name(aad_object)
 
         return access_policies
+
+
+@KeyVault.action_registry.register('update-access-policy')
+class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
+    """
+        Adds Get and List key access policy to all keyvaults
+
+            .. code-block:: yaml
+
+              policies:
+                - name: azure-keyvault-update-access-policies
+                  resource: azure.keyvault
+                  description: |
+                    Add key get and list to all keyvault access policies
+                  actions:
+                   - type: update-access-policy
+                     operation: add
+                     access-policies:
+                      - tenant-id: 00000000-0000-0000-0000-000000000000
+                        object-id: 11111111-1111-1111-1111-111111111111
+                        permissions:
+                          keys:
+                            - Get
+                            - List
+    """
+
+    schema = type_schema('update-access-policy',
+        required=['operation', 'access-policies'],
+        operation={'type': 'string', 'enum': ['add', 'replace']},
+        **{
+            "access-policies": {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'tenant-id': {'type': 'string'},
+                    'object-id': {'type': 'string'},
+                    'permissions': {
+                        'type': 'object',
+                        'keys': {'type': 'array', 'items': {'type': 'string'}},
+                        'secrets': {'type': 'array', 'items': {'type': 'string'}},
+                        'certificates': {'type': 'array', 'items': {'type': 'string'}}
+                    }
+                }
+            }
+        })
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        operation = self.data.get('operation')
+        access_policies = KeyVaultUpdateAccessPolicyAction._transform_access_policies(
+            self.data.get('access-policies')
+        )
+
+        try:
+            self.client.vaults.update_access_policy(
+                resource_group_name=resource['resourceGroup'],
+                vault_name=resource['name'],
+                operation_kind=operation,
+                properties=access_policies
+            )
+        except Exception as error:
+            log.warning(error)
+
+    @staticmethod
+    def _transform_access_policies(access_policies):
+        policies = [
+            {"objectId": i['object-id'],
+                "tenantId": i['tenant-id'],
+                "permissions": i['permissions']} for i in access_policies]
+
+        return {"accessPolicies": policies}
