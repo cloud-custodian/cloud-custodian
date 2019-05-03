@@ -14,14 +14,14 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3800,Microsoft.Compute/LowCostGet30Min;31583"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:43:56 GMT"
+                        "Fri, 03 May 2019 19:37:34 GMT"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3860,Microsoft.Compute/LowCostGet30Min;31103"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
@@ -118,14 +118,14 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3799,Microsoft.Compute/LowCostGet30Min;31582"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:43:57 GMT"
+                        "Fri, 03 May 2019 19:37:34 GMT"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3859,Microsoft.Compute/LowCostGet30Min;31102"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"

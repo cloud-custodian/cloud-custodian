@@ -14,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 03 May 2019 19:11:57 GMT"
+                    ],
+                    "set-cookie": [
+                        "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "x-ms-request-charge": [
                         "1"
                     ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "set-cookie": [
-                        "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 19:10:10 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
                     ],
                     "content-length": [
                         "143435"

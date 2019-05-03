@@ -14,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3850,Microsoft.Compute/LowCostGet30Min;31639"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:41:41 GMT"
+                        "Fri, 03 May 2019 19:37:04 GMT"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3897,Microsoft.Compute/LowCostGet30Min;31216"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "content-length": [
-                        "2337"
+                        "2338"
                     ]
                 },
                 "body": {
@@ -91,7 +91,7 @@
                                     "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
                                 }
                             },
-                            "provisioningState": "Updating"
+                            "provisioningState": "Succeeded"
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
@@ -114,66 +114,24 @@
             },
             "response": {
                 "status": {
-                    "code": 500,
-                    "message": "Internal Server Error"
-                },
-                "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-ms-failure-cause": [
-                        "gateway"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 19:41:51 GMT"
-                    ],
-                    "content-length": [
-                        "312"
-                    ],
-                    "connection": [
-                        "close"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "error": {
-                            "code": "InternalServerError",
-                            "message": "Encountered internal server error. Diagnostic information: timestamp '20190502T194152Z', subscription id 'aa98974b-5d2a-4d98-a78a-382f3715d07e', tracking id '366020c9-5891-4cac-84da-00f2384c99e0', request correlation id '366020c9-5891-4cac-84da-00f2384c99e0'."
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-03-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
                     "code": 200,
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3849,Microsoft.Compute/LowCostGet30Min;31638"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:41:52 GMT"
+                        "Fri, 03 May 2019 19:37:03 GMT"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3892,Microsoft.Compute/LowCostGet30Min;31211"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "content-length": [
-                        "2337"
+                        "2338"
                     ]
                 },
                 "body": {
@@ -237,7 +195,7 @@
                                     "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
                                 }
                             },
-                            "provisioningState": "Updating"
+                            "provisioningState": "Succeeded"
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",

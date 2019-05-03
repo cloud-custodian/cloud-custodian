@@ -203,15 +203,30 @@ class AzureVCRBaseTest(VCRTestCase):
     def _response_substitutions(response):
         data = response['body']['data']
 
-        if data is dict:
+        if isinstance(data, dict):
             odata_metadata = data.get('odata.metadata')
             if odata_metadata and "directoryObjects" in odata_metadata:
                 response['body']['data'] = GRAPH_RESPONSE
+                return response
 
             # Replace Activity Log API responses
             value_array = data.get('value', [])
             if len(value_array) > 0 and value_array[0].get('eventTimestamp'):
                 response['body']['data'] = ACTIVITY_LOG_RESPONSE
+                return response
+
+            if 'authorizations' in data:
+                response['body']['data']['authorizations'] = []
+
+            # Real resource type responses are critical to catching
+            # API version failures, but we can get rid of extra fields
+            # and save a lot of space
+            if 'resourceTypes' in data:
+                response['body']['data']['resourceTypes'] = \
+                    [{
+                        'resourceType': r['resourceType'],
+                        'apiVersions': [next(iter(r['apiVersions']))]
+                    } for r in data['resourceTypes']]
 
         return response
 

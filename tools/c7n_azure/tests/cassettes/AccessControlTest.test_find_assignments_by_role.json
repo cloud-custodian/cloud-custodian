@@ -14,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 03 May 2019 19:11:55 GMT"
+                    ],
                     "set-cookie": [
                         "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 13:30:15 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "x-ms-request-charge": [
                         "1"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "55682"
@@ -1154,138 +1154,6 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/974c5e8b-45b9-4653-ba55-5f855dd0fb88?api-version=2018-01-01-preview",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "set-cookie": [
-                        "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 13:30:22 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-ms-request-charge": [
-                        "1"
-                    ],
-                    "content-length": [
-                        "1055"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "properties": {
-                            "roleName": "Storage Queue Data Contributor",
-                            "type": "BuiltInRole",
-                            "description": "Allows for read, write, and delete access to Azure Storage queues and queue messages",
-                            "assignableScopes": [
-                                "/"
-                            ],
-                            "permissions": [
-                                {
-                                    "actions": [
-                                        "Microsoft.Storage/storageAccounts/queueServices/queues/delete",
-                                        "Microsoft.Storage/storageAccounts/queueServices/queues/read",
-                                        "Microsoft.Storage/storageAccounts/queueServices/queues/write"
-                                    ],
-                                    "notActions": [],
-                                    "dataActions": [
-                                        "Microsoft.Storage/storageAccounts/queueServices/queues/messages/delete",
-                                        "Microsoft.Storage/storageAccounts/queueServices/queues/messages/read",
-                                        "Microsoft.Storage/storageAccounts/queueServices/queues/messages/write"
-                                    ],
-                                    "notDataActions": []
-                                }
-                            ],
-                            "createdOn": "2017-12-21T00:01:24.7972312Z",
-                            "updatedOn": "2019-03-05T21:58:02.7367128Z",
-                            "createdBy": null,
-                            "updatedBy": null
-                        },
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/974c5e8b-45b9-4653-ba55-5f855dd0fb88",
-                        "type": "Microsoft.Authorization/roleDefinitions",
-                        "name": "974c5e8b-45b9-4653-ba55-5f855dd0fb88"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/ac63b705-f282-497d-ac71-919bf39d939d?api-version=2018-01-01-preview",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "set-cookie": [
-                        "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 13:30:17 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-ms-request-charge": [
-                        "1"
-                    ],
-                    "content-length": [
-                        "633"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "properties": {
-                            "roleName": "Management Group Reader",
-                            "type": "BuiltInRole",
-                            "description": "Management Group Reader Role",
-                            "assignableScopes": [
-                                "/"
-                            ],
-                            "permissions": [
-                                {
-                                    "actions": [
-                                        "Microsoft.Management/managementGroups/read"
-                                    ],
-                                    "notActions": [],
-                                    "dataActions": [],
-                                    "notDataActions": []
-                                }
-                            ],
-                            "createdOn": "2018-06-22T00:31:03.4295347Z",
-                            "updatedOn": "2018-07-10T20:49:42.5630340Z",
-                            "createdBy": null,
-                            "updatedBy": null
-                        },
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/ac63b705-f282-497d-ac71-919bf39d939d",
-                        "type": "Microsoft.Authorization/roleDefinitions",
-                        "name": "ac63b705-f282-497d-ac71-919bf39d939d"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/cdda3590-29a3-44f6-95f2-9f980659eb04?api-version=2018-01-01-preview",
                 "body": null,
                 "headers": {}
@@ -1296,20 +1164,20 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 03 May 2019 19:11:56 GMT"
+                    ],
                     "set-cookie": [
                         "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 13:30:21 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "x-ms-request-charge": [
                         "1"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "643"
@@ -1349,6 +1217,69 @@
         {
             "request": {
                 "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635?api-version=2018-01-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 03 May 2019 19:11:56 GMT"
+                    ],
+                    "set-cookie": [
+                        "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-charge": [
+                        "1"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "604"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "roleName": "Owner",
+                            "type": "BuiltInRole",
+                            "description": "Lets you manage everything, including access to resources.",
+                            "assignableScopes": [
+                                "/"
+                            ],
+                            "permissions": [
+                                {
+                                    "actions": [
+                                        "*"
+                                    ],
+                                    "notActions": [],
+                                    "dataActions": [],
+                                    "notDataActions": []
+                                }
+                            ],
+                            "createdOn": "2015-02-02T21:55:09.8806423Z",
+                            "updatedOn": "2019-02-05T21:24:32.2101122Z",
+                            "createdBy": null,
+                            "updatedBy": null
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+                        "type": "Microsoft.Authorization/roleDefinitions",
+                        "name": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/ba92f5b4-2d11-453d-a403-e96b0029c9fe?api-version=2018-01-01-preview",
                 "body": null,
                 "headers": {}
@@ -1359,20 +1290,20 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 03 May 2019 19:11:56 GMT"
+                    ],
                     "set-cookie": [
                         "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 13:30:17 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "x-ms-request-charge": [
                         "1"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "1061"
@@ -1428,20 +1359,20 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 03 May 2019 19:11:57 GMT"
+                    ],
                     "set-cookie": [
                         "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 13:30:19 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "x-ms-request-charge": [
                         "1"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "820"
@@ -1487,7 +1418,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635?api-version=2018-01-01-preview",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/ac63b705-f282-497d-ac71-919bf39d939d?api-version=2018-01-01-preview",
                 "body": null,
                 "headers": {}
             },
@@ -1497,14 +1428,11 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 03 May 2019 19:11:57 GMT"
+                    ],
                     "set-cookie": [
                         "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 13:30:18 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -1512,37 +1440,109 @@
                     "x-ms-request-charge": [
                         "1"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "content-length": [
-                        "604"
+                        "633"
                     ]
                 },
                 "body": {
                     "data": {
                         "properties": {
-                            "roleName": "Owner",
+                            "roleName": "Management Group Reader",
                             "type": "BuiltInRole",
-                            "description": "Lets you manage everything, including access to resources.",
+                            "description": "Management Group Reader Role",
                             "assignableScopes": [
                                 "/"
                             ],
                             "permissions": [
                                 {
                                     "actions": [
-                                        "*"
+                                        "Microsoft.Management/managementGroups/read"
                                     ],
                                     "notActions": [],
                                     "dataActions": [],
                                     "notDataActions": []
                                 }
                             ],
-                            "createdOn": "2015-02-02T21:55:09.8806423Z",
-                            "updatedOn": "2019-02-05T21:24:32.2101122Z",
+                            "createdOn": "2018-06-22T00:31:03.4295347Z",
+                            "updatedOn": "2018-07-10T20:49:42.5630340Z",
                             "createdBy": null,
                             "updatedBy": null
                         },
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/ac63b705-f282-497d-ac71-919bf39d939d",
                         "type": "Microsoft.Authorization/roleDefinitions",
-                        "name": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                        "name": "ac63b705-f282-497d-ac71-919bf39d939d"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/974c5e8b-45b9-4653-ba55-5f855dd0fb88?api-version=2018-01-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 03 May 2019 19:11:57 GMT"
+                    ],
+                    "set-cookie": [
+                        "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-request-charge": [
+                        "1"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1055"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "roleName": "Storage Queue Data Contributor",
+                            "type": "BuiltInRole",
+                            "description": "Allows for read, write, and delete access to Azure Storage queues and queue messages",
+                            "assignableScopes": [
+                                "/"
+                            ],
+                            "permissions": [
+                                {
+                                    "actions": [
+                                        "Microsoft.Storage/storageAccounts/queueServices/queues/delete",
+                                        "Microsoft.Storage/storageAccounts/queueServices/queues/read",
+                                        "Microsoft.Storage/storageAccounts/queueServices/queues/write"
+                                    ],
+                                    "notActions": [],
+                                    "dataActions": [
+                                        "Microsoft.Storage/storageAccounts/queueServices/queues/messages/delete",
+                                        "Microsoft.Storage/storageAccounts/queueServices/queues/messages/read",
+                                        "Microsoft.Storage/storageAccounts/queueServices/queues/messages/write"
+                                    ],
+                                    "notDataActions": []
+                                }
+                            ],
+                            "createdOn": "2017-12-21T00:01:24.7972312Z",
+                            "updatedOn": "2019-03-05T21:58:02.7367128Z",
+                            "createdBy": null,
+                            "updatedBy": null
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/roleDefinitions/974c5e8b-45b9-4653-ba55-5f855dd0fb88",
+                        "type": "Microsoft.Authorization/roleDefinitions",
+                        "name": "974c5e8b-45b9-4653-ba55-5f855dd0fb88"
                     }
                 }
             }
@@ -1560,20 +1560,20 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 03 May 2019 19:11:57 GMT"
+                    ],
                     "set-cookie": [
                         "x-ms-gateway-slice=Production; path=/; secure; HttpOnly"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 13:30:18 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "x-ms-request-charge": [
                         "1"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "603"

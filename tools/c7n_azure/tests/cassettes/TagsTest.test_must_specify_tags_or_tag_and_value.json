@@ -14,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3848,Microsoft.Compute/LowCostGet30Min;31637"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:41:52 GMT"
+                        "Fri, 03 May 2019 19:37:03 GMT"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3891,Microsoft.Compute/LowCostGet30Min;31210"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "content-length": [
-                        "2337"
+                        "2338"
                     ]
                 },
                 "body": {
@@ -91,7 +91,7 @@
                                     "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
                                 }
                             },
-                            "provisioningState": "Updating"
+                            "provisioningState": "Succeeded"
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
@@ -118,20 +118,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3847,Microsoft.Compute/LowCostGet30Min;31636"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:41:52 GMT"
+                        "Fri, 03 May 2019 19:37:04 GMT"
                     ],
-                    "x-ms-ratelimit-remaining-resource": [
-                        "Microsoft.Compute/LowCostGet3Min;3890,Microsoft.Compute/LowCostGet30Min;31209"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "content-length": [
-                        "2337"
+                        "2338"
                     ]
                 },
                 "body": {
@@ -195,7 +195,7 @@
                                     "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
                                 }
                             },
-                            "provisioningState": "Updating"
+                            "provisioningState": "Succeeded"
                         },
                         "type": "Microsoft.Compute/virtualMachines",
                         "location": "southcentralus",
