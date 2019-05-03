@@ -27,6 +27,7 @@ from c7n_azure import constants
 from concurrent.futures import as_completed
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
+from netaddr import IPNetwork, IPRange
 
 from c7n.utils import chunks
 from c7n.utils import local_session
@@ -378,6 +379,29 @@ class PortsRangeHelper(object):
                     ports[p] = IsAllowed
 
         return ports
+
+
+class IpRangeHelper(object):
+
+    @staticmethod
+    def parse_ip_ranges(data, key):
+        '''
+        Parses IP range or CIDR mask.
+        :param data: Dictionary where to look for the value.
+        :param key:  Key for the value to be parsed.
+        :return: Set of IP ranges and networks.
+        '''
+
+        if key not in data:
+            return None
+
+        ranges = [[s.strip() for s in r.split('-')] for r in data[key]]
+        result = set()
+        for r in ranges:
+            if len(r) > 2:
+                raise Exception('Invalid range. Use x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.')
+            result.add(IPRange(*r) if len(r) == 2 else IPNetwork(r[0]))
+        return result
 
 
 class AppInsightsHelper(object):

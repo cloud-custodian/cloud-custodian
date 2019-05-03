@@ -178,6 +178,8 @@ class Notify(BaseNotify):
             'account_id': self.manager.config.account_id,
             'account': alias,
             'region': self.manager.config.region,
+            'execution_id': self.manager.ctx.execution_id,
+            'execution_start': self.manager.ctx.start_time,
             'policy': self.manager.data}
         message['action'] = self.expand_variables(message)
 

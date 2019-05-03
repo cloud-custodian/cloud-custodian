@@ -19,6 +19,7 @@ from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 
+
 @requires_arm_polling
 class AzureEventSubscriptionsTest(BaseTest):
     event_sub_name = 'custodiantestsubscription'

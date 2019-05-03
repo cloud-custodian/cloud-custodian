@@ -39,7 +39,8 @@ DEFAULT_SUBSCRIPTION_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
 CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 DEFAULT_USER_OBJECT_ID = '00000000-0000-0000-0000-000000000002'
 DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000003'
-DEFAULT_STORAGE_KEY = 'DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w=='
+DEFAULT_STORAGE_KEY = 'DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo'\
+                      '/MGFHKc+t+M20PxoraNCslng9w=='
 
 GRAPH_RESPONSE = {
     "value": [
@@ -60,9 +61,9 @@ ACTIVITY_LOG_RESPONSE = {
     "value": [
         {
             "caller": "john@doe.com",
-            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/"
-                  "Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/"
-                  "ticks/636923208048336028",
+            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/"
+                  "TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/"
+                  "37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
             "operationName": {
                 "value": "Microsoft.Compute/virtualMachines/write",
                 "localizedValue": "Create or Update Virtual Machine"
@@ -104,9 +105,11 @@ class AzureVCRBaseTest(VCRTestCase):
                         'transfer-encoding',
                         'expires']
 
-    def setUp(self):
-        super(AzureVCRBaseTest, self).setUp()
-        self.is_recording = hasattr(self, 'cassette') and os.path.isfile(self.cassette._path)
+    def is_recording(self):
+        # You can't do this in setup because it is actually required by the base class
+        # setup (via our callbacks), but it is also not possible to do until the base class setup
+        # has completed initializing the cassette instance.
+        return hasattr(self, 'cassette') and os.path.isfile(self.cassette._path)
 
     def _get_vcr_kwargs(self):
         return super(VCRTestCase, self)._get_vcr_kwargs(
@@ -161,7 +164,7 @@ class AzureVCRBaseTest(VCRTestCase):
         return request
 
     def _response_callback(self, response):
-        if not self.is_recording:
+        if not self.is_recording():
             if 'data' in response['body']:
                 body = json.dumps(response['body']['data'])
                 response['body']['string'] = body.encode('utf-8')
@@ -263,7 +266,7 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             self._lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_init)
             self._lro_patch.start()
             self.addCleanup(self._lro_patch.stop)
-        elif self.is_recording:
+        elif self.is_recording():
             # If using polling we need to monkey patch the timeout during playback
             # or we'll have long sleeps introduced into our test runs
             Session._old_client = Session.client

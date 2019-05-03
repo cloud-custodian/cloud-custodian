@@ -39,6 +39,30 @@
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false
          }
+      },
+      {
+        "type": "Microsoft.Sql/servers/firewallRules",
+        "apiVersion": "2015-05-01-preview",
+        "name": "[concat(parameters('servers_cctestsqlserver_name'), '/AllowAllWindowsAzureIps')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Sql/servers', parameters('servers_cctestsqlserver_name'))]"
+        ],
+        "properties": {
+          "startIpAddress": "0.0.0.0",
+          "endIpAddress": "0.0.0.0"
+        }
+      },
+      {
+        "type": "Microsoft.Sql/servers/firewallRules",
+        "apiVersion": "2015-05-01-preview",
+        "name": "[concat(parameters('servers_cctestsqlserver_name'), '/1.2.2.128s25')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Sql/servers', parameters('servers_cctestsqlserver_name'))]"
+        ],
+        "properties": {
+          "startIpAddress": "1.2.2.128",
+          "endIpAddress": "1.2.2.255"
+        }
       }
    ],
    "outputs": {}

@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 19 Apr 2019 09:38:26 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "459",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres/backupRuns/1555592400197?alt=json"
+  },
+  "body": {
+    "kind": "sql#backupRun",
+    "status": "SUCCESSFUL",
+    "enqueuedTime": "2019-04-18T15:54:50.354Z",
+    "id": "1555592400197",
+    "startTime": "2019-04-18T15:54:50.386Z",
+    "endTime": "2019-04-18T15:55:35.883Z",
+    "type": "AUTOMATED",
+    "windowStartTime": "2019-04-18T13:00:00.197Z",
+    "instance": "custodian-postgres",
+    "selfLink": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres/backupRuns/1555592400197"
+  }
+}

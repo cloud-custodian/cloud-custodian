@@ -17,6 +17,7 @@ import logging
 import c7n_gcp.policy
 
 # This is an alphabetically sorted import list
+import c7n_gcp.resources.appengine
 import c7n_gcp.resources.bigquery
 import c7n_gcp.resources.build
 import c7n_gcp.resources.cloudbilling

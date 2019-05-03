@@ -51,7 +51,8 @@ class SubscriptionTest(BaseTest):
         # The lookup table for policy ID's is huge
         # so just patch in the constant to reduce test impact
         definition_patch.return_value.id = \
-            "/providers/Microsoft.Authorization/policyDefinitions/37e0d2fe-28a5-43d6-a273-67d37d1f5606"
+            "/providers/Microsoft.Authorization/policyDefinitions/"
+        "37e0d2fe-28a5-43d6-a273-67d37d1f5606"
 
         p = self.load_policy({
             'name': 'test-add-policy',
