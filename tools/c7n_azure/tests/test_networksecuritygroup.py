@@ -213,11 +213,7 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'ingress',
                  'ports': '1000-1100',
                  'match': 'any',
-                 'access': 'Deny'}],
-            'actions': [
-                {'type': 'close',
-                 'ports': '1000-1100',
-                 'direction': 'Inbound'}]
+                 'access': 'Deny'}]
         })
 
         resources = p.run()

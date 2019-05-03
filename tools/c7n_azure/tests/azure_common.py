@@ -105,11 +105,11 @@ class AzureVCRBaseTest(VCRTestCase):
                         'transfer-encoding',
                         'expires']
 
-    def is_recording(self):
+    def is_playback(self):
         # You can't do this in setup because it is actually required by the base class
         # setup (via our callbacks), but it is also not possible to do until the base class setup
         # has completed initializing the cassette instance.
-        return hasattr(self, 'cassette') and os.path.isfile(self.cassette._path)
+        return not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path)
 
     def _get_vcr_kwargs(self):
         return super(VCRTestCase, self)._get_vcr_kwargs(
@@ -164,7 +164,7 @@ class AzureVCRBaseTest(VCRTestCase):
         return request
 
     def _response_callback(self, response):
-        if not self.is_recording():
+        if self.is_playback():
             if 'data' in response['body']:
                 body = json.dumps(response['body']['data'])
                 response['body']['string'] = body.encode('utf-8')
@@ -260,28 +260,31 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         super(BaseTest, self).setUp()
         ThreadHelper.disable_multi_threading = True
 
+        # We always patch the date so URLs that involve dates match up
+        self._utc_patch = patch.object(actions, 'utcnow', BaseTest.get_test_date)
+        self._utc_patch.start()
+        self.addCleanup(self._utc_patch.stop)
+
         if not self._requires_polling:
             # Patch Poller with constructor that always disables polling
             # This breaks blocking on long running operations (resource creation).
             self._lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_init)
             self._lro_patch.start()
             self.addCleanup(self._lro_patch.stop)
-        elif self.is_recording():
-            # If using polling we need to monkey patch the timeout during playback
-            # or we'll have long sleeps introduced into our test runs
-            Session._old_client = Session.client
-            Session.client = BaseTest.session_client_wrapper
-            self.addCleanup(BaseTest.session_client_cleanup)
 
-        self._utc_patch = patch.object(actions, 'utcnow', BaseTest.get_test_date)
-        self._utc_patch.start()
-        self.addCleanup(self._utc_patch.stop)
+        if self.is_playback():
+            if self._requires_polling:
+                # If using polling we need to monkey patch the timeout during playback
+                # or we'll have long sleeps introduced into our test runs
+                Session._old_client = Session.client
+                Session.client = BaseTest.session_client_wrapper
+                self.addCleanup(BaseTest.session_client_cleanup)
 
-        if constants.ENV_ACCESS_TOKEN in os.environ:
-            self._tenant_patch = patch('c7n_azure.session.Session.get_tenant_id',
-                                       return_value=DEFAULT_TENANT_ID)
-            self._tenant_patch.start()
-            self.addCleanup(self._tenant_patch.stop)
+            if constants.ENV_ACCESS_TOKEN in os.environ:
+                self._tenant_patch = patch('c7n_azure.session.Session.get_tenant_id',
+                                           return_value=DEFAULT_TENANT_ID)
+                self._tenant_patch.start()
+                self.addCleanup(self._tenant_patch.stop)
 
     def get_test_date(self):
         if self.cassette.responses:
