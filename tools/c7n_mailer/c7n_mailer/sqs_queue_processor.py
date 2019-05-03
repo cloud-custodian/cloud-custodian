@@ -204,10 +204,12 @@ class MailerSqsQueueProcessor(object):
         ):
             from .splunk_delivery import SplunkHecDelivery
             splunk_delivery = SplunkHecDelivery(self.config, self.session, self.logger)
-            splunk_messages = splunk_delivery.get_splunk_events(sqs_message)
+            splunk_messages = splunk_delivery.get_splunk_payloads(
+                sqs_message, encoded_sqs_message['Attributes']['SentTimestamp']
+            )
 
             try:
-                splunk_delivery.deliver_splunk_messages(splunk_messages, sqs_message)
+                splunk_delivery.deliver_splunk_messages(splunk_messages)
             except Exception:
                 traceback.print_exc()
                 pass
