@@ -129,7 +129,7 @@ class AppEngineFirewallIngressRule(ChildResourceManager):
         component = 'apps.firewall.ingressRules'
         enum_spec = ('list', 'ingressRules[]', None)
         scope = None
-        id = 'id'
+        id = 'priority'
         parent_spec = {
             'resource': 'app-engine',
             'child_enum_params': {
