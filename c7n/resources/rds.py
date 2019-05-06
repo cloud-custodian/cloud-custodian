@@ -96,6 +96,7 @@ class RDS(QueryResourceManager):
         date = 'InstanceCreateTime'
         dimension = 'DBInstanceIdentifier'
         config_type = 'AWS::RDS::DBInstance'
+        arn = 'DBInstanceArn'
 
         default_report_fields = (
             'DBInstanceIdentifier',
@@ -118,11 +119,11 @@ class RDS(QueryResourceManager):
 
     @property
     def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='db', separator=':')
-        return self._generate_arn
+        return functools.partial(
+            generate_arn, 'rds',
+            region=self.config.region,
+            account_id=self.config.account_id,
+            resource_type='db', separator=':')
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -465,8 +466,7 @@ class TagTrim(tags.TagTrim):
     permissions = ('rds:RemoveTagsFromResource',)
 
     def process_tag_removal(self, client, resource, candidates):
-        arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
-        client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
+        client.remove_tags_from_resource(ResourceName=resource['DBInstanceArn'], TagKeys=candidates)
 
 
 START_STOP_ELIGIBLE_ENGINES = {

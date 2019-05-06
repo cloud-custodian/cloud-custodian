@@ -365,7 +365,7 @@ class RDSTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 5)
 
     def test_rds_retention_copy_tags(self):
         session_factory = self.replay_flight_data("test_rds_retention")
@@ -379,7 +379,7 @@ class RDSTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 5)
 
     def test_rds_restore(self):
         self.patch(rds.RestoreInstance, "executor_factory", MainThreadExecutor)

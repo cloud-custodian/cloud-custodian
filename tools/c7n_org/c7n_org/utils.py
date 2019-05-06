@@ -17,6 +17,9 @@ def account_tags(account):
 @contextmanager
 def environ(**kw):
     current_env = dict(os.environ)
+    for k, v in list(current_env.items()):
+        if k.startswith('AWS_'):
+            os.environ.pop(k)
     for k, v in kw.items():
         os.environ[k] = v
 

@@ -76,7 +76,7 @@ class ArnTest(BaseTest):
 class UtilTest(BaseTest):
 
     def test_default_account_id_assume(self):
-        config = Bag(assume_role='arn:aws:iam::644160558196:role/custodian-mu')
+        config = Bag(assume_role='arn:aws:iam::644160558196:role/custodian-mu', account_id=None)
         aws._default_account_id(config)
         self.assertEqual(config.account_id, '644160558196')
 
