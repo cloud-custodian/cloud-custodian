@@ -306,21 +306,18 @@ class TestRestResource(BaseTest):
                         "type": "rest-method",
                         "key": "authorizationType",
                         "value": "AWS_IAM",
-                        "op": "equal",
                     },
                     {
                         "type": "rest-method",
                         "key": "apiKeyRequired",
                         "value": False,
-                        "op": "equal",
+                        "matched": True,
                     }
                 ],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["restApiId"], "41tqbpyer2")
         self.assertEqual(len(resources[0].get("c7n:matched-resource-methods")), 2)
 
         p = self.load_policy(
@@ -337,16 +334,13 @@ class TestRestResource(BaseTest):
                         "type": "rest-method",
                         "key": "apiKeyRequired",
                         "value": False,
-                        "matched": True,
                     }
                 ],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["restApiId"], "41tqbpyer2")
-        self.assertEqual(len(resources[0].get("c7n:matched-resource-methods")), 1)
+        self.assertEqual(len(resources[0].get("c7n:matched-resource-methods")), 3)
 
 
 class TestRestStage(BaseTest):

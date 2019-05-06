@@ -2,21 +2,21 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "b94763f4-5c60-11e9-9baa-9d73dcc87891",
+            "RequestId": "effea6b4-703d-11e9-be65-1bdbaaecb7a1",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 11 Apr 2019 13:50:10 GMT",
+                "date": "Mon, 06 May 2019 20:31:33 GMT",
                 "content-type": "application/json",
-                "content-length": "477",
+                "content-length": "490",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "b94763f4-5c60-11e9-9baa-9d73dcc87891",
-                "x-amz-apigw-id": "X-fi6LG3oAMEbnA="
+                "x-amzn-requestid": "effea6b4-703d-11e9-be65-1bdbaaecb7a1",
+                "x-amz-apigw-id": "ZRzx1KLhoAMEbgQ="
             },
             "RetryAttempts": 0
         },
         "httpMethod": "GET",
-        "authorizationType": "NONE",
-        "apiKeyRequired": true,
+        "authorizationType": "AWS_IAM",
+        "apiKeyRequired": false,
         "methodResponses": {
             "200": {
                 "statusCode": "200",
@@ -26,13 +26,13 @@
             }
         },
         "methodIntegration": {
-            "type": "MOCK",
-            "requestTemplates": {
-                "application/json": "{\"statusCode\": 200}"
-            },
+            "type": "HTTP",
+            "httpMethod": "GET",
+            "uri": "http://google.com",
+            "connectionType": "INTERNET",
             "passthroughBehavior": "WHEN_NO_MATCH",
             "timeoutInMillis": 29000,
-            "cacheNamespace": "x4ixbp4ukh",
+            "cacheNamespace": "urrp8u1wd4",
             "cacheKeyParameters": [],
             "integrationResponses": {
                 "200": {

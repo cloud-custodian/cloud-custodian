@@ -2,24 +2,25 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "b82f15c4-5c60-11e9-b836-7130c6f26748",
+            "RequestId": "efd6ac50-703d-11e9-90ec-79d14dbd7260",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 11 Apr 2019 13:50:08 GMT",
+                "date": "Mon, 06 May 2019 20:31:33 GMT",
                 "content-type": "application/json",
-                "content-length": "71",
+                "content-length": "81",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "b82f15c4-5c60-11e9-b836-7130c6f26748",
-                "x-amz-apigw-id": "X-fioJ9HoAMEbgQ="
+                "x-amzn-requestid": "efd6ac50-703d-11e9-90ec-79d14dbd7260",
+                "x-amz-apigw-id": "ZRzxyKhCoAMEbgA="
             },
             "RetryAttempts": 0
         },
         "items": [
             {
-                "id": "x4ixbp4ukh",
+                "id": "urrp8u1wd4",
                 "path": "/",
                 "resourceMethods": {
-                    "GET": {}
+                    "GET": {},
+                    "HEAD": {}
                 }
             }
         ]

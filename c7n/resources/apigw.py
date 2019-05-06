@@ -563,8 +563,8 @@ class FilterRestMethod(ValueFilter):
 
         with self.executor_factory(max_workers=2) as w:
             tasks = []
-            if self.data.get('matched', False):
-                resources = [r for r in resources if r.get('c7n:matched-resource-methods') != '']
+            # if self.data.get('matched', False):
+            #     resources = [r for r in resources if r.get('c7n:matched-resource-methods') != '']
             for r in resources:
                 if self.data.get('matched', False):
                     for ms in r.get('c7n:matched-resource-methods'):
@@ -592,6 +592,11 @@ class FilterRestMethod(ValueFilter):
                         results.add(m['resourceId'])
                         resource_map[m['resourceId']].setdefault(
                             ANNOTATION_KEY_MATCHED_METHODS, []).append(m)
+                    if self.data.get('matched', False) and not self.match(m):
+                        resource_map[m['resourceId']].setdefault(
+                            ANNOTATION_KEY_MATCHED_METHODS, []).remove(m)
+                        
+
         return [resource_map[rid] for rid in results]
 
     def process_task_set(self, client, task_set):
