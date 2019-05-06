@@ -10,7 +10,7 @@ Unit tests can be run with:
 
 .. code-block:: bash
 
-   $ python -m tox
+   $ tox
 
 Linting can be run with:
 

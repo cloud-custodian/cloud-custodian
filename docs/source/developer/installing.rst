@@ -86,7 +86,7 @@ Then build the software with `tox <https://tox.readthedocs.io/en/latest/>`_:
 
 .. code-block:: bash
 
-    $ python3.7 -m tox
+    $ tox
 
 Tox creates a sandboxed "virtual environment" ("virtualenv") for each Python version, 2.7, 3.6, and 3.7.
 These are stored in the ``.tox/`` directory.
@@ -98,7 +98,7 @@ You can run the test suite in a single enviroment with the ``-e`` flag:
 
 .. code-block:: bash
 
-    $ python3.7 -m tox -e py37
+    $ tox -e py37
 
 To access the executables installed in one or the other virtual environment,
 source the virtualenv into your current shell, e.g.:
