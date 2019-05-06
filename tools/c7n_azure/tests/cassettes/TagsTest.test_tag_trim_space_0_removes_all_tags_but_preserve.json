@@ -466,7 +466,7 @@
                         "no-cache"
                     ],
                     "azure-asyncoperation": [
-                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Compute/locations/southcentralus/operations/87bba90a-500f-444f-97e0-fbd4b966655f?api-version=2019-03-01"
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/87bba90a-500f-444f-97e0-fbd4b966655f?api-version=2019-03-01"
                     ],
                     "x-ms-ratelimit-remaining-resource": [
                         "Microsoft.Compute/PutVM3Min;201,Microsoft.Compute/PutVM30Min;1121"
@@ -1030,7 +1030,7 @@
                         "no-cache"
                     ],
                     "azure-asyncoperation": [
-                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Compute/locations/southcentralus/operations/066a540e-f936-4ec9-b09a-b07340b31a85?api-version=2019-03-01"
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/066a540e-f936-4ec9-b09a-b07340b31a85?api-version=2019-03-01"
                     ],
                     "x-ms-ratelimit-remaining-resource": [
                         "Microsoft.Compute/PutVM3Min;200,Microsoft.Compute/PutVM30Min;1120"

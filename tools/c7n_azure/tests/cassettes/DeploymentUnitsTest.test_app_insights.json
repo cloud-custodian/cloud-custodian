@@ -214,7 +214,7 @@
                             "Name": "cloud-custodian-test",
                             "CreationDate": "2019-05-02T19:11:25.7270455+00:00",
                             "PackageId": null,
-                            "TenantId": "aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                            "TenantId": "ea42f556-5106-4743-99b0-c129bfa71a47",
                             "HockeyAppId": null,
                             "HockeyAppToken": null,
                             "provisioningState": "Succeeded",

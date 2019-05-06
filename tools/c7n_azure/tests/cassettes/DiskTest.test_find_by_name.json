@@ -67,7 +67,7 @@
                                     "creationData": {
                                         "createOption": "FromImage",
                                         "imageReference": {
-                                            "id": "/Subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/Canonical/ArtifactTypes/VMImage/Offers/UbuntuServer/Skus/16.04.0-LTS/Versions/16.04.201802220"
+                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/Canonical/ArtifactTypes/VMImage/Offers/UbuntuServer/Skus/16.04.0-LTS/Versions/16.04.201802220"
                                         }
                                     },
                                     "diskSizeGB": 30,
@@ -122,7 +122,7 @@
                                     "creationData": {
                                         "createOption": "FromImage",
                                         "imageReference": {
-                                            "id": "/Subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/Canonical/ArtifactTypes/VMImage/Offers/UbuntuServer/Skus/16.04.0-LTS/Versions/16.04.201903130"
+                                            "id": "/Subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/Providers/Microsoft.Compute/Locations/southcentralus/Publishers/Canonical/ArtifactTypes/VMImage/Offers/UbuntuServer/Skus/16.04.0-LTS/Versions/16.04.201903130"
                                         }
                                     },
                                     "diskSizeGB": 30,

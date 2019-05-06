@@ -56,7 +56,7 @@
                                     "tier": "Standard"
                                 },
                                 "properties": {
-                                    "displayName": "ASC DataProtection (subscription: aa98974b-5d2a-4d98-a78a-382f3715d07e)",
+                                    "displayName": "ASC DataProtection (subscription: ea42f556-5106-4743-99b0-c129bfa71a47)",
                                     "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/9cb3cc7a-b39b-4b82-bc89-e5a5d9ff7b97",
                                     "scope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
                                     "description": "This policy assignment was automatically created by Azure Security Center",
@@ -78,7 +78,7 @@
                                     "tier": "Standard"
                                 },
                                 "properties": {
-                                    "displayName": "ASC Default (subscription: aa98974b-5d2a-4d98-a78a-382f3715d07e)",
+                                    "displayName": "ASC Default (subscription: ea42f556-5106-4743-99b0-c129bfa71a47)",
                                     "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
                                     "scope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
                                     "parameters": {

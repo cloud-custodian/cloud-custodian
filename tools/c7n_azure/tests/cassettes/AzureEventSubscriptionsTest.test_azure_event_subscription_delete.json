@@ -440,7 +440,7 @@
                         "no-cache"
                     ],
                     "azure-asyncoperation": [
-                        "https://management.azure.com:443/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/operationsStatus/BFBC77F2-24EF-46A0-9090-F06DD6A187EB?api-version=2018-09-15-preview"
+                        "https://management.azure.com:443/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.EventGrid/operationsStatus/BFBC77F2-24EF-46A0-9090-F06DD6A187EB?api-version=2018-09-15-preview"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -738,7 +738,7 @@
                         "no-cache"
                     ],
                     "location": [
-                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.EventGrid/operationResults/E44751F0-0859-4523-8353-E2040959AFE5?api-version=2018-09-15-preview"
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.EventGrid/operationResults/E44751F0-0859-4523-8353-E2040959AFE5?api-version=2018-09-15-preview"
                     ],
                     "x-ms-ratelimit-remaining-subscription-deletes": [
                         "14998"

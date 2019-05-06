@@ -36,7 +36,7 @@
                                 "type": "Microsoft.Devices/IotHubs",
                                 "location": "westus",
                                 "tags": {},
-                                "subscriptionid": "aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                                "subscriptionid": "ea42f556-5106-4743-99b0-c129bfa71a47",
                                 "resourcegroup": "test_iothub",
                                 "etag": "AAAAAAWSGos=",
                                 "properties": {
