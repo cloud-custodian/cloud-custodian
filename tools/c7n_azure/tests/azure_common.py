@@ -202,6 +202,7 @@ class AzureVCRBaseTest(VCRTestCase):
         data = response['body']['data']
 
         if isinstance(data, dict):
+            # Replace AD graph responses
             odata_metadata = data.get('odata.metadata')
             if odata_metadata and "directoryObjects" in odata_metadata:
                 response['body']['data'] = GRAPH_RESPONSE
@@ -300,10 +301,8 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                 self.addCleanup(self._tenant_patch.stop)
 
     def get_test_date(self):
-        if self.cassette.responses:
-            header_date = self.cassette.responses[0]['headers'].get('date')
-        else:
-            header_date = None
+        header_date = self.cassette.responses[0]['headers'].get('date') \
+            if self.cassette.responses else None
 
         if header_date:
             test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
