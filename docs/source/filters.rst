@@ -3,68 +3,117 @@
 Generic Filters
 ===============
 
-These filters can be applied to all policies for all resources. See the
-:ref:`Resource-Specific Filters and Actions reference <policy>` for
+The following filters can be applied to all policies for all resources. See the
+:ref:`Filters and Actions reference <policy>` for
 resource-specific filters.
 
-Value Filters
+Value Filter
 -------------
 
 Cloud Custodian provides for a flexible query language on any resource by
 allowing for rich queries on JSON objects via JMESPath, and allows for
-mixing and combining those with a boolean conditional operators that
-are nest-able. Comparison between values is configurable supporting
-scalar operators:
+mixing and combining those with boolean conditional operators that
+are nest-able. (Tutorial here on `JMESPath <http://jmespath.org/tutorial.html>`_ syntax)
+
+
+The base value filter enables the use of jmespath with data returned from a describe call.
+
+.. code-block:: yaml
+
+    filters:
+         - type: value
+           key: "State[0]"    ─▶ The value from the describe call
+           value: "running"   ─▶ Value that is being filtered against
+
+
+There are several ways to get a list of possible keys for each resource.
+
+- Via CLI
+
+    Create a new custodian yaml file with just the name and resource fields. Then run
+    ``custodian run -s OUTPUT_DIR``. The valid key fields can be found in the output directory
+    in resources.json
+
+    .. code-block:: yaml
+
+        policies:
+          - name: my-first-policy
+            resource: ec2
+
+- Via Cloud Providers
+
+    Go to the relevant cloud provider sdk and search for the describe api call for the resource
+    your interested in. The available fields will be listed under the results of that api call.
+
+
 
 - Comparison operators:
+    The generic value filter allows for comparison operators to be used
+
     - ``equal`` or ``eq``
     - ``not-equal`` or ``ne``
     - ``greater-than`` or ``gt``
     - ``gte`` or ``ge``
     - ``less-than`` or ``lt``
     - ``lte`` or ``le``
-- Other operators
+
+  .. code-block:: yaml
+
+      filters:
+         - type: value
+           key: CpuOptions.CoreCount      ─▶ The value from the describe call
+           value: 36                      ─▶ Value that is being compared
+           op: greater-than               ─▶ Comparison Operator
+
+- Other operators:
     - ``absent``
     - ``present``
     - ``not-null``
     - ``empty``
-- Collection operators against user supplied lists:
+
+  .. code-block:: yaml
+
+      filters:
+         - type: value
+           key: CpuOptions.CoreCount      ─▶ The value from the describe call
+           value: present                 ─▶ Checks if key is present
+
+
+- List Operators:
+    There is a collection of operators that can be used with user supplied lists:
+
     - ``in``
     - ``not-in`` or ``ni``
     - ``or`` or ``Or``
     - ``and`` or ``And``
     - ``not``
     - ``intersect`` - Provides comparison between 2 lists
+
+  .. code-block:: yaml
+
+      filters:
+         - type: value
+           key: ImageId                   ─▶ The value from the describe call
+           op: in                         ─▶ List operator
+           value: [ID-123, ID-321]        ─▶ List of Values to be compared against
+
+
 - Special operators:
     - ``glob`` - Provides Glob matching support
     - ``regex`` - Provides Regex matching support but ignores case
     - ``regex-case`` - Provides case sensitive Regex matching support
 
-`AgeFilter`
-  Automatically filter resources older than a given date in Days (see `Dateutil Parser <http://dateutil.readthedocs.org/en/latest/parser.html#dateutil.parser.parse>`_)
-
-
-JMESPath Filter
----------------
-
-`ValueFilter`
-  Generic value filter using jmespath based on the data returned from a describe call
 
   .. code-block:: yaml
 
-     - name: ebs-unmark-attached-deletion
-       resource: ebs
-       comments: |
-         Unmark any attached EBS volumes that were scheduled for deletion
-         if they are now attached
-       filters:
-         - type: value                     ─┐ The value of the key from the describe
-           key: "Attachments[0].Device"     ├▶EBS call
-           value: not-null                 ─┘
-         - "tag:maid_status": not-null     ─▶ This filter
-       actions:
-         - unmark
+      filters:
+         - type: value
+           key: FunctionName                ─▶ The value from the describe call
+           op: regex                        ─▶ Special operator
+           value: ^(custodian?)\w+          ─▶ Regex string
 
+
+- Transformations:
   Transformations on the value can be done using the ``value_type`` keyword.  The
   following value types are supported:
 
@@ -77,6 +126,7 @@ JMESPath Filter
   - ``resource_count`` - compare against the number of matched resources
   - ``size`` - the length of an element
   - ``swap`` - swap the value and the evaluated key
+
 
   Examples:
 
@@ -146,8 +196,17 @@ JMESPath Filter
                  - subnet-2d2736444
 
 
-`EventFilter`
-  Filter against a CloudWatch event JSON associated to a resource type
+Age Filter
+-------------
+  Automatically filter resources older than a given date in Days (see `Dateutil Parser <http://dateutil.readthedocs.org/en/latest/parser.html#dateutil.parser.parse>`_)
+  These are implemented on a per resource basis. See the :ref:`Resource-Specific Filters and Actions reference <policy>` for
+  resource-specific filters.
+
+
+Event Filter
+-------------
+  Filter against a CloudWatch event JSON associated to a resource type. The list of possible keys are now from the cloudtrail
+  event and not the describe resource call as is the case in the ValueFilter
 
   .. code-block:: yaml
 
