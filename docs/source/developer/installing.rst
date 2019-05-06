@@ -86,29 +86,32 @@ Then build the software with `tox <https://tox.readthedocs.io/en/latest/>`_:
 
 .. code-block:: bash
 
-    $ tox
+    $ python3.7 -m tox
 
-Tox creates a sandboxed "virtual environment" ("virtualenv") for each Python
-version, 2.7 and 3.6. These are stored in the ``.tox/`` directory. It then runs
-the test suite under both versions of Python, per the ``tox.ini`` file. You can
-run the test suite in a single enviroment with the ``-e`` flag:
+Tox creates a sandboxed "virtual environment" ("virtualenv") for each Python version, 2.7, 3.6, and 3.7.
+These are stored in the ``.tox/`` directory.
+It then runs the test suite under all versions of Python, per the ``tox.ini`` file.
+If tox is unable to find a Python executable on your system for one of the supported versions, it will fail for that environment.
+You can safely ignore these failures when developing locally.
+
+You can run the test suite in a single enviroment with the ``-e`` flag:
 
 .. code-block:: bash
 
-    $ tox -e py27
+    $ tox -e py37
 
 To access the executables installed in one or the other virtual environment,
 source the virtualenv into your current shell, e.g.:
 
 .. code-block:: bash
 
-    $ source .tox/py27/bin/activate
+    $ source .tox/py37/bin/activate
 
 You should then have, e.g., the ``custodian`` command available:
 
 .. code-block:: bash
 
-    (py27)$ custodian -h
+    (py37)$ custodian -h
 
 You'll also be able to invoke `nosetests
 <http://nose.readthedocs.io/en/latest/>`_ or `pytest
@@ -117,4 +120,4 @@ choosing, e.g.:
 
 .. code-block:: bash
 
-    (py27) $ pytest tests/test_s3.py -x
+    (py37) $ pytest tests/test_s3.py -x
