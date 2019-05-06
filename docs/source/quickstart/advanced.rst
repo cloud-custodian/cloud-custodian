@@ -3,10 +3,51 @@
 Advanced Usage
 ==============
 
+* :ref:`run-multiple-accounts`
 * :ref:`run-multiple-regions`
 * :ref:`report-multiple-regions`
 * :ref:`report-custom-fields`
 * :ref:`policy_resource_limits`
+
+.. _run-multiple-accounts:
+
+Running against multiple accounts
+---------------------------------
+
+Support for running against multiple AWS accounts, Azure subscriptions, and GCP
+Subscriptions can be achieved through c7n-org, which must be installed on top 
+of Cloud Custodian::
+
+  $ pip install c7n-org
+
+C7n-org allows users to run Custodian policies against multiple accounts,
+run a script against multiple AWS accounts, or report on AWS cross account policy execution.
+
+In order to run c7n-org, a config file must be created which contains detailed information about the accounts:
+
+.. code-block:: yaml
+
+  accounts:
+  - account_id: '123123123123'
+    name: account-1
+    regions:
+    - us-east-1
+    - us-west-2
+    role: arn:aws:iam::123123123123:role/CloudCustodian
+    vars:
+      charge_code: xyz
+    tags:
+    - type:prod
+    - division:some division
+    - partition:us
+    - scope:pci
+  ...
+
+This config file will vary based on the cloud provider being used, and helper scripts are provided to
+auto generate the config files.
+
+For more information about this tooling and instructions please refer to the `official documentation
+<https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_org>`_.
 
 .. _run-multiple-regions:
 
