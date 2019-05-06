@@ -98,7 +98,7 @@ You can run the test suite in a single enviroment with the ``-e`` flag:
 
 .. code-block:: bash
 
-    $ tox -e py37
+    $ python3.7 -m tox -e py37
 
 To access the executables installed in one or the other virtual environment,
 source the virtualenv into your current shell, e.g.:
