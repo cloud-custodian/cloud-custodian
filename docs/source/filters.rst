@@ -5,7 +5,7 @@ Generic Filters
 
 The following filters can be applied to all policies for all resources. See the
 :ref:`Filters and Actions reference <policy>` for
-resource-specific filters.
+aws resource-specific filters.
 
 Value Filter
 -------------
