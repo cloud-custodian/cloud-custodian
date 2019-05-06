@@ -78,15 +78,15 @@ class AzureVCRBaseTest(VCRTestCase):
 
     TEST_DATE = None
 
-    FILTERED_HEADERS = ['Authorization',
-                        'Accept-Encoding',
+    FILTERED_HEADERS = ['authorization',
+                        'accept-encoding',
                         'client-request-id',
                         'retry-after',
                         'strict-transport-security',
                         'server',
-                        'User-Agent',
+                        'user-Agent',
                         'accept-language',
-                        'Connection',
+                        'connection',
                         'x-ms-client-request-id',
                         'x-ms-correlation-request-id',
                         'x-ms-ratelimit-remaining-subscription-reads',
@@ -172,11 +172,9 @@ class AzureVCRBaseTest(VCRTestCase):
 
             return response
 
-        headers = {}
-        for key in response['headers']:
-            if key.lower() not in self.FILTERED_HEADERS:
-                headers[key.lower()] = response['headers'][key]
-        response['headers'] = headers
+        response['headers'] = {k.lower(): v for (k, v) in
+                               response['headers'].items()
+                               if k.lower() not in self.FILTERED_HEADERS}
 
         content_type = response['headers'].get('content-type', (None,))[0]
         if not content_type or 'application/json' not in content_type:
@@ -211,7 +209,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
             # Replace Activity Log API responses
             value_array = data.get('value', [])
-            if len(value_array) > 0 and value_array[0].get('eventTimestamp'):
+            if value_array and value_array[0].get('eventTimestamp'):
                 response['body']['data'] = ACTIVITY_LOG_RESPONSE
                 return response
 

@@ -342,8 +342,7 @@ class PolicyCompliantFilter(Filter):
             policyClient = s.client("azure.mgmt.resource.policy.PolicyClient")
             definitions = [d for d in policyClient.policy_definitions.list()]
             definition_ids = [d.id.lower() for d in definitions
-                              if self.definitions is None or
-                              d.display_name in self.definitions or
+                              if d.display_name in self.definitions or
                               d.name in self.definitions]
 
         # Find non-compliant resources
