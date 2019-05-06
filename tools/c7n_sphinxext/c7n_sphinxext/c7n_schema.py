@@ -31,6 +31,14 @@ py_sig_re = re.compile(
           ''', re.VERBOSE)
 
 
+class CustodianProvider(Directive):
+    pass
+
+
+class CustodianResource(Directive):
+    pass
+
+
 class C7nSchemaDirective(Directive):
 
     has_content = True
