@@ -1231,6 +1231,22 @@ class BucketPolicyStatements(BaseTest):
 
 class S3Test(BaseTest):
 
+    def test_bucket_get_resources(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [
+            ('get_bucket_tagging', 'Tags', [], 'TagSet')])
+        session_factory = self.replay_flight_data("test_s3_get_resources")
+        p = self.load_policy(
+            {"name": "bucket-fetch", "resource": "s3"},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(['c7n-codebuild'])
+        self.assertEqual(len(resources), 1)
+        tags = {t['Key']: t['Value'] for t in resources[0].get('Tags')}
+        self.assertEqual(
+            tags, {
+                'Application': 'test', 'Env': 'Dev', 'Owner': 'nicholase',
+                'Retention': '2', 'Retention2': '3', 'test': 'test'})
+
     def test_multipart_large_file(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3.EncryptExtantKeys, "executor_factory", MainThreadExecutor)

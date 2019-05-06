@@ -99,6 +99,7 @@
                 "StorageEncrypted": false,
                 "DBInstanceClass": "db.m3.medium",
                 "DbInstancePort": 0,
+		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:oneness",
                 "DBInstanceIdentifier": "oneness"
             },
 
@@ -204,101 +205,9 @@
                 "StorageEncrypted": true,
                 "DBInstanceClass": "db.m3.medium",
                 "DbInstancePort": 0,
-                "DBInstanceIdentifier": "sbbdev"
+                "DBInstanceIdentifier": "sbbdev",
+		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:sbbdev"
             },
-
-            {
-                "PubliclyAccessible": false,
-                "MasterUsername": "gadmin",
-                "MonitoringInterval": 0,
-                "LicenseModel": "general-public-license",
-                "VpcSecurityGroups": [
-                  {
-                      "Status": "active",
-                      "VpcSecurityGroupId": "sg-0a08e365"
-                  }
-                ],
-                "InstanceCreateTime": {
-                    "hour": 19,
-                    "__class__": "datetime",
-                    "month": 2,
-                    "second": 39,
-                    "microsecond": 343000,
-                    "year": 2016,
-                    "day": 17,
-                    "minute": 7
-                },
-                "CopyTagsToSnapshot": false,
-                "OptionGroupMemberships": [
-                    {
-                        "Status": "in-sync",
-                        "OptionGroupName": "default:aurora-5-6"
-                    }
-                ],
-                "PendingModifiedValues": {},
-                "Engine": "aurora",
-                "MultiAZ": false,
-                "DBSecurityGroups": [],
-                "DBParameterGroups": [
-                    {
-                        "DBParameterGroupName": "default.aurora5.6",
-                        "ParameterApplyStatus": "in-sync"
-                    }
-                ],
-                "AutoMinorVersionUpgrade": false,
-                "PreferredBackupWindow": "08:00-09:00",
-                "PromotionTier": 1,
-                "DBSubnetGroup": {
-                    "Subnets": [
-                        {
-                            "SubnetStatus": "Active",
-                            "SubnetIdentifier": "subnet-389e3d53",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-west-2c"
-                            }
-                        },
-                        {
-                            "SubnetStatus": "Active",
-                            "SubnetIdentifier": "subnet-3e9e3d55",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-west-2a"
-                            }
-                        },
-                        {
-                            "SubnetStatus": "Active",
-                            "SubnetIdentifier": "subnet-3f9e3d54",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-west-2b"
-                            }
-                        }
-                    ],
-                    "DBSubnetGroupName": "default",
-                    "VpcId": "vpc-399e3d52",
-                    "DBSubnetGroupDescription": "default",
-                    "SubnetGroupStatus": "Complete"
-                },
-                "ReadReplicaDBInstanceIdentifiers": [],
-                "AllocatedStorage": 1,
-                "BackupRetentionPeriod": 14,
-                "PreferredMaintenanceWindow": "thu:05:01-thu:05:31",
-                "Endpoint": {
-                    "Port": 3306,
-                    "Address": "mobile-e-dev-ms-keshav-rds-poolmember-1.cj9uic5xuiu0.us-west-2.rds.amazonaws.com"
-                },
-                "DBInstanceStatus": "available",
-                "EngineVersion": "5.6.10a",
-                "AvailabilityZone": "us-east-1b",
-                "DomainMemberships": [],
-                "DBClusterIdentifier": "mobile-e-dev-ms-keshav-rds",
-                "StorageType": "aurora",
-                "DbiResourceId": "db-RCRPVEDVXXB5PA36Z7NBZN4KNU",
-                "CACertificateIdentifier": "rds-ca-2015",
-                "StorageEncrypted": true,
-                "DBInstanceClass": "db.r3.large",
-                "DbInstancePort": 0,
-                "DBInstanceIdentifier": "mobile-e-dev-ms-keshav-rds-poolmember-1"
-            },
-
             {
                 "PubliclyAccessible": false,
                 "MasterUsername": "dbadmin",
@@ -395,7 +304,8 @@
                 "StorageEncrypted": true,
                 "DBInstanceClass": "db.m3.medium",
                 "DbInstancePort": 0,
-                "DBInstanceIdentifier": "qapipfitread"
+                "DBInstanceIdentifier": "qapipfitread",
+		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:qapipfitread"
             },
 
             {
@@ -505,7 +415,8 @@
                 "StorageEncrypted": true,
                 "DBInstanceClass": "db.m3.medium",
                 "DbInstancePort": 0,
-                "DBInstanceIdentifier": "sbbdevslave"
+                "DBInstanceIdentifier": "sbbdevslave",
+		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:sbbdevslave"
             },
 
             {
@@ -605,7 +516,8 @@
                 "StorageEncrypted": true,
                 "DBInstanceClass": "db.m3.2xlarge",
                 "DbInstancePort": 0,
-                "DBInstanceIdentifier": "qpsoaread"
+                "DBInstanceIdentifier": "qpsoaread",
+		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:qpsoaread"
             }
 
         ],

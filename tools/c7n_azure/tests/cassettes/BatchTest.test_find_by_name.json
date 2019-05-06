@@ -1,0 +1,54 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Batch/batchAccounts?api-version=2018-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 16:38:24 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "458"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_batch/providers/Microsoft.Batch/batchAccounts/cctest",
+                                "name": "cctest",
+                                "type": "Microsoft.Batch/batchAccounts",
+                                "location": "westus2",
+                                "properties": {
+                                    "accountEndpoint": "cctest.westus2.batch.azure.com",
+                                    "provisioningState": "Succeeded",
+                                    "dedicatedCoreQuota": 700,
+                                    "lowPriorityCoreQuota": 500,
+                                    "poolQuota": 100,
+                                    "activeJobAndJobScheduleQuota": 300,
+                                    "poolAllocationMode": "BatchService"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

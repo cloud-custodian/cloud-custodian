@@ -37,19 +37,16 @@ class CloudHSMCluster(QueryResourceManager):
         # Note: resourcegroupstaggingapi still points to hsm-classic
 
     augment = universal_augment
-    _generate_arn = None
 
     @property
     def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                'cloudhsm',
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type='cluster',
-                separator='/')
-        return self._generate_arn
+        return functools.partial(
+            generate_arn,
+            'cloudhsm',
+            region=self.config.region,
+            account_id=self.account_id,
+            resource_type='cluster',
+            separator='/')
 
 
 @CloudHSMCluster.action_registry.register('tag')

@@ -14,12 +14,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
-from azure_common import BaseTest, arm_template, DEFAULT_SUBSCRIPTION_ID
+from azure_common import BaseTest, arm_template, requires_arm_polling
 from c7n_azure.azure_events import AzureEventSubscription
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 
 
+@requires_arm_polling
 class AzureEventSubscriptionsTest(BaseTest):
     event_sub_name = 'custodiantestsubscription'
 
@@ -33,7 +34,7 @@ class AzureEventSubscriptionsTest(BaseTest):
             resource_id=account.id, queue_name=queue_name)
         AzureEventSubscription.create(event_sub_destination,
                                       self.event_sub_name,
-                                      DEFAULT_SUBSCRIPTION_ID)
+                                      self.session.get_subscription_id())
 
     def test_event_subscription_schema_validate(self):
         with self.sign_out_patch():
@@ -77,11 +78,6 @@ class AzureEventSubscriptionsTest(BaseTest):
         p_delete = self.load_policy({
             'name': 'test-azure-event-subscriptions',
             'resource': 'azure.eventsubscription',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value': self.event_sub_name}],
             'actions': [
                 {'type': 'delete'}
             ]

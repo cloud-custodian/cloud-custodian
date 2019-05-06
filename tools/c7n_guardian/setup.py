@@ -29,7 +29,7 @@ setup(
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     author="Kapil Thangavelu",
     author_email="kapil.foss@gmail.com",
     license="Apache-2.0",

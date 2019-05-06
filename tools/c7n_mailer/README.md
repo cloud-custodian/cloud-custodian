@@ -174,6 +174,8 @@ Delivery via tag has been tested with webhooks but should support all delivery m
 c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.yml -s .
 ```
 
+Note: You can set the profile via environment variable e.g. `export AWS_DEFAULT_PROFILE=foo`
+
 You should see output similar to the following:
 
 ```
@@ -206,7 +208,7 @@ c7n-mailer: error: argument -c/--config is required
 ```
 
 Fundamentally what `c7n-mailer` does is deploy a Lambda (using
-[Mu](http://www.capitalone.io/cloud-custodian/docs/policy/mu.html)) based on
+[Mu](http://cloudcustodian.io/docs/policy/mu.html)) based on
 configuration you specify in a YAML file.  Here is [the
 schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
 [an example config](./example.yml), and here is a description of the options:
@@ -471,6 +473,8 @@ The following variables are available when rendering templates:
 | `action` | `notify` action that generated this SQS message |
 | `policy` | policy that triggered this notify action |
 | `account` | short name of the aws account |
+| `region`  | region the policy was executing in |
+| `execution_start` | The time policy started executing |
 
 The following extra global functions are available:
 
@@ -479,6 +483,9 @@ The following extra global functions are available:
 | `format_struct(struct)` | pretty print a json structure |
 | `resource_tag(resource, key)` | retrieve a tag value from a resource or return an empty string, aliased as get_resource_tag_value |
 | `format_resource(resource, resource_type)` | renders a one line summary of a resource |
+| `date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z')`| customize rendering of an utc datetime string |
+| `seach(expression, value)` | jmespath search value using expression |
+| `yaml_safe(value)` | yaml dumper |
 
 The following extra jinja filters are available:
 
@@ -492,7 +499,7 @@ The following extra jinja filters are available:
 
 Clone the repository:
 ```
-$ git clone https://github.com/capitalone/cloud-custodian
+$ git clone https://github.com/cloud-custodian/cloud-custodian
 ```
 Install dependencies (with virtualenv):
 ```

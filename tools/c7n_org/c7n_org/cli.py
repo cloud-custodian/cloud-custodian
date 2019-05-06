@@ -162,6 +162,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
         level=level,
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
 
+    logging.getLogger().setLevel(level)
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('s3transfer').setLevel(logging.WARNING)
     logging.getLogger('custodian.s3').setLevel(logging.ERROR)

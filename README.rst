@@ -165,13 +165,13 @@ Get Involved
 
 * Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
 * Reddit - https://reddit.com/r/cloudcustodian
-* Gitter - https://gitter.im/capitalone/cloud-custodian
+* Gitter - https://gitter.im/cloud-custodian/cloud-custodian
 
 Additional Tools
 ################
 
 The Custodian project also develops and maintains a suite of additional tools
-here https://github.com/capitalone/cloud-custodian/tree/master/tools:
+here https://github.com/cloud-custodian/cloud-custodian/tree/master/tools:
 
 
 Org
