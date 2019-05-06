@@ -28,7 +28,7 @@ The base value filter enables the use of jmespath with data returned from a desc
 
 There are several ways to get a list of possible keys for each resource.
 
-- Via CLI
+- Via Custodian CLI
 
     Create a new custodian yaml file with just the name and resource fields. Then run
     ``custodian run -s OUTPUT_DIR``. The valid key fields can be found in the output directory
@@ -40,9 +40,14 @@ There are several ways to get a list of possible keys for each resource.
           - name: my-first-policy
             resource: aws.ec2
 
-- Via Cloud Providers
+- Via Cloud Providers CLI
 
-    Go to the relevant cloud provider sdk and search for the describe api call for the resource
+    Use the relevant cloud provider cli to run the describe call to view all available keys. For example
+    using aws cli run ``aws ec2 describe-instances`` or with azure ``az vm list``
+
+- Via Cloud Provider Documentation
+
+    Go to the relevant cloud provider sdk documentation and search for the describe api call for the resource
     your interested in. The available fields will be listed under the results of that api call.
 
 
