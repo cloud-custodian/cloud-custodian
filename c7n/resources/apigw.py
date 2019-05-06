@@ -563,12 +563,16 @@ class FilterRestMethod(ValueFilter):
 
         with self.executor_factory(max_workers=2) as w:
             tasks = []
+            if self.data.get('matched', False):
+                resources = [r for r in resources if r.get('c7n:matched-resource-methods') != '']
             for r in resources:
                 if self.data.get('matched', False):
-                    r.pop(ANNOTATION_KEY_MATCHED_METHODS, [])
-                r_method_set = method_set
-                if method_set == 'all':
-                    r_method_set = r.get('resourceMethods', {}).keys()
+                    for ms in r.get('c7n:matched-resource-methods'):
+                        r_method_set = [ms.get('httpMethod') for ms in r.get('c7n:matched-resource-methods')]
+                else:
+                    r_method_set = method_set
+                    if method_set == 'all':
+                        r_method_set = r.get('resourceMethods', {}).keys()
                 for m in r_method_set:
                     tasks.append((r, m))
             for task_set in utils.chunks(tasks, 20):
