@@ -1,11 +1,17 @@
 #!/bin/bash
 IFS=$'\n\t'
 
-
 # IFS new value is less likely to cause confusing bugs when looping arrays or arguments (e.g. $@)
+
+# If `az ad signed-in-user show` fails then update your Azure CLI version
 
 resourceLocation="South Central US"
 templateDirectory="$( cd "$( dirname "$0" )" && pwd )"
+
+azureTenantId=$(az account show --query tenantId)
+azureTenantId=${azureTenantId//\"}
+azureAdUserObjectId=$(az ad signed-in-user show --query objectId)
+azureAdUserObjectId=${azureAdUserObjectId//\"}
 
 # Create resource groups and deploy for each template file
 for file in "$templateDirectory"/*.json; do
@@ -14,8 +20,18 @@ for file in "$templateDirectory"/*.json; do
   rgName="test_$filenameNoExtension"
 
   if [ $# -eq 0 ] || [[ "$@" =~ "$filenameNoExtension" ]]; then
+
       az group create --name $rgName --location $resourceLocation
-      az group deployment create --resource-group $rgName --template-file $file
+      if [[ "$filenameNoExtension" =~ "keyvault-no-policies" ]]; then
+        az group deployment create --resource-group $rgName --template-file $file \
+            --parameters "tenantId=$azureTenantId"
+      elif [[ "$filenameNoExtension" =~ "keyvault" ]]; then
+        az group deployment create --resource-group $rgName --template-file $file \
+            --parameters "tenantId=$azureTenantId" \
+                         "userObjectId=$azureAdUserObjectId"
+      else
+        az group deployment create --resource-group $rgName --template-file $file
+      fi
   else
     echo "Skipping $rgName"
   fi

@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7-slim-stretch
 
 LABEL name="custodian" \
       description="Cloud Management Rules Engine" \
@@ -6,21 +6,26 @@ LABEL name="custodian" \
       homepage="http://github.com/cloud-custodian/cloud-custodian" \
       maintainer="Custodian Community <https://cloudcustodian.io>"
 
-ADD . /src
+# Transfer Custodian source into container by directory
+# to minimize size
+ADD setup.py README.rst requirements.txt /src/
+ADD c7n /src/c7n/
+ADD tools /src/tools/
 
-# Install Custodian Core & AWS
 WORKDIR /src
-RUN pip3 install -r requirements.txt -e .
 
-# Install Custodian Azure
-WORKDIR /src/tools/c7n_azure
-RUN pip3 install -r requirements.txt -e .
+RUN apt-get --yes update && apt-get --yes upgrade \
+ && apt-get --yes install build-essential \
+ && pip3 install -r requirements.txt  . \
+ && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
+ && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
+ && apt-get --yes remove build-essential \
+ && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+ && rm -Rf /var/cache/apt/ \
+ && rm -Rf /var/lib/apt/lists/* \
+ && rm -Rf /src/ \
+ && rm -Rf /root/.cache/
 
-# Install Custodian GCP
-WORKDIR /src/tools/c7n_gcp
-RUN pip3 install -r requirements.txt -e .
-
-# Setup for EntryPoint
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 VOLUME ["/var/log/cloud-custodian", "/etc/cloud-custodian"]
 ENTRYPOINT ["/usr/local/bin/custodian"]

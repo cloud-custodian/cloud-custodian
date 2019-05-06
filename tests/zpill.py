@@ -234,6 +234,7 @@ class ZippedPill(pill.Pill):
         while next_file is None:
             index = self._index.setdefault(base_name, 1)
             fn = os.path.join(self._data_path, base_name + "_{0}.json".format(index))
+            fn = fn.replace('\\', '/')
             if fn in self._files:
                 next_file = fn
                 self._index[base_name] += 1

@@ -1,0 +1,118 @@
+{
+    "status_code": 200,
+    "data": {
+        "Certificate": {
+            "CertificateArn": "arn:aws:acm:us-east-1:644160558196:certificate/291f52cc-1817-469f-918a-cccbb4f9a5fb",
+            "DomainName": "foobar.com",
+            "SubjectAlternativeNames": [
+                "foobar.com",
+                "*.foobar.com"
+            ],
+            "DomainValidationOptions": [
+                {
+                    "DomainName": "foobar.com",
+                    "ValidationStatus": "SUCCESS",
+                    "ResourceRecord": {
+                        "Name": "_ec8035cff4a1a46daee290c427dac7a.foobar.com.",
+                        "Type": "CNAME",
+                        "Value": "_1abbfb686a4ce0ad208bfb14516bf6f2.tljzshvwok.acm-validations.aws."
+                    },
+                    "ValidationMethod": "DNS"
+                },
+                {
+                    "DomainName": "*.foobar.com",
+                    "ValidationStatus": "SUCCESS",
+                    "ResourceRecord": {
+                        "Name": "_ec8035cff4a1a46daee290c427dac7a1.foobar.com.",
+                        "Type": "CNAME",
+                        "Value": "_1abbfb686a4ce0ad208bfb14516bf6f2.tljzshvwok.acm-validations.aws."
+                    },
+                    "ValidationMethod": "DNS"
+                }
+            ],
+            "Serial": "03:a4:c3:cb:0c:37:af:11:65:3a:63:dc:ed:95:57:04",
+            "Subject": "CN=foobar.com",
+            "Issuer": "Amazon",
+            "CreatedAt": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 12,
+                "day": 7,
+                "hour": 10,
+                "minute": 56,
+                "second": 38,
+                "microsecond": 0
+            },
+            "IssuedAt": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 12,
+                "day": 7,
+                "hour": 11,
+                "minute": 0,
+                "second": 54,
+                "microsecond": 0
+            },
+            "Status": "ISSUED",
+            "NotBefore": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 12,
+                "day": 6,
+                "hour": 19,
+                "minute": 0,
+                "second": 0,
+                "microsecond": 0
+            },
+            "NotAfter": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 1,
+                "day": 7,
+                "hour": 7,
+                "minute": 0,
+                "second": 0,
+                "microsecond": 0
+            },
+            "KeyAlgorithm": "RSA-2048",
+            "SignatureAlgorithm": "SHA256WITHRSA",
+            "InUseBy": [
+                "arn:aws:cloudfront::644160558196:distribution/E3IM41Z1TUORKF"
+            ],
+            "Type": "AMAZON_ISSUED",
+            "KeyUsages": [
+                {
+                    "Name": "DIGITAL_SIGNATURE"
+                },
+                {
+                    "Name": "KEY_ENCIPHERMENT"
+                }
+            ],
+            "ExtendedKeyUsages": [
+                {
+                    "Name": "TLS_WEB_SERVER_AUTHENTICATION",
+                    "OID": "1.3.6.1.5.5.7.3.1"
+                },
+                {
+                    "Name": "TLS_WEB_CLIENT_AUTHENTICATION",
+                    "OID": "1.3.6.1.5.5.7.3.2"
+                }
+            ],
+            "RenewalEligibility": "ELIGIBLE",
+            "Options": {
+                "CertificateTransparencyLoggingPreference": "ENABLED"
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "14027628-702f-11e9-b696-7dce1073acb5",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "14027628-702f-11e9-b696-7dce1073acb5",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1486",
+                "date": "Mon, 06 May 2019 18:45:10 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

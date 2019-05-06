@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure.mgmt.storage.models import StorageAccount
-from azure_common import BaseTest
+from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
 from mock import mock
@@ -209,12 +209,13 @@ class AzurePolicyModeTest(BaseTest):
         with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
             storage_account = StorageAccount(id=1, location='westus')
             event_mode = AzureEventGridMode(p)
+            event_mode.target_subscription_ids = [DEFAULT_SUBSCRIPTION_ID]
             event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
             name, args, kwargs = mock_create.mock_calls[0]
 
             # verify the advanced filter created
-            event_filter = args[3].advanced_filters[0]
+            event_filter = args[4].advanced_filters[0]
             self.assertEqual(event_filter.key, 'Data.OperationName')
             self.assertEqual(event_filter.values, ['Microsoft.Compute/virtualMachines/write'])
             self.assertEqual(event_filter.operator_type, 'StringIn')
@@ -236,12 +237,13 @@ class AzurePolicyModeTest(BaseTest):
         with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
             storage_account = StorageAccount(id=1, location='westus')
             event_mode = AzureEventGridMode(p)
+            event_mode.target_subscription_ids = [DEFAULT_SUBSCRIPTION_ID]
             event_mode._create_event_subscription(storage_account, 'some_queue', None)
 
             name, args, kwargs = mock_create.mock_calls[0]
 
             # verify the advanced filter created
-            event_filter = args[3].advanced_filters[0]
+            event_filter = args[4].advanced_filters[0]
             self.assertEqual(event_filter.key, 'Data.OperationName')
             self.assertEqual(event_filter.values,
                              ['Microsoft.Compute/virtualMachines/write',

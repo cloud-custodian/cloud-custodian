@@ -37,7 +37,8 @@ from jsonschema.exceptions import best_match
 from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_resources
-from c7n.filters import ValueFilter, EventFilter, AgeFilter
+from c7n.resolver import ValuesFrom
+from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
 
 
 def validate(data, schema=None):
@@ -46,22 +47,11 @@ def validate(data, schema=None):
         Validator.check_schema(schema)
 
     validator = Validator(schema)
-
     errors = list(validator.iter_errors(data))
-
     if not errors:
-        counter = Counter([p['name'] for p in data.get('policies')])
-        dupes = []
-        for k, v in counter.items():
-            if v > 1:
-                dupes.append(k)
-        if dupes:
-            return [ValueError(
-                "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes))), dupes[0]]
-        return []
+        return check_unique(data) or []
     try:
-        resp = specific_error(errors[0])
+        resp = policy_error_scope(specific_error(errors[0]), data)
         name = isinstance(
             errors[0].instance,
             dict) and errors[0].instance.get(
@@ -76,6 +66,29 @@ def validate(data, schema=None):
         errors[0],
         best_match(validator.iter_errors(data)),
     ]))
+
+
+def check_unique(data):
+    counter = Counter([p['name'] for p in data.get('policies', [])])
+    for k, v in list(counter.items()):
+        if v == 1:
+            counter.pop(k)
+    if counter:
+        return [ValueError(
+            "Only one policy with a given name allowed, duplicates: {}".format(counter)),
+            list(counter.keys())[0]]
+
+
+def policy_error_scope(error, data):
+    """Scope a schema error to its policy name and resource."""
+    err_path = list(error.absolute_path)
+    if err_path[0] != 'policies':
+        return error
+    pdata = data['policies'][err_path[1]]
+    pdata.get('name', 'unknown')
+    error.message = "Error on policy:{} resource:{}\n".format(
+        pdata.get('name', 'unknown'), pdata.get('resource', 'unknown')) + error.message
+    return error
 
 
 def specific_error(error):
@@ -176,7 +189,18 @@ def generate(resource_types=()):
                 'minProperties': 1,
                 'maxProperties': 1},
         },
-
+        'filters_common': {
+            'comparison_operators': {
+                'enum': list(OPERATORS.keys())},
+            'value_types': {'enum': VALUE_TYPES},
+            'value_from': ValuesFrom.schema,
+            'value': {'oneOf': [
+                {'type': 'array'},
+                {'type': 'string'},
+                {'type': 'boolean'},
+                {'type': 'number'},
+                {'type': 'null'}]},
+        },
         'policy': {
             'type': 'object',
             'required': ['name', 'resource'],
@@ -208,13 +232,12 @@ def generate(resource_types=()):
                     'type': 'array'
                 },
                 #
-                # unclear if this should be allowed, it kills resource
-                # cache coherency between policies, and we need to
-                # generalize server side query mechanisms, currently
-                # this only for ec2 instance queries. limitations
-                # in json schema inheritance prevent us from doing this
-                # on a type specific basis
-                # https://stackoverflow.com/questions/22689900/json-schema-allof-with-additionalproperties
+                # TODO: source queries should really move under
+                # source. This was initially used for describe sources
+                # to expose server side query mechanisms, however its
+                # important to note it also prevents resource cache
+                # utilization between policies that have different
+                # queries.
                 'query': {
                     'type': 'array', 'items': {'type': 'object'}}
 
@@ -252,7 +275,7 @@ def generate(resource_types=()):
                 ))
 
     schema = {
-        '$schema': 'http://json-schema.org/schema#',
+        "$schema": "http://json-schema.org/draft-07/schema#",
         'id': 'http://schema.cloudcustodian.io/v0/custodian.json',
         'definitions': definitions,
         'type': 'object',
@@ -283,7 +306,11 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None, d
             seen_actions.add(a)
         if a.schema_alias:
             if action_name in definitions['actions']:
-                assert definitions['actions'][action_name] == a.schema, "Schema mismatch on action w/ schema alias"  # NOQA
+
+                if definitions['actions'][action_name] != a.schema: # NOQA
+                    msg = "Schema mismatch on type:{} action:{} w/ schema alias ".format(
+                        type_name, action_name)
+                    raise SyntaxError(msg)
             definitions['actions'][action_name] = a.schema
             action_refs.append({'$ref': '#/definitions/actions/%s' % action_name})
         else:

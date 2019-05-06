@@ -1,4 +1,4 @@
-# Copyright 2018 Capital One Services, LLC
+# Copyright 2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import time
+
 from gcp_common import BaseTest
 from googleapiclient.errors import HttpError
 
@@ -20,7 +21,8 @@ from googleapiclient.errors import HttpError
 class SqlInstanceTest(BaseTest):
 
     def test_sqlinstance_query(self):
-        factory = self.replay_flight_data('sqlinstance-query')
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('sqlinstance-query', project_id=project_id)
         p = self.load_policy(
             {'name': 'all-sqlinstances',
              'resource': 'gcp.sql-instance'},
@@ -35,8 +37,8 @@ class SqlInstanceTest(BaseTest):
              'resource': 'gcp.sql-instance'},
             session_factory=factory)
         instance = p.resource_manager.get_resource(
-            {"project": "cloud-custodian",
-             "name": "brenttest-2"})
+            {'project_id': 'cloud-custodian',
+             'database_id': 'cloud-custodian:brenttest-2'})
         self.assertEqual(instance['state'], 'RUNNABLE')
 
     def test_stop_instance(self):
@@ -82,3 +84,156 @@ class SqlInstanceTest(BaseTest):
             self.fail('found deleted instance: %s' % result)
         except HttpError as e:
             self.assertTrue("does not exist" in str(e))
+
+
+class SqlDatabaseTest(BaseTest):
+
+    def test_sqldatabase_query(self):
+        project_id = 'mitropject'
+        session_factory = self.replay_flight_data('sqldatabase-query', project_id=project_id)
+
+        database_name = 'postgres'
+
+        policy = self.load_policy(
+            {'name': 'all-sql-databases',
+             'resource': 'gcp.sql-database'},
+            session_factory=session_factory)
+
+        databases = policy.run()
+        self.assertEqual(databases[0]['name'], database_name)
+
+    def test_sqldatabase_get(self):
+        project_id = 'mitropject'
+        session_factory = self.replay_flight_data('sqldatabase-get', project_id=project_id)
+
+        database_name = 'postgres'
+        instance_name = 'testpg'
+
+        policy = self.load_policy(
+            {'name': 'one-sql-database',
+             'resource': 'gcp.sql-database'},
+            session_factory=session_factory)
+
+        resource_manager = policy.resource_manager
+
+        database = resource_manager.get_resource(
+            {'project': 'mitropject',
+             'name': database_name,
+             'instance': instance_name})
+
+        annotation_key = resource_manager.resource_type.get_parent_annotation_key()
+
+        self.assertEqual(database['name'], database_name)
+        self.assertEqual(database[annotation_key]['name'], instance_name)
+
+
+class SqlUserTest(BaseTest):
+
+    def test_sqluser_query(self):
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data(
+            'sqluser-query', project_id=project_id)
+
+        user_name = 'postgres'
+        instance_name = 'custodian-postgres'
+
+        filter_annotation_key = 'c7n:sql-instance'
+        policy = self.load_policy(
+            {'name': 'gcp-sql-user-dryrun',
+             'resource': 'gcp.sql-user',
+             'filters': [{
+                     'type': 'value',
+                     'key': '\"{}\".name'.format(filter_annotation_key),
+                     'op': 'regex',
+                     'value': instance_name}]
+             },
+            session_factory=session_factory)
+        annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+        # If fails there, policies using filters for the resource
+        # need to be updated since the key has been changed.
+        self.assertEqual(annotation_key, filter_annotation_key)
+
+        users = policy.run()
+
+        self.assertEqual(users[0]['name'], user_name)
+        self.assertEqual(users[0][annotation_key]['name'], instance_name)
+
+
+class SqlBackupRunTest(BaseTest):
+
+    def test_sqlbackuprun_query(self):
+        backup_run_id = '1555592400197'
+        instance_name = 'custodian-postgres'
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('sqlbackuprun-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-sql-backup-run-dryrun',
+             'resource': 'gcp.sql-backup-run'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+        backup_run = policy.run()[0]
+
+        self.assertEqual(backup_run['id'], backup_run_id)
+        self.assertEqual(backup_run[parent_annotation_key]['name'], instance_name)
+
+    def test_sqlbackuprun_get(self):
+        backup_run_id = '1555592400197'
+        instance_name = 'custodian-postgres'
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('sqlbackuprun-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-sql-backup-run-dryrun',
+             'resource': 'gcp.sql-backup-run'},
+            session_factory=session_factory)
+
+        resource_manager = policy.resource_manager
+        backup_run = resource_manager.get_resource(
+            {'project_id': project_id,
+             'backup_run_id': backup_run_id,
+             'database_id': project_id + ':' + instance_name})
+        parent_annotation_key = resource_manager.resource_type.get_parent_annotation_key()
+
+        self.assertEqual(backup_run['id'], backup_run_id)
+        self.assertEqual(backup_run[parent_annotation_key]['name'], instance_name)
+
+
+class SqlSslCertTest(BaseTest):
+
+    def test_sqlsslcet_query(self):
+        ssl_cert_sha = '62a43e710693b34d5fdb34911a656fd7a3b76cc7'
+        instance_name = 'custodian-postgres'
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('sqlsslcert-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-sql-ssl-cert-dryrun',
+             'resource': 'gcp.sql-ssl-cert'},
+            session_factory=session_factory)
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+        ssl_cert = policy.run()[0]
+
+        self.assertEqual(ssl_cert['sha1Fingerprint'], ssl_cert_sha)
+        self.assertEqual(ssl_cert[parent_annotation_key]['name'], instance_name)
+
+    def test_sqlsslcet_get(self):
+        ssl_cert_sha = '62a43e710693b34d5fdb34911a656fd7a3b76cc7'
+        instance_name = 'custodian-postgres'
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('sqlsslcert-get', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-sql-ssl-cert-dryrun',
+             'resource': 'gcp.sql-ssl-cert'},
+            session_factory=session_factory)
+
+        resource_manager = policy.resource_manager
+        ssl_cert = resource_manager.get_resource(
+            {'project_id': project_id,
+             'sha_1_fingerprint': ssl_cert_sha,
+             'database_id': project_id + ':' + instance_name})
+        parent_annotation_key = resource_manager.resource_type.get_parent_annotation_key()
+
+        self.assertEqual(ssl_cert['sha1Fingerprint'], ssl_cert_sha)
+        self.assertEqual(ssl_cert[parent_annotation_key]['name'], instance_name)

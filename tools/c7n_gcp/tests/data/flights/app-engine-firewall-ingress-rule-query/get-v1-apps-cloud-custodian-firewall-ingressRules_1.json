@@ -1,0 +1,29 @@
+{
+  "headers": {
+    "etag": "21a01e7119c4df46",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 25 Apr 2019 12:16:04 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "164",
+    "-content-encoding": "gzip",
+    "content-location": "https://appengine.googleapis.com/v1/apps/cloud-custodian/firewall/ingressRules?alt=json"
+  },
+  "body": {
+    "ingressRules": [
+      {
+        "priority": 2147483647,
+        "action": "ALLOW",
+        "sourceRange": "*",
+        "description": "The default action."
+      }
+    ]
+  }
+}

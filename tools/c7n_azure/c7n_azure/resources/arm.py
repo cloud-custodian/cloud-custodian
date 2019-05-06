@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import six
+from collections import namedtuple
 from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction, DeleteAction
 from c7n_azure.filters import (MetricFilter, TagActionFilter,
                                DiagnosticSettingsFilter, PolicyCompliantFilter)
@@ -75,6 +76,24 @@ class ArmResourceManager(QueryResourceManager):
                 if hasattr(klass.resource_type, 'diagnostic_settings_enabled') \
                         and klass.resource_type.diagnostic_settings_enabled:
                     klass.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
+
+
+@six.add_metaclass(QueryMeta)
+class ChildArmResourceManager(ArmResourceManager):
+
+    ParentSpec = namedtuple("ParentSpec", ["manager_name", "annotate_parent"])
+
+    child_source = 'describe-child-azure'
+
+    @property
+    def source_type(self):
+        source = self.data.get('source', self.child_source)
+        if source == 'describe':
+            source = self.child_source
+        return source
+
+    def get_parent_manager(self):
+        return self.get_resource_manager(self.resource_type.parent_spec.manager_name)
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)

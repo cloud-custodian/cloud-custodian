@@ -1,0 +1,150 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Devices/IotHubs?api-version=2018-12-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:32:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1952"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_iothub/providers/Microsoft.Devices/IotHubs/cctest-iothub",
+                                "name": "cctest-iothub",
+                                "type": "Microsoft.Devices/IotHubs",
+                                "location": "westus",
+                                "tags": {},
+                                "subscriptionid": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                "resourcegroup": "test_iothub",
+                                "etag": "AAAAAAWSGos=",
+                                "properties": {
+                                    "locations": [
+                                        {
+                                            "location": "West US",
+                                            "role": "primary"
+                                        },
+                                        {
+                                            "location": "East US",
+                                            "role": "secondary"
+                                        }
+                                    ],
+                                    "operationsMonitoringProperties": {
+                                        "events": {
+                                            "None": "None",
+                                            "Connections": "None",
+                                            "DeviceTelemetry": "None",
+                                            "C2DCommands": "None",
+                                            "DeviceIdentityOperations": "None",
+                                            "FileUploadOperations": "None",
+                                            "Routes": "None"
+                                        }
+                                    },
+                                    "state": "Active",
+                                    "provisioningState": "Succeeded",
+                                    "ipFilterRules": [],
+                                    "hostName": "cctest-iothub.azure-devices.net",
+                                    "eventHubEndpoints": {
+                                        "events": {
+                                            "retentionTimeInDays": 1,
+                                            "partitionCount": 4,
+                                            "partitionIds": [
+                                                "0",
+                                                "1",
+                                                "2",
+                                                "3"
+                                            ],
+                                            "path": "cctest-iothub",
+                                            "endpoint": "sb://iothub-ns-cctest-iot-1582726-f3cdbbd0c1.servicebus.windows.net/"
+                                        },
+                                        "operationsMonitoringEvents": {
+                                            "retentionTimeInDays": 1,
+                                            "partitionCount": 4,
+                                            "partitionIds": [
+                                                "0",
+                                                "1",
+                                                "2",
+                                                "3"
+                                            ],
+                                            "path": "cctest-iothub-operationmonitoring",
+                                            "endpoint": "sb://iothub-ns-cctest-iot-1582726-f3cdbbd0c1.servicebus.windows.net/"
+                                        }
+                                    },
+                                    "routing": {
+                                        "endpoints": {
+                                            "serviceBusQueues": [],
+                                            "serviceBusTopics": [],
+                                            "eventHubs": [],
+                                            "storageContainers": []
+                                        },
+                                        "routes": [],
+                                        "fallbackRoute": {
+                                            "name": "$fallback",
+                                            "source": "DeviceMessages",
+                                            "condition": "true",
+                                            "endpointNames": [
+                                                "events"
+                                            ],
+                                            "isEnabled": true
+                                        }
+                                    },
+                                    "storageEndpoints": {
+                                        "$default": {
+                                            "sasTtlAsIso8601": "PT1H",
+                                            "connectionString": "",
+                                            "containerName": ""
+                                        }
+                                    },
+                                    "messagingEndpoints": {
+                                        "fileNotifications": {
+                                            "lockDurationAsIso8601": "PT1M",
+                                            "ttlAsIso8601": "PT1H",
+                                            "maxDeliveryCount": 10
+                                        }
+                                    },
+                                    "enableFileUploadNotifications": false,
+                                    "cloudToDevice": {
+                                        "maxDeliveryCount": 10,
+                                        "defaultTtlAsIso8601": "PT1H",
+                                        "feedback": {
+                                            "lockDurationAsIso8601": "PT1M",
+                                            "ttlAsIso8601": "PT1H",
+                                            "maxDeliveryCount": 10
+                                        }
+                                    },
+                                    "features": "None"
+                                },
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "capacity": 1
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

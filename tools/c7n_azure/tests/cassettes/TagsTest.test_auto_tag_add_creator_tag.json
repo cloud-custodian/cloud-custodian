@@ -1,0 +1,2617 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3981,Microsoft.Compute/LowCostGet30Min;31764"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:40 GMT"
+                    ],
+                    "content-length": [
+                        "2338"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "vmId": "e1182f4f-d46b-43c4-a797-feee1c1ae2bd",
+                            "hardwareProfile": {
+                                "vmSize": "Basic_A0"
+                            },
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2"
+                                    },
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_977a393608a8458f960a28f8000151d7",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_977a393608a8458f960a28f8000151d7"
+                                        },
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
+                                    }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vm45mqcga7pkswi",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                }
+                            },
+                            "provisioningState": "Succeeded"
+                        },
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue",
+                            "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "name": "cctestvm"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;134,Microsoft.Compute/HighCostGet30Min;650"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:41 GMT"
+                    ],
+                    "content-length": [
+                        "2623"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "vmId": "e1182f4f-d46b-43c4-a797-feee1c1ae2bd",
+                                    "hardwareProfile": {
+                                        "vmSize": "Basic_A0"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04.0-LTS",
+                                            "version": "latest"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "cctestvm_disk2_977a393608a8458f960a28f8000151d7",
+                                                "createOption": "Empty",
+                                                "caching": "None",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Standard_LRS",
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_977a393608a8458f960a28f8000151d7"
+                                                },
+                                                "diskSizeGB": 1023,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vm45mqcga7pkswi",
+                                        "adminUsername": "testuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "name": "cctestvm"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:42 GMT"
+                    ],
+                    "content-length": [
+                        "89528"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636925090347965429:e24310c0;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:43 GMT"
+                    ],
+                    "content-length": [
+                        "86674"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636925087972866847:fd7e3f80;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:43 GMT"
+                    ],
+                    "content-length": [
+                        "88736"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636925076382650289:c27de352;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:44 GMT"
+                    ],
+                    "content-length": [
+                        "86446"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636925073851974852:7f5a7704;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:45 GMT"
+                    ],
+                    "content-length": [
+                        "86543"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636925066914140491:cd600bd6;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:46 GMT"
+                    ],
+                    "content-length": [
+                        "84465"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636924305560098646:8305bbcd;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:47 GMT"
+                    ],
+                    "content-length": [
+                        "91276"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636924283506081555:0ba35618;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:48 GMT"
+                    ],
+                    "content-length": [
+                        "87056"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636924227179111100:59b907c3;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:49 GMT"
+                    ],
+                    "content-length": [
+                        "83855"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636923231066019244:36f63f8f;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:50 GMT"
+                    ],
+                    "content-length": [
+                        "88889"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636923209986985043:5f46e43f;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:51 GMT"
+                    ],
+                    "content-length": [
+                        "88867"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636922696785003664:a36db248;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:52 GMT"
+                    ],
+                    "content-length": [
+                        "89071"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636922688368652468:8c25aee2;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:52 GMT"
+                    ],
+                    "content-length": [
+                        "85741"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636922681127965252:770b4a2e;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:53 GMT"
+                    ],
+                    "content-length": [
+                        "84761"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636922569327674429:66413968;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:54 GMT"
+                    ],
+                    "content-length": [
+                        "90951"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636922417211335046:08de0e38;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:55 GMT"
+                    ],
+                    "content-length": [
+                        "87991"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636922386382406740:515328f3;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:56 GMT"
+                    ],
+                    "content-length": [
+                        "90898"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636919022873325559:8369aa52;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:57 GMT"
+                    ],
+                    "content-length": [
+                        "90184"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636919012393297606:7534ee22;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:58 GMT"
+                    ],
+                    "content-length": [
+                        "85794"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636919010009585853:f04bbaad;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:59 GMT"
+                    ],
+                    "content-length": [
+                        "90569"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918999754599287:c2bc1d00;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:52:59 GMT"
+                    ],
+                    "content-length": [
+                        "86762"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918994819817713:fbc60ef1;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:00 GMT"
+                    ],
+                    "content-length": [
+                        "86850"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918986846683594:11368671;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:01 GMT"
+                    ],
+                    "content-length": [
+                        "84338"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918898151733249:340da7d9;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:02 GMT"
+                    ],
+                    "content-length": [
+                        "90253"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918213208180887:df3b715e;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:02 GMT"
+                    ],
+                    "content-length": [
+                        "89534"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918200160377175:28a8ea5e;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:02 GMT"
+                    ],
+                    "content-length": [
+                        "86719"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918193963263819:fa39e5e7;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:04 GMT"
+                    ],
+                    "content-length": [
+                        "87373"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918184605405913:dadf6642;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:05 GMT"
+                    ],
+                    "content-length": [
+                        "87966"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918123107591110:fd1d919a;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:05 GMT"
+                    ],
+                    "content-length": [
+                        "86261"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/eventtypes/management/values?api-version=2015-04-01&$filter=eventTimestamp%20ge%20%272019-04-23%2023%3A59%3A59%27%20and%20resourceUri%20eq%20%27%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2FTEST_VM%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2Fcctestvm%27%20and%20eventChannels%20eq%20%27Operation%27&$select=eventTimestamp%2C%20operationName%2C%20caller&$skipToken=US1:0636918109336288445:54b37329;EU1:-1:FFFFFFFF;AS1:-1:FFFFFFFF",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:06 GMT"
+                    ],
+                    "content-length": [
+                        "85184"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "caller": "john@doe.com",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+                                "operationName": {
+                                    "value": "Microsoft.Compute/virtualMachines/write",
+                                    "localizedValue": "Create or Update Virtual Machine"
+                                },
+                                "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "25497"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:06 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute",
+                        "namespace": "Microsoft.Compute",
+                        "authorizations": [],
+                        "resourceTypes": [
+                            {
+                                "resourceType": "availabilitySets",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/extensions",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/extensions",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/networkInterfaces",
+                                "apiVersions": [
+                                    "2018-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines/networkInterfaces",
+                                "apiVersions": [
+                                    "2018-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/publicIPAddresses",
+                                "apiVersions": [
+                                    "2018-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/operations",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/vmSizes",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/runCommands",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/usages",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/virtualMachines",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/publishers",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "operations",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections/restorePoints",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/metricDefinitions",
+                                "apiVersions": [
+                                    "2014-04-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "sharedVMImages",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "sharedVMImages/versions",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/artifactPublishers",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/capsoperations",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/images",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/images/versions",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "disks",
+                                "apiVersions": [
+                                    "2018-09-30"
+                                ]
+                            },
+                            {
+                                "resourceType": "snapshots",
+                                "apiVersions": [
+                                    "2018-09-30"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/diskoperations",
+                                "apiVersions": [
+                                    "2018-09-30"
+                                ]
+                            },
+                            {
+                                "resourceType": "images",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/logAnalytics",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            }
+                        ],
+                        "registrationState": "Registered"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PATCH",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-03-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "azure-asyncnotification": [
+                        "Enabled"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/a0215225-d1b5-4ba0-91e3-3b093a10a477?api-version=2019-03-01"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/PutVM3Min;234,Microsoft.Compute/PutVM30Min;1154"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:07 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1197"
+                    ],
+                    "content-length": [
+                        "2384"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "vmId": "e1182f4f-d46b-43c4-a797-feee1c1ae2bd",
+                            "hardwareProfile": {
+                                "vmSize": "Basic_A0"
+                            },
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2"
+                                    },
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_977a393608a8458f960a28f8000151d7",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_977a393608a8458f960a28f8000151d7"
+                                        },
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
+                                    }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vm45mqcga7pkswi",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                }
+                            },
+                            "provisioningState": "Updating"
+                        },
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue",
+                            "schedule": "on=(M-U,8);off=(M-U,18);tz=pt",
+                            "CreatorEmail": "stefango@microsoft.com"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "name": "cctestvm"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3978,Microsoft.Compute/LowCostGet30Min;31761"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:08 GMT"
+                    ],
+                    "content-length": [
+                        "2385"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "vmId": "e1182f4f-d46b-43c4-a797-feee1c1ae2bd",
+                            "hardwareProfile": {
+                                "vmSize": "Basic_A0"
+                            },
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2"
+                                    },
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_977a393608a8458f960a28f8000151d7",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_977a393608a8458f960a28f8000151d7"
+                                        },
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
+                                    }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vm45mqcga7pkswi",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                }
+                            },
+                            "provisioningState": "Succeeded"
+                        },
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue",
+                            "schedule": "on=(M-U,8);off=(M-U,18);tz=pt",
+                            "CreatorEmail": "stefango@microsoft.com"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "name": "cctestvm"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3976,Microsoft.Compute/LowCostGet30Min;31759"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:08 GMT"
+                    ],
+                    "content-length": [
+                        "2385"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "vmId": "e1182f4f-d46b-43c4-a797-feee1c1ae2bd",
+                            "hardwareProfile": {
+                                "vmSize": "Basic_A0"
+                            },
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2"
+                                    },
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_977a393608a8458f960a28f8000151d7",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_977a393608a8458f960a28f8000151d7"
+                                        },
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
+                                    }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vm45mqcga7pkswi",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                }
+                            },
+                            "provisioningState": "Succeeded"
+                        },
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue",
+                            "schedule": "on=(M-U,8);off=(M-U,18);tz=pt",
+                            "CreatorEmail": "stefango@microsoft.com"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "name": "cctestvm"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;133,Microsoft.Compute/HighCostGet30Min;649"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:08 GMT"
+                    ],
+                    "content-length": [
+                        "2674"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "vmId": "e1182f4f-d46b-43c4-a797-feee1c1ae2bd",
+                                    "hardwareProfile": {
+                                        "vmSize": "Basic_A0"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04.0-LTS",
+                                            "version": "latest"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "cctestvm_disk2_977a393608a8458f960a28f8000151d7",
+                                                "createOption": "Empty",
+                                                "caching": "None",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Standard_LRS",
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_977a393608a8458f960a28f8000151d7"
+                                                },
+                                                "diskSizeGB": 1023,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vm45mqcga7pkswi",
+                                        "adminUsername": "testuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt",
+                                    "CreatorEmail": "stefango@microsoft.com"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "name": "cctestvm"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "25497"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:09 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute",
+                        "namespace": "Microsoft.Compute",
+                        "authorizations": [],
+                        "resourceTypes": [
+                            {
+                                "resourceType": "availabilitySets",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/extensions",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/extensions",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/networkInterfaces",
+                                "apiVersions": [
+                                    "2018-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/virtualMachines/networkInterfaces",
+                                "apiVersions": [
+                                    "2018-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachineScaleSets/publicIPAddresses",
+                                "apiVersions": [
+                                    "2018-10-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/operations",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/vmSizes",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/runCommands",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/usages",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/virtualMachines",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/publishers",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "operations",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "restorePointCollections/restorePoints",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "virtualMachines/metricDefinitions",
+                                "apiVersions": [
+                                    "2014-04-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "sharedVMImages",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "sharedVMImages/versions",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/artifactPublishers",
+                                "apiVersions": [
+                                    "2017-10-15-preview"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/capsoperations",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/images",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "galleries/images/versions",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "disks",
+                                "apiVersions": [
+                                    "2018-09-30"
+                                ]
+                            },
+                            {
+                                "resourceType": "snapshots",
+                                "apiVersions": [
+                                    "2018-09-30"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/diskoperations",
+                                "apiVersions": [
+                                    "2018-09-30"
+                                ]
+                            },
+                            {
+                                "resourceType": "images",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            },
+                            {
+                                "resourceType": "locations/logAnalytics",
+                                "apiVersions": [
+                                    "2019-03-01"
+                                ]
+                            }
+                        ],
+                        "registrationState": "Registered"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PATCH",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-03-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "azure-asyncnotification": [
+                        "Enabled"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "azure-asyncoperation": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/locations/southcentralus/operations/f35f49bd-465f-4d0e-95f1-319ebc8732bc?api-version=2019-03-01"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/PutVM3Min;233,Microsoft.Compute/PutVM30Min;1153"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:09 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1198"
+                    ],
+                    "content-length": [
+                        "2337"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "vmId": "e1182f4f-d46b-43c4-a797-feee1c1ae2bd",
+                            "hardwareProfile": {
+                                "vmSize": "Basic_A0"
+                            },
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2"
+                                    },
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_977a393608a8458f960a28f8000151d7",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_977a393608a8458f960a28f8000151d7"
+                                        },
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
+                                    }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vm45mqcga7pkswi",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                }
+                            },
+                            "provisioningState": "Updating"
+                        },
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue",
+                            "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "name": "cctestvm"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3974,Microsoft.Compute/LowCostGet30Min;31757"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 19:53:10 GMT"
+                    ],
+                    "content-length": [
+                        "2338"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "vmId": "e1182f4f-d46b-43c4-a797-feee1c1ae2bd",
+                            "hardwareProfile": {
+                                "vmSize": "Basic_A0"
+                            },
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "Canonical",
+                                    "offer": "UbuntuServer",
+                                    "sku": "16.04.0-LTS",
+                                    "version": "latest"
+                                },
+                                "osDisk": {
+                                    "osType": "Linux",
+                                    "name": "cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "Standard_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_a9f308a2eb4a47d288b5ea13757ebfe2"
+                                    },
+                                    "diskSizeGB": 30
+                                },
+                                "dataDisks": [
+                                    {
+                                        "lun": 0,
+                                        "name": "cctestvm_disk2_977a393608a8458f960a28f8000151d7",
+                                        "createOption": "Empty",
+                                        "caching": "None",
+                                        "managedDisk": {
+                                            "storageAccountType": "Standard_LRS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_977a393608a8458f960a28f8000151d7"
+                                        },
+                                        "diskSizeGB": 1023,
+                                        "toBeDetached": false
+                                    }
+                                ]
+                            },
+                            "osProfile": {
+                                "computerName": "vm45mqcga7pkswi",
+                                "adminUsername": "testuser",
+                                "linuxConfiguration": {
+                                    "disablePasswordAuthentication": false
+                                },
+                                "secrets": []
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": true,
+                                    "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                }
+                            },
+                            "provisioningState": "Succeeded"
+                        },
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "southcentralus",
+                        "tags": {
+                            "testtag": "testvalue",
+                            "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                        "name": "cctestvm"
+                    }
+                }
+            }
+        }
+    ]
+}

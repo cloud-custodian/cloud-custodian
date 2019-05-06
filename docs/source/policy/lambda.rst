@@ -69,7 +69,7 @@ event subscriptions need two additional fields:
    the resources can be queried.
 
 For very common API calls for policies, some `shortcuts
-<https://github.com/capitalone/cloud-custodian/blob/master/c7n/cwe.py#L28-L69>`_
+<https://github.com/cloud-custodian/cloud-custodian/blob/master/c7n/cwe.py#L28-L69>`_
 have been defined to allow for easier policy writing as for the
 ``RunInstances`` API call above, which expands to:
 
@@ -110,6 +110,14 @@ Periodic Function
 We support both rate per unit time and cron expressions, per `scheduler syntax
 <http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html>`_.
 
+When using --assume on the custodian run cli command, the specified
+role is also considered as the execution role to be attached to lambda
+function that gets deployed. In such scenario it is not required to
+specify the role attribute in the config block for mode. However, if
+you are not using the --assume option, then it is required to add role
+in the config-block of mode. When specifying role {account_id} is runtime
+substituted so a policy can be used across accounts.
+
 .. code-block:: yaml
 
    policies:
@@ -118,6 +126,7 @@ We support both rate per unit time and cron expressions, per `scheduler syntax
        mode:
          type: periodic
          schedule: "rate(1 day)"
+         role: arn:aws:iam::{account_id}:role/some-role
 
 
 Config Rules

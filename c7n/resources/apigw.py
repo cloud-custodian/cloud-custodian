@@ -152,6 +152,7 @@ class UpdateApi(BaseAction):
 
        policies:
          - name: apigw-description
+           resource: rest-api
            filters:
              - description: empty
            actions:

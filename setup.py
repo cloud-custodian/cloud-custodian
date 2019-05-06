@@ -9,14 +9,14 @@ def read(fname):
 
 setup(
     name="c7n",
-    version='0.8.42.1',
+    version='0.8.43.1',
     description="Cloud Custodian - Policy Rules Engine",
     long_description=read('README.rst'),
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
     entry_points={
@@ -30,8 +30,6 @@ setup(
         "jsonschema",
         "jsonpatch>=1.21",
         "argcomplete",
-# Pinned due to azure-core-cli pin on tabulate
-# https://github.com/Azure/azure-cli/issues/8567
-        "tabulate==0.8.2"
+        "tabulate>=0.8.2"
     ],
 )
