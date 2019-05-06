@@ -1469,6 +1469,7 @@ class Resize(BaseTest):
         wait_until("available")
         self.assertEqual(describe()["AllocatedStorage"], 6)  # nearest gigabyte
 
+
 class TestReservedRDSInstance(BaseTest):
     def test_reserved_rds_instance_query(self):
         session_factory = self.replay_flight_data("test_reserved_rds_instance_query")

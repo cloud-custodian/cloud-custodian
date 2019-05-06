@@ -1679,6 +1679,7 @@ class ModifyDb(BaseAction):
             except c.exceptions.DBInstanceNotFoundFault:
                 raise
 
+
 @resources.register('rds-reserved')
 class ReservedRDS(QueryResourceManager):
 
