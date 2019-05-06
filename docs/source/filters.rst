@@ -43,7 +43,10 @@ There are several ways to get a list of possible keys for each resource.
 - Via Cloud Providers CLI
 
     Use the relevant cloud provider cli to run the describe call to view all available keys. For example
-    using aws cli run ``aws ec2 describe-instances`` or with azure ``az vm list``
+    using aws cli run ``aws ec2 describe-instances`` or with azure ``az vm list``.
+
+    Note: You do not need to include the outermost json field in most cases since custodian removes this field
+    from the results.
 
 - Via Cloud Provider Documentation
 
