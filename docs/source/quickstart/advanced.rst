@@ -15,7 +15,7 @@ Running against multiple accounts
 ---------------------------------
 
 Support for running against multiple AWS accounts, Azure subscriptions, and GCP
-Subscriptions can be achieved through c7n-org, which must be installed on top 
+projects can be achieved through c7n-org, which must be installed on top 
 of Cloud Custodian::
 
   $ pip install c7n-org
