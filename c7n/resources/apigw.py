@@ -568,7 +568,7 @@ class FilterRestMethod(ValueFilter):
             for r in resources:
                 if self.data.get('matched', False):
                     for ms in r.get('c7n:matched-resource-methods'):
-                        r_method_set = [ms.get('httpMethod') for ms in 
+                        r_method_set = [ms.get('httpMethod') for ms in
                             r.get('c7n:matched-resource-methods')]
                 else:
                     r_method_set = method_set
@@ -595,7 +595,7 @@ class FilterRestMethod(ValueFilter):
                             ANNOTATION_KEY_MATCHED_METHODS, []).append(m)
                     if self.data.get('matched', False) and not self.match(m):
                         resource_map[m['resourceId']].setdefault(
-                            ANNOTATION_KEY_MATCHED_METHODS, []).remove(m)   
+                            ANNOTATION_KEY_MATCHED_METHODS, []).remove(m)
         return [resource_map[rid] for rid in results]
 
     def process_task_set(self, client, task_set):
