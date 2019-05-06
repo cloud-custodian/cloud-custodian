@@ -38,7 +38,7 @@ There are several ways to get a list of possible keys for each resource.
 
         policies:
           - name: my-first-policy
-            resource: ec2
+            resource: aws.ec2
 
 - Via Cloud Providers
 
@@ -173,7 +173,7 @@ There are several ways to get a list of possible keys for each resource.
         comment:  |
            The txt file needs to be in utf-8 no BOM format and contain one
            subnet per line in the file no quotes around the subnets either.
-        resource: rds
+        resource: aws.rds
         filters:
             - type: value
               key: "DBSubnetGroup.Subnets[].SubnetIdentifier"
@@ -185,7 +185,7 @@ There are several ways to get a list of possible keys for each resource.
      # This policy will compare rds instances subnet group list against a
      # inline user provided list of public subnets.
      - name: find-rds-on-public-subnets-using-inline-list
-       resource: rds
+       resource: aws.rds
        filters:
            - type: value
              key: "DBSubnetGroup.Subnets[].SubnetIdentifier"
@@ -211,7 +211,7 @@ Event Filter
   .. code-block:: yaml
 
      - name: no-ec2-public-ips
-       resource: ec2
+       resource: aws.ec2
        mode:
          type: cloudtrail
          events:
