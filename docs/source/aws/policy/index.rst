@@ -1,7 +1,7 @@
 .. _policy:
 
-Resource-Specific Filters and Actions
-=====================================
+Filters and Actions
+===================
 
 These topics provide detailed reference information about the filters and
 actions that you can specify in policies against individual resources. See the
