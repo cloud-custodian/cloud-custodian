@@ -565,7 +565,7 @@ class FilterRestMethod(ValueFilter):
         with self.executor_factory(max_workers=2) as w:
             tasks = []
             if self.data.get('matched', False):
-                resources = [r for r in resources if r.get('c7n:matched-resource-methods') != '']
+                resources = [r for r in resources if r.get('c7n:matched-resource-methods')]
             for r in resources:
                 if self.data.get('matched', False):
                     for ms in r.get('c7n:matched-resource-methods'):
