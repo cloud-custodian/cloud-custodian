@@ -39,7 +39,7 @@ page.
 
 
 Troubleshooting & Tinkering
-+++++++++++++++++++++++++++
+----------------------------
 
 If you are not using the ``us-east-1`` region, then you'll need to specify that
 as well, either on the command line or in an environment variable:

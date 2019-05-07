@@ -1,4 +1,4 @@
-.. _azure_gettingstarted:
+.. _azure-gettingstarted:
 
 Getting Started
 ===============
