@@ -18,7 +18,7 @@ Install Cloud Custodian
 
 To install Cloud Custodian, just run::
 
-  $ virtualenv --python=python2 custodian
+  $ virtualenv --python=python3 custodian
   $ source custodian/bin/activate
   (custodian) $ pip install c7n
 
@@ -31,10 +31,12 @@ of a virtualenv.)
 Cloud Provider Specific Help
 ----------------------------
 
-For specific setup isntructions for AWS, Azure, and GCP, visit the relevant getting started
+For specific setup instructions for AWS, Azure, and GCP, visit the relevant getting started
 page.
 
 - :ref:`AWS <aws-gettingstarted>`
+- :ref:`Azure <azure-gettingstarted>`
+
 
 Troubleshooting & Tinkering
 +++++++++++++++++++++++++++
