@@ -1,170 +1,38 @@
-/*
- * Start Bootstrap - Landing Page (http://startbootstrap.com/)
- * Copyright 2013-2016 Start Bootstrap
- * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
- */
-
-body,
-html {
-    width: 100%;
-    height: 100%;
+:root {
+    --jumbotron-padding-y: 3rem;
 }
 
-body,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-weight: 700;
+.jumbotron {
+    padding-top: var(--jumbotron-padding-y);
+    padding-bottom: var(--jumbotron-padding-y);
+    margin-bottom: 0;
+    background-color: #fff;
 }
 
-.topnav {
-    font-size: 14px; 
+.bg-dark-cc {
+    background-color: #2c3943 !important;
 }
 
-.lead {
-    font-size: 18px;
-    font-weight: 400;
+.footer-cc {
+    background-color: #1a2730 !important;
 }
 
-.intro-header {
-    padding-top: 50px; /* If you're making other pages, make sure there is 50px of padding to make sure the navbar doesn't overlap content! */
-    padding-bottom: 50px;
-    text-align: center;
-    color: #ffffff;
-    background: url(../img/documentation-hero.svg) no-repeat center center;
-    background-size: 4000px;
-}
-
-.intro-message {
-    position: relative;
-    padding-top: 10%;
-    padding-bottom: 10%;
-}
-
-.intro-message > h1 {
-    margin: 0;
-    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
-    font-size: 5em;
-}
-
-
-
-.intro-message > h3 {
-    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
-}
-
-
-.intro-divider {
-	  padding-top: 0px;
-    width: 400px;
-    border-top: 1px solid #f8f8f8;
-    border-bottom: 1px solid rgba(0,0,0,0.2);
-}
-
-@media(max-width:767px) {
-    .intro-message {
-        padding-bottom: 15%;
-    }
-
-    .intro-message > h1 {
-        font-size: 3em;
-    }
-
-    ul.intro-social-buttons > li {
-        display: block;
-        margin-bottom: 20px;
-        padding: 0;
-    }
-
-    ul.intro-social-buttons > li:last-child {
-        margin-bottom: 0;
-    }
-
-    .intro-divider {
-        width: 100%;
+@media (min-width: 768px) {
+    .jumbotron {
+        padding-top: calc(var(--jumbotron-padding-y) * 2);
+        padding-bottom: calc(var(--jumbotron-padding-y) * 2);
     }
 }
 
-.network-name {
-    text-transform: uppercase;
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: 2px;
-}
-
-.content-section-a {
-    padding-top: 40px;
-    padding-bottom: 60px;
-    background-color: #f8f8f8;
-}
-
-.content-section-b {
-    padding-top: 60px;
-    padding-bottom: 60px;
-    border-top: 1px solid #e7e7e7;
-    border-bottom: 1px solid #e7e7e7;
-}
-
-.section-heading {
-    margin-bottom: 30px;
-}
-
-.section-heading-spacer {
-    float: left;
-    width: 200px;
-    border-top: 3px solid #e7e7e7;
-}
-
-.banner {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    color: #f8f8f8;
-    background: url(../img/banner-bg.jpg) no-repeat center center;
-    background-size: cover;
-}
-
-.banner h2 {
-    margin: 0;
-    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
-    font-size: 3em;
-}
-
-.banner ul {
+.jumbotron p:last-child {
     margin-bottom: 0;
 }
 
-.banner-social-buttons {
-    float: right;
-    margin-top: 0;
+.jumbotron-heading {
+    font-weight: 300;
 }
 
-@media(max-width:1199px) {
-    ul.banner-social-buttons {
-        float: left;
-        margin-top: 15px;
-    }
+.jumbotron .container {
+    max-width: 40rem;
 }
 
-
-footer {
-    padding-top: 30px;
-    padding-bottom: 150px;
-    background-color: #f8f8f8;
-}
-
-p.copyright {
-    margin: 15px 0 0;
-}
-
-i.callout-icon {
-    font-size: 100px;
-}
-
-.textContainer h2 {
-    vertical-align: middle;
-    display: inline-block;
-}
