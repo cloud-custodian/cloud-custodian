@@ -1,175 +1,169 @@
 <html>
-<head "=" ">
+    <head>
 
-    <meta charset="utf-8 ">
-    <meta http-equiv="X-UA-Compatible " content="IE=edge ">
-    <meta name="viewport " content="width=device-width, initial-scale=1 ">
-    <meta name="description " content="Cloud Custodian ">
-    <meta name="author " content="Capital One ">
+        <meta charset="utf-8 ">
+        <meta http-equiv="X-UA-Compatible " content="IE=edge ">
+        <meta name="viewport " content="width=device-width, initial-scale=1 ">
+        <meta name="description " content="Cloud Custodian ">
+        <meta name="author " content="Capital One ">
 
-    <title>Cloud Custodian</title>
+        <title>Cloud Custodian</title>
 
-    <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css " rel="stylesheet ">
+        <!-- Bootstrap Core CSS -->
+        <link href="css/bootstrap.min.css " rel="stylesheet ">
 
-    <!-- Custom CSS -->
-    <link href="css/landing-page.css " rel="stylesheet ">
+        <!-- Custom CSS -->
+        <link href="css/landing-page.css " rel="stylesheet ">
 
-    <!-- Custom Glyphs and Fonts -->
-    <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+        <!-- Custom Glyphs and Fonts -->
+        <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js "></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js "></script>
-    <![endif]-->
+    </head>
+    <body>
 
-</head><body>
+        <div class="container fluid">
+        <!-- Navigation -->
+            <header>
+                <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+                    <a class="navbar-brand" href="#">
+                        <img src="/img/logo_capone_devex_cloud_custodian.svg" width="30" height="30" class="d-inline-block align-top" alt="Cloud Custodian logo">
+                        Cloud Custodian
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-    <div class="container fluid">
-    <!-- Navigation -->
-        <header>
-            <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-                <a class="navbar-brand" href="#">
-                    <img src="/img/logo_capone_devex_cloud_custodian.svg" width="30" height="30" class="d-inline-block align-top" alt="Cloud Custodian logo">
-                    Cloud Custodian
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                    <div class="collapse navbar-collapse" id="navbarColor03">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="docs/index.html ">
+                                    <i class="fas fa-book fa-fw "></i>
+                                    Docs
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://pypi.python.org/pypi/c7n ">
+                                    <i class="fas fa-cloud-download-alt fa-fw "></i>
+                                    Install
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://github.com/capitalone/cloud-custodian ">
+                                    <i class="fab fa-sm fa-github"></i>
+                                    GitHub
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="https://gitter.im/capitalone/cloud-custodian ">
+                                    <i class="fab fa-sm fa-gitter"></i>
+                                    Community
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
 
-                <div class="collapse navbar-collapse" id="navbarColor03">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="docs/index.html ">
-                                <i class="fas fa-book fa-fw "></i>
-                                Docs
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="https://pypi.python.org/pypi/c7n ">
-                                <i class="fas fa-cloud-download-alt fa-fw "></i>
-                                Install
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="https://github.com/capitalone/cloud-custodian ">
-                                <i class="fab fa-sm fa-github"></i>
-                                GitHub
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="https://gitter.im/capitalone/cloud-custodian ">
-                                <i class="fab fa-sm fa-gitter"></i>
-                                Community
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
-
-        <main role="main" style="padding-top: 5em">
-            <section id="about" class="jumbotron text-center">
-                <h1 class="display-4">
-                    <img src="/img/logo_capone_devex_cloud_custodian.svg" width="100" height="100" class="d-linline-block" alt="Cloud Custodian logo">
-                    Cloud Custodian
-                </h1>
-                <p class="lead">Opensource Cloud Security, Governance, and Management</p>
-                <hr class="my-4">
-                <a class="btn btn-outline-primary" href="docs/index.html">
-                    <i class="fas fa-book fa-fw "></i>
-                    Docs
-                </a>
-                <a href="https://pypi.python.org/pypi/c7n" class="btn btn-outline-dark">
-                    <i class="fas fa-cloud-download-alt fa-fw "></i>
-                    Install
-                </a>
-                <a href="https://github.com/cloud-custodian/cloud-custodian" class="btn btn-outline-dark">
-                    <i class="fab fa-github fa-fw"></i>
-                    Github
-                </a>
-                <a href="https://gitter.im/capitalone/cloud-custodian" class="btn btn-outline-dark">
-                    <i class="fab fa-gitter fa-fw "></i>
-                    Gitter
-                </a>
-            </section>
-            <section id="features">
-                <div class="row pt-1">
-                    <div class="col-md-4 col-sm-6 col-xs-12 pt-2 feature-item">
-                        <div class="card">
-                            <h4 class="card-header">The Path to a Well Managed Cloud</h4>
-                            <div class="card-body">
-                                <p class="card-text font-weight-light">Cloud Custodian enables users to be well managed in the cloud. The simple YAML DSL allows you to easily define rules to enable a well-managed cloud infrastructure, that's both secure and cost optimized. It consolidates many of the ad-hoc scripts organizations have into a lightweight and flexible tool, with unified metrics and reporting.</p>
-                                <p class="card-text font-weight-light"> Custodian supports managing AWS, Azure, and GCP public cloud environments. </p>
+            <main role="main" style="padding-top: 5em">
+                <section id="about" class="jumbotron text-center">
+                    <h1 class="display-4">
+                        <img src="/img/logo_capone_devex_cloud_custodian.svg" width="100" height="100" class="d-linline-block" alt="Cloud Custodian logo">
+                        Cloud Custodian
+                    </h1>
+                    <p class="lead">Opensource Cloud Security, Governance, and Management</p>
+                    <hr class="my-4">
+                    <a class="btn btn-outline-primary" href="docs/index.html">
+                        <i class="fas fa-book fa-fw "></i>
+                        Docs
+                    </a>
+                    <a href="https://pypi.python.org/pypi/c7n" class="btn btn-outline-dark">
+                        <i class="fas fa-cloud-download-alt fa-fw "></i>
+                        Install
+                    </a>
+                    <a href="https://github.com/cloud-custodian/cloud-custodian" class="btn btn-outline-dark">
+                        <i class="fab fa-github fa-fw"></i>
+                        Github
+                    </a>
+                    <a href="https://gitter.im/capitalone/cloud-custodian" class="btn btn-outline-dark">
+                        <i class="fab fa-gitter fa-fw "></i>
+                        Gitter
+                    </a>
+                </section>
+                <section id="features">
+                    <div class="row pt-1">
+                        <div class="col-md-4 col-sm-6 col-xs-12 pt-2 feature-item">
+                            <div class="card">
+                                <h4 class="card-header">The Path to a Well Managed Cloud</h4>
+                                <div class="card-body">
+                                    <p class="card-text font-weight-light">Cloud Custodian enables users to be well managed in the cloud. The simple YAML DSL allows you to easily define rules to enable a well-managed cloud infrastructure, that's both secure and cost optimized. It consolidates many of the ad-hoc scripts organizations have into a lightweight and flexible tool, with unified metrics and reporting.</p>
+                                    <p class="card-text font-weight-light"> Custodian supports managing AWS, Azure, and GCP public cloud environments. </p>
+                                </div>
                             </div>
                         </div>
+                        <div class="col-md-4 col-sm-6 col-xs-12 pt-2 feature-item">
+                            <h4>
+                                <i class="fas fa-lock " aria-hidden="true "></i>
+                                Real-time Compliance
+                            </h4>
+                            <p class="font-weight-light">Besides just providing reports of issues, Custodian can actively enforce the security policies you define.</p>
+                            <h4>
+                                <i class="far fa-clock" aria-hidden="true "></i>
+                                Cost Management
+                            </h4>
+                            <p class="font-weight-light">Setup off-hours to save you money, by turning-off resources when they're not being used. Garbage collect unused resources by looking into utilization metrics.</p>
+                        </div>
+                        <div class="col-md-4 col-sm-6 col-xs-12 pt-2 feature-item">
+                            <h4>
+                                <i class="fas fa-terminal " aria-hidden="true "></i>
+                                Run Anywhere
+                            </h4>
+                            <p class="font-weight-light">Custodian can be run locally, on an instance, or Serverless in AWS Lambda.</p>
+                            <h4>
+                                <i class="fas fa-code " aria-hidden="true "></i>
+                                Open Source
+                            </h4>
+                            <p class="font-weight-light">Cloud Custodian is open source and free for everyone to use.</p>
+                            <h4>
+                                <i class="far fa-file-alt" aria-hidden="true "></i>
+                                Simple DSL
+                            </h4>
+                            <p class="font-weight-light">Use Custodian to build complex workflows or simple queries, millions of policies can be constructed using our easy to read DSL.</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12 pt-2 feature-item">
-                        <h4>
-                            <i class="fas fa-lock " aria-hidden="true "></i>
-                            Real-time Compliance
-                        </h4>
-                        <p class="font-weight-light">Besides just providing reports of issues, Custodian can actively enforce the security policies you define.</p>
-                        <h4>
-                            <i class="far fa-clock" aria-hidden="true "></i>
-                            Cost Management
-                        </h4>
-                        <p class="font-weight-light">Setup off-hours to save you money, by turning-off resources when they're not being used. Garbage collect unused resources by looking into utilization metrics.</p>
-                    </div>
-                    <div class="col-md-4 col-sm-6 col-xs-12 pt-2 feature-item">
-                        <h4>
-                            <i class="fas fa-terminal " aria-hidden="true "></i>
-                            Run Anywhere
-                        </h4>
-                        <p class="font-weight-light">Custodian can be run locally, on an instance, or Serverless in AWS Lambda.</p>
-                        <h4>
-                            <i class="fas fa-code " aria-hidden="true "></i>
-                            Open Source
-                        </h4>
-                        <p class="font-weight-light">Cloud Custodian is open source and free for everyone to use.</p>
-                        <h4>
-                            <i class="far fa-file-alt" aria-hidden="true "></i>
-                            Simple DSL
-                        </h4>
-                        <p class="font-weight-light">Use Custodian to build complex workflows or simple queries, millions of policies can be constructed using our easy to read DSL.</p>
+                </section>
+            </main>
+
+        <footer class="footer-cc mt-3">
+            <section id="gettingStarted" class="text-center text-light bg-dark bg-dark-cc py-2">
+                <h2>
+                    Getting Started
+                </h2>
+                <a href="https://pypi.python.org/pypi/c7n&#10; " class="btn btn-light btn-lg "><i class="fas fa-cloud-download-alt fa-fw "></i> <span class="network-name ">Download</span></a>
+                <a href="docs/quickstart/index.html&#10;&#10; " class="btn btn-light btn-lg "><i class="fas fa-book fa-fw "></i> <span class="network-name ">Quickstart Guide</span></a>
+                <div class="row justify-content-center">
+                    <div class="col-md-8 text-center ">
+                        <p>&nbsp;</p>
+                        <h4>Using <a href="https://www.python.org/downloads/&#10;&#10; ">Python 2.7</a> install Custodian using <a href="https://pip.pypa.io/en/stable/installing/ ">pip</a></h4>
+                        <pre class="bg-white text-dark"><code>pip install c7n</code></pre>
                     </div>
                 </div>
             </section>
-        </main>
-
-    <!-- Footer -->
-    <footer class="footer-cc mt-3">
-        <section id="gettingStarted" class="text-center text-light bg-dark bg-dark-cc py-2">
-            <h2>
-                Getting Started
-            </h2>
-            <a href="https://pypi.python.org/pypi/c7n&#10; " class="btn btn-light btn-lg "><i class="fas fa-cloud-download-alt fa-fw "></i> <span class="network-name ">Download</span></a>
-            <a href="docs/quickstart/index.html&#10;&#10; " class="btn btn-light btn-lg "><i class="fas fa-book fa-fw "></i> <span class="network-name ">Quickstart Guide</span></a>
-            <div class="row justify-content-center">
-                <div class="col-md-8 text-center ">
-                    <p>&nbsp;</p>
-                    <h4>Using <a href="https://www.python.org/downloads/&#10;&#10; ">Python 2.7</a> install Custodian using <a href="https://pip.pypa.io/en/stable/installing/ ">pip</a></h4>
-                    <pre class="bg-white text-dark"><code>pip install c7n</code></pre>
+            <section id="copyright ">
+                <div class="row ">
+                    <div class="col-lg-12 ">
+                        <p class="copyright text-muted small ">Copyright © 2016-2019 Capital One</p>
+                    </div>
                 </div>
-            </div>
-        </section>
-        <section id="copyright ">
-            <div class="row ">
-                <div class="col-lg-12 ">
-                    <p class="copyright text-muted small ">Copyright © 2016-2019 Capital One</p>
-                </div>
-            </div>
-        </section>
-    </footer>
+            </section>
+        </footer>
 
-        <!-- jQuery -->
-        <script src="js/jquery.js "></script>
+            <!-- jQuery -->
+            <script src="js/jquery.js "></script>
 
-        <!-- Bootstrap Core JavaScript -->
-        <script src="js/bootstrap.min.js "></script>
+            <!-- Bootstrap Core JavaScript -->
+            <script src="js/bootstrap.min.js "></script>
 
-    </div>
-</body></html>
+        </div>
+    </body>
+</html>
