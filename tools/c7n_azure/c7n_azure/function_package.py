@@ -33,7 +33,7 @@ class FunctionPackage(object):
 
     def __init__(self, name, function_path=None, target_subscription_ids=None):
         self.log = logging.getLogger('custodian.azure.function_package')
-        self.pkg = PythonPackageArchive()
+        self.pkg = None
         self.name = name
         self.function_path = function_path or os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'function.py')
@@ -154,10 +154,14 @@ class FunctionPackage(object):
         wheels_folder = os.path.join(self.cache_folder, 'wheels')
         wheels_install_folder = os.path.join(self.cache_folder, 'dependencies')
 
+        cache_zip_file = os.path.join(self.cache_folder, 'cache.zip')
+        cache_metadata_file = os.path.join(self.cache_folder, 'metadata.json')
+
         packages = \
             DependencyManager.get_dependency_packages_list(modules, excluded_packages)
 
-        if not DependencyManager.check_cache(self.cache_folder, wheels_install_folder, packages):
+        if not DependencyManager.check_cache(cache_metadata_file, cache_zip_file, packages):
+            cache_pkg = PythonPackageArchive()
             self.log.info("Cached packages not found or requirements were changed.")
             # If cache check fails, wipe all previous wheels, installations etc
             if os.path.exists(self.cache_folder):
@@ -173,21 +177,32 @@ class FunctionPackage(object):
             self.log.info("Installing wheels...")
             DependencyManager.install_wheels(wheels_folder, wheels_install_folder)
 
+            for root, _, files in os.walk(wheels_install_folder):
+                arc_prefix = os.path.relpath(root, wheels_install_folder)
+                for f in files:
+                    dest_path = os.path.join(arc_prefix, f)
+
+                    if f.endswith('.pyc') or f.endswith('.c'):
+                        continue
+                    f_path = os.path.join(root, f)
+
+                    cache_pkg.add_file(f_path, dest_path)
+
+            self.log.info('Saving cache zip file...')
+            cache_pkg.close()
+            with open(cache_zip_file, 'wb') as fout:
+                fout.write(cache_pkg.get_stream().read())
+
+            self.log.info("Removing temporary folders...")
+            shutil.rmtree(wheels_folder)
+            shutil.rmtree(wheels_install_folder)
+
             self.log.info("Updating metadata file...")
-            DependencyManager.create_cache_metadata(self.cache_folder,
-                                                    wheels_install_folder,
+            DependencyManager.create_cache_metadata(cache_metadata_file,
+                                                    cache_zip_file,
                                                     packages)
 
-        for root, _, files in os.walk(wheels_install_folder):
-            arc_prefix = os.path.relpath(root, wheels_install_folder)
-            for f in files:
-                dest_path = os.path.join(arc_prefix, f)
-
-                if f.endswith('.pyc') or f.endswith('.c'):
-                    continue
-                f_path = os.path.join(root, f)
-
-                self.pkg.add_file(f_path, dest_path)
+        self.pkg = PythonPackageArchive(cache_file=cache_zip_file)
 
         exclude = os.path.normpath('/cache/') + os.path.sep
         self.pkg.add_modules(lambda f: (exclude in f),

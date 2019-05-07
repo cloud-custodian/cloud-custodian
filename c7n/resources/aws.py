@@ -107,7 +107,9 @@ def _default_region(options):
 
 
 def _default_account_id(options):
-    if options.assume_role:
+    if options.account_id:
+        return
+    elif options.assume_role:
         try:
             options.account_id = options.assume_role.split(':')[4]
             return

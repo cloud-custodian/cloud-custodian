@@ -369,8 +369,6 @@ class QueryResourceManager(ResourceManager):
 
     resource_type = ""
 
-    retry = None
-
     # TODO Check if we can move to describe source
     max_workers = 3
     chunk_size = 20
@@ -554,7 +552,7 @@ class QueryResourceManager(ResourceManager):
                 generate_arn,
                 self.get_model().service,
                 region=self.config.region,
-                account_id=self.account_id,
+                account_id=self.config.account_id,
                 resource_type=self.get_model().type,
                 separator='/')
         return self._generate_arn

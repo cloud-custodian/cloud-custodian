@@ -90,7 +90,8 @@
                     "Port": 3306, 
                     "Address": "bluelobster.cnhganveedh2.us-west-2.rds.amazonaws.com"
                 }, 
-                "DBInstanceStatus": "available", 
+                "DBInstanceStatus": "available",
+		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:bluelobster",
                 "EngineVersion": "5.6.27", 
                 "AvailabilityZone": "us-west-2a", 
                 "DomainMemberships": [], 
@@ -200,7 +201,8 @@
                 "CACertificateIdentifier": "rds-ca-2015", 
                 "StorageEncrypted": false, 
                 "DBInstanceClass": "db.m4.large", 
-                "DbInstancePort": 0, 
+                "DbInstancePort": 0,
+		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:zebramoon",
                 "DBInstanceIdentifier": "zebramoon"
             }
         ], 

@@ -46,75 +46,80 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_metric_elastic_exclude(self, utcnow):
-        p = self.load_policy({
-            'name': 'test-azure-sql-server',
-            'resource': 'azure.sqlserver',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'glob',
-                 'value_type': 'normalize',
-                 'value': 'cctestsqlserver*'},
-                {'type': 'metric',
-                 'metric': 'dtu_consumption_percent',
-                 'op': 'lt',
-                 'aggregation': 'average',
-                 'threshold': 10,
-                 'timeframe': 72,
-                 'filter': "ElasticPoolResourceId eq '*'"
-                 }],
-        })
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
+    def test_metric_elastic_exclude(self):
+        with patch('c7n_azure.actions.utcnow') as utc_patch:
+            utc_patch.return_value = self.get_test_date()
 
-    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_metric_elastic_include(self, utcnow):
-        p = self.load_policy({
-            'name': 'test-azure-sql-server',
-            'resource': 'azure.sqlserver',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'glob',
-                 'value_type': 'normalize',
-                 'value': 'cctestsqlserver*'},
-                {'type': 'metric',
-                 'metric': 'dtu_consumption_percent',
-                 'op': 'lt',
-                 'aggregation': 'average',
-                 'threshold': 10,
-                 'timeframe': 72,
-                 'filter': "ElasticPoolResourceId eq '*'",
-                 'no_data_action': 'include'
-                 }],
-        })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+            p = self.load_policy({
+                'name': 'test-azure-sql-server',
+                'resource': 'azure.sqlserver',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'glob',
+                     'value_type': 'normalize',
+                     'value': 'cctestsqlserver*'},
+                    {'type': 'metric',
+                     'metric': 'dtu_consumption_percent',
+                     'op': 'lt',
+                     'aggregation': 'average',
+                     'threshold': 10,
+                     'timeframe': 72,
+                     'filter': "ElasticPoolResourceId eq '*'"
+                     }],
+            })
+            resources = p.run()
+            self.assertEqual(len(resources), 0)
 
-    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_metric_database(self, utcnow):
-        p = self.load_policy({
-            'name': 'test-azure-sql-server',
-            'resource': 'azure.sqlserver',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'glob',
-                 'value_type': 'normalize',
-                 'value': 'cctestsqlserver*'},
-                {'type': 'metric',
-                 'metric': 'dtu_consumption_percent',
-                 'op': 'lt',
-                 'aggregation': 'average',
-                 'threshold': 10,
-                 'timeframe': 72,
-                 'filter': "DatabaseResourceId eq '*'"
-                 }],
-        })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+    def test_metric_elastic_include(self):
+        with patch('c7n_azure.actions.utcnow') as utc_patch:
+            utc_patch.return_value = self.get_test_date()
+            p = self.load_policy({
+                'name': 'test-azure-sql-server',
+                'resource': 'azure.sqlserver',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'glob',
+                     'value_type': 'normalize',
+                     'value': 'cctestsqlserver*'},
+                    {'type': 'metric',
+                     'metric': 'dtu_consumption_percent',
+                     'op': 'lt',
+                     'aggregation': 'average',
+                     'threshold': 10,
+                     'timeframe': 72,
+                     'filter': "ElasticPoolResourceId eq '*'",
+                     'no_data_action': 'include'
+                     }],
+            })
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+
+    def test_metric_database(self):
+        with patch('c7n_azure.actions.utcnow') as utc_patch:
+            utc_patch.return_value = self.get_test_date()
+
+            p = self.load_policy({
+                'name': 'test-azure-sql-server',
+                'resource': 'azure.sqlserver',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'glob',
+                     'value_type': 'normalize',
+                     'value': 'cctestsqlserver*'},
+                    {'type': 'metric',
+                     'metric': 'dtu_consumption_percent',
+                     'op': 'lt',
+                     'aggregation': 'average',
+                     'threshold': 10,
+                     'timeframe': 72,
+                     'filter': "DatabaseResourceId eq '*'"
+                     }],
+            })
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
 
     def test_firewall_rules_include_range(self):
         p = self.load_policy({

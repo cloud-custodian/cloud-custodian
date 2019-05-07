@@ -22,11 +22,6 @@ import subprocess
 import six
 import sys
 
-# Try to set this early if offers any help against this OSX issue
-# https://bugs.python.org/issue33725
-# if sys.platform == 'darwin':
-#    os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
-
 import multiprocessing
 from concurrent.futures import (
     ProcessPoolExecutor,
@@ -52,6 +47,14 @@ from c7n_org.utils import environ, account_tags
 from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('c7n_org')
+
+# Workaround OSX issue, note this exists for py2 but there
+# isn't anything we can do in that case.
+# https://bugs.python.org/issue33725
+if sys.platform == 'darwin' and (
+        sys.version_info.major > 3 and sys.version_info.minor > 4):
+    multiprocessing.set_start_method('spawn')
+
 
 WORKER_COUNT = int(
     os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
@@ -162,6 +165,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
         level=level,
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
 
+    logging.getLogger().setLevel(level)
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('s3transfer').setLevel(logging.WARNING)
     logging.getLogger('custodian.s3').setLevel(logging.ERROR)
