@@ -35,7 +35,7 @@ CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 
 class SessionTest(BaseTest):
 
-    authorization_file = os.path.join(os.path.dirname(__file__), 'files', 'test_auth_file.json')
+    authorization_file = os.path.join(os.path.dirname(__file__), 'data', 'test_auth_file.json')
 
     def setUp(self):
         super(SessionTest, self).setUp()

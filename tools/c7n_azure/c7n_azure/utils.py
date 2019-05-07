@@ -13,7 +13,9 @@
 # limitations under the License.
 import collections
 import datetime
+import enum
 import hashlib
+import isodate
 import logging
 import re
 import time
@@ -442,3 +444,48 @@ class ManagedGroupHelper(object):
         entities = client.entities.list(filter='name eq \'%s\'' % managed_resource_group)
 
         return [e.name for e in entities if e.type == '/subscriptions']
+
+
+class RetentionPeriod(object):
+
+    PATTERN = re.compile("^P([1-9][0-9]*)([DWMY])$")
+
+    @enum.unique
+    class Units(enum.Enum):
+        day = ('day', 'D')
+        days = ('days', 'D')
+        week = ('week', 'W')
+        weeks = ('weeks', 'W')
+        month = ('month', 'M')
+        months = ('months', 'M')
+        year = ('year', 'Y')
+        years = ('years', 'Y')
+
+        def __init__(self, str_value, iso8601_symbol):
+            self.str_value = str_value
+            self.iso8601_symbol = iso8601_symbol
+
+        def __str__(self):
+            return self.str_value
+
+    @staticmethod
+    def duration_from_period_and_units(period, retention_period_unit):
+        iso8601_str = "P{}{}".format(period, retention_period_unit.iso8601_symbol)
+        duration = isodate.parse_duration(iso8601_str)
+        return duration
+
+    @staticmethod
+    def parse_iso8601_retention_period(iso8601_retention_period):
+        """
+        A simplified iso8601 duration parser that only accepts one duration designator.
+        """
+        match = re.match(RetentionPeriod.PATTERN, iso8601_retention_period)
+        if match is None:
+            raise ValueError("Invalid iso8601_retention_period: {}. "
+            "This parser only accepts a single duration designator."
+            .format(iso8601_retention_period))
+        period = int(match.group(1))
+        iso8601_symbol = match.group(2)
+        units = next(units for units in RetentionPeriod.Units
+            if units.iso8601_symbol == iso8601_symbol)
+        return period, units

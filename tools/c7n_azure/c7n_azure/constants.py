@@ -59,3 +59,34 @@ DEFAULT_CHUNK_SIZE = 20
 Custom Retry Code Variables
 """
 DEFAULT_MAX_RETRY_AFTER = 30
+
+
+"""
+Azure Functions Host Configuration
+"""
+FUNCTION_HOST_CONFIG = {
+    "version": "2.0",
+    "healthMonitor": {
+        "enabled": True,
+        "healthCheckInterval": "00:00:10",
+        "healthCheckWindow": "00:02:00",
+        "healthCheckThreshold": 6,
+        "counterThreshold": 0.80
+    },
+    "functionTimeout": "00:05:00",
+    "logging": {
+        "fileLoggingMode": "debugOnly"
+    },
+    "extensions": {
+        "http": {
+            "routePrefix": "api",
+            "maxConcurrentRequests": 5,
+            "maxOutstandingRequests": 30
+        }
+    }
+}
+
+FUNCTION_EXTENSION_BUNDLE_CONFIG = {
+    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "version": "[1.*, 2.0.0)"
+}
