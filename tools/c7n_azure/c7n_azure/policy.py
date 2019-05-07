@@ -76,7 +76,14 @@ class AzureFunctionMode(ServerlessExecutionMode):
                              'location': 'string',
                              'resourceGroupName': 'string',
                              'skuTier': 'string',
-                             'skuName': 'string'}
+                             'skuName': 'string',
+                             'auto_scale': {
+                                 'enable_auto_scale': bool,
+                                 'min_capacity': 'string',
+                                 'max_capacity': 'string',
+                                 'default_capacity': 'string'
+                             }
+                         }
                          }
                     ]
                 },
@@ -112,11 +119,11 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'resource_group_name': 'cloud-custodian',
                 'sku_tier': 'Dynamic',  # consumption plan
                 'sku_name': 'Y1',
-                'auto_scale':{
+                'auto_scale': {
                     'enable_auto_scale': False,
-                    'min_capacity':1,
-                    'max_capacity':2,
-                    'default_capacity':1
+                    'min_capacity': "1",
+                    'max_capacity': "1",
+                    'default_capacity': "1"
                 }
             })
 
@@ -169,14 +176,14 @@ class AzureFunctionMode(ServerlessExecutionMode):
             result['name'] = ResourceIdParser.get_resource_name(settings)
             result['resource_group_name'] = ResourceIdParser.get_resource_group(settings)
         else:
-            #get nested keys
+            # get nested keys
             for key in properties.keys():
                 value = settings.get(StringUtils.snake_to_camel(key), properties[key])
                 if isinstance(value, dict):
                     result[key] = {}
                     for key2 in properties.get(key).keys():
                         result[key][key2] = settings.get(StringUtils.snake_to_camel(key), properties[key]).get(
-                            StringUtils.snake_to_camel(key2),properties[key][key2])
+                            StringUtils.snake_to_camel(key2), properties[key][key2])
                 else:
                     result[key] = value
 

@@ -24,11 +24,11 @@ from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
 from c7n_azure.provisioning.storage_account import StorageAccountUnit
+from c7n_azure.provisioning.autoscale import AutoScaleUnit
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
 from msrestazure.azure_exceptions import CloudError
-from c7n_azure.autoscale_utils import AutoScaleUtilities
 
 from c7n.utils import local_session
 
@@ -80,16 +80,20 @@ class FunctionAppUtilities(object):
             app_resource_group_name = ResourceIdParser.get_resource_group(app_id)
             app_service_plan = web_client.app_service_plans.get(app_resource_group_name, app_name)
 
-            # enable autoscale if applicable
-            auto_scale = AutoScaleUtilities(app_service_plan, parameters.service_plan['auto_scale'])
-            auto_scale.deploy_auto_scale(app_resource_group_name)
             # update the sku tier to properly reflect what is provisioned in Azure
             parameters.service_plan['sku_tier'] = app_service_plan.sku.tier
 
             return function_app
 
+        # provision app service plan
         sp_unit = AppServicePlanUnit()
         app_service_plan = sp_unit.provision_if_not_exists(parameters.service_plan)
+
+        # enable autoscale
+        ac_unit = AutoScaleUnit()
+        ac_unit.set_service_plan_id(app_service_plan.id)
+        ac_unit.set_sku_tier(app_service_plan.sku)
+        ac_unit.provision_if_not_exists(parameters.service_plan)
 
         # if only resource_id is provided, retrieve existing app plan sku tier
         parameters.service_plan['sku_tier'] = app_service_plan.sku.tier
@@ -108,8 +112,6 @@ class FunctionAppUtilities(object):
              'is_consumption_plan': FunctionAppUtilities.is_consumption_plan(parameters),
              'storage_account_connection_string': con_string})
 
-        auto_scale = AutoScaleUtilities(app_service_plan, parameters.service_plan['auto_scale'])
-        auto_scale.deploy_auto_scale(parameters.function_app_resource_group_name)
         return function_app_unit.provision(function_app_params)
 
     @staticmethod
