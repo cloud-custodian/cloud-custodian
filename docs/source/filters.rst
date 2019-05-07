@@ -78,6 +78,7 @@ There are several ways to get a list of possible keys for each resource.
     - ``present``
     - ``not-null``
     - ``empty``
+    - ``contains``
 
   .. code-block:: yaml
 
@@ -87,15 +88,32 @@ There are several ways to get a list of possible keys for each resource.
            value: present                 ─▶ Checks if key is present
 
 
-- List Operators:
-    There is a collection of operators that can be used with user supplied lists:
-
-    - ``in``
-    - ``not-in`` or ``ni``
+- Logical Operators:
     - ``or`` or ``Or``
     - ``and`` or ``And``
     - ``not``
+
+  .. code-block:: yaml
+
+      filters:
+         - or:                              ─▶ Logical Operator
+           - type: value
+             key: CpuOptions.CoreCount      ─▶ The value from the describe call
+             value: 36                      ─▶ Value that is being compared
+           - type: value
+             key: CpuOptions.CoreCount      ─▶ The value from the describe call
+             value: 42                      ─▶ Value that is being compared
+
+- List Operators:
+    There is a collection of operators that can be used with user supplied lists. The operators
+    are evaluated as ``value from key`` in (the operator) ``given value``. If you would like it
+    evaluated in the opposite way  ``given value`` in (the operator) ``value from key`` then you
+    can include the ``swap`` transformation or use the ``contains`` operator.
+
+    - ``in``
+    - ``not-in`` or ``ni``
     - ``intersect`` - Provides comparison between 2 lists
+
 
   .. code-block:: yaml
 
@@ -104,6 +122,16 @@ There are several ways to get a list of possible keys for each resource.
            key: ImageId                   ─▶ The value from the describe call
            op: in                         ─▶ List operator
            value: [ID-123, ID-321]        ─▶ List of Values to be compared against
+
+  .. code-block:: yaml
+
+      filters:
+         - type: value
+           key: ImageId.List              ─▶ The value from the describe call
+           op: in                         ─▶ List operator
+           value: ID-321                  ─▶ Values to be compared against
+           value_type: swap               ─▶ Switches list comparison order
+
 
 
 - Special operators:
