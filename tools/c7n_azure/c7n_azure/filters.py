@@ -305,7 +305,7 @@ class PolicyCompliantFilter(Filter):
 
     Filter resources by their current Azure Policy compliance status.
 
-    You can specify if you want to filter compliant or non-compiant resources.
+    You can specify if you want to filter compliant or non-compliant resources.
 
     You can provide a list of Azure Policy definitions display names or names to limit
     amount of non-compliant resources. By default it returns a list of all non-compliant
@@ -335,21 +335,22 @@ class PolicyCompliantFilter(Filter):
 
     def process(self, resources, event=None):
         s = self.manager.get_session()
+        definition_ids = None
 
         # Translate definitions display names into ids
-        policyClient = s.client("azure.mgmt.resource.policy.PolicyClient")
-        definitions = [d for d in policyClient.policy_definitions.list()]
-        definition_ids = [d.id.lower() for d in definitions
-                          if self.definitions is None or
-                          d.display_name in self.definitions or
-                          d.name in self.definitions]
+        if self.definitions:
+            policyClient = s.client("azure.mgmt.resource.policy.PolicyClient")
+            definitions = [d for d in policyClient.policy_definitions.list()]
+            definition_ids = [d.id.lower() for d in definitions
+                              if d.display_name in self.definitions or
+                              d.name in self.definitions]
 
         # Find non-compliant resources
         client = PolicyInsightsClient(s.get_credentials())
         query = client.policy_states.list_query_results_for_subscription(
             policy_states_resource='latest', subscription_id=s.subscription_id).value
         non_compliant = [f.resource_id.lower() for f in query
-                         if f.policy_definition_id.lower() in definition_ids]
+                         if not definition_ids or f.policy_definition_id.lower() in definition_ids]
 
         if self.compliant:
             return [r for r in resources if r['id'].lower() not in non_compliant]

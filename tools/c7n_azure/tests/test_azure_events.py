@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
-from azure_common import BaseTest, arm_template, DEFAULT_SUBSCRIPTION_ID
+from azure_common import BaseTest, arm_template
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
@@ -66,6 +66,6 @@ class AzureEventsTest(BaseTest):
         sub_name = 'custodiantestsubscription'
         event_subscription = AzureEventSubscription.create(sub_destination,
                                                            sub_name,
-                                                           DEFAULT_SUBSCRIPTION_ID)
+                                                           self.session.get_subscription_id())
         self.assertEqual(event_subscription.name, sub_name)
         self.assertEqual(event_subscription.destination.endpoint_type, 'StorageQueue')

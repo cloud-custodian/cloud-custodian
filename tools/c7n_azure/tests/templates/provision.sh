@@ -1,8 +1,9 @@
 #!/bin/bash
 IFS=$'\n\t'
 
-
 # IFS new value is less likely to cause confusing bugs when looping arrays or arguments (e.g. $@)
+
+# If `az ad signed-in-user show` fails then update your Azure CLI version
 
 resourceLocation="South Central US"
 templateDirectory="$( cd "$( dirname "$0" )" && pwd )"

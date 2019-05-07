@@ -1,0 +1,56 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cdn/profiles?api-version=2017-10-12",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:10:27 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; odata.metadata=minimal"
+                    ],
+                    "odata-version": [
+                        "4.0"
+                    ],
+                    "content-length": [
+                        "436"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestcdnprofile",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile",
+                                "type": "Microsoft.Cdn/profiles",
+                                "tags": {},
+                                "location": "CentralUs",
+                                "sku": {
+                                    "name": "Standard_Microsoft"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceState": "Active"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

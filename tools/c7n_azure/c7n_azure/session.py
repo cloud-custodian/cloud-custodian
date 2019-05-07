@@ -211,7 +211,7 @@ class Session(object):
     def get_tenant_id(self):
         self._initialize_session()
         if self._is_token_auth:
-            decoded = jwt.decode(self.credentials['token']['access_token'], verify=False)
+            decoded = jwt.decode(self.credentials.token['access_token'], verify=False)
             return decoded['tid']
 
         return self.tenant_id

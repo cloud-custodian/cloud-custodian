@@ -137,7 +137,7 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
             else:
                 send_logger.error("Received throttling error, retry time is %i"
                                   "(retry only if < %i seconds)."
-                                  % (retry_after, constants.DEFAULT_MAX_RETRY_AFTER))
+                                  % (retry_after or 0, constants.DEFAULT_MAX_RETRY_AFTER))
                 break
         else:
             break

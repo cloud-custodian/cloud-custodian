@@ -12,115 +12,303 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import datetime
+import email.utils as eut
+import json
 import os
 import re
 
-from c7n_azure import constants
+import msrest.polling
+from azure_serializer import AzureSerializer
+from c7n_azure import constants, actions
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
 from mock import patch
+from msrest.pipeline import ClientRawResponse
+from msrest.serialization import Model
+from msrest.service_client import ServiceClient
 from vcr_unittest import VCRTestCase
 
 from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
 
-import msrest.polling
-from msrest.serialization import Model
-from msrest.service_client import ServiceClient
-from msrest.pipeline import ClientRawResponse
-
 load_resources()
 
 C7N_SCHEMA = generate()
 DEFAULT_SUBSCRIPTION_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
 CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
-DEFAULT_TENANT_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
-# latest VCR recording date that tag tests
-# If tests need to be re-recorded, update to current date
-TEST_DATE = datetime.datetime(2018, 9, 10, 23, 59, 59)
+DEFAULT_USER_OBJECT_ID = '00000000-0000-0000-0000-000000000002'
+DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000003'
+DEFAULT_STORAGE_KEY = 'DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo'\
+                      '/MGFHKc+t+M20PxoraNCslng9w=='
+
+GRAPH_RESPONSE = {
+    "value": [
+        {
+            "NOTE": "THIS RESPONSE FAKED BY AZURE_COMMON.PY",
+            "odata.type": "Microsoft.DirectoryServices.User",
+            "objectType": "User",
+            "objectId": DEFAULT_USER_OBJECT_ID,
+            "displayName": "John Doe",
+            "mail": "john@doe.com",
+            "refreshTokensValidFromDateTime": "2018-08-22T20:37:43Z",
+            "userPrincipalName": "john@doe.com"
+        }
+    ]
+}
+
+ACTIVITY_LOG_RESPONSE = {
+    "value": [
+        {
+            "caller": "john@doe.com",
+            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/"
+                  "TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/events/"
+                  "37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
+            "operationName": {
+                "value": "Microsoft.Compute/virtualMachines/write",
+                "localizedValue": "Create or Update Virtual Machine"
+            },
+            "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
+        }
+    ]
+}
 
 
 class AzureVCRBaseTest(VCRTestCase):
 
+    TEST_DATE = None
+
+    FILTERED_HEADERS = ['authorization',
+                        'accept-encoding',
+                        'client-request-id',
+                        'retry-after',
+                        'strict-transport-security',
+                        'server',
+                        'user-Agent',
+                        'accept-language',
+                        'connection',
+                        'x-ms-client-request-id',
+                        'x-ms-correlation-request-id',
+                        'x-ms-ratelimit-remaining-subscription-reads',
+                        'x-ms-request-id',
+                        'x-ms-routing-request-id',
+                        'x-ms-gateway-service-instanceid',
+                        'x-ms-ratelimit-remaining-tenant-reads',
+                        'x-ms-served-by',
+                        'x-aspnet-version',
+                        'x-content-type-options',
+                        'x-powered-by',
+                        'ocp-aad-diagnostics-server-name',
+                        'ocp-aad-session-key',
+                        'vary',
+                        'pragma',
+                        'transfer-encoding',
+                        'expires']
+
+    def is_playback(self):
+        # You can't do this in setup because it is actually required by the base class
+        # setup (via our callbacks), but it is also not possible to do until the base class setup
+        # has completed initializing the cassette instance.
+        return not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path)
+
     def _get_vcr_kwargs(self):
         return super(VCRTestCase, self)._get_vcr_kwargs(
-            filter_headers=['Authorization',
-                            'client-request-id',
-                            'retry-after',
-                            'x-ms-client-request-id',
-                            'x-ms-correlation-request-id',
-                            'x-ms-ratelimit-remaining-subscription-reads',
-                            'x-ms-request-id',
-                            'x-ms-routing-request-id',
-                            'x-ms-gateway-service-instanceid',
-                            'x-ms-ratelimit-remaining-tenant-reads',
-                            'x-ms-served-by', ],
-            before_record_request=self.request_callback
+            before_record_request=self._request_callback,
+            before_record_response=self._response_callback,
+            decode_compressed_response=True
         )
 
     def _get_vcr(self, **kwargs):
         myvcr = super(VCRTestCase, self)._get_vcr(**kwargs)
-        myvcr.register_matcher('azurematcher', self.azure_matcher)
-        myvcr.match_on = ['azurematcher', 'method']
+        myvcr.register_matcher('azure-matcher', self._azure_matcher)
+        myvcr.match_on = ['azure-matcher', 'method']
+        myvcr.register_serializer('azure-json', AzureSerializer())
+        myvcr.serializer = 'azure-json'
+        myvcr.path_transformer = AzureVCRBaseTest._json_extension
 
-        # Block recording when using fake token (tox runs)
+        # Block recording when using fake token (generally only used on build servers)
         if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
             myvcr.record_mode = 'none'
 
         return myvcr
 
-    def azure_matcher(self, r1, r2):
+    def _azure_matcher(self, r1, r2):
         """Replace all subscription ID's and ignore api-version"""
         if [k for k in set(r1.query) if k[0] != 'api-version'] != [
                 k for k in set(r2.query) if k[0] != 'api-version']:
             return False
 
-        r1_path = re.sub(
-            r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
-            DEFAULT_SUBSCRIPTION_ID,
-            r1.path)
-        r2_path = re.sub(
-            r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
-            DEFAULT_SUBSCRIPTION_ID,
-            r2.path)
+        r1_path = AzureVCRBaseTest._replace_subscription_id(r1.path)
+        r2_path = AzureVCRBaseTest._replace_subscription_id(r2.path)
 
         r1_path = r1_path.replace('//', '/')
         r2_path = r2_path.replace('//', '/')
 
         return r1_path == r2_path
 
-    def request_callback(self, request):
+    def _request_callback(self, request):
         """Modify requests before saving"""
-        if "/subscriptions/" in request.url:
-            request.uri = re.sub(
-                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
-                DEFAULT_SUBSCRIPTION_ID,
-                request.url)
+        request.uri = AzureVCRBaseTest._replace_subscription_id(request.uri)
+        request.uri = AzureVCRBaseTest._replace_tenant_id(request.uri)
+
         if request.body:
             request.body = b'mock_body'
+
+        # Request headers serve no purpose as only URI is read during a playback.
+        request.headers = None
+
         if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
             return None
         if re.match('https://login.microsoftonline.com/([^/]+)/oauth2/token', request.uri):
             return None
         return request
 
+    def _response_callback(self, response):
+        if self.is_playback():
+            if 'data' in response['body']:
+                body = json.dumps(response['body']['data'])
+                response['body']['string'] = body.encode('utf-8')
+                response['headers']['content-length'] = [str(len(body))]
+
+            return response
+
+        response['headers'] = {k.lower(): v for (k, v) in
+                               response['headers'].items()
+                               if k.lower() not in self.FILTERED_HEADERS}
+
+        content_type = response['headers'].get('content-type', (None,))[0]
+        if not content_type or 'application/json' not in content_type:
+            return response
+
+        body = response['body'].pop('string').decode('utf-8')
+
+        # Clean up subscription IDs and storage keys
+        body = AzureVCRBaseTest._replace_subscription_id(body)
+        body = AzureVCRBaseTest._replace_storage_keys(body)
+
+        try:
+            response['body']['data'] = json.loads(body)
+        except json.decoder.JSONDecodeError:
+            self.fail("AzureVCRBaseTest could not parse JSON response body "
+                      "while attempting to record cassette. Body:\n%s" % body)
+
+        # Replace some API responses entirely
+        response = AzureVCRBaseTest._response_substitutions(response)
+
+        return response
+
+    @staticmethod
+    def _response_substitutions(response):
+        data = response['body']['data']
+
+        if isinstance(data, dict):
+            # Replace AD graph responses
+            odata_metadata = data.get('odata.metadata')
+            if odata_metadata and "directoryObjects" in odata_metadata:
+                response['body']['data'] = GRAPH_RESPONSE
+                return response
+
+            # Replace Activity Log API responses
+            value_array = data.get('value', [])
+            if value_array and value_array[0].get('eventTimestamp'):
+                response['body']['data'] = ACTIVITY_LOG_RESPONSE
+                return response
+
+            if 'authorizations' in data:
+                response['body']['data']['authorizations'] = []
+
+            # Real resource type responses are critical to catching
+            # API version failures, but we can get rid of extra fields
+            # and save a lot of space
+            if 'resourceTypes' in data:
+                response['body']['data']['resourceTypes'] = \
+                    [{
+                        'resourceType': r['resourceType'],
+                        'apiVersions': [next(iter(r['apiVersions']))]
+                    } for r in data['resourceTypes']]
+
+        return response
+
+    @staticmethod
+    def _replace_subscription_id(s):
+        if "subscriptions" in s:
+            return re.sub(
+                r"(?P<prefix>(/|%2F)subscriptions(/|%2F))"
+                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
+                r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
+        return s
+
+    @staticmethod
+    def _replace_tenant_id(s):
+        if "graph.windows.net" in s:
+            return re.sub(
+                r"(?P<prefix>(/|%2F)graph.windows.net(/|%2F))"
+                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
+                r"\g<prefix>" + DEFAULT_TENANT_ID, s)
+        return s
+
+    @staticmethod
+    def _replace_storage_keys(s):
+        # All usages of storage keys have the word "key" somewhere
+        if "key" in s:
+            return re.sub(
+                r"(?P<prefix>=|\"|:)(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==)",
+                r"\g<prefix>" + DEFAULT_STORAGE_KEY, s)
+        return s
+
+    @staticmethod
+    def _json_extension(path):
+        # A simple transformer keeps the native
+        # cassette naming logic in place
+        return path[:-4] + "json"
+
 
 class BaseTest(TestUtils, AzureVCRBaseTest):
     """ Azure base testing class.
     """
+    def __init__(self, *args, **kwargs):
+        super(BaseTest, self).__init__(*args, **kwargs)
+        self._requires_polling = False
 
     def setUp(self):
         super(BaseTest, self).setUp()
         ThreadHelper.disable_multi_threading = True
 
-        # Patch Poller with constructor that always disables polling
-        self.lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_test_init)
-        self.lro_patch.start()
+        # We always patch the date so URLs that involve dates match up
+        self._utc_patch = patch.object(actions, 'utcnow', BaseTest.get_test_date)
+        self._utc_patch.start()
+        self.addCleanup(self._utc_patch.stop)
 
-    def tearDown(self):
-        super(BaseTest, self).tearDown()
-        self.lro_patch.stop()
+        if not self._requires_polling:
+            # Patch Poller with constructor that always disables polling
+            # This breaks blocking on long running operations (resource creation).
+            self._lro_patch = patch.object(msrest.polling.LROPoller, '__init__', BaseTest.lro_init)
+            self._lro_patch.start()
+            self.addCleanup(self._lro_patch.stop)
+
+        if self.is_playback():
+            if self._requires_polling:
+                # If using polling we need to monkey patch the timeout during playback
+                # or we'll have long sleeps introduced into our test runs
+                Session._old_client = Session.client
+                Session.client = BaseTest.session_client_wrapper
+                self.addCleanup(BaseTest.session_client_cleanup)
+
+            if constants.ENV_ACCESS_TOKEN in os.environ:
+                self._tenant_patch = patch('c7n_azure.session.Session.get_tenant_id',
+                                           return_value=DEFAULT_TENANT_ID)
+                self._tenant_patch.start()
+                self.addCleanup(self._tenant_patch.stop)
+
+    def get_test_date(self):
+        header_date = self.cassette.responses[0]['headers'].get('date') \
+            if self.cassette.responses else None
+
+        if header_date:
+            test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
+        else:
+            test_date = datetime.datetime.now()
+        return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
 
     @staticmethod
     def setup_account():
@@ -142,7 +330,7 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                           }, clear=True)
 
     @staticmethod
-    def lro_test_init(self, client, initial_response, deserialization_callback, polling_method):
+    def lro_init(self, client, initial_response, deserialization_callback, polling_method):
         self._client = client if isinstance(client, ServiceClient) else client._client
         self._response = initial_response.response if \
             isinstance(initial_response, ClientRawResponse) else \
@@ -161,6 +349,16 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         self._done = None
         self._exception = None
 
+    @staticmethod
+    def session_client_cleanup():
+        Session.client = Session._old_client
+
+    @staticmethod
+    def session_client_wrapper(self, client):
+        client = Session._old_client(self, client)
+        client.config.long_running_operation_timeout = 0
+        return client
+
 
 def arm_template(template):
     def decorator(func):
@@ -171,3 +369,15 @@ def arm_template(template):
             return func(*args, **kwargs)
         return wrapper
     return decorator
+
+
+def requires_arm_polling(cls):
+    orig_init = cls.__init__
+    # Make copy of original __init__, so we can call it without recursion
+
+    def __init__(self, *args, **kws):
+        orig_init(self, *args, **kws)  # Call the original __init__
+        self._requires_polling = True
+
+    cls.__init__ = __init__  # Set the class' __init__ to the new one
+    return cls
