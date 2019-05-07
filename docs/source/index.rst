@@ -45,6 +45,12 @@ Navigate below and get started with Cloud Custodian!
    azure/contribute
 
 .. toctree::
+    :maxdepth: 1
+    :caption: GCP
+
+    gcp/gettingstarted
+
+.. toctree::
    :maxdepth: 2
    :caption: Contributing
 
