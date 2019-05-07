@@ -66,6 +66,60 @@ class DescribeSource(object):
         return resources
 
 
+class ChildResourceQuery(ResourceQuery):
+    """A resource query for resources that must be queried with parent information.
+    Several resource types can only be queried in the context of their
+    parents identifiers. ie. SQL and Cosmos databases
+    """
+
+    parent_key = 'c7n:parent-id'
+
+    def __init__(self, session_factory, manager):
+        super(ChildResourceQuery, self).__init__(session_factory)
+        self.manager = manager
+
+    def filter(self, resource_manager, **params):
+        """Query a set of resources."""
+        m = self.resolve(resource_manager.resource_type)
+        client = resource_manager.get_client()
+
+        enum_op, list_op, extra_args = m.enum_spec
+
+        parent_type, annotate_parent = m.parent_spec
+        parents = self.manager.get_resource_manager(parent_type)
+
+        # Have to query separately for each parent's children.
+        results = []
+        for parent in parents.resources():
+            if extra_args:
+                params.update({key: parent[extra_args[key]] for key in extra_args.keys()})
+
+            op = getattr(getattr(client, enum_op), list_op)
+            subset = [r.serialize(True) for r in op(**params)]
+
+            if annotate_parent:
+                for r in subset:
+                    r[self.parent_key] = parent[parents.resource_type.id]
+
+            if subset:
+                results.extend(subset)
+        return results
+
+
+@sources.register('describe-child-azure')
+class ChildDescribeSource(DescribeSource):
+
+    resource_query_factory = ChildResourceQuery
+
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = self.get_query()
+
+    def get_query(self):
+        return self.resource_query_factory(
+            self.manager.session_factory, self.manager)
+
+
 class QueryMeta(type):
     """metaclass to have consistent action/filter registry for new resources."""
     def __new__(cls, name, parents, attrs):

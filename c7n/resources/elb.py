@@ -397,7 +397,7 @@ class DisableS3Logging(BaseAction):
                   - type: is-logging
                     bucket: prodbucket
                 actions:
-                  - type: disable-elb-logging
+                  - type: disable-s3-logging
     """
     schema = type_schema('disable-s3-logging')
     permissions = ("elasticloadbalancing:ModifyLoadBalancerAttributes",)

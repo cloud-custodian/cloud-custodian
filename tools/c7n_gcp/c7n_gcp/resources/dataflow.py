@@ -23,7 +23,7 @@ class DataflowJob(QueryResourceManager):
         service = 'dataflow'
         version = 'v1b3'
         component = 'projects.jobs'
-        enum_spec = ('list', 'jobs[]', None)
+        enum_spec = ('aggregated', 'jobs[]', None)
         scope_key = 'projectId'
         id = 'name'
 

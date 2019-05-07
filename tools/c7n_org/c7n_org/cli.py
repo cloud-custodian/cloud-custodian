@@ -17,11 +17,17 @@
 from collections import Counter
 import logging
 import os
-import multiprocessing
 import time
 import subprocess
+import six
 import sys
 
+# Try to set this early if offers any help against this OSX issue
+# https://bugs.python.org/issue33725
+# if sys.platform == 'darwin':
+#    os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
+
+import multiprocessing
 from concurrent.futures import (
     ProcessPoolExecutor,
     as_completed)
@@ -46,11 +52,6 @@ from c7n_org.utils import environ, account_tags
 from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('c7n_org')
-
-# On OSX High Sierra Workaround
-# https://github.com/ansible/ansible/issues/32499
-if sys.platform == 'darwin':
-    os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
 
 WORKER_COUNT = int(
     os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
@@ -202,9 +203,22 @@ def resolve_regions(regions, partition='aws'):
 
 def get_session(account, session_name, region):
     if account.get('role'):
-        return assumed_session(
-            account['role'], session_name, region=region,
-            external_id=account.get('external_id'))
+        roles = account['role']
+        if isinstance(roles, six.string_types):
+            roles = [roles]
+        s = None
+        for r in roles:
+            try:
+                s = assumed_session(
+                    r, session_name, region=region,
+                    external_id=account.get('external_id'),
+                    session=s)
+            except ClientError as e:
+                log.error(
+                    "unable to obtain credentials for account:%s role:%s error:%s",
+                    account['name'], r, e)
+                raise
+        return s
     elif account.get('profile'):
         return SessionFactory(region, account['profile'])()
     else:
@@ -372,21 +386,24 @@ def report(config, output, use, output_dir, accounts,
     writer.writerows(rows)
 
 
-def run_account_script(account, region, output_dir, debug, script_args):
-    try:
-        session = get_session(account, "org-script", region)
-        creds = session._session.get_credentials()
-    except ClientError:
-        log.error(
-            "unable to obtain credentials for account:%s role:%s",
-            account['name'], account['role'])
-        return 1
-
-    env = os.environ.copy()
+def _get_env_creds(session, region):
+    creds = session._session.get_credentials()
+    env = {}
     env['AWS_ACCESS_KEY_ID'] = creds.access_key
     env['AWS_SECRET_ACCESS_KEY'] = creds.secret_key
     env['AWS_SESSION_TOKEN'] = creds.token
     env['AWS_DEFAULT_REGION'] = region
+    return env
+
+
+def run_account_script(account, region, output_dir, debug, script_args):
+    try:
+        session = get_session(account, "org-script", region)
+    except ClientError:
+        return 1
+
+    env = os.environ.copy()
+    env.update(_get_env_creds(session, region))
 
     log.info("running script on account:%s region:%s script: `%s`",
              account['name'], region, " ".join(script_args))
@@ -492,9 +509,16 @@ def run_account(account, region, policies_config, output_path,
         account_id=account['account_id'], metrics_enabled=metrics,
         log_group=None, profile=None, external_id=None)
 
+    env_vars = account_tags(account)
+
     if account.get('role'):
-        config['assume_role'] = account['role']
-        config['external_id'] = account.get('external_id')
+        if isinstance(account['role'], six.string_types):
+            config['assume_role'] = account['role']
+            config['external_id'] = account.get('external_id')
+        else:
+            env_vars.update(
+                _get_env_creds(get_session(account, 'custodian', region), region))
+
     elif account.get('profile'):
         config['profile'] = account['profile']
 
@@ -503,9 +527,8 @@ def run_account(account, region, policies_config, output_path,
     success = True
     st = time.time()
 
-    with environ(**account_tags(account)):
+    with environ(**env_vars):
         for p in policies:
-
             # Variable expansion and non schema validation (not optional)
             p.expand_variables(p.get_variables(account.get('vars', {})))
             p.validate()

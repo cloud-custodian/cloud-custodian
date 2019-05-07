@@ -1,0 +1,37 @@
+{
+  "body": {
+    "items": [
+      {
+        "profile": "COMPATIBLE", 
+        "kind": "compute#sslPolicy", 
+        "name": "newpolicy", 
+        "minTlsVersion": "TLS_1_0", 
+        "fingerprint": "BoVS1G-KySQ=", 
+        "creationTimestamp": "2019-03-11T05:40:52.917-07:00", 
+        "id": "4540081266450229691", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/newpolicy"
+      }
+    ], 
+    "kind": "compute#sslPoliciesList", 
+    "id": "projects/cloud-custodian/global/sslPolicies", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "574", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 11 Mar 2019 13:47:58 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Mon, 11 Mar 2019 13:47:58 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"BO6OAgfn40fb55us8CD5L5r-epc=/mL-qYVUneYpP6_H1kvEFR7Vp5LY=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

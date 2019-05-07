@@ -25,7 +25,8 @@ from azure.common.credentials import (BasicTokenAuthentication,
 from msrestazure.azure_active_directory import MSIAuthentication
 
 from c7n_azure import constants
-from c7n_azure.utils import ResourceIdParser, StringUtils, custodian_azure_send_override
+from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
+                             ManagedGroupHelper)
 
 try:
     from azure.cli.core._profile import Profile
@@ -168,9 +169,21 @@ class Session(object):
         self._initialize_session()
         return self.subscription_id
 
-    def get_function_target_subscription_id(self):
+    def get_function_target_subscription_name(self):
         self._initialize_session()
+
+        if constants.ENV_FUNCTION_MANAGED_GROUP_NAME in os.environ:
+            return os.environ[constants.ENV_FUNCTION_MANAGED_GROUP_NAME]
         return os.environ.get(constants.ENV_FUNCTION_SUB_ID, self.subscription_id)
+
+    def get_function_target_subscription_ids(self):
+        self._initialize_session()
+
+        if constants.ENV_FUNCTION_MANAGED_GROUP_NAME in os.environ:
+            return ManagedGroupHelper.get_subscriptions_list(
+                os.environ[constants.ENV_FUNCTION_MANAGED_GROUP_NAME], self.get_credentials())
+
+        return [os.environ.get(constants.ENV_FUNCTION_SUB_ID, self.subscription_id)]
 
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """
@@ -212,14 +225,15 @@ class Session(object):
     def load_auth_file(self, path):
         with open(path) as json_file:
             data = json.load(json_file)
+            self.tenant_id = data['credentials']['tenant']
             return (ServicePrincipalCredentials(
                 client_id=data['credentials']['client_id'],
                 secret=data['credentials']['secret'],
-                tenant=data['credentials']['tenant'],
+                tenant=self.tenant_id,
                 resource=self.resource_namespace
-            ), data['subscription'])
+            ), data.get('subscription', None))
 
-    def get_functions_auth_string(self):
+    def get_functions_auth_string(self, target_subscription_id):
         """
         Build auth json string for deploying
         Azure Functions.  Look for dedicated
@@ -237,8 +251,6 @@ class Session(object):
             constants.ENV_FUNCTION_CLIENT_SECRET
         ]
 
-        function_subscription_id = self.get_function_target_subscription_id()
-
         # Use dedicated function env vars if available
         if all(k in os.environ for k in function_auth_variables):
             auth = {
@@ -248,7 +260,7 @@ class Session(object):
                         'secret': os.environ[constants.ENV_FUNCTION_CLIENT_SECRET],
                         'tenant': os.environ[constants.ENV_FUNCTION_TENANT_ID]
                     },
-                'subscription': function_subscription_id
+                'subscription': target_subscription_id
             }
 
         elif type(self.credentials) is ServicePrincipalCredentials:
@@ -259,7 +271,7 @@ class Session(object):
                         'secret': os.environ[constants.ENV_CLIENT_SECRET],
                         'tenant': os.environ[constants.ENV_TENANT_ID]
                     },
-                'subscription': function_subscription_id
+                'subscription': target_subscription_id
             }
 
         else:

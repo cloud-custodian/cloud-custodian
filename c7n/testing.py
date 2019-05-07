@@ -28,7 +28,7 @@ import six
 import yaml
 
 from c7n import policy
-from c7n.schema import validate as schema_validate
+from c7n.schema import generate, validate as schema_validate
 from c7n.ctx import ExecutionContext
 from c7n.utils import reset_session_cache
 from c7n.config import Bag, Config
@@ -65,13 +65,14 @@ class TestUtils(unittest.TestCase):
         Input a dictionary and a format. Valid formats are `yaml` and `json`
         Returns the file path.
         """
-        fh = tempfile.NamedTemporaryFile(mode="w+b", suffix="." + format)
+        fh = tempfile.NamedTemporaryFile(mode="w+b", suffix="." + format, delete=False)
         if format == "json":
             fh.write(json.dumps(policy).encode("utf8"))
         else:
             fh.write(yaml.dump(policy, encoding="utf8", Dumper=yaml.SafeDumper))
 
         fh.flush()
+        self.addCleanup(os.unlink, fh.name)
         self.addCleanup(fh.close)
         return fh.name
 
@@ -100,6 +101,8 @@ class TestUtils(unittest.TestCase):
         cache=False,
     ):
         if validate:
+            if not self.custodian_schema:
+                self.custodian_schema = generate()
             errors = schema_validate({"policies": [data]}, self.custodian_schema)
             if errors:
                 raise errors[0]
