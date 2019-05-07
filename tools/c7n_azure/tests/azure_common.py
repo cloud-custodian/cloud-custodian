@@ -89,6 +89,9 @@ class AzureVCRBaseTest(VCRTestCase):
                         'connection',
                         'x-ms-client-request-id',
                         'x-ms-correlation-request-id',
+                        'x-ms-keyvault-service-version',
+                        'x-ms-keyvault-network-info',
+                        'x-ms-keyvault-region',
                         'x-ms-ratelimit-remaining-subscription-reads',
                         'x-ms-request-id',
                         'x-ms-routing-request-id',
@@ -183,6 +186,7 @@ class AzureVCRBaseTest(VCRTestCase):
         body = response['body'].pop('string').decode('utf-8')
 
         # Clean up subscription IDs and storage keys
+        body = AzureVCRBaseTest._replace_tenant_id(body)
         body = AzureVCRBaseTest._replace_subscription_id(body)
         body = AzureVCRBaseTest._replace_storage_keys(body)
 
@@ -240,12 +244,13 @@ class AzureVCRBaseTest(VCRTestCase):
 
     @staticmethod
     def _replace_tenant_id(s):
-        if "graph.windows.net" in s:
-            return re.sub(
-                r"(?P<prefix>(/|%2F)graph.windows.net(/|%2F))"
-                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
-                r"\g<prefix>" + DEFAULT_TENANT_ID, s)
-        return s
+        prefixes = ['(/|%2F)graph.windows.net(/|%2F)',
+                    '"tenantId":\\s*"']
+        regex = r"(?P<prefix>(%s))" \
+                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
+                % '|'.join(['(%s)' % p for p in prefixes])
+
+        return re.sub(regex, r"\g<prefix>" + DEFAULT_TENANT_ID, s)
 
     @staticmethod
     def _replace_storage_keys(s):
