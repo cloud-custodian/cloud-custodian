@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
 import distutils.util
 import json
 import logging
@@ -24,7 +25,9 @@ from c7n.mu import PythonPackageArchive
 from c7n.utils import local_session
 from c7n_azure.constants import (ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,
                                  FUNCTION_EVENT_TRIGGER_MODE,
-                                 FUNCTION_TIME_TRIGGER_MODE)
+                                 FUNCTION_TIME_TRIGGER_MODE,
+                                 FUNCTION_HOST_CONFIG,
+                                 FUNCTION_EXTENSION_BUNDLE_CONFIG)
 from c7n_azure.dependency_manager import DependencyManager
 from c7n_azure.session import Session
 
@@ -71,43 +74,13 @@ class FunctionPackage(object):
                 self.pkg.add_contents(dest=name + '/config.json',
                                       contents=policy_contents)
 
-                if policy['mode']['type'] == FUNCTION_EVENT_TRIGGER_MODE:
-                    self._add_queue_binding_extensions()
+        self._add_host_config(policy['mode']['type'])
 
-        self._add_host_config()
-
-    def _add_host_config(self):
-        config = \
-            {
-                "version": "2.0",
-                "healthMonitor": {
-                    "enabled": True,
-                    "healthCheckInterval": "00:00:10",
-                    "healthCheckWindow": "00:02:00",
-                    "healthCheckThreshold": 6,
-                    "counterThreshold": 0.80
-                },
-                "functionTimeout": "00:05:00",
-                "logging": {
-                    "fileLoggingMode": "debugOnly"
-                },
-                "extensions": {
-                    "http": {
-                        "routePrefix": "api",
-                        "maxConcurrentRequests": 5,
-                        "maxOutstandingRequests": 30
-                    }
-                }
-            }
+    def _add_host_config(self, mode):
+        config = copy.deepcopy(FUNCTION_HOST_CONFIG)
+        if mode == FUNCTION_EVENT_TRIGGER_MODE:
+            config['extensionBundle'] = FUNCTION_EXTENSION_BUNDLE_CONFIG
         self.pkg.add_contents(dest='host.json', contents=json.dumps(config))
-
-    def _add_queue_binding_extensions(self):
-        bindings_dir_path = os.path.abspath(
-            os.path.join(os.path.join(__file__, os.pardir), 'function_binding_resources'))
-        bin_path = os.path.join(bindings_dir_path, 'bin')
-
-        self.pkg.add_directory(bin_path)
-        self.pkg.add_file(os.path.join(bindings_dir_path, 'extensions.csproj'))
 
     def get_function_config(self, policy, queue_name=None):
         config = \
@@ -243,13 +216,17 @@ class FunctionPackage(object):
         # update perms of the package
         self._update_perms_package()
         zip_api_url = '%s/api/zipdeploy?isAsync=true' % deployment_creds.scm_uri
-
+        headers = {'content-type': 'application/octet-stream'}
         self.log.info("Publishing Function package from %s" % self.pkg.path)
 
         zip_file = self.pkg.get_bytes()
 
         try:
-            r = requests.post(zip_api_url, data=zip_file, timeout=300, verify=self.enable_ssl_cert)
+            r = requests.post(zip_api_url,
+                              data=zip_file,
+                              headers=headers,
+                              timeout=300,
+                              verify=self.enable_ssl_cert)
         except requests.exceptions.ReadTimeout:
             self.log.error("Your Function App deployment timed out after 5 minutes. Try again.")
 
