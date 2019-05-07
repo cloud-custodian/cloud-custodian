@@ -52,11 +52,20 @@ Navigate below and get started with Cloud Custodian!
 
 .. toctree::
    :maxdepth: 2
+   :caption: Tools
+
+   tools/c7n-org
+   tools/c7n-mailer
+
+
+.. toctree::
+   :maxdepth: 2
    :caption: Contributing
 
    contribute
    developer/index.rst
    developer/installing.rst
    developer/tests.rst
+   developer/documentation.rst
 
 
