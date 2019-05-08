@@ -149,7 +149,7 @@ Given that, you can run Cloud Custodian with
 You can run it with Docker as well
 
 .. code-block:: bash
-   
+
   # Download the image
   $ docker pull cloudcustodian/c7n
 
