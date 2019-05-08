@@ -40,7 +40,7 @@ class AutoScaleUnit(DeploymentUnit):
                                     "metricResourceUri": params['service_plan_id'],
                                     "operator": "GreaterThan",
                                     "statistic": "Average",
-                                    "threshold": 70,
+                                    "threshold": 80,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT10M",
