@@ -50,4 +50,3 @@ class AppServicePlanUnit(DeploymentUnit):
             ac_unit.provision(autoscale_params)
 
         return plan
-

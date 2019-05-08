@@ -1,5 +1,5 @@
-
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
+
 
 class AutoScaleUnit(DeploymentUnit):
     def __init__(self):
