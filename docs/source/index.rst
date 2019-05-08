@@ -19,7 +19,6 @@ Navigate below and get started with Cloud Custodian!
    overview/index
    quickstart/index
    quickstart/usage
-   quickstart/modes
    quickstart/advanced
    quickstart/policyStructure
 
@@ -31,6 +30,7 @@ Navigate below and get started with Cloud Custodian!
    aws/examples/index
    aws/policy/index
    filters
+   aws/aws-modes
    aws/policy/lambda
    aws/policy/mu
 
@@ -42,8 +42,15 @@ Navigate below and get started with Cloud Custodian!
    azure/authentication
    azure/examples/index
    azure/policy/index
+   azure/azure-modes
    azure/advanced/index
    azure/contribute
+
+.. toctree::
+   :maxdepth: 1
+   :caption: GCP
+
+   gcp/gcp-modes
 
 .. toctree::
    :maxdepth: 2
