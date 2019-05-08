@@ -91,7 +91,7 @@ Quick Install
 
 ::
 
-  $ virtualenv --python=python2 custodian
+  $ python3 -m venv custodian
   $ source custodian/bin/activate
   (custodian) $ pip install c7n
 
