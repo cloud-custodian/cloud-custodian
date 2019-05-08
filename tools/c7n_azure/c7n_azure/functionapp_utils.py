@@ -24,7 +24,6 @@ from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
 from c7n_azure.provisioning.storage_account import StorageAccountUnit
-from c7n_azure.provisioning.autoscale import AutoScaleUnit
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
@@ -88,12 +87,6 @@ class FunctionAppUtilities(object):
         # provision app service plan
         sp_unit = AppServicePlanUnit()
         app_service_plan = sp_unit.provision_if_not_exists(parameters.service_plan)
-
-        # enable autoscale
-        ac_unit = AutoScaleUnit()
-        ac_unit.set_service_plan_id(app_service_plan.id)
-        ac_unit.set_sku_tier(app_service_plan.sku)
-        ac_unit.provision_if_not_exists(parameters.service_plan)
 
         # if only resource_id is provided, retrieve existing app plan sku tier
         parameters.service_plan['sku_tier'] = app_service_plan.sku.tier

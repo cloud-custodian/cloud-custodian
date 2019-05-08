@@ -77,11 +77,14 @@ class AzureFunctionMode(ServerlessExecutionMode):
                              'resourceGroupName': 'string',
                              'skuTier': 'string',
                              'skuName': 'string',
-                             'auto_scale': {
-                                 'enable_auto_scale': bool,
-                                 'min_capacity': 'string',
-                                 'max_capacity': 'string',
-                                 'default_capacity': 'string'
+                             'autoScale': {
+                                 'type': 'object',
+                                 'properties': {
+                                     'enabled': {'type': 'boolean'},
+                                     'minCapacity': {'type': 'string'},
+                                     'maxCapacity': {'type': 'string'},
+                                     'defaultCapacity': {'type': 'string'}
+                                 }
                              }
                          }
                          }
@@ -121,10 +124,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
                 'sku_tier': 'Dynamic',  # consumption plan
                 'sku_name': 'Y1',
                 'auto_scale': {
-                    'enable_auto_scale': False,
-                    'min_capacity': "1",
-                    'max_capacity': "1",
-                    'default_capacity': "1"
+                    'enabled': False,
+                    'min_capacity': 1,
+                    'max_capacity': 2,
+                    'default_capacity': 1
                 }
             })
 
