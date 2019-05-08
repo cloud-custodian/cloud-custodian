@@ -141,6 +141,8 @@ Given that, you can run Cloud Custodian with
 
   # Dryrun on the policies (no actions executed) to see what resources
   # match each policy.
+  # AWS cli tokens must be set within the environment
+  # along with a region in order to execute the dry run
   $ custodian run --dryrun -s out policy.yml
 
   # Run the policy
@@ -149,7 +151,7 @@ Given that, you can run Cloud Custodian with
 You can run it with Docker as well
 
 .. code-block:: bash
-   
+
   # Download the image
   $ docker pull cloudcustodian/c7n
 
