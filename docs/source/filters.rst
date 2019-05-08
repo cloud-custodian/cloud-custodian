@@ -51,7 +51,7 @@ There are several ways to get a list of possible keys for each resource.
 - Via Cloud Provider Documentation
 
     Go to the relevant cloud provider sdk documentation and search for the describe api call for the resource
-    your interested in. The available fields will be listed under the results of that api call.
+    you're interested in. The available fields will be listed under the results of that api call.
 
 
 
@@ -231,6 +231,36 @@ There are several ways to get a list of possible keys for each resource.
                  - subnet-1b8474522
                  - subnet-2d2736444
 
+- Value Regex:
+  When using a Value Filter, a ``value_regex`` can be
+  specified. This will mean that the value is evaluated against the
+  result of running the regex that was provided on the ``key``,
+  instead of the full contents of the ``key`` itself.
+
+  The filter expects that there will be exactly one capturing group, however
+  non-capturing groups can be specified as well, e.g. ``(?:newkey|oldkey)``.
+
+  Note that if the value regex does not find a match, it will just
+  pass-through the full contents of the ``key`` itself, i.e. essentially act as
+  if the ``value_regex`` had not been specified at all.
+  This could possibly have unintended consequences depending on how the
+  filter is configured.
+
+  In this example there is an ``expiration`` comparison,
+  which needs a datetime, however the tag containing this information
+  also has other data in it. By setting the ``value_regex``
+  to capture just the datetime part of the tag, the filter can be evaluated
+  as normal.
+
+  .. code-block:: yaml
+
+    # Find expiry from tag contents
+    - type: value
+      key: "tag:metadata"
+      value_type: expiration
+      value_regex: ".*delete_after=([0-9]{4}-[0-9]{2}-[0-9]{2}).*"
+      op: less-than
+      value: 0
 
 Age Filter
 -------------

@@ -23,6 +23,7 @@ from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
 from .common import instance, event_data, Bag
+from c7n.filters.core import ValueRegex
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -289,6 +290,33 @@ class TestValueTypes(BaseFilterTest):
         fdata["op"] = "equal"
         self.assertFilter(fdata, i("abc"), True)
 
+    def test_integer_with_value_regex(self):
+        fdata = {
+            "type": "value",
+            "key": "tag:Count",
+            "op": "greater-than",
+            "value_regex": r".*data=([0-9]+)",
+            "value_type": "integer",
+            "value": 0,
+        }
+
+        def i(d):
+            value = "mode=5;data={}".format(d)
+            return instance(Tags=[{"Key": "Count", "Value": value}])
+
+        self.assertFilter(fdata, i("42"), True)
+        self.assertFilter(fdata, i("0"), False)
+        self.assertFilter(fdata, i("abc"), False)
+
+        fdata["op"] = "equal"
+        self.assertFilter(fdata, i("42"), False)
+        self.assertFilter(fdata, i("0"), True)
+        # This passes because the 'integer' value_type
+        # returns '0' when it fails to parse an int.
+        # Making abc == 0 evaluate to True seems dangerous,
+        # but it's existing behaviour.
+        self.assertFilter(fdata, i("abc"), True)
+
     def test_swap(self):
         fdata = {
             "type": "value",
@@ -347,6 +375,147 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(now), True)
         self.assertFilter(fdata, i(now.isoformat()), True)
 
+    def test_expiration_with_value_regex(self):
+
+        now = datetime.now(tz=tz.tzutc())
+        three_months = now + timedelta(90)
+        two_months = now + timedelta(60)
+
+        def i(c, e):
+            value = "creation={};expiry={}".format(c, e)
+            return instance(Tags=[{"Key": "metadata", "Value": value}])
+
+        fdata = {
+            "type": "value",
+            "key": "tag:metadata",
+            "op": "less-than",
+            "value_regex": r".*expiry=([0-9-:\s\+\.T]+Z?)",
+            "value_type": "expiration",
+            "value": 61,
+        }
+
+        self.assertFilter(fdata, i((three_months - timedelta(100)), three_months), False)
+        self.assertFilter(fdata, i((two_months - timedelta(100)), two_months), True)
+        self.assertFilter(fdata, i((now - timedelta(100)), now), True)
+        self.assertFilter(fdata, i((now - timedelta(100)).isoformat(), now.isoformat()), True)
+
+    def test_regex_capture_matches_first_occurrence(self):
+
+        def i(first, second):
+            value = "{}text{}".format(first, second)
+            return instance(Tags=[{"Key": "metadata", "Value": value}])
+
+        fdata = {
+            "type": "value",
+            "key": "tag:metadata",
+            "op": "equal",
+            "value_regex": r"([0-9])",
+            "value_type": "integer",
+            "value": 3,
+        }
+
+        self.assertFilter(fdata, i(2, 3), False)
+        self.assertFilter(fdata, i(3, 2), True)
+
+        fdata['value_regex'] = r".*([0-9])"
+        self.assertFilter(fdata, i(2, 3), True)
+        self.assertFilter(fdata, i(3, 2), False)
+
+    def test_regex_capture_with_non_capturing_groups(self):
+
+        def i(d):
+            return instance(Tags=[{"Key": "metadata", "Value": d}])
+
+        fdata = {
+            "type": "value",
+            "key": "tag:metadata",
+            "op": "equal",
+            "value_regex": r"(?:oldformat|newformat)=(expected\s\w+)",
+            "value_type": "string",
+            "value": "expected value",
+        }
+
+        self.assertFilter(fdata, i("newformat=expected value"), True)
+        self.assertFilter(fdata, i("oldformat=expected value"), True)
+        self.assertFilter(fdata, i("otherformat=expected value"), False)
+
+    def test_value_regex_validation(self):
+        # Regex won't compile
+        fdata = {
+            "type": "value",
+            "key": "tag:metadata",
+            "op": "less-than",
+            "value_regex": r".*expiry=?????[([0-9)",
+            "value_type": "expiration",
+            "value": 61,
+        }
+        self.assertRaises(PolicyValidationError, filters.factory(fdata, {}).validate)
+
+        # More than one capture group
+        fdata = {
+            "type": "value",
+            "key": "tag:metadata",
+            "op": "less-than",
+            "value_regex": r".*(expiry)=([0-9-:\s\+\.T]+Z?)",
+            "value_type": "expiration",
+            "value": 61,
+        }
+        self.assertRaises(PolicyValidationError, filters.factory(fdata, {}).validate)
+
+        # No capture group
+        fdata = {
+            "type": "value",
+            "key": "tag:metadata",
+            "op": "less-than",
+            "value_regex": r".*expiry=[0-9-:\s\+\.T]+Z?",
+            "value_type": "expiration",
+            "value": 61,
+        }
+        self.assertRaises(PolicyValidationError, filters.factory(fdata, {}).validate)
+
+        # One capture group and non-capturing groups (should not error)
+        fdata = {
+            "type": "value",
+            "key": "tag:metadata",
+            "op": "less-than",
+            "value_regex": r"pet=(?:cat|dog);number=([0-9]{1,4})",
+            "value_type": "integer",
+            "value": 12,
+        }
+        filters.factory(fdata, {}).validate
+
+        # Invalid `op`
+        fdata = {
+            "type": "value",
+            "key": "tag:metadata",
+            "op": "contains",
+            "value_regex": r"pet=(?:cat|dog);number=([0-9]{1,4})",
+            "value_type": "integer",
+            "value": [12, 13, 14, 15],
+        }
+        self.assertRaises(PolicyValidationError, filters.factory(fdata, {}).validate)
+
+    def test_value_regex_match(self):
+        fdata = {
+            "type": "value",
+            "key": "tag:metadata",
+            "op": "less-than",
+            "value_regex": r"pet=(?:cat|dog);number=([0-9]{1,4})",
+            "value_type": "integer",
+            "value": 12,
+        }
+        capture = ValueRegex(fdata['value_regex'])
+
+        # No match returns original value (pass-through)
+        retValue = capture.get_resource_value("pet=elephant;number=3")
+        self.assertEqual("pet=elephant;number=3", retValue)
+        # TypeError returns original value (pass-through)
+        retValue = capture.get_resource_value(True)
+        self.assertEqual(True, retValue)
+        # Match returns matched value
+        retValue = capture.get_resource_value("pet=dog;number=44")
+        self.assertEqual("44", retValue)
+
     def test_resource_count_filter(self):
         fdata = {
             "type": "value", "value_type": "resource_count", "op": "lt", "value": 2
@@ -376,6 +545,15 @@ class TestValueTypes(BaseFilterTest):
 
         # Missing `op`
         f = {"type": "value", "value_type": "resource_count", "value": 1}
+        self.assertRaises(
+            PolicyValidationError, filters.factory(f, {}).validate
+        )
+
+        # Unexpected `value_regex`
+        f = {
+            "type": "value", "value_type": "resource_count", "op": "eq", "value": "foo",
+            "value_regex": "([0-7]{3,7})"
+        }
         self.assertRaises(
             PolicyValidationError, filters.factory(f, {}).validate
         )
