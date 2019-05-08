@@ -90,10 +90,10 @@ First a policy file needs to be created in YAML format, as an example
 
   policies:
     - name: remediate-extant-keys
-      description: |
-        Scan through all s3 buckets in an account and ensure all objects
-        are encrypted (default to AES256).
-      resource: aws.s3
+    description: |
+      Scan through all s3 buckets in an account and ensure all objects
+      are encrypted (default to AES256).
+    resource: aws.s3
       actions:
         - encrypt-keys
 
@@ -149,7 +149,7 @@ Given that, you can run Cloud Custodian with
 You can run it with Docker as well
 
 .. code-block:: bash
-
+   
   # Download the image
   $ docker pull cloudcustodian/c7n
 
