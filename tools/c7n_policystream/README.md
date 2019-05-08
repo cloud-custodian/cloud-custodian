@@ -19,7 +19,7 @@ Two example use cases:
 Policystream works on individual github repositories, or per Github integration
 across an organization's set of repositories.
 
-# Install
+## Install
 
 policystream can be installed via pypi, provided the require pre-requisites
 libraries are available (libgit2 > 0.26)
@@ -30,7 +30,7 @@ pip install c7n-policystream
 
 Docker images available soon, see build for constructing your own.
 
-# Build
+## Build
 
 Alternatively a docker image can be built as follows
 
@@ -43,7 +43,7 @@ docker build -t policystream:latest -f tools/c7n_policystream/Dockerfile .
 docker run --mount src="$(pwd)",target=/repos,type=bind policystream:latest
 ```
 
-# Usage
+## Usage
 
 Streaming use case (default stream is to stdout, also supports kinesis, rdbms and sqs)
 
@@ -83,7 +83,7 @@ Pull request use, output policies changes between current branch and master.
     resource: aws.lambda
 ```
 
-# Options
+## Options
 
 ```
 $ c7n-policystream --help

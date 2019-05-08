@@ -62,7 +62,10 @@ html:
 #	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
 #	$(SPHINXBINS)/sphinx-apidoc -H "Azure" -o $(SRCDIR)/generated/azure $(SRCDIR)/../../tools/c7n_azure/c7n_azure
 #	$(SPHINXBINS)/sphinx-apidoc -H "GCP" -o $(SRCDIR)/generated/gcp $(SRCDIR)/../../tools/c7n_gcp/c7n_gcp
+	cp README.rst $(SRCDIR)/overview.rst
+#	cp tools/c7n_guardian/readme.md $(SRCDIR)/tools/c7n-guardian.md
 	cp tools/c7n_org/README.md $(SRCDIR)/tools/c7n-org.md
+	cp tools/c7n_policystream/README.md $(SRCDIR)/tools/c7n-policystream.md
 	cp tools/c7n_mailer/README.md $(SRCDIR)/tools/c7n-mailer.md
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo

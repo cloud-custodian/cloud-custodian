@@ -20,7 +20,7 @@
 
 
 Cloud Custodian
----------------
+===============
 
 Cloud Custodian is a rules engine for managing public cloud accounts
 and resources. It allows users to define policies to enable a well
@@ -48,7 +48,7 @@ execute against large existing fleets.
 
 
 Features
-########
+--------
 
 - Comprehensive support for public cloud services and resources with a
   rich library of actions and filters to build policies with.
@@ -64,7 +64,7 @@ Features
 
 
 Links
-#####
+-----
 
 - `Homepage <http://cloudcustodian.io>`_
 - `Docs <http://cloudcustodian.io/docs/index.html>`_
@@ -72,7 +72,7 @@ Links
 - `Presentations <https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid>`_
 
 Quick Install
-#############
+-------------
 
 ::
 
@@ -82,18 +82,20 @@ Quick Install
 
 
 Usage
-#####
+-----
 
-First a policy file needs to be created in YAML format, as an example::
+First a policy file needs to be created in YAML format, as an example
+
+.. code-block:: yaml
 
   policies:
-  - name: remediate-extant-keys
+    - name: remediate-extant-keys
     description: |
       Scan through all s3 buckets in an account and ensure all objects
       are encrypted (default to AES256).
     resource: aws.s3
-    actions:
-      - encrypt-keys
+      actions:
+        - encrypt-keys
 
   - name: ec2-require-non-public-and-encrypted-volumes
     resource: aws.ec2
@@ -104,7 +106,7 @@ First a policy file needs to be created in YAML format, as an example::
     mode:
       type: cloudtrail
       events:
-          - RunInstances
+        - RunInstances
     filters:
       - type: ebs
         key: Encrypted
@@ -130,7 +132,9 @@ First a policy file needs to be created in YAML format, as an example::
         days: 4
 
 
-Given that, you can run Cloud Custodian with::
+Given that, you can run Cloud Custodian with
+
+.. code-block:: bash
 
   # Validate the configuration (note this happens by default on run)
   $ custodian validate policy.yml
@@ -143,7 +147,8 @@ Given that, you can run Cloud Custodian with::
   $ custodian run -s out policy.yml
 
 You can run it with Docker as well
-::
+
+.. code-block:: bash
    
   # Download the image
   $ docker pull cloudcustodian/c7n
@@ -162,24 +167,24 @@ like Lego bricks with actions and filters.
 Consult the documentation for additional information, or reach out on gitter.
 
 Get Involved
-############
+------------
 
 * Mailing List - https://groups.google.com/forum/#!forum/cloud-custodian
 * Reddit - https://reddit.com/r/cloudcustodian
 * Gitter - https://gitter.im/cloud-custodian/cloud-custodian
 
 Additional Tools
-################
+----------------
 
 The Custodian project also develops and maintains a suite of additional tools
 here https://github.com/cloud-custodian/cloud-custodian/tree/master/tools:
 
 
 Org
-   Multi-account policy execution.
+  Multi-account policy execution.
 
 PolicyStream
-   Git history as stream of logical policy changes.
+  Git history as stream of logical policy changes.
 
 Salactus
    Scale out s3 scanning.
@@ -202,7 +207,7 @@ Sentry
 
 
 Contributors
-############
+------------
 
 We welcome Your interest in Capital One’s Open Source Projects (the
 “Project”). Any Contributor to the Project must accept and sign an
@@ -218,7 +223,7 @@ impact Your rights to use Your own Contributions for any other purpose.
 
 
 Code of Conduct
-###############
+---------------
 
 This project adheres to the `Open Code of Conduct <https://developer.capitalone.com/single/code-of-conduct/>`_. By participating, you are
 expected to honor this code.

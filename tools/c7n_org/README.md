@@ -1,4 +1,4 @@
-## What is c7n-org?
+# What is c7n-org?
 
 c7n-org is a tool to run custodian against multiple AWS accounts,
 Azure subscriptions, or GCP projects in parallel.
