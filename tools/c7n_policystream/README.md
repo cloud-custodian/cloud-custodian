@@ -1,3 +1,8 @@
+
+[//]: # (         !!! IMPORTANT !!!                    )
+[//]: # (This file is moved during document generation.)
+[//]: # (Only edit the original document at ./tools/c7n_policystream/README.md)
+
 # Policy Changes from Git
 
 Using custodian in accordance with infrastructure as code principles,

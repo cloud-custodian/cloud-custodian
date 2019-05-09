@@ -25,13 +25,31 @@ Then, create a file named ``custodian.yml`` with this content:
 
     policies:
       - name: my-first-policy
-        resource: ec2
+        resource: aws.ec2
+        filters:
+          - "tag:Custodian": present
+
+At this point, we have specified the following things:
+
+1. The name of the policy
+2. The resource type to query against, in this case (aws.ec2)
+3. The filters list
+4. The Custodian tag filter
+
+Running this policy will not execute any actions as the actions list does not exist.
+
+We can extend this example to stop the instances that are actually filtered in by the
+Custodian tag filter by simply specifying the ``stop`` action:
+
+.. code-block:: yaml
+
+    policies:
+      - name: my-first-policy
+        resource: aws.ec2
         filters:
           - "tag:Custodian": present
         actions:
-          - stop
-
-.. _aws-run-policy:
+          - stop .. _aws-run-policy:
 
 Run your policy
 ---------------
@@ -60,3 +78,39 @@ For more information on basic concepts and terms, check the :ref:`glossary
 <glossary>`. See our extended example of a policy's structure 
 :ref:`tag compliance policy <policyStructure>`, or browse all of our
 :ref:`use case recipes <usecases>`.
+
+.. _monitor-aws-cc:
+
+Monitor AWS
+-----------
+
+You can generate CloudWatch metrics by specifying the ``--metrics`` flag and specifying ``aws``::
+
+  $ custodian run -s <output_directory> --metrics aws <policyfile>.yml
+
+You can also upload Cloud Custodian logs to CloudWatch logs::
+
+  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> -s <output_directory> <policyfile>.yml
+
+And you can output logs and resource records to S3::
+
+  $ custodian run -s s3://<my-bucket><my-prefix> <policyfile>.yml
+
+If Custodian is being run without Assume Roles, all output will be put into the same account.
+Custodian is built with the ability to be run from different accounts and leverage STS
+Role Assumption for cross-account access. Users can leverage the metrics that are
+being generated after each run by creating Custodian Dashboards in CloudWatch.
+
+Troubleshooting & Tinkering
++++++++++++++++++++++++++++
+
+If you are not using the ``us-east-1`` region, then you'll need to specify that
+as well, either on the command line or in an environment variable:
+
+.. code-block:: bash
+
+    --region=us-west-1
+
+.. code-block:: bash
+
+  $ AWS_DEFAULT_REGION=us-west-1

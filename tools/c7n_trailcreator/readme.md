@@ -1,4 +1,4 @@
-# AWS AutoTag Resource Creators
+# AWS Retroactive Tagging Resource Creators
 
 This script will process cloudtrail records to create a sqlite db of
 resources and their creators, and then use that sqlitedb to tag

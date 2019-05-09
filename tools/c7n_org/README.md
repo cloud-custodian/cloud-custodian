@@ -1,3 +1,8 @@
+
+[//]: # (         !!! IMPORTANT !!!                    )
+[//]: # (This file is moved during document generation.)
+[//]: # (Only edit the original document at ./tools/c7n_org/README.md)
+
 # What is c7n-org?
 
 c7n-org is a tool to run custodian against multiple AWS accounts,
@@ -88,7 +93,7 @@ be looking to incorporate them into a new c7n-org subcommand.
 - For **Azure**, the script `azuresubs.py` generates a config file
   from the Azure Resource Management API
 
-    - Please see the [Additional Azure Instructions](#Additional-Azure-Instructions) 
+    - Please see the [Additional Azure Instructions](#Additional-Azure-Instructions)
     - for initial setup and other important info
 
 - For **GCP**, the script `gcpprojects.py` generates a config file from
