@@ -344,6 +344,7 @@ The following configuration items are *all* optional. The ones marked "Required 
 | &#x2705;       | `splunk_hec_url`        | string             | URL to your Splunk HTTP Event Collector endpoint |
 | &#x2705;       | `splunk_hec_token` | string | Splunk HEC authentication token for specified username |
 |                | `splunk_remove_paths` | array of strings | List of [RFC6901](http://tools.ietf.org/html/rfc6901) JSON Pointers to remove from the event, if present, before sending to Splunk |
+|                | `splunk_remove_metrics` | boolean | If true, remove `c7n.metrics` element from resources before logging them |
 |                | `splunk_actions_list` | boolean | If true, add an `actions` list to the top-level message sent to Splunk, containing the names of all non-notify actions taken |
 |                | `splunk_max_attempts` | integer | Maximum number of times to try POSTing data to Splunk HEC (default 4) |
 |                | `splunk_hec_max_length` | integer | Maximum data length that Splunk HEC accepts; an error will be logged for any message sent over this length |

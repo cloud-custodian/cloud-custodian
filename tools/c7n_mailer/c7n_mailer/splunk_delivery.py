@@ -90,6 +90,11 @@ class SplunkHecDelivery(object):
         logs = []
         for res in msg['resources']:
             x = deepcopy(base_log)
+            if (
+                self.config.get('splunk_remove_metrics', False) and
+                'c7n.metrics' in res
+            ):
+                del res['c7n.metrics']
             x['resource'] = res
             x['tags'] = self.tags_for_resource(res)
             logs.append(self._prune_log_message(x))
