@@ -8,7 +8,7 @@ LABEL name="custodian" \
 
 # Transfer Custodian source into container by directory
 # to minimize size
-ADD setup.py README.rst requirements.txt /src/
+ADD setup.py README.md requirements.txt /src/
 ADD c7n /src/c7n/
 ADD tools /src/tools/
 

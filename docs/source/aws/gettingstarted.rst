@@ -60,7 +60,7 @@ Now, run Custodian:
 
     AWS_ACCESS_KEY_ID="foo" AWS_SECRET_ACCESS_KEY="bar" custodian run --output-dir=. custodian.yml
 
-Note: If you already have AWS credentials configured for AWS CLI or SDK access, then you may omit providing them on the command line. 
+Note: If you already have AWS credentials configured for AWS CLI or SDK access, then you may omit providing them on the command line.
 If successful, you should see output similar to the following on the command line::
 
     2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: ec2 region:us-east-1 c7n:0.8.21.2
@@ -75,9 +75,95 @@ overwriting it). Lastly, you should find the instance stopping or stopped in
 your AWS console. Congratulations, and welcome to Custodian!
 
 For more information on basic concepts and terms, check the :ref:`glossary
-<glossary>`. See our extended example of a policy's structure 
+<glossary>`. See our extended example of a policy's structure
 :ref:`tag compliance policy <policyStructure>`, or browse all of our
 :ref:`use case recipes <usecases>`.
+
+A 2nd Example Policy
+--------------------
+
+First a role must be created with the appropriate permissions for
+custodian to act on the resources described in the policies yaml
+given as an example below. For convenience, an `example policy <../_static/custodian-quickstart-policy.json>`_
+is provided for this quick start guide. Customized AWS IAM policies
+will be necessary for your own custodian policies
+
+To implement the policy:
+
+#. Open the AWS console
+#. Navigate to IAM -> Policies
+#. Use the json option to copy the `example policy <../_static/custodian-quickstart-policy.json>`_ as a new AWS IAM Policy
+#. Name the IAM policy as something recognizable and save it.
+#. Navigate to IAM -> Roles and create a role called CloudCustodian-QuickStart
+#. Assign the role the IAM policy created above.
+#. Now with the pre-requisite completed; you are ready continue and run custodian.
+
+A custodian policy file needs to be created in YAML format, as an example
+
+.. code-block:: yaml
+
+  policies:
+  - name: s3-cross-account
+    description: |
+      Checks S3 for buckets with cross-account access and
+      removes the cross-account access.
+    resource: s3
+    region: us-east-1
+    filters:
+      - type: cross-account
+    actions:
+      - type: remove-statements
+        statement_ids: matched
+
+  - name: ec2-require-non-public-and-encrypted-volumes
+    resource: aws.ec2
+    description: |
+      Provision a lambda and cloud watch event target
+      that looks at all new instances and terminates those with
+      unencrypted volumes.
+    mode:
+      type: cloudtrail
+      role: CloudCustodian-QuickStart
+      events:
+        - RunInstances
+    filters:
+      - type: ebs
+        key: Encrypted
+        value: false
+    actions:
+      - terminate
+
+  - name: tag-compliance
+    resource: aws.ec2
+    description: |
+      Schedule a resource that does not meet tag compliance policies
+      to be stopped in four days.
+    filters:
+      - State.Name: running
+      - "tag:Environment": absent
+      - "tag:AppId": absent
+      - or:
+        - "tag:OwnerContact": absent
+        - "tag:DeptID": absent
+    actions:
+      - type: mark-for-op
+        op: stop
+        days: 4
+
+
+Given that, you can run Cloud Custodian with
+
+.. code-block:: bash
+
+  # Validate the configuration (note this happens by default on run)
+  $ custodian validate policy.yml
+
+  # Dryrun on the policies (no actions executed) to see what resources
+  # match each policy.
+  $ custodian run --dryrun -s out policy.yml
+
+  # Run the policy
+  $ custodian run -s out policy.yml
 
 .. _monitor-aws-cc:
 
