@@ -1,0 +1,130 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2015-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-routing-request-id": [
+                        "WESTUS2:20190503T154710Z:b4ca6268-a691-4909-ac93-30898e7d9098"
+                    ],
+                    "Expires": [
+                        "-1"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-reads": [
+                        "11999"
+                    ],
+                    "Date": [
+                        "Fri, 03 May 2019 15:47:09 GMT"
+                    ],
+                    "x-ms-request-id": [
+                        "46ce3eef-fe0a-4fb6-ac1d-b61eb71982e2"
+                    ],
+                    "Pragma": [
+                        "no-cache"
+                    ],
+                    "Content-Type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "Vary": [
+                        "Accept-Encoding"
+                    ],
+                    "Server": [
+                        "Microsoft-HTTPAPI/2.0"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000; includeSubDomains"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "x-ms-correlation-request-id": [
+                        "b4ca6268-a691-4909-ac93-30898e7d9098"
+                    ],
+                    "Cache-Control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "428"
+                    ]
+                },
+                "body": {
+                    "string": "{\"value\":[{\"kind\":\"v12.0\",\"properties\":{\"administratorLogin\":\"custodian\",\"version\":\"12.0\",\"state\":\"Ready\",\"fullyQualifiedDomainName\":\"cctestsqlserverj6y6cbbtaphs4.database.windows.net\"},\"location\":\"eastus2\",\"id\":\"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4\",\"name\":\"cctestsqlserverj6y6cbbtaphs4\",\"type\":\"Microsoft.Sql/servers\"}]}"
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/firewallRules?api-version=2014-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-routing-request-id": [
+                        "WESTUS2:20190503T154711Z:e256965f-02bb-485e-bd2b-fb5667fe4e1f"
+                    ],
+                    "DataServiceVersion": [
+                        "3.0;"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-reads": [
+                        "11999"
+                    ],
+                    "Date": [
+                        "Fri, 03 May 2019 15:47:11 GMT"
+                    ],
+                    "x-ms-request-id": [
+                        "3ab55fc5-48ce-4bd7-aca0-76039cd7e44e"
+                    ],
+                    "Content-Type": [
+                        "application/json; odata=minimalmetadata; streaming=true; charset=utf-8"
+                    ],
+                    "Transfer-Encoding": [
+                        "chunked"
+                    ],
+                    "X-Content-Type-Options": [
+                        "nosniff"
+                    ],
+                    "Strict-Transport-Security": [
+                        "max-age=31536000; includeSubDomains"
+                    ],
+                    "Server": [
+                        "Microsoft-HTTPAPI/2.0"
+                    ],
+                    "x-ms-correlation-request-id": [
+                        "e256965f-02bb-485e-bd2b-fb5667fe4e1f"
+                    ],
+                    "Vary": [
+                        "Accept-Encoding"
+                    ],
+                    "Cache-Control": [
+                        "no-store, no-cache"
+                    ],
+                    "content-length": [
+                        "739"
+                    ]
+                },
+                "body": {
+                    "string": "{\"value\":[{\"id\":\"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/firewallRules/1.2.2.128s25\",\"name\":\"1.2.2.128s25\",\"type\":\"Microsoft.Sql/servers/firewallRules\",\"location\":\"East US 2\",\"kind\":\"v12.0\",\"properties\":{\"startIpAddress\":\"1.2.2.128\",\"endIpAddress\":\"1.2.2.255\"}},{\"id\":\"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/firewallRules/AllowAllWindowsAzureIps\",\"name\":\"AllowAllWindowsAzureIps\",\"type\":\"Microsoft.Sql/servers/firewallRules\",\"location\":\"East US 2\",\"kind\":\"v12.0\",\"properties\":{\"startIpAddress\":\"0.0.0.0\",\"endIpAddress\":\"0.0.0.0\"}}]}"
+                }
+            }
+        }
+    ]
+}

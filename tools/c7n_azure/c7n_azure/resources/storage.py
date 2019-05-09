@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
+from c7n_azure.filters import FirewallRulesFilter
 from azure.mgmt.storage.models import IPRule, \
     NetworkRuleSet, StorageAccountUpdateParameters, VirtualNetworkRule
 from c7n.filters.core import type_schema
 from c7n_azure.actions import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from netaddr import IPNetwork
 
 
 @resources.register('storage')
@@ -79,3 +83,23 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
             resource['resourceGroup'],
             resource['name'],
             StorageAccountUpdateParameters(network_rule_set=rule_set))
+
+
+@Storage.filter_registry.register('firewall-rules')
+class StorageFirewallRulesFilter(FirewallRulesFilter):
+
+    def __init__(self, data, manager=None):
+        super(StorageFirewallRulesFilter, self).__init__(data, manager)
+        self._log = logging.getLogger('custodian.azure.storage')
+
+    @property
+    def log(self):
+        return self._log
+
+    def _query_rules(self, resource):
+
+        ip_rules = resource['properties']['networkAcls']['ipRules']
+
+        resource_rules = set([IPNetwork(r['value']) for r in ip_rules])
+
+        return resource_rules

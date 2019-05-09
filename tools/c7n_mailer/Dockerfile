@@ -13,7 +13,7 @@ ADD c7n /src/c7n/
 ADD tools /src/tools/
 
 WORKDIR /src
-
+RUN adduser --disabled-login custodian
 RUN apt-get --yes update && apt-get --yes upgrade \
  && apt-get --yes install build-essential \
  && pip3 install -r requirements.txt  . \
@@ -26,5 +26,9 @@ RUN apt-get --yes update && apt-get --yes upgrade \
  && rm -Rf /src/ \
  && rm -Rf /root/.cache/
 
+USER custodian
+WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
-ENTRYPOINT ["c7n-mailer"]
+VOLUME ["/home/custodian"]
+ENTRYPOINT ["/usr/local/bin/c7n-mailer"]
+CMD ["--help"]

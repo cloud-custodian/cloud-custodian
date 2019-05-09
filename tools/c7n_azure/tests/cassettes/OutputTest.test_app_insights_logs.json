@@ -1,0 +1,58 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://dc.services.visualstudio.com/v2/track",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 400,
+                    "message": "Invalid instrumentation key"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:33:09 GMT"
+                    ],
+                    "x-ms-session-id": [
+                        "10C636AD-B40E-4C10-844F-999651959D3C"
+                    ],
+                    "access-control-allow-headers": [
+                        "Origin, X-Requested-With, Content-Name, Content-Type, Accept, Sdk-Context"
+                    ],
+                    "content-length": [
+                        "117"
+                    ],
+                    "access-control-max-age": [
+                        "3600"
+                    ],
+                    "access-control-allow-origin": [
+                        "*"
+                    ],
+                    "connection": [
+                        "close"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "itemsReceived": 1,
+                        "itemsAccepted": 0,
+                        "errors": [
+                            {
+                                "index": 0,
+                                "statusCode": 400,
+                                "message": "Invalid instrumentation key"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

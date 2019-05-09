@@ -14,6 +14,7 @@ ADD tools /src/tools/
 
 WORKDIR /src
 
+RUN adduser --disabled-login custodian
 RUN apt-get --yes update && apt-get --yes upgrade \
  && apt-get --yes install build-essential \
  && pip3 install -r requirements.txt  . \
@@ -26,6 +27,9 @@ RUN apt-get --yes update && apt-get --yes upgrade \
  && rm -Rf /src/ \
  && rm -Rf /root/.cache/
 
+USER custodian
+WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
-VOLUME ["/var/log/cloud-custodian", "/etc/cloud-custodian"]
+VOLUME ["/home/custodian"]
 ENTRYPOINT ["/usr/local/bin/custodian"]
+CMD ["--help"]

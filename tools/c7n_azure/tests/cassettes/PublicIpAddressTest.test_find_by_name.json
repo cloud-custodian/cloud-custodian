@@ -1,0 +1,137 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/publicIPAddresses?api-version=2018-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:33:10 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "4463"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "k8s-master-ip-cctestacsdnsmgmt-C02B7042",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/publicIPAddresses/k8s-master-ip-cctestacsdnsmgmt-C02B7042",
+                                "etag": "W/\"920e7005-7127-462c-9b59-22f8ff4d1323\"",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "698e7ee0-c77b-48c0-9b98-4e730b6307a5",
+                                    "ipAddress": "40.84.199.78",
+                                    "publicIPAddressVersion": "IPv4",
+                                    "publicIPAllocationMethod": "Dynamic",
+                                    "idleTimeoutInMinutes": 4,
+                                    "dnsSettings": {
+                                        "domainNameLabel": "cctestacsdnsmgmt",
+                                        "fqdn": "cctestacsdnsmgmt.southcentralus.cloudapp.azure.com"
+                                    },
+                                    "ipTags": [],
+                                    "ipConfiguration": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/frontendIPConfigurations/k8s-master-lbFrontEnd-C02B7042"
+                                    }
+                                },
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                }
+                            },
+                            {
+                                "name": "cctestdiagnostic_loadbalancer_public_ip",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/publicIPAddresses/cctestdiagnostic_loadbalancer_public_ip",
+                                "etag": "W/\"b04ca1ec-22fb-4cce-a85b-bdac40e2f6c1\"",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "ecfa9ea5-8777-492b-be4b-84f777fa3c28",
+                                    "publicIPAddressVersion": "IPv4",
+                                    "publicIPAllocationMethod": "Dynamic",
+                                    "idleTimeoutInMinutes": 4,
+                                    "ipTags": [],
+                                    "ipConfiguration": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer/frontendIPConfigurations/LoadBalancerFrontEnd"
+                                    }
+                                },
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                }
+                            },
+                            {
+                                "name": "cctestloadbalancer_public_ip",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_load-balancer/providers/Microsoft.Network/publicIPAddresses/cctestloadbalancer_public_ip",
+                                "etag": "W/\"43087167-6318-47e3-ac7d-7c318bfb7224\"",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "580195db-22b4-4473-a8d2-416c5f63438f",
+                                    "publicIPAddressVersion": "IPv4",
+                                    "publicIPAllocationMethod": "Dynamic",
+                                    "idleTimeoutInMinutes": 4,
+                                    "ipTags": [],
+                                    "ipConfiguration": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_load-balancer/providers/Microsoft.Network/loadBalancers/cctestloadbalancer/frontendIPConfigurations/LoadBalancerFrontEnd"
+                                    }
+                                },
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                }
+                            },
+                            {
+                                "name": "myPublicIP",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/publicIPAddresses/myPublicIP",
+                                "etag": "W/\"1e79faa3-362d-483d-a3d6-1e8b0f57e9ac\"",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "726b74fe-4b59-4ea5-b4ce-69cc9cbf106a",
+                                    "ipAddress": "23.102.173.223",
+                                    "publicIPAddressVersion": "IPv4",
+                                    "publicIPAllocationMethod": "Dynamic",
+                                    "idleTimeoutInMinutes": 4,
+                                    "dnsSettings": {
+                                        "domainNameLabel": "cctestvm",
+                                        "fqdn": "cctestvm.southcentralus.cloudapp.azure.com"
+                                    },
+                                    "ipTags": [],
+                                    "ipConfiguration": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic/ipConfigurations/ipconfig1"
+                                    }
+                                },
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

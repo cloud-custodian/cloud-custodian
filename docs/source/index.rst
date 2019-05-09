@@ -54,6 +54,7 @@ Navigate below and get started with Cloud Custodian!
    :maxdepth: 1
    :caption: GCP
 
+   gcp/gettingstarted
    gcp/gcp-modes
 
 .. toctree::
