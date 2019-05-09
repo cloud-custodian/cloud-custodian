@@ -81,8 +81,6 @@ class SplunkHecDelivery(object):
             base_log['actions'] = []
             for a in msg['policy']['actions']:
                 if isinstance(a, type({})):
-                    if a.get('type', 'unknown') == 'notify':
-                        continue
                     base_log['actions'].append(a['type'])
                 else:
                     base_log['actions'].append(a)
