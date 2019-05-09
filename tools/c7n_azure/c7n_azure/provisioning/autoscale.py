@@ -1,4 +1,5 @@
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
+from c7n_azure import constants
 
 
 class AutoScaleUnit(DeploymentUnit):
@@ -20,7 +21,7 @@ class AutoScaleUnit(DeploymentUnit):
                 "enabled": True,
                 "profiles": [
                     {
-                        "name": "Auto created scale condition",
+                        "name": "Cloud Custodian auto created scale condition",
                         "capacity": {
                             "minimum": params['min_capacity'],
                             "maximum": params['max_capacity'],
@@ -54,5 +55,5 @@ class AutoScaleUnit(DeploymentUnit):
         }
 
         return self.client.autoscale_settings.create_or_update(params['resource_group_name'],
-                                                               "autoscale",
+                                                               constants.FUNCTION_AUTOSCALE_NAME,
                                                                auto_scale_parameters)

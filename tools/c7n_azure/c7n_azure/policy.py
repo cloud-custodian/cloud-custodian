@@ -186,12 +186,8 @@ class AzureFunctionMode(ServerlessExecutionMode):
             for key in properties.keys():
                 value = settings.get(StringUtils.snake_to_camel(key), properties[key])
                 if isinstance(value, dict):
-                    result[key] = {}
-                    for key2 in properties[key].keys():
-                        key_camel_case = StringUtils.snake_to_camel(key)
-                        key2_camel_case = StringUtils.snake_to_camel(key2)
-                        result[key][key2] = settings.get(key_camel_case, properties[key])\
-                            .get(key2_camel_case, properties[key][key2])
+                    result[key] = \
+                        AzureFunctionMode.extract_properties({'v': value}, 'v', properties[key])
                 else:
                     result[key] = value
 

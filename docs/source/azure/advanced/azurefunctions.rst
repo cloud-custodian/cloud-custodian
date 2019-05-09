@@ -36,7 +36,7 @@ A dedicated plan can service multiple Function Applications.  If you provide the
 use the default name then only new Function Applications will be created during deployment, all using the same
 shared plan resources.
 
-You can enabled default auto scaling option for your dedicated App Service Plan. Default option allows you
+You can enable default auto scaling option for your dedicated App Service Plan. Default option allows you
 to specify minimum and maximum number of underlying VMs. Scaling is performed based on the average RAM usage.
 App Service Plan will be scaled up if average RAM usage was more than 80% in the past 10 minutes.
 This option is disabled by default.

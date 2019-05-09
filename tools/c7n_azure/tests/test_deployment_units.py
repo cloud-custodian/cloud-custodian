@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, requires_arm_polling
+from c7n_azure import constants
 from c7n_azure.constants import FUNCTION_DOCKER_VERSION
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
@@ -75,6 +76,27 @@ class DeploymentUnitsTest(BaseTest):
         unit = AppServicePlanUnit()
 
         self._validate(unit, params)
+
+    def test_app_service_plan_autoscale(self):
+        params = {'name': 'cloud-custodian-test',
+                  'location': 'westus2',
+                  'resource_group_name': self.rg_name,
+                  'sku_tier': 'Basic',
+                  'sku_name': 'B1',
+                  'auto_scale': {
+                      'enabled': True,
+                      'min_capacity': 1,
+                      'max_capacity': 2,
+                      'default_capacity': 1}
+                  }
+
+        unit = AppServicePlanUnit()
+
+        plan = self._validate(unit, params)
+        client = self.session.client('azure.mgmt.monitor.MonitorManagementClient')
+        rules = client.autoscale_settings.get(self.rg_name, constants.FUNCTION_AUTOSCALE_NAME)
+
+        self.assertEqual(rules.target_resource_uri, plan.id)
 
     def test_function_app_consumption(self):
         # provision storage account

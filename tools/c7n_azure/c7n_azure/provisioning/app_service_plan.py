@@ -38,7 +38,7 @@ class AppServicePlanUnit(DeploymentUnit):
                                                               plan_params).result()
 
         # Deploy default autoscale rule for dedicated plans if required by the policy
-        autoscale_params = copy.deepcopy(params['auto_scale'])
+        autoscale_params = copy.deepcopy(params.get('auto_scale', {}))
         if bool(autoscale_params.get('enabled')) and \
            not StringUtils.equal(plan.sku, 'dynamic'):
             autoscale_params['name'] = 'autoscale'
