@@ -9,8 +9,9 @@ in an hour period and the Lambda function is not tagged with **Custodian_Lambda_
 then the policy will take the action of notifying the Lambda function owner and the cloud team.  These
 notifications can help developers by informing them if unexpected errors occur so they can be quickly
 addressed.
+
 For the notify action in the policy to work you must have setup the c7n_mailer tool:
-https://github.com/capitalone/cloud-custodian/tree/master/tools/c7n_mailer
+https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer
 
 Mailer Setup Guide:
 https://devops4solutions.com/cloud-custodian-configure-email/

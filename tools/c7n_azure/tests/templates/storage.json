@@ -19,6 +19,34 @@
       "properties": {}
     },
     {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-07-01",
+      "name": "[concat('ccipstorage', uniqueString(resourceGroup().id))]",
+      "location": "southcentralus",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "Storage",
+      "properties": {
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [
+            {
+              "value": "3.1.1.1",
+              "action": "Allow"
+            },
+            {
+              "value": "1.2.2.128/25",
+              "action": "Allow"
+            }
+          ],
+          "defaultAction": "Deny"
+        }
+      }
+    },
+    {
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "2018-12-01",
       "name": "cctstoragevnet1",

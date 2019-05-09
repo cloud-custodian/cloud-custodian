@@ -1,0 +1,224 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/publishingcredentials/list?api-version=2018-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 500,
+                    "message": "Internal Server Error"
+                },
+                "headers": {
+                    "x-ms-failure-cause": [
+                        "gateway"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "connection": [
+                        "close"
+                    ],
+                    "content-length": [
+                        "720"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 20:34:26 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "MultipleErrorsOccurred",
+                            "message": "Multiple error occurred: . Please see details.",
+                            "details": [
+                                {
+                                    "code": "InternalServerError",
+                                    "message": "Encountered internal server error. Diagnostic information: timestamp '20190502T203427Z', subscription id 'ea42f556-5106-4743-99b0-c129bfa71a47', tracking id '5f19c6f6-23ca-4ffa-9389-23498777cdd4', request correlation id '5f19c6f6-23ca-4ffa-9389-23498777cdd4'."
+                                },
+                                {
+                                    "code": "InternalServerError",
+                                    "message": "Encountered internal server error. Diagnostic information: timestamp '20190502T203427Z', subscription id 'ea42f556-5106-4743-99b0-c129bfa71a47', tracking id '5f19c6f6-23ca-4ffa-9389-23498777cdd4', request correlation id '5f19c6f6-23ca-4ffa-9389-23498777cdd4'."
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/publishingcredentials/list?api-version=2018-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 500,
+                    "message": "Internal Server Error"
+                },
+                "headers": {
+                    "x-ms-failure-cause": [
+                        "gateway"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "connection": [
+                        "close"
+                    ],
+                    "content-length": [
+                        "312"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 20:34:37 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "InternalServerError",
+                            "message": "Encountered internal server error. Diagnostic information: timestamp '20190502T203438Z', subscription id 'ea42f556-5106-4743-99b0-c129bfa71a47', tracking id '416c39e7-6f24-4f64-818f-54a5d93ca41c', request correlation id '416c39e7-6f24-4f64-818f-54a5d93ca41c'."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/publishingcredentials/list?api-version=2018-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 20:34:45 GMT"
+                    ],
+                    "content-length": [
+                        "695"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/publishingcredentials/$cloud-custodian-test",
+                        "name": "cloud-custodian-test",
+                        "type": "Microsoft.Web/sites/publishingcredentials",
+                        "location": "West US 2",
+                        "properties": {
+                            "name": null,
+                            "publishingUserName": "$cloud-custodian-test",
+                            "publishingPassword": "QqrcY8pcgoG0RF5aPnDGwkjXP5bKqEa1yRidE8NBR1khwGToy2Ze5ElQQAH4",
+                            "publishingPasswordHash": null,
+                            "publishingPasswordHashSalt": null,
+                            "metadata": null,
+                            "isDeleted": false,
+                            "scmUri": "https://$cloud-custodian-test:QqrcY8pcgoG0RF5aPnDGwkjXP5bKqEa1yRidE8NBR1khwGToy2Ze5ElQQAH4@cloud-custodian-test.scm.azurewebsites.net"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cloud-custodian-test.scm.azurewebsites.net/api/deployments",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "etag": [
+                        "\"6ac6b952\""
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "2"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 20:34:45 GMT"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=e566830fcb90564433d8116337d77fee023c24beb241ecfd5bdebeab53f12868;Path=/;HttpOnly;Domain=cloud-custodian-test.scm.azurewebsites.net"
+                    ]
+                },
+                "body": {
+                    "data": []
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/syncfunctiontriggers?api-version=2018-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 20:34:48 GMT"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=e566830fcb90564433d8116337d77fee023c24beb241ecfd5bdebeab53f12868;Path=/;HttpOnly;Domain=cloud-custodian-test.scm.azurewebsites.net"
+                    ],
+                    "content-length": [
+                        "20"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "status": "success"
+                    }
+                }
+            }
+        }
+    ]
+}

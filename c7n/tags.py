@@ -1053,7 +1053,9 @@ class CopyRelatedResourceTag(Tag):
 
     def process_resource(self, client, r, related_tags, tag_keys, tag_action):
         tags = {}
-        resource_tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        resource_tags = {
+            t['Key']: t['Value'] for t in r.get('Tags', []) if not t['Key'].startswith('aws:')}
+
         if tag_keys == '*':
             tags = {k: v for k, v in related_tags.items()
                     if resource_tags.get(k) != v}

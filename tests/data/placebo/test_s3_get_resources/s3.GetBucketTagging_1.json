@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "95648019DEB0B644",
+            "HostId": "ifCWL52/FlHpWVkde+8HOZQ5Du+cv58/FPSgBzF0SymEEhiO8OGKarNOoWHO9iXkZoOcwQD73fk=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "ifCWL52/FlHpWVkde+8HOZQ5Du+cv58/FPSgBzF0SymEEhiO8OGKarNOoWHO9iXkZoOcwQD73fk=",
+                "x-amz-request-id": "95648019DEB0B644",
+                "date": "Wed, 01 May 2019 11:22:04 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "TagSet": [
+            {
+                "Key": "Retention2",
+                "Value": "3"
+            },
+            {
+                "Key": "Owner",
+                "Value": "nicholase"
+            },
+            {
+                "Key": "test",
+                "Value": "test"
+            },
+            {
+                "Key": "Env",
+                "Value": "Dev"
+            },
+            {
+                "Key": "Retention",
+                "Value": "2"
+            },
+            {
+                "Key": "Application",
+                "Value": "test"
+            }
+        ]
+    }
+}

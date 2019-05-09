@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
+import jmespath
 import inspect
 import logging
 import os
@@ -30,6 +31,7 @@ from yaml.constructor import ConstructorError
 from c7n.exceptions import ClientError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
+from c7n.schema import generate
 from c7n.utils import dumps, load_file, local_session, SafeLoader
 from c7n.config import Bag, Config
 from c7n import provider
@@ -515,7 +517,9 @@ def _print_cls_schema(cls):
     # Print schema
     print("\nSchema\n------\n")
     if hasattr(cls, 'schema'):
+        definitions = generate()['definitions']
         component_schema = dict(cls.schema)
+        component_schema = _expand_schema(component_schema, definitions)
         component_schema.pop('additionalProperties', None)
         component_schema.pop('type', None)
         print(yaml.safe_dump(component_schema))
@@ -524,6 +528,18 @@ def _print_cls_schema(cls):
         print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
     print('')
     return
+
+
+def _expand_schema(schema, definitions):
+    """Expand references in schema to their full schema"""
+    for k, v in list(schema.items()):
+        if k == '$ref':
+            # the value here is in the form of: '#/definitions/path/to/key'
+            path = '.'.join(v.split('/')[2:])
+            return jmespath.search(path, definitions)
+        if isinstance(v, dict):
+            schema[k] = _expand_schema(v, definitions)
+    return schema
 
 
 def _metrics_get_endpoints(options):

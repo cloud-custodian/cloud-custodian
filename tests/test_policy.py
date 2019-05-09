@@ -175,7 +175,7 @@ class PolicyPermissions(BaseTest):
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
-            'support-case', 'transit-attachment'))
+            'support-case', 'transit-attachment', 'config-recorder'))
 
         missing_method = []
         for k, v in manager.resources.items():
@@ -477,7 +477,7 @@ class TestPolicy(BaseTest):
         self.assertEqual(policy.tags, ["abc"])
         self.assertFalse(policy.is_lambda)
         self.assertTrue(
-            repr(policy).startswith("<Policy resource: ec2 name: ec2-utilization")
+            repr(policy).startswith("<Policy resource:ec2 name:ec2-utilization")
         )
 
     def test_policy_name_filtering(self):
@@ -869,7 +869,7 @@ class PullModeTest(BaseTest):
 
         lines = log_file.getvalue().strip().split("\n")
         self.assertIn(
-            "Skipping policy {} target-region: us-east-1 current-region: us-west-2".format(
+            "Skipping policy:{} target-region:us-east-1 current-region:us-west-2".format(
                 policy_name
             ),
             lines,

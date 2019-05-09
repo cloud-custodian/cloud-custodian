@@ -1112,8 +1112,7 @@ class Tag(Action):
         tags = self.get_tag_set()
         error = None
 
-        client = local_session(self.manager.session_factory).client('autoscaling')
-
+        client = self.get_client()
         with self.executor_factory(max_workers=3) as w:
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
@@ -1144,6 +1143,9 @@ class Tag(Action):
                 atags['ResourceId'] = a['AutoScalingGroupName']
                 tag_params.append(atags)
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
+
+    def get_client(self):
+        return local_session(self.manager.session_factory).client('autoscaling')
 
 
 @ASG.action_registry.register('propagate-tags')

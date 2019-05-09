@@ -518,9 +518,8 @@ class Tag(tags.Tag):
     permissions = ('redshift:CreateTags',)
 
     def process_resource_set(self, client, resources, tags):
-        for r in resources:
-            arn = self.manager.generate_arn(r['ClusterIdentifier'])
-            client.create_tags(ResourceName=arn, Tags=tags)
+        for rarn, r in zip(self.manager.get_arns(resources), resources):
+            client.create_tags(ResourceName=rarn, Tags=tags)
 
 
 @actions.register('unmark')
@@ -547,9 +546,8 @@ class RemoveTag(tags.RemoveTag):
     permissions = ('redshift:DeleteTags',)
 
     def process_resource_set(self, client, resources, tag_keys):
-        for r in resources:
-            arn = self.manager.generate_arn(r['ClusterIdentifier'])
-            client.delete_tags(ResourceName=arn, TagKeys=tag_keys)
+        for rarn, r in zip(self.manager.get_arns(resources), resources):
+            client.delete_tags(ResourceName=rarn, TagKeys=tag_keys)
 
 
 @actions.register('tag-trim')

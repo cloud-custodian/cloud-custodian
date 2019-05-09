@@ -26,6 +26,7 @@ import io
 import json
 import logging
 import os
+import shutil
 import time
 import tempfile
 import zipfile
@@ -63,20 +64,31 @@ class PythonPackageArchive(object):
 
     zip_compression = zipfile.ZIP_DEFLATED
 
-    def __init__(self, *modules):
+    def __init__(self, modules=(), cache_file=None):
         self._temp_archive_file = tempfile.NamedTemporaryFile(delete=False)
+        if cache_file:
+            with open(cache_file, 'rb') as fin:
+                shutil.copyfileobj(fin, self._temp_archive_file)
+
         self._zip_file = zipfile.ZipFile(
-            self._temp_archive_file, mode='w',
+            self._temp_archive_file, mode='a',
             compression=self.zip_compression)
         self._closed = False
-        self.add_modules(None, *modules)
+        self.add_modules(None, modules)
 
     def __del__(self):
-        if not self._closed:
-            self.close()
-        if self._temp_archive_file:
-            self._temp_archive_file.close()
-            os.unlink(self.path)
+        try:
+            if not self._closed:
+                self.close()
+            if self._temp_archive_file:
+                self._temp_archive_file.close()
+                os.unlink(self.path)
+        except AttributeError:
+            # Finalizers in python are fairly problematic, especially when
+            # breaking cycle references, there are no ordering guaranteees
+            # so our tempfile may already be gc'd before this ref'd version
+            # is called.
+            pass
 
     @property
     def path(self):
@@ -88,7 +100,7 @@ class PythonPackageArchive(object):
             raise ValueError("Archive not closed, size not accurate")
         return os.stat(self._temp_archive_file.name).st_size
 
-    def add_modules(self, ignore, *modules):
+    def add_modules(self, ignore, modules):
         """Add the named Python modules to the archive. For consistency's sake
         we only add ``*.py`` files, not ``*.pyc``. We also don't add other
         files, including compiled modules. You'll have to add such files
@@ -274,7 +286,7 @@ def custodian_archive(packages=None):
     modules = {'c7n', 'pkg_resources'}
     if packages:
         modules = filter(None, modules.union(packages))
-    return PythonPackageArchive(*sorted(modules))
+    return PythonPackageArchive(sorted(modules))
 
 
 class LambdaManager(object):
@@ -807,7 +819,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def timeout(self):
-        return self.policy.data['mode'].get('timeout', 60)
+        return self.policy.data['mode'].get('timeout', 900)
 
     @property
     def security_groups(self):

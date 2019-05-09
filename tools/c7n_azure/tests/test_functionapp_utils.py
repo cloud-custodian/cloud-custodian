@@ -21,6 +21,7 @@ from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from mock import patch
 
 from c7n.utils import local_session
+from c7n.mu import PythonPackageArchive
 from c7n_azure.session import Session
 
 CONST_GROUP_NAME = 'test_functionapp-reqs'
@@ -158,6 +159,7 @@ class FunctionAppUtilsTest(BaseTest):
             function_app_name='cloud-custodian-test')
 
         package = FunctionPackage("TestPolicy")
+        package.pkg = PythonPackageArchive()
         package.close()
 
         FunctionAppUtilities.publish_functions_package(

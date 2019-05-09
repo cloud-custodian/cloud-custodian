@@ -50,7 +50,9 @@ class Certificate(QueryResourceManager):
 class DescribeCertificate(DescribeSource):
 
     def augment(self, resources):
-        return universal_augment(self.manager, resources)
+        return universal_augment(
+            self.manager,
+            super(DescribeCertificate, self).augment(resources))
 
 
 @Certificate.action_registry.register('delete')

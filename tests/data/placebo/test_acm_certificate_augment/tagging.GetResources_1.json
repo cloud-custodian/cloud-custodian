@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:acm:us-east-1:619193117841:certificate/291f52cc-1817-469f-918a-cccbb4f9a5fb",
+                "Tags": [
+                    {
+                        "Key": "Env",
+                        "Value": "Prod"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "14214891-702f-11e9-b90c-0de00c1c2689",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "14214891-702f-11e9-b90c-0de00c1c2689",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "189",
+                "date": "Mon, 06 May 2019 18:45:10 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -11,6 +11,10 @@ Filters
     - Metric Filter - Filter on metrics from Azure Monitor - (see `Storage Account Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftstoragestorageaccounts/>`_)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
+- Firewall Rules Filter (see :ref:`azure_filters`)
+
+  .. c7n-schema:: StorageFirewallRulesFilter
+       :module: c7n_azure.resources.storage
 
 Actions
 -------
