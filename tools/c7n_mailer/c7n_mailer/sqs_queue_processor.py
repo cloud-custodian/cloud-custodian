@@ -55,7 +55,9 @@ class MailerSqsQueueIterator(object):
             QueueUrl=self.queue_url,
             WaitTimeSeconds=self.timeout,
             MaxNumberOfMessages=3,
-            MessageAttributeNames=self.msg_attributes)
+            MessageAttributeNames=self.msg_attributes,
+            AttributeNames=['SentTimestamp']
+        )
 
         msgs = response.get('Messages', [])
         self.logger.debug('Messages received %d', len(msgs))
