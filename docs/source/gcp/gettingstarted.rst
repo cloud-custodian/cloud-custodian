@@ -46,7 +46,7 @@ In order for Custodian to be able to interact with your GCP resources, you will 
 configure your GCP authentication credentials on your system in a way in which the
 application is able to retrieve them.
 
-Choose from one of the following methods to figure your credentials, depending on your
+Choose from one of the following methods to configure your credentials, depending on your
 use case. In either option, after the configuration is complete, Custodian will implicitly
 pick up your credentials when it runs.
 
@@ -61,7 +61,7 @@ Then run the following command, substituting your username:
 
 .. code-block:: bash
 
-    gcloud auth login <your_user_name>
+    gcloud auth application-default login <your_user_name>
 
 Executing the command will open a browser window with prompts to finish configuring
 your credentials. For more information on this command,
@@ -73,49 +73,49 @@ If you are planning to run Custodian using a service account, then configure you
 using environment variables.
 
 Follow the steps outlined in the 
-`GCP documentation to configure credentials this way. <https://cloud.google.com/docs/authentication/getting-started>`_
+`GCP documentation to configure credentials for service accounts. <https://cloud.google.com/docs/authentication/getting-started>`_
 
 .. _gcp_write-policy:
 
 Write Your First Policy
 -----------------------
 A policy is the primary way that Custodian is configured to manage cloud resources.
-It is a YAML file file that follows a predetermined schema to describe what you want
+It is a YAML file that follows a predetermined schema to describe what you want
 Custodian to do.
 
 There are three main components to a policy:
+
 * Resource: the type of resource to run the policy against
-* Filters: criteria to identify specific subsets of resources
+* Filters: criteria to produce a specific subset of resources
 * Actions: directives to take on the filtered set of resources
 
 In the example below, we will write a policy that filters for compute engine
-resources, and then add a tag to each rersource.
+resources, and then stops each resource.
 
-File Name: ``custodian.yml``
+Filename: ``custodian.yml``
 
 .. code-block:: yaml
 
     policies:
       - name: my-first-policy
-      description: |
-        Adds a tag to virtual machines with the name
-      resource: gcp.cloud-compute
-      filters:
-        - type: value
-        key: name
-        value: my_vm_name
-      actions:
-        - type: tag
-        tag: Hello
-        value: World
+        description: |
+          Stops all compute instances that contain the word "test"
+        resource: gcp.instance
+        filters:
+          - type: value
+            key: name
+            value: test
+            op: in
+        actions:
+          - type: stop
 
 .. _gcp_run-policy:
 
 Run Your Policy
 ---------------
+First, ensure you have :ref:`configured one of the supported authentication mechanisms <gcp_authenticate>`.
 
-First, **configure one of the supported authentication mechanisms** as documented in :ref:`gcp_authenticate`.
-Next run the following from the commandline:
+Next, run the following command to execute the policy with Custodian:
 
 .. code-block:: bash
 
@@ -123,13 +123,12 @@ Next run the following from the commandline:
 
 If successful, you should see output similar to the following on the command line::
 
-    2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: azure.vm
-    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource:ec2 has count:1 time:1.38
-    2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: tag: 1 execution_time: 0.67
-
+    2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: gcp.instance
+    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource: gcp.instance has count:3 time:1.38
+    2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: stop: 3 execution_time: 0.67
 
 You should also find a new ``my-first-policy`` directory with a log and other
-files (subsequent runs will append to the log by default rather than
+files (subsequent runs will append to the log by default, rather than
 overwriting it).
 
 See :ref:`filters` for more information on the features of the Value filter used in this sample.
