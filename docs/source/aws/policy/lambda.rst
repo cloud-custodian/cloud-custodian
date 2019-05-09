@@ -193,6 +193,42 @@ EC2 instance with the ``Custodian`` tag, and stops it according to your policy.
 Congratulations! You have now installed your policy to run under Config rather
 than from your command line.
 
+Lambda Configuration
+####################
+
+Custodian lambdas support configuring all lambda options via keys on the lambda
+mode in the YAML.  See AWS'
+`AWS Lambda Function Configuration <https://docs.aws.amazon.com/lambda/latest/dg/resource-model.html>`_
+page for the full list of configuration options avaible on a Lambda.
+
+Refer to :ref:`aws-modes` for detailed explanation of the different ``type``
+values and the corresponding additional configuration options each requires.
+
+Here is an example YAML fragment that shows the options you are most likely to want or need to configure on a
+lambda:
+
+.. code-block:: yaml
+
+    mode:
+      type: cloudtrail
+      events:
+        - CreateBucket
+
+      ##### ROLE #####
+      # Specify the ARN role as either name or full ARN.  This shows
+      # us running the lambda with the IAM role named Custodian.
+      # Specifying role by name:
+      role: Custodian
+      # Or specifying using a full ARN
+      # role: arn:aws:iam::123456789012:role/Custodian
+
+      ##### TAGS #####
+      # Specify the tags to assign to this Lambda.  We are setting a
+      # tag named "Application" with a value of "Custodian", and a
+      # "CreatedBy" tag with a value of "CloudCustodian".
+      tags:
+        Application: Custodian
+        CreatedBy: CloudCustodian
 
 Execution Options
 #################

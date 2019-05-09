@@ -1,4 +1,8 @@
-## What is c7n-org?
+# c7n-org: Multi Account Custodian Execution
+
+[//]: # (         !!! IMPORTANT !!!                    )
+[//]: # (This file is moved during document generation.)
+[//]: # (Only edit the original document at ./tools/c7n_org/README.md)
 
 c7n-org is a tool to run custodian against multiple AWS accounts,
 Azure subscriptions, or GCP projects in parallel.
@@ -88,7 +92,7 @@ be looking to incorporate them into a new c7n-org subcommand.
 - For **Azure**, the script `azuresubs.py` generates a config file
   from the Azure Resource Management API
 
-    - Please see the [Additional Azure Instructions](#Additional-Azure-Instructions) 
+    - Please see the [Additional Azure Instructions](#Additional-Azure-Instructions)
     - for initial setup and other important info
 
 - For **GCP**, the script `gcpprojects.py` generates a config file from
@@ -157,15 +161,15 @@ specifying `-p` or selecting groups of policies via their tags with
 
 See `c7n-org run --help` for more information.
 
-## Defining and using variables.
+## Defining and using variables
 
 Each account/subscription/project configuration in the config file can
-also define a variables section `vars` that can be used in policies
+also define a variables section `vars` that can be used in policies'
 definitions and are interpolated at execution time. These are in
 addition to the default runtime variables custodian provides like
 `account_id`, `now`, and `region`.
 
-Example of defining in c7n-org config file
+Example of defining in c7n-org config file:
 
 ```yaml
 accounts:
@@ -176,7 +180,7 @@ accounts:
     charge_code: xyz
 ```
 
-Example of using in a policy file
+Example of using in a policy file:
 
 ```yaml
 policies:
@@ -186,11 +190,11 @@ policies:
       - "tag:CostCenter": "{charge_code}"
 ```
 
-**Note** variable interpolation is senstive to proper quoting and spacing
-ie. `{ charge_code }` would be invalid due to the extra white space. Additionally
-yaml parsing can transform a value like `{charge_code}` to null, unless its quoteda
+**Note** Variable interpolation is sensitive to proper quoting and spacing,
+i.e., `{ charge_code }` would be invalid due to the extra white space. Additionally,
+yaml parsing can transform a value like `{charge_code}` to null, unless it's quoted
 in strings like the above example. Values that do interpolation into other content
-dont require quoting ie. "my_{charge_code}"
+don't require quoting, i.e., "my_{charge_code}".
 
 ## Other commands
 

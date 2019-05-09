@@ -13,6 +13,7 @@ ADD c7n /src/c7n/
 ADD tools /src/tools/
 
 WORKDIR /src
+
 RUN adduser --disabled-login custodian
 RUN apt-get --yes update && apt-get --yes upgrade \
  && apt-get --yes install build-essential \
