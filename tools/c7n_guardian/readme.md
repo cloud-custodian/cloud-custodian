@@ -58,7 +58,7 @@ Commands:
 
 ```
 
-# Accounts Credentials
+## Accounts Credentials
 
 The cli needs credentials access to assume the roles in the config
 file for all accounts (master and members), the execution credentials
@@ -66,7 +66,7 @@ used can be sourced from a profile, or from role assumption in
 addition to credential sourcing supported by the aws sdk.
 
 
-# Using custodian policies for remediation
+## Using custodian policies for remediation
 
 Here's some example policies that will provision a custodian lambda that
 receives the guard duty notifications and performs some basic remediation
@@ -74,7 +74,7 @@ on the alerted resources, respectively stopping an ec2 instance, and removing
 an access key. You have the full access to custodian's actions and filters
 for doing additional activities in response to events.
 
-```
+```yaml
 
 policies:
 

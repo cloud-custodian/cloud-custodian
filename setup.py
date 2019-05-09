@@ -11,7 +11,8 @@ setup(
     name="c7n",
     version='0.8.43.1',
     description="Cloud Custodian - Policy Rules Engine",
-    long_description=read('README.rst'),
+    long_description=read('README.md'),
+    long_description_content_type='text/markdown',
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"

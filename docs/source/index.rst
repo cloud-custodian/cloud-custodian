@@ -16,11 +16,15 @@ Navigate below and get started with Cloud Custodian!
    :maxdepth: 2
    :caption: Introduction
 
+   overview
    overview/index
    quickstart/index
    quickstart/usage
+   filters
    quickstart/advanced
    quickstart/policyStructure
+   overview/glossary
+   overview/deployment
 
 .. toctree::
    :maxdepth: 2
@@ -30,6 +34,7 @@ Navigate below and get started with Cloud Custodian!
    aws/examples/index
    aws/policy/index
    filters
+   aws/aws-modes
    aws/policy/lambda
    aws/policy/mu
 
@@ -41,22 +46,25 @@ Navigate below and get started with Cloud Custodian!
    azure/authentication
    azure/examples/index
    azure/policy/index
+   azure/azure-modes
    azure/advanced/index
    azure/contribute
 
 .. toctree::
-    :maxdepth: 1
-    :caption: GCP
+   :maxdepth: 1
+   :caption: GCP
 
-    gcp/gettingstarted
+   gcp/gettingstarted
+   gcp/gcp-modes
 
 .. toctree::
    :maxdepth: 2
    :caption: Tools
 
    tools/c7n-org
+   tools/c7n-policystream
    tools/c7n-mailer
-
+   tools/c7n-trailcreator
 
 .. toctree::
    :maxdepth: 2
