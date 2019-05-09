@@ -5,4 +5,5 @@ from jinja2 import Environment, PackageLoader
 _env = Environment(loader=PackageLoader('c7n_sphinxext', '_templates'))
 
 
-TEMPLATE_C7N_SCHEMA = _env.get_template("c7n_schema.rst")
+def get_template(template_name):
+    return _env.get_template(template_name)
