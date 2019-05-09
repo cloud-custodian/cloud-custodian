@@ -33,7 +33,7 @@ Navigate below and get started with Cloud Custodian!
    aws/examples/index
    aws/policy/index
    aws/aws-modes
-   quickstart/usage
+   aws/usage
    aws/policy/lambda
    aws/policy/mu
 
