@@ -1,9 +1,8 @@
+# c7n-policystream: Policy Changes from Git
 
 [//]: # (         !!! IMPORTANT !!!                    )
 [//]: # (This file is moved during document generation.)
 [//]: # (Only edit the original document at ./tools/c7n_policystream/README.md)
-
-# Policy Changes from Git
 
 Using custodian in accordance with infrastructure as code principles,
 we store policy assets in a versioned control repository. This

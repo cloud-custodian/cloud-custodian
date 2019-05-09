@@ -1,9 +1,8 @@
+# c7n-mailer: Custodian Mailer
 
 [//]: # (         !!! IMPORTANT !!!                    )
 [//]: # (This file is moved during document generation.)
 [//]: # (Only edit the original document at ./tools/c7n_mailer/README.md)
-
-# Custodian Mailer
 
 A mailer implementation for Custodian. Outbound mail delivery is still somewhat
 organization-specific, so this at the moment serves primarily as an example
