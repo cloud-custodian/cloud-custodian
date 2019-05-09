@@ -65,7 +65,7 @@ html:
 
 #
 # Copy readme files that are in the tree to avoid duplicating
-	cp README.rst $(SRCDIR)/overview.rst
+	cp README.md $(SRCDIR)/overview.md
 	cp tools/c7n_org/README.md $(SRCDIR)/tools/c7n-org.md
 	cp tools/c7n_policystream/README.md $(SRCDIR)/tools/c7n-policystream.md
 	cp tools/c7n_mailer/README.md $(SRCDIR)/tools/c7n-mailer.md
@@ -76,7 +76,7 @@ html:
 
 #
 # Remove the copies so folks dont accidentally edit the copy
-	rm $(SRCDIR)/overview.rst
+	rm $(SRCDIR)/overview.md
 	rm $(SRCDIR)/tools/c7n-org.md
 	rm $(SRCDIR)/tools/c7n-policystream.md
 	rm $(SRCDIR)/tools/c7n-mailer.md
