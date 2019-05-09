@@ -18,6 +18,16 @@ from .common import BaseTest
 
 class CertificateTest(BaseTest):
 
+    def test_certificate_augment(self):
+        factory = self.replay_flight_data("test_acm_certificate_augment")
+        p = self.load_policy({
+            'name': 'acm-cert-get',
+            'resource': 'acm-certificate'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('NotAfter' in resources[0])
+
     def test_certificate_delete(self):
         factory = self.replay_flight_data("test_acm_certificate_delete")
         p = self.load_policy(

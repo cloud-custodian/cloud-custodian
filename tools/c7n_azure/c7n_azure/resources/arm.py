@@ -13,33 +13,38 @@
 # limitations under the License.
 
 import six
-from collections import namedtuple
 from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction, DeleteAction
 from c7n_azure.filters import (MetricFilter, TagActionFilter,
                                DiagnosticSettingsFilter, PolicyCompliantFilter)
 from c7n_azure.provider import resources
-from c7n_azure.query import QueryResourceManager, QueryMeta
+from c7n_azure.query import QueryResourceManager, QueryMeta, ChildResourceManager, TypeInfo, \
+    ChildTypeInfo, TypeMeta
 from c7n_azure.utils import ResourceIdParser
 
 from c7n.utils import local_session
+
+
+@six.add_metaclass(TypeMeta)
+class ArmTypeInfo(TypeInfo):
+    # api client construction information for ARM resources
+    id = 'id'
+    name = 'name'
+    diagnostic_settings_enabled = True
+    default_report_fields = (
+        'name',
+        'location',
+        'resourceGroup'
+    )
 
 
 @resources.register('armresource')
 @six.add_metaclass(QueryMeta)
 class ArmResourceManager(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(ArmTypeInfo):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
         enum_spec = ('resources', 'list', None)
-        id = 'id'
-        name = 'name'
-        diagnostic_settings_enabled = True
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup'
-        )
 
     def augment(self, resources):
         for resource in resources:
@@ -79,21 +84,10 @@ class ArmResourceManager(QueryResourceManager):
 
 
 @six.add_metaclass(QueryMeta)
-class ChildArmResourceManager(ArmResourceManager):
+class ChildArmResourceManager(ChildResourceManager, ArmResourceManager):
 
-    ParentSpec = namedtuple("ParentSpec", ["manager_name", "annotate_parent"])
-
-    child_source = 'describe-child-azure'
-
-    @property
-    def source_type(self):
-        source = self.data.get('source', self.child_source)
-        if source == 'describe':
-            source = self.child_source
-        return source
-
-    def get_parent_manager(self):
-        return self.get_resource_manager(self.resource_type.parent_spec.manager_name)
+    class resource_type(ChildTypeInfo, ArmTypeInfo):
+        pass
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)

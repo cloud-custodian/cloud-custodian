@@ -15,6 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest
 
+from mock import patch
+
 
 class SubscriptionTest(BaseTest):
     def setUp(self):
@@ -33,18 +35,25 @@ class SubscriptionTest(BaseTest):
                               {'type': 'value',
                                'key': 'properties.displayName',
                                'op': 'eq',
-                               'value': 'cctestpolicydn'}]}}
+                               'value': 'cctestpolicy_sub'}]}}
                 ],
                 'actions': [
                     {'type': 'add-policy',
-                     'name': 'cctestpolicy',
-                     'display_name': 'cctestpolicydn',
+                     'name': 'cctestpolicy_sub',
+                     'display_name': 'cctestpolicy_sub',
                      'definition_name': "Audit use of classic storage accounts"}
                 ]
             }, validate=True)
             self.assertTrue(p)
 
-    def test_add_policy(self):
+    @patch('c7n_azure.resources.subscription.AddPolicy._get_definition_id')
+    def test_add_policy(self, definition_patch):
+        # The lookup table for policy ID's is huge
+        # so just patch in the constant to reduce test impact
+        definition_patch.return_value.id = \
+            "/providers/Microsoft.Authorization/policyDefinitions/"
+        "37e0d2fe-28a5-43d6-a273-67d37d1f5606"
+
         p = self.load_policy({
             'name': 'test-add-policy',
             'resource': 'azure.subscription',
@@ -56,12 +65,12 @@ class SubscriptionTest(BaseTest):
                           {'type': 'value',
                            'key': 'properties.displayName',
                            'op': 'eq',
-                           'value': 'cctestpolicydn'}]}}
+                           'value': 'cctestpolicy_sub'}]}}
             ],
             'actions': [
                 {'type': 'add-policy',
-                 'name': 'cctestpolicy',
-                 'display_name': 'cctestpolicydn',
+                 'name': 'cctestpolicy_sub',
+                 'display_name': 'cctestpolicy_sub',
                  'definition_name': "Audit use of classic storage accounts"}
             ]
         })
@@ -77,7 +86,7 @@ class SubscriptionTest(BaseTest):
                 {'type': 'value',
                  'key': 'properties.displayName',
                  'op': 'eq',
-                 'value': 'cctestpolicydn'}
+                 'value': 'cctestpolicy_sub'}
             ],
             'actions': [
                 {'type': 'delete'}

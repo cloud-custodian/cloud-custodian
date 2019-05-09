@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
 import distutils.util
 import json
 import logging
@@ -24,7 +25,9 @@ from c7n.mu import PythonPackageArchive
 from c7n.utils import local_session
 from c7n_azure.constants import (ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,
                                  FUNCTION_EVENT_TRIGGER_MODE,
-                                 FUNCTION_TIME_TRIGGER_MODE)
+                                 FUNCTION_TIME_TRIGGER_MODE,
+                                 FUNCTION_HOST_CONFIG,
+                                 FUNCTION_EXTENSION_BUNDLE_CONFIG)
 from c7n_azure.dependency_manager import DependencyManager
 from c7n_azure.session import Session
 
@@ -33,7 +36,7 @@ class FunctionPackage(object):
 
     def __init__(self, name, function_path=None, target_subscription_ids=None):
         self.log = logging.getLogger('custodian.azure.function_package')
-        self.pkg = PythonPackageArchive()
+        self.pkg = None
         self.name = name
         self.function_path = function_path or os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'function.py')
@@ -71,43 +74,13 @@ class FunctionPackage(object):
                 self.pkg.add_contents(dest=name + '/config.json',
                                       contents=policy_contents)
 
-                if policy['mode']['type'] == FUNCTION_EVENT_TRIGGER_MODE:
-                    self._add_queue_binding_extensions()
+        self._add_host_config(policy['mode']['type'])
 
-        self._add_host_config()
-
-    def _add_host_config(self):
-        config = \
-            {
-                "version": "2.0",
-                "healthMonitor": {
-                    "enabled": True,
-                    "healthCheckInterval": "00:00:10",
-                    "healthCheckWindow": "00:02:00",
-                    "healthCheckThreshold": 6,
-                    "counterThreshold": 0.80
-                },
-                "functionTimeout": "00:05:00",
-                "logging": {
-                    "fileLoggingMode": "debugOnly"
-                },
-                "extensions": {
-                    "http": {
-                        "routePrefix": "api",
-                        "maxConcurrentRequests": 5,
-                        "maxOutstandingRequests": 30
-                    }
-                }
-            }
+    def _add_host_config(self, mode):
+        config = copy.deepcopy(FUNCTION_HOST_CONFIG)
+        if mode == FUNCTION_EVENT_TRIGGER_MODE:
+            config['extensionBundle'] = FUNCTION_EXTENSION_BUNDLE_CONFIG
         self.pkg.add_contents(dest='host.json', contents=json.dumps(config))
-
-    def _add_queue_binding_extensions(self):
-        bindings_dir_path = os.path.abspath(
-            os.path.join(os.path.join(__file__, os.pardir), 'function_binding_resources'))
-        bin_path = os.path.join(bindings_dir_path, 'bin')
-
-        self.pkg.add_directory(bin_path)
-        self.pkg.add_file(os.path.join(bindings_dir_path, 'extensions.csproj'))
 
     def get_function_config(self, policy, queue_name=None):
         config = \
@@ -154,10 +127,14 @@ class FunctionPackage(object):
         wheels_folder = os.path.join(self.cache_folder, 'wheels')
         wheels_install_folder = os.path.join(self.cache_folder, 'dependencies')
 
+        cache_zip_file = os.path.join(self.cache_folder, 'cache.zip')
+        cache_metadata_file = os.path.join(self.cache_folder, 'metadata.json')
+
         packages = \
             DependencyManager.get_dependency_packages_list(modules, excluded_packages)
 
-        if not DependencyManager.check_cache(self.cache_folder, wheels_install_folder, packages):
+        if not DependencyManager.check_cache(cache_metadata_file, cache_zip_file, packages):
+            cache_pkg = PythonPackageArchive()
             self.log.info("Cached packages not found or requirements were changed.")
             # If cache check fails, wipe all previous wheels, installations etc
             if os.path.exists(self.cache_folder):
@@ -173,21 +150,32 @@ class FunctionPackage(object):
             self.log.info("Installing wheels...")
             DependencyManager.install_wheels(wheels_folder, wheels_install_folder)
 
+            for root, _, files in os.walk(wheels_install_folder):
+                arc_prefix = os.path.relpath(root, wheels_install_folder)
+                for f in files:
+                    dest_path = os.path.join(arc_prefix, f)
+
+                    if f.endswith('.pyc') or f.endswith('.c'):
+                        continue
+                    f_path = os.path.join(root, f)
+
+                    cache_pkg.add_file(f_path, dest_path)
+
+            self.log.info('Saving cache zip file...')
+            cache_pkg.close()
+            with open(cache_zip_file, 'wb') as fout:
+                fout.write(cache_pkg.get_stream().read())
+
+            self.log.info("Removing temporary folders...")
+            shutil.rmtree(wheels_folder)
+            shutil.rmtree(wheels_install_folder)
+
             self.log.info("Updating metadata file...")
-            DependencyManager.create_cache_metadata(self.cache_folder,
-                                                    wheels_install_folder,
+            DependencyManager.create_cache_metadata(cache_metadata_file,
+                                                    cache_zip_file,
                                                     packages)
 
-        for root, _, files in os.walk(wheels_install_folder):
-            arc_prefix = os.path.relpath(root, wheels_install_folder)
-            for f in files:
-                dest_path = os.path.join(arc_prefix, f)
-
-                if f.endswith('.pyc') or f.endswith('.c'):
-                    continue
-                f_path = os.path.join(root, f)
-
-                self.pkg.add_file(f_path, dest_path)
+        self.pkg = PythonPackageArchive(cache_file=cache_zip_file)
 
         exclude = os.path.normpath('/cache/') + os.path.sep
         self.pkg.add_modules(lambda f: (exclude in f),
@@ -228,13 +216,17 @@ class FunctionPackage(object):
         # update perms of the package
         self._update_perms_package()
         zip_api_url = '%s/api/zipdeploy?isAsync=true' % deployment_creds.scm_uri
-
+        headers = {'content-type': 'application/octet-stream'}
         self.log.info("Publishing Function package from %s" % self.pkg.path)
 
         zip_file = self.pkg.get_bytes()
 
         try:
-            r = requests.post(zip_api_url, data=zip_file, timeout=300, verify=self.enable_ssl_cert)
+            r = requests.post(zip_api_url,
+                              data=zip_file,
+                              headers=headers,
+                              timeout=300,
+                              verify=self.enable_ssl_cert)
         except requests.exceptions.ReadTimeout:
             self.log.error("Your Function App deployment timed out after 5 minutes. Try again.")
 
