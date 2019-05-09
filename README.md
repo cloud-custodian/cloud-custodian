@@ -76,28 +76,15 @@ $ source custodian/bin/activate
 Usage
 -----
 
-First a role must be created with the appropriate permissions for
-custodian to act on the resources described in the policies yaml given
-as an example below. For convenience, an _example policy_ is provided for this
-quick start guide. Customized AWS IAM policies will be necessary for
-your own custodian policies
-
-To implement the policy:
-
-1.  Open the AWS console
-2.  Navigate to IAM -\> Policies
-3.  Use the _json_ option to copy the example policy as a
-    new AWS IAM Policy
-4.  Name the IAM policy as something recognizable and save it.
-5.  Navigate to IAM -\> Roles and create a role called
-    _CloudCustodian-QuickStart_
-6.  Assign the role the IAM policy created above.
-
-Now with the pre-requisite completed; you are ready continue and run
-custodian.
-
-A custodian policy file needs to be created in YAML format, as an
-example
+Cloud Custodian works on a YAML policy that are user generated. The policy 
+contains the resources that the policy will run on, filters control which resources 
+will be affected by this policy, modes control how the policy will be run, and actions 
+are the actions the policy will take. Below is a sample policy that uses AWS and assumes that 
+the user have the access necessary to preform the tasks. This policy ensures that these 3 rules are 
+followed:
+  1. will enforce encryption on all S3 buckets and the objects that are contained.
+  1. will terminate any EC2 instance that do not have an encrypted EBS volume.
+  1. will stop any EC2 instance that does not have the follow tags "Environment", "AppId", and either "OwnerContact" or "DeptId".
 
 ```yaml
 policies:
@@ -145,7 +132,7 @@ policies:
       days: 4
 ```
 
-Given that, you can run Cloud Custodian with
+You can validate, test, and run Cloud Custodian with the example policy with these commands:
 
 ```
 # Validate the configuration (note this happens by default on run)
@@ -159,7 +146,7 @@ $ custodian run --dryrun -s out policy.yml
 $ custodian run -s out policy.yml
 ```
 
-You can run it with Docker as well
+You can run Cloud Custodian with a policy in Docker as well
 
 ```
 # Download the image
@@ -193,11 +180,20 @@ $ docker run -it \
   cloudcustodian/c7n run -v -s /home/custodian/output /home/custodian/policy.yml
 ```
 
-Custodian supports a few other useful subcommands and options, including
-outputs to S3, Cloudwatch metrics, STS role assumption. Policies go
+Custodian supports other useful subcommands and options, including
+outputs to S3, CloudWatch metrics, STS role assumption. Policies go
 together like Lego bricks with actions and filters.
 
 Consult the documentation for additional information, or reach out on gitter.
+
+Cloud Provider Specific Help
+----------------------------
+
+For specific instructions for AWS, Azure, and GCP, visit the relevant getting started page.
+
+- [AWS](https://cloudcustodian.io/docs/aws/gettingstarted.html)
+- [Azure](https://cloudcustodian.io/docs/azure/gettingstarted.html)
+- [GCP](https://cloudcustodian.io/docs/gcp/gettingstarted.html)
 
 Get Involved
 ------------
