@@ -1,0 +1,126 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachineScaleSets?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:44:06 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGetVMScaleSet3Min;179,Microsoft.Compute/HighCostGetVMScaleSet30Min;897"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "2758"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard_DS1_v2",
+                                    "tier": "Standard",
+                                    "capacity": 2
+                                },
+                                "properties": {
+                                    "singlePlacementGroup": true,
+                                    "upgradePolicy": {
+                                        "mode": "Manual",
+                                        "automaticOSUpgradePolicy": {
+                                            "enableAutomaticOSUpgrade": false,
+                                            "disableAutomaticRollback": false
+                                        }
+                                    },
+                                    "virtualMachineProfile": {
+                                        "osProfile": {
+                                            "computerNamePrefix": "cctestvms",
+                                            "adminUsername": "azureuser",
+                                            "linuxConfiguration": {
+                                                "disablePasswordAuthentication": true,
+                                                "ssh": {
+                                                    "publicKeys": [
+                                                        {
+                                                            "path": "/home/azureuser/.ssh/authorized_keys",
+                                                            "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIa+Nm+Bgj3hO22NwS0cGAvwjnTkyKesClgT3KhKlDmkYEwdLwUe6kJ59MCa0BPHDgQMFIr6r9e5f470Kd6Erl6pWxT6v4cNhwkVlTz4KHkQ7IQvj0X+T4MrThjIsTju+HMYUKc0u53FJwx7iyBuAuwRFE5SCtZlN8CjfxKZrNrTGQ38XbstqN+Uu7nZ8yng8gdqnN/mSK9ssmMONLQAJQyZ2SLWMwXHJFpcPWJft8XjOnsVMbhfYdpoHoKpyNVsYT2/Zh/nNPWQnkOtAAnWTLQbBN7J9RruXMvJPRvFVUQoeUQJOQzZxmaAX5gpJU7YGPzgaCciKQqlpsVxEV3tE3"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "secrets": []
+                                        },
+                                        "storageProfile": {
+                                            "osDisk": {
+                                                "createOption": "FromImage",
+                                                "caching": "ReadWrite",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Premium_LRS"
+                                                }
+                                            },
+                                            "imageReference": {
+                                                "publisher": "OpenLogic",
+                                                "offer": "CentOS",
+                                                "sku": "7.2",
+                                                "version": "latest"
+                                            }
+                                        },
+                                        "networkProfile": {
+                                            "networkInterfaceConfigurations": [
+                                                {
+                                                    "name": "cctestvmssNic",
+                                                    "properties": {
+                                                        "primary": true,
+                                                        "enableAcceleratedNetworking": false,
+                                                        "dnsSettings": {
+                                                            "dnsServers": []
+                                                        },
+                                                        "enableIPForwarding": false,
+                                                        "ipConfigurations": [
+                                                            {
+                                                                "name": "cctestvmssIpConfig",
+                                                                "properties": {
+                                                                    "subnet": {
+                                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vmss/providers/Microsoft.Network/virtualNetworks/cctestvmssVnet/subnets/default"
+                                                                    },
+                                                                    "privateIPAddressVersion": "IPv4"
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "priority": "Regular"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "overprovision": true,
+                                    "uniqueId": "3ad96140-9304-4647-99a3-5a2d53c8badd"
+                                },
+                                "type": "Microsoft.Compute/virtualMachineScaleSets",
+                                "location": "eastus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VMSS/providers/Microsoft.Compute/virtualMachineScaleSets/cctestvmss",
+                                "name": "cctestvmss"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

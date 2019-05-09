@@ -1,0 +1,128 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/routeTables?api-version=2018-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:33:12 GMT"
+                    ],
+                    "content-length": [
+                        "3198"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "3a55213d-4992-404f-b8cc-a095437705e9",
+                        "659aee15-87e6-4398-8c83-0fad9bd90824"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestroutetable",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_route-table-and-vnet/providers/Microsoft.Network/routeTables/cctestroutetable",
+                                "etag": "W/\"9eacc1d1-55cc-4ca1-8ac0-2283133548a2\"",
+                                "type": "Microsoft.Network/routeTables",
+                                "location": "westus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "2a86398b-a74b-4f12-a32d-aec818974d6a",
+                                    "disableBgpRoutePropagation": false,
+                                    "routes": [],
+                                    "subnets": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_route-table-and-vnet/providers/Microsoft.Network/virtualNetworks/ccroutetablevnet/subnets/cctestsubnet1"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "k8s-master-C02B7042-routetable",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-C02B7042-routetable",
+                                "etag": "W/\"8e933da8-9910-441b-82fc-c8ebba2b3755\"",
+                                "type": "Microsoft.Network/routeTables",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "9ed9db82-79fa-4e9f-ad87-1650e96ba828",
+                                    "disableBgpRoutePropagation": false,
+                                    "routes": [
+                                        {
+                                            "name": "k8s-master-c02b7042-0",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-C02B7042-routetable/routes/k8s-master-c02b7042-0",
+                                            "etag": "W/\"8e933da8-9910-441b-82fc-c8ebba2b3755\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.244.1.0/24",
+                                                "nextHopType": "VirtualAppliance",
+                                                "nextHopIpAddress": "10.240.255.5"
+                                            },
+                                            "type": "Microsoft.Network/routeTables/routes"
+                                        },
+                                        {
+                                            "name": "k8s-agent-c02b7042-0",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-C02B7042-routetable/routes/k8s-agent-c02b7042-0",
+                                            "etag": "W/\"8e933da8-9910-441b-82fc-c8ebba2b3755\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.244.0.0/24",
+                                                "nextHopType": "VirtualAppliance",
+                                                "nextHopIpAddress": "10.240.0.5"
+                                            },
+                                            "type": "Microsoft.Network/routeTables/routes"
+                                        },
+                                        {
+                                            "name": "k8s-agent-c02b7042-1",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-C02B7042-routetable/routes/k8s-agent-c02b7042-1",
+                                            "etag": "W/\"8e933da8-9910-441b-82fc-c8ebba2b3755\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.244.2.0/24",
+                                                "nextHopType": "VirtualAppliance",
+                                                "nextHopIpAddress": "10.240.0.6"
+                                            },
+                                            "type": "Microsoft.Network/routeTables/routes"
+                                        },
+                                        {
+                                            "name": "k8s-agent-c02b7042-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/routeTables/k8s-master-C02B7042-routetable/routes/k8s-agent-c02b7042-2",
+                                            "etag": "W/\"8e933da8-9910-441b-82fc-c8ebba2b3755\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.244.3.0/24",
+                                                "nextHopType": "VirtualAppliance",
+                                                "nextHopIpAddress": "10.240.0.4"
+                                            },
+                                            "type": "Microsoft.Network/routeTables/routes"
+                                        }
+                                    ],
+                                    "subnets": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/virtualNetworks/k8s-vnet-C02B7042/subnets/k8s-subnet"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

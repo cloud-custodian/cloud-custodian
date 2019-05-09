@@ -12,8 +12,8 @@ class HandlerTest(BaseTest):
     @patch('c7n.policy.Policy.push')
     def test_run(self, push_mock, _1, initialize_mock):
         context = {
-            'config_file': join(dirname(__file__), 'files', 'test_config.json'),
-            'auth_file': join(dirname(__file__), 'files', 'test_auth_file.json')
+            'config_file': join(dirname(__file__), 'data', 'test_config.json'),
+            'auth_file': join(dirname(__file__), 'data', 'test_auth_file.json')
         }
 
         self.assertTrue(run(None, context, CUSTOM_SUBSCRIPTION_ID))
@@ -31,8 +31,8 @@ class HandlerTest(BaseTest):
 
     def test_run_empty_policy(self):
         context = {
-            'config_file': join(dirname(__file__), 'files', 'test_config_empty.json'),
-            'auth_file': join(dirname(__file__), 'files', 'test_auth_file.json')
+            'config_file': join(dirname(__file__), 'data', 'test_config_empty.json'),
+            'auth_file': join(dirname(__file__), 'data', 'test_auth_file.json')
         }
 
         self.assertFalse(run(None, context))

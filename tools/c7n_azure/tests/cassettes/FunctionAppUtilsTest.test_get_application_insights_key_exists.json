@@ -1,0 +1,71 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "request-context": [
+                        "appId=cid-v1:920e14b1-13f3-461a-a4bb-b4fe6f1a4525"
+                    ],
+                    "access-control-expose-headers": [
+                        "Request-Context"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:31:42 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1041"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test",
+                        "name": "cloud-custodian-test",
+                        "type": "microsoft.insights/components",
+                        "location": "westus2",
+                        "tags": {
+                            "hidden-link:/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test": "Resource"
+                        },
+                        "kind": "web",
+                        "etag": "\"19006d63-0000-0600-0000-5cca14f30000\"",
+                        "properties": {
+                            "Ver": "v2",
+                            "ApplicationId": "cloud-custodian-test",
+                            "AppId": "ceacef8b-51b3-4f3f-8931-d5de24086ff6",
+                            "Application_Type": "web",
+                            "Flow_Type": null,
+                            "Request_Source": "IbizaWebAppExtensionCreate",
+                            "InstrumentationKey": "92921c0a-5f65-4c17-8bf2-d480dbe2af3b",
+                            "Name": "cloud-custodian-test",
+                            "CreationDate": "2019-05-01T21:51:46.7859097+00:00",
+                            "PackageId": null,
+                            "TenantId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                            "HockeyAppId": null,
+                            "HockeyAppToken": null,
+                            "provisioningState": "Succeeded",
+                            "SamplingPercentage": null,
+                            "CustomMetricsOptedInType": null,
+                            "Retention": null
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

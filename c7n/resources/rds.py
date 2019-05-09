@@ -1686,3 +1686,18 @@ class ModifyDb(BaseAction):
                 c.modify_db_instance(**param)
             except c.exceptions.DBInstanceNotFoundFault:
                 raise
+
+
+@resources.register('rds-reserved')
+class ReservedRDS(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'rds'
+        name = id = 'ReservedDBInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_db_instances', 'ReservedDBInstances', None)
+        filter_name = 'ReservedDBInstances'
+        filter_type = 'list'
+        dimension = None
+        type = "reserved-db"

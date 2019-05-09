@@ -1,0 +1,88 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ContainerService/containerServices?api-version=2017-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/GetContainerServiceSubscription3Min;149,Microsoft.Compute/GetContainerServiceSubscription30Min;1499"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:10:30 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1823"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "type": "Microsoft.ContainerService/ContainerServices",
+                                "location": "southcentralus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_CONTAINERSERVICE/providers/Microsoft.ContainerService/containerServices/cctestacs",
+                                "name": "cctestacs",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "orchestratorProfile": {
+                                        "orchestratorType": "Kubernetes"
+                                    },
+                                    "masterProfile": {
+                                        "count": 1,
+                                        "dnsPrefix": "cctestacsdnsmgmt",
+                                        "fqdn": "cctestacsdnsmgmt.southcentralus.cloudapp.azure.com",
+                                        "vmSize": "Standard_D2_v2"
+                                    },
+                                    "agentPoolProfiles": [
+                                        {
+                                            "name": "agentpool0",
+                                            "count": 3,
+                                            "vmSize": "Standard_D2_v2",
+                                            "dnsPrefix": "cctestacsdnsagent",
+                                            "fqdn": "",
+                                            "osType": "Linux"
+                                        }
+                                    ],
+                                    "linuxProfile": {
+                                        "ssh": {
+                                            "publicKeys": [
+                                                {
+                                                    "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCu+HeCwOjvMmh3oL29xkt9RLmMnNI7OXqkEKeAC2k3TmywKhPe81IoB+BjJdURne0oamHHp7QwVVff1rOPsT0+Df0u0xzMPKzY6yq5RZy7ClNcptVTQxBYVRuNLoTqgvH79OnlLVHjU6ANtgMj+gC5ZPDyaou8v8V9zaFALcmaGxIPEwquuQBy9XHeYPgQyiVSrmRvL3ZX7hOdxAvqc3nHY8T5d96ojhvk1nXaOaewNELBeD4SfpqV96xtMsOWkdIrQdfiqmO0oTxDms+Ky/RuphhUlrd8XOdqEuaWvGLTK2y1KkdgHfdoe5LWdQAW7H8YHb5EgcqvBX+5wIj+ncHT"
+                                                }
+                                            ]
+                                        },
+                                        "adminUsername": "azureuser"
+                                    },
+                                    "servicePrincipalProfile": {
+                                        "clientId": "364bd82c-67e2-489d-994a-081407d2857d"
+                                    },
+                                    "diagnosticsProfile": {
+                                        "vmDiagnostics": {
+                                            "enabled": false
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
