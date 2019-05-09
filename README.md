@@ -66,7 +66,7 @@ Links
 Quick Install
 -------------
 
-```
+```shell
 $ python3 -m venv custodian
 $ source custodian/bin/activate
 (custodian) $ pip install c7n
@@ -78,23 +78,27 @@ Usage
 
 Cloud Custodian works on a YAML policy that are user generated. The policy 
 contains the resources that the policy will run on, filters control which resources 
-will be affected by this policy, modes control how the policy will be run, and actions 
+will be affected by this policy, modes control how the policy will execute, and actions 
 are the actions the policy will take. Below is a sample policy that uses AWS and assumes that 
 the user have the access necessary to preform the tasks. This policy ensures that these 3 rules are 
 followed:
-  1. will enforce encryption on all S3 buckets and the objects that are contained.
+  1. will enforce that no S3 buckets have cross-account access enabled.
   1. will terminate any EC2 instance that do not have an encrypted EBS volume.
-  1. will stop any EC2 instance that does not have the follow tags "Environment", "AppId", and either "OwnerContact" or "DeptId".
+  1. will stop any EC2 instance that does not have the follow tags "Environment", "AppId", and either "OwnerContact" or "DeptID".
 
 ```yaml
 policies:
-  - name: remediate-extant-keys
-  description: |
-    Scan through all s3 buckets in an account and ensure all objects
-    are encrypted (default to AES256).
-  resource: aws.s3
-    actions:
-      - encrypt-keys
+- name: s3-cross-account
+   description: |
+     Checks S3 for buckets with cross-account access and
+     removes the cross-account access.
+   resource: s3
+   region: us-east-1
+   filters:
+     - type: cross-account
+   actions:
+     - type: remove-statements
+       statement_ids: matched
 
 - name: ec2-require-non-public-and-encrypted-volumes
   resource: aws.ec2
@@ -134,7 +138,7 @@ policies:
 
 You can validate, test, and run Cloud Custodian with the example policy with these commands:
 
-```
+```shell
 # Validate the configuration (note this happens by default on run)
 $ custodian validate policy.yml
 
@@ -148,7 +152,7 @@ $ custodian run -s out policy.yml
 
 You can run Cloud Custodian with a policy in Docker as well
 
-```
+```shell
 # Download the image
 $ docker pull cloudcustodian/c7n
 $ mkdir output
