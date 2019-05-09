@@ -91,7 +91,7 @@ Quick Install
 
 ::
 
-  $ virtualenv --python=python2 custodian
+  $ python3 -m venv custodian
   $ source custodian/bin/activate
   (custodian) $ pip install c7n
 
@@ -185,13 +185,33 @@ You can run it with Docker as well
 
   # Download the image
   $ docker pull cloudcustodian/c7n
+  $ mkdir output
 
   # Run the policy
+  #
+  # This will run the policy using only the environment variables for authentication
   $ docker run -it \
-      -v $(pwd)/output:/output \
-      -v $(pwd)/policy.yml:/policy.yml \
-      --env-file <(env | grep "^AWS") \
-      cloudcustodian/c7n run -v -s /output /policy.yml
+    -v $(pwd)/output:/home/custodian/output \
+    -v $(pwd)/policy.yml:/home/custodian/policy.yml \
+    --env-file <(env | grep "^AWS\|^AZURE\|^GOOGLE") \
+    cloudcustodian/c7n run -v -s /home/custodian/output /home/custodian/policy.yml
+
+  # Run the policy (using AWS's generated credentials from STS)
+  #
+  # NOTE: We mount the ``.aws/credentials`` and ``.aws/config`` directories to
+  # the docker container to support authentication to AWS using the same credentials
+  # credentials that are available to the local user if authenticating with STS.
+  # This exposes your container to additional credentials than may be necessary,
+  # i.e. additional credentials may be available inside of the container than is
+  # minimally necessary.
+
+  $ docker run -it \
+    -v $(pwd)/output:/home/custodian/output \
+    -v $(pwd)/policy.yml:/home/custodian/policy.yml \
+    -v $(cd ~ && pwd)/.aws/credentials/home/custodian/:.aws/credentials \
+    -v $(cd ~ && pwd)/.aws/config:/home/custodian/.aws/config \
+    --env-file <(env | grep "^AWS") \
+    cloudcustodian/c7n run -v -s /home/custodian/output /home/custodian/policy.yml
 
 Custodian supports a few other useful subcommands and options, including
 outputs to S3, Cloudwatch metrics, STS role assumption. Policies go together

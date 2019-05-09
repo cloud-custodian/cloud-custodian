@@ -6,8 +6,8 @@ Getting Started
 See also the readme in the GitHub repository.
 
 * :ref:`install-cc`
-* :ref:`cloud-providers`
 * :ref:`explore-cc`
+* :ref:`cloud-providers`
 * :ref:`monitor-cc`
 * :ref:`tab-completion`
 
@@ -18,53 +18,9 @@ Install Cloud Custodian
 
 To install Cloud Custodian, just run::
 
-  $ virtualenv --python=python2 custodian
+  $ python3 -m venv custodian
   $ source custodian/bin/activate
   (custodian) $ pip install c7n
-
-(Note that Custodian's `Lambda features <../policy/lambda.html>`_ currently `do
-not work <https://github.com/cloud-custodian/cloud-custodian/issues/193>`_ outside
-of a virtualenv.)
-
-.. _cloud-providers:
-
-Cloud Provider Specific Help
-----------------------------
-
-For specific setup isntructions for AWS, Azure, and GCP, visit the relevant getting started
-page.
-
-- :ref:`AWS <aws-gettingstarted>`
-
-Troubleshooting & Tinkering
-+++++++++++++++++++++++++++
-
-If you are not using the ``us-east-1`` region, then you'll need to specify that
-as well, either on the command line or in an environment variable:
-
-.. code-block:: bash
-
-    --region=us-west-1
-
-.. code-block:: bash
-
-  $ AWS_DEFAULT_REGION=us-west-1
-
-
-The policy is validated automatically when you run it, but you can also
-validate it separately:
-
-.. code-block:: bash
-
-  $ custodian validate custodian.yml
-
-You can also check which resources are identified by the policy, without
-running any actions on the resources:
-
-.. code-block:: bash
-
-  $ custodian run --dryrun -s . custodian.yml
-
 
 .. _explore-cc:
 
@@ -73,24 +29,24 @@ Explore Cloud Custodian
 
 Run ``custodian -h`` to see a list of available commands.
 
-Run ``custodian schema`` to see the complete list of AWS resources against
+Run ``custodian schema`` to see the complete list of cloud resources against
 which you can run policies. To invoke command-line help with more information
 about policy schema details, run ``custodian schema -h``.
 
-Run ``custodian schema <cloud-provider>`` to see the available resources for a specific
-cloud provider: ``custodian schema aws``
+Run ``custodian schema <cloud-provider>`` to see the available resources for a
+specific cloud provider: ``custodian schema aws``
 
-Run ``custodian schema <resource>`` to see the available :ref:`filters and
-actions <policy>` for each resource.
+Run ``custodian schema <cloud-provider>.<resource>`` to see the available
+:ref:`filters and actions <policy>` for each resource.
 
 Drill down to get more information about available policy settings for each
 resource, where the model for the command is::
 
-  $ custodian schema <resource>.<category>.<item>
+  $ custodian schema <cloud>.<resource>.<category>.<item>
 
 For example::
 
-  $ custodian schema s3.filters.is-log-target
+  $ custodian schema aws.s3.filters.is-log-target
 
 provides the following information::
 
@@ -128,6 +84,40 @@ provides the following information::
       'type': 'object'}
 
 
+Additionally, you can use the schema command to view information on the different
+supported modes in Cloud Custodian::
+
+  $ custodian schema mode
+
+.. _cloud-providers:
+
+Cloud Provider Specific Help
+----------------------------
+
+For specific setup isntructions for AWS, Azure, and GCP, visit the relevant getting started
+page.
+
+- :ref:`AWS <aws-gettingstarted>`
+- :ref:`Azure <azure_gettingstarted>`
+- GCP <tbd>
+
+Troubleshooting & Tinkering
++++++++++++++++++++++++++++
+
+The policy is validated automatically when you run it, but you can also
+validate it separately:
+
+.. code-block:: bash
+
+  $ custodian validate custodian.yml
+
+You can also check which resources are identified by the policy, without
+running any actions on the resources:
+
+.. code-block:: bash
+
+  $ custodian run --dryrun -s . custodian.yml
+
 .. _monitor-cc:
 
 Monitor resources
@@ -135,17 +125,15 @@ Monitor resources
 
 Additional commands let you monitor your services in detail.
 
-You can generate metrics by specifying the boolean metrics flag::
+You can generate metrics, log outputs, and output to blob storage in each of the different
+providers (AWS, Azure, Google Cloud Platform).
 
-  $ custodian run -s <output_directory> --metrics <policyfile>.yml
+For detailed instructions on how to add metrics, logging, and blob storage output for the
+different clouds, check out the cloud provider specific pages:
 
-You can also upload Cloud Custodian logs to CloudWatch logs::
-
-  $ custodian run --log-group=/cloud-custodian/<dev-account>/<region> -s <output_directory> <policyfile>.yml
-
-And you can output logs and resource records to S3::
-
-  $ custodian run -s s3://<my-bucket><my-prefix> <policyfile>.yml
+- :ref:`AWS <aws-gettingstarted>`
+- :ref:`Azure <azure_gettingstarted>`
+- GCP <tbd>
 
 For details, see :ref:`usage`.
 

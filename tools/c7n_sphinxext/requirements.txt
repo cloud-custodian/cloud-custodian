@@ -1,19 +1,5 @@
 Sphinx==2.0.1
-
-# Pygments Pain
-#
-# Needs a pin as 2.3.1 has a bug with yaml addressed in:
-# https://bitbucket.org/birkenfeld/pygments-main/pull-requests/797
-#
-# Issue requesting a new release with fix:
-# https://bitbucket.org/birkenfeld/pygments-main/issues/1499
-#
-# We're pulling directly from git to get better yaml highlighting with the bug fixes
-#
--e hg+https://bitbucket.org/birkenfeld/pygments-main@38d35093ce1e3722c5f58404d1d277de75f3cc68#egg=Pygments
-#
-
-# rq.filter: !=2.3.1
+Pygments==2.4.0
 recommonmark>=0.5.0
 sphinx-rtd-theme==0.4.3
 sphinx-markdown-tables>=0.0.9

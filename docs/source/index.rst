@@ -17,6 +17,7 @@ Navigate below and get started with Cloud Custodian!
    :caption: Introduction
 
    overview
+   overview/index
    quickstart/index
    quickstart/usage
    filters
@@ -52,7 +53,7 @@ Navigate below and get started with Cloud Custodian!
    tools/c7n-org
    tools/c7n-policystream
    tools/c7n-mailer
-
+   tools/c7n-trailcreator
 
 .. toctree::
    :maxdepth: 2
