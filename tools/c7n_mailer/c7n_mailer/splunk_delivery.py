@@ -34,8 +34,8 @@ class SplunkHecDelivery(object):
 
         :param msg: c7n notification message
         :type msg: dict
-        :param msg_timestamp: int timestamp when message was sent to SQS,
-          for use as event timestamp in Splunk.
+        :param msg_timestamp: int timestamp (milliseconds) when message was sent
+          to SQS, for use as event timestamp in Splunk.
         :type msg_timestamp: int
         :return: list of Splunk payload dicts
         :rtype: list
@@ -94,7 +94,7 @@ class SplunkHecDelivery(object):
             ):
                 del res['c7n.metrics']
             x['resource'] = res
-            x['tags'] = self.tags_for_resource(res)
+            x['resource']['tags'] = self.tags_for_resource(res)
             logs.append(self._prune_log_message(x))
         return logs
 
@@ -235,24 +235,27 @@ class SplunkHecDelivery(object):
         :type res: dict
         :return: dict of tags
         """
-        t = res.get('Tags', res.get('tags', {}))
-        if t is None:
+        try:
+            t = res.get('Tags', res.get('tags', {}))
+            if t is None:
+                return {}
+            # it's a dict, return it right away
+            if isinstance(t, type({})):
+                return t
+            # if it's not a dict or list, unknown, return empty dict
+            if not isinstance(t, type([])):
+                return {}
+            # it's a list
+            tags = {}
+            for item in t:
+                if 'Key' not in item or 'Value' not in item:
+                    continue
+                k = item.get('Key')
+                v = item.get('Value')
+                tags[k] = v
+            return tags
+        except Exception:
             return {}
-        # it's a dict, return it right away
-        if isinstance(t, type({})):
-            return t
-        # if it's not a dict or list, unknown, return empty dict
-        if not isinstance(t, type([])):
-            return {}
-        # it's a list
-        tags = {}
-        for item in t:
-            if 'Key' not in item or 'Value' not in item:
-                continue
-            k = item.get('Key')
-            v = item.get('Value')
-            tags[k] = v
-        return tags
 
     @staticmethod
     def _splunk_indices_for_message(msg):
