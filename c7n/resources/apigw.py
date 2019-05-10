@@ -593,7 +593,8 @@ class FilterRestMethod(ValueFilter):
                         continue
                     if self.data.get('matched', False) and not self.match(m):
                         try:
-                            resource_map[m['resourceId']].get('c7n:matched-resource-methods').remove(m)
+                            resource_map[m['resourceId']].get(
+                                'c7n:matched-resource-methods').remove(m)
                         except ValueError:
                             continue
 
