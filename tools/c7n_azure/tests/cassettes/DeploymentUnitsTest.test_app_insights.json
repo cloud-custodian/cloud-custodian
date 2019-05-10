@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units?api-version=2018-05-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units?api-version=2018-05-01",
                 "body": null,
                 "headers": {}
             },
@@ -14,24 +14,24 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-length": [
-                        "228"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "227"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "date": [
-                        "Fri, 10 May 2019 19:29:45 GMT"
+                        "Fri, 10 May 2019 19:58:46 GMT"
                     ]
                 },
                 "body": {
                     "data": {
                         "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units",
                         "name": "cloud-custodian-test-deployment-units",
-                        "location": "westus2",
+                        "location": "westus",
                         "properties": {
                             "provisioningState": "Succeeded"
                         }
@@ -52,11 +52,11 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1198"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "cache-control": [
                         "no-cache"
@@ -65,7 +65,7 @@
                         "Request-Context"
                     ],
                     "date": [
-                        "Fri, 10 May 2019 19:29:49 GMT"
+                        "Fri, 10 May 2019 19:58:52 GMT"
                     ],
                     "request-context": [
                         "appId=cid-v1:920e14b1-13f3-461a-a4bb-b4fe6f1a4525"
@@ -82,17 +82,17 @@
                         "location": "westus2",
                         "tags": {},
                         "kind": "web",
-                        "etag": "\"85005ed6-0000-0600-0000-5cd5d12b0000\"",
+                        "etag": "\"8600b21d-0000-0600-0000-5cd5d7f90000\"",
                         "properties": {
                             "Ver": "v2",
                             "ApplicationId": "cloud-custodian-test",
-                            "AppId": "98c50e90-699a-4254-8736-bbf94acc0134",
+                            "AppId": "cf844956-bb71-4057-9c3e-2dfac0c7447f",
                             "Application_Type": "web",
                             "Flow_Type": null,
                             "Request_Source": "IbizaWebAppExtensionCreate",
-                            "InstrumentationKey": "c72d9c61-0ea8-45dd-bfde-0151ede8f057",
+                            "InstrumentationKey": "0e148de7-8e2f-4b5c-9d2a-21c582fd82a2",
                             "Name": "cloud-custodian-test",
-                            "CreationDate": "2019-05-10T19:29:47.3889861+00:00",
+                            "CreationDate": "2019-05-10T19:58:48.8983727+00:00",
                             "PackageId": null,
                             "TenantId": "00000000-0000-0000-0000-000000000003",
                             "HockeyAppId": null,

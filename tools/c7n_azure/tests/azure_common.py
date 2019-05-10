@@ -256,7 +256,7 @@ class AzureVCRBaseTest(VCRTestCase):
     @staticmethod
     def _replace_storage_keys(s):
         # All usages of storage keys have the word "key" somewhere
-        if "key" in s:
+        if "key" in s.lower():
             return re.sub(
                 r"(?P<prefix>=|\"|:)(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==)",
                 r"\g<prefix>" + DEFAULT_STORAGE_KEY, s)

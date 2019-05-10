@@ -57,7 +57,7 @@ class DeploymentUnitsTest(BaseTest):
 
     def test_app_insights(self):
         params = {'name': 'cloud-custodian-test',
-                  'location': self.rg_location,
+                  'location': 'westus2',
                   'resource_group_name': self.rg_name}
         unit = AppInsightsUnit()
 

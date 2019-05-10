@@ -14,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1198"
-                    ],
-                    "content-type": [
-                        "application/json"
+                    "date": [
+                        "Fri, 10 May 2019 19:53:30 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 10 May 2019 19:31:27 GMT"
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-length": [
-                        "1375"
+                        "1372"
                     ]
                 },
                 "body": {
@@ -36,9 +36,9 @@
                         "name": "cloud-custodian-test",
                         "type": "Microsoft.Web/serverfarms",
                         "kind": "linux",
-                        "location": "West US 2",
+                        "location": "West US",
                         "properties": {
-                            "serverFarmId": 8379,
+                            "serverFarmId": 25652,
                             "name": "cloud-custodian-test",
                             "workerSize": "Default",
                             "workerSizeId": 0,
@@ -48,7 +48,7 @@
                             "currentWorkerSizeId": 0,
                             "currentNumberOfWorkers": 1,
                             "status": "Ready",
-                            "webSpace": "cloud-custodian-test-deployment-units-WestUS2webspace",
+                            "webSpace": "cloud-custodian-test-deployment-units-WestUSwebspace",
                             "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
                             "adminSiteName": null,
                             "hostingEnvironment": null,
@@ -58,7 +58,7 @@
                             "adminRuntimeSiteName": null,
                             "computeMode": "Dedicated",
                             "siteMode": null,
-                            "geoRegion": "West US 2",
+                            "geoRegion": "West US",
                             "perSiteScaling": false,
                             "maximumElasticWorkerCount": 1,
                             "numberOfSites": 0,
@@ -72,7 +72,7 @@
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "mdmId": "waws-prod-mwh-007_8379",
+                            "mdmId": "waws-prod-bay-081_25652",
                             "targetWorkerCount": 0,
                             "targetWorkerSizeId": 0,
                             "provisioningState": "Succeeded",

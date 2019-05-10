@@ -14,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
-                    ],
-                    "content-type": [
-                        "application/json"
+                    "date": [
+                        "Fri, 10 May 2019 19:51:52 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 10 May 2019 19:29:57 GMT"
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-length": [
-                        "1424"
+                        "1422"
                     ]
                 },
                 "body": {
@@ -36,9 +36,9 @@
                         "name": "cloud-custodian-test-autoscale",
                         "type": "Microsoft.Web/serverfarms",
                         "kind": "linux",
-                        "location": "West US 2",
+                        "location": "West US",
                         "properties": {
-                            "serverFarmId": 8377,
+                            "serverFarmId": 25649,
                             "name": "cloud-custodian-test-autoscale",
                             "workerSize": "Default",
                             "workerSizeId": 0,
@@ -48,7 +48,7 @@
                             "currentWorkerSizeId": 0,
                             "currentNumberOfWorkers": 1,
                             "status": "Ready",
-                            "webSpace": "cloud-custodian-test-deployment-units-WestUS2webspace",
+                            "webSpace": "cloud-custodian-test-deployment-units-WestUSwebspace",
                             "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
                             "adminSiteName": null,
                             "hostingEnvironment": null,
@@ -58,21 +58,21 @@
                             "adminRuntimeSiteName": null,
                             "computeMode": "Dedicated",
                             "siteMode": null,
-                            "geoRegion": "West US 2",
+                            "geoRegion": "West US",
                             "perSiteScaling": false,
                             "maximumElasticWorkerCount": 1,
                             "numberOfSites": 0,
                             "hostingEnvironmentId": null,
                             "isSpot": false,
                             "spotExpirationTime": null,
-                            "freeOfferExpirationTime": "2019-06-09T19:29:51.7",
+                            "freeOfferExpirationTime": "2019-06-09T19:51:45.99",
                             "tags": null,
                             "kind": "linux",
                             "resourceGroup": "cloud-custodian-test-deployment-units",
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "mdmId": "waws-prod-mwh-007_8377",
+                            "mdmId": "waws-prod-bay-081_25649",
                             "targetWorkerCount": 0,
                             "targetWorkerSizeId": 0,
                             "provisioningState": "Succeeded",
@@ -102,20 +102,20 @@
                     "message": "Created"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                    "date": [
+                        "Fri, 10 May 2019 19:51:59 GMT"
                     ],
                     "content-length": [
-                        "1348"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                        "1346"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 10 May 2019 19:30:01 GMT"
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ]
                 },
                 "body": {
@@ -123,7 +123,7 @@
                         "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default",
                         "name": "cloud_custodian_default",
                         "type": "Microsoft.Insights/autoscaleSettings",
-                        "location": "West US 2",
+                        "location": "West US",
                         "tags": {
                             "$type": "Microsoft.WindowsAzure.Management.Common.Storage.CasePreservedDictionary, Microsoft.WindowsAzure.Management.Common.Storage"
                         },
@@ -182,17 +182,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "date": [
+                        "Fri, 10 May 2019 19:52:00 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 10 May 2019 19:30:01 GMT"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "content-length": [
-                        "1348"
+                        "1346"
                     ]
                 },
                 "body": {
@@ -200,7 +200,7 @@
                         "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default",
                         "name": "cloud_custodian_default",
                         "type": "Microsoft.Insights/autoscaleSettings",
-                        "location": "West US 2",
+                        "location": "West US",
                         "tags": {
                             "$type": "Microsoft.WindowsAzure.Management.Common.Storage.CasePreservedDictionary, Microsoft.WindowsAzure.Management.Common.Storage"
                         },
