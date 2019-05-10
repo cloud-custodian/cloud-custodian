@@ -13,7 +13,7 @@ in the makefile:
 
 This creates a virtual env in your enlistment and installs all packages as editable.
 
-Instead, you can do `pip install -r tools/c7n_azure/requirements.txt` to install test dependencies.
+You can also simply do `pip install -r requirements-dev.txt` to install all dev/test dependencies.
 
 Adding New Azure Resources
 ==========================
@@ -78,6 +78,9 @@ Testing
 Tests for c7n_azure run automatically with other Custodian tests.  See :ref:`Testing for Developers <developer-tests>`
 for information on how to run Tox.
 
+If you'd like to run tests at the command line or in your IDE then reference `tox.ini` to see the required
+environment variables and command lines for running `pytest`.
+
 
 Test framework
 --------------
@@ -90,7 +93,7 @@ VCRpy documentation can be found here: `VCR.py documentation <https://vcrpy.read
 ARM templates
 -------------
 
-To ensure VCR cassetes can be easily re-recorded, there are ARM templates to deploy Azure tests infrastructure.
+To ensure VCR cassettes can be easily re-recorded, there are ARM templates to deploy Azure tests infrastructure.
 
 These templates will allow you to provision real Azure resources appropriate for recreating the VCR
 cassettes used by the unit tests.  They will let you run the unit tests against real resources.

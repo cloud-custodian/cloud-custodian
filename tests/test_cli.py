@@ -18,10 +18,14 @@ import os
 import sys
 
 from argparse import ArgumentTypeError
-from c7n import cli, version, commands
 from datetime import datetime, timedelta
 
+from c7n import cli, version, commands
+from c7n.resolver import ValuesFrom
+from c7n.commands import _expand_schema
 from c7n.resources import aws
+from c7n.schema import generate
+
 from .common import BaseTest, TextTestIO
 
 
@@ -224,6 +228,21 @@ class SchemaTest(CliTest):
 
         output = self.get_output(["custodian", "schema", "ec2.filters.image"])
         self.assertIn("Help", output)
+
+    def test_schema_expand(self):
+        # refs should only ever exist in a dictionary by itself
+        test_schema = {
+            '$ref': '#/definitions/filters_common/value_from'
+        }
+        result = _expand_schema(test_schema, generate()['definitions'])
+        self.assertEquals(result, ValuesFrom.schema)
+
+    def test_schema_expand_not_found(self):
+        test_schema = {
+            '$ref': '#/definitions/filters_common/invalid_schema'
+        }
+        result = _expand_schema(test_schema, generate()['definitions'])
+        self.assertEquals(result, None)
 
 
 class ReportTest(CliTest):

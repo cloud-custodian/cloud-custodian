@@ -243,6 +243,7 @@ class PostFinding(BaseAction):
     def get_finding(self, resources, existing_finding_id, created_at, updated_at):
         policy = self.manager.ctx.policy
         model = self.manager.resource_type
+        region = self.data.get('region', self.manager.config.region)
 
         if existing_finding_id:
             finding_id = existing_finding_id
@@ -258,7 +259,7 @@ class PostFinding(BaseAction):
         finding = {
             "SchemaVersion": self.FindingVersion,
             "ProductArn": "arn:aws:securityhub:{}:{}:product/{}/{}".format(
-                self.manager.config.region,
+                region,
                 self.manager.config.account_id,
                 self.manager.config.account_id,
                 self.ProductName,

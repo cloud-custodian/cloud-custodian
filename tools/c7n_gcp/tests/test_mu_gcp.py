@@ -94,7 +94,12 @@ class FunctionTest(BaseTest):
         self.addCleanup(shutil.rmtree, tmp_dir)
 
     def test_abstract_gcp_mode(self):
-        p = self.load_policy({'name': 'instance', 'resource': 'gcp.instance'})
+        # this will fetch a discovery
+        factory = self.replay_flight_data(
+            'mu-gcp-abstract', project_id='test-226520')
+        p = self.load_policy({
+            'name': 'instance', 'resource': 'gcp.instance'},
+            session_factory=factory)
         exec_mode = policy.FunctionMode(p)
         self.assertRaises(NotImplementedError, exec_mode.run)
         self.assertRaises(NotImplementedError, exec_mode.provision)

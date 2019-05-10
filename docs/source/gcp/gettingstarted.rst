@@ -1,19 +1,23 @@
 .. _gcp_gettingstarted:
 
 Getting Started
-===============
+===========================
 
-:ref:`gcp_authentication`
-:ref:`gcp_contribute`.
+The GCP provider plugin is an optional package which can be installed in addition to
+the base Cloud Custodian application. It provides the ability to write policies which
+interact with GCP related resources.
 
-Install Cloud Custodian and GCP Plugin
-----------------------------------------
+.. _gcp_install-cc:
 
-Cloud Custodian is a Python application and supports Python 2 and 3 on Linux and Windows.
+Install GCP Plugin
+------------------
+
+First, ensure you have :ref:`installed the base Cloud Custodian application <install-cc>`. 
+Cloud Custodian is a Python application that supports Python 2 and 3 on Linux and Windows. 
 We recommend using Python 3.6 or higher.
 
-The Azure provider is an additional package which is installed in addition to c7n.
-
+Once the base install is complete, you are now ready to install the GCP provider package
+using one of the following options:
 
 Option 1: Install released packages to local Python Environment
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -30,47 +34,88 @@ Option 2: Install latest from the repository
 .. code-block:: bash
 
     $ git clone https://github.com/cloud-custodian/cloud-custodian.git
-    $ cd cloud-custodian
     $ pip install -e ./cloud-custodian
     $ pip install -e ./cloud-custodian/tools/c7n_gcp
 
+.. _gcp_authenticate:
 
-Write your first policy
+Connect Your Authentication Credentials
+---------------------------------------
+
+In order for Custodian to be able to interact with your GCP resources, you will need to
+configure your GCP authentication credentials on your system in a way in which the
+application is able to retrieve them.
+
+Choose from one of the following methods to configure your credentials, depending on your
+use case. In either option, after the configuration is complete, Custodian will implicitly
+pick up your credentials when it runs.
+
+GCP CLI:
+""""""""
+If you are a general user accessing a single account, then you can use the GCP CLI to
+configure your credentials.
+
+First, `install <https://cloud.google.com/sdk/install>`_ ``gcloud`` (the GCP Command Line Interface).
+
+Then run the following command, substituting your username:
+
+.. code-block:: bash
+
+    gcloud auth application-default login <your_user_name>
+
+Executing the command will open a browser window with prompts to finish configuring
+your credentials. For more information on this command,
+`view its documentation <https://cloud.google.com/sdk/gcloud/reference/auth/login>`_.
+
+Environment Variables:
+""""""""""""""""""""""
+If you are planning to run Custodian using a service account, then configure your credentials
+using environment variables.
+
+Follow the steps outlined in the 
+`GCP documentation to configure credentials for service accounts. <https://cloud.google.com/docs/authentication/getting-started>`_
+
+.. _gcp_write-policy:
+
+Write Your First Policy
 -----------------------
+A policy is the primary way that Custodian is configured to manage cloud resources.
+It is a YAML file that follows a predetermined schema to describe what you want
+Custodian to do.
 
-A policy specifies the following items:
+There are three main components to a policy:
 
-* The type of resource to run the policy against
-* Filters to narrow down the set of resources
-* Actions to take on the filtered set of resources
+* Resource: the type of resource to run the policy against
+* Filters: criteria to produce a specific subset of resources
+* Actions: directives to take on the filtered set of resources
 
-For this tutorial we will filter to a VM of a specific name, then add the tag ``Hello: World``.
+In the example below, we will write a policy that filters for compute engine
+resources, and then stops each resource.
 
-Create a file named ``custodian.yml`` with this content, and update ``my_vm_name`` to match an existing VM.
-
-*note: Some text editors (VSCode) inject invalid whitespace characters when copy/pasting YAML from a browser*
+Filename: ``custodian.yml``
 
 .. code-block:: yaml
 
     policies:
-        - name: my-first-policy
-          description: |
-            Adds a tag to a virtual machines
-          resource: azure.vm
-          filters:
-            - type: value
-              key: name
-              value: my_vm_name
-          actions:
-           - type: tag
-             tag: Hello
-             value: World
+      - name: my-first-policy
+        description: |
+          Stops all compute instances that contain the word "test"
+        resource: gcp.instance
+        filters:
+          - type: value
+            key: name
+            value: test
+            op: in
+        actions:
+          - type: stop
 
-Run your policy
+.. _gcp_run-policy:
+
+Run Your Policy
 ---------------
+First, ensure you have :ref:`configured one of the supported authentication mechanisms <gcp_authenticate>`.
 
-First, **choose one of the supported authentication mechanisms** and either log in to Azure CLI or set
-environment variables as documented in gcp_authentication
+Next, run the following command to execute the policy with Custodian:
 
 .. code-block:: bash
 
@@ -78,13 +123,12 @@ environment variables as documented in gcp_authentication
 
 If successful, you should see output similar to the following on the command line::
 
-    2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: azure.vm
-    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource:ec2 has count:1 time:1.38
-    2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: tag: 1 execution_time: 0.67
-
+    2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: gcp.instance
+    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource: gcp.instance has count:3 time:1.38
+    2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: stop: 3 execution_time: 0.67
 
 You should also find a new ``my-first-policy`` directory with a log and other
-files (subsequent runs will append to the log by default rather than
+files (subsequent runs will append to the log by default, rather than
 overwriting it).
 
 See :ref:`filters` for more information on the features of the Value filter used in this sample.

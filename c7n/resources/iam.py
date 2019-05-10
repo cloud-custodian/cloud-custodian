@@ -104,7 +104,8 @@ class RoleTag(Tag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                client.tag_role(RoleName=role['RoleName'], Tags=tags)
+                self.manager.retry(
+                    client.tag_role, RoleName=role['RoleName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -118,7 +119,8 @@ class RoleRemoveTag(RemoveTag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                client.untag_role(RoleName=role['RoleName'], TagKeys=tags)
+                self.manager.retry(
+                    client.untag_role, RoleName=role['RoleName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -169,7 +171,8 @@ class UserTag(Tag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                client.tag_user(UserName=u['UserName'], Tags=tags)
+                self.manager.retry(
+                    client.tag_user, UserName=u['UserName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -183,7 +186,8 @@ class UserRemoveTag(RemoveTag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                client.untag_user(UserName=u['UserName'], TagKeys=tags)
+                self.manager.retry(
+                    client.untag_user, UserName=u['UserName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 

@@ -6,23 +6,29 @@ LABEL name="mailer" \
       homepage="https://cloudcustodian.io" \
       maintainer="Custodian Community <https://cloudcustodian.io>"
 
-# Assemble custodian bits by parent dir.
-ADD setup.py README.rst requirements.txt /src/
+# Transfer Custodian source into container by directory
+# to minimize size
+ADD setup.py README.md requirements.txt /src/
 ADD c7n /src/c7n/
 ADD tools /src/tools/
 
 WORKDIR /src
-
+RUN adduser --disabled-login custodian
 RUN apt-get --yes update && apt-get --yes upgrade \
- && apt-get --yes install python-dev build-essential \
+ && apt-get --yes install build-essential \
  && pip3 install -r requirements.txt  . \
  && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
  && pip3 install -r tools/c7n_mailer/requirements.txt tools/c7n_mailer \
- && apt-get --yes remove build-essential python-dev \
+ && apt-get --yes remove build-essential \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
  && rm -Rf /var/cache/apt/ \
  && rm -Rf /var/lib/apt/lists/* \
- && rm -Rf /src/
+ && rm -Rf /src/ \
+ && rm -Rf /root/.cache/
 
+USER custodian
+WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
-ENTRYPOINT ["c7n-mailer"]
+VOLUME ["/home/custodian"]
+ENTRYPOINT ["/usr/local/bin/c7n-mailer"]
+CMD ["--help"]

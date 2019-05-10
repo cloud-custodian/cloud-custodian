@@ -16,17 +16,27 @@ Navigate below and get started with Cloud Custodian!
    :maxdepth: 2
    :caption: Introduction
 
+   overview
    overview/index
    quickstart/index
    quickstart/usage
+   filters
    quickstart/advanced
    quickstart/policyStructure
+   overview/glossary
+   overview/deployment
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Examples
+   :maxdepth: 2
+   :caption: AWS
 
-   usecases/index
+   aws/gettingstarted
+   aws/examples/index
+   aws/policy/index
+   filters
+   aws/aws-modes
+   aws/policy/lambda
+   aws/policy/mu
 
 .. toctree::
    :maxdepth: 1
@@ -36,6 +46,7 @@ Navigate below and get started with Cloud Custodian!
    azure/authentication
    azure/examples/index
    azure/policy/index
+   azure/azure-modes
    azure/advanced/index
    azure/contribute
 
@@ -44,25 +55,16 @@ Navigate below and get started with Cloud Custodian!
    :caption: GCP
 
    gcp/gettingstarted
-..   gcp/authentication
-   gcp/examples/index
-   gcp/policy/index
-   gcp/advanced/index
-   gcp/contribute
+   gcp/gcp-modes
 
 .. toctree::
    :maxdepth: 2
-   :caption: Working with AWS Lambda
+   :caption: Tools
 
-   policy/lambda
-   policy/mu
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Policies reference
-
-   policy/index.rst
-   filters
+   tools/c7n-org
+   tools/c7n-policystream
+   tools/c7n-mailer
+   tools/c7n-trailcreator
 
 .. toctree::
    :maxdepth: 2
@@ -72,18 +74,6 @@ Navigate below and get started with Cloud Custodian!
    developer/index.rst
    developer/installing.rst
    developer/tests.rst
-
-.. toctree::
-   :maxdepth: 2
-   :caption: API Reference
-
-   generated/aws/modules
-   generated/azure/modules
-   generated/gcp/modules
+   developer/documentation.rst
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`

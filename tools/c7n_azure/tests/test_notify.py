@@ -53,6 +53,12 @@ class NotifyTest(BaseTest):
         p = self.load_policy({
             'name': 'test-notify-for-keyvault',
             'resource': 'azure.keyvault',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cckeyvault1*'}],
             'actions': [
                 {'type': 'notify',
                  'template': 'default',

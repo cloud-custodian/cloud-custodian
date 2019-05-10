@@ -77,6 +77,14 @@ class StorageUtilities(object):
         return queue_service.create_queue(name)
 
     @staticmethod
+    def delete_queue_from_storage_account(storage_account, name, session):
+        token = StorageUtilities.get_storage_token(session)
+        queue_service = QueueService(
+            account_name=storage_account.name,
+            token_credential=token)
+        return queue_service.delete_queue(name)
+
+    @staticmethod
     def put_queue_message(queue_service, queue_name, content):
         return queue_service.put_message(queue_name, content)
 
