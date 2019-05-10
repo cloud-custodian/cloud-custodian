@@ -30,7 +30,9 @@ RUN apt-get --yes update && apt-get --yes upgrade \
 	&& rm -Rf /var/cache/apt/ \
 	&& rm -Rf /var/lib/apt/lists/* \
 	&& rm -Rf /src/ \
-	&& rm -Rf /root/.cache/
+	&& rm -Rf /root/.cache/ \
+        && mkdir /output \
+        && chown custodian: /output
 
 USER custodian
 WORKDIR /home/custodian
