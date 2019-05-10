@@ -2,7 +2,6 @@ import copy
 from azure.mgmt.web.models import AppServicePlan, SkuDescription
 from c7n_azure.provisioning.autoscale import AutoScaleUnit
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
-from c7n_azure.provisioning.resource_group import ResourceGroupUnit
 from c7n_azure.utils import StringUtils
 
 
