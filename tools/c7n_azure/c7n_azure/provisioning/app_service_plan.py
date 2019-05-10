@@ -18,10 +18,6 @@ class AppServicePlanUnit(DeploymentUnit):
                                                  params['name'])
 
     def _provision(self, params):
-        rg_unit = ResourceGroupUnit()
-        rg_unit.provision_if_not_exists({'name': params['resource_group_name'],
-                                         'location': params['location']})
-
         plan_params = AppServicePlan(
             app_service_plan_name=params['name'],
             location=params['location'],

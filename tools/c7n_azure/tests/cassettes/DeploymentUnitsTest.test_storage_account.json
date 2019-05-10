@@ -4,84 +4,6 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182745?api-version=2019-04-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 404,
-                    "message": "Not Found"
-                },
-                "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-ms-failure-cause": [
-                        "gateway"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 19:30:53 GMT"
-                    ],
-                    "content-length": [
-                        "193"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "error": {
-                            "code": "ResourceNotFound",
-                            "message": "The Resource 'Microsoft.Storage/storageAccounts/custodianaccount47182745' under resource group 'custodian-test-deployment-units' was not found."
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182745?api-version=2019-04-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 404,
-                    "message": "Not Found"
-                },
-                "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "x-ms-failure-cause": [
-                        "gateway"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 19:30:54 GMT"
-                    ],
-                    "content-length": [
-                        "193"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "error": {
-                            "code": "ResourceNotFound",
-                            "message": "The Resource 'Microsoft.Storage/storageAccounts/custodianaccount47182745' under resource group 'custodian-test-deployment-units' was not found."
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units?api-version=2018-05-01",
                 "body": null,
                 "headers": {}
@@ -92,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 19:30:53 GMT"
-                    ],
                     "content-length": [
                         "216"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 10 May 2019 18:56:42 GMT"
                     ]
                 },
                 "body": {
@@ -120,7 +42,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182745?api-version=2019-04-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182745?api-version=2018-07-01",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -131,22 +53,22 @@
                 },
                 "headers": {
                     "location": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/53538058-2f49-44da-86fa-4e65f2927a0c?monitor=true&api-version=2019-04-01"
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Storage/locations/westus2/asyncoperations/e5084127-a4dc-4888-a74a-4cac8799b281?monitor=true&api-version=2018-07-01"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "1199"
                     ],
+                    "content-length": [
+                        "0"
+                    ],
                     "content-type": [
                         "text/plain; charset=utf-8"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:30:54 GMT"
-                    ],
-                    "content-length": [
-                        "0"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                        "Fri, 10 May 2019 18:56:42 GMT"
                     ]
                 },
                 "body": {
@@ -157,75 +79,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/53538058-2f49-44da-86fa-4e65f2927a0c?monitor=true&api-version=2019-04-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 202,
-                    "message": "Accepted"
-                },
-                "headers": {
-                    "location": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/53538058-2f49-44da-86fa-4e65f2927a0c?monitor=true&api-version=2019-04-01"
-                    ],
-                    "content-type": [
-                        "text/plain; charset=utf-8"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 19:31:12 GMT"
-                    ],
-                    "content-length": [
-                        "0"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ]
-                },
-                "body": {
-                    "string": ""
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/53538058-2f49-44da-86fa-4e65f2927a0c?monitor=true&api-version=2019-04-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 202,
-                    "message": "Accepted"
-                },
-                "headers": {
-                    "location": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/53538058-2f49-44da-86fa-4e65f2927a0c?monitor=true&api-version=2019-04-01"
-                    ],
-                    "content-type": [
-                        "text/plain; charset=utf-8"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 19:31:15 GMT"
-                    ],
-                    "content-length": [
-                        "0"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ]
-                },
-                "body": {
-                    "string": ""
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/53538058-2f49-44da-86fa-4e65f2927a0c?monitor=true&api-version=2019-04-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/e5084127-a4dc-4888-a74a-4cac8799b281?monitor=true&api-version=2018-07-01",
                 "body": null,
                 "headers": {}
             },
@@ -235,17 +89,17 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "content-type": [
                         "application/json"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:31:18 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                        "Fri, 10 May 2019 18:57:00 GMT"
                     ],
                     "content-length": [
-                        "1155"
+                        "1127"
                     ]
                 },
                 "body": {
@@ -261,29 +115,28 @@
                         "location": "westus2",
                         "tags": {},
                         "properties": {
-                            "minimumTlsVersion": "TLS1_2",
                             "networkAcls": {
                                 "bypass": "AzureServices",
                                 "virtualNetworkRules": [],
                                 "ipRules": [],
                                 "defaultAction": "Allow"
                             },
-                            "supportsHttpsTrafficOnly": true,
+                            "supportsHttpsTrafficOnly": false,
                             "encryption": {
                                 "services": {
                                     "file": {
                                         "enabled": true,
-                                        "lastEnabledTime": "2019-05-02T19:30:55.0461474Z"
+                                        "lastEnabledTime": "2019-05-10T18:56:43.0646440Z"
                                     },
                                     "blob": {
                                         "enabled": true,
-                                        "lastEnabledTime": "2019-05-02T19:30:55.0461474Z"
+                                        "lastEnabledTime": "2019-05-10T18:56:43.0646440Z"
                                     }
                                 },
                                 "keySource": "Microsoft.Storage"
                             },
                             "provisioningState": "Succeeded",
-                            "creationTime": "2019-05-02T19:30:54.9680179Z",
+                            "creationTime": "2019-05-10T18:56:42.9853206Z",
                             "primaryEndpoints": {
                                 "blob": "https://custodianaccount47182745.blob.core.windows.net/",
                                 "queue": "https://custodianaccount47182745.queue.core.windows.net/",

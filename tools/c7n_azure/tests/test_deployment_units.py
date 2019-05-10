@@ -34,7 +34,12 @@ class DeploymentUnitsTest(BaseTest):
 
     @classmethod
     def setUpClass(cls):
-        cls.session = local_session(Session)
+        try:
+            cls.session = local_session(Session)
+            client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
+            client.resource_groups.create_or_update(cls.rg_name, {'location': 'westus2'})
+        except CloudError:
+            pass
 
     @classmethod
     def tearDownClass(cls):
@@ -45,9 +50,7 @@ class DeploymentUnitsTest(BaseTest):
             pass
 
     def _validate(self, unit, params):
-        temp = unit.get(params)
-        self.assertEqual(temp, None)
-        result = unit.provision_if_not_exists(params)
+        result = unit.provision(params)
         self.assertNotEqual(result, None)
         return result
 
@@ -78,7 +81,7 @@ class DeploymentUnitsTest(BaseTest):
         self._validate(unit, params)
 
     def test_app_service_plan_autoscale(self):
-        params = {'name': 'cloud-custodian-test',
+        params = {'name': 'cloud-custodian-test-autoscale',
                   'location': 'westus2',
                   'resource_group_name': self.rg_name,
                   'sku_tier': 'Basic',

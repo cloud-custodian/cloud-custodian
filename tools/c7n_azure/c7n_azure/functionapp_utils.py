@@ -23,6 +23,7 @@ from c7n_azure.constants import \
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from c7n_azure.provisioning.app_service_plan import AppServicePlanUnit
 from c7n_azure.provisioning.function_app import FunctionAppDeploymentUnit
+from c7n_azure.provisioning.resource_group import ResourceGroupUnit
 from c7n_azure.provisioning.storage_account import StorageAccountUnit
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
@@ -83,6 +84,11 @@ class FunctionAppUtilities(object):
             parameters.service_plan['sku_tier'] = app_service_plan.sku.tier
 
             return function_app
+
+        # provision app service plan resource group
+        rg_unit = ResourceGroupUnit()
+        rg_unit.provision_if_not_exists({'name': parameters.service_plan['resource_group_name'],
+                                         'location': parameters.service_plan['location']})
 
         # provision app service plan
         sp_unit = AppServicePlanUnit()
