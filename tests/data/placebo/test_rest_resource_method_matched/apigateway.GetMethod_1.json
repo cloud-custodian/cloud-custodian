@@ -2,21 +2,21 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "ef4bd162-703d-11e9-be65-1bdbaaecb7a1",
+            "RequestId": "587481a2-72b8-11e9-b058-613cf4d2d114",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Mon, 06 May 2019 20:31:32 GMT",
+                "date": "Fri, 10 May 2019 00:12:49 GMT",
                 "content-type": "application/json",
-                "content-length": "490",
+                "content-length": "489",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "ef4bd162-703d-11e9-be65-1bdbaaecb7a1",
-                "x-amz-apigw-id": "ZRzxpKLbIAMEbgQ="
+                "x-amzn-requestid": "587481a2-72b8-11e9-b058-613cf4d2d114",
+                "x-amz-apigw-id": "ZcNAPJByIAMEbnA="
             },
             "RetryAttempts": 0
         },
         "httpMethod": "GET",
         "authorizationType": "AWS_IAM",
-        "apiKeyRequired": false,
+        "apiKeyRequired": true,
         "methodResponses": {
             "200": {
                 "statusCode": "200",
@@ -32,7 +32,7 @@
             "connectionType": "INTERNET",
             "passthroughBehavior": "WHEN_NO_MATCH",
             "timeoutInMillis": 29000,
-            "cacheNamespace": "urrp8u1wd4",
+            "cacheNamespace": "7xp5ydgql7",
             "cacheKeyParameters": [],
             "integrationResponses": {
                 "200": {

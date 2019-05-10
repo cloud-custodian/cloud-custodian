@@ -2,15 +2,15 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "ef7ccc48-703d-11e9-a436-5144c0edc13e",
+            "RequestId": "5884ae01-72b8-11e9-be65-1bdbaaecb7a1",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Mon, 06 May 2019 20:31:32 GMT",
+                "date": "Fri, 10 May 2019 00:12:49 GMT",
                 "content-type": "application/json",
-                "content-length": "490",
+                "content-length": "486",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "ef7ccc48-703d-11e9-a436-5144c0edc13e",
-                "x-amz-apigw-id": "ZRzxsJDyIAMEd9Q="
+                "x-amzn-requestid": "5884ae01-72b8-11e9-be65-1bdbaaecb7a1",
+                "x-amz-apigw-id": "ZcNAQLv5oAMEbgQ="
             },
             "RetryAttempts": 0
         },
@@ -32,7 +32,7 @@
             "connectionType": "INTERNET",
             "passthroughBehavior": "WHEN_NO_MATCH",
             "timeoutInMillis": 29000,
-            "cacheNamespace": "urrp8u1wd4",
+            "cacheNamespace": "punxre",
             "cacheKeyParameters": [],
             "integrationResponses": {
                 "200": {

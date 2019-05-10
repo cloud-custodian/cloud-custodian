@@ -318,7 +318,12 @@ class TestRestResource(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources[0].get("c7n:matched-resource-methods")), 2)
+        self.assertEqual(len(resources), 2)
+        for r in resources:
+            if r['restApiId'] == "dj7uijzv27":
+                self.assertEqual(len(r.get("c7n:matched-resource-methods")), 2)
+            if r['restApiId'] == "7keylcvgkk":
+                self.assertEqual(len(r.get("c7n:matched-resource-methods")), 1)
 
         p = self.load_policy(
             {
@@ -340,7 +345,12 @@ class TestRestResource(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources[0].get("c7n:matched-resource-methods")), 3)
+        self.assertEqual(len(resources), 2)
+        for r in resources:
+            if r['restApiId'] == "dj7uijzv27":
+                self.assertEqual(len(r.get("c7n:matched-resource-methods")), 4)
+            if r['restApiId'] == "7keylcvgkk":
+                self.assertEqual(len(r.get("c7n:matched-resource-methods")), 3)
 
 
 class TestRestStage(BaseTest):

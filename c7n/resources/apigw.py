@@ -564,17 +564,10 @@ class FilterRestMethod(ValueFilter):
 
         with self.executor_factory(max_workers=2) as w:
             tasks = []
-            if self.data.get('matched', False):
-                resources = [r for r in resources if r.get('c7n:matched-resource-methods')]
             for r in resources:
-                if self.data.get('matched', False):
-                    for ms in r.get('c7n:matched-resource-methods'):
-                        r_method_set = [ms.get('httpMethod') for ms in
-                            r.get('c7n:matched-resource-methods')]
-                else:
-                    r_method_set = method_set
-                    if method_set == 'all':
-                        r_method_set = r.get('resourceMethods', {}).keys()
+                r_method_set = method_set
+                if method_set == 'all':
+                    r_method_set = r.get('resourceMethods', {}).keys()
                 for m in r_method_set:
                     tasks.append((r, m))
             for task_set in utils.chunks(tasks, 20):
@@ -590,13 +583,20 @@ class FilterRestMethod(ValueFilter):
                          for r, mt in task_set])
                     continue
                 for m in f.result():
-                    if self.match(m):
+                    if not self.data.get('matched', False):
+                        if self.match(m):
+                            results.add(m['resourceId'])
+                            resource_map[m['resourceId']].setdefault(
+                                ANNOTATION_KEY_MATCHED_METHODS, []).append(m)
+                    if self.data.get('matched', False) and self.match(m):
                         results.add(m['resourceId'])
-                        resource_map[m['resourceId']].setdefault(
-                            ANNOTATION_KEY_MATCHED_METHODS, []).append(m)
+                        continue
                     if self.data.get('matched', False) and not self.match(m):
-                        resource_map[m['resourceId']].setdefault(
-                            ANNOTATION_KEY_MATCHED_METHODS, []).remove(m)
+                        try:
+                            resource_map[m['resourceId']].get('c7n:matched-resource-methods').remove(m)
+                        except ValueError:
+                            continue
+
         return [resource_map[rid] for rid in results]
 
     def process_task_set(self, client, task_set):
