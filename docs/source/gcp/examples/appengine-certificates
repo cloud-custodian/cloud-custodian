@@ -2,6 +2,8 @@ Check if an SSL Certificate is About to Expire
 ===============================
 Custodian can check and notify if an SSL certificate is about to expire. Note that the ``notify`` action requires the Pub/Sub topic to be configured.
 
+In the example below, the policy is set to filter certificates which expire in 60 days or less.
+
 .. code-block:: yaml
 
     policies:
@@ -12,8 +14,9 @@ Custodian can check and notify if an SSL certificate is about to expire. Note th
           filters:
           - type: value
             key: expireTime
-            op: regex
-            value: 2019-01-31(.)*
+            op: less-than
+            value_type: expiration
+            value: 60
           actions:
            - type: notify
              to:
