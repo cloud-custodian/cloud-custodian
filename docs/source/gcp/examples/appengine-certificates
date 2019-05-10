@@ -1,0 +1,24 @@
+Check if an SSL Certificate is About to Expire
+===============================
+Custodian can check and notify if an SSL certificate is about to expire. Note that the ``notify`` action requires the Pub/Sub topic to be configured.
+
+.. code-block:: yaml
+
+    policies:
+        - name: appengine-certificate-age
+          description: |
+            Check existing certificate
+          resource: gcp.app-engine-certificate
+          filters:
+          - type: value
+            key: expireTime
+            op: regex
+            value: 2019-01-31(.)*
+          actions:
+           - type: notify
+             to:
+               - email@address
+             format: txt
+             transport:
+               type: pubsub
+               topic: projects/my-gcp-project/topics/my-topic            
