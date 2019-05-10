@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test?api-version=2018-02-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test?api-version=2018-02-01",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -14,31 +14,31 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                        "1198"
                     ],
                     "content-type": [
                         "application/json"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "date": [
-                        "Fri, 10 May 2019 18:56:41 GMT"
+                        "Fri, 10 May 2019 19:31:27 GMT"
                     ],
                     "content-length": [
-                        "1355"
+                        "1375"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test",
                         "name": "cloud-custodian-test",
                         "type": "Microsoft.Web/serverfarms",
                         "kind": "linux",
                         "location": "West US 2",
                         "properties": {
-                            "serverFarmId": 781,
+                            "serverFarmId": 8379,
                             "name": "cloud-custodian-test",
                             "workerSize": "Default",
                             "workerSizeId": 0,
@@ -48,8 +48,8 @@
                             "currentWorkerSizeId": 0,
                             "currentNumberOfWorkers": 1,
                             "status": "Ready",
-                            "webSpace": "custodian-test-deployment-units-WestUS2webspace",
-                            "subscription": "aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                            "webSpace": "cloud-custodian-test-deployment-units-WestUS2webspace",
+                            "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
                             "adminSiteName": null,
                             "hostingEnvironment": null,
                             "hostingEnvironmentProfile": null,
@@ -68,11 +68,11 @@
                             "freeOfferExpirationTime": null,
                             "tags": null,
                             "kind": "linux",
-                            "resourceGroup": "custodian-test-deployment-units",
+                            "resourceGroup": "cloud-custodian-test-deployment-units",
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "mdmId": "waws-prod-mwh-029_781",
+                            "mdmId": "waws-prod-mwh-007_8379",
                             "targetWorkerCount": 0,
                             "targetWorkerSizeId": 0,
                             "provisioningState": "Succeeded",

@@ -30,14 +30,15 @@ from c7n.utils import local_session
 @requires_arm_polling
 class DeploymentUnitsTest(BaseTest):
 
-    rg_name = 'custodian-test-deployment-units'
+    rg_name = 'cloud-custodian-test-deployment-units'
+    rg_location = 'westus'
 
     @classmethod
     def setUpClass(cls):
         try:
             cls.session = local_session(Session)
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
-            client.resource_groups.create_or_update(cls.rg_name, {'location': 'westus2'})
+            client.resource_groups.create_or_update(cls.rg_name, {'location': cls.rg_location})
         except CloudError:
             pass
 
@@ -56,7 +57,7 @@ class DeploymentUnitsTest(BaseTest):
 
     def test_app_insights(self):
         params = {'name': 'cloud-custodian-test',
-                  'location': 'westus2',
+                  'location': self.rg_location,
                   'resource_group_name': self.rg_name}
         unit = AppInsightsUnit()
 
@@ -64,7 +65,7 @@ class DeploymentUnitsTest(BaseTest):
 
     def test_storage_account(self):
         params = {'name': 'custodianaccount47182745',
-                  'location': 'westus2',
+                  'location': self.rg_location,
                   'resource_group_name': self.rg_name}
         unit = StorageAccountUnit()
 
@@ -72,7 +73,7 @@ class DeploymentUnitsTest(BaseTest):
 
     def test_service_plan(self):
         params = {'name': 'cloud-custodian-test',
-                  'location': 'westus2',
+                  'location': self.rg_location,
                   'resource_group_name': self.rg_name,
                   'sku_tier': 'Basic',
                   'sku_name': 'B1'}
@@ -82,7 +83,7 @@ class DeploymentUnitsTest(BaseTest):
 
     def test_app_service_plan_autoscale(self):
         params = {'name': 'cloud-custodian-test-autoscale',
-                  'location': 'westus2',
+                  'location': self.rg_location,
                   'resource_group_name': self.rg_name,
                   'sku_tier': 'Basic',
                   'sku_name': 'B1',
@@ -105,16 +106,16 @@ class DeploymentUnitsTest(BaseTest):
         # provision storage account
         sa_params = {
             'name': 'custodianaccount47182748',
-            'location': 'westus2',
+            'location': self.rg_location,
             'resource_group_name': self.rg_name}
         storage_unit = StorageAccountUnit()
-        storage_account_id = storage_unit.provision_if_not_exists(sa_params).id
+        storage_account_id = storage_unit.provision(sa_params).id
         conn_string = FunctionAppUtilities.get_storage_account_connection_string(storage_account_id)
 
         # provision function app
         func_params = {
             'name': 'cc-consumption-47182748',
-            'location': 'westus',
+            'location': self.rg_location,
             'resource_group_name': self.rg_name,
             'app_service_plan_id': None,  # auto-provision a dynamic app plan
             'app_insights_key': None,
@@ -132,27 +133,27 @@ class DeploymentUnitsTest(BaseTest):
         # provision storage account
         sa_params = {
             'name': 'custodianaccount47182741',
-            'location': 'westus2',
+            'location': self.rg_location,
             'resource_group_name': self.rg_name}
         storage_unit = StorageAccountUnit()
-        storage_account_id = storage_unit.provision_if_not_exists(sa_params).id
+        storage_account_id = storage_unit.provision(sa_params).id
         conn_string = FunctionAppUtilities.get_storage_account_connection_string(storage_account_id)
 
         # provision app plan
         app_plan_params = {
             'name': 'cloud-custodian-test2',
-            'location': 'westus2',
+            'location': self.rg_location,
             'resource_group_name': self.rg_name,
             'sku_tier': 'Basic',
             'sku_name': 'B1'}
         app_plan_unit = AppServicePlanUnit()
-        app_plan = app_plan_unit.provision_if_not_exists(app_plan_params)
+        app_plan = app_plan_unit.provision(app_plan_params)
 
         # provision function app
         func_app_name = 'cc-dedicated-47182748'
         func_params = {
             'name': func_app_name,
-            'location': 'westus',
+            'location': self.rg_location,
             'resource_group_name': self.rg_name,
             'app_service_plan_id': app_plan.id,
             'app_insights_key': None,

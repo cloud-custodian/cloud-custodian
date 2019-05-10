@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale?api-version=2018-02-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale?api-version=2018-02-01",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -14,31 +14,31 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1198"
+                        "1199"
                     ],
                     "content-type": [
                         "application/json"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "date": [
-                        "Fri, 10 May 2019 18:54:57 GMT"
+                        "Fri, 10 May 2019 19:29:57 GMT"
                     ],
                     "content-length": [
-                        "1410"
+                        "1424"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
                         "name": "cloud-custodian-test-autoscale",
                         "type": "Microsoft.Web/serverfarms",
                         "kind": "linux",
                         "location": "West US 2",
                         "properties": {
-                            "serverFarmId": 779,
+                            "serverFarmId": 8377,
                             "name": "cloud-custodian-test-autoscale",
                             "workerSize": "Default",
                             "workerSizeId": 0,
@@ -48,8 +48,8 @@
                             "currentWorkerSizeId": 0,
                             "currentNumberOfWorkers": 1,
                             "status": "Ready",
-                            "webSpace": "custodian-test-deployment-units-WestUS2webspace",
-                            "subscription": "aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                            "webSpace": "cloud-custodian-test-deployment-units-WestUS2webspace",
+                            "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
                             "adminSiteName": null,
                             "hostingEnvironment": null,
                             "hostingEnvironmentProfile": null,
@@ -65,14 +65,14 @@
                             "hostingEnvironmentId": null,
                             "isSpot": false,
                             "spotExpirationTime": null,
-                            "freeOfferExpirationTime": "2019-06-09T18:54:52.1133333",
+                            "freeOfferExpirationTime": "2019-06-09T19:29:51.7",
                             "tags": null,
                             "kind": "linux",
-                            "resourceGroup": "custodian-test-deployment-units",
+                            "resourceGroup": "cloud-custodian-test-deployment-units",
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "mdmId": "waws-prod-mwh-029_779",
+                            "mdmId": "waws-prod-mwh-007_8377",
                             "targetWorkerCount": 0,
                             "targetWorkerSizeId": 0,
                             "provisioningState": "Succeeded",
@@ -92,7 +92,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default?api-version=2015-04-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default?api-version=2015-04-01",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -102,25 +102,25 @@
                     "message": "Created"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "1199"
                     ],
                     "content-length": [
-                        "1330"
+                        "1348"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "date": [
-                        "Fri, 10 May 2019 18:55:04 GMT"
+                        "Fri, 10 May 2019 19:30:01 GMT"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default",
                         "name": "cloud_custodian_default",
                         "type": "Microsoft.Insights/autoscaleSettings",
                         "location": "West US 2",
@@ -141,7 +141,7 @@
                                             "metricTrigger": {
                                                 "metricName": "MemoryPercentage",
                                                 "metricNamespace": "",
-                                                "metricResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                                                "metricResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
                                                 "timeGrain": "PT1M",
                                                 "statistic": "Average",
                                                 "timeWindow": "PT10M",
@@ -162,7 +162,7 @@
                             ],
                             "enabled": false,
                             "name": "cloud_custodian_default",
-                            "targetResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                            "targetResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
                             "notifications": null
                         }
                     }
@@ -172,7 +172,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default?api-version=2015-04-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default?api-version=2015-04-01",
                 "body": null,
                 "headers": {}
             },
@@ -182,22 +182,22 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "date": [
-                        "Fri, 10 May 2019 18:55:04 GMT"
+                        "Fri, 10 May 2019 19:30:01 GMT"
                     ],
                     "content-length": [
-                        "1330"
+                        "1348"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default",
                         "name": "cloud_custodian_default",
                         "type": "Microsoft.Insights/autoscaleSettings",
                         "location": "West US 2",
@@ -218,7 +218,7 @@
                                             "metricTrigger": {
                                                 "metricName": "MemoryPercentage",
                                                 "metricNamespace": "",
-                                                "metricResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                                                "metricResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
                                                 "timeGrain": "PT1M",
                                                 "statistic": "Average",
                                                 "timeWindow": "PT10M",
@@ -239,7 +239,7 @@
                             ],
                             "enabled": false,
                             "name": "cloud_custodian_default",
-                            "targetResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                            "targetResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
                             "notifications": null
                         }
                     }

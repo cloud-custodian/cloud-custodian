@@ -235,17 +235,18 @@ class AzureVCRBaseTest(VCRTestCase):
 
     @staticmethod
     def _replace_subscription_id(s):
-        if "subscriptions" in s:
-            return re.sub(
-                r"(?P<prefix>(/|%2F)subscriptions(/|%2F))"
-                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
-                r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
-        return s
+        prefixes = ['(/|%2F)subscriptions(/|%2F)',
+                    '"subscription":\\s*"']
+        regex = r"(?P<prefix>(%s))" \
+                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
+                % '|'.join(['(%s)' % p for p in prefixes])
+
+        return re.sub(regex, r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
 
     @staticmethod
     def _replace_tenant_id(s):
         prefixes = ['(/|%2F)graph.windows.net(/|%2F)',
-                    '"tenantId":\\s*"']
+                    '"(t|T)enantId":\\s*"']
         regex = r"(?P<prefix>(%s))" \
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
                 % '|'.join(['(%s)' % p for p in prefixes])
