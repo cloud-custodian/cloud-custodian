@@ -1,0 +1,60 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.91",
+      "requestAttributes": {
+        "time": "2019-05-10T11:56:21.407Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "cloudsql.googleapis.com",
+    "methodName": "cloudsql.backupRuns.create",
+    "authorizationInfo": [
+      {
+        "resource": "backupRuns/",
+        "permission": "cloudsql.backupRuns.create",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "resourceName": "backupRuns/",
+    "request": {
+      "@type": "type.googleapis.com/google.cloud.sql.v1beta4.SqlBackupRunsInsertRequest",
+      "instance": "custodian-postgres",
+      "project": "cloud-custodian"
+    },
+    "response": {
+      "user": "alex.karpitski@gmail.com",
+      "targetProject": "cloud-custodian",
+      "selfLink": "https://content.googleapis.com/sql/v1beta4/projects/cloud-custodian/operations/d875b177-6d15-4244-9d4c-dd158fafa347",
+      "targetLink": "https://content.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres",
+      "operationType": "BACKUP_VOLUME",
+      "kind": "sql#operation",
+      "status": "PENDING",
+      "name": "d875b177-6d15-4244-9d4c-dd158fafa347",
+      "targetId": "custodian-postgres",
+      "@type": "type.googleapis.com/google.cloud.sql.v1beta4.SqlOperation",
+      "instanceUid": "1-057e25ab-7a5e-4520-847b-8661d2da9fda",
+      "insertTime": "2019-05-10T11:56:21.417Z"
+    }
+  },
+  "insertId": "4zt58aegxfxn",
+  "resource": {
+    "type": "cloudsql_database",
+    "labels": {
+      "database_id": "cloud-custodian:custodian-postgres",
+      "region": "us-central",
+      "project_id": "cloud-custodian"
+    }
+  },
+  "timestamp": "2019-05-10T11:56:21.393Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-05-10T11:56:22.123402111Z"
+}

@@ -14,7 +14,7 @@
 
 import time
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
 
 
@@ -178,25 +178,41 @@ class SqlBackupRunTest(BaseTest):
         self.assertEqual(backup_run[parent_annotation_key]['name'], instance_name)
 
     def test_sqlbackuprun_get(self):
-        backup_run_id = '1555592400197'
+        backup_run_id = '1557489381417'
         instance_name = 'custodian-postgres'
         project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('sqlbackuprun-get', project_id=project_id)
 
         policy = self.load_policy(
+            {'name': 'gcp-sql-backup-run-audit',
+             'resource': 'gcp.sql-backup-run',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['cloudsql.backupRuns.create']
+             }},
+            session_factory=session_factory)
+
+        exec_mode = policy.get_execution_mode()
+        event = event_data('sql-backup-create.json')
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+        resources = exec_mode.run(event, None)
+
+        self.assertEqual(resources[0]['id'], backup_run_id)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], instance_name)
+
+    def test_from_insert_time_to_id(self):
+        insert_time = '2019-05-10T11:56:21.417Z'
+        expected_id = 1557489381417
+
+        session_factory = self.replay_flight_data('sqlbackuprun-get')
+        policy = self.load_policy(
             {'name': 'gcp-sql-backup-run-dryrun',
              'resource': 'gcp.sql-backup-run'},
             session_factory=session_factory)
-
         resource_manager = policy.resource_manager
-        backup_run = resource_manager.get_resource(
-            {'project_id': project_id,
-             'backup_run_id': backup_run_id,
-             'database_id': project_id + ':' + instance_name})
-        parent_annotation_key = resource_manager.resource_type.get_parent_annotation_key()
+        actual_id = resource_manager.resource_type._from_insert_time_to_id(insert_time)
 
-        self.assertEqual(backup_run['id'], backup_run_id)
-        self.assertEqual(backup_run[parent_annotation_key]['name'], instance_name)
+        self.assertEqual(actual_id, expected_id)
 
 
 class SqlSslCertTest(BaseTest):
