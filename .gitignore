@@ -35,6 +35,7 @@ results.xml
 pyvenv.cfg
 junit
 /.vs
+build/
 docs/source/overview\.rst
 docs/source/tools/c7n-mailer\.md
 docs/source/tools/c7n-org\.md
