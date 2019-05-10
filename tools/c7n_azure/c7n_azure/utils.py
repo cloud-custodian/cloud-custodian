@@ -446,6 +446,10 @@ class ManagedGroupHelper(object):
         return [e.name for e in entities if e.type == '/subscriptions']
 
 
+def generate_key_vault_url(name):
+    return constants.TEMPLATE_KEYVAULT_URL.format(name)
+
+
 class RetentionPeriod(object):
 
     PATTERN = re.compile("^P([1-9][0-9]*)([DWMY])$")

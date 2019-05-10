@@ -59,12 +59,32 @@ clean:
 	rm -rf $(SRCDIR)/generated
 
 html:
-	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
-	$(SPHINXBINS)/sphinx-apidoc -H "Azure" -o $(SRCDIR)/generated/azure $(SRCDIR)/../../tools/c7n_azure/c7n_azure
-	$(SPHINXBINS)/sphinx-apidoc -H "GCP" -o $(SRCDIR)/generated/gcp $(SRCDIR)/../../tools/c7n_gcp/c7n_gcp
+#	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
+#	$(SPHINXBINS)/sphinx-apidoc -H "Azure" -o $(SRCDIR)/generated/azure $(SRCDIR)/../../tools/c7n_azure/c7n_azure
+#	$(SPHINXBINS)/sphinx-apidoc -H "GCP" -o $(SRCDIR)/generated/gcp $(SRCDIR)/../../tools/c7n_gcp/c7n_gcp
+
+#
+# Copy readme files that are in the tree to avoid duplicating
+	cp README.md $(SRCDIR)/overview.md
+	cp tools/c7n_org/README.md $(SRCDIR)/tools/c7n-org.md
+	cp tools/c7n_policystream/README.md $(SRCDIR)/tools/c7n-policystream.md
+	cp tools/c7n_mailer/README.md $(SRCDIR)/tools/c7n-mailer.md
+	cp tools/c7n_trailcreator/readme.md $(SRCDIR)/tools/c7n-trailcreator.md
+#	cp tools/c7n_guardian/readme.md $(SRCDIR)/tools/c7n-guardian.md
+
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+
+#
+# Remove the copies so folks dont accidentally edit the copy
+	rm $(SRCDIR)/overview.md
+	rm $(SRCDIR)/tools/c7n-org.md
+	rm $(SRCDIR)/tools/c7n-policystream.md
+	rm $(SRCDIR)/tools/c7n-mailer.md
+	rm $(SRCDIR)/tools/c7n-trailcreator.md
+
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml

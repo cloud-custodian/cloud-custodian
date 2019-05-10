@@ -12,18 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import operator
+from abc import ABCMeta, abstractmethod
 from concurrent.futures import as_completed
 from datetime import timedelta
 
+import six
 from azure.mgmt.policyinsights import PolicyInsightsClient
+from c7n_azure.tags import TagHelper
+from c7n_azure.utils import IpRangeHelper
+from c7n_azure.utils import Math
+from c7n_azure.utils import ThreadHelper
+from c7n_azure.utils import now
 from dateutil import tz as tzutils
 from dateutil.parser import parse
 
-from c7n_azure.utils import Math
-from c7n_azure.utils import now
-from c7n_azure.tags import TagHelper
-
-from c7n.filters import Filter, ValueFilter
+from c7n.filters import Filter, ValueFilter, FilterValidationError
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time, OffHour, OnHour
 from c7n.utils import chunks
@@ -382,3 +385,90 @@ class AzureOnHour(OnHour):
         if tag_value is not False:
             tag_value = tag_value.lower().strip("'\"")
         return tag_value
+
+
+@six.add_metaclass(ABCMeta)
+class FirewallRulesFilter(Filter):
+    """Filters resources by the firewall rules
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: servers-with-firewall
+                  resource: azure.sqlserver
+                  filters:
+                      - type: firewall-rules
+                        include:
+                            - '131.107.160.2-131.107.160.3'
+                            - 10.20.20.0/24
+    """
+
+    schema = type_schema(
+        'firewall-rules',
+        **{
+            'include': {'type': 'array', 'items': {'type': 'string'}},
+            'equal': {'type': 'array', 'items': {'type': 'string'}}
+        })
+
+    def __init__(self, data, manager=None):
+        super(FirewallRulesFilter, self).__init__(data, manager)
+        self.policy_include = None
+        self.policy_equal = None
+
+    @property
+    @abstractmethod
+    def log(self):
+        raise NotImplementedError()
+
+    def validate(self):
+        self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
+        self.policy_equal = IpRangeHelper.parse_ip_ranges(self.data, 'equal')
+
+        has_include = self.policy_include is not None
+        has_equal = self.policy_equal is not None
+
+        if has_include and has_equal:
+            raise FilterValidationError('Cannot have both include and equal.')
+
+        if not has_include and not has_equal:
+            raise FilterValidationError('Must have either include or equal.')
+
+        return True
+
+    def process(self, resources, event=None):
+        result, _ = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._check_resources,
+            executor_factory=self.executor_factory,
+            log=self.log
+        )
+
+        return result
+
+    def _check_resources(self, resources, event):
+        return [r for r in resources if self._check_resource(r)]
+
+    @abstractmethod
+    def _query_rules(self, resource):
+        """
+        Queries firewall rules for a resource. Override in concrete classes.
+        :param resource:
+        :return: A set of netaddr.IPRange or netaddr.IPSet with rules defined for the resource.
+        """
+        raise NotImplementedError()
+
+    def _check_resource(self, resource):
+        resource_rules = self._query_rules(resource)
+        ok = self._check_rules(resource_rules)
+        return ok
+
+    def _check_rules(self, resource_rules):
+        if self.policy_equal is not None:
+            return self.policy_equal == resource_rules
+        elif self.policy_include is not None:
+            return self.policy_include.issubset(resource_rules)
+        else:  # validated earlier, can never happen
+            raise FilterValidationError("Internal error.")

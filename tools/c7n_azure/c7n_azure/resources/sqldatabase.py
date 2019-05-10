@@ -13,17 +13,18 @@
 # limitations under the License.from c7n_azure.provider import resources
 
 import abc
-import six
-import logging
 import enum
-from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ArmResourceManager, ChildArmResourceManager
-from c7n_azure.query import ChildResourceQuery
+import logging
+
+import six
 from c7n_azure.filters import scalar_ops
-from c7n.filters import Filter
+from c7n_azure.provider import resources
+from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n_azure.utils import RetentionPeriod, ResourceIdParser, ThreadHelper
-from c7n.utils import type_schema
 from msrestazure.azure_exceptions import CloudError
+
+from c7n.filters import Filter
+from c7n.utils import type_schema
 
 log = logging.getLogger('custodian.azure.sqldatabase')
 
@@ -31,17 +32,16 @@ log = logging.getLogger('custodian.azure.sqldatabase')
 @resources.register('sqldatabase')
 class SqlDatabase(ChildArmResourceManager):
 
-    class resource_type(ArmResourceManager.resource_type):
+    class resource_type(ChildArmResourceManager.resource_type):
         service = 'azure.mgmt.sql'
         client = 'SqlManagementClient'
-        enum_spec = ('databases', 'list_by_server', {
-            'resource_group_name': 'resourceGroup',
-            'server_name': 'name'
-        })
-        parent_spec = ChildArmResourceManager.ParentSpec(
-            manager_name='sqlserver',
-            annotate_parent=True
-        )
+        enum_spec = ('databases', 'list_by_server', None)
+        parent_manager_name = 'sqlserver'
+
+        @classmethod
+        def extra_args(cls, parent_resource):
+            return {'resource_group_name': parent_resource['resourceGroup'],
+                    'server_name': parent_resource['name']}
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -95,7 +95,7 @@ class BackupRetentionPolicyFilter(Filter):
         return retention is not None and self._perform_op(retention, self.retention_limit)
 
     def _get_backup_retention_policy(self, resource, get_operation):
-        server_id = resource[ChildResourceQuery.parent_key]
+        server_id = resource[self.manager.resource_type.parent_key]
         resource_group_name = resource.get('resourceGroup')
         if resource_group_name is None:
             resource_group_name = ResourceIdParser.get_resource_group(server_id)

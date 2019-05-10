@@ -13,20 +13,21 @@
 # limitations under the License.
 
 import importlib
+import inspect
 import json
 import logging
 import os
+import sys
 import types
 
 import jwt
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
-
-from msrestazure.azure_active_directory import MSIAuthentication
-
 from c7n_azure import constants
 from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
                              ManagedGroupHelper)
+from msrestazure.azure_active_directory import MSIAuthentication
+from azure.keyvault import KeyVaultAuthentication, AccessToken
 
 try:
     from azure.cli.core._profile import Profile
@@ -127,7 +128,14 @@ class Session(object):
              self.subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
                 resource=self.resource_namespace)
+
             self.log.info("Creating session with Azure CLI Authentication")
+
+        # TODO: cleanup this workaround when issue resolved.
+        # https://github.com/Azure/azure-sdk-for-python/issues/5096
+        if self.resource_namespace == constants.RESOURCE_VAULT:
+            access_token = AccessToken(token=self.get_bearer_token())
+            self.credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
 
         # Let provided id parameter override everything else
         if self.subscription_id_override is not None:
@@ -149,7 +157,19 @@ class Session(object):
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
-        client = klass(self.credentials, self.subscription_id)
+
+        klass_parameters = None
+        if sys.version_info[0] < 3:
+            import funcsigs
+            klass_parameters = funcsigs.signature(klass).parameters
+        else:
+            klass_parameters = inspect.signature(klass).parameters
+
+        client = None
+        if 'subscription_id' in klass_parameters:
+            client = klass(credentials=self.credentials, subscription_id=self.subscription_id)
+        else:
+            client = klass(credentials=self.credentials)
 
         # Override send() method to log request limits & custom retries
         service_client = client._client

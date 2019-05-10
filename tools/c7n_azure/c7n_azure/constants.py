@@ -48,6 +48,7 @@ Authentication Resource
 """
 RESOURCE_ACTIVE_DIRECTORY = 'https://management.core.windows.net/'
 RESOURCE_STORAGE = 'https://storage.azure.com/'
+RESOURCE_VAULT = 'https://vault.azure.net'
 
 """
 Threading Variable
@@ -60,6 +61,10 @@ Custom Retry Code Variables
 """
 DEFAULT_MAX_RETRY_AFTER = 30
 
+"""
+KeyVault url templates
+"""
+TEMPLATE_KEYVAULT_URL = 'https://{0}.vault.azure.net'
 
 """
 Azure Functions Host Configuration

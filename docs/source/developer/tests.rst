@@ -41,6 +41,12 @@ Decorating tests
 The ``functional`` decorator marks tests that don't require any pre-existing
 AWS context, and can therefore be run cleanly against live AWS.
 
+To run only the tests decorated by ``functional``:
+
+.. code-block::
+
+    (py37)$ pytest tests/test_vpc.py -x -m functional
+
 Writing Placebo Tests for AWS Resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

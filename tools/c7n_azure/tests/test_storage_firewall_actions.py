@@ -15,17 +15,18 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import re
 
+from azure.mgmt.storage.models import StorageAccountUpdateParameters, Action, DefaultAction
 from azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
+
 from c7n.utils import local_session
-from azure.mgmt.storage.models import StorageAccountUpdateParameters, Action, DefaultAction
 
 rg_name = 'test_storage'
 
 
-class StorageTestFirewall(BaseTest):
+class StorageTestFirewallActions(BaseTest):
     def setUp(self):
-        super(StorageTestFirewall, self).setUp()
+        super(StorageTestFirewallActions, self).setUp()
         self.client = local_session(Session).client('azure.mgmt.storage.StorageManagementClient')
 
     def tearDown(self):
@@ -211,7 +212,9 @@ class StorageTestFirewall(BaseTest):
         self.assertEqual(bypass, 'Metrics')
 
     def _get_resources(self):
-        resources = list(self.client.storage_accounts.list_by_resource_group(rg_name))
+        resources = [
+            r for r in self.client.storage_accounts.list_by_resource_group(rg_name)
+            if r.name.startswith('cctstorage')]
         return resources
 
     def _assert_equal_resource_ids(self, id1, id2):
