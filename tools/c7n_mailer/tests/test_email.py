@@ -105,8 +105,6 @@ class EmailTest(unittest.TestCase):
 
     def test_event_owner_ldap_flow(self):
         targets = ['event-owner']
-        username = self.email_delivery.get_aws_username_from_event(CLOUDTRAIL_EVENT)
-        self.assertEqual(username, 'michael_bolton')
         michael_bolton_email = self.email_delivery.get_event_owner_email(targets, CLOUDTRAIL_EVENT)
         self.assertEqual(michael_bolton_email, ['michael_bolton@initech.com'])
 
