@@ -16,7 +16,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from mock import patch, Mock
 import types
 
-from azure_common import BaseTest
+from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
+from c7n.config import Bag
 from c7n_azure.utils import Math
 from c7n_azure.utils import ResourceIdParser
 from c7n_azure.utils import StringUtils
@@ -24,17 +25,20 @@ from c7n_azure.tags import TagHelper
 from c7n_azure.utils import PortsRangeHelper
 from c7n_azure.utils import AppInsightsHelper
 from c7n_azure.utils import custodian_azure_send_override
-
+from c7n_azure.utils import ManagedGroupHelper
 
 RESOURCE_ID = (
-    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/"
-    "rgtest/providers/Microsoft.Compute/virtualMachines/nametest")
+    "/subscriptions/%s/resourceGroups/"
+    "rgtest/providers/Microsoft.Compute/virtualMachines/nametest" % DEFAULT_SUBSCRIPTION_ID)
 GUID = '00000000-0000-0000-0000-000000000000'
 
 
 class UtilsTest(BaseTest):
     def setUp(self):
         super(UtilsTest, self).setUp()
+
+    def test_get_subscription_id(self):
+        self.assertEqual(ResourceIdParser.get_subscription_id(RESOURCE_ID), DEFAULT_SUBSCRIPTION_ID)
 
     def test_get_namespace(self):
         self.assertEqual(ResourceIdParser.get_namespace(RESOURCE_ID), "Microsoft.Compute")
@@ -227,3 +231,20 @@ class UtilsTest(BaseTest):
 
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
+
+    managed_group_return_value = ([
+        Bag({'name': '/providers/Microsoft.Management/managementGroups/cc-test-1',
+             'type': '/providers/Microsoft.Management/managementGroups'}),
+        Bag({'name': '/providers/Microsoft.Management/managementGroups/cc-test-2',
+             'type': '/providers/Microsoft.Management/managementGroups'}),
+        Bag({'name': DEFAULT_SUBSCRIPTION_ID,
+             'type': '/subscriptions'}),
+        Bag({'name': GUID,
+             'type': '/subscriptions'}),
+    ])
+
+    @patch('azure.mgmt.managementgroups.operations.EntitiesOperations.list',
+           return_value=managed_group_return_value)
+    def test_managed_group_helper(self, _1):
+        sub_ids = ManagedGroupHelper.get_subscriptions_list('test-group', "")
+        self.assertEqual(sub_ids, [DEFAULT_SUBSCRIPTION_ID, GUID])

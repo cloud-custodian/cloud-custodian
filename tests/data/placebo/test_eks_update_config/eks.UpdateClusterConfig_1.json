@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "d8d9da1e-4c93-11e9-b780-851217557d54",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Fri, 22 Mar 2019 11:15:50 GMT",
+                "content-type": "application/json",
+                "content-length": "254",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "d8d9da1e-4c93-11e9-b780-851217557d54",
+                "x-amz-apigw-id": "W8OL1EqgiYcFnvQ=",
+                "x-amzn-trace-id": "Root=1-5c94c3e5-40a49fa43e329e4831df943a;Sampled=1"
+            },
+            "RetryAttempts": 0
+        },
+        "update": {
+            "id": "adebf3ee-dc26-48d2-963c-8b755ad715dc",
+            "status": "InProgress",
+            "type": "EndpointAccessUpdate",
+            "params": [
+                {
+                    "type": "EndpointPublicAccess",
+                    "value": "false"
+                },
+                {
+                    "type": "EndpointPrivateAccess",
+                    "value": "true"
+                }
+            ],
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 3,
+                "day": 22,
+                "hour": 7,
+                "minute": 15,
+                "second": 50,
+                "microsecond": 192000
+            },
+            "errors": []
+        }
+    }
+}

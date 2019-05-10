@@ -188,7 +188,7 @@ when any event is triggered in the subscription. Cloud custodian filters to the 
 ignores all other events.
 
 In order to subscribe on an event you need to provide the resource provider and the action, or provide the string
-of one of the `shortcuts <https://github.com/capitalone/cloud-custodian/blob/master/tools/c7n_azure/c7n_azure/azure_events.py>`_.
+of one of the `shortcuts <https://github.com/cloud-custodian/cloud-custodian/blob/master/tools/c7n_azure/c7n_azure/azure_events.py>`_.
 
 .. code-block:: yaml
 
@@ -228,3 +228,32 @@ used for deployment.
 
 You may provide the service principal but omit the subscription ID if you wish.
 
+Management Groups Support
+#########################
+
+You can deploy Azure Functions targeting all subscriptions that are part of specified Management Group.
+
+The following variable allows you to specify Management Group name:
+
+.. code-block:: bash
+
+    AZURE_FUNCTION_MANAGEMENT_GROUP_NAME
+
+It can be used with Function specific Service Principal credentials described before. Management Group environment variable has the highest priority, so `AZURE_FUNCTION_SUBSCRIPTION_ID` will be ignored.
+
+Timer triggered functions
+=========================
+
+When Management Groups option is used with periodic mode, Cloud Custodian deploys a single Azure Function App with multiple Azure Functions following single subscription per function rule.
+
+Event triggered functions
+=========================
+
+When Management Groups option is used with event mode, Cloud Custodian deploys single Azure Function. It creates Event Grid subscription for each Subscription in Management Group delivering events to a single Azure Storage Queue.
+
+Permissions
+===========
+
+Service Principal used at the Functions runtime required to have appropriate level of permission in each target subscription.
+
+Service Principal used to provision Azure Functions required to have permissions to access Management Groups. If SP doesn't have `MG Reader` permissions in any child subscription these subscriptions won't be a part of Cloud Custodian Azure Function deployment process.

@@ -250,7 +250,7 @@ def setup_parser():
         help=argparse.SUPPRESS,
         default=None, nargs="?", const="default")
 
-    schema_desc = ("Browse the available vocabularies (resources, filters, and "
+    schema_desc = ("Browse the available vocabularies (resources, filters, modes, and "
                    "actions) for policy construction. The selector "
                    "is specified with RESOURCE[.CATEGORY[.ITEM]] "
                    "examples: s3, ebs.actions, or ec2.filters.instance-age")

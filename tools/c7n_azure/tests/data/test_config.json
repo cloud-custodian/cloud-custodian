@@ -1,0 +1,13 @@
+{
+  "policies": [
+    {
+      "name": "cctestpolicy",
+      "resource": "azure.resourcegroup",
+      "mode": {
+        "execution-options": {
+          "test_option": "test_value"
+        }
+      }
+    }
+  ]
+}

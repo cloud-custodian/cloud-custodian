@@ -347,7 +347,7 @@ class EnableS3Logging(BaseAction):
 
             policies:
               - name: elb-test
-                resource: app-elb
+                resource: elb
                 filters:
                   - type: is-not-logging
                 actions:
@@ -397,7 +397,7 @@ class DisableS3Logging(BaseAction):
                   - type: is-logging
                     bucket: prodbucket
                 actions:
-                  - type: disable-elb-logging
+                  - type: disable-s3-logging
     """
     schema = type_schema('disable-s3-logging')
     permissions = ("elasticloadbalancing:ModifyLoadBalancerAttributes",)

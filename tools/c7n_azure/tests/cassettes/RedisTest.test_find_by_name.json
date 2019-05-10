@@ -1,0 +1,70 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cache/Redis?api-version=2018-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:33:11 GMT"
+                    ],
+                    "x-rp-server-mvid": [
+                        "36d7eb14-b41f-413d-b2ac-e880d98dedd5"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "613"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_redis/providers/Microsoft.Cache/Redis/cctestredis",
+                                "location": "Central US",
+                                "name": "cctestredis",
+                                "type": "Microsoft.Cache/Redis",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "redisVersion": "3.2.7",
+                                    "sku": {
+                                        "name": "Basic",
+                                        "family": "C",
+                                        "capacity": 0
+                                    },
+                                    "enableNonSslPort": false,
+                                    "redisConfiguration": {
+                                        "maxclients": "256",
+                                        "maxmemory-reserved": "2",
+                                        "maxfragmentationmemory-reserved": "12",
+                                        "maxmemory-delta": "2"
+                                    },
+                                    "accessKeys": null,
+                                    "hostName": "cctestredis.redis.cache.windows.net",
+                                    "port": 6379,
+                                    "sslPort": 6380,
+                                    "linkedServers": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

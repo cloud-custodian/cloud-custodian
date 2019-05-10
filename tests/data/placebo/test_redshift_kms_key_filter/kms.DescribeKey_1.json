@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "8785aeb9-a616-4e2b-bbd3-df3cde76bcc5",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 1,
+                "day": 30,
+                "hour": 15,
+                "minute": 56,
+                "second": 54,
+                "microsecond": 705000
+            },
+            "Enabled": true,
+            "Description": "Default master key that protects my Redshift data when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS"
+        },
+        "ResponseMetadata": {
+            "RequestId": "d2fa8387-c595-40b7-8d92-a17674c5928a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d2fa8387-c595-40b7-8d92-a17674c5928a",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "408"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

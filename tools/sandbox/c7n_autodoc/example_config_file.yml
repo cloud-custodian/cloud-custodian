@@ -1,0 +1,47 @@
+---
+config: 
+
+  # --------------- 
+  # REQUIRED INPUTS
+  # --------------- 
+  
+  # This is the local directory that will be crawled to find policy files
+  # c7n_policy_directory = './aws/c7n/'
+  c7n_policy_directory: '/path/to/files'
+ 
+  # This regex will be used to identify files in the directory listed above
+  file_regex: re.compile('(custodian.*yml$)')
+ 
+  # This regex will be used with a regex 'search' against the file path
+  # & name to determine category valid categories are: 'Security &
+  # Governance' and 'Cost Controls' if the below regex does not match it
+  # will be category 'Cost Controls' Example:
+  # '/misc_cloud_stuff/c7n/aws/security-governance/policy1.yml' would
+  # match and thus be put in the 'Security & Governance' category.
+  category_regex: re.compile('security-governance')
+ 
+  # --------------- 
+  # OPTIONAL INPUTS
+  # --------------- 
+  
+  # This tool will create a link to each policy.  This URL will be used
+  # as the base.  See regex below.
+  file_url_base: 'https://github.com/your_project_path'
+
+  # This regex will be used in a re.sub to go from local file path to URL
+  file_url_regex: re.compile('.*\/my_dir\/my_dir2')
+
+  # S3: if provided the html, and any supporing files, will be uploaded to S3
+  # The bucket must already exist and be configured correctly, see main documentation
+  s3_bucket_name: 's3-bucket-name'
+  s3_bucket_path: ''
+
+  # Environment tagging - Many users will have a tagging strategy which dictates
+  # what environments a policy is deployed.  Use the following fields to include
+  # environment columns to your autodoc.
+  # Dictionary key is the tag which should exist on the policy and the value is what
+  # you will see in the autodoc
+  environment_tags:
+    'environment:Sandbox': 'Sandbox'
+    'environment:Test': 'Test'
+    'environment:Production': 'Production'

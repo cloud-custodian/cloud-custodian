@@ -1388,40 +1388,24 @@ class SecurityGroupTest(BaseTest):
                 "resource": "security-group",
                 "filters": [{"GroupId": "sg-6c7fa917"}],
             },
-            session_factory=factory,
-        )
+            session_factory=factory)
+
         d_resources = p.run()
         self.assertEqual(len(d_resources), 1)
-
-        p = self.load_policy(
-            {
-                "name": "sg-test",
-                "source": "config",
-                "resource": "security-group",
-                "filters": [{"type": "default-vpc"}, {"GroupId": "sg-6c7fa917"}],
-            },
-            session_factory=factory,
-        )
+        p = self.load_policy({
+            "name": "sg-test",
+            "source": "config",
+            "resource": "security-group",
+            # to match on filter annotation
+            "filters": [{"GroupId": "sg-6c7fa917"}],
+            "query": [{"clause": "resourceId = 'sg-6c7fa917'"}]},
+            session_factory=factory)
         c_resources = p.run()
 
         self.assertEqual(len(c_resources), 1)
         self.assertEqual(c_resources[0]["GroupId"], "sg-6c7fa917")
         self.maxDiff = None
-        self.assertEqual(c_resources, d_resources)
-
-        p = self.load_policy(
-            {
-                "name": "sg-test",
-                "resource": "security-group",
-                "filters": [
-                    {"type": "ingress", "Cidr": {"value": "108.56.181.242/32"}}
-                ],
-            },
-            session_factory=factory,
-        )
-        c_resources = p.run()
-        self.assertEqual(len(c_resources), 1)
-        self.assertEqual(c_resources[0]["GroupId"], "sg-6c7fa917")
+        self.assertEqual(c_resources[0], d_resources[0])
 
     def test_config_rule(self):
         factory = self.replay_flight_data("test_security_group_config_rule")
@@ -2217,6 +2201,98 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Tags"][0]["Value"], "FancyTestVPC")
+
+    def test_vpc_scenario_2(self):
+        factory = self.replay_flight_data("test_vpc_scenario_2")
+        p = self.load_policy(
+            {
+                "name": "vpc-scenario-2",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "value_type": "resource_count",
+                        "value": 2,
+                        "op": "lt"
+                    },
+                    {
+                        "type": "internet-gateway",
+                        "value_type": "resource_count",
+                        "value": 1,
+                        "op": "gte"
+                    },
+                    {
+                        "type": "nat-gateway",
+                        "value_type": "resource_count",
+                        "value": 1,
+                        "op": "gte"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_vpc_by_subnet(self):
+        factory = self.replay_flight_data("test_vpc_scenario_2")
+        p = self.load_policy(
+            {
+                "name": "vpc-subnet",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "tag:Name",
+                        "value": "Public subnet",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Tags"][0]["Value"], "scenario-2-test")
+
+    def test_vpc_by_internet_gateway(self):
+        factory = self.replay_flight_data("test_vpc_scenario_2")
+        p = self.load_policy(
+            {
+                "name": "vpc-internet-gateway",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "internet-gateway",
+                        "key": "tag:Name",
+                        "value": "Fancy Internet Gateway",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Tags"][0]["Value"], "scenario-2-test")
+
+    def test_vpc_by_nat_gateway(self):
+        factory = self.replay_flight_data("test_vpc_scenario_2")
+        p = self.load_policy(
+            {
+                "name": "vpc-nat-gateway",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "nat-gateway",
+                        "key": "tag:Name",
+                        "value": "Fancy NAT Gateway",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Tags"][0]["Value"], "scenario-2-test")
 
 
 class EndpointTest(BaseTest):

@@ -1,0 +1,56 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ContainerRegistry/registries?api-version=2017-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:10:29 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "502"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "type": "Microsoft.ContainerRegistry/registries",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_container_registry/providers/Microsoft.ContainerRegistry/registries/cctestcontainerregistry",
+                                "name": "cctestcontainerregistry",
+                                "location": "westus",
+                                "tags": {},
+                                "properties": {
+                                    "loginServer": "cctestcontainerregistry.azurecr.io",
+                                    "creationDate": "2019-05-01T21:44:02.7732001Z",
+                                    "provisioningState": "Succeeded",
+                                    "adminUserEnabled": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

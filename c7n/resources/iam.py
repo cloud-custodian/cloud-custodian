@@ -34,7 +34,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import ValueFilter, Filter, OPERATORS
+from c7n.filters import ValueFilter, Filter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
@@ -104,7 +104,8 @@ class RoleTag(Tag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                client.tag_role(RoleName=role['RoleName'], Tags=tags)
+                self.manager.retry(
+                    client.tag_role, RoleName=role['RoleName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -118,7 +119,8 @@ class RoleRemoveTag(RemoveTag):
     def process_resource_set(self, client, roles, tags):
         for role in roles:
             try:
-                client.untag_role(RoleName=role['RoleName'], TagKeys=tags)
+                self.manager.retry(
+                    client.untag_role, RoleName=role['RoleName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -169,7 +171,8 @@ class UserTag(Tag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                client.tag_user(UserName=u['UserName'], Tags=tags)
+                self.manager.retry(
+                    client.tag_user, UserName=u['UserName'], Tags=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -183,7 +186,8 @@ class UserRemoveTag(RemoveTag):
     def process_resource_set(self, client, users, tags):
         for u in users:
             try:
-                client.untag_user(UserName=u['UserName'], TagKeys=tags)
+                self.manager.retry(
+                    client.untag_user, UserName=u['UserName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
 
@@ -345,6 +349,7 @@ class ServiceUsage(Filter):
         'ServiceName', 'ServiceNamespace', 'TotalAuthenticatedEntities',
         'LastAuthenticated', 'LastAuthenticatedEntity'))
 
+    schema_alias = True
     schema_attr = {
         sa: {'oneOf': [
             {'type': 'string'},
@@ -434,7 +439,7 @@ class CheckPermissions(Filter):
             'match-operator': {'enum': ['and', 'or']},
             'actions': {'type': 'array', 'items': {'type': 'string'}},
             'required': ('actions', 'match')})
-
+    schema_alias = True
     policy_annotation = 'c7n:policy'
     eval_annotation = 'c7n:perm-matches'
 
@@ -817,6 +822,48 @@ class SetPolicy(BaseAction):
                     pass
 
 
+@Role.action_registry.register('delete')
+class RoleDelete(BaseAction):
+    """Delete an IAM Role.
+
+    For example, if you want to automatically delete an unused IAM role.
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-delete-unused-role
+          resource: iam-role
+          filters:
+            - type: usage
+              match-operator: all
+              LastAuthenticated: null
+          actions:
+            - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ('iam:DeleteRole',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        error = None
+        for r in resources:
+            try:
+                client.delete_role(RoleName=r['RoleName'])
+            except client.exceptions.DeleteConflictException as e:
+                self.log.warning(
+                    "Role:%s cannot be deleted, must remove role from instance profile first"
+                    % r['Arn'])
+                error = e
+            except client.exceptions.NoSuchEntityException:
+                continue
+            except client.exceptions.UnmodifiableEntityException:
+                continue
+        if error:
+            raise error
+
+
 ######################
 #    IAM Policies    #
 ######################
@@ -1088,8 +1135,7 @@ class CredentialReport(Filter):
     """
     schema = type_schema(
         'credential',
-        value_type=ValueFilter.schema['properties']['value_type'],
-
+        value_type={'ref': '#/definitions/filters_common/value_types'},
         key={'type': 'string',
              'title': 'report key to search',
              'enum': [
@@ -1111,13 +1157,8 @@ class CredentialReport(Filter):
                  'certs.active',
                  'certs.last_rotated',
              ]},
-        value={'oneOf': [
-            {'type': 'array'},
-            {'type': 'string'},
-            {'type': 'boolean'},
-            {'type': 'number'},
-            {'type': 'null'}]},
-        op={'enum': list(OPERATORS.keys())},
+        value={'$ref': '#/definitions/filters_common/value'},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         report_generate={
             'title': 'Generate a report if none is present.',
             'default': True,

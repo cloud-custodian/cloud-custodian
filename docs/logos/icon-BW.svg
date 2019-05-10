@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="158px" height="160px" viewBox="0 0 158 160" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 180 180 180 180 0 0 0"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" transform="translate(-11.000000, -11.000000)">
+            <g id="C1_OSLogo_CloudCustodian_Icon_RGB_BW">
+                <g id="g3553" transform="translate(90.000000, 90.000000) scale(-1, 1) rotate(-180.000000) translate(-90.000000, -90.000000) ">
+                    <g id="g3555" transform="translate(49.964625, 64.213375)" fill="#231F20" fill-rule="nonzero">
+                        <polygon id="path3557" points="16.25 26.25 1.21375 17.57 1.21375 0.20875 16.25 8.89"></polygon>
+                    </g>
+                    <g id="g3559" transform="translate(73.958375, 86.815000)" fill="#231F20" fill-rule="nonzero">
+                        <polygon id="path3561" points="16.25 17.5 1.21375 8.82 16.25 0.14 31.28625 8.81875"></polygon>
+                    </g>
+                    <g id="g3563" transform="translate(91.978000, 100.669250)" fill="#231F20" fill-rule="nonzero">
+                        <polygon id="path3565" points="16.25 17.5 1.21625 26.18 1.21625 8.8175 16.25 0.1375"></polygon>
+                    </g>
+                    <g id="g3567" transform="translate(72.186375, 64.352625)" fill="#231F20" fill-rule="nonzero">
+                        <polygon id="path3569" points="0 8.75 15.03625 0.07 15.03625 17.43 0 26.11125"></polygon>
+                    </g>
+                    <g id="g3571" transform="translate(49.964625, 88.169000)" fill="#231F20" fill-rule="nonzero">
+                        <polygon id="path3573" points="16.25 30 1.21375 38.68 1.21375 0.50875 16.25 9.19"></polygon>
+                    </g>
+                    <g id="g3575" transform="translate(70.972000, 100.599500)" fill="#231F20" fill-rule="nonzero">
+                        <polygon id="path3577" points="16.25 26.25 1.21375 17.57 1.21375 0.2075 16.25 8.8875"></polygon>
+                    </g>
+                    <g id="g3579" transform="translate(54.165000, 39.251000)" fill="#231F20" fill-rule="nonzero">
+                        <polygon id="path3581" points="0 20 33.0575 0.9125 33.0575 18.27625 15.03625 28.68"></polygon>
+                    </g>
+                    <g id="g3583" transform="translate(112.985500, 64.283125)" fill="#231F20" fill-rule="nonzero">
+                        <polygon id="path3585" points="16.25 17.5 1.21375 26.18125 1.21375 8.82 16.25 0.1375"></polygon>
+                    </g>
+                    <g id="g3587" transform="translate(93.193875, 64.419125)" fill="#231F20" fill-rule="nonzero">
+                        <polygon id="path3589" points="0 0 15.03375 8.68375 15.03375 26.0425 0 17.36375"></polygon>
+                    </g>
+                    <g id="g3591">
+                        <g id="g3593-Clipped">
+                            <mask id="mask-2" fill="white">
+                                <use xlink:href="#path-1"></use>
+                            </mask>
+                            <g id="path3597"></g>
+                            <g id="g3593" mask="url(#mask-2)">
+                                <g transform="translate(10.000000, 10.000000)">
+                                    <g id="g3599" transform="translate(0.207250, 0.025000)">
+                                        <path d="M125,47.5 L80.00125,21.52 L35,47.50125 L35,127.16625 L58.99375,113.315 L80.00125,125.4425 L101.00625,113.315 L125,127.16625 L125,47.5 Z M79.7925,158.725 C36.3,158.725 1.0425,123.4675 1.0425,79.975 C1.0425,36.4825 36.3,1.225 79.7925,1.225 C123.285,1.225 158.5425,36.4825 158.5425,79.975 C158.5425,123.4675 123.285,158.725 79.7925,158.725 L79.7925,158.725 Z" id="path3601" fill="#231F20" fill-rule="nonzero"></path>
+                                    </g>
+                                    <g id="g3603" transform="translate(102.985500, 78.099000)">
+                                        <polygon id="path3605" fill="#231F20" fill-rule="nonzero" points="16.25 38.75 1.21375 30.07 1.21375 9.26 16.25 0.58"></polygon>
+                                    </g>
+                                    <g id="g3607" transform="translate(83.193875, 30.024750)">
+                                        <polygon id="path3609" fill="#231F20" fill-rule="nonzero" points="0 17.5 0 0.13875 33.05625 19.225 18.02 27.90625"></polygon>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <text id="SM" fill="#241F20" font-family="Optimist-Regular, Optimist" font-size="8" font-weight="normal">
+                <tspan x="128.856" y="170">SM</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

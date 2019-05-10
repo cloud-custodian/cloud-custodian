@@ -21,4 +21,6 @@ class ConfigMap(QueryResourceManager):
     class resource_type(TypeInfo):
         group = 'Core'
         version = 'V1'
+        patch = 'patch_namespaced_config_map'
+        delete = 'delete_namespaced_config_map'
         enum_spec = ('list_config_map_for_all_namespaces', 'items', None)

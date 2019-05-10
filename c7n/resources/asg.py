@@ -28,7 +28,7 @@ import time
 
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import ValueFilter, AgeFilter, Filter, OPERATORS
+from c7n.filters import ValueFilter, AgeFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour, Time
 import c7n.filters.vpc as net_filters
 
@@ -97,7 +97,7 @@ class LaunchInfo(object):
             return {}
         return {
             (t['LaunchTemplateId'],
-             t.get('c7n:VersionAlias', t['VersionNumber'])): t['LaunchTemplateData']
+             str(t.get('c7n:VersionAlias', t['VersionNumber']))): t['LaunchTemplateData']
             for t in tmpl_mgr.get_resources(template_ids)}
 
     def get_launch_configs(self, asgs):
@@ -563,7 +563,7 @@ class ImageAgeFilter(AgeFilter):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
     def process(self, asgs, event=None):
@@ -1112,8 +1112,7 @@ class Tag(Action):
         tags = self.get_tag_set()
         error = None
 
-        client = local_session(self.manager.session_factory).client('autoscaling')
-
+        client = self.get_client()
         with self.executor_factory(max_workers=3) as w:
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
@@ -1144,6 +1143,9 @@ class Tag(Action):
                 atags['ResourceId'] = a['AutoScalingGroupName']
                 tag_params.append(atags)
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
+
+    def get_client(self):
+        return local_session(self.manager.session_factory).client('autoscaling')
 
 
 @ASG.action_registry.register('propagate-tags')
@@ -1683,7 +1685,7 @@ class LaunchConfigAge(AgeFilter):
     date_attribute = "CreatedTime"
     schema = type_schema(
         'age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
 

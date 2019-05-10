@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "Vpcs": [
+            {
+                "VpcId": "vpc-0c1be6284618ac4c1",
+                "InstanceTenancy": "default",
+                "Tags": [
+                    {
+                        "Value": "scenario-2-test",
+                        "Key": "Name"
+                    }
+                ],
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0999d4dea61f0ff21",
+                        "CidrBlock": "10.0.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "State": "available",
+                "DhcpOptionsId": "dopt-73a70517",
+                "CidrBlock": "10.0.0.0/16",
+                "IsDefault": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "688ea6ff-7a28-41fb-9729-eea68fab91d8",
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "server": "AmazonEC2",
+                "content-type": "text/xml;charset=UTF-8",
+                "date": "Tue, 27 Jun 2017 17:50:58 GMT"
+            }
+        }
+    }
+}

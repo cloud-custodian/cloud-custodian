@@ -25,17 +25,16 @@ jobs:
       displayName: "Flake8 Lint"
 
 - job: 'Test'
-  condition: "succeeded()"
   pool:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
       Python27:
         python.version: '2.7'
-        TOXENV: py27-cov
+        TOXENV: py27
       Python36:
         python.version: '3.6'
-        TOXENV: py36
+        TOXENV: py36-cov
       Python37:
         python.version: '3.7'
         TOXENV: py37
@@ -62,7 +61,7 @@ jobs:
 
   - script: python tools/dev/cicov.py
     displayName: 'Publish Code Coverage'
-    condition: "eq(variables['python.version'], '2.7')"
+    condition: "eq(variables['python.version'], '3.6')"
     env:
       CODECOV_TOKEN: $(CODECOV_TOKEN)
       PR: $(system.pullRequest.pullRequestNumber)
@@ -73,7 +72,7 @@ jobs:
       BUILD_REASON: $(Build.Reason)
       BUILD_BRANCH: $(Build.SourceBranchName)
 
-  - script: make sphinx
+  - script: TOXENV=docs tox
     displayName: "Docs Build"
     condition: "eq(variables['python.version'], '3.7')"
 
@@ -82,4 +81,44 @@ jobs:
     inputs:
       testResultsFiles: '**/test-results.xml'
       testRunTitle: 'Python $(python.version)'
+    condition: succeededOrFailed()
+
+- job: 'TestWindows'
+  displayName: 'Test Win2019'
+  pool:
+    vmImage: 'windows-2019'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+        TOXENV: py36
+      Python37:
+        python.version: '3.7'
+        TOXENV: py37
+    maxParallel: 3
+
+  steps:
+  - checkout: self
+    fetchDepth: 2
+
+  - task: UsePythonVersion@0
+    displayName: "Set Python Version"
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: python -m pip install --upgrade pip && pip install tox
+    displayName: 'Install Test Runner'
+
+  - script: tox --notest
+    displayName: 'Install Dependencies'
+
+  - script: tox
+    displayName: 'Tox'
+
+  - task: PublishTestResults@2
+    displayName: "Publish Test Results Azure"
+    inputs:
+      testResultsFiles: '**/test-results.xml'
+      testRunTitle: 'Python $(python.version) Windows'
     condition: succeededOrFailed()

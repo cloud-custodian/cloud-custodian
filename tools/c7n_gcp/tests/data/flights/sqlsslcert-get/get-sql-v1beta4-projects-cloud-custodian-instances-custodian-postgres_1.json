@@ -1,0 +1,83 @@
+{
+  "headers": {
+    "expires": "Fri, 19 Apr 2019 12:14:36 GMT",
+    "date": "Fri, 19 Apr 2019 12:14:36 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3054",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres?alt=json"
+  },
+  "body": {
+    "kind": "sql#instance",
+    "selfLink": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres",
+    "name": "custodian-postgres",
+    "connectionName": "cloud-custodian:us-central1:custodian-postgres",
+    "etag": "ca037987b8e4f5970f2c97826b626934b73e8527d714631b9e6cd0ac1d585dc6",
+    "project": "cloud-custodian",
+    "state": "RUNNABLE",
+    "backendType": "SECOND_GEN",
+    "databaseVersion": "POSTGRES_9_6",
+    "region": "us-central1",
+    "settings": {
+      "kind": "sql#settings",
+      "settingsVersion": "8",
+      "authorizedGaeApplications": [],
+      "tier": "db-custom-1-3840",
+      "backupConfiguration": {
+        "kind": "sql#backupConfiguration",
+        "startTime": "13:00",
+        "enabled": true,
+        "replicationLogArchivingEnabled": false
+      },
+      "pricingPlan": "PER_USE",
+      "replicationType": "SYNCHRONOUS",
+      "activationPolicy": "ALWAYS",
+      "ipConfiguration": {
+        "ipv4Enabled": true,
+        "authorizedNetworks": []
+      },
+      "locationPreference": {
+        "kind": "sql#locationPreference",
+        "zone": "us-central1-a"
+      },
+      "dataDiskSizeGb": "10",
+      "dataDiskType": "PD_SSD",
+      "maintenanceWindow": {
+        "kind": "sql#maintenanceWindow",
+        "hour": 0,
+        "day": 0
+      },
+      "storageAutoResize": true,
+      "storageAutoResizeLimit": "0",
+      "availabilityType": "ZONAL"
+    },
+    "serverCaCert": {
+      "kind": "sql#sslCert",
+      "instance": "custodian-postgres",
+      "sha1Fingerprint": "f9cdf259fa1d1454ea9426829a7c18f980995021",
+      "commonName": "C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA",
+      "certSerialNumber": "0",
+      "cert": "-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2xvdWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJ\nBgNVBAYTAlVTMB4XDTE5MDMyNTE0MjEzMFoXDTI5MDMyMjE0MjIzMFowSDEjMCEG\nA1UEAxMaR29vZ2xlIENsb3VkIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2ds\nZSwgSW5jMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC\nggEBAILjAFjGJicgivnvc+lXK7154VnzGORVfsszulGDBIYXxaOvvPbcNufGeD/r\na7Ujihy8Rs5rt1ikLH3Lc5q6h7RTILBM/fJR2++08k0EDlAv5ljgv1Z6CsmHkVr+\nrodXFKf5JBDN9eStyvil7gzWin7LwnjCWkU7l3BU6NKDTBF/TIY2g4D+UDGAwxxH\nUWFGtPQGapYdN0D4yvYeK047Gqwlh2j/L080pOnchcNYAl2scovStE8V9VZtVn5l\nrBe6DnVB6QMRg0xNR9HLkYq9eXx3OftU9jCRaOAOGdNC8UuQIufZ1pcSxtjt1HRV\nlS5qvG4dSaHg55JOajy047AbBYMCAwEAAaMWMBQwEgYDVR0TAQH/BAgwBgEB/wIB\nADANBgkqhkiG9w0BAQsFAAOCAQEANtjiV3a8FX7NozOVyAyIMzNRscVTNAefuFk1\nkYx6/sqwMt/03+KfGajhhVTdMN7ykL9q2j2a+Qeugf68UqqnGBcyHUwQ8eOXkbIR\nTnEu3KBxtc15qtti+NwiZa4qQ696YooP+k/9I6RGjsQr7akpKHC8oEbLDUlwR1Hf\nP8GTvh5POuA7MO7q9O6W1EXz6c/5LCbrrT0zdaOIehE2W+YRPltgEauu8k1MDyrh\nGdZThXeuiU9Ef8HSFI1sfSoGl2NRHfVLiisDmYc+mBCKL4G/NPibDzT6ASvq2RTf\nGkga+kymJa29g2f4XRDBFIsj44/MO1KAOeD14dmGxoy0q0pKPw==\n-----END CERTIFICATE-----",
+      "createTime": "2019-03-25T14:21:30.278Z",
+      "expirationTime": "2029-03-22T14:22:30.278Z"
+    },
+    "ipAddresses": [
+      {
+        "ipAddress": "35.226.177.220",
+        "type": "PRIMARY"
+      }
+    ],
+    "instanceType": "CLOUD_SQL_INSTANCE",
+    "serviceAccountEmailAddress": "laygzyvv3vbqboh56k2aeoa36y@speckle-umbrella-pg-8.iam.gserviceaccount.com",
+    "gceZone": "us-central1-a"
+  }
+}
