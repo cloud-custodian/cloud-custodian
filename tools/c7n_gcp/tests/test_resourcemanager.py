@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 
 
 class OrganizationTest(BaseTest):
@@ -30,15 +30,20 @@ class OrganizationTest(BaseTest):
         self.assertEqual(organization_resources[0]['name'], organization_name)
 
     def test_organization_get(self):
-        organization_name = 'organizations/851339424791'
+        organization_name = 'organizations/926683928810'
         session_factory = self.replay_flight_data(
             'organization-get')
 
         policy = self.load_policy(
-            {'name': 'gcp-organization-dryrun',
-             'resource': 'gcp.organization'},
+            {'name': 'gcp-organization-audit',
+             'resource': 'gcp.organization',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['CreateProject']
+             }},
             session_factory=session_factory)
+        exec_mode = policy.get_execution_mode()
+        event = event_data('resourcemanager-project-create.json')
+        resources = exec_mode.run(event, None)
 
-        organization_resource = policy.resource_manager.get_resource(
-            {'name': organization_name})
-        self.assertEqual(organization_resource['name'], organization_name)
+        self.assertEqual(resources[0]['name'], organization_name)
