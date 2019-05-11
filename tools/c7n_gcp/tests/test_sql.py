@@ -234,22 +234,24 @@ class SqlSslCertTest(BaseTest):
         self.assertEqual(ssl_cert[parent_annotation_key]['name'], instance_name)
 
     def test_sqlsslcet_get(self):
-        ssl_cert_sha = '62a43e710693b34d5fdb34911a656fd7a3b76cc7'
+        ssl_cert_sha = '49a10ed7135e3171ce5e448cc785bc63b5b81e6c'
         instance_name = 'custodian-postgres'
         project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('sqlsslcert-get', project_id=project_id)
 
         policy = self.load_policy(
-            {'name': 'gcp-sql-ssl-cert-dryrun',
-             'resource': 'gcp.sql-ssl-cert'},
+            {'name': 'gcp-sql-ssl-cert-audit',
+             'resource': 'gcp.sql-ssl-cert',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['cloudsql.sslCerts.create']
+             }},
             session_factory=session_factory)
 
-        resource_manager = policy.resource_manager
-        ssl_cert = resource_manager.get_resource(
-            {'project_id': project_id,
-             'sha_1_fingerprint': ssl_cert_sha,
-             'database_id': project_id + ':' + instance_name})
-        parent_annotation_key = resource_manager.resource_type.get_parent_annotation_key()
+        exec_mode = policy.get_execution_mode()
+        event = event_data('sql-ssl-cert-create.json')
+        parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
+        resources = exec_mode.run(event, None)
 
-        self.assertEqual(ssl_cert['sha1Fingerprint'], ssl_cert_sha)
-        self.assertEqual(ssl_cert[parent_annotation_key]['name'], instance_name)
+        self.assertEqual(resources[0]['sha1Fingerprint'], ssl_cert_sha)
+        self.assertEqual(resources[0][parent_annotation_key]['name'], instance_name)

@@ -1,0 +1,29 @@
+{
+  "body": {
+    "certSerialNumber": "1429316777", 
+    "kind": "sql#sslCert", 
+    "sha1Fingerprint": "49a10ed7135e3171ce5e448cc785bc63b5b81e6c", 
+    "commonName": "custodian-test", 
+    "instance": "custodian-postgres",
+    "cert": "-----BEGIN CERTIFICATE-----\nMIIDaDCCAlCgAwIBAgIEVTGkqTANBgkqhkiG9w0BAQsFADCBhjEtMCsGA1UELhMk\nY2ZlODI5NjctODcyNS00OWNiLTg1YWYtNzQ1NDU5OTJlZWJmMTIwMAYDVQQDEylH\nb29nbGUgQ2xvdWQgU1FMIENsaWVudCBDQSBjdXN0b2RpYW4tdGVzdDEUMBIGA1UE\nChMLR29vZ2xlLCBJbmMxCzAJBgNVBAYTAlVTMB4XDTE5MDUxMTA2MDYxN1oXDTI5\nMDUwODA2MDcxN1owPDEXMBUGA1UEAxMOY3VzdG9kaWFuLXRlc3QxFDASBgNVBAoT\nC0dvb2dsZSwgSW5jMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEP\nADCCAQoCggEBAIo3VyzDUneQxKZP7hd8IF5tVJGNV0IBOFX6DmmnVGyh00kKGu5q\nqAvkY+C6YLFMGs8oXEwuww2mz46Zws8Y3IG3pekdPI4W1gd69wi/JhLEjCgCJ+d+\nuhk5shUhEKbL/WDmoFt4DPpPVHS5gU9p+mpOqtcG2ZpkiGOmMDfqPww62L0BRhGK\nDrq8QIYjLFQ5VovvIC+fqO2QoeGbsLWakjwxBqe748sVf370saZ/SaEjT9UOA3/J\n5PTJMEKLsDaerbbx1zaLXMZZ8xhfGxGTvDbczLysxpiE9FlvuxBo88ph78E7dbkL\n+KPHuJ/Osmxy8Sz9+8oIRXLWRlmlc63vgc0CAwEAAaMnMCUwIwYDVR0RBBwwGoEY\nYWxleC5rYXJwaXRza2lAZ21haWwuY29tMA0GCSqGSIb3DQEBCwUAA4IBAQCSaTA/\nBtrv3VZJcCLtDRxYJIht3tILCRpzsGVW57cy7n51YnCq0SUAr6VMqpytlWmQRyNd\nB/KRZQWEKih6L2s844CVVS4kKeGCyJK4xqZkHGExsK4KpLRkP1maJNK1GvpaJGLh\nJrlD2Nhvb8WfGTdwAu/qjl3PiHEWg61KYqKr+ssazizmJw3n0IZaMYM9g7vViQNl\nckDwrBqV03kN9JtIM9LQyUP3lWmItwtgnH6TTPVkqald4sxoAxoa3Vf6yjsrDRH7\n1tAbSjgF3SIFt4Cla7ZqTlchhRCO/dOSIgOylTnPq94W2C1reDD/vGZH8ztM6GYN\nOFGFRhraPjecPkXp\n-----END CERTIFICATE-----",
+    "expirationTime": "2029-05-08T06:07:17.469Z",
+    "createTime": "2019-05-11T06:06:17.469Z",
+    "selfLink": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres/sslCerts/49a10ed7135e3171ce5e448cc785bc63b5b81e6c"
+  },
+  "headers": {
+    "status": "200",
+    "content-length": "1730",
+    "x-xss-protection": "0",
+    "content-location": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres/sslCerts/49a10ed7135e3171ce5e448cc785bc63b5b81e6c?alt=json",
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Sat, 11 May 2019 06:38:39 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

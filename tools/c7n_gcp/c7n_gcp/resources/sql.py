@@ -185,6 +185,7 @@ class SqlSslCert(SqlInstanceChildWithSelfLink):
         version = 'v1beta4'
         component = 'sslCerts'
         enum_spec = ('list', 'items[]', None)
+        get_requires_event = True
         id = 'sha1Fingerprint'
         parent_spec = {
             'resource': 'sql-instance',
@@ -194,8 +195,11 @@ class SqlSslCert(SqlInstanceChildWithSelfLink):
         }
 
         @staticmethod
-        def get(client, resource_info):
-            parameters = {'project': resource_info['project_id'],
-                          'instance': resource_info['database_id'].split(':')[1],
-                          'sha1Fingerprint': resource_info['sha_1_fingerprint']}
+        def get(client, event):
+            self_link = jmespath.search('protoPayload.response.clientCert.certInfo.selfLink', event)
+            self_link_re = '.*?/projects/(.*?)/instances/(.*?)/sslCerts/(.*)'
+            project, instance, sha_1_fingerprint = re.match(self_link_re, self_link).groups()
+            parameters = {'project': project,
+                          'instance': instance,
+                          'sha1Fingerprint': sha_1_fingerprint}
             return client.execute_command('get', parameters)
