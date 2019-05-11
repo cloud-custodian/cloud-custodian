@@ -1,7 +1,7 @@
 .. _gcp_loadbalancing_policy:
 
 Virtual Networks (Need to check)
-================================
+=================================
 
 Filters (Need to check)
 -----------------------
@@ -16,7 +16,7 @@ Actions (Need to check)
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
 Example Policies (Need to check)
-----------------
+--------------------------------
 
 This set of policies will mark all Virtual Networks for deletion in 7 days that have 'test' in name (ignore case),
 and then perform the delete operation on those ready for deletion.

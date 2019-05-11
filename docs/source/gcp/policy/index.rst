@@ -1,6 +1,6 @@
 .. _gcp_policies:
 
-Policies (Need to check)
+Policies
 ========
 
 Here are some more specific example policies for these resources:
