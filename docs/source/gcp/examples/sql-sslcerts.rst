@@ -1,5 +1,5 @@
 Cloud SQL - Notify on Certificates Which Are About to Expire
-===================================================================================
+============================================================
 
 TBD. return certs which are about to expire in 60 days or less
 

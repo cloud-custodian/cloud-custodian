@@ -1,5 +1,5 @@
 Cloud SQL - Check Users
-===================================================================================
+=======================
 
 TBD. list instance superusers which are not included into a standard user set
 

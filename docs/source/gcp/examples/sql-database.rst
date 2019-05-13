@@ -1,5 +1,5 @@
 Cloud SQL - Check Database Names Against a Naming Convention
-===================================================================================
+============================================================
 
 TBD. Return databases which names doesn't match a certain naming convention. Regexp is used.
 
