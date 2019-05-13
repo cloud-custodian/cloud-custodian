@@ -5,17 +5,29 @@ Load Balancer
 
 Filters: TBD
 ------------
+Filters are not implemented.
 
 Actions: TBD
 ------------
+Actions are not implemented.
 
-TBD: information about environment variables
+Environment variables
+---------------------
+To check the policies please make sure that following environment variables are set:
+
+- GOOGLE_CLOUD_PROJECT
+
+- GOOGLE_APPLICATION_CREDENTIALS
+
+The details about the variables are available in the `GCP documentation to configure credentials for service accounts. <https://cloud.google.com/docs/authentication/getting-started>`_
 
 Example Policies
 ----------------
 
 Load Balancers' Addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `addresses <https://cloud.google.com/compute/docs/reference/rest/v1/addresses>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -26,6 +38,8 @@ Load Balancers' Addresses
 
 Load Balancers' Global Addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `global addresses <https://cloud.google.com/compute/docs/reference/rest/v1/globalAddresses>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -36,6 +50,8 @@ Load Balancers' Global Addresses
 
 Load Balancers' URL Maps
 ~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `URL maps <https://cloud.google.com/compute/docs/reference/rest/v1/urlMaps>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -46,6 +62,8 @@ Load Balancers' URL Maps
 
 Load Balancers' Target HTTP Proxies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `target HTTP proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetHttpProxies>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -55,7 +73,9 @@ Load Balancers' Target HTTP Proxies
           resource: gcp.loadbalancer-target-http-proxy
 
 Load Balancers' HTTPs Proxies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `target HTTPs proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetHttpsProxies>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -66,6 +86,8 @@ Load Balancers' HTTPs Proxies
 
 Load Balancers' Target TCP Proxies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `target TCP proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetTcpProxies>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -76,6 +98,8 @@ Load Balancers' Target TCP Proxies
 
 Load Balancers' Target SSL Proxies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `target SSL proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetSslProxies>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -86,6 +110,8 @@ Load Balancers' Target SSL Proxies
 
 Load Balancers' SSL Policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `SSL policies <https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -96,6 +122,8 @@ Load Balancers' SSL Policies
 
 Load Balancers' SSL Certificates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `SSL certificates <https://cloud.google.com/compute/docs/reference/rest/v1/sslCertificates>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -106,6 +134,8 @@ Load Balancers' SSL Certificates
 
 Load Balancers' Backend Buckets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `backend buckets <https://cloud.google.com/compute/docs/reference/rest/v1/backendBuckets>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -116,6 +146,8 @@ Load Balancers' Backend Buckets
 
 Load Balancers' Health Checks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `health checks <https://cloud.google.com/compute/docs/reference/rest/v1/healthChecks>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -124,8 +156,10 @@ Load Balancers' Health Checks
             List of Load Balancers' Health Checks
           resource: gcp.loadbalancer-health-check
 
-Load Balancers' HTTP Health Check
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Load Balancers' HTTP Health Checks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `HTTP health checks <https://cloud.google.com/compute/docs/reference/rest/v1/httpHealthChecks>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -136,6 +170,8 @@ Load Balancers' HTTP Health Check
 
 Load Balancers' HTTPs Health Checks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `HTTPs health checks <https://cloud.google.com/compute/docs/reference/rest/v1/httpsHealthChecks>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -146,6 +182,8 @@ Load Balancers' HTTPs Health Checks
 
 Load Balancers' Target Instances
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `target instances <https://cloud.google.com/compute/docs/reference/rest/v1/targetInstances>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -156,6 +194,8 @@ Load Balancers' Target Instances
 
 Load Balancers' Target Pools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `target pools <https://cloud.google.com/compute/docs/reference/rest/v1/targetPools>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -166,6 +206,8 @@ Load Balancers' Target Pools
 
 Load Balancers' Forwarding Rules
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `addresses <https://cloud.google.com/compute/docs/reference/rest/v1/addresses>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -176,6 +218,8 @@ Load Balancers' Forwarding Rules
 
 Load Balancers' Global Forwarding Rules
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `forwarding rules <https://cloud.google.com/compute/docs/reference/rest/v1/forwardingRules>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -186,6 +230,8 @@ Load Balancers' Global Forwarding Rules
 
 Load Balancers' Backend Services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `backend services <https://cloud.google.com/compute/docs/reference/rest/v1/backendServices>`_ GCP REST resource.
+
 .. code-block:: yaml
 
     policies:
@@ -196,6 +242,10 @@ Load Balancers' Backend Services
 
 Load Balancers' Region Backend Services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The resource works with `region backend services <https://cloud.google.com/compute/docs/reference/rest/v1/regionBackendServices>`_ GCP REST resource.
+
+The 'region' param in the query is required.
+
 .. code-block:: yaml
 
     policies:
