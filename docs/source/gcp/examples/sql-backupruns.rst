@@ -31,7 +31,3 @@ policies:
           transport:
             type: pubsub
             topic: projects/river-oxygen-233508/topics/first
-
-
-
-
