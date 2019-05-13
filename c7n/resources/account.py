@@ -16,6 +16,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
+import time
 from botocore.exceptions import ClientError
 from datetime import datetime, timedelta
 
@@ -509,6 +510,18 @@ class ServiceLimit(Filter):
             'support', region_name='us-east-1')
         checks = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
+
+        # Check status and if necessary refresh checks
+        if checks['status'] == 'not_available':
+            client.refresh_trusted_advisor_check(checkId=self.check_id)
+            for ta_refresh_interval in range(0, 9):
+                time.sleep(3)
+                refresh_response = client.describe_trusted_advisor_check_refresh_statuses(
+                    checkIds=[self.check_id])
+                if refresh_response['statuses'][0]['status'] == 'success':
+                    checks = client.describe_trusted_advisor_check_result(
+                        checkId=self.check_id, language='en')['result']
+                    break
 
         region = self.manager.config.region
         checks['flaggedResources'] = [r for r in checks['flaggedResources']
