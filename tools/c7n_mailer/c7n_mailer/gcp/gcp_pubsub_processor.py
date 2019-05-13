@@ -29,6 +29,7 @@ class MailerGcpPubSubProcessor(object):
         self.logger = logger
         self.subscription = self.config['queue_url']
         self.session = session or Session()
+        self.client = self.session.client('pubsub', 'v1', 'projects.subscriptions')
 
     def run(self):
         self.logger.info("Downloading messages from the GCP PubSub Subscription.")
@@ -64,9 +65,7 @@ class MailerGcpPubSubProcessor(object):
     def receive_messages(self):
         """Receive messsage(s) from subscribed topic
         """
-        client = self.session.client('pubsub', 'v1', 'projects.subscriptions')
-
-        return client.execute_command('pull', {
+        return self.client.execute_command('pull', {
             'subscription': self.subscription,
             'body': {
                 'returnImmediately': True,
@@ -77,9 +76,7 @@ class MailerGcpPubSubProcessor(object):
     def ack_messages(self, discard_datetime):
         """Acknowledge and Discard messages up to datetime using seek api command
         """
-        client = self.session.client('pubsub', 'v1', 'projects.subscriptions')
-
-        return client.execute_command('seek', {
+        return self.client.execute_command('seek', {
             'subscription': self.subscription,
             'body': {
                 'time': discard_datetime

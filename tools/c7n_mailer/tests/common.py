@@ -56,6 +56,18 @@ MAILER_CONFIG = {
                           os.path.abspath('/')],
 }
 
+MAILER_CONFIG_1 = {
+    'smtp_port': 25,
+    'smtp_ssl': False,
+    'smtp_username': 'user',
+    'smtp_password': 'password',
+    'from_address': 'devops@initech.com',
+    'queue_url': 'projects/c7n-dev/subscriptions/getnotify',
+    'smtp_server': 'smtp.inittech.com',
+    'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
+                          os.path.abspath('/')],
+}
+
 MAILER_CONFIG_AZURE = {
     'queue_url': 'asq://storageaccount.queue.core.windows.net/queuename',
     'from_address': 'you@youremail.com',
@@ -232,6 +244,38 @@ SQS_MESSAGE_4 = {
     'event': None,
     'resources': [RESOURCE_1]
 }
+
+GCP_MESSAGES = {'receivedMessages': [{'ackId': 'TgQhIT4wPkVTRFAGFixdRkhRNxkIaFEOT14jPzUgKEURCAgUBXx9cURLdV9bGgdRDRlyfGckOFgUBwtCUXZVWxENem1cVzhUCRB1eWF8algbAwVAVH53_pGKmvCVOR1tNcH7qrdASszD_492Zho9XxJLLD5-Ki1FQV5AEkwhGERJUytDCypYEQ', 'message': {'data': 'eJzVUrtuwzAM3PUVhuY6GQNk6tStX1AUgULTrgqZFCQqgBHk36tHHm6nolsHDbrDHe9EnZXGE5LofUfJuSelDQAnkoMdMqZhR/2AJ/0gfqABJ8tUQONcATw7C0sGzkqTmbFQglF6YrHj0jSRU4BKTeA3Ph1jOvbC3kLhR+sEQ8z0m1q5+MCfCBK31/HbKqjXw9VcXdR7jSo51N1AFl8NHgkEZ++MVHTA0SQnBc4pyoRbZEtT1zRdc6xSrrY6RQzPA8/G0gZ41nWwBEPRc5DW/za4FWzq0vHXZXIddbkX+m76D9usdv+X7WZ5vu1fjcAHDi+rX9JcymOV8wVn/efe', 'messageId': '549740902827570', 'publishTime': '2019-05-13T18:31:17.926Z'}}, {'ackId': 'EU4EISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEQgIFAV8fXJETnVYM3UHUQ0Zc3swJ2gPGgZREVF0XlEbH1lcfkoCVQQRdHtifGlYEAIBTVJW-tGc_8SVEG87adWQpatUVfyK7YwxZhs9XxJLLD5-Ki1FQV5AEkwhGERJUytDCypY', 'message': {'data': 'eJzVUrtuwzAM3PUVhuY6GQNk6tStX1AUgULTrgqZFCQqgBHk36tHHm6nolsHDbrDHe9EnZXGE5LofUfJuSelDQAnkoMdMqZhR/2AJ/0gfqABJ8tUQONcATw7C0sGzkqTmbFQglF6YrHj0jSRU4BKTeA3Ph1jOvbC3kLhR+sEQ8z0m1q5+MCfCBK31/HbKqjXw9VcXdR7jSo51N1AFl8NHgkEZ++MVHTA0SQnBc4pyoRbZEtT1zRdc6xSrrY6RQzPA8/G0gZ41nWwBEPRc5DW/za4FWzq0vHXZXIddbkX+m76D9usdv+X7WZ5vu1fjcAHDi+rX9JcymOV8wVn/efe', 'messageId': '549866393233381', 'publishTime': '2019-05-13T20:55:05.231Z'}}, {'ackId': 'EU4EISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEQgIFAV8fXJETnVYM3UHUQ0Zc3swJ2gPGgZREVF0X1EbH1lcfkoCVQQRd3lgfWxTEwEKQVRW-tGc_8SVEG87adWQpatUVfyK7YwxZhs9XxJLLD5-Ki1FQV5AEkwhGERJUytDCypY', 'message': {'data': 'eJzVUrtuwzAM3PUVhuY6GQNk6tStX1AUgULTrgqZFCQqgBHk36tHHm6nolsHDbrDHe9EnZXGE5LofUfJuSelDQAnkoMdMqZhR/2AJ/0gfqABJ8tUQONcATw7C0sGzkqTmbFQglF6YrHj0jSRU4BKTeA3Ph1jOvbC3kLhR+sEQ8z0m1q5+MCfCBK31/HbKqjXw9VcXdR7jSo51N1AFl8NHgkEZ++MVHTA0SQnBc4pyoRbZEtT1zRdc6xSrrY6RQzPA8/G0gZ41nWwBEPRc5DW/za4FWzq0vHXZXIddbkX+m76D9usdv+X7WZ5vu1fjcAHDi+rX9JcymOV8wVn/efe', 'messageId': '549854186900847', 'publishTime': '2019-05-13T20:36:47.576Z'}}]}
+
+GCP_MESSAGE = '''{
+    "account": "c7n-dev", 
+    "account_id": "c7n-dev",
+    "action": {
+        "subject": "testing notify action",
+        "template": "default",
+        "to": ["user@domain.com"],
+        "transport": {
+            "topic": "projects/c7n-dev/topics/c7n_notify",
+            "type": "pubsub"},
+        "type": "notify"},
+    "event": null,
+    "policy": {
+        "actions": [{
+            "subject": "testing notify action", 
+            "template": "default", 
+            "to": ["user@domain.com"],
+            "transport": {
+                "topic": "projects/c7n-dev/topics/c7n_notify", 
+                "type": "pubsub"}, 
+            "type": "notify"}], 
+        "filters": [{
+            "name": "projects/c7n-dev/topics/c7n_notify"}],
+        "name": "test-notify",
+        "resource": "gcp.pubsub-topic"}, 
+    "region": "all",
+    "resources": [{
+        "c7n:MatchedFilters": ["name"],
+        "name": "projects/c7n-dev/topics/c7n_notify"}]}'''
 
 ASQ_MESSAGE = '''{
    "account":"subscription",

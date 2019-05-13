@@ -12,7 +12,7 @@ from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
 from c7n_mailer.azure import deploy as azure_deploy
 from c7n_mailer.gcp.gcp_pubsub_processor import MailerGcpPubSubProcessor
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
-from ruamel import yml
+from ruamel import yaml
 
 
 CONFIG_SCHEMA = {

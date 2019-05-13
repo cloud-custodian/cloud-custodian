@@ -74,7 +74,8 @@ class EmailDelivery(object):
         self.config = config
         self.logger = logger
         self.session = session
-        if not self.config.get('queue_url').startswith('projects'):
+        from .cli import is_gcp_cloud
+        if not is_gcp_cloud(self.config):
             self.aws_ses = session.client('ses', region_name=config.get('ses_region'))
         self.ldap_lookup = self.get_ldap_connection()
 

@@ -16,8 +16,9 @@ import base64
 import json
 import unittest
 import zlib
-from common import logger, MAILER_CONFIG, GCP_MESSAGE
+from common import logger, MAILER_CONFIG_1, GCP_MESSAGE, GCP_MESSAGES
 from c7n_mailer.gcp.gcp_pubsub_processor import MailerGcpPubSubProcessor
+from c7n_mailer.email_delivery import EmailDelivery
 from mock import MagicMock, patch
 
 
@@ -29,27 +30,16 @@ class GcpTest(unittest.TestCase):
             zlib.compress(GCP_MESSAGE.encode('utf8')))
         self.loaded_message = json.loads(GCP_MESSAGE)
 
-    @patch('c7n_mailer.email_delivery.get_to_addrs_email_messages_map')
-    def test_process_azure_queue_message_success(self, mock_get_addr):
-        p = MailerGcpPubSubProcessor(MAILER_CONFIG, logger)
-        self.assertTrue(p.process_message(self.compressed_message))
-        mock_get_addr.assert_called_with(self.loaded_message)
-
-    @patch('c7n_mailer.email_delivery.get_to_addrs_email_messages_map')
-    def test_process_azure_queue_message_failure(self, mock_get_addr):
-        p = MailerGcpPubSubProcessor(MAILER_CONFIG, logger)
-        self.assertFalse(p.process_message(self.compressed_message))
-        mock_get_addr.assert_called_with(self.loaded_message)
-
     @patch.object(MailerGcpPubSubProcessor, 'process_message')
-    @patch.object(MailerGcpPubSubProcessor, 'ack_messages')
+    def test_process_pubsub_message_success(self, mock_process):
+        processor = MailerGcpPubSubProcessor(MAILER_CONFIG_1, logger)
+        self.assertTrue(processor.process_message(self.compressed_message))
+
     @patch.object(MailerGcpPubSubProcessor, 'receive_messages')
-    def test_run(self, mock_get_message, mock_ack, mock_process):
-        mock_get_message.side_effect = [[self.compressed_message], []]
-        mock_ack.return_value = True
-        mock_process.return_value = True
-        p = MailerGcpPubSubProcessor(MAILER_CONFIG, logger)
-        p.run()
-        self.assertEqual(2, mock_get_message.call_count)
-        self.assertEqual(1, mock_process.call_count)
-        mock_ack.assert_called()
+    def test_run(self, mock_receive):
+        processor = MailerGcpPubSubProcessor(MAILER_CONFIG_1, logger)
+        processor.run()
+        self.assertEqual(1, mock_receive.call_count)
+
+
+
