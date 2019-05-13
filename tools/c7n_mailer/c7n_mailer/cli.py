@@ -12,7 +12,8 @@ from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
 from c7n_mailer.azure import deploy as azure_deploy
 from c7n_mailer.gcp.gcp_pubsub_processor import MailerGcpPubSubProcessor
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
-from ruamel import yaml
+from ruamel import yml
+
 
 CONFIG_SCHEMA = {
     'type': 'object',
@@ -214,6 +215,7 @@ def main():
             azure_deploy.provision(mailer_config)
         elif is_gcp_cloud(mailer_config):
             print('Deploying mailer as a google cloud function is not supported at this time.')
+
         else:
             deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
 

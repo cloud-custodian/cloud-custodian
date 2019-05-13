@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-GCP Pub-Sub Message Processing
-==============================
-"""
-
 import six
+import json
 from c7n_mailer.email_delivery import EmailDelivery
+from c7n_gcp.client import Session
 import base64
 import zlib
+
+MAX_MESSAGES = 1000
 
 
 class MailerGcpPubSubProcessor(object):
@@ -29,7 +28,7 @@ class MailerGcpPubSubProcessor(object):
         self.config = config
         self.logger = logger
         self.subscription = self.config['queue_url']
-        self.session = session
+        self.session = session or Session()
 
     def run(self):
         self.logger.info("Downloading messages from the GCP PubSub Subscription.")
@@ -55,7 +54,7 @@ class MailerGcpPubSubProcessor(object):
     # This function, when processing gcp pubsub messages, will only deliver messages over email.
     # TODO: Slack and Datadog integration or wait for future redesign
     def process_message(self, encoded_gcp_pubsub_message):
-        pubsub_message = self.unpack(encoded_gcp_pubsub_message['message']['data'])
+        pubsub_message = self.unpack_to_dict(encoded_gcp_pubsub_message['message']['data'])
         delivery = EmailDelivery(self.config, self.session, self.logger)
         to_email_messages_map = delivery.get_to_addrs_email_messages_map(
             pubsub_message)
@@ -70,7 +69,8 @@ class MailerGcpPubSubProcessor(object):
         return client.execute_command('pull', {
             'subscription': self.subscription,
             'body': {
-                'returnImmediately': True
+                'returnImmediately': True,
+                'max_messages': MAX_MESSAGES
             }
         })
 
@@ -87,9 +87,11 @@ class MailerGcpPubSubProcessor(object):
         })
 
     @staticmethod
-    def unpack(encoded_gcp_pubsub_message):
-        """ Returns a message that been base64 decoded
+    def unpack_to_dict(encoded_gcp_pubsub_message):
+        """ Returns a message as a dict that been base64 decoded
         """
-        b64decoded = base64.b64decode(encoded_gcp_pubsub_message)
-        uncompressed = zlib.decompress(b64decoded)
-        return uncompressed
+        return json.loads(
+            zlib.decompress(base64.b64decode(
+                encoded_gcp_pubsub_message
+            )
+            ))

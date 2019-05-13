@@ -74,7 +74,8 @@ class EmailDelivery(object):
         self.config = config
         self.logger = logger
         self.session = session
-        self.aws_ses = session.client('ses', region_name=config.get('ses_region'))
+        if not self.config.get('queue_url').startswith('projects'):
+            self.aws_ses = session.client('ses', region_name=config.get('ses_region'))
         self.ldap_lookup = self.get_ldap_connection()
 
     def get_ldap_connection(self):
@@ -275,7 +276,6 @@ class EmailDelivery(object):
             priority = PRIORITIES[str(priority)].copy()
             for key in priority:
                 message[key] = priority[key]
-
         return message
 
     def get_mimetext_message(self, sqs_message, resources, to_addrs):
