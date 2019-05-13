@@ -248,11 +248,8 @@ class SplunkHecDelivery(object):
             # it's a list
             tags = {}
             for item in t:
-                if 'Key' not in item or 'Value' not in item:
-                    continue
-                k = item.get('Key')
-                v = item.get('Value')
-                tags[k] = v
+                if 'Key' in item and 'Value' in item:
+                    tags[item['Key']] = item['Value']
             return tags
         except Exception:
             return {}
@@ -275,4 +272,4 @@ class SplunkHecDelivery(object):
                     continue
                 parsed = urlparse(to)
                 indices.add(parsed.netloc)
-        return list(indices)
+        return sorted(list(indices))

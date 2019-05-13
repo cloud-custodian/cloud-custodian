@@ -544,7 +544,8 @@ class TestPruneLogMessage(DeliveryTester):
             '/bar/1',
             '/baz/blarg',
             '/baz/blam/one',
-            '/baz/blam/two'
+            '/baz/blam/two',
+            '/not/a/path'
         ]
         expected = {
             'foo': '123',
@@ -626,7 +627,7 @@ class TestTrySend(DeliveryTester):
         assert mock_send.mock_calls == [call(j)]
         assert self.mock_logger.mock_calls == [
             call.error(
-                'WARNING: Sending %d characters to Splunk HEC; line length '
+                'ERROR: Sending %d characters to Splunk HEC; line length '
                 'limit is %d characters. Data will be truncated: %s',
                 25772, 3000, j
             )
@@ -699,39 +700,11 @@ class TestTrySend(DeliveryTester):
         ]
 
 
-class TestTagsForResource(DeliveryTester):
-
-    def test_none(self):
-        assert self.cls.tags_for_resource({}) is None
-
-    def test_tags_dict(self):
-        assert self.cls.tags_for_resource({
-            'tags': {'foo': 'bar', 'one': 'two'}
-        }) == {'foo': 'bar', 'one': 'two'}
-
-    def test_tags_list(self):
-        assert self.cls.tags_for_resource({
-            'Tags': [
-                {
-                    'Key': 'foo',
-                    'Value': 'bar'
-                },
-                {
-                    'Key': 'one',
-                    'Value': 'two'
-                }
-            ]
-        }) == {'foo': 'bar', 'one': 'two'}
-
-    def test_tags_other_type(self):
-        assert self.cls.tags_for_resource({
-            'Tags': 1
-        }) is None
-
-
 class TestSendSplunk(DeliveryTester):
 
     def test_send(self):
+        self.config['splunk_hec_url'] = 'https://splunk.url/foo'
+        self.config['splunk_hec_token'] = 'stoken'
         m_resp = Mock(spec_set=requests.models.Response)
         type(m_resp).status_code = 200
         type(m_resp).text = '{"text": "Success"}'
@@ -760,6 +733,8 @@ class TestSendSplunk(DeliveryTester):
         ]
 
     def test_send_exception(self):
+        self.config['splunk_hec_url'] = 'https://splunk.url/foo'
+        self.config['splunk_hec_token'] = 'stoken'
 
         def se_post(*args, **kwargs):
             raise Exception('foo')
@@ -787,6 +762,8 @@ class TestSendSplunk(DeliveryTester):
         ]
 
     def test_send_bad_status(self):
+        self.config['splunk_hec_url'] = 'https://splunk.url/foo'
+        self.config['splunk_hec_token'] = 'stoken'
         m_resp = Mock(spec_set=requests.models.Response)
         type(m_resp).status_code = 403
         type(m_resp).text = '{"text": "Success"}'
@@ -819,6 +796,8 @@ class TestSendSplunk(DeliveryTester):
         ]
 
     def test_send_non_success(self):
+        self.config['splunk_hec_url'] = 'https://splunk.url/foo'
+        self.config['splunk_hec_token'] = 'stoken'
         m_resp = Mock(spec_set=requests.models.Response)
         type(m_resp).status_code = 200
         type(m_resp).text = '{"text": "Failure"}'
@@ -852,6 +831,8 @@ class TestSendSplunk(DeliveryTester):
         ]
 
     def test_send_non_success_no_json(self):
+        self.config['splunk_hec_url'] = 'https://splunk.url/foo'
+        self.config['splunk_hec_token'] = 'stoken'
 
         def se_exc(*args, **kwargs):
             raise Exception('foo')
@@ -887,3 +868,72 @@ class TestSendSplunk(DeliveryTester):
                 {'text': '{"text": "Failure"}'}
             )
         ]
+
+
+class TestTagsForResource(DeliveryTester):
+
+    def test_empty_resource(self):
+        assert self.cls.tags_for_resource({}) == {}
+
+    def test_tags_none(self):
+        assert self.cls.tags_for_resource({'tags': None}) == {}
+
+    def test_tags_dict(self):
+        assert self.cls.tags_for_resource({
+            'tags': {'foo': 'bar', 'one': 'two'}
+        }) == {'foo': 'bar', 'one': 'two'}
+
+    def test_exception(self):
+        assert self.cls.tags_for_resource(None) == {}
+
+    def test_tags_list(self):
+        assert self.cls.tags_for_resource({
+            'Tags': [
+                {
+                    'Key': 'foo',
+                    'Value': 'bar'
+                },
+                {
+                    'Key': 'one',
+                    'Value': 'two'
+                },
+                {
+                    'foo': 'baz'
+                }
+            ]
+        }) == {'foo': 'bar', 'one': 'two'}
+
+    def test_tags_other_type(self):
+        assert self.cls.tags_for_resource({
+            'Tags': 1
+        }) == {}
+
+
+class TestSplunkIndicesForMessage(DeliveryTester):
+
+    def test_no_message(self):
+        assert self.cls._splunk_indices_for_message(None) == []
+
+    def test_no_action(self):
+        assert self.cls._splunk_indices_for_message({'foo': 'bar'}) == []
+
+    def test_action_no_to(self):
+        assert self.cls._splunk_indices_for_message(
+            {'action': {'foo': 'bar'}}
+        ) == []
+
+    def test_simple(self):
+        msg = {
+            'action': {
+                'to': {
+                    'foo',
+                    'splunkhec://bar',
+                    'baz@example.com',
+                    'splunkhec://blam',
+                    'slack://quux'
+                }
+            }
+        }
+        expected = ['bar', 'blam']
+        res = self.cls._splunk_indices_for_message(msg)
+        assert res == expected
