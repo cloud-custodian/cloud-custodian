@@ -49,8 +49,7 @@ def get_archive(config):
         # requests (recursive deps), needed by datadog, slackclient, splunk
         'requests', 'urllib3', 'idna', 'chardet', 'certifi',
         # used by splunk; also dependencies of c7n itself
-        'jsonpointer', 'jsonpatch'
-    )
+        'jsonpointer', 'jsonpatch'])
 
     for d in set(config['templates_folders']):
         if not os.path.exists(d):
