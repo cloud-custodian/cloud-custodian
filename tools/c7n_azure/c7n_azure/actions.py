@@ -361,7 +361,7 @@ class TagTrim(AzureBaseAction):
 
     .. code-block :: yaml
 
-      - policies:
+       policies:
          - name: azure-tag-trim
            comment: |
              Any instances with 14 or more tags get tags removed until
@@ -376,18 +376,18 @@ class TagTrim(AzureBaseAction):
                # have 14 or more tags since they will need to have tags
                # removed for the 2 extra. This also ensures that metrics
                # reporting is correct for the policy.
-               type: value
-               key: "[length(Tags)][0]"
-               op: ge
-               value: 14
+              - type: value
+                key: "length(Tags)"
+                op: ge
+                value: 14
            actions:
-             - type: tag-trim
-               space: 2
-               preserve:
-                - OwnerContact
-                - Environment
-                - downtime
-                - custodian_status
+              - type: tag-trim
+                space: 2
+                preserve:
+                 - OwnerContact
+                 - Environment
+                 - downtime
+                 - custodian_status
     """
     max_tag_count = 15
 
@@ -508,7 +508,7 @@ class TagDelayedAction(AzureBaseAction):
 
     .. code-block :: yaml
 
-      - policies:
+       policies:
         - name: vm-mark-for-stop
           resource: azure.vm
           filters:

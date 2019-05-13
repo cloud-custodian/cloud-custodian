@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:workspace/ws-quaith6ec",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "sandbox"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:workspace/ws-go0eiz0sh",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "production"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:workspace/ws-aicoo5che",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "sandbox"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "c85984f3-54e3-11e9-b8d3-a39c4cd9b6c1",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c85984f3-54e3-11e9-b8d3-a39c4cd9b6c1",
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Tue, 02 Apr 2019 01:08:10 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

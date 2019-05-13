@@ -175,7 +175,7 @@ class PolicyPermissions(BaseTest):
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
-            'support-case', 'transit-attachment'))
+            'support-case', 'transit-attachment', 'config-recorder'))
 
         missing_method = []
         for k, v in manager.resources.items():
@@ -372,8 +372,8 @@ class TestPolicy(BaseTest):
             'resource': 'aws.ec2',
             'mode': {
                 'type': 'config-rule',
-                'member-role': 'arn:aws:iam::{account_id}/role/BarFoo',
-                'role': 'arn:aws:iam::{account_id}/role/FooBar'},
+                'member-role': 'arn:aws:iam::{account_id}:role/BarFoo',
+                'role': 'arn:aws:iam::{account_id}:role/FooBar'},
             'actions': [
                 {'type': 'tag',
                  'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
@@ -387,7 +387,7 @@ class TestPolicy(BaseTest):
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
         p.expand_variables(p.get_variables())
-        self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311/role/FooBar')
+        self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
 
     def test_policy_variable_interpolation(self):
 
@@ -396,7 +396,7 @@ class TestPolicy(BaseTest):
             'resource': 'aws.ec2',
             'mode': {
                 'type': 'config-rule',
-                'member-role': 'arn:aws:iam::{account_id}/role/BarFoo',
+                'member-role': 'arn:aws:iam::{account_id}:role/BarFoo',
                 'role': 'FooBar'},
             'actions': [
                 {'type': 'tag',
@@ -417,8 +417,8 @@ class TestPolicy(BaseTest):
         self.assertEqual(
             p.data['actions'][1]['subject'],
             "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]")
-        self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311/role/FooBar')
-        self.assertEqual(p.data['mode']['member-role'], 'arn:aws:iam::{account_id}/role/BarFoo')
+        self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
+        self.assertEqual(p.data['mode']['member-role'], 'arn:aws:iam::{account_id}:role/BarFoo')
         self.assertEqual(p.resource_manager.actions[0].data['value'], ivalue)
 
     def test_child_resource_trail_validation(self):
@@ -477,7 +477,7 @@ class TestPolicy(BaseTest):
         self.assertEqual(policy.tags, ["abc"])
         self.assertFalse(policy.is_lambda)
         self.assertTrue(
-            repr(policy).startswith("<Policy resource: ec2 name: ec2-utilization")
+            repr(policy).startswith("<Policy resource:ec2 name:ec2-utilization")
         )
 
     def test_policy_name_filtering(self):
@@ -595,7 +595,7 @@ class TestPolicy(BaseTest):
         self.assertRaises(ResourceLimitExceeded, p.run)
         self.assertEqual(
             output.getvalue().strip(),
-            "policy: log-delete exceeded resource limit: 2.5% found: 1 total: 1")
+            "policy:log-delete exceeded resource-limit:2.5% found:1 total:1")
         self.assertEqual(
             p.ctx.metrics.buf[0]['MetricName'], 'ResourceLimitExceeded')
 
@@ -624,6 +624,35 @@ class TestPolicy(BaseTest):
             validate=True,
             session_factory=session_factory
         )
+
+    def test_policy_resource_limit_and_percent(self):
+        session_factory = self.replay_flight_data(
+            "test_policy_resource_count")
+        p = self.load_policy(
+            {
+                "name": "ecs-cluster-resource-count",
+                "resource": "ecs",
+                "max-resources": {
+                    "amount": 1,
+                    "percent": 10,
+                    "op": "and"
+                }
+            },
+            session_factory=session_factory)
+        self.assertRaises(ResourceLimitExceeded, p.run)
+        p = self.load_policy(
+            {
+                "name": "ecs-cluster-resource-count",
+                "resource": "ecs",
+                "max-resources": {
+                    "amount": 100,
+                    "percent": 10,
+                    "op": "and"
+                }
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(resources)
 
     def test_policy_resource_limits_with_filter(self):
         session_factory = self.replay_flight_data(
@@ -840,7 +869,7 @@ class PullModeTest(BaseTest):
 
         lines = log_file.getvalue().strip().split("\n")
         self.assertIn(
-            "Skipping policy {} target-region: us-east-1 current-region: us-west-2".format(
+            "Skipping policy:{} target-region:us-east-1 current-region:us-west-2".format(
                 policy_name
             ),
             lines,

@@ -49,7 +49,8 @@
                         "DBParameterGroupName": "default.postgres9.5", 
                         "ParameterApplyStatus": "in-sync"
                     }
-                ], 
+                ],
+		"DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:mydb",
                 "AutoMinorVersionUpgrade": false, 
                 "PreferredBackupWindow": "11:03-11:33", 
                 "DBSubnetGroup": {

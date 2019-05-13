@@ -16,15 +16,13 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n_gcp",
-    version='0.2.1',
+    version='0.3.0',
     description="Cloud Custodian - Multi Account",
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
-    author="Kapil Thangavelu",
-    author_email="kapil.foss@gmail.com",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
     entry_points={

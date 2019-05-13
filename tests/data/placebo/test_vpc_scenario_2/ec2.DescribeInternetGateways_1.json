@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "InternetGateways": [
+            {
+                "Tags": [
+                    {
+                        "Value": "Fancy Internet Gateway",
+                        "Key": "Name"
+                    }
+                ],
+                "Attachments": [
+                    {
+                        "State": "available",
+                        "VpcId": "vpc-0c1be6284618ac4c1"
+                    }
+                ],
+                "InternetGatewayId": "igw-0978760ab0696f757"
+            }
+        ],
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "688ea6ff-7a28-41fb-9729-eea68fab91d8",
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "server": "AmazonEC2",
+                "content-type": "text/xml;charset=UTF-8",
+                "date": "Tue, 27 Jun 2017 17:50:58 GMT"
+            }
+        }
+    }
+}

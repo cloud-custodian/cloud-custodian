@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"configuration\":{\"handler\":\"main\",\"role\":\"arn:aws:iam::644160558196:role/SSM-Register-API\",\"functionName\":\"omnissm-handle-registrations\",\"tracingConfig\":{\"mode\":\"Active\"},\"runtime\":\"go1.x\",\"description\":\"\",\"codeSize\":8830136.0,\"version\":\"$LATEST\",\"timeout\":60.0,\"revisionId\":\"54ee096c-43b2-48cd-9ac4-b66d1d4ce8a6\",\"codeSha256\":\"ywUl4fJB5SrJcltR5mF+fAfeR/YimO1eJPNCRl8idIA\\u003d\",\"memorySize\":128.0,\"vpcConfig\":{\"securityGroupIds\":[],\"subnetIds\":[]},\"layers\":[],\"lastModified\":\"2018-10-17T15:12:52.533+0000\",\"functionArn\":\"arn:aws:lambda:us-east-2:644160558196:function:omnissm-handle-registrations\"},\"supplementaryConfiguration\":{\"Policy\":\"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Id\\\":\\\"default\\\",\\\"Statement\\\":[{\\\"Sid\\\":\\\"omnissm-HandleRegistrationsRegisterIdPermissionTest-39ATCTCKW89Q\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"apigateway.amazonaws.com\\\"},\\\"Action\\\":\\\"lambda:invokeFunction\\\",\\\"Resource\\\":\\\"arn:aws:lambda:us-east-2:644160558196:function:omnissm-handle-registrations\\\",\\\"Condition\\\":{\\\"ArnLike\\\":{\\\"AWS:SourceArn\\\":\\\"arn:aws:execute-api:us-east-2:644160558196:ia2ajo0b3m/*/PATCH/register\\\"}}},{\\\"Sid\\\":\\\"omnissm-HandleRegistrationsRegisterInstancePermissionTest-1LY0UOWAKWWIB\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"apigateway.amazonaws.com\\\"},\\\"Action\\\":\\\"lambda:invokeFunction\\\",\\\"Resource\\\":\\\"arn:aws:lambda:us-east-2:644160558196:function:omnissm-handle-registrations\\\",\\\"Condition\\\":{\\\"ArnLike\\\":{\\\"AWS:SourceArn\\\":\\\"arn:aws:execute-api:us-east-2:644160558196:ia2ajo0b3m/*/POST/register\\\"}}},{\\\"Sid\\\":\\\"omnissm-HandleRegistrationsRegisterIdPermissionProd-OO474G0BWHSZ\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"apigateway.amazonaws.com\\\"},\\\"Action\\\":\\\"lambda:invokeFunction\\\",\\\"Resource\\\":\\\"arn:aws:lambda:us-east-2:644160558196:function:omnissm-handle-registrations\\\",\\\"Condition\\\":{\\\"ArnLike\\\":{\\\"AWS:SourceArn\\\":\\\"arn:aws:execute-api:us-east-2:644160558196:ia2ajo0b3m/Prod/PATCH/register\\\"}}},{\\\"Sid\\\":\\\"omnissm-HandleRegistrationsRegisterInstancePermissionProd-1K4E93RBE7BZ8\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"apigateway.amazonaws.com\\\"},\\\"Action\\\":\\\"lambda:invokeFunction\\\",\\\"Resource\\\":\\\"arn:aws:lambda:us-east-2:644160558196:function:omnissm-handle-registrations\\\",\\\"Condition\\\":{\\\"ArnLike\\\":{\\\"AWS:SourceArn\\\":\\\"arn:aws:execute-api:us-east-2:644160558196:ia2ajo0b3m/Prod/POST/register\\\"}}}]}\",\"Tags\":{\"lambda:createdBy\":\"SAM\"}}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "4cb30254-69a9-11e9-910c-95022bece009",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4cb30254-69a9-11e9-910c-95022bece009",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "2976",
+                "date": "Sun, 28 Apr 2019 11:32:27 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

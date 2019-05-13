@@ -1,4 +1,8 @@
 boto3
 pyyaml>=4.2b4
+<<<<<<< HEAD
 jinja2==2.10
+=======
+jinja2==2.10.1
+>>>>>>> upstream/master
 jsonschema

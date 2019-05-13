@@ -158,6 +158,29 @@ class RDSClusterTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_modify_rds_cluster(self):
+        session_factory = self.replay_flight_data("test_modify_rds_cluster")
+        p = self.load_policy(
+            {
+                "name": "modify-db-cluster",
+                "resource": "rds-cluster",
+                "filters": [{"DeletionProtection": True}],
+                "actions": [{
+                    "type": "modify-db-cluster",
+                    "attributes": {
+                        "DeletionProtection": False}
+                }]
+            },
+            session_factory=session_factory, config={'account_id': '644160558196'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("rds")
+        cluster = client.describe_db_clusters(
+            DBClusterIdentifier='mytest')
+        self.assertFalse(cluster['DBClusters'][0]['DeletionProtection'])
+
     def test_rdscluster_tag_augment(self):
         session_factory = self.replay_flight_data("test_rdscluster_tag_augment")
         p = self.load_policy(

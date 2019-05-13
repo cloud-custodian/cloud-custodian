@@ -1,0 +1,148 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?$filter=resourceType%20eq%20%27Microsoft.KeyVault%2Fvaults%27&api-version=2015-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:32:48 GMT"
+                    ],
+                    "content-length": [
+                        "539"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
+                                "name": "cckeyvault1c6ra5qqpkhceo",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {}
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault-no-policies/providers/Microsoft.KeyVault/vaults/cckeyvault2kme24fgeaqvqk",
+                                "name": "cckeyvault2kme24fgeaqvqk",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo?api-version=2018-02-14",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:32:48 GMT"
+                    ],
+                    "x-ms-keyvault-service-version": [
+                        "1.1.0.244"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1013"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
+                        "name": "cckeyvault1c6ra5qqpkhceo",
+                        "type": "Microsoft.KeyVault/vaults",
+                        "location": "southcentralus",
+                        "tags": {},
+                        "properties": {
+                            "sku": {
+                                "family": "A",
+                                "name": "Standard"
+                            },
+                            "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                            "accessPolicies": [
+                                {
+                                    "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                                    "objectId": "3857c640-b81d-4a7b-b006-ca39332fddb2",
+                                    "permissions": {
+                                        "keys": [
+                                            "Get",
+                                            "List",
+                                            "Update",
+                                            "Create",
+                                            "Import",
+                                            "Delete",
+                                            "Recover",
+                                            "Backup",
+                                            "Restore"
+                                        ],
+                                        "secrets": [
+                                            "Get",
+                                            "List",
+                                            "Set",
+                                            "Delete",
+                                            "Recover",
+                                            "Backup",
+                                            "Restore"
+                                        ],
+                                        "certificates": [
+                                            "Get",
+                                            "List",
+                                            "Update",
+                                            "Create",
+                                            "Import",
+                                            "Delete",
+                                            "Recover",
+                                            "ManageContacts",
+                                            "ManageIssuers",
+                                            "GetIssuers",
+                                            "ListIssuers",
+                                            "SetIssuers",
+                                            "DeleteIssuers"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "enabledForDeployment": false,
+                            "enabledForDiskEncryption": false,
+                            "enabledForTemplateDeployment": false,
+                            "vaultUri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/",
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

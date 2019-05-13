@@ -49,7 +49,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_mailer",
-    version='0.4.2',
+    version='0.5.0',
     description="Cloud Custodian - Reference Mailer",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -57,7 +57,7 @@ setup(
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
     entry_points={

@@ -26,18 +26,15 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.5',
+    version='0.5.3',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    include_package_data=True,
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
-    maintainer="Kapil Thangavelu",
-    maintainer_email="kapil.foss@gmail.com",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
     entry_points={
@@ -57,6 +54,7 @@ setup(
                       "azure-mgmt-datafactory",
                       "azure-mgmt-iothub",
                       "azure-mgmt-keyvault",
+                      "azure-mgmt-managementgroups",
                       "azure-mgmt-network",
                       "azure-mgmt-redis",
                       "azure-mgmt-resource",
@@ -68,6 +66,7 @@ setup(
                       "azure-mgmt-subscription",
                       "azure-mgmt-eventgrid==2.0.0rc2",  # RC2 supports AdvancedFilters
                       "azure-graphrbac",
+                      "azure-keyvault",
                       "azure-storage-blob",
                       "azure-storage-queue",
                       "distlib",
@@ -78,8 +77,8 @@ setup(
                       "azure-cli-core",
                       "adal",
                       "backports.functools_lru_cache",
-                      "future",
-                      "futures>=3.1.1"],
+                      "futures>=3.1.1",
+                      "netaddr"],
     package_data={str(''): [str('function_binding_resources/bin/*.dll'),
                             str('function_binding_resources/*.csproj'),
                             str('function_binding_resources/bin/*.json')]}

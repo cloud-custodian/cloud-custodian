@@ -18,7 +18,7 @@ from gcp_common import BaseTest, event_data
 class BigQueryDataSetTest(BaseTest):
 
     def test_query(self):
-        factory = self.replay_flight_data('bigquery-dataset-query')
+        factory = self.replay_flight_data('bq-dataset-query')
         p = self.load_policy({
             'name': 'bq-get',
             'resource': 'gcp.bq-dataset'},
@@ -30,3 +30,51 @@ class BigQueryDataSetTest(BaseTest):
             'devxyz')
         self.assertTrue('access' in dataset)
         self.assertEqual(dataset['labels'], {'env': 'dev'})
+
+
+class BigQueryJobTest(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('bq-job-query', project_id=project_id)
+        p = self.load_policy({
+            'name': 'bq-job-get',
+            'resource': 'gcp.bq-job'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['status']['state'], 'DONE')
+        self.assertEqual(resources[0]['jobReference']['location'], 'US')
+        self.assertEqual(resources[0]['jobReference']['projectId'], project_id)
+
+    def test_job_get(self):
+        project_id = 'cloud-custodian'
+        job_id = 'bquxjob_6277c025_1694dadb228'
+        location = 'US'
+        factory = self.replay_flight_data('bq-job-get', project_id=project_id)
+        p = self.load_policy({
+            'name': 'bq-job-get',
+            'resource': 'gcp.bq-job'},
+            session_factory=factory)
+        job = p.resource_manager.get_resource({
+            "project_id": project_id,
+            "job_id": job_id,
+        })
+        self.assertEqual(job['jobReference']['jobId'], job_id)
+        self.assertEqual(job['jobReference']['location'], location)
+        self.assertEqual(job['jobReference']['projectId'], project_id)
+        self.assertEqual(job['id'], "{}:{}.{}".format(project_id, location, job_id))
+
+
+class BigQueryProjectTest(BaseTest):
+
+    def test_query(self):
+        factory = self.replay_flight_data('bq-project-query')
+        p = self.load_policy({
+            'name': 'bq-get',
+            'resource': 'gcp.bq-project'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['friendlyName'], 'test project')
+        self.assertEqual(resources[0]['id'], 'cloud-custodian')

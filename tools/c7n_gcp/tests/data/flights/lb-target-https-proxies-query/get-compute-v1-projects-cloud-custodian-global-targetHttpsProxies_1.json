@@ -1,0 +1,39 @@
+{
+  "body": {
+    "items": [
+      {
+        "kind": "compute#targetHttpsProxy", 
+        "name": "newhttpslb-target-proxy", 
+        "sslCertificates": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/testcert"
+        ], 
+        "quicOverride": "NONE", 
+        "urlMap": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/newhttpslb", 
+        "creationTimestamp": "2019-03-12T02:55:59.482-07:00", 
+        "id": "4375728720756489408", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies/newhttpslb-target-proxy"
+      }
+    ], 
+    "kind": "compute#targetHttpsProxyList", 
+    "id": "projects/cloud-custodian/global/targetHttpsProxies", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "813", 
+    "transfer-encoding": "chunked", 
+    "expires": "Tue, 12 Mar 2019 10:05:06 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Tue, 12 Mar 2019 10:05:06 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"K0ucKTIWbwDgbFV42ExeJSVnNt8=/2PmAVLbG_MKMajWkizyohnfhiIQ=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

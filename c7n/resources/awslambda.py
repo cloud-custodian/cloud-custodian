@@ -83,7 +83,8 @@ class ConfigLambda(query.ConfigSource):
     def load_resource(self, item):
         resource = super(ConfigLambda, self).load_resource(item)
         resource['Tags'] = [
-            {u'Key': k, u'Value': v} for k, v in item.get('tags', {}).items()]
+            {u'Key': k, u'Value': v} for k, v in item[
+                'supplementaryConfiguration'].get('Tags', {}).items()]
         resource['c7n:Policy'] = item[
             'supplementaryConfiguration'].get('Policy')
         return resource
@@ -423,6 +424,7 @@ class LambdaLayerVersion(query.QueryResourceManager):
 
         policies:
           - name: lambda-layer
+            resource: lambda
             query:
               - version: latest
 

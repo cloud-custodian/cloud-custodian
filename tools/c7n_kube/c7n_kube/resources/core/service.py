@@ -14,7 +14,6 @@
 #
 from c7n_kube.query import QueryResourceManager, TypeInfo
 from c7n_kube.provider import resources
-from c7n_kube.labels import LabelNamespacedResource
 
 
 @resources.register('service')
@@ -22,37 +21,6 @@ class Service(QueryResourceManager):
     class resource_type(TypeInfo):
         group = 'Core'
         version = 'V1'
+        patch = 'patch_namespaced_service'
+        delete = 'delete_namespaced_service'
         enum_spec = ('list_service_for_all_namespaces', 'items', None)
-
-
-@Service.action_registry.register('label')
-class LabelService(LabelNamespacedResource):
-    """
-    Label a namespaced service
-
-    .. code-block:: yaml
-      policies:
-        - name: label-namespace
-          resource: kube.service
-          actions:
-            - type: label
-              labels:
-                label1: value1
-                label2: value2
-
-    To remove a label from a namespace, provide the label with the value ``null``
-
-    .. code-block:: yaml
-      policies:
-        - name: remove-label-from-service
-          resource: kube.service
-          filters:
-            - 'metadata.labels.label1': present
-          actions:
-            - type: label
-              labels:
-                label1: null
-
-    """
-    permissions = ('PatchNamespacedService',)
-    method_spec = {'op': 'patch_namespaced_service'}

@@ -148,7 +148,7 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
             resource: batch-compute
             filters:
               - computeResources.desiredvCpus: 0
-            action:
+            actions:
               - type: delete
     """
     schema = type_schema('delete')

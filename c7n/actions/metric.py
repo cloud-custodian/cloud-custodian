@@ -89,7 +89,7 @@ class PutMetric(BaseAction):
                     namespace: Usage Metrics
                     metric_name: Attached Disks
                     op: count
-                    units: Files
+                    units: Count
 
     op and units are optional and will default to simple Counts.
     """

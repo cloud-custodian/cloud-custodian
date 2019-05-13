@@ -162,12 +162,15 @@ class LambdaTest(BaseTest):
                 "name": "lambda-config",
                 "resource": "lambda",
                 "source": "config",
-                "filters": [{"FunctionName": "omnissm-register"}],
+                'query': [
+                    {'clause': "resourceId = 'omnissm-handle-registrations'"},
+                ],
             },
-            session_factory=factory,
-        )
+            session_factory=factory, config={'region': 'us-east-2'})
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'omnissm-handle-registrations')
         self.assertEqual(
             resources[0]["Tags"], [{"Key": "lambda:createdBy", "Value": "SAM"}]
         )

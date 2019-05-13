@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="158px" height="158px" viewBox="0 0 158 158" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+    <title>icon-color</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M0,78.75 C0,35.2575 35.2575,0 78.75,0 L78.75,0 C122.2425,0 157.5,35.2575 157.5,78.75 L157.5,78.75 C157.5,122.2425 122.2425,157.5 78.75,157.5 L78.75,157.5 C35.2575,157.5 0,122.2425 0,78.75" id="path-1"></path>
+        <linearGradient x1="50%" y1="-67.0967167%" x2="50%" y2="63.9870373%" id="linearGradient-3">
+            <stop stop-color="#F79421" offset="0%"></stop>
+            <stop stop-color="#F5CA1B" offset="98.3516%"></stop>
+            <stop stop-color="#F5CA1B" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-4" points="0 180 180 180 180 0 0 0"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-color" transform="translate(-11.000000, -11.000000)">
+            <g id="C1_OSLogo_CloudCustodian_Icon_RGB_FullColor">
+                <g id="g3363" transform="translate(90.000000, 90.000000) scale(-1, 1) rotate(-180.000000) translate(-90.000000, -90.000000) ">
+                    <g id="g3365" transform="translate(47.294625, 34.389000)" fill="#FFFFFF" fill-rule="nonzero">
+                        <path d="M63.75,37.5 L42.60875,25.8275 L21.32625,37.88625 L21.32625,61.86125 L42.60875,73.97625 L63.75,63.01125 L63.75,37.5 Z M63.90125,86.13625 L42.80125,98.31375 L21.50875,86.13625 L0.36125,98.33625 L0.36125,25.205 L42.9575,1.15875 L85.0425,25.3175 L85.55375,98.38 L63.90125,86.13625 L63.90125,86.13625 Z" id="path3367"></path>
+                    </g>
+                    <g id="g3369" transform="translate(11.250000, 11.250000)">
+                        <g id="g3371-Clipped">
+                            <mask id="mask-2" fill="white">
+                                <use xlink:href="#path-1"></use>
+                            </mask>
+                            <g id="path3375"></g>
+                            <g id="g3371" mask="url(#mask-2)" fill="url(#linearGradient-3)" fill-rule="nonzero">
+                                <g id="g3377">
+                                    <g id="g3379">
+                                        <path d="M0,78.75 C0,35.2575 35.2575,0 78.75,0 L78.75,0 C122.2425,0 157.5,35.2575 157.5,78.75 L157.5,78.75 C157.5,122.2425 122.2425,157.5 78.75,157.5 L78.75,157.5 C35.2575,157.5 0,122.2425 0,78.75" id="path3389"></path>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                    <g id="g3391">
+                        <g id="g3393-Clipped">
+                            <mask id="mask-5" fill="white">
+                                <use xlink:href="#path-4"></use>
+                            </mask>
+                            <g id="path3397"></g>
+                            <g id="g3393" mask="url(#mask-5)">
+                                <g transform="translate(43.750000, 30.000000)">
+                                    <g id="g3399" transform="translate(49.443875, 70.599375)">
+                                        <polygon id="path3401" fill="#FFFFFF" fill-rule="nonzero" points="0 26.25 15.03375 17.57 15.03375 0.2075 0 8.8875"></polygon>
+                                    </g>
+                                    <g id="g3403" transform="translate(28.436375, 70.669125)">
+                                        <polygon id="path3405" fill="#FFFFFF" fill-rule="nonzero" points="0 17.5 15.03625 26.18 15.03625 8.8175 0 0.1375"></polygon>
+                                    </g>
+                                    <g id="g3407" transform="translate(7.429000, 58.099000)">
+                                        <polygon id="path3409" fill="#FFFFFF" fill-rule="nonzero" points="0 38.75 15.03625 30.07 15.03625 9.26 0 0.58"></polygon>
+                                    </g>
+                                    <g id="g3411" transform="translate(7.429000, 34.283125)">
+                                        <polygon id="path3413" fill="#FFFFFF" fill-rule="nonzero" points="0 17.5 15.03625 26.18 15.03625 8.82 0 0.14"></polygon>
+                                    </g>
+                                    <g id="g3415" transform="translate(9.722000, 10.163000)">
+                                        <polygon id="path3417" fill="#FFFFFF" fill-rule="nonzero" points="33.75 0 0.6925 19.0875 15.72875 27.7675 33.75 17.365"></polygon>
+                                    </g>
+                                    <g id="g3419" transform="translate(49.443875, 10.163000)">
+                                        <polygon id="path3421" fill="#FFFFFF" fill-rule="nonzero" points="0 0 0 17.36125 18.02 27.7675 33.05625 19.08625"></polygon>
+                                    </g>
+                                    <g id="g3423" transform="translate(69.235500, 34.421125)">
+                                        <polygon id="path3425" fill="#FFFFFF" fill-rule="nonzero" points="16.25 0 1.21375 8.6825 1.21375 26.0425 16.25 17.3625"></polygon>
+                                    </g>
+                                    <g id="g3427" transform="translate(69.235500, 58.678375)">
+                                        <polygon id="path3429" fill="#FFFFFF" fill-rule="nonzero" points="16.25 0 1.21375 8.68125 1.21375 29.49125 16.25 38.17"></polygon>
+                                    </g>
+                                    <g id="g3431" transform="translate(0.485500, 1.178375)">
+                                        <path d="M85,57.5 L69.96375,66.18125 L69.96375,86.99125 L85,95.67 L85,57.5 Z M85,33.2425 L69.96375,41.925 L69.96375,59.285 L85,50.605 L85,33.2425 Z M48.95875,8.985 L48.95875,26.34625 L66.9775,36.7525 L82.01375,28.07125 L48.95875,8.985 Z M63.9925,59.28375 L63.9925,41.92375 L48.95875,33.24125 L48.95875,50.605 L63.9925,59.28375 Z M30.9375,64.45625 L45.9725,73.13625 L61.00875,64.45625 L45.9725,55.77625 L30.9375,64.45625 Z M42.98625,33.24375 L27.95125,41.92375 L27.95125,59.285 L42.98625,50.60375 L42.98625,33.24375 Z M42.98625,8.985 L9.93,28.0725 L24.965,36.7525 L42.98625,26.35 L42.98625,8.985 Z M6.94375,50.605 L21.97875,59.285 L21.97875,41.925 L6.94375,33.24375 L6.94375,50.605 Z M6.94375,95.67 L21.97875,86.99125 L21.97875,66.18 L6.94375,57.5 L6.94375,95.67 L6.94375,95.67 Z M27.95125,86.99125 L42.98625,95.67125 L42.98625,78.30875 L27.95125,69.62875 L27.95125,86.99125 Z M48.95875,95.67125 L63.9925,86.99125 L63.9925,69.62875 L48.95875,78.30875 L48.95875,95.67125 Z M66.97875,92.16125 L45.9725,104.28875 L24.965,92.16125 L0.97125,106.01375 L0.97125,26.34875 L45.9725,0.36625 L90.97125,26.34625 L90.97125,106.01375 L66.97875,92.16125 Z" id="path3433" fill="#88752F" fill-rule="nonzero"></path>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <text id="SM" fill="#AFA37C" font-family="Optimist-Regular, Optimist" font-size="8" font-weight="normal">
+                <tspan x="127.356" y="168">SM</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

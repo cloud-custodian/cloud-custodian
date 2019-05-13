@@ -1,0 +1,32 @@
+{
+  "body": {
+    "kind": "compute#targetSslProxy", 
+    "name": "lb2-target-proxy", 
+    "service": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/backendServices/lb2", 
+    "proxyHeader": "NONE", 
+    "sslCertificates": [
+      "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/testcert"
+    ], 
+    "creationTimestamp": "2019-03-06T07:34:34.302-08:00", 
+    "id": "1917928467246241381", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetSslProxies/lb2-target-proxy"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "538", 
+    "transfer-encoding": "chunked", 
+    "expires": "Wed, 06 Mar 2019 15:52:27 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Wed, 06 Mar 2019 15:52:27 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetSslProxies/lb2-target-proxy?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"0GDkhZBjF4Vl_NZyDhDapyfB20Y=/fqK7bOxgEqUDindToHnwaiDdIUo=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

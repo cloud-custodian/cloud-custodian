@@ -1,0 +1,32 @@
+{
+  "body": {
+    "items": [
+      {
+        "kind": "sql#user", 
+        "name": "postgres", 
+        "project": "cloud-custodian",
+        "instance": "custodian-postgres",
+        "host": "", 
+        "etag": "84ee9e4a5ab0e95c12ed77825ce5ee8f6933b34a5c2d64dd1b98e627ddf12833"
+      }
+    ], 
+    "kind": "sql#usersList"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "268", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres/users?alt=json",
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 19 Apr 2019 07:20:18 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "GSE", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "date": "Fri, 19 Apr 2019 07:20:18 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
