@@ -13,7 +13,7 @@ in the makefile:
 
 This creates a virtual env in your enlistment and installs all packages as editable.
 
-Instead, you can do `pip install -r tools/c7n_gcp/requirements.txt` to install test dependencies.
+Instead, you can do `pip install -r tools/c7n_gcp/requirements.txt` to install dependencies.
 
 Adding New GCP Resources
 ==========================
@@ -21,7 +21,7 @@ Adding New GCP Resources
 Install GCP Dependencies
 --------------------------
 
-Custodian interfaces with ARM resources using GCP's REST interface.
+Custodian interfaces uses GCP's REST interface.
 
 Create New GCP Resource (Need to check)
 -----------------------------------------
@@ -52,7 +52,7 @@ load all registered resources. Import the resource in
 Testing (Need to check)
 =========================
 
-Tests for c7n_gcp run automatically with other Custodian tests.  See :ref:`Testing for Developers <developer-tests>`
+Tests for c7n_gcp run automatically with other Custodian tests.
 for information on how to run Tox.
 
 
