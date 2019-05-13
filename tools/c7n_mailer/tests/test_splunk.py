@@ -387,7 +387,7 @@ class TestGetSplunkEvents(DeliveryTester):
     @patch(
         '%s._prune_log_message' % pb, return_value={'event': 'cleaned'}
     )
-    def test_simple(self, mock_prune, mock_getuser):
+    def test_remove_metrics(self, mock_prune, mock_getuser):
         self.config['splunk_remove_metrics'] = True
 
         def se_tags(res):
