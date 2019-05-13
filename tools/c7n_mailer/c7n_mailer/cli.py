@@ -10,6 +10,7 @@ import jsonschema
 from c7n_mailer import deploy, utils
 from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
 from c7n_mailer.azure import deploy as azure_deploy
+from c7n_mailer.gcp.gcp_pubsub_processor import MailerGcpPubSubProcessor
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from ruamel import yaml
 
@@ -179,6 +180,10 @@ def is_azure_cloud(mailer_config):
     return mailer_config.get('queue_url').startswith('asq')
 
 
+def is_gcp_cloud(mailer_config):
+    return mailer_config.get('queue_url').startswith('projects')
+
+
 def main():
     parser = get_c7n_mailer_parser()
     args = parser.parse_args()
@@ -207,6 +212,8 @@ def main():
 
         if is_azure_cloud(mailer_config):
             azure_deploy.provision(mailer_config)
+        elif is_gcp_cloud(mailer_config):
+            print('Deploying mailer as a google cloud function is not supported at this time.')
         else:
             deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
 
@@ -216,6 +223,8 @@ def main():
         # Select correct processor
         if is_azure_cloud(mailer_config):
             processor = MailerAzureQueueProcessor(mailer_config, logger)
+        elif is_gcp_cloud(mailer_config):
+            processor = MailerGcpPubSubProcessor(mailer_config, logger)
         else:
             aws_session = session_factory(mailer_config)
             processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)

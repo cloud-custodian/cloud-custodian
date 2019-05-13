@@ -1,8 +1,4 @@
-# c7n-mailer: Custodian Mailer
-
-[//]: # (         !!! IMPORTANT !!!                    )
-[//]: # (This file is moved during document generation.)
-[//]: # (Only edit the original document at ./tools/c7n_mailer/README.md)
+# Custodian Mailer
 
 A mailer implementation for Custodian. Outbound mail delivery is still somewhat
 organization-specific, so this at the moment serves primarily as an example
@@ -25,17 +21,17 @@ and run a policy that triggers an email to your inbox.
 
 1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/cloudcustodian/mailer)
    - or use `pip install c7n-mailer`
-2. In your text editor, create a `mailer.yml` file to hold your mailer config.
-3. In the AWS console, create a new standard SQS queue (quick create is fine).
+1. In your text editor, create a `mailer.yml` file to hold your mailer config.
+1. In the AWS console, create a new standard SQS queue (quick create is fine).
    Copy the queue URL to `queue_url` in `mailer.yml`.
-4. In AWS, locate or create a role that has read access to the queue. Grab the
+1. In AWS, locate or create a role that has read access to the queue. Grab the
    role ARN and set it as `role` in `mailer.yml`.
 
 there is different notification endpoints options, you can combine both.
 
 ### Email:
 Make sure your email address is verified in SES, and set it as
-`from_address` in `mailer.yml`. By default SES is in sandbox mode where you
+   `from_address` in `mailer.yml`. By default SES is in sandbox mode where you
 must
 [verify](http://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html)
 every individual recipient of emails. If need be, make an AWS support ticket to
@@ -53,14 +49,14 @@ from_address: you@example.com
 
 Now let's make a Custodian policy to populate your mailer queue. Create a
 `test-policy.yml` file with this content (update `to` and `queue` to match your
-environment)
+environment):
 
 ```yaml
-  policies:
+policies:
   - name: c7n-mailer-test
     resource: sqs
     filters:
-      - "tag:MailerTest": absent
+     - "tag:MailerTest": absent
     actions:
       - type: notify
         template: default
@@ -178,8 +174,6 @@ Delivery via tag has been tested with webhooks but should support all delivery m
 c7n-mailer --config mailer.yml --update-lambda && custodian run -c test-policy.yml -s .
 ```
 
-Note: You can set the profile via environment variable e.g. `export AWS_DEFAULT_PROFILE=foo`
-
 You should see output similar to the following:
 
 ```
@@ -212,10 +206,10 @@ c7n-mailer: error: argument -c/--config is required
 ```
 
 Fundamentally what `c7n-mailer` does is deploy a Lambda (using
-[Mu](http://cloudcustodian.io/docs/policy/mu.html)) based on
+[Mu](http://www.capitalone.io/cloud-custodian/docs/policy/mu.html)) based on
 configuration you specify in a YAML file.  Here is [the
-schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform,
-and here is a description of the options:
+schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform, here is
+[an example config](./example.yml), and here is a description of the options:
 
 | Required? | Key                  | Type             | Notes                               |
 |:---------:|:---------------------|:-----------------|:------------------------------------|
@@ -256,8 +250,19 @@ and here is a description of the options:
 |           | `skuTier`                      | string           | Default: `Basic` |
 |           | `skuName`                      | string           | Default: `B1`    |
 
+#### Standard Google Cloud Config
+To configure Mailer to support Google Cloud, you must set the properties below in the config. Please note that Mailer will only run from the command line to support Google Cloud. Deployment of c7n_mailer as a Google Cloud Function is not supported at this time.  Additionally, Mailer for GCP only supports SMTP delivery at this time.
 
-
+| Required? | Key                  | Type             | Notes                               |
+|:---------:|:---------------------|:-----------------|:------------------------------------|
+| &#x2705;  | `queue_url`       | string           | set to the url path of the gcp subscription |                                    |
+|           | `from_address`       | string           | default from address that messages are sent from                |
+|           | `contact_tags`       | array of strings | tags(labels) that we should look at for address information |
+|           | `smtp_server`        | string           | Your smtp server ip address or hostname |
+|           | `smtp_port`          | integer          | smtp port                           |
+|           | `smtp_ssl`           | boolean          | this defaults to True               |
+|           | `smtp_username`      | string           |                                     |
+|           | `smtp_password`      | string           |                                     |
 
 #### Mailer Infrastructure Config
 
@@ -404,7 +409,7 @@ mailer is running under.
 The notify action in your policy will reflect transport type `asq` with the URL
 to an Azure Storage Queue.  For example:
 
-```yaml
+```json
 policies:
   - name: azure-notify
     resource: azure.resourcegroup
@@ -424,7 +429,7 @@ policies:
 In your mailer configuration, you'll need to provide your SendGrid API key as well as
 prefix your queue URL with `asq://` to let mailer know what type of queue it is:
 
-```yaml
+```yml
 queue_url: asq://storageaccount.queue.core.windows.net/queuename
 from_address: you@youremail.com
 sendgrid_api_key: SENDGRID_API_KEY
@@ -443,7 +448,7 @@ mailer configuration.
 
 where `mailer.yml` may look like:
 
-```yaml
+```yml
 queue_url: asq://storage.queue.core.windows.net/custodian
 from_address: foo@mail.com
 sendgrid_api_key: <key>
@@ -455,11 +460,59 @@ function_properties:
     skuName: B1
     location: WestUS2
 ```
+## Using on GCP
+
+Requires:
+
+- `c7n_gcp` package.  See [GCP Getting Started](https://cloudcustodian.io/docs/gcp/gettingstarted.html)
+- A working SMTP Account. 
+- [GCP Pubsub Subscription](https://cloud.google.com/pubsub/docs/)
+
+The mailer supports GCP Pubsub transports and SMTP/Email delivery.
+Configuration for this scenario requires only minor changes from AWS deployments.
+
+The notify action in your policy will reflect transport type `asq` with the URL
+to an Azure Storage Queue.  For example:
+
+```yml
+policies:
+  - name: gcp-notify
+    resource: gcp.compute
+    description: example policy
+    actions:
+      - type: notify
+        template: default
+        priority_header: '2'
+        subject: Hello from C7N Mailer
+        to:
+          - you@youremail.com
+        transport:
+          type: pubsub
+          topic: projects/myproject/topics/mytopic
+```
+
+In your mailer configuration, you'll need to provide your SMTP account information 
+as well as your topic subscription path in the queue_url variable. Please note that the 
+subscription you specify should be subscribed to the topic you assign in your policies' 
+notify action for GCP resources. 
+
+```yml
+queue_url: projects/myproject/subscriptions/mysubscription
+from_address: you@youremail.com
+smtp_server: my.smtp.add.ress
+smtp_port: 25
+smtp_ssl: True
+smtp_username: smtpuser
+smtp_password: smtppassword
+```
+
+The mailer will transmit all messages found on the queue on each execution using SMTP/Email delivery. 
 
 ## Writing an email template
 
 Templates are authored in [jinja2](http://jinja.pocoo.org/docs/dev/templates/).
-Drop a file with the `.j2` extension into the a templates directory, and send a pull request to this
+Drop a file with the `.j2` extension into the
+[`c7n_mailer/msg-templates`](./c7n_mailer/msg-templates) directory, and send a pull request to this
 repo. You can then reference it in the `notify` action as the `template`
 variable by file name minus extension. Templates ending with `.html.j2` are
 sent as HTML-formatted emails, all others are sent as plain text.
@@ -476,8 +529,6 @@ The following variables are available when rendering templates:
 | `action` | `notify` action that generated this SQS message |
 | `policy` | policy that triggered this notify action |
 | `account` | short name of the aws account |
-| `region`  | region the policy was executing in |
-| `execution_start` | The time policy started executing |
 
 The following extra global functions are available:
 
@@ -486,9 +537,6 @@ The following extra global functions are available:
 | `format_struct(struct)` | pretty print a json structure |
 | `resource_tag(resource, key)` | retrieve a tag value from a resource or return an empty string, aliased as get_resource_tag_value |
 | `format_resource(resource, resource_type)` | renders a one line summary of a resource |
-| `date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z')`| customize rendering of an utc datetime string |
-| `seach(expression, value)` | jmespath search value using expression |
-| `yaml_safe(value)` | yaml dumper |
 
 The following extra jinja filters are available:
 
@@ -502,7 +550,7 @@ The following extra jinja filters are available:
 
 Clone the repository:
 ```
-$ git clone https://github.com/cloud-custodian/cloud-custodian
+$ git clone https://github.com/capitalone/cloud-custodian
 ```
 Install dependencies (with virtualenv):
 ```
