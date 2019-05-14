@@ -191,5 +191,5 @@ class TestAMI(BaseTest):
         self.assertEqual(len(resources), 1)
         client = session_factory().client("ec2")
         res = client.describe_image_attribute(Attribute='launchPermission',
-            ImageId='ami-05eec6d1db8feea7b')
+            ImageId=resources[0]['ImageId'])
         self.assertEqual(res['LaunchPermissions'], [{'UserId': '123456789'}])
