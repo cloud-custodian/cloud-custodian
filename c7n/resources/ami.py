@@ -212,7 +212,7 @@ class ModifyImageAttribute(BaseAction):
         params={'type': 'object'},
         required=('params',))
     
-    permissions = ('ec2:ModifyImageAttribute')
+    permissions = ('ec2:ModifyImageAttribute',)
     shape = 'ModifyImageAttributeRequest'
 
     def validate(self):
