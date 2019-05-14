@@ -179,7 +179,7 @@ class FunctionPackage(object):
 
         exclude = os.path.normpath('/cache/') + os.path.sep
         self.pkg.add_modules(lambda f: (exclude in f),
-                             *[m.replace('-', '_') for m in modules])
+                             [m.replace('-', '_') for m in modules])
 
         # add config and policy
         self._add_functions_required_files(policy, queue_name)
