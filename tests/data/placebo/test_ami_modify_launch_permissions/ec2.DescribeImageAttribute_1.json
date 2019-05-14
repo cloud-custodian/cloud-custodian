@@ -4,7 +4,7 @@
         "ImageId": "ami-05eec6d1db8feea7b",
         "LaunchPermissions": [
             {
-                "UserId": "872247246277"
+                "UserId": "123456789"
             }
         ],
         "ResponseMetadata": {

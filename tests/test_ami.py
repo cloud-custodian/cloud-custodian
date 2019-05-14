@@ -183,7 +183,7 @@ class TestAMI(BaseTest):
                     "params": {
                       "Attribute": "LaunchPermissions",
                       "LaunchPermission": {
-                        "Add": [{"UserId": "872247246277"}]}}}],
+                        "Add": [{"UserId": "123456789"}]}}}],
             },
             session_factory=session_factory,
         )
@@ -192,4 +192,4 @@ class TestAMI(BaseTest):
         client = session_factory().client("ec2")
         res = client.describe_image_attribute(Attribute='launchPermission',
             ImageId='ami-05eec6d1db8feea7b')
-        self.assertEqual(res['LaunchPermissions'], [{'UserId': '872247246277'}])
+        self.assertEqual(res['LaunchPermissions'], [{'UserId': '123456789'}])
