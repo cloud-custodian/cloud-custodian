@@ -50,6 +50,119 @@ class Vpc(query.QueryResourceManager):
         id_prefix = "vpc-"
 
 
+@Vpc.action_registry.register('delete')
+class Delete(BaseAction):
+    """Action to delete VPC(s)
+
+    It is recommended to apply a filter to the delete policy to avoid the
+    deletion of all VPCs returned.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: vpc-delete-test
+                resource: vpc
+                filters:
+                  - type: value
+                    key: "tag:Name"
+                    op: eq
+                    value: "c7n-vpc-delete-test"
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteSubnet', 'ec2:DetachInternetGateway', 'ec2:DeleteInternetGateway',
+                   'ec2:DeleteRouteTable', 'ec2:DeleteSecurityGroup', 'ec2:DeleteVpc',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        # Delete Subnets associated with VPC
+        vpc_subnet_filter = VpcSubnetFilter(data=self.data, manager=self.manager)
+        vpc_subnet_ids = vpc_subnet_filter.get_related_ids(resources=resources)
+        for id in vpc_subnet_ids:
+            try:
+                client.delete_subnet(SubnetId=id)
+                self.log.debug(
+                    "Deleted associated Subnet ID %s",
+                    id
+                )
+            except ClientError as e:
+                self.log.warning(
+                    "Could not delete Subnet ID %s, error: %s",
+                    id, e)
+
+        # Delete Internet Gateways assocaited with VPC
+        # Detaching the Internet Gateway requires the VpcId
+        for r in resources:
+            vpc_igw_filter = VpcInternetGatewayFilter(data=self.data, manager=self.manager)
+            vpc_igw_ids = vpc_igw_filter.get_related_ids(resources=[r])
+            for id in vpc_igw_ids:
+                # You must detach the internet gateway from the VPC before you can delete it.
+                try:
+                    client.detach_internet_gateway(InternetGatewayId=id, VpcId=r['VpcId'])
+                    self.log.debug(
+                        "Detached associated Internet Gateway ID %s",
+                        id
+                    )
+                except ClientError as e:
+                    self.log.warning(
+                        "Could not detach Internet Gateway ID %s, error: %s",
+                        id, e)
+
+                try:
+                    client.delete_internet_gateway(InternetGatewayId=id)
+                    self.log.debug(
+                        "Deleted associated Internet Gateway ID %s",
+                        id
+                    )
+                except ClientError as e:
+                    self.log.warning(
+                        "Could not delete Internet Gateway ID %s, error: %s",
+                        id, e)
+
+        # Delete Route Tables associated with VPC
+        vpc_rtb_filter = VpcRouteTableFilter(data=self.data, manager=self.manager)
+        vpc_rtb_ids = vpc_rtb_filter.get_related_ids(resources=resources)
+        for id in vpc_rtb_ids:
+            try:
+                client.delete_route_table(RouteTableId=id)
+                self.log.debug(
+                    "Deleted associated Route Table ID %s",
+                    id
+                )
+            except ClientError as e:
+                self.log.warning(
+                    "Could not delete Route Table ID %s, error: %s",
+                    id, e)
+
+        # Delete Security Groups associated with VPC
+        vpc_sg_filter = VpcSecurityGroupFilter(data=self.data, manager=self.manager)
+        vpc_security_group_ids = vpc_sg_filter.get_related_ids(resources=resources)
+        for id in vpc_security_group_ids:
+            try:
+                client.delete_security_group(GroupId=id)
+                self.log.debug(
+                    "Deleted associated Security Group ID %s",
+                    id
+                )
+            except ClientError as e:
+                self.log.warning(
+                    "Could not delete Security Group ID %s, error: %s",
+                    id, e)
+
+        # Delete the VPCs
+        for r in resources:
+            client.delete_vpc(VpcId=r['VpcId'])
+            self.log.debug(
+                "Deleted VPC ID %s",
+                r['VpcId']
+            )
+
+
 @Vpc.filter_registry.register('flow-logs')
 class FlowLogFilter(Filter):
     """Are flow logs enabled on the resource.
@@ -307,6 +420,40 @@ class VpcInternetGatewayFilter(RelatedResourceFilter):
         return vpc_igw_ids
 
 
+@Vpc.filter_registry.register('route-table')
+class VpcRouteTableFilter(RelatedResourceFilter):
+    """Filter VPCs based on Route Table attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: internet-gateway
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'route-table', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.RouteTable"
+    RelatedIdsExpression = '[RouteTables][].RouteTableId'
+    AnnotationKey = "MatchedVpcsRtbs"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        vpc_rtb_ids = {
+            g['RouteTableId'] for g in
+            self.manager.get_resource_manager('route-table').resources()
+            if g.get('VpcId', '') in vpc_ids
+        }
+        return vpc_rtb_ids
+
+
 @Vpc.filter_registry.register('vpc-attributes')
 class AttributesFilter(Filter):
     """Filters VPCs based on their DNS attributes
@@ -447,6 +594,35 @@ class Subnet(query.QueryResourceManager):
 
 
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
+
+
+@Subnet.action_registry.register('delete')
+class Delete(BaseAction):
+    """Action to delete subnet(s)
+
+    It is recommended to apply a filter to the delete policy to avoid the
+    deletion of all subnets returned.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: subnets-unused-delete
+                resource: subnet
+                filters:
+                  - flow-logs
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteSubnet',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_subnet(SubnetId=r['GroupId'])
 
 
 @resources.register('security-group')
