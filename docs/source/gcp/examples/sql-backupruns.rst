@@ -1,13 +1,11 @@
-Cloud SQL - Lists Unsucessful Backups Older Than N Days
+Cloud SQL - List Unsucessful Backups Older Than N Days
 =======================================================
 
-TBD. list unsucessful backups older than 5 days
-
-In the example below, TBD.
+The following example demonstates ability of Cloud Custodian to track backup runs of Cloud SQL instances and list unsucessful backups (if any) older than 5 days.
 
 .. code-block:: yaml
 
-policies:
+    policies:
     - name: leonid-sql-backup-run
       description: |
         check basic work of Cloud SQL filter on backup runs: lists unsucessful backups older than 5 days
