@@ -23,23 +23,8 @@ Install GCP Dependencies
 
 Custodian interfaces uses GCP's REST interface.
 
-Create New GCP Resource (Need to check)
------------------------------------------
-
-Create your new GCP Resource.
-
-- ``service``: The GCP SDK dependency added in step 1.
-- ``client``: Client class name of the Azure Resource SDK of the resource you added.
-- ``enum_spec``: Is a tuple of (enum_operation, list_operation, extra_args). The resource SDK client will have a list of operations this resource has.
-    Place the name of the property as the enum_operation. Next, put `list` as the operations.
-
-.. code-block:: python
-
-    from c7n_gcp.provider import resources
-
-
-Load New GCP Resource (Need to check)
---------------------------------------
+Load New GCP Resource
+---------------------
 
 Once the required dependecies are installed and created the new GCP Resource, custodian will
 load all registered resources. Import the resource in
@@ -49,12 +34,10 @@ load all registered resources. Import the resource in
 
     import c7n_gcp.resources.container_registry
 
-Testing (Need to check)
-=========================
+Testing
+========
 
-Tests for c7n_gcp run automatically with other Custodian tests.
-for information on how to run Tox.
-
+Tests for c7n_gcp run automatically with other Custodian tests. See :ref:`Testing for Developers <developer-tests>` for information on how to run Tox.
 
 Running tests
 ---------------
