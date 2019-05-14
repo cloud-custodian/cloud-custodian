@@ -25,7 +25,7 @@ To configure Cloud Pub/Sub messaging please take a look at the :ref:`gcp_generic
               format: json
               transport:
                 type: pubsub
-                topic: projects/custodian-test-project-0/topics/load-balancer-addresses
+                topic: projects/cloud-custodian/topics/load-balancer-resources
         - name: load-balancers-addresses-in-premium-network-tier
           description: |
             List of Load Balancers' Addresses in premium network tier
@@ -41,4 +41,4 @@ To configure Cloud Pub/Sub messaging please take a look at the :ref:`gcp_generic
               format: json
               transport:
                 type: pubsub
-                topic: projects/custodian-test-project-0/topics/load-balancer-addresses
+                topic: projects/cloud-custodian/topics/load-balancer-resources
