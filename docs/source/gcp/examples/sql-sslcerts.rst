@@ -1,13 +1,11 @@
 Cloud SQL - Notify on Certificates Which Are About to Expire
 ============================================================
 
-TBD. return certs which are about to expire in 60 days or less
-
-In the example below, TBD.
+In the example below, Cusodian will track SSL certificates which are in use by your Cloud SQL instances and notify about the ones which are going to expire in 60 days or less.
 
 .. code-block:: yaml
 
-policies:
+    policies:
     - name: leonid-sql-ssl-cert
       description: |
         check basic work of Cloud SQL filter on SSL certificates: returns certs which are about to expire in 60 days or less
