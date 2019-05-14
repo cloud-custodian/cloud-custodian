@@ -202,7 +202,7 @@ class ModifyImageAttribute(BaseAction):
                     params:
                       Attribute: LaunchPermissions
                       LaunchPermission:
-                        Add: 
+                        Add:
                          - 'UserId': 'XXXXXXXXX277'
 
     """
@@ -211,7 +211,7 @@ class ModifyImageAttribute(BaseAction):
         'modify-image-attribute',
         params={'type': 'object'},
         required=('params',))
-    
+
     permissions = ('ec2:ModifyImageAttribute',)
     shape = 'ModifyImageAttributeRequest'
 

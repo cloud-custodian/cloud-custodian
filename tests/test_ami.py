@@ -181,9 +181,9 @@ class TestAMI(BaseTest):
                 "actions": [{
                     "type": "modify-image-attribute",
                     "params": {
-                      "Attribute": "LaunchPermissions",
-                      "LaunchPermission": {
-                        "Add": [{"UserId": "123456789"}]}}}],
+                        "Attribute": "LaunchPermissions",
+                        "LaunchPermission": {
+                            "Add": [{"UserId": "123456789"}]}}}],
             },
             session_factory=session_factory,
         )
