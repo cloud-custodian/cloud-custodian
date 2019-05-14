@@ -23,6 +23,8 @@ from c7n.actions import BaseAction
 from c7n.exceptions import ClientError
 from c7n.filters import (
     AgeFilter, Filter, CrossAccountAccessFilter)
+from .aws import shape_validate
+from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource
 from c7n.resolver import ValuesFrom
@@ -175,6 +177,53 @@ class RemoveLaunchPermissions(BaseAction):
     def process_image(self, client, image):
         client.reset_image_attribute(
             ImageId=image['ImageId'], Attribute="launchPermission")
+
+
+@AMI.action_registry.register('modify-image-attribute')
+class ModifyImageAttribute(BaseAction):
+    """Action to modify the image attributes of an AMI
+
+    This action will help share any AMIs to other AWS 
+    accounts such that other groups and users can launch instances
+    using this.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-remove-launch-permissions
+                resource: ami
+                filters:
+                  - type: image-age
+                    days: 60
+                actions:
+                  - remove-launch-permissions
+
+    """
+
+    schema = type_schema(
+        'modify-image-attribute',
+        params={'type': 'object'},
+        required=('params',))
+    
+    permissions = ('ec2:ModifyImageAttribute')
+    shape = 'ModifyImageAttributeRequest'
+
+    def validate(self):
+        attrs = dict(self.data['params'])
+        if 'ImageId' in attrs:
+            raise PolicyValidationError(
+                "Can't include Image id in modify-image-attribute action")
+        attrs['ImageId'] = 'PolicyValidation'
+        return shape_validate(attrs, self.shape, 'ec2')
+
+    def process(self, images):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for i in images:
+            client.modify_image_attribute(
+                ImageId=i['ImageId'],
+                **self.data['params'])
 
 
 @AMI.action_registry.register('copy')

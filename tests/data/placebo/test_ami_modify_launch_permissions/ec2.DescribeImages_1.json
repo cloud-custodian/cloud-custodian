@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2019-05-14T16:47:47.000Z",
+                "ImageId": "ami-05eec6d1db8feea7b",
+                "ImageLocation": "644160558196/amzn-ami-hvm-2017.09.1.20180115-x86_64-gp2",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "644160558196",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-02b7bd98e16c50d31",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2",
+                            "Encrypted": false
+                        }
+                    }
+                ],
+                "Description": "amzn-ami-hvm-2017.09.1.20180115-x86_64-gp2",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "amzn-ami-hvm-2017.09.1.20180115-x86_64-gp2",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "6fd9a335-0530-43d4-a5ce-deda864e2b70",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "1686",
+                "date": "Tue, 14 May 2019 17:23:33 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

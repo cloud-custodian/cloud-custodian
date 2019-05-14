@@ -170,3 +170,27 @@ class TestAMI(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ami_modify_launch_permissions(self):
+        session_factory = self.replay_flight_data("test_ami_modify_launch_permissions")
+        p = self.load_policy(
+            {
+                "name": "cross-account-ami",
+                "resource": "ami",
+                "filters": [{"type": "image-age", "days": 0}],
+                "actions": [{
+                    "type": "modify-image-attribute",
+                    "params": {
+                      "Attribute": "LaunchPermissions",
+                      "LaunchPermission": {
+                        "Add": [{"UserId": "872247246277"}]}}}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("ec2")
+        res = client.describe_image_attribute(
+           Attribute='launchPermission',
+           ImageId='ami-05eec6d1db8feea7b')
+        self.assertEqual(res['LaunchPermissions'], [{'UserId': '872247246277'}])
