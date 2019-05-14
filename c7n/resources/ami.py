@@ -203,7 +203,7 @@ class ModifyImageAttribute(BaseAction):
                       Attribute: LaunchPermissions
                       LaunchPermission:
                         Add: 
-                         - 'UserId': '872247246277'
+                         - 'UserId': 'XXXXXXXXX277'
 
     """
 
