@@ -51,7 +51,7 @@ class Vpc(query.QueryResourceManager):
 
 
 @Vpc.action_registry.register('delete')
-class Delete(BaseAction):
+class VpcDelete(BaseAction):
     """Action to delete VPC(s)
 
     It is recommended to apply a filter to the delete policy to avoid the
@@ -83,9 +83,12 @@ class Delete(BaseAction):
         # Delete Subnets associated with VPC
         vpc_subnet_filter = VpcSubnetFilter(data=self.data, manager=self.manager)
         vpc_subnet_ids = vpc_subnet_filter.get_related_ids(resources=resources)
+        subnet_manager = self.manager.get_resource_manager('subnet')
         for id in vpc_subnet_ids:
             try:
-                client.delete_subnet(SubnetId=id)
+                #client.delete_subnet(SubnetId=id)
+                subnets = subnet_manager.get_resources([id])
+                subnet_manager.action_registry.get('delete')({}, subnet_manager).process(subnets)
                 self.log.debug(
                     "Deleted associated Subnet ID %s",
                     id
@@ -142,9 +145,12 @@ class Delete(BaseAction):
         # Delete Security Groups associated with VPC
         vpc_sg_filter = VpcSecurityGroupFilter(data=self.data, manager=self.manager)
         vpc_security_group_ids = vpc_sg_filter.get_related_ids(resources=resources)
+        sg_manager = self.manager.get_resource_manager('security-group')
         for id in vpc_security_group_ids:
             try:
-                client.delete_security_group(GroupId=id)
+                #client.delete_security_group(GroupId=id)
+                sgs = sg_manager.get_resources([id])
+                sg_manager.action_registry.get('delete')({}, sg_manager).process(sgs)
                 self.log.debug(
                     "Deleted associated Security Group ID %s",
                     id
@@ -432,7 +438,7 @@ class VpcRouteTableFilter(RelatedResourceFilter):
               - name: gray-vpcs
                 resource: vpc
                 filters:
-                  - type: internet-gateway
+                  - type: route-table
                     key: tag:Color
                     value: Gray
     """
@@ -597,7 +603,7 @@ Subnet.filter_registry.register('flow-logs', FlowLogFilter)
 
 
 @Subnet.action_registry.register('delete')
-class Delete(BaseAction):
+class SubnetDelete(BaseAction):
     """Action to delete subnet(s)
 
     It is recommended to apply a filter to the delete policy to avoid the
@@ -622,7 +628,7 @@ class Delete(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
         for r in resources:
-            client.delete_subnet(SubnetId=r['GroupId'])
+            client.delete_subnet(SubnetId=r['SubnetId'])
 
 
 @resources.register('security-group')
@@ -1345,7 +1351,7 @@ class IPPermissionEgress(SGPermission):
 
 
 @SecurityGroup.action_registry.register('delete')
-class Delete(BaseAction):
+class SecurityGroupDelete(BaseAction):
     """Action to delete security group(s)
 
     It is recommended to apply a filter to the delete policy to avoid the
