@@ -1,13 +1,11 @@
 Cloud SQL - Check Users
 =======================
 
-TBD. list instance superusers which are not included into a standard user set
-
-In the example below, TBD.
+One of security best practices is to control list of your users with extended permissions (e.g. 'postresql', 'root', etc). In the example below, Custodian lists existing users which are not included into an approved set.
 
 .. code-block:: yaml
 
-policies:
+    policies:
     - name: leonid-sql-user
       description: |
         check basic work of Cloud SQL filter on users: lists instance superusers which are not included into a standard user set
