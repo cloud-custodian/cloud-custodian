@@ -3,13 +3,13 @@
 Load Balancer
 =============
 
-Filters: TBD
-------------
-Filters are not implemented.
+Filters
+--------
+ - Standard Value Filter (see :ref:`filters`)
 
-Actions: TBD
-------------
-Actions are not implemented.
+Actions
+--------
+ - GCP Actions (see :ref:`gcp_genericgcpactions`)
 
 Environment variables
 ---------------------
