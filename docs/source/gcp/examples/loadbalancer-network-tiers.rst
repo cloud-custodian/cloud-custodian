@@ -5,7 +5,7 @@ These examples allow to work with GCP loadbalancer-address resource. It describe
 
 Details about all available loadbalancer resource are available in the :ref:`gcp_loadbalancer` page.
 
-To configure Cloud Pub/Sub messaging please take a look at the article.
+To configure Cloud Pub/Sub messaging please take a look at the :ref:`gcp_genericgcpactions` page.
 
 .. code-block:: yaml
 

@@ -10,4 +10,5 @@ Here are some more specific example policies for these resources:
   :titlesonly:
   :glob:
 
+  genericgcpactions
   resources/*
