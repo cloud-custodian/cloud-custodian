@@ -1,13 +1,11 @@
 Cloud SQL - Check Regions of Instances and Their State
-======================================================
+========================================================
 
-TBD. Returns instances which are not in an approved set of regions AND not in runnable state.
-
-In the example below, TBD.
+Execution of the following policy returns instances which are not in an approved set of regions AND not in runnable state. You may use more complex logic to combine any condition you need.
 
 .. code-block:: yaml
 
-policies:
+    policies:
     - name: leonid-sql-instance
       description: |
         check basic work of Cloud SQL filter on instances: returns instances which are not in an approved set of regions AND not in runnable state
