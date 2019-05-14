@@ -183,7 +183,7 @@ class RemoveLaunchPermissions(BaseAction):
 class ModifyImageAttribute(BaseAction):
     """Action to modify the image attributes of an AMI
 
-    This action will help share any AMIs to other AWS 
+    This action will help share any AMIs to other AWS
     accounts such that other groups and users can launch instances
     using this.
 
@@ -198,7 +198,12 @@ class ModifyImageAttribute(BaseAction):
                   - type: image-age
                     days: 60
                 actions:
-                  - remove-launch-permissions
+                  - type: modify-image-attribute
+                    params:
+                      Attribute: LaunchPermissions
+                      LaunchPermission:
+                        Add: 
+                         - 'UserId': '872247246277'
 
     """
 
