@@ -44,6 +44,8 @@ def get_archive(config):
         'c7n_mailer',
         # core deps
         'jinja2', 'markupsafe', 'ruamel', 'ldap3', 'pyasn1', 'redis',
+        # for other dependencies
+        'pkg_resources',
         # transport datadog - recursive deps
         'datadog', 'simplejson', 'decorator',
         # requests (recursive deps), needed by datadog, slackclient, splunk
