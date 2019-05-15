@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import itertools
 import operator
+import time
 import zlib
 import jmespath
 
@@ -29,7 +30,7 @@ from c7n.filters.revisions import Diff
 from c7n.filters.locked import Locked
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
+from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr, backoff_delays
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -92,7 +93,8 @@ class VpcDelete(BaseAction):
                         'type': 'array',
                         'items': {
                             'type': 'string',
-                            'enum': ['subnet', 'internet-gateway', 'route-table', 'security-group']
+                            'enum': ['internet-gateway', 'nat-gateway', 'route-table',
+                                     'security-group', 'subnet']
                         }
                     }
                 ]
@@ -104,6 +106,40 @@ class VpcDelete(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
+        max_attempts=8
+        min_delay=2
+        max_delay = max(min_delay, 2) ** max_attempts
+
+        # Delete NAT-gateway associated with VPC
+        if self.data.get('dependencies', {}) == 'all' or \
+                'nat-gateway' in self.data.get('dependencies', {}):
+            vpc_ngw_filter = VpcNatGatewayFilter(data=self.data, manager=self.manager)
+            vpc_ngw_ids = vpc_ngw_filter.get_related_ids(resources=resources)
+            ngw_manager = self.manager.get_resource_manager('nat-gateway')
+            for id in vpc_ngw_ids:
+                try:
+                    client.delete_nat_gateway(NatGatewayId=id)
+                    self.log.debug(
+                        "Deleting associated NAT Gateway ID %s",
+                        id
+                    )
+                    # NAT Gateway deletion usually takes some time
+                    for idx, delay in enumerate(backoff_delays(min_delay, max_delay, jitter=True)):
+                        ngws = ngw_manager.get_resources([id], cache=False)
+                        if len(ngws) == 0 or ngws[0]['State'] == 'deleted':
+                            self.log.debug("Nat Gateway deletion confirmed: %s", id)
+                            break
+                        if idx == max_attempts - 1:
+                            self.log.debug("Giving up waiting for Nat Gateway to be deleted: %s",
+                                           id)
+                            break
+                        self.log.debug("Waiting for Nat Gateway to be deleted: %s", id)
+                        time.sleep(delay)
+
+                except ClientError as e:
+                    self.log.warning(
+                        "Could not delete NAT Gateway ID %s, error: %s",
+                        id, e)
 
         # Delete Subnets associated with VPC
         if self.data.get('dependencies', {}) == 'all' or \
@@ -114,7 +150,8 @@ class VpcDelete(BaseAction):
             for id in vpc_subnet_ids:
                 try:
                     subnets = subnet_manager.get_resources([id])
-                    subnet_manager.action_registry.get('delete')({}, subnet_manager).process(subnets)
+                    subnet_manager.action_registry.get('delete')({}, subnet_manager).process(
+                        subnets)
                     self.log.debug(
                         "Deleted associated Subnet ID %s",
                         id
