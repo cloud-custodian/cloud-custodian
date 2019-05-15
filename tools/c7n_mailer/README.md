@@ -408,7 +408,7 @@ to an Azure Storage Queue.  For example:
 policies:
   - name: azure-notify
     resource: azure.resourcegroup
-    description: example policy
+    description: send a message to a mailer instance
     actions:
       - type: notify
         template: default
@@ -441,7 +441,7 @@ mailer configuration.
 
 `c7n-mailer --config mailer.yml --update-lambda`
 
-where `mailer.yml` may look like:
+where a simple `mailer.yml` using Consumption functions may look like:
 
 ```yaml
 queue_url: asq://storage.queue.core.windows.net/custodian
@@ -450,10 +450,6 @@ sendgrid_api_key: <key>
 function_properties:
   servicePlan:
     name: 'testmailer1'
-    resourceGroupName: custodianmailer1
-    skuTier: Basic
-    skuName: B1
-    location: WestUS2
 ```
 
 ## Writing an email template

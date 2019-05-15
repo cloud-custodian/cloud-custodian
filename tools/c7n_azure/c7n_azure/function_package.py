@@ -74,7 +74,6 @@ class FunctionPackage(object):
                 self.pkg.add_contents(dest=name + '/config.json',
                                       contents=policy_contents)
                 self._add_host_config(policy['mode']['type'])
-            
             else:
                 self._add_host_config(None)
 
