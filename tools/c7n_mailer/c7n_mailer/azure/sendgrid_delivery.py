@@ -17,7 +17,7 @@ import six
 from c7n_mailer.utils import (get_message_subject, get_rendered_jinja)
 from c7n_mailer.utils_email import is_email
 from python_http_client import exceptions
-from sendgrid.helpers.mail import Mail
+from sendgrid.helpers.mail import Mail, To, From
 
 
 class SendGridDelivery(object):
@@ -97,14 +97,14 @@ class SendGridDelivery(object):
             for to_address in email_to_addrs:
                 if email_format == "html":
                     mail = Mail(
-                        from_email=from_address,
-                        to_emails=to_address,
+                        from_email=From(from_address),
+                        to_emails=To(to_address),
                         subject=subject,
                         html_content=email_content)
                 else:
                     mail = Mail(
-                        from_email=from_address,
-                        to_emails=to_address,
+                        from_email=From(from_address),
+                        to_emails=To(to_address),
                         subject=subject,
                         plain_text_content=email_content)
                 try:
