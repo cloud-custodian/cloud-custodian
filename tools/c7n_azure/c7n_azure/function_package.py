@@ -73,8 +73,10 @@ class FunctionPackage(object):
 
                 self.pkg.add_contents(dest=name + '/config.json',
                                       contents=policy_contents)
-
-        self._add_host_config(policy.get('mode', {}).get('type', None))
+                self._add_host_config(policy['mode']['type'])
+            
+            else:
+                self._add_host_config(None)
 
     def _add_host_config(self, mode):
         config = copy.deepcopy(FUNCTION_HOST_CONFIG)
