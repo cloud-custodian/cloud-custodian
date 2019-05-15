@@ -61,9 +61,7 @@ from c7n.actions.securityhub import OtherResourcePostFinding
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter,
-    OPERATORS)
-
+    CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter)
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -98,6 +96,7 @@ class RDS(QueryResourceManager):
         date = 'InstanceCreateTime'
         dimension = 'DBInstanceIdentifier'
         config_type = 'AWS::RDS::DBInstance'
+        arn = 'DBInstanceArn'
 
         default_report_fields = (
             'DBInstanceIdentifier',
@@ -120,11 +119,11 @@ class RDS(QueryResourceManager):
 
     @property
     def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='db', separator=':')
-        return self._generate_arn
+        return functools.partial(
+            generate_arn, 'rds',
+            region=self.config.region,
+            account_id=self.config.account_id,
+            resource_type='db', separator=':')
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -467,8 +466,7 @@ class TagTrim(tags.TagTrim):
     permissions = ('rds:RemoveTagsFromResource',)
 
     def process_tag_removal(self, client, resource, candidates):
-        arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
-        client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
+        client.remove_tags_from_resource(ResourceName=resource['DBInstanceArn'], TagKeys=candidates)
 
 
 START_STOP_ELIGIBLE_ENGINES = {
@@ -511,8 +509,7 @@ class Stop(BaseAction):
 
     schema = type_schema('stop')
 
-    # permissions are unclear, and not currrently documented or in iam gen
-    permissions = ("rds:RebootDBInstance",)
+    permissions = ("rds:StopDBInstance",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
@@ -533,8 +530,7 @@ class Start(BaseAction):
 
     schema = type_schema('start')
 
-    # permissions are unclear, and not currrently documented or in iam gen
-    permissions = ("rds:RebootDBInstance",)
+    permissions = ("rds:StartDBInstance",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
@@ -653,6 +649,8 @@ class Delete(BaseAction):
 class CopySnapshotTags(BaseAction):
     """Enables copying tags from rds instance to snapshot
 
+    DEPRECATED - use modify-db instead with `CopyTagsToSnapshot`
+
         .. code-block: yaml
 
             policies:
@@ -674,23 +672,29 @@ class CopySnapshotTags(BaseAction):
     permissions = ('rds:ModifyDBInstances',)
 
     def process(self, resources):
+        error = None
         with self.executor_factory(max_workers=2) as w:
-            futures = []
+            futures = {}
+            client = local_session(self.manager.session_factory).client('rds')
+            resources = [r for r in resources
+                         if r['CopyTagsToSnapshot'] != self.data.get('enable', True)]
             for r in resources:
-                futures.append(w.submit(
-                    self.set_snapshot_tags, r))
+                futures[w.submit(self.set_snapshot_tags, client, r)] = r
             for f in as_completed(futures):
                 if f.exception():
+                    error = f.exception()
                     self.log.error(
-                        'Exception updating rds CopyTagsToSnapshot  \n %s',
-                        f.exception())
+                        'error updating rds:%s CopyTagsToSnapshot \n %s',
+                        futures[f]['DBInstanceIdentifier'], error)
+        if error:
+            raise error
         return resources
 
-    def set_snapshot_tags(self, r):
-        c = local_session(self.manager.session_factory).client('rds')
-        self.manager.retry(c.modify_db_instance(
+    def set_snapshot_tags(self, client, r):
+        self.manager.retry(
+            client.modify_db_instance,
             DBInstanceIdentifier=r['DBInstanceIdentifier'],
-            CopyTagsToSnapshot=self.data.get('enable', True)))
+            CopyTagsToSnapshot=self.data.get('enable', True))
 
 
 @RDS.action_registry.register("post-finding")
@@ -1069,7 +1073,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
 
@@ -1682,3 +1686,18 @@ class ModifyDb(BaseAction):
                 c.modify_db_instance(**param)
             except c.exceptions.DBInstanceNotFoundFault:
                 raise
+
+
+@resources.register('rds-reserved')
+class ReservedRDS(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'rds'
+        name = id = 'ReservedDBInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_db_instances', 'ReservedDBInstances', None)
+        filter_name = 'ReservedDBInstances'
+        filter_type = 'list'
+        dimension = None
+        type = "reserved-db"

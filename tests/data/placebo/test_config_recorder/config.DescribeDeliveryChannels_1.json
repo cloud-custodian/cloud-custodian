@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "DeliveryChannels": [
+            {
+                "name": "default",
+                "s3BucketName": "config-bucket-644160558196",
+                "snsTopicARN": "arn:aws:sns:us-east-1:644160558196:config-topic"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "f6cecbb8-66fc-11e9-9235-15f1e21ed970",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f6cecbb8-66fc-11e9-9235-15f1e21ed970",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "149",
+                "date": "Thu, 25 Apr 2019 01:53:46 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

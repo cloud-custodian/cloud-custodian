@@ -437,7 +437,7 @@ class ServiceLimit(Filter):
 
       # Note this is extant for each active instance type in the account
       # however the total value is against sum of all instance types.
-      # see issue https://github.com/capitalone/cloud-custodian/issues/516
+      # see issue https://github.com/cloud-custodian/cloud-custodian/issues/516
 
       - service: EC2 limit: On-Demand instances - m3.medium
 

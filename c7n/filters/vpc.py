@@ -138,7 +138,7 @@ class NetworkLocation(Filter):
            'required': ['key'],
 
            })
-
+    schema_alias = True
     permissions = ('ec2:DescribeSecurityGroups', 'ec2:DescribeSubnets')
 
     def validate(self):

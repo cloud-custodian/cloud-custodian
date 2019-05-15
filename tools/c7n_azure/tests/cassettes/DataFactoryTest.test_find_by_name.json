@@ -1,0 +1,52 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DataFactory/factories?api-version=2018-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:11:14 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "439"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctest-data-factory",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_datafactory/providers/Microsoft.DataFactory/factories/cctest-data-factory",
+                                "type": "Microsoft.DataFactory/factories",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "createTime": "2019-05-01T21:47:25.4879451Z",
+                                    "version": "2017-09-01-preview"
+                                },
+                                "eTag": "\"0000181d-0000-0100-0000-5cca13ed0000\"",
+                                "location": "East US",
+                                "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

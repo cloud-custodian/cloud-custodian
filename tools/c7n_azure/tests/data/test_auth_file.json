@@ -1,0 +1,8 @@
+{
+  "credentials": {
+    "client_id": "client",
+    "secret": "secret",
+    "tenant": "tenant"
+  },
+  "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47"
+}

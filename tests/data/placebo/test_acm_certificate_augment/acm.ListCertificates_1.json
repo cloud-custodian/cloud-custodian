@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "CertificateSummaryList": [
+            {
+                "CertificateArn": "arn:aws:acm:us-east-1:619193117841:certificate/291f52cc-1817-469f-918a-cccbb4f9a5fb",
+                "DomainName": "cloudcustodian.io"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "13ec0740-702f-11e9-a527-2f8930fe945f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "13ec0740-702f-11e9-a527-2f8930fe945f",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "166",
+                "date": "Mon, 06 May 2019 18:45:10 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

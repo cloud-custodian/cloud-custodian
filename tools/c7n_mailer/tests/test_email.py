@@ -54,6 +54,10 @@ class EmailTest(unittest.TestCase):
         self.email_delivery.ldap_lookup.uid_regex = ''
         template_abs_filename = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                                              'example.jinja')
+
+        # Jinja paths must always be forward slashes regardless of operating system
+        template_abs_filename = template_abs_filename.replace('\\', '/')
+
         SQS_MESSAGE_1['action']['template'] = template_abs_filename
         SQS_MESSAGE_4['action']['template'] = template_abs_filename
 

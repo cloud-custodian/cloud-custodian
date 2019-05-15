@@ -19,11 +19,13 @@ import c7n_azure.output
 import c7n_azure.policy
 import c7n_azure.resources.cosmos_db
 import c7n_azure.resources.key_vault
+import c7n_azure.resources.key_vault_keys
 import c7n_azure.resources.load_balancer
 import c7n_azure.resources.resourcegroup
 import c7n_azure.resources.public_ip
 import c7n_azure.resources.storage
 import c7n_azure.resources.sqlserver
+import c7n_azure.resources.sqldatabase
 import c7n_azure.resources.vm
 import c7n_azure.resources.vnet
 import c7n_azure.resources.route_table

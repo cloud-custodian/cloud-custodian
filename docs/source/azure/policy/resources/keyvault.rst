@@ -23,6 +23,19 @@ Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
+- ``update-access-policy`` - Add or Replace access policies from key vaults under a provided principal object id
+    - operation: `add`, `append`
+        - `add`: adds or appends permission
+        - `replace`: replaces existing access policy
+    - tenant-id: The tenant id of the object id and is used for authenticating with keyvault
+    - object-id: The object id of the user or service principal. This can be retrieved through azure cli or azure portal
+    - Keys permissions: `Get`, `Create`, `Delete`, `List`, `Update`, `Import`, `Backup`, `Restore`, `Recover`, `Decrypt`, `UnwrapKey`, `Encrypt`, `WrapKey`, `Verify`, `Sign`, `Purge`
+    - Secret permissions: `Get`, `List`, `Set`, `Delete`, `Backup`, `Restore`, `Recover`, `Purge`
+    - Certificate permissions: `Get`, `List`, `Delete`, `Create`, `Import`, `Update`, `ManageContacts`, `GetIssuers`, `ListIssuers`, `SetIssuers`, `DeleteIssuers`, `ManageIssuers`, `Recover`, `Backup`, `Restore`, `Purge`
+
+  .. c7n-schema:: KeyVaultUpdateAccessPolicyAction
+       :module: c7n_azure.resources.key_vault
+
 Example Policies
 ----------------
 
@@ -100,3 +113,23 @@ This policy will find all KeyVaults with an access of Service Principals not in 
                     - get
                   certificates:
                     - get
+
+This policy will find all KeyVaults and add get and list permissions for keys.
+
+.. code-block:: yaml
+
+    policies:
+        - name: policy
+          description:
+            Add get and list permissions to keys access policy
+          resource: azure.keyvault
+          actions:
+            - type: update-access-policy
+              operation: add
+              access-policies:
+                - tenant-id: 00000000-0000-0000-0000-000000000000
+                  object-id: 11111111-1111-1111-1111-111111111111
+                  permissions:
+                    keys:
+                      - get
+                      - list

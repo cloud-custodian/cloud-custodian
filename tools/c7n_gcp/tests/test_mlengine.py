@@ -14,7 +14,7 @@
 from gcp_common import BaseTest
 
 
-class TestMLModels(BaseTest):
+class MLModelTest(BaseTest):
 
     def test_models_query(self):
         project_id = "cloud-custodian"
@@ -52,3 +52,43 @@ class TestMLModels(BaseTest):
         })
 
         self.assertEqual(resource['name'], "projects/cloud-custodian/models/{}".format(name))
+
+
+class MLJobTest(BaseTest):
+
+    def test_jobs_query(self):
+        project_id = 'mythic-tribute-232915'  # 'cloud-custodian'
+
+        session_factory = self.replay_flight_data(
+            'ml-jobs-query', project_id)
+
+        policy = self.load_policy(
+            {
+                'name': 'ml-jobs-query',
+                'resource': 'gcp.ml-job'
+            },
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_jobs_get(self):
+        project_id = 'mythic-tribute-232915'  # 'cloud-custodian'
+        id = "test_job"
+
+        session_factory = self.replay_flight_data(
+            'ml-jobs-query-get', project_id)
+
+        policy = self.load_policy(
+            {
+                'name': 'ml-jobs-query-get',
+                'resource': 'gcp.ml-job'
+            },
+            session_factory=session_factory)
+
+        resource = policy.resource_manager.get_resource({
+            "name": id,
+            "project_id": project_id,
+        })
+
+        self.assertEqual(resource['jobId'], id)

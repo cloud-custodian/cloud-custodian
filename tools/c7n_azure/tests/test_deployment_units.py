@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest
+from azure_common import BaseTest, requires_arm_polling
 from c7n_azure.constants import FUNCTION_DOCKER_VERSION
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
@@ -26,6 +26,7 @@ from msrestazure.azure_exceptions import CloudError
 from c7n.utils import local_session
 
 
+@requires_arm_polling
 class DeploymentUnitsTest(BaseTest):
 
     rg_name = 'custodian-test-deployment-units'
@@ -43,7 +44,8 @@ class DeploymentUnitsTest(BaseTest):
             pass
 
     def _validate(self, unit, params):
-        self.assertEqual(unit.get(params), None)
+        temp = unit.get(params)
+        self.assertEqual(temp, None)
         result = unit.provision_if_not_exists(params)
         self.assertNotEqual(result, None)
         return result
@@ -57,7 +59,7 @@ class DeploymentUnitsTest(BaseTest):
         self._validate(unit, params)
 
     def test_storage_account(self):
-        params = {'name': 'custodianaccount47182748',
+        params = {'name': 'custodianaccount47182745',
                   'location': 'westus2',
                   'resource_group_name': self.rg_name}
         unit = StorageAccountUnit()
@@ -104,7 +106,7 @@ class DeploymentUnitsTest(BaseTest):
     def test_function_app_dedicated(self):
         # provision storage account
         sa_params = {
-            'name': 'custodianaccount47182748',
+            'name': 'custodianaccount47182741',
             'location': 'westus2',
             'resource_group_name': self.rg_name}
         storage_unit = StorageAccountUnit()
@@ -113,7 +115,7 @@ class DeploymentUnitsTest(BaseTest):
 
         # provision app plan
         app_plan_params = {
-            'name': 'cloud-custodian-test',
+            'name': 'cloud-custodian-test2',
             'location': 'westus2',
             'resource_group_name': self.rg_name,
             'sku_tier': 'Basic',

@@ -19,7 +19,8 @@ import functools
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter, OPERATORS
+from c7n.filters import AgeFilter
+from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
@@ -69,6 +70,8 @@ class RDSCluster(QueryResourceManager):
 
 RDSCluster.filter_registry.register('tag-count', tags.TagCountFilter)
 RDSCluster.filter_registry.register('marked-for-op', tags.TagActionFilter)
+RDSCluster.filter_registry.register('offhour', OffHour)
+RDSCluster.filter_registry.register('onhour', OnHour)
 
 
 def _rds_cluster_tags(model, dbs, session_factory, generator, retry):
@@ -489,7 +492,7 @@ class RDSSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
 

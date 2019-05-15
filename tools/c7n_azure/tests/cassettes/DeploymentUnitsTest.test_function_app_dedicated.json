@@ -1,0 +1,938 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182741?api-version=2019-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-failure-cause": [
+                        "gateway"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:07:57 GMT"
+                    ],
+                    "content-length": [
+                        "123"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "ResourceGroupNotFound",
+                            "message": "Resource group 'custodian-test-deployment-units' could not be found."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-failure-cause": [
+                        "gateway"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:07:53 GMT"
+                    ],
+                    "content-length": [
+                        "123"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "ResourceGroupNotFound",
+                            "message": "Resource group 'custodian-test-deployment-units' could not be found."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units?api-version=2018-05-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:07:55 GMT"
+                    ],
+                    "content-length": [
+                        "216"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units",
+                        "name": "custodian-test-deployment-units",
+                        "location": "westus2",
+                        "properties": {
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182741?api-version=2019-04-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "content-type": [
+                        "text/plain; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:07:55 GMT"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/561f84cd-9ff5-4cc8-9b9e-881eb8e33498?monitor=true&api-version=2019-04-01"
+                    ],
+                    "content-length": [
+                        "0"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/561f84cd-9ff5-4cc8-9b9e-881eb8e33498?monitor=true&api-version=2019-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "content-type": [
+                        "text/plain; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:12 GMT"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/561f84cd-9ff5-4cc8-9b9e-881eb8e33498?monitor=true&api-version=2019-04-01"
+                    ],
+                    "content-length": [
+                        "0"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/561f84cd-9ff5-4cc8-9b9e-881eb8e33498?monitor=true&api-version=2019-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "content-type": [
+                        "text/plain; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:15 GMT"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/561f84cd-9ff5-4cc8-9b9e-881eb8e33498?monitor=true&api-version=2019-04-01"
+                    ],
+                    "content-length": [
+                        "0"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus2/asyncoperations/561f84cd-9ff5-4cc8-9b9e-881eb8e33498?monitor=true&api-version=2019-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:16 GMT"
+                    ],
+                    "content-length": [
+                        "1155"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "kind": "Storage",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182741",
+                        "name": "custodianaccount47182741",
+                        "type": "Microsoft.Storage/storageAccounts",
+                        "location": "westus2",
+                        "tags": {},
+                        "properties": {
+                            "minimumTlsVersion": "TLS1_2",
+                            "networkAcls": {
+                                "bypass": "AzureServices",
+                                "virtualNetworkRules": [],
+                                "ipRules": [],
+                                "defaultAction": "Allow"
+                            },
+                            "supportsHttpsTrafficOnly": true,
+                            "encryption": {
+                                "services": {
+                                    "file": {
+                                        "enabled": true,
+                                        "lastEnabledTime": "2019-05-03T14:07:54.6103946Z"
+                                    },
+                                    "blob": {
+                                        "enabled": true,
+                                        "lastEnabledTime": "2019-05-03T14:07:54.6103946Z"
+                                    }
+                                },
+                                "keySource": "Microsoft.Storage"
+                            },
+                            "provisioningState": "Succeeded",
+                            "creationTime": "2019-05-03T14:07:54.5322417Z",
+                            "primaryEndpoints": {
+                                "blob": "https://custodianaccount47182741.blob.core.windows.net/",
+                                "queue": "https://custodianaccount47182741.queue.core.windows.net/",
+                                "table": "https://custodianaccount47182741.table.core.windows.net/",
+                                "file": "https://custodianaccount47182741.file.core.windows.net/"
+                            },
+                            "primaryLocation": "westus2",
+                            "statusOfPrimary": "available"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182741/listKeys?api-version=2019-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:20 GMT"
+                    ],
+                    "content-length": [
+                        "288"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "keys": [
+                            {
+                                "keyName": "key1",
+                                "value": "DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
+                                "permissions": "FULL"
+                            },
+                            {
+                                "keyName": "key2",
+                                "value": "DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
+                                "permissions": "FULL"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test2?api-version=2018-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-failure-cause": [
+                        "gateway"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:19 GMT"
+                    ],
+                    "content-length": [
+                        "182"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "ResourceNotFound",
+                            "message": "The Resource 'Microsoft.Web/serverFarms/cloud-custodian-test2' under resource group 'custodian-test-deployment-units' was not found."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:19 GMT"
+                    ],
+                    "content-length": [
+                        "216"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units",
+                        "name": "custodian-test-deployment-units",
+                        "location": "westus2",
+                        "properties": {
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test2?api-version=2018-02-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:26 GMT"
+                    ],
+                    "content-length": [
+                        "1380"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test2",
+                        "name": "cloud-custodian-test2",
+                        "type": "Microsoft.Web/serverfarms",
+                        "kind": "linux",
+                        "location": "West US 2",
+                        "properties": {
+                            "serverFarmId": 8219,
+                            "name": "cloud-custodian-test2",
+                            "workerSize": "Default",
+                            "workerSizeId": 0,
+                            "workerTierName": null,
+                            "numberOfWorkers": 1,
+                            "currentWorkerSize": "Default",
+                            "currentWorkerSizeId": 0,
+                            "currentNumberOfWorkers": 1,
+                            "status": "Ready",
+                            "webSpace": "custodian-test-deployment-units-WestUS2webspace",
+                            "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                            "adminSiteName": null,
+                            "hostingEnvironment": null,
+                            "hostingEnvironmentProfile": null,
+                            "maximumNumberOfWorkers": 3,
+                            "planName": "VirtualDedicatedPlan",
+                            "adminRuntimeSiteName": null,
+                            "computeMode": "Dedicated",
+                            "siteMode": null,
+                            "geoRegion": "West US 2",
+                            "perSiteScaling": false,
+                            "maximumElasticWorkerCount": 1,
+                            "numberOfSites": 0,
+                            "hostingEnvironmentId": null,
+                            "isSpot": false,
+                            "spotExpirationTime": null,
+                            "freeOfferExpirationTime": "2019-06-02T14:08:20.83",
+                            "tags": null,
+                            "kind": "linux",
+                            "resourceGroup": "custodian-test-deployment-units",
+                            "reserved": true,
+                            "isXenon": false,
+                            "hyperV": false,
+                            "mdmId": "waws-prod-mwh-007_8219",
+                            "targetWorkerCount": 0,
+                            "targetWorkerSizeId": 0,
+                            "provisioningState": "Succeeded",
+                            "webSiteId": null
+                        },
+                        "sku": {
+                            "name": "B1",
+                            "tier": "Basic",
+                            "size": "B1",
+                            "family": "B",
+                            "capacity": 1
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/sites/cc-dedicated-47182748?api-version=2018-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-failure-cause": [
+                        "gateway"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:28 GMT"
+                    ],
+                    "content-length": [
+                        "176"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "ResourceNotFound",
+                            "message": "The Resource 'Microsoft.Web/sites/cc-dedicated-47182748' under resource group 'custodian-test-deployment-units' was not found."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/sites/cc-dedicated-47182748?api-version=2018-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 404,
+                    "message": "Not Found"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-failure-cause": [
+                        "gateway"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:26 GMT"
+                    ],
+                    "content-length": [
+                        "176"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "ResourceNotFound",
+                            "message": "The Resource 'Microsoft.Web/sites/cc-dedicated-47182748' under resource group 'custodian-test-deployment-units' was not found."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/sites/cc-dedicated-47182748?api-version=2018-02-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "499"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "etag": [
+                        "\"1D501B9AFE592D5\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:46 GMT"
+                    ],
+                    "content-length": [
+                        "3179"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/sites/cc-dedicated-47182748",
+                        "name": "cc-dedicated-47182748",
+                        "type": "Microsoft.Web/sites",
+                        "kind": "functionapp,linux,container",
+                        "location": "westus",
+                        "properties": {
+                            "name": "cc-dedicated-47182748",
+                            "state": "Running",
+                            "hostNames": [
+                                "cc-dedicated-47182748.azurewebsites.net"
+                            ],
+                            "webSpace": "custodian-test-deployment-units-WestUS2webspace",
+                            "selfLink": "https://waws-prod-mwh-007.api.azurewebsites.windows.net:454/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/webspaces/custodian-test-deployment-units-WestUS2webspace/sites/cc-dedicated-47182748",
+                            "repositorySiteName": "cc-dedicated-47182748",
+                            "owner": null,
+                            "usageState": "Normal",
+                            "enabled": true,
+                            "adminEnabled": true,
+                            "enabledHostNames": [
+                                "cc-dedicated-47182748.azurewebsites.net",
+                                "cc-dedicated-47182748.scm.azurewebsites.net"
+                            ],
+                            "siteProperties": {
+                                "metadata": null,
+                                "properties": [
+                                    {
+                                        "name": "LinuxFxVersion",
+                                        "value": "DOCKER|mcr.microsoft.com/azure-functions/python:latest"
+                                    },
+                                    {
+                                        "name": "WindowsFxVersion",
+                                        "value": null
+                                    }
+                                ],
+                                "appSettings": null
+                            },
+                            "availabilityState": "Normal",
+                            "sslCertificates": null,
+                            "csrs": [],
+                            "cers": null,
+                            "siteMode": null,
+                            "hostNameSslStates": [
+                                {
+                                    "name": "cc-dedicated-47182748.azurewebsites.net",
+                                    "sslState": "Disabled",
+                                    "ipBasedSslResult": null,
+                                    "virtualIP": null,
+                                    "thumbprint": null,
+                                    "toUpdate": null,
+                                    "toUpdateIpBasedSsl": null,
+                                    "ipBasedSslState": "NotConfigured",
+                                    "hostType": "Standard"
+                                },
+                                {
+                                    "name": "cc-dedicated-47182748.scm.azurewebsites.net",
+                                    "sslState": "Disabled",
+                                    "ipBasedSslResult": null,
+                                    "virtualIP": null,
+                                    "thumbprint": null,
+                                    "toUpdate": null,
+                                    "toUpdateIpBasedSsl": null,
+                                    "ipBasedSslState": "NotConfigured",
+                                    "hostType": "Repository"
+                                }
+                            ],
+                            "computeMode": null,
+                            "serverFarm": null,
+                            "serverFarmId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test2",
+                            "reserved": true,
+                            "isXenon": false,
+                            "hyperV": false,
+                            "lastModifiedTimeUtc": "2019-05-03T14:08:30.5766667",
+                            "storageRecoveryDefaultState": "Running",
+                            "contentAvailabilityState": "Normal",
+                            "runtimeAvailabilityState": "Normal",
+                            "siteConfig": null,
+                            "deploymentId": "cc-dedicated-47182748",
+                            "trafficManagerHostNames": null,
+                            "sku": "Basic",
+                            "scmSiteAlsoStopped": false,
+                            "targetSwapSlot": null,
+                            "hostingEnvironment": null,
+                            "hostingEnvironmentProfile": null,
+                            "clientAffinityEnabled": false,
+                            "clientCertEnabled": false,
+                            "clientCertExclusionPaths": null,
+                            "hostNamesDisabled": false,
+                            "domainVerificationIdentifiers": null,
+                            "kind": "functionapp,linux,container",
+                            "outboundIpAddresses": "52.175.254.10,52.183.85.212,52.183.86.156,52.183.100.42,52.183.85.188",
+                            "possibleOutboundIpAddresses": "52.175.254.10,52.183.85.212,52.183.86.156,52.183.100.42,52.183.85.188,52.151.29.83,52.151.33.248",
+                            "containerSize": 0,
+                            "dailyMemoryTimeQuota": 0,
+                            "suspendedTill": null,
+                            "siteDisabledReason": 0,
+                            "functionExecutionUnitsCache": null,
+                            "maxNumberOfWorkers": null,
+                            "homeStamp": "waws-prod-mwh-007",
+                            "cloningInfo": null,
+                            "hostingEnvironmentId": null,
+                            "tags": null,
+                            "resourceGroup": "custodian-test-deployment-units",
+                            "defaultHostName": "cc-dedicated-47182748.azurewebsites.net",
+                            "slotSwapStatus": null,
+                            "httpsOnly": false,
+                            "redundancyMode": "None",
+                            "inProgressOperationId": null,
+                            "geoDistributions": null
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/sites/cc-dedicated-47182748/config/web?api-version=2018-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:47 GMT"
+                    ],
+                    "content-length": [
+                        "2884"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/sites/cc-dedicated-47182748/config/web",
+                        "name": "cc-dedicated-47182748",
+                        "type": "Microsoft.Web/sites/config",
+                        "location": "West US 2",
+                        "properties": {
+                            "numberOfWorkers": 1,
+                            "defaultDocuments": [
+                                "Default.htm",
+                                "Default.html",
+                                "Default.asp",
+                                "index.htm",
+                                "index.html",
+                                "iisstart.htm",
+                                "default.aspx",
+                                "index.php"
+                            ],
+                            "netFrameworkVersion": "v4.0",
+                            "phpVersion": "",
+                            "pythonVersion": "",
+                            "nodeVersion": "",
+                            "linuxFxVersion": "DOCKER|mcr.microsoft.com/azure-functions/python:latest",
+                            "windowsFxVersion": null,
+                            "requestTracingEnabled": false,
+                            "remoteDebuggingEnabled": false,
+                            "remoteDebuggingVersion": null,
+                            "httpLoggingEnabled": false,
+                            "logsDirectorySizeLimit": 35,
+                            "detailedErrorLoggingEnabled": false,
+                            "publishingUsername": "$cc-dedicated-47182748",
+                            "publishingPassword": null,
+                            "appSettings": null,
+                            "metadata": null,
+                            "connectionStrings": null,
+                            "machineKey": null,
+                            "handlerMappings": null,
+                            "documentRoot": null,
+                            "scmType": "None",
+                            "use32BitWorkerProcess": true,
+                            "webSocketsEnabled": false,
+                            "alwaysOn": true,
+                            "javaVersion": null,
+                            "javaContainer": null,
+                            "javaContainerVersion": null,
+                            "appCommandLine": "",
+                            "managedPipelineMode": "Integrated",
+                            "virtualApplications": [
+                                {
+                                    "virtualPath": "/",
+                                    "physicalPath": "site\\wwwroot",
+                                    "preloadEnabled": true,
+                                    "virtualDirectories": null
+                                }
+                            ],
+                            "winAuthAdminState": 0,
+                            "winAuthTenantState": 0,
+                            "customAppPoolIdentityAdminState": false,
+                            "customAppPoolIdentityTenantState": false,
+                            "runtimeADUser": null,
+                            "runtimeADUserPassword": null,
+                            "loadBalancing": "LeastRequests",
+                            "routingRules": [],
+                            "experiments": {
+                                "rampUpRules": []
+                            },
+                            "limits": null,
+                            "autoHealEnabled": false,
+                            "autoHealRules": null,
+                            "tracingOptions": null,
+                            "vnetName": "",
+                            "siteAuthEnabled": false,
+                            "siteAuthSettings": {
+                                "enabled": null,
+                                "unauthenticatedClientAction": null,
+                                "tokenStoreEnabled": null,
+                                "allowedExternalRedirectUrls": null,
+                                "defaultProvider": null,
+                                "clientId": null,
+                                "clientSecret": null,
+                                "clientSecretCertificateThumbprint": null,
+                                "issuer": null,
+                                "allowedAudiences": null,
+                                "additionalLoginParams": null,
+                                "isAadAutoProvisioned": false,
+                                "googleClientId": null,
+                                "googleClientSecret": null,
+                                "googleOAuthScopes": null,
+                                "facebookAppId": null,
+                                "facebookAppSecret": null,
+                                "facebookOAuthScopes": null,
+                                "twitterConsumerKey": null,
+                                "twitterConsumerSecret": null,
+                                "microsoftAccountClientId": null,
+                                "microsoftAccountClientSecret": null,
+                                "microsoftAccountOAuthScopes": null
+                            },
+                            "cors": {
+                                "allowedOrigins": [
+                                    "https://functions.azure.com",
+                                    "https://functions-staging.azure.com",
+                                    "https://functions-next.azure.com"
+                                ],
+                                "supportCredentials": false
+                            },
+                            "push": null,
+                            "apiDefinition": null,
+                            "apiManagementConfig": null,
+                            "autoSwapSlotName": null,
+                            "localMySqlEnabled": false,
+                            "managedServiceIdentityId": null,
+                            "xManagedServiceIdentityId": null,
+                            "ipSecurityRestrictions": null,
+                            "scmIpSecurityRestrictions": null,
+                            "scmIpSecurityRestrictionsUseMain": false,
+                            "http20Enabled": true,
+                            "minTlsVersion": "1.2",
+                            "ftpsState": "AllAllowed",
+                            "reservedInstanceCount": 0,
+                            "preWarmedInstanceCount": null
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/sites/cc-dedicated-47182748/config/appsettings/list?api-version=2018-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 03 May 2019 14:08:47 GMT"
+                    ],
+                    "content-length": [
+                        "824"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/Microsoft.Web/sites/cc-dedicated-47182748/config/appsettings",
+                        "name": "appsettings",
+                        "type": "Microsoft.Web/sites/config",
+                        "location": "West US 2",
+                        "properties": {
+                            "MACHINEKEY_DecryptionKey": "98FE8AA8DD98876C42158B7E53AA53BC858EB0547575FEB76D91F32B05DE3175",
+                            "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=custodianaccount47182741;AccountKey=Ff3OZRGSuW3hRAtj+W+tfQPcVYQBc+V1z2cCLNxjgOmtezKnG+rNI6z+/+yyLgBzHBCrT4rsjt+36drkviRtnw==",
+                            "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=custodianaccount47182741;AccountKey=Ff3OZRGSuW3hRAtj+W+tfQPcVYQBc+V1z2cCLNxjgOmtezKnG+rNI6z+/+yyLgBzHBCrT4rsjt+36drkviRtnw==",
+                            "FUNCTIONS_EXTENSION_VERSION": "~2",
+                            "FUNCTIONS_WORKER_RUNTIME": "python"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

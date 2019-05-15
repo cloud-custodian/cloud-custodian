@@ -17,28 +17,34 @@ from c7n_azure.actions import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAc
 from c7n_azure.filters import (MetricFilter, TagActionFilter,
                                DiagnosticSettingsFilter, PolicyCompliantFilter)
 from c7n_azure.provider import resources
-from c7n_azure.query import QueryResourceManager, QueryMeta
+from c7n_azure.query import QueryResourceManager, QueryMeta, ChildResourceManager, TypeInfo, \
+    ChildTypeInfo, TypeMeta
 from c7n_azure.utils import ResourceIdParser
 
 from c7n.utils import local_session
+
+
+@six.add_metaclass(TypeMeta)
+class ArmTypeInfo(TypeInfo):
+    # api client construction information for ARM resources
+    id = 'id'
+    name = 'name'
+    diagnostic_settings_enabled = True
+    default_report_fields = (
+        'name',
+        'location',
+        'resourceGroup'
+    )
 
 
 @resources.register('armresource')
 @six.add_metaclass(QueryMeta)
 class ArmResourceManager(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(ArmTypeInfo):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
         enum_spec = ('resources', 'list', None)
-        id = 'id'
-        name = 'name'
-        diagnostic_settings_enabled = True
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup'
-        )
 
     def augment(self, resources):
         for resource in resources:
@@ -75,6 +81,13 @@ class ArmResourceManager(QueryResourceManager):
                 if hasattr(klass.resource_type, 'diagnostic_settings_enabled') \
                         and klass.resource_type.diagnostic_settings_enabled:
                     klass.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
+
+
+@six.add_metaclass(QueryMeta)
+class ChildArmResourceManager(ChildResourceManager, ArmResourceManager):
+
+    class resource_type(ChildTypeInfo, ArmTypeInfo):
+        pass
 
 
 resources.subscribe(resources.EVENT_FINAL, ArmResourceManager.register_arm_specific)

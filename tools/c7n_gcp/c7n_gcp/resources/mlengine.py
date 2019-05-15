@@ -32,7 +32,27 @@ class MLModel(QueryResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_query(
-                'get', verb_arguments={
-                    'name': 'projects/{}/models/{}'.format(
-                        resource_info['project_id'],
-                        resource_info['name'].rsplit('/', 1)[-1])})
+                'get', {'name': 'projects/{}/models/{}'.format(
+                    resource_info['project_id'],
+                    resource_info['name'].rsplit('/', 1)[-1])})
+
+
+@resources.register('ml-job')
+class MLJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ml'
+        version = 'v1'
+        component = 'projects.jobs'
+        enum_spec = ('list', 'jobs[]', None)
+        scope = 'project'
+        scope_key = 'parent'
+        scope_template = 'projects/{}'
+        id = 'jobId'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'name': 'projects/{}/jobs/{}'.format(
+                    resource_info['project_id'],
+                    resource_info['name'].rsplit('/', 1)[-1])})
