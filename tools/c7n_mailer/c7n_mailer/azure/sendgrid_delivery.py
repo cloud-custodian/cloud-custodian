@@ -17,7 +17,7 @@ import six
 from c7n_mailer.utils import (get_message_subject, get_rendered_jinja)
 from c7n_mailer.utils_email import is_email
 from python_http_client import exceptions
-from sendgrid.helpers.mail import Email, Content, Mail
+from sendgrid.helpers.mail import Mail
 
 
 class SendGridDelivery(object):
