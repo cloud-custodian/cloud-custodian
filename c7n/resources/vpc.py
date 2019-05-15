@@ -70,10 +70,35 @@ class VpcDelete(BaseAction):
                     op: eq
                     value: "c7n-vpc-delete-test"
                 actions:
-                  - delete
+                  - type: delete
+                    dependencies:
+                      - subnet
+                      - internet-gateway
+                      - route-table
+                      - security-group
     """
 
-    schema = type_schema('delete')
+    schema = {
+        'type': 'object',
+        'properties': {
+            'type': {'enum': ['delete']},
+            'dependencies': {
+                'oneOf': [
+                    {
+                        'type': 'string',
+                        'enum': ['all']
+                    },
+                    {
+                        'type': 'array',
+                        'items': {
+                            'type': 'string',
+                            'enum': ['subnet', 'internet-gateway', 'route-table', 'security-group']
+                        }
+                    }
+                ]
+            }
+        }
+    }
     permissions = ('ec2:DeleteSubnet', 'ec2:DetachInternetGateway', 'ec2:DeleteInternetGateway',
                    'ec2:DeleteRouteTable', 'ec2:DeleteSecurityGroup', 'ec2:DeleteVpc',)
 
@@ -81,84 +106,90 @@ class VpcDelete(BaseAction):
         client = local_session(self.manager.session_factory).client('ec2')
 
         # Delete Subnets associated with VPC
-        vpc_subnet_filter = VpcSubnetFilter(data=self.data, manager=self.manager)
-        vpc_subnet_ids = vpc_subnet_filter.get_related_ids(resources=resources)
-        subnet_manager = self.manager.get_resource_manager('subnet')
-        for id in vpc_subnet_ids:
-            try:
-                #client.delete_subnet(SubnetId=id)
-                subnets = subnet_manager.get_resources([id])
-                subnet_manager.action_registry.get('delete')({}, subnet_manager).process(subnets)
-                self.log.debug(
-                    "Deleted associated Subnet ID %s",
-                    id
-                )
-            except ClientError as e:
-                self.log.warning(
-                    "Could not delete Subnet ID %s, error: %s",
-                    id, e)
+        if self.data.get('dependencies', {}) == 'all' or \
+                'subnet' in self.data.get('dependencies', {}):
+            vpc_subnet_filter = VpcSubnetFilter(data=self.data, manager=self.manager)
+            vpc_subnet_ids = vpc_subnet_filter.get_related_ids(resources=resources)
+            subnet_manager = self.manager.get_resource_manager('subnet')
+            for id in vpc_subnet_ids:
+                try:
+                    subnets = subnet_manager.get_resources([id])
+                    subnet_manager.action_registry.get('delete')({}, subnet_manager).process(subnets)
+                    self.log.debug(
+                        "Deleted associated Subnet ID %s",
+                        id
+                    )
+                except ClientError as e:
+                    self.log.warning(
+                        "Could not delete Subnet ID %s, error: %s",
+                        id, e)
 
         # Delete Internet Gateways assocaited with VPC
         # Detaching the Internet Gateway requires the VpcId
-        for r in resources:
-            vpc_igw_filter = VpcInternetGatewayFilter(data=self.data, manager=self.manager)
-            vpc_igw_ids = vpc_igw_filter.get_related_ids(resources=[r])
-            for id in vpc_igw_ids:
-                # You must detach the internet gateway from the VPC before you can delete it.
-                try:
-                    client.detach_internet_gateway(InternetGatewayId=id, VpcId=r['VpcId'])
-                    self.log.debug(
-                        "Detached associated Internet Gateway ID %s",
-                        id
-                    )
-                except ClientError as e:
-                    self.log.warning(
-                        "Could not detach Internet Gateway ID %s, error: %s",
-                        id, e)
+        if self.data.get('dependencies', {}) == 'all' or \
+                'internet-gateway' in self.data.get('dependencies', {}):
+            for r in resources:
+                vpc_igw_filter = VpcInternetGatewayFilter(data=self.data, manager=self.manager)
+                vpc_igw_ids = vpc_igw_filter.get_related_ids(resources=[r])
+                for id in vpc_igw_ids:
+                    # You must detach the internet gateway from the VPC before you can delete it.
+                    try:
+                        client.detach_internet_gateway(InternetGatewayId=id, VpcId=r['VpcId'])
+                        self.log.debug(
+                            "Detached associated Internet Gateway ID %s",
+                            id
+                        )
+                    except ClientError as e:
+                        self.log.warning(
+                            "Could not detach Internet Gateway ID %s, error: %s",
+                            id, e)
 
-                try:
-                    client.delete_internet_gateway(InternetGatewayId=id)
-                    self.log.debug(
-                        "Deleted associated Internet Gateway ID %s",
-                        id
-                    )
-                except ClientError as e:
-                    self.log.warning(
-                        "Could not delete Internet Gateway ID %s, error: %s",
-                        id, e)
+                    try:
+                        client.delete_internet_gateway(InternetGatewayId=id)
+                        self.log.debug(
+                            "Deleted associated Internet Gateway ID %s",
+                            id
+                        )
+                    except ClientError as e:
+                        self.log.warning(
+                            "Could not delete Internet Gateway ID %s, error: %s",
+                            id, e)
 
         # Delete Route Tables associated with VPC
-        vpc_rtb_filter = VpcRouteTableFilter(data=self.data, manager=self.manager)
-        vpc_rtb_ids = vpc_rtb_filter.get_related_ids(resources=resources)
-        for id in vpc_rtb_ids:
-            try:
-                client.delete_route_table(RouteTableId=id)
-                self.log.debug(
-                    "Deleted associated Route Table ID %s",
-                    id
-                )
-            except ClientError as e:
-                self.log.warning(
-                    "Could not delete Route Table ID %s, error: %s",
-                    id, e)
+        if self.data.get('dependencies', {}) == 'all' or \
+                'route-table' in self.data.get('dependencies', {}):
+            vpc_rtb_filter = VpcRouteTableFilter(data=self.data, manager=self.manager)
+            vpc_rtb_ids = vpc_rtb_filter.get_related_ids(resources=resources)
+            for id in vpc_rtb_ids:
+                try:
+                    client.delete_route_table(RouteTableId=id)
+                    self.log.debug(
+                        "Deleted associated Route Table ID %s",
+                        id
+                    )
+                except ClientError as e:
+                    self.log.warning(
+                        "Could not delete Route Table ID %s, error: %s",
+                        id, e)
 
         # Delete Security Groups associated with VPC
-        vpc_sg_filter = VpcSecurityGroupFilter(data=self.data, manager=self.manager)
-        vpc_security_group_ids = vpc_sg_filter.get_related_ids(resources=resources)
-        sg_manager = self.manager.get_resource_manager('security-group')
-        for id in vpc_security_group_ids:
-            try:
-                #client.delete_security_group(GroupId=id)
-                sgs = sg_manager.get_resources([id])
-                sg_manager.action_registry.get('delete')({}, sg_manager).process(sgs)
-                self.log.debug(
-                    "Deleted associated Security Group ID %s",
-                    id
-                )
-            except ClientError as e:
-                self.log.warning(
-                    "Could not delete Security Group ID %s, error: %s",
-                    id, e)
+        if self.data.get('dependencies', {}) == 'all' or \
+                'security-group' in self.data.get('dependencies', {}):
+            vpc_sg_filter = VpcSecurityGroupFilter(data=self.data, manager=self.manager)
+            vpc_security_group_ids = vpc_sg_filter.get_related_ids(resources=resources)
+            sg_manager = self.manager.get_resource_manager('security-group')
+            for id in vpc_security_group_ids:
+                try:
+                    sgs = sg_manager.get_resources([id])
+                    sg_manager.action_registry.get('delete')({}, sg_manager).process(sgs)
+                    self.log.debug(
+                        "Deleted associated Security Group ID %s",
+                        id
+                    )
+                except ClientError as e:
+                    self.log.warning(
+                        "Could not delete Security Group ID %s, error: %s",
+                        id, e)
 
         # Delete the VPCs
         for r in resources:
