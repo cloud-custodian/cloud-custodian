@@ -1,0 +1,20 @@
+{
+    "status_code": 400, 
+    "data": {
+        "Error": {
+            "Message": "the specified group: \"sg-0bc202959ab1c430e\" name: \"default\" cannot be deleted by a user", 
+            "Code": "CannotDelete"
+        }, 
+        "ResponseMetadata": {
+            "RequestId": "ee8c3ee5-7022-4663-ad70-9bd479f65a2a", 
+            "HTTPStatusCode": 400, 
+            "RetryAttempts": 0, 
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:49 GMT", 
+                "transfer-encoding": "chunked", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
+        }
+    }
+}

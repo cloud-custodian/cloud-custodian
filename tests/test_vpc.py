@@ -213,6 +213,48 @@ class VpcTest(BaseTest):
         self.assertEqual([len(resources), resources[0]["VpcId"]], [1, "vpc-7af45101"])
         self.assertTrue("c7n:DhcpConfiguration" in resources[0])
 
+    def test_vpc_delete(self):
+        session_factory = self.replay_flight_data('test_vpc_delete')
+        client = session_factory().client("ec2")
+
+        p = self.load_policy(
+            {
+                'name': 'test-vpc-delete',
+                'resource': 'vpc',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'tag:Name',
+                        'op': 'eq',
+                        'value': 'c7n-vpc-delete-test'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'dependencies': [
+                            'subnet',
+                            'route-table',
+                            'internet-gateway',
+                            'security-group'
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcId"], 'vpc-0a052574e7ad26482')
+        try:
+            client.describe_security_groups(VpcIds=['vpc-0a052574e7ad26482'])
+        except Exception:
+            pass
+        else:
+            self.fail("vpc not deleted")
+
 
 class NetworkLocationTest(BaseTest):
 

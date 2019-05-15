@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "2bdc6279-99bd-4e03-a5da-18a4c8da8a09", 
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:50 GMT", 
+                "transfer-encoding": "chunked", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "server": "AmazonEC2", 
+                "vary": "accept-encoding"
+            }
+        }
+    }
+}

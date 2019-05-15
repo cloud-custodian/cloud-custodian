@@ -1,0 +1,43 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Vpcs": [
+            {
+                "InstanceTenancy": "default", 
+                "CidrBlockAssociationSet": [
+                    {
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }, 
+                        "AssociationId": "vpc-cidr-assoc-06347c7be88ac57e6", 
+                        "CidrBlock": "10.0.0.0/16"
+                    }
+                ], 
+                "DhcpOptionsId": "dopt-73a70517", 
+                "State": "available", 
+                "VpcId": "vpc-0a052574e7ad26482", 
+                "OwnerId": "123456789012", 
+                "CidrBlock": "10.0.0.0/16", 
+                "IsDefault": false, 
+                "Tags": [
+                    {
+                        "Key": "Name", 
+                        "Value": "c7n-vpc-delete-test"
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RequestId": "7bb39e28-f67a-437d-9cd6-3de6e6e1ef5d", 
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:47 GMT", 
+                "transfer-encoding": "chunked", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "server": "AmazonEC2", 
+                "vary": "accept-encoding"
+            }
+        }
+    }
+}

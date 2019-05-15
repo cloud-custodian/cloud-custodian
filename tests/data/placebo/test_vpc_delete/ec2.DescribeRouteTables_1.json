@@ -1,0 +1,63 @@
+{
+    "status_code": 200, 
+    "data": {
+        "RouteTables": [
+            {
+                "RouteTableId": "rtb-0d8b6350c84721fa9", 
+                "Associations": [], 
+                "VpcId": "vpc-0a052574e7ad26482", 
+                "OwnerId": "123456789012", 
+                "PropagatingVgws": [], 
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/16", 
+                        "Origin": "CreateRouteTable", 
+                        "GatewayId": "local", 
+                        "State": "active"
+                    }, 
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0", 
+                        "Origin": "CreateRoute", 
+                        "GatewayId": "igw-06a65b3a1efbfb2e1", 
+                        "State": "blackhole"
+                    }
+                ], 
+                "Tags": []
+            },
+            {
+                "RouteTableId": "rtb-010af5ef3ea01f217", 
+                "Associations": [
+                    {
+                        "Main": true, 
+                        "RouteTableAssociationId": "rtbassoc-08f44944f5eeb8250", 
+                        "RouteTableId": "rtb-010af5ef3ea01f217"
+                    }
+                ], 
+                "VpcId": "vpc-0a052574e7ad26482", 
+                "OwnerId": "123456789012", 
+                "PropagatingVgws": [], 
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/16", 
+                        "Origin": "CreateRouteTable", 
+                        "GatewayId": "local", 
+                        "State": "active"
+                    }
+                ], 
+                "Tags": []
+            }
+        ], 
+        "ResponseMetadata": {
+            "RequestId": "395b36a4-b70e-429a-a314-8dfd466f6131", 
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:48 GMT", 
+                "transfer-encoding": "chunked", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "server": "AmazonEC2", 
+                "vary": "accept-encoding"
+            }
+        }
+    }
+}
