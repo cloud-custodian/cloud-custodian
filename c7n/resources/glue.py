@@ -13,14 +13,17 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import functools
+
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, chunks, type_schema
+from c7n.utils import local_session, chunks, type_schema, generate_arn
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n import tags
 
 
 @resources.register('glue-connection')
@@ -99,6 +102,18 @@ class GlueDevEndpoint(QueryResourceManager):
 
     permissions = ('glue:GetDevEndpoints',)
 
+    @property
+    def generate_arn(self):
+        print(self.config)
+        # if self._generate_arn is None:
+        self._generate_arn = functools.partial(
+            generate_arn,
+            'glue',
+            region=self.config.region,
+            account_id=self.config.account_id,
+            resource_type='devEndpoint',
+            separator='/')
+        return self._generate_arn
 
 @GlueDevEndpoint.action_registry.register('delete')
 class DeleteDevEndpoint(BaseAction):
@@ -137,3 +152,34 @@ class DeleteDevEndpoint(BaseAction):
                     self.log.error(
                         "Exception deleting glue dev endpoint \n %s",
                         f.exception())
+
+
+@GlueDevEndpoint.action_registry.register('tag')
+class Tag(tags.Tag):
+    """Tags AWS Glue resource"""
+    permissions = ('glue:TagResource',)
+
+    def process_resource_set(self, client, resources, tags):
+        tags_lower = []
+
+        for tag in tags:
+            tags_lower.append({k.lower(): v for k, v in tag.items()})
+        for r in resources:
+            try:
+                arn = self.manager.generate_arn(r['EndpointName'])
+                client.tag_resource(ResourceArn=arn, TagsToAdd=tag)
+            except client.exceptions.EntityNotFoundException as e:
+                print(e)
+                continue
+
+# @GlueDevEndpoint.action_registry.register('untag')
+# class Untag(tags.Tag):
+#     """Remove tags from AWS Glue resource"""
+
+#     def process_resource_set(self, client, resources, tags):
+#         client = local_session(self.manager.session_factory).client('glue')
+#         for r in resources:
+#             try:
+#                 client.tag_resource(ResourceArn=r['ARN'])
+#             except client.exceptions.EntityNotFoundException:
+#                 continue
