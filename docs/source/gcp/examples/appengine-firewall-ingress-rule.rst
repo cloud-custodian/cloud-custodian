@@ -1,6 +1,6 @@
-App Engine - Check if a Required Firewall Rule is in Place
+App Engine - Check if a Firewall Rule is in Place
 ============================================================
-Custodian can check and notify if App Engine firewall rules have been changed, removed or mis-configured.
+Custodian can check and notify if App Engine firewall ingress rules have been mis-configured.
 
 The policy below checks if a default ALLOW ingress rule is still active (e.g., somebody forgotten to remove it).
 
