@@ -1,7 +1,7 @@
 App Engine - Domain
 ====================
 
-Description
+Custodian can check expiration of user-added custom domains.
 
 .. code-block:: yaml
 
@@ -21,7 +21,7 @@ Description
         actions:
           - type: notify
             to:
-              - alex.karpitski@gmail.com
+              - email@address
             subject: Domains no longer in use
             format: txt
             transport:
