@@ -1,29 +1,24 @@
-App Engine - Domain Mapping
-===========================
+App Engine - Audit domain mappings being added
+===============================================
+Custodian can audit new mappings being added. Note that the ``notify`` action requires a Pub/Sub topic to be configured.
 
-Description
+In the example below, the policy notifies users if the ``CreateDomainMapping`` action appears in the logs.
 
 .. code-block:: yaml
 
-    vars:
-      no-longer-in-use: &outdated-mappings
-        - appengine-de.mo
-        - alex.gcp-li.ga
-        - whatever.com
     policies:
-      - name: gcp-app-engine-domain-mapping-notify-if-outdated
+      - name: gcp-app-engine-domain-mapping-audit-new-mappings
         resource: gcp.app-engine-domain-mapping
-        filters:
-          - type: value
-            key: id
-            op: in
-            value: *outdated-mappings
+        mode:
+          type: gcp-audit
+          methods:
+            - "google.appengine.v1beta.DomainMappings.CreateDomainMapping"
         actions:
           - type: notify
+            subject: New domain mapping added
             to:
-              - alex.karpitski@gmail.com
-            subject: Mappings no longer in use
+              - email@address
             format: txt
             transport:
               type: pubsub
-              topic: projects/cloud-custodian-190204/topics/appengine-demo
+              topic: projects/my-gcp-project/topics/my-topic
