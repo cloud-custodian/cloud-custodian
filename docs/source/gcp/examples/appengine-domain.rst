@@ -1,6 +1,6 @@
 App Engine - Check if a blacklisted domain is still in use
 ===========================================================
-Custodian can check and notify whether the used there are user-defined blacklisted domains in use. Note that the ``notify`` action requires a Pub/Sub topic to be configured.
+Custodian can check and notify if there are user-defined blacklisted domains in use. Note that the ``notify`` action requires a Pub/Sub topic to be configured.
 
 In the example below, the policy checks if there are any domains contained in the ``&blacklisted-domains`` variable.
 
