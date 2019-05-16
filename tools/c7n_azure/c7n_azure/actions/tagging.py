@@ -7,7 +7,7 @@ from c7n_azure import constants
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import StringUtils
 from dateutil import tz as tzutils
-from tools.c7n_azure.c7n_azure.actions.base import AzureBaseAction, AzureEventAction
+from c7n_azure.actions.base import AzureBaseAction, AzureEventAction
 
 from c7n import utils
 from c7n.exceptions import PolicyValidationError
