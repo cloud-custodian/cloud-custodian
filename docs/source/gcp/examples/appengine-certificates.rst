@@ -1,6 +1,6 @@
 App Engine - Check if an SSL Certificate is About to Expire
-=============================================================
-Custodian can check and notify if an SSL certificate is about to expire. Note that the ``notify`` action requires the Pub/Sub topic to be configured.
+============================================================
+Custodian can check and notify if an SSL certificate is about to expire. Note that the ``notify`` action requires a Pub/Sub topic to be configured.
 
 In the example below, the policy is set to filter certificates which expire in 60 days or less.
 
@@ -19,6 +19,7 @@ In the example below, the policy is set to filter certificates which expire in 6
             value: 60
           actions:
            - type: notify
+             subject: Certificates expiring in 60 days
              to:
                - email@address
              format: txt
