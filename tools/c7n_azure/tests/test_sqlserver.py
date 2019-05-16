@@ -47,7 +47,7 @@ class SqlServerTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_metric_elastic_exclude(self):
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
+        with patch('c7n_azure.utils.utcnow') as utc_patch:
             utc_patch.return_value = self.get_test_date()
 
             p = self.load_policy({
@@ -72,7 +72,7 @@ class SqlServerTest(BaseTest):
             self.assertEqual(len(resources), 0)
 
     def test_metric_elastic_include(self):
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
+        with patch('c7n_azure.utils.utcnow') as utc_patch:
             utc_patch.return_value = self.get_test_date()
             p = self.load_policy({
                 'name': 'test-azure-sql-server',
@@ -97,7 +97,7 @@ class SqlServerTest(BaseTest):
             self.assertEqual(len(resources), 1)
 
     def test_metric_database(self):
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
+        with patch('c7n_azure.utils.utcnow') as utc_patch:
             utc_patch.return_value = self.get_test_date()
 
             p = self.load_policy({

@@ -19,7 +19,7 @@ import re
 
 import msrest.polling
 from azure_serializer import AzureSerializer
-from c7n_azure import constants, actions
+from c7n_azure import constants, utils
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
 from mock import patch
@@ -280,7 +280,7 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         ThreadHelper.disable_multi_threading = True
 
         # We always patch the date so URLs that involve dates match up
-        self._utc_patch = patch.object(actions, 'utcnow', BaseTest.get_test_date)
+        self._utc_patch = patch.object(utils, 'utcnow', BaseTest.get_test_date)
         self._utc_patch.start()
         self.addCleanup(self._utc_patch.stop)
 

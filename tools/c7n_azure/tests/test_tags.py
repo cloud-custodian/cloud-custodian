@@ -18,7 +18,7 @@ import logging
 import re
 
 from azure_common import BaseTest, arm_template
-from c7n_azure.actions import AutoTagUser
+from c7n_azure.actions.tagging import AutoTagUser
 from c7n_azure.session import Session
 from mock import patch
 
@@ -392,7 +392,7 @@ class TagsTest(BaseTest):
     @arm_template('vm.json')
     def test_auto_tag_add_creator_tag(self):
         """Adds CreatorEmail to a resource group."""
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
+        with patch('c7n_azure.utils.utcnow') as utc_patch:
             utc_patch.return_value = self.get_test_date()
 
             p = self.load_policy({
@@ -420,7 +420,7 @@ class TagsTest(BaseTest):
     @arm_template('vm.json')
     def test_auto_tag_update_false_noop_for_existing_tag(self):
         """Adds CreatorEmail to a resource group"""
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
+        with patch('c7n_azure.utils.utcnow') as utc_patch:
             utc_patch.return_value = self.get_test_date()
 
             # setup by adding an existing CreatorEmail tag

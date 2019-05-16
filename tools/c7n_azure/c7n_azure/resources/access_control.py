@@ -17,7 +17,7 @@ import re
 
 import six
 from azure.graphrbac import GraphRbacManagementClient
-from c7n_azure.actions import AzureBaseAction
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
