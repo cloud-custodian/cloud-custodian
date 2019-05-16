@@ -94,7 +94,11 @@ class SplunkHecDelivery(object):
             ):
                 del res['c7n.metrics']
             x['resource'] = res
-            x['resource']['tags'] = self.tags_for_resource(res)
+            # ensure there's one "tags" element, and it's a dict
+            tmp = self.tags_for_resource(res)
+            if 'Tags' in x['resource']:
+                del x['resource']['Tags']
+            x['resource']['tags'] = tmp
             logs.append(self._prune_log_message(x))
         return logs
 

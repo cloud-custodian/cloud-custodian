@@ -140,7 +140,13 @@ class TestGetSplunkEvents(DeliveryTester):
                 ]
             },
             'resources': [
-                {'InstanceId': 'i-123', 'c7n:MatchedFilters': [1, 2]},
+                {
+                    'InstanceId': 'i-123',
+                    'c7n:MatchedFilters': [1, 2],
+                    'Tags': [
+                        {'Key': 'tag1', 'Value': 'val1'}
+                    ]
+                },
                 {'InstanceId': 'i-456'},
                 {'InstanceId': 'i-789', 'c7n.metrics': {'foo': 'bar'}}
             ]
