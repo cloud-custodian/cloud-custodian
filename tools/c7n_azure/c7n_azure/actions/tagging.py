@@ -1,11 +1,19 @@
+import datetime
+import logging
+from email.utils import parseaddr
+
+import jmespath
+from c7n_azure import constants
+from c7n_azure.tags import TagHelper
+from c7n_azure.utils import StringUtils
+from dateutil import tz as tzutils
+from tools.c7n_azure.c7n_azure.actions.base import AzureBaseAction, AzureEventAction
+
 from c7n import utils
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import Time
-from tools.c7n_azure.c7n_azure.actions.base import AzureBaseAction, AzureEventAction
-import jmespath
-from c7n_azure.tags import TagHelper
-from c7n_azure import constants
+
 
 class Tag(AzureBaseAction):
     """Adds tags to Azure resources
@@ -202,6 +210,9 @@ class AutoTagUser(AzureEventAction):
             return False
 
     def _get_user_from_resource_logs(self, resource):
+        # Makes patching this easier
+        from c7n_azure.utils import utcnow
+
         # Calculate start time
         delta_days = self.data.get('days', self.max_query_days)
         start_time = utcnow() - datetime.timedelta(days=delta_days)
@@ -399,7 +410,7 @@ class TagDelayedAction(AzureBaseAction):
         if days is None or hours is None:
             # maintains default value of days being 4 if nothing is provided
             days = 4
-        action_date = (n + timedelta(days=days, hours=hours))
+        action_date = (n + datetime.timedelta(days=days, hours=hours))
         if hours > 0:
             action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
         else:

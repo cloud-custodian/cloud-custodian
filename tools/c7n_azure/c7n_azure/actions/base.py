@@ -15,28 +15,14 @@
 Actions to perform on Azure resources
 """
 import abc
-import datetime
 import logging
-from email.utils import parseaddr
-
-from datetime import timedelta
-
 
 import six
 from c7n_azure import constants
-from c7n_azure.storage_utils import StorageUtilities
-
-from c7n_azure.utils import utcnow, ThreadHelper, StringUtils
-from dateutil import tz as tzutils
+from c7n_azure.utils import ThreadHelper
 from msrestazure.azure_exceptions import CloudError
 
-from c7n import utils
-from c7n.actions import BaseAction, BaseNotify, EventAction
-from c7n.filters import FilterValidationError
-from c7n.filters.core import PolicyValidationError
-from c7n.filters.offhours import Time
-from c7n.resolver import ValuesFrom
-from c7n.utils import type_schema
+from c7n.actions import BaseAction, EventAction
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -111,5 +97,3 @@ class AzureEventAction(EventAction, AzureBaseAction):
     def _process_resource(self, resource, event):
         raise NotImplementedError(
             "Base action class does not implement this behavior")
-
-

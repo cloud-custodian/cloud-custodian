@@ -19,7 +19,7 @@ import re
 
 import msrest.polling
 from azure_serializer import AzureSerializer
-from c7n_azure import constants, utils
+from c7n_azure import utils, constants
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
 from mock import patch
@@ -280,9 +280,13 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         ThreadHelper.disable_multi_threading = True
 
         # We always patch the date so URLs that involve dates match up
-        self._utc_patch = patch.object(utils, 'utcnow', BaseTest.get_test_date)
+        self._utc_patch = patch.object(utils, 'utcnow', self.get_test_date)
         self._utc_patch.start()
         self.addCleanup(self._utc_patch.stop)
+
+        self._now_patch = patch.object(utils, 'now', self.get_test_date)
+        self._now_patch.start()
+        self.addCleanup(self._now_patch.stop)
 
         if not self._requires_polling:
             # Patch Poller with constructor that always disables polling
@@ -305,7 +309,7 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                 self._tenant_patch.start()
                 self.addCleanup(self._tenant_patch.stop)
 
-    def get_test_date(self):
+    def get_test_date(self, tz=None):
         header_date = self.cassette.responses[0]['headers'].get('date') \
             if self.cassette.responses else None
 

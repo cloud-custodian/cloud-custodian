@@ -33,8 +33,8 @@ Option 2: Install latest from the repository
 
     $ git clone https://github.com/cloud-custodian/cloud-custodian.git
     $ cd cloud-custodian
-    $ pip install -e ./cloud-custodian
-    $ pip install -e ./cloud-custodian/tools/c7n_azure
+    $ pip install -e .
+    $ pip install -e tools/c7n_azure
 
 
 .. _azure_write-policy:
