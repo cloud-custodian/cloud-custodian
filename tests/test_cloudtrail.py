@@ -108,7 +108,7 @@ class CloudTrail(BaseTest):
         p = self.load_policy({
             'name': 'resource',
             'resource': 'cloudtrail',
-            'filters': [{'type':'is-shadow', 'state': False}]},
+            'filters': [{'type': 'is-shadow', 'state': False}]},
             session_factory=factory, config={'region': 'us-east-1'})
         resources = p.run()
         self.assertEqual(2, len(resources))
