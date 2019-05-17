@@ -101,13 +101,13 @@ example
 
 ```yaml
 policies:
-  - name: remediate-extant-keys
+- name: remediate-extant-keys
   description: |
     Scan through all s3 buckets in an account and ensure all objects
     are encrypted (default to AES256).
   resource: aws.s3
-    actions:
-      - encrypt-keys
+  actions:
+    - encrypt-keys
 
 - name: ec2-require-non-public-and-encrypted-volumes
   resource: aws.ec2
