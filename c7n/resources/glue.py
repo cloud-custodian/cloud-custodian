@@ -114,6 +114,7 @@ class GlueDevEndpoint(QueryResourceManager):
             separator='/')
         return self._generate_arn
 
+
 @GlueDevEndpoint.action_registry.register('delete')
 class DeleteDevEndpoint(BaseAction):
     """Deletes public Glue Dev Endpoints
@@ -159,7 +160,7 @@ class Tag(tags.Tag):
     permissions = ('glue:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
-        tags = {tag.get('Key'):tag.get('Value') for tag in tags}
+        tags = {tag.get('Key'): tag.get('Value') for tag in tags}
         for r in resources:
             arn = self.manager.generate_arn(r['EndpointName'])
             client.tag_resource(ResourceArn=arn, TagsToAdd=tags)
