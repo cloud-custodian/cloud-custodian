@@ -113,7 +113,7 @@ Others
       ARM resource type supported by Cloud Custodian.
 
       .. c7n-schema:: DeleteAction
-            :module: c7n_azure.actions.tagging
+            :module: c7n_azure.actions.delete
 
       .. code-block:: yaml
 
