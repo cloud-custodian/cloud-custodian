@@ -1,7 +1,7 @@
 .. _gcp_pubsub:
 
 Pub\\Sub
-=======
+========
 
 Filters
 --------
