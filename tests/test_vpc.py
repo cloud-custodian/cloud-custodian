@@ -249,12 +249,8 @@ class VpcTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["VpcId"], 'vpc-0cc1f28fcc3977440')
-        try:
-            client.describe_security_groups(VpcIds=['vpc-0cc1f28fcc3977440'])
-        except Exception:
-            pass
-        else:
-            self.fail("vpc not deleted")
+        # client.describe_vpcs(VpcIds=['vpc-0cc1f28fcc3977440'])
+        # calling that again just hits the placebo data? Not really testing much
 
 
 class NetworkLocationTest(BaseTest):
@@ -2398,6 +2394,25 @@ class EndpointTest(BaseTest):
         self.assertEqual(violations[0]['Action'], '*')
         self.assertEqual(violations[0]['Resource'], '*')
         self.assertEqual(violations[0]['Effect'], 'Allow')
+
+
+class InternetGatewayTest(BaseTest):
+
+    def test_delete_internet_gateways(self):
+        factory = self.replay_flight_data("test_internet_gateway_delete")
+        client = factory().client("ec2")
+        p = self.load_policy(
+            {
+                "name": "delete-internet-gateways",
+                "resource": "internet-gateway",
+                "filters": [{"tag:Name": "c7n_test"}],
+                "actions": [{"type": "delete", "force": "true"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["InternetGatewayId"], 'igw-01862a679bf95e81b')
 
 
 class NATGatewayTest(BaseTest):

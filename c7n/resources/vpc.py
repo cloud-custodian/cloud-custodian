@@ -102,7 +102,8 @@ class VpcDelete(BaseAction):
         }
     }
     permissions = ('ec2:DeleteSubnet', 'ec2:DetachInternetGateway', 'ec2:DeleteInternetGateway',
-                   'ec2:DeleteRouteTable', 'ec2:DeleteSecurityGroup', 'ec2:DeleteVpc',)
+                   'ec2:DeleteNatGateway', 'ec2:DeleteRouteTable', 'ec2:DeleteSecurityGroup',
+                   'ec2:DeleteVpc',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -118,12 +119,14 @@ class VpcDelete(BaseAction):
             ngw_manager = self.manager.get_resource_manager('nat-gateway')
             for id in vpc_ngw_ids:
                 try:
-                    client.delete_nat_gateway(NatGatewayId=id)
+                    ngws = ngw_manager.get_resources([id])
+                    ngw_manager.action_registry.get('delete')({}, ngw_manager).process(ngws)
                     self.log.debug(
                         "Deleting associated NAT Gateway ID %s",
                         id
                     )
                     # NAT Gateway deletion usually takes some time
+                    # Unfortunately, boto does not provide a 'waiter' for this.
                     for idx, delay in enumerate(backoff_delays(min_delay, max_delay, jitter=True)):
                         time.sleep(delay)
                         ngws = ngw_manager.get_resources([id], cache=False)
@@ -161,8 +164,10 @@ class VpcDelete(BaseAction):
                         "Could not delete Subnet ID %s, error: %s",
                         id, e)
 
-        # Delete Internet Gateways assocaited with VPC
+        # Delete Internet Gateways associated with VPC
         # Detaching the Internet Gateway requires the VpcId
+        # The Internet Gateway could be connected to other VPCs too?
+        # We probably want to only detach from this one, so we won't use the delete action
         if self.data.get('dependencies', {}) == 'all' or \
                 'internet-gateway' in self.data.get('dependencies', {}):
             for r in resources:
@@ -197,8 +202,11 @@ class VpcDelete(BaseAction):
                 'route-table' in self.data.get('dependencies', {}):
             vpc_rtb_filter = VpcRouteTableFilter(data=self.data, manager=self.manager)
             vpc_rtb_ids = vpc_rtb_filter.get_related_ids(resources=resources)
+            rtb_manager = self.manager.get_resource_manager('route-table')
             for id in vpc_rtb_ids:
                 try:
+                    rtbs = rtb_manager.get_resources([id])
+                    rtb_manager.action_registry.get('delete')({}, rtb_manager).process(rtbs)
                     client.delete_route_table(RouteTableId=id)
                     self.log.debug(
                         "Deleted associated Route Table ID %s",
@@ -1697,6 +1705,33 @@ class Route(ValueFilter):
         return results
 
 
+@RouteTable.action_registry.register('delete')
+class DeleteRouteTable(BaseAction):
+    """Delete a Route Table
+
+        :example:
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: delete-route-table
+                    resource: route-table
+                    filters:
+                      type: value
+                      key: "tag:Name"
+                      value: "c7n-delete-test"
+                    actions:
+                      - delete
+        """
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteRouteTable',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_route_table(RouteTableId=r['RouteTableId'])
+
+
 @resources.register('transit-gateway')
 class TransitGateway(query.QueryResourceManager):
 
@@ -2029,6 +2064,41 @@ class InternetGateway(query.QueryResourceManager):
         date = None
         config_type = "AWS::EC2::InternetGateway"
         id_prefix = "igw-"
+
+
+@InternetGateway.action_registry.register('delete')
+class DeleteInternetGateway(BaseAction):
+    """Delete an Internet Gateway
+
+        If the force boolean is true, we will detach the Internet Gateway from all attached VPCs,
+        and then delete.
+
+        :example:
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: delete-internet-gateway
+                    resource: internet-gateway
+                    filters:
+                      type: value
+                      key: "tag:Name"
+                      value: "c7n-delete-test"
+                    actions:
+                      - delete
+        """
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('ec2:DeleteInternetGateway', 'ec2:DetachInternetGateway')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            if self.data.get('force') and len(r['Attachments']):
+                # This could be attached to more than one VPC?
+                # I guess we had better detach all of them
+                for a in r['Attachments']:
+                    client.detach_internet_gateway(InternetGatewayId=r['InternetGatewayId'], VpcId=a['VpcId'])
+            client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
 
 
 @resources.register('nat-gateway')
