@@ -13,19 +13,21 @@
 # limitations under the License.
 
 import importlib
+import inspect
 import json
 import logging
 import os
+import sys
 import types
 
 import jwt
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
-
-from msrestazure.azure_active_directory import MSIAuthentication
-
 from c7n_azure import constants
-from c7n_azure.utils import ResourceIdParser, StringUtils, custodian_azure_send_override
+from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
+                             ManagedGroupHelper)
+from msrestazure.azure_active_directory import MSIAuthentication
+from azure.keyvault import KeyVaultAuthentication, AccessToken
 
 try:
     from azure.cli.core._profile import Profile
@@ -126,7 +128,14 @@ class Session(object):
              self.subscription_id,
              self.tenant_id) = Profile().get_login_credentials(
                 resource=self.resource_namespace)
+
             self.log.info("Creating session with Azure CLI Authentication")
+
+        # TODO: cleanup this workaround when issue resolved.
+        # https://github.com/Azure/azure-sdk-for-python/issues/5096
+        if self.resource_namespace == constants.RESOURCE_VAULT:
+            access_token = AccessToken(token=self.get_bearer_token())
+            self.credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
 
         # Let provided id parameter override everything else
         if self.subscription_id_override is not None:
@@ -148,7 +157,19 @@ class Session(object):
         service_name, client_name = client.rsplit('.', 1)
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
-        client = klass(self.credentials, self.subscription_id)
+
+        klass_parameters = None
+        if sys.version_info[0] < 3:
+            import funcsigs
+            klass_parameters = funcsigs.signature(klass).parameters
+        else:
+            klass_parameters = inspect.signature(klass).parameters
+
+        client = None
+        if 'subscription_id' in klass_parameters:
+            client = klass(credentials=self.credentials, subscription_id=self.subscription_id)
+        else:
+            client = klass(credentials=self.credentials)
 
         # Override send() method to log request limits & custom retries
         service_client = client._client
@@ -168,9 +189,21 @@ class Session(object):
         self._initialize_session()
         return self.subscription_id
 
-    def get_function_target_subscription_id(self):
+    def get_function_target_subscription_name(self):
         self._initialize_session()
+
+        if constants.ENV_FUNCTION_MANAGEMENT_GROUP_NAME in os.environ:
+            return os.environ[constants.ENV_FUNCTION_MANAGEMENT_GROUP_NAME]
         return os.environ.get(constants.ENV_FUNCTION_SUB_ID, self.subscription_id)
+
+    def get_function_target_subscription_ids(self):
+        self._initialize_session()
+
+        if constants.ENV_FUNCTION_MANAGEMENT_GROUP_NAME in os.environ:
+            return ManagedGroupHelper.get_subscriptions_list(
+                os.environ[constants.ENV_FUNCTION_MANAGEMENT_GROUP_NAME], self.get_credentials())
+
+        return [os.environ.get(constants.ENV_FUNCTION_SUB_ID, self.subscription_id)]
 
     def resource_api_version(self, resource_id):
         """ latest non-preview api version for resource """
@@ -198,7 +231,7 @@ class Session(object):
     def get_tenant_id(self):
         self._initialize_session()
         if self._is_token_auth:
-            decoded = jwt.decode(self.credentials['token']['access_token'], verify=False)
+            decoded = jwt.decode(self.credentials.token['access_token'], verify=False)
             return decoded['tid']
 
         return self.tenant_id
@@ -212,14 +245,15 @@ class Session(object):
     def load_auth_file(self, path):
         with open(path) as json_file:
             data = json.load(json_file)
+            self.tenant_id = data['credentials']['tenant']
             return (ServicePrincipalCredentials(
                 client_id=data['credentials']['client_id'],
                 secret=data['credentials']['secret'],
-                tenant=data['credentials']['tenant'],
+                tenant=self.tenant_id,
                 resource=self.resource_namespace
-            ), data['subscription'])
+            ), data.get('subscription', None))
 
-    def get_functions_auth_string(self):
+    def get_functions_auth_string(self, target_subscription_id):
         """
         Build auth json string for deploying
         Azure Functions.  Look for dedicated
@@ -237,8 +271,6 @@ class Session(object):
             constants.ENV_FUNCTION_CLIENT_SECRET
         ]
 
-        function_subscription_id = self.get_function_target_subscription_id()
-
         # Use dedicated function env vars if available
         if all(k in os.environ for k in function_auth_variables):
             auth = {
@@ -248,7 +280,7 @@ class Session(object):
                         'secret': os.environ[constants.ENV_FUNCTION_CLIENT_SECRET],
                         'tenant': os.environ[constants.ENV_FUNCTION_TENANT_ID]
                     },
-                'subscription': function_subscription_id
+                'subscription': target_subscription_id
             }
 
         elif type(self.credentials) is ServicePrincipalCredentials:
@@ -259,7 +291,7 @@ class Session(object):
                         'secret': os.environ[constants.ENV_CLIENT_SECRET],
                         'tenant': os.environ[constants.ENV_TENANT_ID]
                     },
-                'subscription': function_subscription_id
+                'subscription': target_subscription_id
             }
 
         else:

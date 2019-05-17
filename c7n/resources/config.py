@@ -20,6 +20,38 @@ from c7n.query import QueryResourceManager
 from c7n.utils import local_session, chunks, type_schema
 
 
+@resources.register('config-recorder')
+class ConfigRecorder(QueryResourceManager):
+
+    class resource_type(object):
+        service = "config"
+        enum_spec = ('describe_configuration_recorders', 'ConfigurationRecorders', None)
+        id = name = "name"
+        filter_name = 'ConfigurationRecorderNames'
+        filter_type = 'list'
+        dimension = None
+        arn = False
+
+    def augment(self, resources):
+        # in general we don't to default augmentation beyond tags, to
+        # avoid extraneous api calls. in this case config recorder is
+        # a singleton (so no cardinality issues in terms of api calls)
+        # and the common case is looking checking against all of the
+        # attributes to ensure proper configuration.
+        client = local_session(self.session_factory).client('config')
+
+        for r in resources:
+            status = client.describe_configuration_recorder_status(
+                ConfigurationRecorderNames=[r['name']])['ConfigurationRecordersStatus']
+            if status:
+                r.update({'status': status.pop()})
+
+            channels = client.describe_delivery_channels().get('DeliveryChannels')
+            if channels:
+                r.update({'deliveryChannel': channels.pop()})
+        return resources
+
+
 @resources.register('config-rule')
 class ConfigRule(QueryResourceManager):
 

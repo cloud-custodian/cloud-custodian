@@ -16,6 +16,23 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from .common import BaseTest
 
 
+class ConfigRecorderTest(BaseTest):
+
+    def test_config_recorder(self):
+        factory = self.replay_flight_data('test_config_recorder')
+        p = self.load_policy({
+            'name': 'recorder',
+            'resource': 'aws.config-recorder',
+            'filters': [
+                {'recordingGroup.allSupported': True},
+                {'recordingGroup.includeGlobalResourceTypes': True},
+                {'deliveryChannel.name': 'default'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'default')
+
+
 class ConfigComplianceTest(BaseTest):
 
     def test_compliance(self):

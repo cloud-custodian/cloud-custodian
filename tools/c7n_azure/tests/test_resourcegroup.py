@@ -40,11 +40,11 @@ class ResourceGroupTest(BaseTest):
             'name': 'test-azure-resource-group',
             'resource': 'azure.resourcegroup',
             'filters': [
-                {'type': 'empty-group'},
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': 'test_emptyrg'}]})
+                 'value': 'test_emptyrg'},
+                {'type': 'empty-group'}]})
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test_emptyrg')

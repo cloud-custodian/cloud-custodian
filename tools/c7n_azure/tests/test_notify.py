@@ -14,8 +14,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template
-from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.session import Session
+from c7n_azure.storage_utils import StorageUtilities
 
 
 class NotifyTest(BaseTest):
@@ -53,6 +53,12 @@ class NotifyTest(BaseTest):
         p = self.load_policy({
             'name': 'test-notify-for-keyvault',
             'resource': 'azure.keyvault',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cckeyvault1*'}],
             'actions': [
                 {'type': 'notify',
                  'template': 'default',

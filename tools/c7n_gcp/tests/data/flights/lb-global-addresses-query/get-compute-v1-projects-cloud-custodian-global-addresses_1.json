@@ -1,0 +1,38 @@
+{
+  "body": {
+    "items": [
+      {
+        "status": "RESERVED", 
+        "kind": "compute#address", 
+        "description": "", 
+        "networkTier": "PREMIUM", 
+        "address": "35.241.5.194", 
+        "creationTimestamp": "2019-03-17T22:07:57.553-07:00", 
+        "id": "332437561884711234", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses/new-global-address", 
+        "name": "new-global-address"
+      }
+    ], 
+    "kind": "compute#addressList", 
+    "id": "projects/cloud-custodian/global/addresses", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "592", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 18 Mar 2019 05:12:56 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Mon, 18 Mar 2019 05:12:56 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/addresses?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"5Ca52uZRGjEsy-3Y6oQPHbycfx4=/ku7UV0Eo6fTkj_BL5ETYTn4nllc=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
