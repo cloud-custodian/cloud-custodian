@@ -8,7 +8,7 @@ This action can be applied to any gcp resource type.
 Notify
 ------
 ``Notify``
-  Add notify message into Cloud Pub\Sub. To check below example please use created GCP project and configured Pub/Sub topic.
+  Add notify message into Cloud Pub/Sub. To check below example please use created GCP project and configured Pub/Sub topic.
 
   .. code-block:: yaml
 
@@ -29,10 +29,10 @@ Notify
 To run the example please make sure
 
  - the project is configured,
- - Pub\Sub topic is created and configured,
+ - Pub/Sub topic is created and configured,
  - Cloud function for messages decoding is created.
 
-Pub\Sub system is able to provide information about message in encoded format. One of the ways how to make the message readable is using a decoding cloud function.
+Pub/Sub system is able to provide information about message in encoded format. One of the ways how to make the message readable is using a decoding cloud function.
 
 If the messaging system is not configured please follow next steps:
 

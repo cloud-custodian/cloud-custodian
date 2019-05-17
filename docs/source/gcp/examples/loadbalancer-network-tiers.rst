@@ -1,7 +1,7 @@
 Load Balancer - Network Tiers
 =============================
 
-These examples allow to work with GCP loadbalancer-address resource. It described below how to notify to Cloud Pub\Sub information about the addresses in standard and premium tiers.
+These examples allow to work with GCP loadbalancer-address resource. It described below how to notify to Cloud Pub/Sub information about the addresses in standard and premium tiers.
 
 Details about all available load-balancer resources are available at the :ref:`gcp_loadbalancer` page.
 
