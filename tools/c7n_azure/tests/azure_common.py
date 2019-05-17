@@ -144,8 +144,8 @@ class AzureVCRBaseTest(VCRTestCase):
         r1_path = AzureVCRBaseTest._replace_subscription_id(r1.path)
         r2_path = AzureVCRBaseTest._replace_subscription_id(r2.path)
 
-        r1_path = r1_path.replace('//', '/')
-        r2_path = r2_path.replace('//', '/')
+        r1_path = r1_path.replace('//', '/').lower()
+        r2_path = r2_path.replace('//', '/').lower()
 
         return r1_path == r2_path
 
