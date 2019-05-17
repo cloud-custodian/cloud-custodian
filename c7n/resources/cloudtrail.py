@@ -55,10 +55,8 @@ class IsShadow(Filter):
     embedded = False
 
     def process(self, resources, event=None):
-        anded = lambda x: True # NOQA
-        op = self.data.get('state', True) and anded or operator.__not__
         rcount = len(resources)
-        trails = [t for t in resources if op(self.is_shadow(t))]
+        trails = [t for t in resources if (self.is_shadow(t) == self.data.get('state', True))]
         if len(trails) != rcount and self.embedded:
             self.log.info("implicitly filtering shadow trails %d -> %d",
                      rcount, len(trails))
@@ -69,6 +67,7 @@ class IsShadow(Filter):
             return True
         if t.get('IsMultiRegionTrail') and t['HomeRegion'] not in t['TrailARN']:
             return True
+        return False
 
 
 @CloudTrail.filter_registry.register('status')
