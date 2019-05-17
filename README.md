@@ -76,15 +76,25 @@ $ source custodian/bin/activate
 Usage
 -----
 
-Cloud Custodian works on a YAML policy that are user generated. The policy
-contains the resources that the policy will run on, filters control which resources
-will be affected by this policy, modes control how the policy will execute, and actions
-are the actions the policy will take. Below is a sample policy that uses AWS and assumes that
-the user have the access necessary to preform the tasks. This policy ensures that these 3 rules are
-followed:
+The first step to using Cloud Custodian is writing a YAML file
+containing the policies that you want to run. Each policy specifies
+the resource type that the policy will run on, a set of filters which
+control resources will be affected by this policy, actions which the policy
+with take on the matched resources, and a mode which controls which
+how the policy will execute.
+
+The best getting started guides are the cloud provider specific tutorials
+ - [AWS Getting Started](https://cloudcustodian.io/docs/aws/gettingstarted.html)
+ - [Azure Getting Started](https://cloudcustodian.io/docs/azure/gettingstarted.html)
+ - [GCP Getting Started](https://cloudcustodian.io/docs/gcp/gettingstarted.html)
+
+As a quick walk through, below are some sample policies for AWS resources.
+
   1. will enforce that no S3 buckets have cross-account access enabled.
-  1. will terminate any EC2 instance that do not have an encrypted EBS volume.
-  1. will stop any EC2 instance that does not have the follow tags "Environment", "AppId", and either "OwnerContact" or "DeptID".
+  1. will terminate any newly launched EC2 instance that do not have an encrypted EBS volume.
+  1. will tag any EC2 instance that does not have the follow tags
+     "Environment", "AppId", and either "OwnerContact" or "DeptID" to be stopped
+	 in four days.
 
 ```yaml
 policies:
@@ -92,7 +102,7 @@ policies:
    description: |
      Checks S3 for buckets with cross-account access and
      removes the cross-account access.
-   resource: s3
+   resource: aws.s3
    region: us-east-1
    filters:
      - type: cross-account
@@ -122,7 +132,9 @@ policies:
   resource: aws.ec2
   description: |
     Schedule a resource that does not meet tag compliance policies
-    to be stopped in four days.
+    to be stopped in four days. Note a separate policy using the
+	`marked-for-op` filter is required to actually stop the instances
+	after four days.
   filters:
     - State.Name: running
     - "tag:Environment": absent
@@ -150,7 +162,7 @@ $ custodian run --dryrun -s out policy.yml
 $ custodian run -s out policy.yml
 ```
 
-You can run Cloud Custodian with a policy in Docker as well
+You can run Cloud Custodian via Docker as well:
 
 ```shell
 # Download the image
