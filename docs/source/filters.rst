@@ -232,19 +232,19 @@ There are several ways to get a list of possible keys for each resource.
                  - subnet-2d2736444
 
 - Value Regex:
+
   When using a Value Filter, a ``value_regex`` can be
-  specified. This will mean that the value is evaluated against the
-  result of running the regex that was provided on the ``key``,
-  instead of the full contents of the ``key`` itself.
+  specified. This will mean that the value used for comparison is the output
+  from evaluating a regex on the value found on a resource using `key`.
 
   The filter expects that there will be exactly one capturing group, however
   non-capturing groups can be specified as well, e.g. ``(?:newkey|oldkey)``.
 
   Note that if the value regex does not find a match, it will just
-  pass-through the full contents of the ``key`` itself, i.e. essentially act as
-  if the ``value_regex`` had not been specified at all.
-  This could possibly have unintended consequences depending on how the
-  filter is configured.
+  pass-through the full contents of the original ``key`` value,
+  i.e. essentially act as if the ``value_regex`` had not been
+  specified at all.  This could possibly have unintended consequences
+  depending on how the filter is configured.
 
   In this example there is an ``expiration`` comparison,
   which needs a datetime, however the tag containing this information
