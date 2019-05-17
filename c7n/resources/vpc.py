@@ -2086,9 +2086,9 @@ class DeleteInternetGateway(BaseAction):
                   - name: delete-internet-gateway
                     resource: internet-gateway
                     filters:
-                      type: value
-                      key: "tag:Name"
-                      value: "c7n-delete-test"
+                      - type: value
+                        key: "tag:Name"
+                        value: "c7n-delete-test"
                     actions:
                       - delete
         """
