@@ -24,7 +24,7 @@ The details about the variables are available in the `GCP documentation to confi
 Example Policies
 ----------------
 
-Load Balancers' Addresses
+Load Balancer. Addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 The resource works with `addresses <https://cloud.google.com/compute/docs/reference/rest/v1/addresses>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
 
