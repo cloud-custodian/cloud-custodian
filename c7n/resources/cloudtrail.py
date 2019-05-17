@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-import operator
 
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
