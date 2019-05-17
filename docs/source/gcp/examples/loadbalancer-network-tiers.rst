@@ -1,4 +1,4 @@
-Loadbalancer - Network Tiers
+Load Balancer - Network Tiers
 =============================
 
 These examples allow to work with GCP loadbalancer-address resource. It described below how to notify to Cloud Pub\Sub information about the addresses in standard and premium tiers.
