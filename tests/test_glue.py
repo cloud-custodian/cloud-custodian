@@ -108,3 +108,49 @@ class TestGlueDevEndpoints(BaseTest):
         client = session_factory().client("glue")
         dev_endpoints = client.get_dev_endpoints()["DevEndpoints"]
         self.assertFalse(dev_endpoints)
+
+class TestGlueTag(BaseTest):
+    def test_glue_tags(self):
+        session_factory = self.record_flight_data("test_glue_tags")
+        policy = {
+            'name': 'glue-dev-endpoint',
+            'resource': 'glue-dev-endpoint',
+            'actions': [
+                {
+                    'type': 'tag',
+                    'key': 'abcd',
+                    'value': 'xyz'
+                },
+            ]
+        }
+        p = self.load_policy(
+            policy,
+            session_factory=session_factory)
+
+        resources = p.run()
+        client = session_factory().client("glue")
+        arn = p.resource_manager.generate_arn(resources[0]['EndpointName'])
+        tags = client.get_tags(ResourceArn=arn)
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(tags.get('Tags'), {'abcd': 'xyz'})
+
+    def test_glue_untag(self):
+        session_factory = self.record_flight_data("test_glue_untag")
+
+        policy = {
+            'name': 'glue-dev-endpoint',
+            'resource': 'glue-dev-endpoint',
+            'actions': [{'type': 'remove-tag', 'tags': ['abcd']}]
+        }
+        p = self.load_policy(
+            policy,
+            session_factory=session_factory)
+
+        resources = p.run()
+        client = session_factory().client("glue")
+        arn = p.resource_manager.generate_arn(resources[0]['EndpointName'])
+        tags = client.get_tags(ResourceArn=arn)
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(tags.get('Tags'), {})
