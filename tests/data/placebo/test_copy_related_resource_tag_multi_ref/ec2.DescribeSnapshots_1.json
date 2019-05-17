@@ -1,0 +1,80 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "Description": "",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-09b2f5724227e0e77",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 16,
+                    "hour": 15,
+                    "minute": 40,
+                    "second": 15,
+                    "microsecond": 829000
+                },
+                "State": "completed",
+                "VolumeId": "vol-00ab6a43334e4224b",
+                "VolumeSize": 1
+            },
+            {
+                "Description": "",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/68425528-9938-4a15-90f2-f1755263b836",
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-0d3154c96a586adff",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 16,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 37,
+                    "microsecond": 69000
+                },
+                "State": "completed",
+                "VolumeId": "vol-069d75193c497b8aa",
+                "VolumeSize": 8
+            },
+            {
+                "Description": "",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/68425528-9938-4a15-90f2-f1755263b836",
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-08734982bb772fc02",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 16,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 56,
+                    "microsecond": 541000
+                },
+                "State": "completed",
+                "VolumeId": "vol-069d75193c497b8aa",
+                "VolumeSize": 8
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "5e784a86-e385-45a8-bea0-de4c47b85f6d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "1763",
+                "date": "Thu, 16 May 2019 17:06:37 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

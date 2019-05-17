@@ -160,8 +160,8 @@ class FunctionAppUtilities(object):
             sas = blob_client.generate_blob_shared_access_signature(
                 FUNCTION_CONSUMPTION_BLOB_CONTAINER,
                 blob_name,
-                BlobPermissions.READ,
-                datetime.datetime.utcnow() +
+                permission=BlobPermissions.READ,
+                expiry=datetime.datetime.utcnow() +
                 datetime.timedelta(days=FUNCTION_PACKAGE_SAS_EXPIRY_DAYS)
                 # expire in 10 years
             )

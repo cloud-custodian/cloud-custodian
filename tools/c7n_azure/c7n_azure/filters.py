@@ -118,7 +118,7 @@ class MetricFilter(Filter):
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes
-        from c7n_azure.actions import utcnow
+        from c7n_azure.utils import utcnow
 
         # Get timespan
         end_time = utcnow()

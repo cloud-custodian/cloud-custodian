@@ -42,7 +42,7 @@ setup(
             'azure = c7n_azure.entry:initialize_azure']
     },
     install_requires=["azure-mgmt-authorization",
-                      "azure-mgmt-applicationinsights",
+                      "azure-mgmt-applicationinsights==0.1.1",
                       "azure-mgmt-batch",
                       "azure-mgmt-cognitiveservices",
                       "azure-mgmt-cosmosdb",

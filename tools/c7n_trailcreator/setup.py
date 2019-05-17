@@ -14,10 +14,15 @@
 
 from setuptools import setup
 
+with open("readme.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name="c7n_trailcreator",
-    version='0.1',
-    description="Cloud Custodian - Retroactive Tag Creators from CloudTrail",
+    version='0.1.1',
+    description="Cloud Custodian - Retroactive Tag Resource Creators from CloudTrail",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"

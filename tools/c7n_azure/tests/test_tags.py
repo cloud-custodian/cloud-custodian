@@ -18,7 +18,7 @@ import logging
 import re
 
 from azure_common import BaseTest, arm_template
-from c7n_azure.actions import AutoTagUser
+from c7n_azure.actions.tagging import AutoTagUser
 from c7n_azure.session import Session
 from mock import patch
 
@@ -392,77 +392,71 @@ class TagsTest(BaseTest):
     @arm_template('vm.json')
     def test_auto_tag_add_creator_tag(self):
         """Adds CreatorEmail to a resource group."""
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
-            utc_patch.return_value = self.get_test_date()
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'auto-tag-user',
+                 'tag': 'CreatorEmail',
+                 'days': 10,
+                 'update': True},
+            ],
+        })
+        p.run()
 
-            p = self.load_policy({
-                'name': 'test-azure-tag',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'}
-                ],
-                'actions': [
-                    {'type': 'auto-tag-user',
-                     'tag': 'CreatorEmail',
-                     'days': 10,
-                     'update': True},
-                ],
-            })
-            p.run()
-
-            after_tags = self.get_tags(self.rg_name, self.vm_name)
-            self.assertTrue(re.match(self.EMAIL_REGEX, after_tags.get('CreatorEmail')))
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertTrue(re.match(self.EMAIL_REGEX, after_tags.get('CreatorEmail')))
 
     @arm_template('vm.json')
     def test_auto_tag_update_false_noop_for_existing_tag(self):
         """Adds CreatorEmail to a resource group"""
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
-            utc_patch.return_value = self.get_test_date()
+        # setup by adding an existing CreatorEmail tag
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'tag',
+                 'tag': 'CreatorEmail',
+                 'value': 'do-not-modify'},
+            ],
+        })
+        p.run()
 
-            # setup by adding an existing CreatorEmail tag
-            p = self.load_policy({
-                'name': 'test-azure-tag',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'}
-                ],
-                'actions': [
-                    {'type': 'tag',
-                     'tag': 'CreatorEmail',
-                     'value': 'do-not-modify'},
-                ],
-            })
-            p.run()
+        p = self.load_policy({
+            'name': 'test-azure-tag',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'}
+            ],
+            'actions': [
+                {'type': 'auto-tag-user',
+                 'tag': 'CreatorEmail',
+                 'update': False,
+                 'days': 10}
+            ],
+        })
+        p.run()
 
-            p = self.load_policy({
-                'name': 'test-azure-tag',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'}
-                ],
-                'actions': [
-                    {'type': 'auto-tag-user',
-                     'tag': 'CreatorEmail',
-                     'update': False,
-                     'days': 10}
-                ],
-            })
-            p.run()
-
-            after_tags = self.get_tags(self.rg_name, self.vm_name)
-            self.assertEqual(after_tags['CreatorEmail'], 'do-not-modify')
+        after_tags = self.get_tags(self.rg_name, self.vm_name)
+        self.assertEqual(after_tags['CreatorEmail'], 'do-not-modify')
 
     def test_auto_tag_days_must_be_btwn_1_and_90(self):
         with self.assertRaises(FilterValidationError):

@@ -204,7 +204,7 @@ class VMTest(BaseTest):
 
     @arm_template('vm.json')
     @patch('c7n_azure.resources.vm.InstanceViewFilter.process', return_value=fake_running_vms)
-    @patch('c7n_azure.actions.DeleteAction.process', return_value='')
+    @patch('c7n_azure.actions.delete.DeleteAction.process', return_value='')
     def test_delete(self, delete_action_mock, filter_mock):
 
         p = self.load_policy({

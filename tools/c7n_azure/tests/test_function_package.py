@@ -111,6 +111,18 @@ class FunctionPackageTest(BaseTest):
         self.assertTrue(FunctionPackageTest._file_exists(files, 'test-azure-package/config.json'))
         self.assertTrue(FunctionPackageTest._file_exists(files, 'host.json'))
 
+    @patch("c7n_azure.session.Session.get_functions_auth_string", return_value="")
+    def test_no_policy_add_required_files(self, session_mock):
+        """ Tools such as mailer will package with no policy """
+
+        packer = FunctionPackage('name')
+        packer.pkg = PythonPackageArchive()
+
+        packer._add_functions_required_files(None)
+        files = packer.pkg._zip_file.filelist
+
+        self.assertTrue(FunctionPackageTest._file_exists(files, 'host.json'))
+
     def test_add_host_config(self):
         packer = FunctionPackage('test')
         packer.pkg = PythonPackageArchive()
