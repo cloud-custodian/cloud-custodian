@@ -48,95 +48,83 @@ class ArmResourceTest(BaseTest):
 
     @arm_template('vm.json')
     def test_metric_filter_find(self):
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
-            utc_patch.return_value = self.get_test_date()
-
-            p = self.load_policy({
-                'name': 'test-azure-metric',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'},
-                    {'type': 'metric',
-                     'metric': 'Network In',
-                     'aggregation': 'total',
-                     'op': 'gt',
-                     'threshold': 0}],
-            })
-            resources = p.run()
-            self.assertEqual(len(resources), 1)
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'aggregation': 'total',
+                 'op': 'gt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     @arm_template('vm.json')
     def test_metric_filter_find_average(self):
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
-            utc_patch.return_value = self.get_test_date()
-
-            p = self.load_policy({
-                'name': 'test-azure-metric',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'},
-                    {'type': 'metric',
-                     'metric': 'Percentage CPU',
-                     'aggregation': 'average',
-                     'op': 'gt',
-                     'threshold': 0}],
-            })
-            resources = p.run()
-            self.assertEqual(len(resources), 1)
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Percentage CPU',
+                 'aggregation': 'average',
+                 'op': 'gt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     @arm_template('vm.json')
     def test_metric_filter_not_find(self):
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
-            utc_patch.return_value = self.get_test_date()
-
-            p = self.load_policy({
-                'name': 'test-azure-metric',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'},
-                    {'type': 'metric',
-                     'metric': 'Network In',
-                     'aggregation': 'total',
-                     'op': 'lt',
-                     'threshold': 0}],
-            })
-            resources = p.run()
-            self.assertEqual(len(resources), 0)
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Network In',
+                 'aggregation': 'total',
+                 'op': 'lt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     @arm_template('vm.json')
     def test_metric_filter_not_find_average(self):
-        with patch('c7n_azure.actions.utcnow') as utc_patch:
-            utc_patch.return_value = self.get_test_date()
-
-            p = self.load_policy({
-                'name': 'test-azure-metric',
-                'resource': 'azure.vm',
-                'filters': [
-                    {'type': 'value',
-                     'key': 'name',
-                     'op': 'eq',
-                     'value_type': 'normalize',
-                     'value': 'cctestvm'},
-                    {'type': 'metric',
-                     'metric': 'Percentage CPU',
-                     'aggregation': 'average',
-                     'op': 'lt',
-                     'threshold': 0}],
-            })
-            resources = p.run()
-            self.assertEqual(len(resources), 0)
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'Percentage CPU',
+                 'aggregation': 'average',
+                 'op': 'lt',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     def test_metric_filter_invalid_missing_metric(self):
         policy = {
@@ -199,7 +187,7 @@ class ArmResourceTest(BaseTest):
 
     @patch('c7n_azure.query.ResourceQuery.filter',
         return_value=fake_arm_resources)
-    @patch('c7n_azure.actions.DeleteAction.process',
+    @patch('c7n_azure.actions.delete.DeleteAction.process',
         return_value='')
     def test_delete_armresource(self, delete_action_mock, filter_mock):
         p = self.load_policy({
@@ -220,7 +208,7 @@ class ArmResourceTest(BaseTest):
 
     @patch('c7n_azure.query.ResourceQuery.filter',
         return_value=fake_arm_resources)
-    @patch('c7n_azure.actions.DeleteAction.process',
+    @patch('c7n_azure.actions.delete.DeleteAction.process',
         return_value='')
     def test_delete_armresource_specific_name(self, delete_action_mock, filter_mock):
         p = self.load_policy({
