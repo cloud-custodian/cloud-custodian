@@ -83,7 +83,8 @@ control resources will be affected by this policy, actions which the policy
 with take on the matched resources, and a mode which controls which
 how the policy will execute.
 
-The best getting started guides are the cloud provider specific tutorials
+The best getting started guides are the cloud provider specific tutorials.
+
  - [AWS Getting Started](https://cloudcustodian.io/docs/aws/gettingstarted.html)
  - [Azure Getting Started](https://cloudcustodian.io/docs/azure/gettingstarted.html)
  - [GCP Getting Started](https://cloudcustodian.io/docs/gcp/gettingstarted.html)
@@ -98,7 +99,7 @@ As a quick walk through, below are some sample policies for AWS resources.
 
 ```yaml
 policies:
-- name: s3-cross-account
+ - name: s3-cross-account
    description: |
      Checks S3 for buckets with cross-account access and
      removes the cross-account access.
@@ -110,39 +111,36 @@ policies:
      - type: remove-statements
        statement_ids: matched
 
-- name: ec2-require-non-public-and-encrypted-volumes
-  resource: aws.ec2
-  description: |
+ - name: ec2-require-non-public-and-encrypted-volumes
+   resource: aws.ec2
+   description: |
     Provision a lambda and cloud watch event target
     that looks at all new instances and terminates those with
     unencrypted volumes.
-  mode:
+   mode:
     type: cloudtrail
     role: CloudCustodian-QuickStart
     events:
       - RunInstances
-  filters:
+   filters:
     - type: ebs
       key: Encrypted
       value: false
-  actions:
+   actions:
     - terminate
 
-- name: tag-compliance
-  resource: aws.ec2
-  description: |
-    Schedule a resource that does not meet tag compliance policies
-    to be stopped in four days. Note a separate policy using the
-	`marked-for-op` filter is required to actually stop the instances
-	after four days.
-  filters:
+ - name: tag-compliance
+   resource: aws.ec2
+   description: |
+     Schedule a resource that does not meet tag compliance policies to be stopped in four days. Note a separate policy using the`marked-for-op` filter is required to actually stop the instances after four days.
+   filters:
     - State.Name: running
     - "tag:Environment": absent
     - "tag:AppId": absent
     - or:
       - "tag:OwnerContact": absent
       - "tag:DeptID": absent
-  actions:
+   actions:
     - type: mark-for-op
       op: stop
       days: 4
@@ -243,22 +241,11 @@ tools here
 - **_Sentry_:** Cloudwatch Log parsing for python tracebacks to integrate with
     <https://sentry.io/welcome/>
 
-Contributors
+Contributing
 ------------
 
-We welcome Your interest in Capital One's Open Source Projects (the
-"Project"). Any Contributor to the Project must accept and sign an
-Agreement indicating agreement to the license terms below. Except for
-the license granted in this Agreement to Capital One and to recipients
-of software distributed by Capital One, You reserve all right, title,
-and interest in and to Your Contributions; this Agreement does not
-impact Your rights to use Your own Contributions for any other purpose.
+See https://cloudcustodian.io/docs/contribute.html
 
-[Sign the Individual
-Agreement](https://docs.google.com/forms/d/19LpBBjykHPox18vrZvBbZUcK6gQTj7qv1O5hCduAZFU/viewform)
-
-[Sign the Corporate
-Agreement](https://docs.google.com/forms/d/e/1FAIpQLSeAbobIPLCVZD_ccgtMWBDAcN68oqbAJBQyDTSAQ1AkYuCp_g/viewform?usp=send_form)
 
 Code of Conduct
 ---------------
