@@ -17,7 +17,8 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('organization')
 class Organization(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/resource-manager/reference/rest/v1/organizations
+    """
     class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
         version = 'v1'
@@ -29,7 +30,8 @@ class Organization(QueryResourceManager):
 
 @resources.register('folder')
 class Folder(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/resource-manager/reference/rest/v1/folders
+    """
     class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
         version = 'v2'
@@ -40,7 +42,8 @@ class Folder(QueryResourceManager):
 
 @resources.register('project')
 class Project(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects
+    """
     class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
         version = 'v1'
