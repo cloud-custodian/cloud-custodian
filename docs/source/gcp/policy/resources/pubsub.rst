@@ -25,7 +25,7 @@ Example Policies
 ----------------
 
 Pub/Sub. Topics
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 The resource works with `topics <https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
 
 .. code-block:: yaml
@@ -45,7 +45,7 @@ The resource works with `topics <https://cloud.google.com/pubsub/docs/reference/
                 topic: projects/cloud-custodian/topics/pubsub
 
 Pub/Sub. Subscriptions
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 The resource works with `subscriptions <https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
 
 .. code-block:: yaml
@@ -65,7 +65,7 @@ The resource works with `subscriptions <https://cloud.google.com/pubsub/docs/ref
                 topic: projects/cloud-custodian/topics/pubsub
 
 Pub/Sub. Snapshots
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 The resource works with `snapshots <https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.snapshots>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
 
 .. code-block:: yaml
