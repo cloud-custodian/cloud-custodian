@@ -106,8 +106,8 @@ class VpcDelete(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
-        max_attempts=8
-        min_delay=2
+        max_attempts = 8
+        min_delay = 2
         max_delay = max(min_delay, 2) ** max_attempts
 
         # Delete NAT-gateway associated with VPC
@@ -125,16 +125,16 @@ class VpcDelete(BaseAction):
                     )
                     # NAT Gateway deletion usually takes some time
                     for idx, delay in enumerate(backoff_delays(min_delay, max_delay, jitter=True)):
+                        time.sleep(delay)
                         ngws = ngw_manager.get_resources([id], cache=False)
                         if len(ngws) == 0 or ngws[0]['State'] == 'deleted':
-                            self.log.debug("Nat Gateway deletion confirmed: %s", id)
+                            self.log.debug("NAT Gateway deletion confirmed: %s", id)
                             break
                         if idx == max_attempts - 1:
-                            self.log.debug("Giving up waiting for Nat Gateway to be deleted: %s",
+                            self.log.debug("Giving up waiting for NAT Gateway to be deleted: %s",
                                            id)
                             break
-                        self.log.debug("Waiting for Nat Gateway to be deleted: %s", id)
-                        time.sleep(delay)
+                        self.log.debug("Waiting for NAT Gateway to be deleted: %s", id)
 
                 except ClientError as e:
                     self.log.warning(
