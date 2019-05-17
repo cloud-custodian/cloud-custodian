@@ -18,12 +18,34 @@ Linting can be run with:
 
   $ make lint
 
+Operating System Compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tests are currently executed on both Ubuntu 1604 and Windows Server 2019
+and must pass on both operating systems.
+
+Both Windows and Linux sample dockerfiles are provided for running Tox which may help you.
+You can find these in `tools/dev`.
+
+In Docker for Windows you can run both of these containers,
+`even simultaneously <https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/linux-containers>`_.
+
+
+If you need access to Windows you can download a
+`virtual machine <https://developer.microsoft.com/en-us/windows/downloads/virtual-machines>`_
+directly from Microsoft for any hypervisor.
 
 Decorating tests
 ~~~~~~~~~~~~~~~~
 
 The ``functional`` decorator marks tests that don't require any pre-existing
 AWS context, and can therefore be run cleanly against live AWS.
+
+To run only the tests decorated by ``functional``:
+
+.. code-block::
+
+    (py37)$ pytest tests/test_vpc.py -x -m functional
 
 Writing Placebo Tests for AWS Resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

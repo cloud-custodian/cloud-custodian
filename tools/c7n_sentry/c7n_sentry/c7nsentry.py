@@ -344,7 +344,7 @@ def get_function(session_factory, name, handler, runtime, role,
             CloudWatchLogSubscription(
                 session_factory, log_groups, pattern)])
 
-    archive = PythonPackageArchive('c7n_sentry')
+    archive = PythonPackageArchive(modules=['c7n_sentry'])
     archive.add_contents(
         'config.json', json.dumps({
             'project': project,

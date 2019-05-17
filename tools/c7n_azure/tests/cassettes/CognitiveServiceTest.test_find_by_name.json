@@ -1,0 +1,56 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CognitiveServices/accounts?api-version=2017-04-18",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:10:28 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "567"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cognitive-service/providers/Microsoft.CognitiveServices/accounts/cctest-cog-serv",
+                                "name": "cctest-cog-serv",
+                                "type": "Microsoft.CognitiveServices/accounts",
+                                "etag": "\"3b002bb6-0000-0700-0000-5cca12f90000\"",
+                                "location": "global",
+                                "sku": {
+                                    "name": "F0"
+                                },
+                                "kind": "TextTranslation",
+                                "properties": {
+                                    "endpoint": "https://api.cognitive.microsoft.com/sts/v1.0/issuetoken",
+                                    "internalId": "eda0729b6ad646ce9bee01f13804bbfc",
+                                    "dateCreated": "2019-05-01T21:43:20.491836Z",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

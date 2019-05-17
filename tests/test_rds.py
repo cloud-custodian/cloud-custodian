@@ -365,7 +365,7 @@ class RDSTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 5)
 
     def test_rds_retention_copy_tags(self):
         session_factory = self.replay_flight_data("test_rds_retention")
@@ -379,7 +379,7 @@ class RDSTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 5)
 
     def test_rds_restore(self):
         self.patch(rds.RestoreInstance, "executor_factory", MainThreadExecutor)
@@ -1468,3 +1468,18 @@ class Resize(BaseTest):
         wait_until("modifying")
         wait_until("available")
         self.assertEqual(describe()["AllocatedStorage"], 6)  # nearest gigabyte
+
+
+class TestReservedRDSInstance(BaseTest):
+    def test_reserved_rds_instance_query(self):
+        session_factory = self.replay_flight_data("test_reserved_rds_instance_query")
+        p = self.load_policy(
+            {
+                "name": "filter-rds-reserved-instances",
+                "resource": "aws.rds-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ReservedDBInstanceId"], "ri-2019-05-06-14-19-06-332")

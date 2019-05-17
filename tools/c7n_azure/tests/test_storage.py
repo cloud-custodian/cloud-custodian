@@ -42,3 +42,105 @@ class StorageTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @arm_template('storage.json')
+    def test_firewall_rules_include(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'include': ['3.1.1.1']}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('storage.json')
+    def test_firewall_rules_not_include_all_ranges(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'include': ['3.1.1.1', '3.1.1.2-3.1.1.2']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(0, len(resources))
+
+    @arm_template('storage.json')
+    def test_firewall_rules_include_cidr(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'include': ['1.2.2.128/25']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    @arm_template('storage.json')
+    def test_firewall_rules_not_include_cidr(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'include': ['2.2.2.128/25']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(0, len(resources))
+
+    @arm_template('storage.json')
+    def test_firewall_rules_equal(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'equal': ['3.1.1.1-3.1.1.1', '1.2.2.128/25']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    @arm_template('storage.json')
+    def test_firewall_rules_not_equal(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'equal': ['3.1.1.1-3.1.1.2', '3.1.1.1-3.1.1.1', '1.2.2.128/25']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(0, len(resources))

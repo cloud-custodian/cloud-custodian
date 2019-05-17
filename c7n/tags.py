@@ -149,7 +149,7 @@ class TagTrim(Action):
 
     .. code-block :: yaml
 
-      - policies:
+       policies:
          - name: ec2-tag-trim
            comment: |
              Any instances with 48 or more tags get tags removed until
@@ -157,22 +157,22 @@ class TagTrim(Action):
              that we free up a tag slot for another usage.
            resource: ec2
            filters:
-               # Filter down to resources which already have 8 tags
-               # as we need space for 3 more, this also ensures that
-               # metrics reporting is correct for the policy.
-               type: value
-               key: "[length(Tags)][0]"
-               op: ge
-               value: 48
+                 # Filter down to resources which already have 8 tags
+                 # as we need space for 3 more, this also ensures that
+                 # metrics reporting is correct for the policy.
+               - type: value
+                 key: "length(Tags)"
+                 op: ge
+                 value: 48
            actions:
-             - type: tag-trim
-               space: 3
-               preserve:
-                - OwnerContact
-                - ASV
-                - CMDBEnvironment
-                - downtime
-                - custodian_status
+              - type: tag-trim
+                space: 3
+                preserve:
+                  - OwnerContact
+                  - ASV
+                  - CMDBEnvironment
+                  - downtime
+                  - custodian_status
     """
     max_tag_count = 50
 
@@ -265,7 +265,7 @@ class TagActionFilter(Filter):
 
     .. code-block :: yaml
 
-      - policies:
+      policies:
         - name: ec2-stop-marked
           resource: ec2
           filters:
@@ -277,7 +277,7 @@ class TagActionFilter(Filter):
               # Another optional tag is skew
               tz: utc
           actions:
-            - stop
+            - type: stop
 
     """
     schema = utils.type_schema(
@@ -462,7 +462,7 @@ class RemoveTag(Action):
     schema = utils.type_schema(
         'untag', aliases=('unmark', 'remove-tag'),
         tags={'type': 'array', 'items': {'type': 'string'}})
-
+    schema_alias = True
     permissions = ('ec2:DeleteTags',)
 
     def process(self, resources):
@@ -1020,9 +1020,11 @@ class CopyRelatedResourceTag(Tag):
         return self
 
     def process(self, resources):
-        related_resources = dict(
-            zip(jmespath.search('[].%s' % self.data['key'], resources), resources))
-        related_ids = set(related_resources)
+        related_resources = list(
+            zip(jmespath.search('[].[%s || "c7n:NotFound"]|[]' % self.data['key'], resources),
+                resources))
+        related_ids = set([r[0] for r in related_resources])
+        related_ids.discard('c7n:NotFound')
         related_tag_map = self.get_resource_tag_map(self.data['resource'], related_ids)
 
         missing_related_tags = related_ids.difference(related_tag_map.keys())
@@ -1038,7 +1040,7 @@ class CopyRelatedResourceTag(Tag):
 
         stats = Counter()
 
-        for related, r in related_resources.items():
+        for related, r in related_resources:
             if related in missing_related_tags or not related_tag_map[related]:
                 stats['missing'] += 1
             elif self.process_resource(
@@ -1053,7 +1055,9 @@ class CopyRelatedResourceTag(Tag):
 
     def process_resource(self, client, r, related_tags, tag_keys, tag_action):
         tags = {}
-        resource_tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        resource_tags = {
+            t['Key']: t['Value'] for t in r.get('Tags', []) if not t['Key'].startswith('aws:')}
+
         if tag_keys == '*':
             tags = {k: v for k, v in related_tags.items()
                     if resource_tags.get(k) != v}

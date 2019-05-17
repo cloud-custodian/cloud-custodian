@@ -1,0 +1,65 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "f2556363-bf15-11e7-84fa-b30901b7673b",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f2556363-bf15-11e7-84fa-b30901b7673b",
+                "date": "Wed, 01 Nov 2017 15:04:23 GMT",
+                "content-length": "673",
+                "content-type": "application/json"
+            }
+        },
+        "FileSystems": [
+            {
+                "SizeInBytes": {
+                    "Value": 6144
+                },
+                "Name": "Somewhere",
+                "CreationToken": "b2bf7400-c02d-4b31-9f88-5691cb3db076",
+                "Encrypted": false,
+                "CreationTime": {
+                    "hour": 10,
+                    "__class__": "datetime",
+                    "month": 11,
+                    "second": 18,
+                    "microsecond": 0,
+                    "year": 2017,
+                    "day": 1,
+                    "minute": 4
+                },
+                "PerformanceMode": "generalPurpose",
+                "FileSystemId": "fs-f2603dbb",
+                "NumberOfMountTargets": 0,
+                "LifeCycleState": "available",
+                "OwnerId": "644160558196"
+            },
+            {
+                "SizeInBytes": {
+                    "Value": 6144
+                },
+                "Name": "Somewhere",
+                "CreationToken": "d190f154-f783-460e-a8a8-c1783b86aa85",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5",
+                "CreationTime": {
+                    "hour": 9,
+                    "__class__": "datetime",
+                    "month": 11,
+                    "second": 7,
+                    "microsecond": 0,
+                    "year": 2017,
+                    "day": 1,
+                    "minute": 41
+                },
+                "PerformanceMode": "generalPurpose",
+                "FileSystemId": "fs-fd673ab4",
+                "NumberOfMountTargets": 0,
+                "LifeCycleState": "available",
+                "OwnerId": "644160558196"
+            }
+        ]
+    }
+}

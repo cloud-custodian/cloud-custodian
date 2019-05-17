@@ -25,9 +25,9 @@ from c7n.actions import EventAction
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
 from c7n.utils import local_session
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
+from c7n_azure.function_package import FunctionPackage
 from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE,
                                  FUNCTION_TIME_TRIGGER_MODE)
-from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
@@ -96,6 +96,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
         self.function_params = None
         self.function_app = None
+        self.target_subscription_ids = []
 
     def get_function_app_params(self):
         session = local_session(self.policy.session_factory)
@@ -118,8 +119,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
         location = service_plan.get('location', 'eastus')
         rg_name = service_plan['resource_group_name']
         sub_id = session.get_subscription_id()
-        target_sub_id = session.get_function_target_subscription_id()
-        function_suffix = StringUtils.naming_hash(rg_name + target_sub_id)
+
+        target_sub_name = session.get_function_target_subscription_name()
+        function_suffix = StringUtils.naming_hash(rg_name + target_sub_name)
+
         storage_suffix = StringUtils.naming_hash(rg_name + sub_id)
 
         storage_account = AzureFunctionMode.extract_properties(
@@ -175,11 +178,13 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def provision(self):
         # Make sure we have auth data for function provisioning
         session = local_session(self.policy.session_factory)
-        session.get_functions_auth_string()
+        session.get_functions_auth_string("")
 
         if sys.version_info[0] < 3:
             self.log.error("Python 2.7 is not supported for deploying Azure Functions.")
             sys.exit(1)
+
+        self.target_subscription_ids = session.get_function_target_subscription_ids()
 
         self.function_params = self.get_function_app_params()
         self.function_app = FunctionAppUtilities.deploy_function_app(self.function_params)
@@ -188,10 +193,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
         """Retrieve logs for the policy"""
         raise NotImplementedError("subclass responsibility")
 
-    def build_functions_package(self, queue_name=None):
+    def build_functions_package(self, queue_name=None, target_subscription_ids=None):
         self.log.info("Building function package for %s" % self.function_params.function_app_name)
 
-        package = FunctionPackage(self.policy_name)
+        package = FunctionPackage(self.policy_name, target_subscription_ids=target_subscription_ids)
         package.build(self.policy.data,
                       modules=['c7n', 'c7n-azure', 'applicationinsights'],
                       non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'pyrsistent'],
@@ -213,7 +218,7 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
 
     def provision(self):
         super(AzurePeriodicMode, self).provision()
-        package = self.build_functions_package()
+        package = self.build_functions_package(target_subscription_ids=self.target_subscription_ids)
         FunctionAppUtilities.publish_functions_package(self.function_params, package)
 
     def run(self, event=None, lambda_context=None):
@@ -251,7 +256,7 @@ class AzureEventGridMode(AzureFunctionMode):
         queue_name = re.sub(r'(-{2,})+', '-', self.function_params.function_app_name.lower())
         storage_account = self._create_storage_queue(queue_name, session)
         self._create_event_subscription(storage_account, queue_name, session)
-        package = self.build_functions_package(queue_name)
+        package = self.build_functions_package(queue_name=queue_name)
         FunctionAppUtilities.publish_functions_package(self.function_params, package)
 
     def run(self, event=None, lambda_context=None):
@@ -321,9 +326,12 @@ class AzureEventGridMode(AzureFunctionMode):
         advance_filter = StringInAdvancedFilter(key='Data.OperationName', values=subscribed_events)
         event_filter = EventSubscriptionFilter(advanced_filters=[advance_filter])
 
-        try:
-            AzureEventSubscription.create(destination, queue_name, session, event_filter)
-            self.log.info('Event grid subscription creation succeeded')
-        except Exception as e:
-            self.log.error('Event Subscription creation failed with error: %s' % e)
-            raise SystemExit
+        for subscription_id in self.target_subscription_ids:
+            try:
+                AzureEventSubscription.create(destination, queue_name,
+                                              subscription_id, session, event_filter)
+                self.log.info('Event grid subscription creation succeeded: subscription_id=%s' %
+                              subscription_id)
+            except Exception as e:
+                self.log.error('Event Subscription creation failed with error: %s' % e)
+                raise SystemExit

@@ -107,6 +107,12 @@ OPERATORS = {
     'intersect': intersect}
 
 
+VALUE_TYPES = [
+    'age', 'integer', 'expiration', 'normalize', 'size',
+    'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
+    'unique_size']
+
+
 class FilterRegistry(PluginRegistry):
 
     def __init__(self, *args, **kw):
@@ -324,7 +330,7 @@ class Not(BooleanGroupFilter):
 class AnnotationSweeper(object):
     """Support clearing annotations set within a block filter.
 
-    See https://github.com/capitalone/cloud-custodian/issues/2116
+    See https://github.com/cloud-custodian/cloud-custodian/issues/2116
     """
     def __init__(self, id_key, resources):
         self.id_key = id_key
@@ -363,19 +369,13 @@ class ValueFilter(Filter):
             # Doesn't mix well as enum with inherits that extend
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
-            'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
-                'unique_size']},
+            'value_type': {'$ref': '#/definitions/filters_common/value_types'},
             'default': {'type': 'object'},
-            'value_from': ValuesFrom.schema,
-            'value': {'oneOf': [
-                {'type': 'array'},
-                {'type': 'string'},
-                {'type': 'boolean'},
-                {'type': 'number'},
-                {'type': 'null'}]},
-            'op': {'enum': list(OPERATORS.keys())}}}
+            'value_from': {'$ref': '#/definitions/filters_common/value_from'},
+            'value': {'$ref': '#/definitions/filters_common/value'},
+            'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
+        }
+    }
 
     annotate = True
     required_keys = set(('value', 'key'))

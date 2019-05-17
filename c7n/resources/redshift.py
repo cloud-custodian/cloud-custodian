@@ -24,9 +24,10 @@ from concurrent.futures import as_completed
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter, OPERATORS,
+    FilterRegistry, ValueFilter, DefaultVpcBase, AgeFilter,
     CrossAccountAccessFilter)
 import c7n.filters.vpc as net_filters
+from c7n.filters.kms import KmsRelatedFilter
 
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
@@ -183,6 +184,28 @@ class Parameter(ValueFilter):
         for pg in db['ClusterParameterGroups']:
             params.update(self.group_params[pg['ParameterGroupName']])
         return self.match(params)
+
+
+@filters.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: redshift-kms-key-filters
+                  resource: redshift
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(alias/aws/)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'KmsKeyId'
 
 
 @actions.register('delete')
@@ -495,9 +518,8 @@ class Tag(tags.Tag):
     permissions = ('redshift:CreateTags',)
 
     def process_resource_set(self, client, resources, tags):
-        for r in resources:
-            arn = self.manager.generate_arn(r['ClusterIdentifier'])
-            client.create_tags(ResourceName=arn, Tags=tags)
+        for rarn, r in zip(self.manager.get_arns(resources), resources):
+            client.create_tags(ResourceName=rarn, Tags=tags)
 
 
 @actions.register('unmark')
@@ -524,9 +546,8 @@ class RemoveTag(tags.RemoveTag):
     permissions = ('redshift:DeleteTags',)
 
     def process_resource_set(self, client, resources, tag_keys):
-        for r in resources:
-            arn = self.manager.generate_arn(r['ClusterIdentifier'])
-            client.delete_tags(ResourceName=arn, TagKeys=tag_keys)
+        for rarn, r in zip(self.manager.get_arns(resources), resources):
+            client.delete_tags(ResourceName=rarn, TagKeys=tag_keys)
 
 
 @actions.register('tag-trim')
@@ -544,8 +565,10 @@ class TagTrim(tags.TagTrim):
               - name: redshift-tag-trim
                 resource: redshift
                 filters:
-                  - type: tag-count
-                    count: 10
+                  - type: value
+                    key: "length(Tags)"
+                    op: ge
+                    value: 10
                 actions:
                   - type: tag-trim
                     space: 1
@@ -648,7 +671,7 @@ class RedshiftSnapshotAge(AgeFilter):
 
     schema = type_schema(
         'age', days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
 

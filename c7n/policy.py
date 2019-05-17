@@ -61,8 +61,8 @@ def load(options, path, format='yaml', validate=True, vars=None):
         from c7n.schema import validate
         errors = validate(data)
         if errors:
-            raise Exception(
-                "Failed to validate on policy %s \n %s" % (
+            raise PolicyValidationError(
+                "Failed to validate policy %s \n %s" % (
                     errors[1], errors[0]))
 
     collection = PolicyCollection.from_data(data, options)
@@ -222,7 +222,7 @@ class PullMode(PolicyExecutionMode):
 
         with self.policy.ctx:
             self.policy.log.debug(
-                "Running policy %s resource: %s region:%s c7n:%s",
+                "Running policy:%s resource:%s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
                 self.policy.options.region or 'default',
                 version)
@@ -238,7 +238,7 @@ class PullMode(PolicyExecutionMode):
 
             rt = time.time() - s
             self.policy.log.info(
-                "policy: %s resource:%s region:%s count:%d time:%0.2f" % (
+                "policy:%s resource:%s region:%s count:%d time:%0.2f" % (
                     self.policy.name,
                     self.policy.resource_type,
                     self.policy.options.region,
@@ -263,9 +263,9 @@ class PullMode(PolicyExecutionMode):
                 with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
                     results = a.process(resources)
                 self.policy.log.info(
-                    "policy: %s action: %s"
-                    " resources: %d"
-                    " execution_time: %0.2f" % (
+                    "policy:%s action:%s"
+                    " resources:%d"
+                    " execution_time:%0.2f" % (
                         self.policy.name, a.name,
                         len(resources), time.time() - s))
                 if results:
@@ -315,18 +315,18 @@ class PullMode(PolicyExecutionMode):
         now = datetime.now(self.policy.tz)
         if self.policy.start and self.policy.start > now:
             self.policy.log.info(
-                "Skipping policy %s start-date: %s is after current date: %s",
+                "Skipping policy:%s start-date:%s is after current-date:%s",
                 self.policy.name, self.policy.start, now)
             return False
         if self.policy.end and self.policy.end < now:
             self.policy.log.info(
-                "Skipping policy %s end-date: %s is before current date: %s",
+                "Skipping policy:%s end-date:%s is before current-date:%s",
                 self.policy.name, self.policy.end, now)
             return False
         if self.policy.region and (
                 self.policy.region != self.policy.options.region):
             self.policy.log.info(
-                "Skipping policy %s target-region: %s current-region: %s",
+                "Skipping policy:%s target-region:%s current-region:%s",
                 self.policy.name, self.policy.region,
                 self.policy.options.region)
             return False
@@ -401,7 +401,7 @@ class LambdaMode(ServerlessExecutionMode):
             self.policy.session_factory.region = region
             self.policy.session_factory.assume_role = member_role
             self.policy.log.info(
-                "Assuming member role: %s", member_role)
+                "Assuming member role:%s", member_role)
             return True
         return False
 
@@ -411,7 +411,7 @@ class LambdaMode(ServerlessExecutionMode):
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
             raise ValueError("Unknown push event mode %s", self.data)
-        self.policy.log.info('Found resource ids: %s', resource_ids)
+        self.policy.log.info('Found resource ids:%s', resource_ids)
         # Handle multi-resource type events, like ec2 CreateTags
         resource_ids = self.policy.resource_manager.match_ids(resource_ids)
         if not resource_ids:
@@ -452,7 +452,7 @@ class LambdaMode(ServerlessExecutionMode):
 
         if not resources:
             self.policy.log.info(
-                "policy: %s resources: %s no resources matched" % (
+                "policy:%s resources:%s no resources matched" % (
                     self.policy.name, self.policy.resource_type))
             return
 
@@ -470,7 +470,7 @@ class LambdaMode(ServerlessExecutionMode):
 
             for action in self.policy.resource_manager.actions:
                 self.policy.log.info(
-                    "policy: %s invoking action: %s resources: %d",
+                    "policy:%s invoking action:%s resources:%d",
                     self.policy.name, action.name, len(resources))
                 if isinstance(action, EventAction):
                     results = action.process(resources, event)
@@ -531,7 +531,8 @@ class PHDMode(LambdaMode):
         categories={'type': 'array', 'items': {
             'enum': ['issue', 'accountNotification', 'scheduledChange']}},
         statuses={'type': 'array', 'items': {
-            'enum': ['open', 'upcoming', 'closed']}})
+            'enum': ['open', 'upcoming', 'closed']}},
+        rinherit=LambdaMode.schema)
 
     def validate(self):
         super(PHDMode, self).validate()
@@ -539,7 +540,7 @@ class PHDMode(LambdaMode):
             return
         if 'health-event' not in self.policy.resource_manager.filter_registry:
             raise PolicyValidationError(
-                "policy:%s phd event mode not supported for resource: %s" % (
+                "policy:%s phd event mode not supported for resource:%s" % (
                     self.policy.name, self.policy.resource_type))
 
     @staticmethod
@@ -749,7 +750,7 @@ class Policy(object):
         self.resource_manager = self.load_resource_manager()
 
     def __repr__(self):
-        return "<Policy resource: %s name: %s region: %s>" % (
+        return "<Policy resource:%s name:%s region:%s>" % (
             self.resource_type, self.name, self.options.region)
 
     @property
@@ -842,13 +843,13 @@ class Policy(object):
         # various filter/action local vocabularies. Where possible defer
         # by using a format string.
         #
-        # See https://github.com/capitalone/cloud-custodian/issues/2330
+        # See https://github.com/cloud-custodian/cloud-custodian/issues/2330
         if not variables:
             variables = {}
 
         if 'mode' in self.data:
             if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
-                self.data['mode']['role'] = "arn:aws:iam::%s/role/%s" % \
+                self.data['mode']['role'] = "arn:aws:iam::%s:role/%s" % \
                                             (self.options.account_id, self.data['mode']['role'])
 
         variables.update({
@@ -982,7 +983,10 @@ class Policy(object):
             except Exception as e:
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s, %s" % (policy_name, policy_tz, e))
-            if not isinstance(p_tz, tzutil.tzfile):
+
+            # Type will be tzwin on windows, but tzwin is null on linux
+            if not (isinstance(p_tz, tzutil.tzfile) or
+                    (tzutil.tzwin and isinstance(p_tz, tzutil.tzwin))):
                 raise ValueError(
                     "Policy: %s TZ not parsable: %s" % (policy_name, policy_tz))
 

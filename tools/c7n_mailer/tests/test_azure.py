@@ -19,6 +19,7 @@ import zlib
 
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure.sendgrid_delivery import SendGridDelivery
 from common import MAILER_CONFIG_AZURE, ASQ_MESSAGE, ASQ_MESSAGE_TAG, logger
 
 from mock import MagicMock, patch
@@ -78,3 +79,12 @@ class AzureTest(unittest.TestCase):
         self.assertEqual(2, mock_get_messages.call_count)
         self.assertEqual(1, mock_process.call_count)
         mock_delete.assert_called()
+
+    @patch('sendgrid.SendGridAPIClient.send')
+    def test_sendgrid_handler(self, mock_send):
+        sendgrid_delivery = SendGridDelivery(MAILER_CONFIG_AZURE, logger)
+        sendgrid_messages = \
+            sendgrid_delivery.get_to_addrs_sendgrid_messages_map(self.loaded_message)
+        result = sendgrid_delivery.sendgrid_handler(self.loaded_message, sendgrid_messages)
+        self.assertTrue(result)
+        mock_send.assert_called()
