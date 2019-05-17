@@ -96,12 +96,12 @@ class CloudTrail(BaseTest):
             'name': 'resource',
             'resource': 'cloudtrail',
             'filters': ['is-shadow']},
-            session_factory=factory, config={'account_id': '111000111222'})
+            session_factory=factory, config={'region': 'us-east-1'})
         resources = p.run()
         self.assertEqual(1, len(resources))
         self.assertEqual(
-            resources[0]['TrailARN'],
-            'arn:aws:cloudtrail:us-east-1:123456789012:trail/MultiRegionShadowCloudTrail')
+            'arn:aws:cloudtrail:us-east-2:123456789012:trail/MultiRegion2CloudTrail',
+            resources[0]['TrailARN'])
 
     def test_is_shadow_not(self):
         factory = self.replay_flight_data('test_cloudtrail_is_shadow_or_not')
@@ -109,15 +109,28 @@ class CloudTrail(BaseTest):
             'name': 'resource',
             'resource': 'cloudtrail',
             'filters': [{'type':'is-shadow', 'state': False}]},
-            session_factory=factory, config={'account_id': '111000111222'})
+            session_factory=factory, config={'region': 'us-east-1'})
         resources = p.run()
         self.assertEqual(2, len(resources))
         self.assertEqual(
-            resources[0]['TrailARN'],
-            'arn:aws:cloudtrail:us-east-1:123456789012:trail/MultiRegionCloudTrail')
+            'arn:aws:cloudtrail:us-east-1:123456789012:trail/MultiRegion1CloudTrail',
+            resources[0]['TrailARN'])
         self.assertEqual(
-            resources[1]['TrailARN'],
-            'arn:aws:cloudtrail:us-east-1:123456789012:trail/SingleCloudTrail')
+            'arn:aws:cloudtrail:us-east-1:123456789012:trail/SingleCloudTrail',
+            resources[1]['TrailARN'])
+
+    def test_is_shadow_multiregion(self):
+        factory = self.replay_flight_data('test_cloudtrail_is_shadow_or_not')
+        p = self.load_policy({
+            'name': 'resource',
+            'resource': 'cloudtrail',
+            'filters': ['is-shadow']},
+            session_factory=factory, config={'region': 'us-east-2'})
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(
+            'arn:aws:cloudtrail:us-east-1:123456789012:trail/MultiRegion1CloudTrail',
+            resources[0]['TrailARN'])
 
     def test_cloudtrail_resource_with_not_filter(self):
         factory = self.replay_flight_data("test_cloudtrail_resource_with_not_filter")
