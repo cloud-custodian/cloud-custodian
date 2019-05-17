@@ -66,7 +66,7 @@ Links
 Quick Install
 -------------
 
-```
+```shell
 $ python3 -m venv custodian
 $ source custodian/bin/activate
 (custodian) $ pip install c7n
@@ -76,78 +76,79 @@ $ source custodian/bin/activate
 Usage
 -----
 
-First a role must be created with the appropriate permissions for
-custodian to act on the resources described in the policies yaml given
-as an example below. For convenience, an _example policy_ is provided for this
-quick start guide. Customized AWS IAM policies will be necessary for
-your own custodian policies
+The first step to using Cloud Custodian is writing a YAML file
+containing the policies that you want to run. Each policy specifies
+the resource type that the policy will run on, a set of filters which
+control resources will be affected by this policy, actions which the policy
+with take on the matched resources, and a mode which controls which
+how the policy will execute.
 
-To implement the policy:
+The best getting started guides are the cloud provider specific tutorials.
 
-1.  Open the AWS console
-2.  Navigate to IAM -\> Policies
-3.  Use the _json_ option to copy the example policy as a
-    new AWS IAM Policy
-4.  Name the IAM policy as something recognizable and save it.
-5.  Navigate to IAM -\> Roles and create a role called
-    _CloudCustodian-QuickStart_
-6.  Assign the role the IAM policy created above.
+ - [AWS Getting Started](https://cloudcustodian.io/docs/aws/gettingstarted.html)
+ - [Azure Getting Started](https://cloudcustodian.io/docs/azure/gettingstarted.html)
+ - [GCP Getting Started](https://cloudcustodian.io/docs/gcp/gettingstarted.html)
 
-Now with the pre-requisite completed; you are ready continue and run
-custodian.
+As a quick walk through, below are some sample policies for AWS resources.
 
-A custodian policy file needs to be created in YAML format, as an
-example
+  1. will enforce that no S3 buckets have cross-account access enabled.
+  1. will terminate any newly launched EC2 instance that do not have an encrypted EBS volume.
+  1. will tag any EC2 instance that does not have the follow tags
+     "Environment", "AppId", and either "OwnerContact" or "DeptID" to be stopped
+	 in four days.
 
 ```yaml
 policies:
-  - name: remediate-extant-keys
-  description: |
-    Scan through all s3 buckets in an account and ensure all objects
-    are encrypted (default to AES256).
-  resource: aws.s3
-    actions:
-      - encrypt-keys
+ - name: s3-cross-account
+   description: |
+     Checks S3 for buckets with cross-account access and
+     removes the cross-account access.
+   resource: aws.s3
+   region: us-east-1
+   filters:
+     - type: cross-account
+   actions:
+     - type: remove-statements
+       statement_ids: matched
 
-- name: ec2-require-non-public-and-encrypted-volumes
-  resource: aws.ec2
-  description: |
+ - name: ec2-require-non-public-and-encrypted-volumes
+   resource: aws.ec2
+   description: |
     Provision a lambda and cloud watch event target
     that looks at all new instances and terminates those with
     unencrypted volumes.
-  mode:
+   mode:
     type: cloudtrail
     role: CloudCustodian-QuickStart
     events:
       - RunInstances
-  filters:
+   filters:
     - type: ebs
       key: Encrypted
       value: false
-  actions:
+   actions:
     - terminate
 
-- name: tag-compliance
-  resource: aws.ec2
-  description: |
-    Schedule a resource that does not meet tag compliance policies
-    to be stopped in four days.
-  filters:
+ - name: tag-compliance
+   resource: aws.ec2
+   description: |
+     Schedule a resource that does not meet tag compliance policies to be stopped in four days. Note a separate policy using the`marked-for-op` filter is required to actually stop the instances after four days.
+   filters:
     - State.Name: running
     - "tag:Environment": absent
     - "tag:AppId": absent
     - or:
       - "tag:OwnerContact": absent
       - "tag:DeptID": absent
-  actions:
+   actions:
     - type: mark-for-op
       op: stop
       days: 4
 ```
 
-Given that, you can run Cloud Custodian with
+You can validate, test, and run Cloud Custodian with the example policy with these commands:
 
-```
+```shell
 # Validate the configuration (note this happens by default on run)
 $ custodian validate policy.yml
 
@@ -159,9 +160,9 @@ $ custodian run --dryrun -s out policy.yml
 $ custodian run -s out policy.yml
 ```
 
-You can run it with Docker as well
+You can run Cloud Custodian via Docker as well:
 
-```
+```shell
 # Download the image
 $ docker pull cloudcustodian/c7n
 $ mkdir output
@@ -193,11 +194,20 @@ $ docker run -it \
   cloudcustodian/c7n run -v -s /home/custodian/output /home/custodian/policy.yml
 ```
 
-Custodian supports a few other useful subcommands and options, including
-outputs to S3, Cloudwatch metrics, STS role assumption. Policies go
+Custodian supports other useful subcommands and options, including
+outputs to S3, CloudWatch metrics, STS role assumption. Policies go
 together like Lego bricks with actions and filters.
 
 Consult the documentation for additional information, or reach out on gitter.
+
+Cloud Provider Specific Help
+----------------------------
+
+For specific instructions for AWS, Azure, and GCP, visit the relevant getting started page.
+
+- [AWS](https://cloudcustodian.io/docs/aws/gettingstarted.html)
+- [Azure](https://cloudcustodian.io/docs/azure/gettingstarted.html)
+- [GCP](https://cloudcustodian.io/docs/gcp/gettingstarted.html)
 
 Get Involved
 ------------
@@ -231,22 +241,11 @@ tools here
 - **_Sentry_:** Cloudwatch Log parsing for python tracebacks to integrate with
     <https://sentry.io/welcome/>
 
-Contributors
+Contributing
 ------------
 
-We welcome Your interest in Capital One's Open Source Projects (the
-"Project"). Any Contributor to the Project must accept and sign an
-Agreement indicating agreement to the license terms below. Except for
-the license granted in this Agreement to Capital One and to recipients
-of software distributed by Capital One, You reserve all right, title,
-and interest in and to Your Contributions; this Agreement does not
-impact Your rights to use Your own Contributions for any other purpose.
+See https://cloudcustodian.io/docs/contribute.html
 
-[Sign the Individual
-Agreement](https://docs.google.com/forms/d/19LpBBjykHPox18vrZvBbZUcK6gQTj7qv1O5hCduAZFU/viewform)
-
-[Sign the Corporate
-Agreement](https://docs.google.com/forms/d/e/1FAIpQLSeAbobIPLCVZD_ccgtMWBDAcN68oqbAJBQyDTSAQ1AkYuCp_g/viewform?usp=send_form)
 
 Code of Conduct
 ---------------
