@@ -58,6 +58,10 @@ class VpcDelete(BaseAction):
     It is recommended to apply a filter to the delete policy to avoid the
     deletion of all VPCs returned.
 
+    If you want to delete any dependencies of the VPC(s), you must specify those as 'dependencies'.
+
+    VPCs can have multiple other dependencies (EC2, RDS) that may not be covered by this action.
+
     :example:
 
     .. code-block:: yaml
@@ -73,6 +77,7 @@ class VpcDelete(BaseAction):
                 actions:
                   - type: delete
                     dependencies:
+                      - nat-gateway
                       - subnet
                       - internet-gateway
                       - route-table
@@ -2097,7 +2102,9 @@ class DeleteInternetGateway(BaseAction):
                 # This could be attached to more than one VPC?
                 # I guess we had better detach all of them
                 for a in r['Attachments']:
-                    client.detach_internet_gateway(InternetGatewayId=r['InternetGatewayId'], VpcId=a['VpcId'])
+                    client.detach_internet_gateway(
+                        InternetGatewayId=r['InternetGatewayId'],
+                        VpcId=a['VpcId'])
             client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
 
 

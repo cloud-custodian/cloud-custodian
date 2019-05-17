@@ -215,8 +215,6 @@ class VpcTest(BaseTest):
 
     def test_vpc_delete(self):
         session_factory = self.replay_flight_data('test_vpc_delete')
-        client = session_factory().client("ec2")
-
         p = self.load_policy(
             {
                 'name': 'test-vpc-delete',
@@ -2400,13 +2398,12 @@ class InternetGatewayTest(BaseTest):
 
     def test_delete_internet_gateways(self):
         factory = self.replay_flight_data("test_internet_gateway_delete")
-        client = factory().client("ec2")
         p = self.load_policy(
             {
                 "name": "delete-internet-gateways",
                 "resource": "internet-gateway",
                 "filters": [{"tag:Name": "c7n_test"}],
-                "actions": [{"type": "delete", "force": "true"}],
+                "actions": [{"type": "delete", "force": True}],
             },
             session_factory=factory,
         )
