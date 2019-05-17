@@ -3,40 +3,40 @@
     "data": {
         "SecurityGroups": [
             {
-                "GroupId": "sg-0bc202959ab1c430e", 
-                "Description": "default VPC security group", 
-                "VpcId": "vpc-0a052574e7ad26482", 
-                "GroupName": "default", 
-                "OwnerId": "123456789012", 
+                "Description": "default VPC security group",
+                "GroupName": "default",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-09e78919ff4ea20a9",
+                                "UserId": "123456789012"
+                            }
+                        ]
+                    }
+                ],
+                "OwnerId": "123456789012",
+                "GroupId": "sg-09e78919ff4ea20a9",
                 "IpPermissionsEgress": [
                     {
-                        "PrefixListIds": [], 
+                        "IpProtocol": "-1",
                         "IpRanges": [
                             {
                                 "CidrIp": "0.0.0.0/0"
                             }
-                        ], 
-                        "Ipv6Ranges": [], 
-                        "UserIdGroupPairs": [], 
-                        "IpProtocol": "-1"
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
                     }
-                ], 
-                "IpPermissions": [
-                    {
-                        "PrefixListIds": [], 
-                        "IpRanges": [], 
-                        "Ipv6Ranges": [], 
-                        "UserIdGroupPairs": [
-                            {
-                                "UserId": "123456789012", 
-                                "GroupId": "sg-0bc202959ab1c430e"
-                            }
-                        ], 
-                        "IpProtocol": "-1"
-                    }
-                ]
+                ],
+                "VpcId": "vpc-0cc1f28fcc3977440"
             }
-        ], 
+        ],
         "ResponseMetadata": {
             "RequestId": "63b421c4-d1aa-4849-93c7-a68ac1f22a3a", 
             "HTTPStatusCode": 200, 

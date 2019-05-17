@@ -1,15 +1,21 @@
 {
     "status_code": 200, 
     "data": {
-        "InternetGateways": [
+        "NatGateways": [
             {
-                "Attachments": [
+                "CreateTime": "2019-05-17T17:39:55.000Z",
+                "NatGatewayAddresses": [
                     {
-                        "State": "available",
-                        "VpcId": "vpc-0cc1f28fcc3977440"
+                        "AllocationId": "eipalloc-0ae30108ef67fc47a",
+                        "NetworkInterfaceId": "eni-0142d2127131f00f1",
+                        "PrivateIp": "10.0.0.209",
+                        "PublicIp": "55.88.222.111"
                     }
                 ],
-                "InternetGatewayId": "igw-01862a679bf95e81b",
+                "NatGatewayId": "nat-0db15032e3c152411",
+                "State": "deleted",
+                "SubnetId": "subnet-0a10d515d917d1b17",
+                "VpcId": "vpc-0cc1f28fcc3977440",
                 "Tags": []
             }
         ],

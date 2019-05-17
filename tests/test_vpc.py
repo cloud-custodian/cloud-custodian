@@ -233,6 +233,7 @@ class VpcTest(BaseTest):
                     {
                         'type': 'delete',
                         'dependencies': [
+                            'nat-gateway',
                             'subnet',
                             'route-table',
                             'internet-gateway',
@@ -247,9 +248,9 @@ class VpcTest(BaseTest):
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VpcId"], 'vpc-0a052574e7ad26482')
+        self.assertEqual(resources[0]["VpcId"], 'vpc-0cc1f28fcc3977440')
         try:
-            client.describe_security_groups(VpcIds=['vpc-0a052574e7ad26482'])
+            client.describe_security_groups(VpcIds=['vpc-0cc1f28fcc3977440'])
         except Exception:
             pass
         else:
