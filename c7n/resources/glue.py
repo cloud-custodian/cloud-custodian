@@ -104,7 +104,6 @@ class GlueDevEndpoint(QueryResourceManager):
 
     @property
     def generate_arn(self):
-        print(self.config)
         # if self._generate_arn is None:
         self._generate_arn = functools.partial(
             generate_arn,
@@ -160,26 +159,19 @@ class Tag(tags.Tag):
     permissions = ('glue:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
-        tags_lower = []
-
-        for tag in tags:
-            tags_lower.append({k.lower(): v for k, v in tag.items()})
+        tags = {tag.get('Key'):tag.get('Value') for tag in tags}
         for r in resources:
-            try:
-                arn = self.manager.generate_arn(r['EndpointName'])
-                client.tag_resource(ResourceArn=arn, TagsToAdd=tag)
-            except client.exceptions.EntityNotFoundException as e:
-                print(e)
-                continue
+            arn = self.manager.generate_arn(r['EndpointName'])
+            client.tag_resource(ResourceArn=arn, TagsToAdd=tags)
 
-# @GlueDevEndpoint.action_registry.register('untag')
-# class Untag(tags.Tag):
-#     """Remove tags from AWS Glue resource"""
 
-#     def process_resource_set(self, client, resources, tags):
-#         client = local_session(self.manager.session_factory).client('glue')
-#         for r in resources:
-#             try:
-#                 client.tag_resource(ResourceArn=r['ARN'])
-#             except client.exceptions.EntityNotFoundException:
-#                 continue
+@GlueDevEndpoint.action_registry.register('remove-tag')
+class Untag(tags.RemoveTag):
+    """Remove tags from AWS Glue resource"""
+    permissions = ('glue:UntagResource',)
+
+    def process_resource_set(self, client, resources, tags):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            arn = self.manager.generate_arn(r['EndpointName'])
+            client.untag_resource(ResourceArn=arn, TagsToRemove=tags)
