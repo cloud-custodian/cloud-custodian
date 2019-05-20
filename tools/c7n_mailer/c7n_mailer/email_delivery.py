@@ -19,7 +19,7 @@ import six
 from .ldap_lookup import LdapLookup
 from c7n_mailer.utils_email import is_email
 from .utils import (
-    format_struct, get_message_subject, get_resource_tag_targets,
+    get_message_subject, get_resource_tag_targets,
     get_rendered_jinja, kms_decrypt, get_aws_username_from_event)
 
 # Those headers are defined as follows:
