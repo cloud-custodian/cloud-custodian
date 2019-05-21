@@ -11,9 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import jmespath
-
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -27,14 +24,7 @@ class Organization(QueryResourceManager):
         component = 'organizations'
         scope = 'global'
         enum_spec = ('search', 'organizations[]', {'body': {}})
-        get_requires_event = True
         id = "name"
-
-        @staticmethod
-        def get(client, event):
-            organization_id = jmespath.search('protoPayload.request.project.parent.id', event)
-            return client.execute_query(
-                'get', {'name': 'organizations/%s' % organization_id})
 
 
 @resources.register('folder')
