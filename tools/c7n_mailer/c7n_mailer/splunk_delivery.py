@@ -74,7 +74,9 @@ class SplunkHecDelivery(object):
             if user is not None:
                 msg['event_triggering_user'] = user
         # get a copy of the message with no resources
-        base_log = deepcopy(msg)
+        base_log = dict(msg)
+        base_log.pop('resources')
+        base_log = deepcopy(base_log)
         del base_log['resources']
         # if configured, build and add actions list
         if self.config.get('splunk_actions_list', False):
@@ -87,7 +89,7 @@ class SplunkHecDelivery(object):
         # generate a separate Splunk message for each resource
         logs = []
         for res in msg['resources']:
-            x = deepcopy(base_log)
+            x = dict(base_log)
             if (
                 self.config.get('splunk_remove_metrics', False) and
                 'c7n.metrics' in res
@@ -244,10 +246,10 @@ class SplunkHecDelivery(object):
             if t is None:
                 return {}
             # it's a dict, return it right away
-            if isinstance(t, type({})):
+            if isinstance(t, dict):
                 return t
             # if it's not a dict or list, unknown, return empty dict
-            if not isinstance(t, type([])):
+            if not isinstance(t, list):
                 return {}
             # it's a list
             tags = {}
