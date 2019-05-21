@@ -1391,7 +1391,7 @@ class MarkForOp(TagDelayedAction):
         message={'type': 'string'},
         days={'type': 'number', 'minimum': 0},
         hours={'type': 'number', 'minimum': 0})
-
+    schema_alias = False
     default_template = (
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
