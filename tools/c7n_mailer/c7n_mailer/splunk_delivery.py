@@ -77,7 +77,6 @@ class SplunkHecDelivery(object):
         base_log = dict(msg)
         base_log.pop('resources')
         base_log = deepcopy(base_log)
-        del base_log['resources']
         # if configured, build and add actions list
         if self.config.get('splunk_actions_list', False):
             base_log['actions'] = []
