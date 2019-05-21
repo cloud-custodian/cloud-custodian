@@ -230,8 +230,7 @@ class SplunkHecDelivery(object):
             )
             raise RuntimeError('POST returned non-success response: %s' % j)
 
-    @staticmethod
-    def tags_for_resource(res):
+    def tags_for_resource(self, res):
         """
         Return the tags for a given resource, or an empty dict if they
         can't be found.
@@ -241,22 +240,12 @@ class SplunkHecDelivery(object):
         :return: dict of tags
         """
         try:
-            t = res.get('Tags', res.get('tags', {}))
-            if t is None:
-                return {}
-            # it's a dict, return it right away
-            if isinstance(t, dict):
-                return t
-            # if it's not a dict or list, unknown, return empty dict
-            if not isinstance(t, list):
-                return {}
-            # it's a list
-            tags = {}
-            for item in t:
-                if 'Key' in item and 'Value' in item:
-                    tags[item['Key']] = item['Value']
-            return tags
+            return {x['Key']: x['Value'] for x in res.get('Tags', [])}
         except Exception:
+            self.logger.warning(
+                'Exception building tags dict; Tags=%s',
+                res.get('Tags', None)
+            )
             return {}
 
     @staticmethod

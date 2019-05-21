@@ -882,15 +882,7 @@ class TestTagsForResource(DeliveryTester):
         assert self.cls.tags_for_resource({}) == {}
 
     def test_tags_none(self):
-        assert self.cls.tags_for_resource({'tags': None}) == {}
-
-    def test_tags_dict(self):
-        assert self.cls.tags_for_resource({
-            'tags': {'foo': 'bar', 'one': 'two'}
-        }) == {'foo': 'bar', 'one': 'two'}
-
-    def test_exception(self):
-        assert self.cls.tags_for_resource(None) == {}
+        assert self.cls.tags_for_resource({'Tags': None}) == {}
 
     def test_tags_list(self):
         assert self.cls.tags_for_resource({
@@ -902,17 +894,9 @@ class TestTagsForResource(DeliveryTester):
                 {
                     'Key': 'one',
                     'Value': 'two'
-                },
-                {
-                    'foo': 'baz'
                 }
             ]
         }) == {'foo': 'bar', 'one': 'two'}
-
-    def test_tags_other_type(self):
-        assert self.cls.tags_for_resource({
-            'Tags': 1
-        }) == {}
 
 
 class TestSplunkIndicesForMessage(DeliveryTester):
