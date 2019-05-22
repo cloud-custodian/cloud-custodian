@@ -18,8 +18,6 @@ from botocore.client import ClientError
 from collections import Counter
 from concurrent.futures import as_completed
 
-from datetime import datetime, timedelta
-from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import logging
@@ -29,7 +27,7 @@ import time
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, AgeFilter, Filter
-from c7n.filters.offhours import OffHour, OnHour, Time
+from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
