@@ -398,6 +398,48 @@ class TestPruneLogMessage(DeliveryTester):
         }
         assert self.cls._prune_log_message(msg) == msg
 
+    def test_no_values(self):
+        msg = {
+            'foo': '123',
+            'bar': [
+                'A', 'B', 'C'
+            ],
+            'baz': {
+                'blam': {
+                    'one': 1,
+                    'two': 2,
+                    'three': 3,
+                    'four': 4
+                },
+                'blarg': {
+                    'quux': False
+                }
+            }
+        }
+        self.config['splunk_remove_paths'] = [
+            '/no/value/here',
+            '/bad',
+            '/not/a/path'
+        ]
+        expected = {
+            'foo': '123',
+            'bar': [
+                'A', 'B', 'C'
+            ],
+            'baz': {
+                'blam': {
+                    'one': 1,
+                    'two': 2,
+                    'three': 3,
+                    'four': 4
+                },
+                'blarg': {
+                    'quux': False
+                }
+            }
+        }
+        assert self.cls._prune_log_message(msg) == expected
+
     def test_remove_some(self):
         msg = {
             'foo': '123',

@@ -127,12 +127,16 @@ class SplunkHecDelivery(object):
         paths = self.config.get('splunk_remove_paths', [])
         if not paths:
             return msg
+        patches = []
         for path in paths:
             try:
                 resolve_pointer(msg, path)
+                patches.append({'op': 'remove', 'path': path})
             except JsonPointerException:
-                continue
-            msg = JsonPatch([{'op': 'remove', 'path': path}]).apply(msg)
+                pass
+        if not patches:
+            return msg
+        msg = JsonPatch(patches).apply(msg)
         return msg
 
     def deliver_splunk_messages(self, payloads):
