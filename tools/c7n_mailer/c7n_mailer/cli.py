@@ -117,7 +117,6 @@ CONFIG_SCHEMA = {
             'type': 'array',
             'items': {'type': 'string'}
         },
-        'splunk_remove_metrics': {'type': 'boolean'},
         'splunk_actions_list': {'type': 'boolean'},
         'splunk_max_attempts': {'type': 'integer'},
         'splunk_hec_max_length': {'type': 'integer'},

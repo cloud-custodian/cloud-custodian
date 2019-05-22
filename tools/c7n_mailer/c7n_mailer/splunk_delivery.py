@@ -1,3 +1,17 @@
+# Copyright 2019 Capital One Services, LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import json
 from time import sleep
 from six.moves.urllib.parse import urlparse
@@ -89,11 +103,6 @@ class SplunkHecDelivery(object):
         logs = []
         for res in msg['resources']:
             x = dict(base_log)
-            if (
-                self.config.get('splunk_remove_metrics', False) and
-                'c7n.metrics' in res
-            ):
-                del res['c7n.metrics']
             x['resource'] = res
             # ensure there's one "tags" element, and it's a dict
             tmp = self.tags_for_resource(res)

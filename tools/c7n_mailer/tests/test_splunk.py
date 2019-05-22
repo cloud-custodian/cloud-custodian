@@ -386,146 +386,16 @@ class TestGetSplunkEvents(DeliveryTester):
             })
         ]
 
-    @patch(
-        '%s.get_aws_username_from_event' % pbm,
-        return_value='uname'
-    )
-    @patch(
-        '%s._prune_log_message' % pb, return_value={'event': 'cleaned'}
-    )
-    def test_remove_metrics(self, mock_prune, mock_getuser):
-        self.config['splunk_remove_metrics'] = True
-
-        def se_tags(res):
-            if res['InstanceId'] == 'i-123':
-                return {'tag1': 'val1'}
-            return {}
-
-        msg = {
-            'account': 'aname',
-            'account_id': 'aid',
-            'region': 'rname',
-            'event': {
-                'foo': '1',
-                'source': 'esrc',
-                'detail-type': 'etype'
-            },
-            'policy': {
-                'resource': 'ec2',
-                'name': 'pname',
-                'actions': [
-                    'foo',
-                    {'type': 'bar'},
-                    {'type': 'notify'},
-                    'baz'
-                ]
-            },
-            'resources': [
-                {'InstanceId': 'i-123', 'c7n:MatchedFilters': [1, 2]},
-                {'InstanceId': 'i-456'},
-                {'InstanceId': 'i-789', 'c7n.metrics': {'foo': 'bar'}}
-            ]
-        }
-        with patch('%s.tags_for_resource' % pb) as mock_tags:
-            mock_tags.side_effect = se_tags
-            res = self.cls.get_splunk_events(msg)
-        assert res == [
-            {'event': 'cleaned'},
-            {'event': 'cleaned'},
-            {'event': 'cleaned'}
-        ]
-        assert mock_tags.mock_calls == [
-            call(msg['resources'][0]),
-            call(msg['resources'][1]),
-            call(msg['resources'][2])
-        ]
-        assert mock_getuser.mock_calls == [
-            call(self.cls.logger, msg['event'])
-        ]
-        assert mock_prune.mock_calls == [
-            call({
-                'account': 'aname',
-                'account_id': 'aid',
-                'region': 'rname',
-                'event': {
-                    'foo': '1',
-                    'source': 'esrc',
-                    'detail-type': 'etype'
-                },
-                'policy': {
-                    'resource': 'ec2',
-                    'name': 'pname',
-                    'actions': [
-                        'foo',
-                        {'type': 'bar'},
-                        {'type': 'notify'},
-                        'baz'
-                    ]
-                },
-                'resource': {
-                    'InstanceId': 'i-123',
-                    'c7n:MatchedFilters': [1, 2],
-                    'tags': {'tag1': 'val1'}
-                },
-                'event_triggering_user': 'uname'
-            }),
-            call({
-                'account': 'aname',
-                'account_id': 'aid',
-                'region': 'rname',
-                'event': {
-                    'foo': '1',
-                    'source': 'esrc',
-                    'detail-type': 'etype'
-                },
-                'policy': {
-                    'resource': 'ec2',
-                    'name': 'pname',
-                    'actions': [
-                        'foo',
-                        {'type': 'bar'},
-                        {'type': 'notify'},
-                        'baz'
-                    ]
-                },
-                'resource': {
-                    'InstanceId': 'i-456',
-                    'tags': {}
-                },
-                'event_triggering_user': 'uname'
-            }),
-            call({
-                'account': 'aname',
-                'account_id': 'aid',
-                'region': 'rname',
-                'event': {
-                    'foo': '1',
-                    'source': 'esrc',
-                    'detail-type': 'etype'
-                },
-                'policy': {
-                    'resource': 'ec2',
-                    'name': 'pname',
-                    'actions': [
-                        'foo',
-                        {'type': 'bar'},
-                        {'type': 'notify'},
-                        'baz'
-                    ]
-                },
-                'resource': {
-                    'InstanceId': 'i-789',
-                    'tags': {}
-                },
-                'event_triggering_user': 'uname'
-            })
-        ]
-
 
 class TestPruneLogMessage(DeliveryTester):
 
     def test_no_paths(self):
-        msg = {'foo': 'bar'}
+        msg = {
+            'foo': 'bar',
+            'resource': {
+                'c7n.metrics': []
+            }
+        }
         assert self.cls._prune_log_message(msg) == msg
 
     def test_remove_some(self):
@@ -544,6 +414,10 @@ class TestPruneLogMessage(DeliveryTester):
                 'blarg': {
                     'quux': False
                 }
+            },
+            'resource': {
+                'r1': 'r2',
+                'c7n.metrics': ['a', 'b']
             }
         }
         self.config['splunk_remove_paths'] = [
@@ -551,7 +425,8 @@ class TestPruneLogMessage(DeliveryTester):
             '/baz/blarg',
             '/baz/blam/one',
             '/baz/blam/two',
-            '/not/a/path'
+            '/not/a/path',
+            '/resource/c7n.metrics'
         ]
         expected = {
             'foo': '123',
@@ -563,6 +438,9 @@ class TestPruneLogMessage(DeliveryTester):
                     'three': 3,
                     'four': 4
                 }
+            },
+            'resource': {
+                'r1': 'r2'
             }
         }
         assert self.cls._prune_log_message(msg) == expected
