@@ -167,7 +167,7 @@ def format_record(r):
             break
     if rid is None:
         log.warning(
-            "couldn't find rids account:%s region:%s service:%s api:%s response:%s",
+            "couldn't find rids account:%s region:%s service:%s api:%s",
             r['accountId'], r['region'], r['eventSource'], r['eventName'])
         return
 

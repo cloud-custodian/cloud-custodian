@@ -28,17 +28,3 @@ class OrganizationTest(BaseTest):
 
         organization_resources = policy.run()
         self.assertEqual(organization_resources[0]['name'], organization_name)
-
-    def test_organization_get(self):
-        organization_name = 'organizations/851339424791'
-        session_factory = self.replay_flight_data(
-            'organization-get')
-
-        policy = self.load_policy(
-            {'name': 'gcp-organization-dryrun',
-             'resource': 'gcp.organization'},
-            session_factory=session_factory)
-
-        organization_resource = policy.resource_manager.get_resource(
-            {'name': organization_name})
-        self.assertEqual(organization_resource['name'], organization_name)
