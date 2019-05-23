@@ -103,7 +103,7 @@ class SplunkHecDelivery(object):
         logs = []
         for res in msg['resources']:
             x = dict(base_log)
-            x['resource'] = res
+            x['resource'] = dict(res)
             # ensure there's one "tags" element, and it's a dict
             tmp = self.tags_for_resource(res)
             if 'Tags' in x['resource']:
