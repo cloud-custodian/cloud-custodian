@@ -18,11 +18,6 @@ Instead, you can do `pip install -r tools/c7n_gcp/requirements.txt` to install d
 Adding New GCP Resources
 ==========================
 
-Install GCP Dependencies
---------------------------
-
-Custodian interfaces uses GCP's REST interface.
-
 Load New GCP Resource
 ---------------------
 
@@ -32,7 +27,7 @@ load all registered resources. Import the resource in
 
 .. code-block:: python
 
-    import c7n_gcp.resources.container_registry
+    import c7n_gcp.resources.dialogflow
 
 Testing
 ========

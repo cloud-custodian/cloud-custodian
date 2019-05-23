@@ -11,16 +11,6 @@ Actions
 --------
  - GCP Actions (see :ref:`gcp_genericgcpactions`)
 
-Environment variables
----------------------
-To check the policies please make sure that following environment variables are set:
-
-- GOOGLE_CLOUD_PROJECT
-
-- GOOGLE_APPLICATION_CREDENTIALS
-
-The details about the variables are available in the `GCP documentation to configure credentials for service accounts. <https://cloud.google.com/docs/authentication/getting-started>`_
-
 Example Policies
 ----------------
 
