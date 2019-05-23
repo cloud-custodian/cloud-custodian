@@ -6,6 +6,8 @@ Load Balancer
 Filters
 --------
  - Standard Value Filter (see :ref:`filters`)
+    Fields for filtering can be received from GCP resource object. Link to appropriate resource is
+    provided in each GCP resource.
 
 Actions
 --------
@@ -16,7 +18,7 @@ Example Policies
 
 Load Balancer. Addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `addresses <https://cloud.google.com/compute/docs/reference/rest/v1/addresses>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Addresses <https://cloud.google.com/compute/docs/reference/rest/v1/addresses>`_
 
 .. code-block:: yaml
 
@@ -32,11 +34,11 @@ The resource works with `addresses <https://cloud.google.com/compute/docs/refere
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Global Addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `global addresses <https://cloud.google.com/compute/docs/reference/rest/v1/globalAddresses>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Global Addresses <https://cloud.google.com/compute/docs/reference/rest/v1/globalAddresses>`_
 
 .. code-block:: yaml
 
@@ -52,11 +54,11 @@ The resource works with `global addresses <https://cloud.google.com/compute/docs
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. URL Maps
 ~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `URL maps <https://cloud.google.com/compute/docs/reference/rest/v1/urlMaps>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: URL Maps <https://cloud.google.com/compute/docs/reference/rest/v1/urlMaps>`_
 
 .. code-block:: yaml
 
@@ -72,11 +74,11 @@ The resource works with `URL maps <https://cloud.google.com/compute/docs/referen
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Target HTTP Proxies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `target HTTP proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetHttpProxies>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Target HTTP Proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetHttpProxies>`_
 
 .. code-block:: yaml
 
@@ -92,11 +94,11 @@ The resource works with `target HTTP proxies <https://cloud.google.com/compute/d
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. HTTPs Proxies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `target HTTPs proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetHttpsProxies>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: HTTPs Proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetHttpsProxies>`_
 
 .. code-block:: yaml
 
@@ -112,11 +114,11 @@ The resource works with `target HTTPs proxies <https://cloud.google.com/compute/
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Target TCP Proxies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `target TCP proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetTcpProxies>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Target TCP Proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetTcpProxies>`_
 
 .. code-block:: yaml
 
@@ -132,11 +134,11 @@ The resource works with `target TCP proxies <https://cloud.google.com/compute/do
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Target SSL Proxies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `target SSL proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetSslProxies>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Target SSL Proxies <https://cloud.google.com/compute/docs/reference/rest/v1/targetSslProxies>`_
 
 .. code-block:: yaml
 
@@ -152,11 +154,11 @@ The resource works with `target SSL proxies <https://cloud.google.com/compute/do
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. SSL Policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `SSL policies <https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: SSL Policies <https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies>`_
 
 .. code-block:: yaml
 
@@ -172,11 +174,11 @@ The resource works with `SSL policies <https://cloud.google.com/compute/docs/ref
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. SSL Certificates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `SSL certificates <https://cloud.google.com/compute/docs/reference/rest/v1/sslCertificates>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: SSL Certificates <https://cloud.google.com/compute/docs/reference/rest/v1/sslCertificates>`_
 
 .. code-block:: yaml
 
@@ -192,11 +194,11 @@ The resource works with `SSL certificates <https://cloud.google.com/compute/docs
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Backend Buckets
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `backend buckets <https://cloud.google.com/compute/docs/reference/rest/v1/backendBuckets>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Backend Buckets <https://cloud.google.com/compute/docs/reference/rest/v1/backendBuckets>`_
 
 .. code-block:: yaml
 
@@ -212,11 +214,11 @@ The resource works with `backend buckets <https://cloud.google.com/compute/docs/
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Health Checks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `health checks <https://cloud.google.com/compute/docs/reference/rest/v1/healthChecks>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Health Checks <https://cloud.google.com/compute/docs/reference/rest/v1/healthChecks>`_
 
 .. code-block:: yaml
 
@@ -232,11 +234,11 @@ The resource works with `health checks <https://cloud.google.com/compute/docs/re
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. HTTP Health Checks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `HTTP health checks <https://cloud.google.com/compute/docs/reference/rest/v1/httpHealthChecks>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: HTTP Health Checks <https://cloud.google.com/compute/docs/reference/rest/v1/httpHealthChecks>`_
 
 .. code-block:: yaml
 
@@ -252,11 +254,11 @@ The resource works with `HTTP health checks <https://cloud.google.com/compute/do
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. HTTPs Health Checks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `HTTPs health checks <https://cloud.google.com/compute/docs/reference/rest/v1/httpsHealthChecks>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: HTTPs Health Checks <https://cloud.google.com/compute/docs/reference/rest/v1/httpsHealthChecks>`_
 
 .. code-block:: yaml
 
@@ -272,11 +274,11 @@ The resource works with `HTTPs health checks <https://cloud.google.com/compute/d
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Target Instances
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `target instances <https://cloud.google.com/compute/docs/reference/rest/v1/targetInstances>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Target Instances <https://cloud.google.com/compute/docs/reference/rest/v1/targetInstances>`_
 
 .. code-block:: yaml
 
@@ -292,11 +294,11 @@ The resource works with `target instances <https://cloud.google.com/compute/docs
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Target Pools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `target pools <https://cloud.google.com/compute/docs/reference/rest/v1/targetPools>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Target Pools <https://cloud.google.com/compute/docs/reference/rest/v1/targetPools>`_
 
 .. code-block:: yaml
 
@@ -312,11 +314,11 @@ The resource works with `target pools <https://cloud.google.com/compute/docs/ref
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Forwarding Rules
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `addresses <https://cloud.google.com/compute/docs/reference/rest/v1/addresses>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Forwarding Rules <https://cloud.google.com/compute/docs/reference/rest/v1/addresses>`_
 
 .. code-block:: yaml
 
@@ -332,11 +334,11 @@ The resource works with `addresses <https://cloud.google.com/compute/docs/refere
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Global Forwarding Rules
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `forwarding rules <https://cloud.google.com/compute/docs/reference/rest/v1/forwardingRules>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Global Forwarding Rules <https://cloud.google.com/compute/docs/reference/rest/v1/forwardingRules>`_
 
 .. code-block:: yaml
 
@@ -352,11 +354,11 @@ The resource works with `forwarding rules <https://cloud.google.com/compute/docs
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Backend Services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `backend services <https://cloud.google.com/compute/docs/reference/rest/v1/backendServices>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Backend Services <https://cloud.google.com/compute/docs/reference/rest/v1/backendServices>`_
 
 .. code-block:: yaml
 
@@ -372,11 +374,11 @@ The resource works with `backend services <https://cloud.google.com/compute/docs
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer
 
 Load Balancer. Region Backend Services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `region backend services <https://cloud.google.com/compute/docs/reference/rest/v1/regionBackendServices>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Region Backend Services <https://cloud.google.com/compute/docs/reference/rest/v1/regionBackendServices>`_
 
 The 'region' param in the query is required.
 
@@ -396,4 +398,4 @@ The 'region' param in the query is required.
               format: json
               transport:
                 type: pubsub
-                topic: projects/cloud-custodian/topics/load-balancer-resources
+                topic: projects/cloud-custodian/topics/loadbalancer

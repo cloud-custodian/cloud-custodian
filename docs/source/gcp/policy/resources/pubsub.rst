@@ -6,6 +6,8 @@ Pub/Sub
 Filters
 --------
  - Standard Value Filter (see :ref:`filters`)
+    Fields for filtering can be received from GCP resource object. Link to appropriate resource is
+    provided in each GCP resource.
 
 Actions
 --------
@@ -16,7 +18,7 @@ Example Policies
 
 Pub/Sub. Topics
 ~~~~~~~~~~~~~~~
-The resource works with `topics <https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Topics <https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics>`_
 
 .. code-block:: yaml
 
@@ -36,7 +38,7 @@ The resource works with `topics <https://cloud.google.com/pubsub/docs/reference/
 
 Pub/Sub. Subscriptions
 ~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `subscriptions <https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Subscriptions <https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions>`_
 
 .. code-block:: yaml
 
@@ -56,7 +58,7 @@ The resource works with `subscriptions <https://cloud.google.com/pubsub/docs/ref
 
 Pub/Sub. Snapshots
 ~~~~~~~~~~~~~~~~~~
-The resource works with `snapshots <https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.snapshots>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Snapshots <https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.snapshots>`_
 
 .. code-block:: yaml
 

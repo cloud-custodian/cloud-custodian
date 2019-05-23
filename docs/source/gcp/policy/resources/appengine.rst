@@ -6,6 +6,8 @@ App Engine
 Filters
 --------
  - Standard Value Filter (see :ref:`filters`)
+    Fields for filtering can be received from GCP resource object. Link to appropriate resource is
+    provided in each GCP resource.
 
 Actions
 --------
@@ -16,7 +18,7 @@ Example Policies
 
 App Engine. Apps
 ~~~~~~~~~~~~~~~~
-The resource works with `apps <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Apps <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps>`_ 
 
 .. code-block:: yaml
 
@@ -36,7 +38,7 @@ The resource works with `apps <https://cloud.google.com/appengine/docs/admin-api
 
 App Engine. Authorized Certificates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `authorized certificates <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedCertificates>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Authorized Certificates <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedCertificates>`_ 
 
 .. code-block:: yaml
 
@@ -56,7 +58,7 @@ The resource works with `authorized certificates <https://cloud.google.com/appen
 
 App Engine. Authorized Domains
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `authorized domains <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedDomains>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Authorized Domains <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedDomains>`_ 
 
 .. code-block:: yaml
 
@@ -76,7 +78,7 @@ The resource works with `authorized domains <https://cloud.google.com/appengine/
 
 App Engine. Domain Mappings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `domain mappings <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.domainMappings>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Domain Mappings <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.domainMappings>`_ 
 
 .. code-block:: yaml
 
@@ -96,7 +98,7 @@ The resource works with `domain mappings <https://cloud.google.com/appengine/doc
 
 App Engine. Apps Firewall Ingress Rules
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The resource works with `ingress rules of apps' firewall <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.firewall.ingressRules>`_ GCP REST resource. Fields that are provided by the REST resource can be used in the policy filter.
+`GCP resource: Ingress Rules of Apps' firewall <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.firewall.ingressRules>`_ 
 
 .. code-block:: yaml
 
