@@ -399,7 +399,7 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i((now - timedelta(100)), now), True)
         self.assertFilter(fdata, i((now - timedelta(100)).isoformat(), now.isoformat()), True)
 
-    def test_regex_capture_matches_first_occurrence(self):
+    def test_value_regex_matches_first_occurrence(self):
 
         def i(first, second):
             value = "{}text{}".format(first, second)
@@ -421,7 +421,7 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(2, 3), True)
         self.assertFilter(fdata, i(3, 2), False)
 
-    def test_regex_capture_with_non_capturing_groups(self):
+    def test_value_regex_with_non_capturing_groups(self):
 
         def i(d):
             return instance(Tags=[{"Key": "metadata", "Value": d}])
@@ -506,12 +506,12 @@ class TestValueTypes(BaseFilterTest):
         }
         capture = ValueRegex(fdata['value_regex'])
 
-        # No match returns original value (pass-through)
+        # No match returns None
         retValue = capture.get_resource_value("pet=elephant;number=3")
-        self.assertEqual("pet=elephant;number=3", retValue)
-        # TypeError returns original value (pass-through)
+        self.assertIsNone(retValue)
+        # TypeError returns None
         retValue = capture.get_resource_value(True)
-        self.assertEqual(True, retValue)
+        self.assertIsNone(retValue)
         # Match returns matched value
         retValue = capture.get_resource_value("pet=dog;number=44")
         self.assertEqual("44", retValue)

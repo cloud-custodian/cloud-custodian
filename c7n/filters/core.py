@@ -714,7 +714,9 @@ class ValueRegex(object):
     the result of the capture group defined in that regex with the 'value'.
     Therefore you must have a single capture group defined in the regex.
 
-    Example of getting a datatime object to make an 'expiration' comparison::
+    If the regex doesn't find a match it will return 'None'
+
+    Example of getting a datetime object to make an 'expiration' comparison::
 
     type: value
     value_regex: ".*delete_after=([0-9]{4}-[0-9]{2}-[0-9]{2}).*"
@@ -733,7 +735,7 @@ class ValueRegex(object):
         try:
             capture = re.match(self.expr, resource)
         except (ValueError, TypeError):
-            return resource
+            return None
         if capture is None:  # regex didn't capture anything
-            return resource
+            return None
         return capture.group(1)

@@ -240,11 +240,8 @@ There are several ways to get a list of possible keys for each resource.
   The filter expects that there will be exactly one capturing group, however
   non-capturing groups can be specified as well, e.g. ``(?:newkey|oldkey)``.
 
-  Note that if the value regex does not find a match, it will just
-  pass-through the full contents of the original ``key`` value,
-  i.e. essentially act as if the ``value_regex`` had not been
-  specified at all.  This could possibly have unintended consequences
-  depending on how the filter is configured.
+  Note that if the value regex does not find a match, it will return a ``None``
+  value.
 
   In this example there is an ``expiration`` comparison,
   which needs a datetime, however the tag containing this information
