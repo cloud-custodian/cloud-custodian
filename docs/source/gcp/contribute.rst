@@ -18,6 +18,63 @@ Instead, you can do `pip install -r tools/c7n_gcp/requirements.txt` to install d
 Adding New GCP Resources
 ==========================
 
+Create New GCP Resource
+-------------------------
+
+Create your new GCP Resource.
+
+The resource extends QueryResourceManager. It have @resources.register with name of the resource.
+The name will be used in policies. Also the resource has resource_type class with the following
+fields:
+
+- ``service`` is required field, part of the request to GCP resource,
+    The name of GCP service.
+- ``component`` is required field, part of the request to GCP resource,
+    The name of GCP resource,
+- ``version`` is required field,
+    It is the version of used resource API, part of the request to GCP resource,
+- ``enum_spec`` is a tuple of (enum_operation, list_operation, extra_args), required field,
+    Place the name of the GCP resource method as the enum_operation.
+    Next, put path to searching array on the list_operation place.
+    Extra_args can be used for set up additional params to a request to GCP.
+- ``id`` is required field,
+    It uses the field as id of the resource,
+- ``scope`` is optional field, default is None,
+    The scope of the resource,
+- ``parent_spec`` is an optional field for build additional requests, default is None,
+    It allows to receive additional information from a parent resource (using `resource` field)
+    based on the request with params (using `child_enum_params` tuples) and map result object
+    to the resource (using `parent_get_params` tuples).
+
+Get methods is created based on `get` methods of GCP resources. As a rule the `get` methods
+have required fields like project name, ID of loading resource etc. The available fields names
+with appropriate information are located in Stackdriver logs.
+
+.. code-block:: python
+
+    from c7n_gcp.provider import resources
+    from c7n_gcp.query import QueryResourceManager, TypeInfo
+
+
+    @resources.register('loadbalancer-address')
+    class LoadBalancingAddress(QueryResourceManager):
+
+        class resource_type(TypeInfo):
+            service = 'compute'
+            component = 'addresses'
+            version = 'v1'
+            enum_spec = ('aggregatedList', 'items.*.addresses[]', None)
+            scope = 'project'
+            id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command('get', {
+                'project': resource_info['project_id'],
+                'region': resource_info['location'],
+                'address': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
+
 Load New GCP Resource
 ---------------------
 
@@ -27,7 +84,7 @@ load all registered resources. Import the resource in
 
 .. code-block:: python
 
-    import c7n_gcp.resources.dialogflow
+    import c7n_gcp.resources.loadbalancer
 
 Testing
 ========
