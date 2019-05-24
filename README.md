@@ -224,13 +224,15 @@ The Custodian project also develops and maintains a suite of additional
 tools here
 <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools>:
 
-- **_Org_:** Multi-account policy execution.
+- [**_Org_:**](https://cloudcustodian.io/docs/tools/c7n-org.html) Multi-account policy execution.
 
-- **_PolicyStream_:** Git history as stream of logical policy changes.
+- [**_PolicyStream_:**](https://cloudcustodian.io/docs/tools/c7n-policystream.html) Git history as stream of logical policy changes.
 
 - **_Salactus_:** Scale out s3 scanning.
 
-- **_Mailer_:** A reference implementation of sending messages to users to notify them.
+- [**_Mailer_:**](https://cloudcustodian.io/docs/tools/c7n-mailer.html) A reference implementation of sending messages to users to notify them.
+
+- [**_Trail Creator_**](https://cloudcustodian.io/docs/tools/c7n-trailcreator.html) Retroactive tagging of resources creators from CloudTrail
 
 - **_TrailDB_:** Cloudtrail indexing and time series generation for dashboarding.
 
@@ -244,7 +246,7 @@ tools here
 Contributing
 ------------
 
-See https://cloudcustodian.io/docs/contribute.html
+See <https://cloudcustodian.io/docs/contribute.html>
 
 
 Code of Conduct
