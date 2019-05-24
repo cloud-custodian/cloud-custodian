@@ -2039,7 +2039,7 @@ class DetachInternetGateway(BaseAction):
                              ]
                          },
                          required=['type', 'vpc_ids'])
-    permissions = ('ec2:DetachInternetGateway')
+    permissions = ('ec2:DetachInternetGateway',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
