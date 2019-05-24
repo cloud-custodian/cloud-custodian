@@ -63,7 +63,6 @@ setup(
                       "azure-mgmt-web",
                       "azure-mgmt-monitor",
                       "azure-mgmt-policyinsights",
-                      "azure-mgmt-subscription",
                       "azure-mgmt-eventgrid==2.0.0rc2",  # RC2 supports AdvancedFilters
                       "azure-graphrbac",
                       "azure-keyvault",
