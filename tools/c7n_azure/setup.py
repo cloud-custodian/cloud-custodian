@@ -57,7 +57,7 @@ setup(
                       "azure-mgmt-managementgroups",
                       "azure-mgmt-network",
                       "azure-mgmt-redis",
-                      "azure-mgmt-resource",
+                      "azure-mgmt-resource==2.1.0",
                       "azure-mgmt-sql",
                       "azure-mgmt-storage",
                       "azure-mgmt-web",
