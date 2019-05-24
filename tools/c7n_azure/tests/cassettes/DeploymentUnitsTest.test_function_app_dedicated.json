@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Fri, 10 May 2019 19:52:40 GMT"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
-                    "content-length": [
-                        "227"
+                    "date": [
+                        "Fri, 24 May 2019 18:12:53 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "content-length": [
+                        "227"
                     ]
                 },
                 "body": {
@@ -52,23 +52,23 @@
                     "message": "Accepted"
                 },
                 "headers": {
-                    "date": [
-                        "Fri, 10 May 2019 19:52:41 GMT"
-                    ],
-                    "location": [
-                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Storage/locations/westus/asyncoperations/25fd876a-e5cd-4dfb-9b92-2a7b4ac6a311?monitor=true&api-version=2018-07-01"
-                    ],
-                    "content-length": [
-                        "0"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-type": [
                         "text/plain; charset=utf-8"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                    "date": [
+                        "Fri, 24 May 2019 18:12:54 GMT"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Storage/locations/westus/asyncoperations/3c1b62eb-088e-4580-b2f5-4a779971cd14?monitor=true&api-version=2018-07-01"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "0"
                     ]
                 },
                 "body": {
@@ -79,7 +79,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus/asyncoperations/25fd876a-e5cd-4dfb-9b92-2a7b4ac6a311?monitor=true&api-version=2018-07-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus/asyncoperations/3c1b62eb-088e-4580-b2f5-4a779971cd14?monitor=true&api-version=2018-07-01",
                 "body": null,
                 "headers": {}
             },
@@ -89,14 +89,14 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
                     "date": [
-                        "Fri, 10 May 2019 19:52:58 GMT"
+                        "Fri, 24 May 2019 18:13:11 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "content-type": [
-                        "application/json"
                     ],
                     "content-length": [
                         "1131"
@@ -126,17 +126,17 @@
                                 "services": {
                                     "file": {
                                         "enabled": true,
-                                        "lastEnabledTime": "2019-05-10T19:52:41.6324849Z"
+                                        "lastEnabledTime": "2019-05-24T18:12:54.1719870Z"
                                     },
                                     "blob": {
                                         "enabled": true,
-                                        "lastEnabledTime": "2019-05-10T19:52:41.6324849Z"
+                                        "lastEnabledTime": "2019-05-24T18:12:54.1719870Z"
                                     }
                                 },
                                 "keySource": "Microsoft.Storage"
                             },
                             "provisioningState": "Succeeded",
-                            "creationTime": "2019-05-10T19:52:41.5230906Z",
+                            "creationTime": "2019-05-24T18:12:54.0938873Z",
                             "primaryEndpoints": {
                                 "blob": "https://custodianaccount47182741.blob.core.windows.net/",
                                 "queue": "https://custodianaccount47182741.queue.core.windows.net/",
@@ -163,17 +163,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Fri, 10 May 2019 19:52:59 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                    "date": [
+                        "Fri, 24 May 2019 18:13:12 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "288"
@@ -199,6 +199,44 @@
         },
         {
             "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 24 May 2019 18:13:12 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "227"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units",
+                        "name": "cloud-custodian-test-deployment-units",
+                        "location": "westus",
+                        "properties": {
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
                 "method": "PUT",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test2?api-version=2018-02-01",
                 "body": "mock_body",
@@ -210,17 +248,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Fri, 10 May 2019 19:53:03 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1198"
+                    "date": [
+                        "Fri, 24 May 2019 18:13:22 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "1375"
@@ -234,7 +272,7 @@
                         "kind": "linux",
                         "location": "West US",
                         "properties": {
-                            "serverFarmId": 25651,
+                            "serverFarmId": 26305,
                             "name": "cloud-custodian-test2",
                             "workerSize": "Default",
                             "workerSizeId": 0,
@@ -268,7 +306,7 @@
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "mdmId": "waws-prod-bay-081_25651",
+                            "mdmId": "waws-prod-bay-081_26305",
                             "targetWorkerCount": 0,
                             "targetWorkerSizeId": 0,
                             "provisioningState": "Succeeded",
@@ -298,11 +336,11 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Fri, 10 May 2019 19:53:21 GMT"
+                    "content-type": [
+                        "application/json"
                     ],
-                    "etag": [
-                        "\"1D50769FC5CD340\""
+                    "date": [
+                        "Fri, 24 May 2019 18:13:41 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
@@ -310,11 +348,11 @@
                     "x-ms-ratelimit-remaining-subscription-resource-requests": [
                         "499"
                     ],
-                    "content-type": [
-                        "application/json"
+                    "etag": [
+                        "\"1D5125C61851320\""
                     ],
                     "content-length": [
-                        "3207"
+                        "3202"
                     ]
                 },
                 "body": {
@@ -390,7 +428,7 @@
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "lastModifiedTimeUtc": "2019-05-10T19:53:05.8833333",
+                            "lastModifiedTimeUtc": "2019-05-24T18:13:25.28",
                             "storageRecoveryDefaultState": "Running",
                             "contentAvailabilityState": "Normal",
                             "runtimeAvailabilityState": "Normal",
@@ -445,14 +483,14 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
                     "date": [
-                        "Fri, 10 May 2019 19:53:23 GMT"
+                        "Fri, 24 May 2019 18:13:41 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "content-type": [
-                        "application/json"
                     ],
                     "content-length": [
                         "2888"
@@ -596,17 +634,17 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
                     "date": [
-                        "Fri, 10 May 2019 19:53:23 GMT"
+                        "Fri, 24 May 2019 18:13:42 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "x-ms-ratelimit-remaining-subscription-resource-requests": [
                         "11999"
-                    ],
-                    "content-type": [
-                        "application/json"
                     ],
                     "content-length": [
                         "828"
@@ -619,7 +657,7 @@
                         "type": "Microsoft.Web/sites/config",
                         "location": "West US",
                         "properties": {
-                            "MACHINEKEY_DecryptionKey": "9B3671E82B55EE680B221AB8B9508A09199E9BCD3C6B1F8871D2CB4C2187F558",
+                            "MACHINEKEY_DecryptionKey": "F3CB7FB82711F2274C06973D8A4EC25AD2075D449D234BC528E28282261ED99A",
                             "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=custodianaccount47182741;AccountKey=DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
                             "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=custodianaccount47182741;AccountKey=DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
                             "FUNCTIONS_EXTENSION_VERSION": "~2",

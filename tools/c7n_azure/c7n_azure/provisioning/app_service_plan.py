@@ -2,6 +2,7 @@ import copy
 from azure.mgmt.web.models import AppServicePlan, SkuDescription
 from c7n_azure.provisioning.autoscale import AutoScaleUnit
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
+from c7n_azure.provisioning.resource_group import ResourceGroupUnit
 from c7n_azure.utils import StringUtils
 
 
@@ -17,6 +18,10 @@ class AppServicePlanUnit(DeploymentUnit):
                                                  params['name'])
 
     def _provision(self, params):
+        rg_unit = ResourceGroupUnit()
+        rg_unit.provision_if_not_exists({'name': params['resource_group_name'],
+                                         'location': params['location']})
+
         plan_params = AppServicePlan(
             app_service_plan_name=params['name'],
             location=params['location'],
