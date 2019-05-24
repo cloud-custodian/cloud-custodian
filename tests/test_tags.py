@@ -21,6 +21,7 @@ from mock import MagicMock, call
 
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
+from c7n.utils import yaml_load
 
 from .common import BaseTest
 
@@ -316,3 +317,51 @@ class CopyRelatedResourceTag(BaseTest):
             ]
         }
         self.assertRaises(PolicyValidationError, self.load_policy, policy)
+
+    def test_copy_related_resource_tag_multi_ref(self):
+        session_factory = self.replay_flight_data('test_copy_related_resource_tag_multi_ref')
+        client = session_factory().client('ec2')
+
+        result = client.describe_volumes()['Volumes']
+        self.assertEqual(len(result), 1)
+        vol = result[0]
+
+        self.assertEqual(vol['Tags'], [{'Key': 'test', 'Value': 'test'}])
+
+        policy = """
+        name: copy-tags-from-ebs-volume-to-snapshot
+        resource: ebs-snapshot
+        filters:
+          - type: value
+            key: Tags
+            value: empty
+        actions:
+          - type: copy-related-tag
+            resource: ebs
+            skip_missing: True
+            key: VolumeId
+            tags: '*'
+        """
+
+        p = self.load_policy(yaml_load(policy), session_factory=session_factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 3)
+
+        if self.recording:
+            time.sleep(10)
+
+        all_snaps = client.describe_snapshots(OwnerIds=['self'])['Snapshots']
+
+        self.assertEqual(len(all_snaps), 3)
+
+        tagged_snaps = [e for e in all_snaps if e['VolumeId'] == vol['VolumeId']]
+        untagged_snaps = [e for e in all_snaps if e['VolumeId'] != vol['VolumeId']]
+
+        self.assertEqual(len(tagged_snaps), 2)
+        self.assertEqual(tagged_snaps[0]['Tags'], vol['Tags'])
+        self.assertEqual(tagged_snaps[1]['Tags'], vol['Tags'])
+
+        self.assertEqual(len(untagged_snaps), 1)
+        self.assertTrue('Tags' not in untagged_snaps[0].keys())

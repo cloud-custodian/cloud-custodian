@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-import operator
 
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
@@ -55,10 +54,8 @@ class IsShadow(Filter):
     embedded = False
 
     def process(self, resources, event=None):
-        anded = lambda x: True # NOQA
-        op = self.data.get('state', True) and anded or operator.__not__
         rcount = len(resources)
-        trails = [t for t in resources if op(self.is_shadow(t))]
+        trails = [t for t in resources if (self.is_shadow(t) == self.data.get('state', True))]
         if len(trails) != rcount and self.embedded:
             self.log.info("implicitly filtering shadow trails %d -> %d",
                      rcount, len(trails))
@@ -67,8 +64,9 @@ class IsShadow(Filter):
     def is_shadow(self, t):
         if t.get('IsOrganizationTrail') and self.manager.config.account_id not in t['TrailARN']:
             return True
-        if t.get('IsMultiRegionTrail') and t['HomeRegion'] not in t['TrailARN']:
+        if t.get('IsMultiRegionTrail') and t['HomeRegion'] != self.manager.config.region:
             return True
+        return False
 
 
 @CloudTrail.filter_registry.register('status')

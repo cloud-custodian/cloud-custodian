@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import unittest
+from mock import Mock
 
 from c7n_mailer import utils
 
@@ -55,3 +56,151 @@ class ResourceFormat(unittest.TestCase):
             'arn: arn:aws:elasticloadbalancing:us-east-1:367930536793:'
             'loadbalancer/app/dev/1234567890'
             '  zones: 0  scheme: internal')
+
+
+class GetAwsUsernameFromEvent(unittest.TestCase):
+
+    # note principalId is very org/domain specific for federated?, it would be
+    # good to get confirmation from capone on this event / test.
+    CLOUDTRAIL_EVENT = {
+        'detail': {
+            'userIdentity': {
+                "type": "IAMUser",
+                "principalId": "AIDAJ45Q7YFFAREXAMPLE",
+                "arn": "arn:aws:iam::123456789012:user/michael_bolton",
+                "accountId": "123456789012",
+                "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+                "userName": "michael_bolton"
+            }
+        }
+    }
+
+    def test_get(self):
+        username = utils.get_aws_username_from_event(
+            Mock(), self.CLOUDTRAIL_EVENT
+        )
+        self.assertEqual(username, 'michael_bolton')
+
+    def test_get_username_none(self):
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), None),
+            None
+        )
+
+    def test_get_username_identity_none(self):
+        evt = {'detail': {}}
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), evt),
+            None
+        )
+
+    def test_get_username_assumed_role(self):
+        evt = {
+            'detail': {
+                'userIdentity': {
+                    'type': 'AssumedRole',
+                    'arn': 'foo'
+                }
+            }
+        }
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), evt),
+            'foo'
+        )
+
+    def test_get_username_assumed_role_instance(self):
+        evt = {
+            'detail': {
+                'userIdentity': {
+                    'type': 'AssumedRole',
+                    'arn': 'foo/i-12345678'
+                }
+            }
+        }
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), evt),
+            None
+        )
+
+    def test_get_username_assumed_role_lambda(self):
+        evt = {
+            'detail': {
+                'userIdentity': {
+                    'type': 'AssumedRole',
+                    'arn': 'foo/awslambda'
+                }
+            }
+        }
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), evt),
+            None
+        )
+
+    def test_get_username_assumed_role_colons(self):
+        evt = {
+            'detail': {
+                'userIdentity': {
+                    'type': 'AssumedRole',
+                    'arn': 'foo/bar:baz:blam'
+                }
+            }
+        }
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), evt),
+            'baz:blam'
+        )
+
+    def test_get_username_iam(self):
+        evt = {
+            'detail': {
+                'userIdentity': {
+                    'type': 'IAMUser',
+                    'userName': 'bar'
+                }
+            }
+        }
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), evt),
+            'bar'
+        )
+
+    def test_get_username_root(self):
+        evt = {
+            'detail': {
+                'userIdentity': {
+                    'type': 'Root'
+                }
+            }
+        }
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), evt),
+            None
+        )
+
+    def test_get_username_principalColon(self):
+        evt = {
+            'detail': {
+                'userIdentity': {
+                    'type': 'foo',
+                    'principalId': 'bar:baz'
+                }
+            }
+        }
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), evt),
+            'baz'
+        )
+
+    def test_get_username_principal(self):
+        evt = {
+            'detail': {
+                'userIdentity': {
+                    'type': 'foo',
+                    'principalId': 'blam'
+                }
+            }
+        }
+        self.assertEqual(
+            utils.get_aws_username_from_event(Mock(), evt),
+            'blam'
+        )

@@ -42,7 +42,7 @@ setup(
             'azure = c7n_azure.entry:initialize_azure']
     },
     install_requires=["azure-mgmt-authorization",
-                      "azure-mgmt-applicationinsights",
+                      "azure-mgmt-applicationinsights==0.1.1",
                       "azure-mgmt-batch",
                       "azure-mgmt-cognitiveservices",
                       "azure-mgmt-cosmosdb",
@@ -57,13 +57,12 @@ setup(
                       "azure-mgmt-managementgroups",
                       "azure-mgmt-network",
                       "azure-mgmt-redis",
-                      "azure-mgmt-resource",
+                      "azure-mgmt-resource==2.1.0",
                       "azure-mgmt-sql",
                       "azure-mgmt-storage",
                       "azure-mgmt-web",
                       "azure-mgmt-monitor",
                       "azure-mgmt-policyinsights",
-                      "azure-mgmt-subscription",
                       "azure-mgmt-eventgrid==2.0.0rc2",  # RC2 supports AdvancedFilters
                       "azure-graphrbac",
                       "azure-keyvault",
