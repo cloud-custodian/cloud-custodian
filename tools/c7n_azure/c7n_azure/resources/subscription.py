@@ -49,8 +49,8 @@ class Subscription(ResourceManager):
 
     def _get_subscription(self, session_factory, config):
         session = local_session(session_factory)
-        client = SubscriptionClient(session.get_credentials(), session.subscription_id)
-        details = client.subscriptions.get(subscription_id=session.subscription_id)
+        client = SubscriptionClient(session.get_credentials(), session.get_subscription_id())
+        details = client.subscriptions.get(subscription_id=session.get_subscription_id())
         return details.serialize(True)
 
 
