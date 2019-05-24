@@ -66,7 +66,8 @@ class FunctionAppUtilsTest(BaseTest):
             service_plan={
                 'id': '',
                 'resource_group_name': CONST_GROUP_NAME,
-                'name': 'cloud-custodian-test'
+                'name': 'cloud-custodian-test',
+                'location': 'westus2'
             },
             function_app_resource_group_name=CONST_GROUP_NAME,
             function_app_name='custodian-test-app')
