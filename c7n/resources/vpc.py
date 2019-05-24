@@ -112,134 +112,43 @@ class VpcDelete(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
-        max_attempts = 8
-        min_delay = 2
-        max_delay = max(min_delay, 2) ** max_attempts
 
         # Delete NAT-gateway associated with VPC
         if self.data.get('dependencies', {}) == 'all' or \
                 'nat-gateway' in self.data.get('dependencies', {}):
-            vpc_ngw_filter = VpcNatGatewayFilter(data=self.data, manager=self.manager)
-            vpc_ngw_ids = vpc_ngw_filter.get_related_ids(resources=resources)
-            ngw_manager = self.manager.get_resource_manager('nat-gateway')
-            for id in vpc_ngw_ids:
-                try:
-                    ngws = ngw_manager.get_resources([id])
-                    ngw_manager.action_registry.get('delete')({}, ngw_manager).process(ngws)
-                    self.log.debug(
-                        "Deleting associated NAT Gateway ID %s",
-                        id
-                    )
-                    # NAT Gateway deletion usually takes some time
-                    # Unfortunately, boto does not provide a 'waiter' for this.
-                    for idx, delay in enumerate(backoff_delays(min_delay, max_delay, jitter=True)):
-                        time.sleep(delay)
-                        ngws = ngw_manager.get_resources([id], cache=False)
-                        if len(ngws) == 0 or ngws[0]['State'] == 'deleted':
-                            self.log.debug("NAT Gateway deletion confirmed: %s", id)
-                            break
-                        if idx == max_attempts - 1:
-                            self.log.debug("Giving up waiting for NAT Gateway to be deleted: %s",
-                                           id)
-                            break
-                        self.log.debug("Waiting for NAT Gateway to be deleted: %s", id)
-
-                except ClientError as e:
-                    self.log.warning(
-                        "Could not delete NAT Gateway ID %s, error: %s",
-                        id, e)
+            self._take_action_on_dependency(resources, 'delete', 'nat-gateway', VpcNatGatewayFilter,
+                                            confirm=True,
+                                            confirmed=lambda x:
+                                                len(x) == 0 or x[0]['State'] == 'deleted')
 
         # Delete Subnets associated with VPC
         if self.data.get('dependencies', {}) == 'all' or \
                 'subnet' in self.data.get('dependencies', {}):
-            vpc_subnet_filter = VpcSubnetFilter(data=self.data, manager=self.manager)
-            vpc_subnet_ids = vpc_subnet_filter.get_related_ids(resources=resources)
-            subnet_manager = self.manager.get_resource_manager('subnet')
-            for id in vpc_subnet_ids:
-                try:
-                    subnets = subnet_manager.get_resources([id])
-                    subnet_manager.action_registry.get('delete')({}, subnet_manager).process(
-                        subnets)
-                    self.log.debug(
-                        "Deleted associated Subnet ID %s",
-                        id
-                    )
-                except ClientError as e:
-                    self.log.warning(
-                        "Could not delete Subnet ID %s, error: %s",
-                        id, e)
+            self._take_action_on_dependency(resources, 'delete', 'subnet', VpcSubnetFilter)
 
         # Delete Internet Gateways associated with VPC
         # Detaching the Internet Gateway requires the VpcId
         # The Internet Gateway could be connected to other VPCs too?
-        # We probably want to only detach from this one, so we won't use the delete action
+        # We probably want to only detach from this one, so we won't force the delete action
         if self.data.get('dependencies', {}) == 'all' or \
                 'internet-gateway' in self.data.get('dependencies', {}):
             for r in resources:
-                vpc_igw_filter = VpcInternetGatewayFilter(data=self.data, manager=self.manager)
-                vpc_igw_ids = vpc_igw_filter.get_related_ids(resources=[r])
-                for id in vpc_igw_ids:
-                    # You must detach the internet gateway from the VPC before you can delete it.
-                    try:
-                        client.detach_internet_gateway(InternetGatewayId=id, VpcId=r['VpcId'])
-                        self.log.debug(
-                            "Detached associated Internet Gateway ID %s",
-                            id
-                        )
-                    except ClientError as e:
-                        self.log.warning(
-                            "Could not detach Internet Gateway ID %s, error: %s",
-                            id, e)
-
-                    try:
-                        client.delete_internet_gateway(InternetGatewayId=id)
-                        self.log.debug(
-                            "Deleted associated Internet Gateway ID %s",
-                            id
-                        )
-                    except ClientError as e:
-                        self.log.warning(
-                            "Could not delete Internet Gateway ID %s, error: %s",
-                            id, e)
+                dep_data = {'vpc_ids': [r['VpcId']]}
+                self._take_action_on_dependency([r], 'detach', 'internet-gateway',
+                                                VpcInternetGatewayFilter, dep_data)
+                self._take_action_on_dependency([r], 'delete', 'internet-gateway',
+                                                VpcInternetGatewayFilter)
 
         # Delete Route Tables associated with VPC
         if self.data.get('dependencies', {}) == 'all' or \
                 'route-table' in self.data.get('dependencies', {}):
-            vpc_rtb_filter = VpcRouteTableFilter(data=self.data, manager=self.manager)
-            vpc_rtb_ids = vpc_rtb_filter.get_related_ids(resources=resources)
-            rtb_manager = self.manager.get_resource_manager('route-table')
-            for id in vpc_rtb_ids:
-                try:
-                    rtbs = rtb_manager.get_resources([id])
-                    rtb_manager.action_registry.get('delete')({}, rtb_manager).process(rtbs)
-                    client.delete_route_table(RouteTableId=id)
-                    self.log.debug(
-                        "Deleted associated Route Table ID %s",
-                        id
-                    )
-                except ClientError as e:
-                    self.log.warning(
-                        "Could not delete Route Table ID %s, error: %s",
-                        id, e)
+            self._take_action_on_dependency(resources, 'delete', 'route-table', VpcRouteTableFilter)
 
         # Delete Security Groups associated with VPC
         if self.data.get('dependencies', {}) == 'all' or \
                 'security-group' in self.data.get('dependencies', {}):
-            vpc_sg_filter = VpcSecurityGroupFilter(data=self.data, manager=self.manager)
-            vpc_security_group_ids = vpc_sg_filter.get_related_ids(resources=resources)
-            sg_manager = self.manager.get_resource_manager('security-group')
-            for id in vpc_security_group_ids:
-                try:
-                    sgs = sg_manager.get_resources([id])
-                    sg_manager.action_registry.get('delete')({}, sg_manager).process(sgs)
-                    self.log.debug(
-                        "Deleted associated Security Group ID %s",
-                        id
-                    )
-                except ClientError as e:
-                    self.log.warning(
-                        "Could not delete Security Group ID %s, error: %s",
-                        id, e)
+            self._take_action_on_dependency(resources, 'delete', 'security-group',
+                                            VpcSecurityGroupFilter)
 
         # Delete the VPCs
         for r in resources:
@@ -248,6 +157,38 @@ class VpcDelete(BaseAction):
                 "Deleted VPC ID %s",
                 r['VpcId']
             )
+
+    def _take_action_on_dependency(self, resources, action, dependency, dependency_filter,
+                                   dep_data=None, confirm=False, confirmed=lambda x: True):
+        max_attempts = 8
+        min_delay = 2
+        max_delay = max(min_delay, 2) ** max_attempts
+        if dep_data is None:
+            dep_data = {}
+
+        vpc_dep_filter = dependency_filter(data=self.data, manager=self.manager)
+        vpc_dep_ids = vpc_dep_filter.get_related_ids(resources=resources)
+        dep_manager = self.manager.get_resource_manager(dependency)
+        for id in vpc_dep_ids:
+            try:
+                deps = dep_manager.get_resources([id])
+                dep_manager.action_registry.get(action)(dep_data, dep_manager).process(deps)
+                self.log.debug("%s action on associated %s ID %s", action, dependency, id)
+
+                if confirm:
+                    for idx, delay in enumerate(backoff_delays(min_delay, max_delay, jitter=True)):
+                        time.sleep(delay)
+                        deps = dep_manager.get_resources([id], cache=False)
+                        if confirmed(deps):
+                            self.log.debug("%s action on %s confirmed: %s", action, dependency, id)
+                            break
+                        if idx == max_attempts - 1:
+                            self.log.debug("Giving up waiting for %s action on %s: %s",
+                                           action, dependency, id)
+                            break
+                        self.log.debug("Waiting for %s action on %s: %s", action, dependency, id)
+            except ClientError as e:
+                self.log.warning("Could not %s %s ID %s, error: %s", action, dependency, id, e)
 
 
 @Vpc.filter_registry.register('flow-logs')
@@ -2069,6 +2010,45 @@ class InternetGateway(query.QueryResourceManager):
         date = None
         config_type = "AWS::EC2::InternetGateway"
         id_prefix = "igw-"
+
+
+@InternetGateway.action_registry.register('detach')
+class DetachInternetGateway(BaseAction):
+    """Detach an Internet Gateway
+
+        :example:
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: detach-internet-gateway
+                    resource: internet-gateway
+                    filters:
+                      - type: value
+                        key: "tag:Name"
+                        value: "c7n-delete-test"
+                    actions:
+                      - type: detach
+                        vpc_ids: "all"
+        """
+    schema = type_schema('detach',
+                         vpc_ids={
+                             'oneOf': [
+                                 {'type': 'string', 'enum': ['all']},
+                                 {'type': 'array', 'items': {'type': 'string'}}
+                             ]
+                         },
+                         required=['type', 'vpc_ids'])
+    permissions = ('ec2:DetachInternetGateway')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            for a in r['Attachments']:
+                if self.data.get('vpc_ids') == 'all' or a['VpcId'] in self.data.get('vpc_ids', []):
+                    client.detach_internet_gateway(
+                        InternetGatewayId=r['InternetGatewayId'],
+                        VpcId=a['VpcId'])
 
 
 @InternetGateway.action_registry.register('delete')
