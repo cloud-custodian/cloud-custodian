@@ -3,7 +3,7 @@
 Generic Actions
 ================
 
-This action can be applied to any gcp resource type.
+This action can be applied to any GCP resource type.
 
 Notify
 ------
