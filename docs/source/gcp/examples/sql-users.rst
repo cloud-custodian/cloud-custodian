@@ -6,7 +6,7 @@ One of security best practices is to control list of your users with extended pe
 .. code-block:: yaml
 
     policies:
-    - name: leonid-sql-user
+    - name: sql-user
       description: |
         check basic work of Cloud SQL filter on users: lists instance superusers which are not included into a standard user set
       resource: gcp.sql-user
