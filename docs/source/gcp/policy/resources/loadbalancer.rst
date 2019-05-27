@@ -375,27 +375,3 @@ Load Balancer. Backend Services
               transport:
                 type: pubsub
                 topic: projects/cloud-custodian/topics/loadbalancer
-
-Load Balancer. Region Backend Services
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`GCP resource: Region Backend Services <https://cloud.google.com/compute/docs/reference/rest/v1/regionBackendServices>`_
-
-The 'region' param in the query is required.
-
-.. code-block:: yaml
-
-    policies:
-        - name: load-balancers-region-backend-services
-          description: |
-            Load Balancer. List of Region Backend Services
-          resource: gcp.loadbalancer-region-backend-service
-          query:
-            - region: us-central1
-          actions:
-            - type: notify
-              to:
-                - email@email
-              format: json
-              transport:
-                type: pubsub
-                topic: projects/cloud-custodian/topics/loadbalancer
