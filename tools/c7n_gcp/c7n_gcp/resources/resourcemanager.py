@@ -26,11 +26,6 @@ class Organization(QueryResourceManager):
         enum_spec = ('search', 'organizations[]', {'body': {}})
         id = "name"
 
-        @staticmethod
-        def get(client, resource_info):
-            return client.execute_query(
-                'get', {'name': resource_info['name']})
-
 
 @resources.register('folder')
 class Folder(QueryResourceManager):

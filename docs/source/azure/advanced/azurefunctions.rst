@@ -24,7 +24,7 @@ When deploying an Azure function the following ARM resources are required and cr
 
 - Storage (shared across functions)
 - Application Insights (shared across functions)
-- Application Service Plan (shared across functions)
+- Application Service Plan (shared across functions with optional default auto scale rule)
 - Application Service (per function)
 
 Functions can be deployed in either a dedicated Application Service Plan (Basic, Standard or Premium) or in a Consumption plan.
@@ -36,24 +36,34 @@ A dedicated plan can service multiple Function Applications.  If you provide the
 use the default name then only new Function Applications will be created during deployment, all using the same
 shared plan resources.
 
+You can enable default auto scaling option for your dedicated App Service Plan. Default option allows you
+to specify minimum and maximum number of underlying VMs. Scaling is performed based on the average RAM usage.
+App Service Plan will be scaled up if average RAM usage was more than 80% in the past 10 minutes.
+This option is disabled by default.
+
 Execution in Azure functions comes with a default set of configurations for the provisioned
 resources. To override these settings you must set 'provision-options' with one of the following
 keys:
 
-- servicePlan
-  - name (default: cloud-custodian)
-  - location (default: East US)
-  - resourceGroupName (default: cloud-custodian)
-  - skuTier (default: Dynamic) # consumption
-  - skuName (default: Y1)
-- storageAccount
-  - name (default: custodian + sha256(resourceGroupName+subscription_id)[:8])
-  - location (default: servicePlan location)
-  - resourceGroupName (default: servicePlan resource group)
-- appInsights
-  - name (default: servicePlan resource group)
-  - location (default: servicePlan location)
-  - resourceGroupName (default: servicePlan name)
+* servicePlan
+    - name (default: cloud-custodian)
+    - location (default: East US)
+    - resourceGroupName (default: cloud-custodian)
+    - skuTier (default: Dynamic) # consumption
+    - skuName (default: Y1)
+    - autoScale (optional):
+         + enabled (default: False)
+         + minCapacity (default: 1)
+         + maxCapacity (default: 1)
+         + defaultCapacity (default: 1)
+* storageAccount
+    - name (default: custodian + sha256(resourceGroupName+subscription_id)[:8])
+    - location (default: servicePlan location)
+    - resourceGroupName (default: servicePlan resource group)
+* appInsights
+    - name (default: servicePlan resource group)
+    - location (default: servicePlan location)
+    - resourceGroupName (default: servicePlan name)
 
 The location allows you to choose the region to deploy the resource group and resources that will be
 provisioned. Application Insights has six available locations and thus can not always be in the same
@@ -71,7 +81,10 @@ If you have existing infrastructure, you can specify resource ids for the follow
 
 If you provide resource ids, Cloud Custodian verifies that resource exists before function app provisioning. It returns an error if resource is missing.
 
-An example on how to set the servicePlanName and accept defaults for the other values:
+An example on how to set the servicePlanName, accept defaults for the other values and enable default scaling:
+
+This policy deploys dedicated Standard S2 App Service Plan with enabled auto scale rule for 1-3 VMs.
+Default scaling rule scales app service plan if total RAM consumption is more than 80%.
 
 .. code-block:: yaml
 
@@ -83,6 +96,13 @@ An example on how to set the servicePlanName and accept defaults for the other v
             provision-options:
               servicePlan: 
                 name: functionshost
+                skuTier: Standard
+                skuName: S2
+                autoScale:
+                  enabled: true
+                  minCapacity: 1
+                  maxCapacity: 3
+                  defaultCapacity: 1
          resource: azure.vm
          filters:
           - type: instance-view

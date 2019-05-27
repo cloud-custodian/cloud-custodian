@@ -19,7 +19,7 @@ import re
 
 import msrest.polling
 from azure_serializer import AzureSerializer
-from c7n_azure import constants, actions
+from c7n_azure import utils, constants
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
 from mock import patch
@@ -144,8 +144,8 @@ class AzureVCRBaseTest(VCRTestCase):
         r1_path = AzureVCRBaseTest._replace_subscription_id(r1.path)
         r2_path = AzureVCRBaseTest._replace_subscription_id(r2.path)
 
-        r1_path = r1_path.replace('//', '/')
-        r2_path = r2_path.replace('//', '/')
+        r1_path = r1_path.replace('//', '/').lower()
+        r2_path = r2_path.replace('//', '/').lower()
 
         return r1_path == r2_path
 
@@ -235,17 +235,18 @@ class AzureVCRBaseTest(VCRTestCase):
 
     @staticmethod
     def _replace_subscription_id(s):
-        if "subscriptions" in s:
-            return re.sub(
-                r"(?P<prefix>(/|%2F)subscriptions(/|%2F))"
-                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}",
-                r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
-        return s
+        prefixes = ['(/|%2F)subscriptions(/|%2F)',
+                    '"subscription":\\s*"']
+        regex = r"(?P<prefix>(%s))" \
+                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
+                % '|'.join(['(%s)' % p for p in prefixes])
+
+        return re.sub(regex, r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
 
     @staticmethod
     def _replace_tenant_id(s):
         prefixes = ['(/|%2F)graph.windows.net(/|%2F)',
-                    '"tenantId":\\s*"']
+                    '"(t|T)enantId":\\s*"']
         regex = r"(?P<prefix>(%s))" \
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
                 % '|'.join(['(%s)' % p for p in prefixes])
@@ -255,7 +256,7 @@ class AzureVCRBaseTest(VCRTestCase):
     @staticmethod
     def _replace_storage_keys(s):
         # All usages of storage keys have the word "key" somewhere
-        if "key" in s:
+        if "key" in s.lower():
             return re.sub(
                 r"(?P<prefix>=|\"|:)(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==)",
                 r"\g<prefix>" + DEFAULT_STORAGE_KEY, s)
@@ -280,9 +281,13 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         ThreadHelper.disable_multi_threading = True
 
         # We always patch the date so URLs that involve dates match up
-        self._utc_patch = patch.object(actions, 'utcnow', BaseTest.get_test_date)
+        self._utc_patch = patch.object(utils, 'utcnow', self.get_test_date)
         self._utc_patch.start()
         self.addCleanup(self._utc_patch.stop)
+
+        self._now_patch = patch.object(utils, 'now', self.get_test_date)
+        self._now_patch.start()
+        self.addCleanup(self._now_patch.stop)
 
         if not self._requires_polling:
             # Patch Poller with constructor that always disables polling
@@ -305,7 +310,7 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                 self._tenant_patch.start()
                 self.addCleanup(self._tenant_patch.stop)
 
-    def get_test_date(self):
+    def get_test_date(self, tz=None):
         header_date = self.cassette.responses[0]['headers'].get('date') \
             if self.cassette.responses else None
 
