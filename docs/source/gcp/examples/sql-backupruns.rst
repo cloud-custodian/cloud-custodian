@@ -6,7 +6,7 @@ The following example demonstates ability of Cloud Custodian to track backup run
 .. code-block:: yaml
 
     policies:
-    - name: leonid-sql-backup-run
+    - name: sql-backup-run
       description: |
         check basic work of Cloud SQL filter on backup runs: lists unsucessful backups older than 5 days
       resource: gcp.sql-backup-run
