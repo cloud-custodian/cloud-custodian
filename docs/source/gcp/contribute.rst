@@ -90,6 +90,9 @@ Testing
 
 Tests for c7n_gcp run automatically with other Custodian tests. See :ref:`Testing for Developers <developer-tests>` for information on how to run Tox.
 
+If you'd like to run tests at the command line or in your IDE then reference `tox.ini` to see the required
+environment variables and command lines for running `pytest`.
+
 Running tests
 ---------------
 
