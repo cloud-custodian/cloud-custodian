@@ -83,7 +83,89 @@ load all registered resources. Import the resource in
 
 .. code-block:: python
 
-    import c7n_gcp.resources.loadbalancer
+    import c7n_gcp.resources.<name of a file with created resources>
+
+Each resource has to have test cases. There are implemented test cases for resources list methods and get methods.
+
+Test cases for resources list methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To create a test case for `list` method is used following scenario.
+
+- A factory is created based on recording real data from a GCP project resource.
+
+    .. code-block:: python
+
+        factory = self.record_flight_data(<name of a file>, project_id=project_id)
+
+The `name of a file` means the folder name that has JSON file(s) with expected response(s) on the request from a testing policy.
+
+- The factory is used for creating the testing policy.
+
+    .. code-block:: python
+
+        policy = self.load_policy(
+            {'name': '<policy name>',
+             'resource': 'gcp.<name of the resource>'},
+            session_factory=factory)
+
+The `policy name` means the name of the policy. It can be used any name of the policy.
+The `name of the resource` is the name of testing resource. It's the resource_name from @resources.register('<resource_name>').
+
+- The result of the running policy is a list of resources. Below code can be used for the policy running:
+
+    .. code-block:: python
+
+        resources = policy.run()
+
+- The next step is current results verification with expecting results.
+
+- Last step is replacing `record_flight_data` in creating the factory by `replay_flight_data`. After that step recorded data in JSON files will be used instead of real data. Name of project in GOOGLE_CLOUD_PROJECT may be replaced on any one.
+
+
+Test cases for resources get methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To create a test case for `get` method is used following scenario.
+
+- A factory was created based on recording real data from a GCP project resource.
+
+    .. code-block:: python
+
+        factory = self.record_flight_data(<name of a file>, project_id=project_id)
+
+The `name of a file` means the folder name that has JSON file(s) with expected response(s) on the request from a testing policy.
+
+- The factory is used for creating the testing policy.
+
+    .. code-block:: python
+
+        policy = self.load_policy(
+            {'name': '<policy name>',
+             'resource': 'gcp.<name of the resource>',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': []
+             }},
+            session_factory=factory)
+
+The `policy name` means the name of the policy. It can be used any name of the policy.
+The `name of the resource` is the name of testing resource. It's the resource_name from @resources.register('<resource_name>').
+The policy should be tested in gcp-audit mode.
+
+- The next step is invoking `get` method of GCP resource that is used for development. The result of invoking is logged in Stackdriver. The result should be copied from Stackdriver log and be put into a JSON file in tools/c7n_gcp/test/data/events folder.
+
+- The next step is creating an event based on JSON file that was created in the previous step. The event is run within policy's execution mode. The sample is below.
+
+    .. code-block:: python
+
+        exec_mode = policy.get_execution_mode()
+        event = event_data('<name of JSON file>')
+        instances = exec_mode.run(event, None)
+
+- Further current results should be verified with expecting results.
+
+- Last step is replacing `record_flight_data` in creating the factory by `replay_flight_data`. After that step recorded data in JSON files will be used instead of real data. Name of project in GOOGLE_CLOUD_PROJECT may be replaced on any one.
 
 Testing
 ========
@@ -103,4 +185,3 @@ You can use `tox` to run all tests or instead you can use `pytest` and run only 
   export GOOGLE_CLOUD_PROJECT=cloud-custodian
   export GOOGLE_APPLICATION_CREDENTIALS=data/credentials.json
   pytest tools/c7n_gcp/tests
-
