@@ -22,6 +22,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
 from c7n.utils import annotation
+from c7n.filters.core import cidr_overlap_validate
 from .common import instance, event_data, Bag
 
 
@@ -726,6 +727,85 @@ class TestFilterRegistry(unittest.TestCase):
     def test_filter_registry(self):
         reg = base_filters.FilterRegistry("test.filters")
         self.assertRaises(PolicyValidationError, reg.factory, {"type": ""})
+
+
+class TestCidrOverlap(unittest.TestCase):
+    sg = {'Cidr': '10.0.0.0/24'}
+
+    def test_cidr_overlap_single(self):
+        f = filters.factory(
+            {
+                'type': 'value',
+                'key': 'Cidr',
+                'value': '10.0.0.0/8',
+                'op': 'cidr_overlap',
+                'value_type': 'cidr'
+            }
+        )
+        self.assertTrue(f(TestCidrOverlap.sg))
+
+    def test_cidr_no_overlap_single(self):
+        f = filters.factory(
+            {
+                'type': 'value',
+                'key': 'Cidr',
+                'value': '20.0.0.0/8',
+                'op': 'cidr_overlap',
+                'value_type': 'cidr'
+            }
+        )
+        self.assertFalse(f(TestCidrOverlap.sg))
+
+    def test_cidr_overlap_list(self):
+        f = filters.factory(
+            {
+                'type': 'value',
+                'key': 'Cidr',
+                'value': ['10.0.0.0/8', '20.0.0.8/8'],
+                'op': 'cidr_overlap',
+                'value_type': 'cidr'
+            }
+        )
+        self.assertTrue(f(TestCidrOverlap.sg))
+
+
+class TestCidrOverlapOpValidation(unittest.TestCase):
+    def test_cidr_overlap_validate_success_single(self):
+        data = {
+            'key': None,
+            'value': '10.0.0.0/8',
+            'op': 'cidr_overlap',
+            'value_type': 'cidr'
+        }
+        self.assertFalse(cidr_overlap_validate(data))
+
+    def test_cidr_overlap_validate_success_list(self):
+        data = {
+            'key': None,
+            'value': ['10.0.0.0/8', '20.0.0.0/8'],
+            'op': 'cidr_overlap',
+            'value_type': 'cidr'
+        }
+        self.assertFalse(cidr_overlap_validate(data))
+
+    def test_cidr_overlap_validate_fail_invalid_cidrs(self):
+        data = {
+            'key': None,
+            'value': ['foo', '20.0.0.0/8'],
+            'op': 'cidr_overlap',
+            'value_type': 'cidr',
+        }
+        with self.assertRaises(PolicyValidationError):
+            cidr_overlap_validate(data)
+
+        data = {
+            'key': None,
+            'value': 'bar',
+            'op': 'cidr_overlap',
+            'value_type': 'cidr',
+        }
+        with self.assertRaises(PolicyValidationError):
+            cidr_overlap_validate(data)
 
 
 if __name__ == "__main__":

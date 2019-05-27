@@ -23,6 +23,7 @@ from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
 import c7n.filters.vpc as net_filters
+from c7n.filters.core import cidr_overlap_validate
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
@@ -970,6 +971,28 @@ class SGPermission(Filter):
             - "::/0"
           op: in
 
+    Additionally, it is possible to check if a Cidr overlaps with another one.
+
+    .. code-block:: yaml
+
+      - type: egress
+        Cidr:
+          value: 10.0.0.0/8
+          op: cidr_overlap
+          value_type: cidr
+
+    or a list of Cidr's:
+
+
+    .. code-block:: yaml
+
+      - type: egress
+        Cidr:
+          value:
+            - 10.0.0.0/8
+            - 20.0.0.0/8
+          op: cidr_overlap
+          value_type: cidr
 
     """
 
@@ -986,6 +1009,10 @@ class SGPermission(Filter):
         if delta:
             raise PolicyValidationError("Unknown keys %s on %s" % (
                 ", ".join(delta), self.manager.data))
+        if 'Cidr' in self.data.keys():
+            if self.data['Cidr'].get('op') == 'cidr_overlap':
+                cidr_overlap_validate(self.data['Cidr'])
+
         return self
 
     def process(self, resources, event=None):
