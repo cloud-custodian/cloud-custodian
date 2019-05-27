@@ -23,31 +23,38 @@ Create New GCP Resource
 
 Most resources extend the QueryResourceManager class. Each class definition will use the @resources.register('<resource_name>') decorator to register that class as a Custodian resource substituting <resource_name> with the new resource name. The name specified in the decorator is how the resource will be referenced within policies.
 
-Each resource also contains an internal class called resource_type, which contains metadata about the resource definition, and has the following attributes:
+Each resource also contains an internal class called `resource_type`, which contains metadata about the resource definition, and has the following attributes:
 
 
 - ``service`` is required field, part of the request to GCP resource,
     The name of GCP service.
 - ``component`` is required field, part of the request to GCP resource,
     The name of GCP resource,
-- ``version`` is required field,
-    It is the version of used resource API, part of the request to GCP resource,
-- ``enum_spec`` is a tuple of (enum_operation, list_operation, extra_args), required field,
-    Place the name of the GCP resource method as the enum_operation.
-    Next, put path to searching array on the list_operation place.
-    Extra_args can be used for set up additional params to a request to GCP.
+- ``version`` is required field, part of the request to GCP resource,
+    It is the `version` of used resource API,
+- ``enum_spec`` is a required field, a tuple of (`enum_operation`, `list_operation`, `extra_args`),
+    Place the name of the GCP resource method as the `enum_operation`.
+    Next, put path to searching array on the `list_operation` place.
+    The `extra_args` param can be used for set up additional params to a request to GCP.
 - ``id`` is required field,
-    It uses the field as id of the resource,
+    It's a field name of the response field that have to be used as resource identifier. The `id` value is used for filtering.
 - ``scope`` is optional field, default is None,
-    The scope of the resource,
-- ``parent_spec`` is an optional field for build additional requests, default is None,
-    It allows to receive additional information from a parent resource (using `resource` field)
-    based on the request with params (using `child_enum_params` tuples) and map result object
-    to the resource (using `parent_get_params` tuples).
+    The scope of the Custodian resource. There are available 3 options: `project`, `zone` or `None`. If the `scope` has a value `project` the GOOGLE_CLOUD_PROJECT variable will be used for building request to GCP resource. The `zone` variable can be ignored for Cloud Custodian's GCP plugin. This scope is used by other cloud providers. If the scope is `None` the request to GCP is built ignoring the GOOGLE_CLOUD_PROJECT variable.
+- ``parent_spec`` is an optional field that allows to build additional requests to parent resources, default is None.
+    The field is used when the request to GCP resource should be created with extra parameters that can be loaded from parent resources.
+    The resource should extend ChildResourceManager instead of QueryResourceManager and use ChildTypeInfo instead of TypeInfo to use the field.
+    The `parent_spec` has following fields: `resource`, `child_enum_params`, `parent_get_params`.
 
-Get methods is created based on `get` methods of GCP resources. As a rule the `get` methods
-have required fields like project name, ID of loading resource etc. The available fields names
-with appropriate information are located in Stackdriver logs.
+    - The field `resource` has value of the resource_name from @resources.register('<resource_name>') that is used for loading parent resource.
+
+    - The field `child_enum_params` has tuples of mappings for building `list` requests to parent resources. It works by the next scenario. First of all it loads a list of instances from parent resource. Further it loads instances for original resources using field values from the loaded parent resources. It uses mappings for fields from `child_enum_params`. The first field in a tuple is a field from parent resource, the second one is the mapped original resource field name.
+
+    - The field `parent_get_params` has tuples of mappings for building `get` requests to parent resources. The first field in a tuple is a field from original resource, the second one is the mapped parent resource field name. It's used for invoking `get` requests of parent resources based on the received response in original resource.
+
+Most resources have get methods that are created based on the corresponding `get` method of the actual GCP resource.
+As a rule the Custodian `get` method has `resource_info` param. The param has fields that are located in Stackdriver logs in `protoPayload.resourceName` and `resource` fields. Examples of the Stackdriver logs are available in tools/c7n_gcp/tests/data/events folder.
+
+There is an example of the resource below.
 
 .. code-block:: python
 
@@ -77,8 +84,9 @@ with appropriate information are located in Stackdriver logs.
 Load New GCP Resource
 ---------------------
 
-Once the required dependecies are installed and created the new GCP Resource, custodian will
-load all registered resources. Import the resource in
+If you created a new module for a GCP service (i.e. this was the first resource implemented for this service in Custodian),
+then import the new service module in entry.py:
+
 ``entry.py``.
 
 .. code-block:: python
