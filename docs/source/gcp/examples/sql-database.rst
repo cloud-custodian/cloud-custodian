@@ -1,12 +1,12 @@
 Cloud SQL - Check Database Names Against a Naming Convention
 ============================================================
 
-The following example policies will allow you to control your Cloud SQL naming convention and check your instances for databases which names don't match that. A naming convention can be set up usina s standard regexp (regular expressions) syntax.
+The following example policies will allow you to control your Cloud SQL naming convention and check your instances for databases which names don't match that. A naming convention can be set up using standard regexp (regular expressions) syntax.
 
 .. code-block:: yaml
 
     policies:
-    - name: leonid-sql-database
+    - name: sql-database
       description: |
         check basic work of Cloud SQL filter on databases: return databases which names doesn't follow a certain naming convention
       resource: gcp.sql-database
