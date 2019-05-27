@@ -23,9 +23,10 @@ Create New GCP Resource
 
 Create your new GCP Resource.
 
-The resource extends QueryResourceManager. It have @resources.register with name of the resource.
-The name will be used in policies. Also the resource has resource_type class with the following
-fields:
+Most resources extend the QueryResourceManager class. Each class definition will use the @resources.register('<resource_name>') decorator to register that class as a Custodian resource substituting <resource_name> with the new resource name. The name specified in the decorator is how the resource will be referenced within policies.
+
+Each resource also contains an internal class called resource_type, which contains metadata about the resource definition, and has the following attributes:
+
 
 - ``service`` is required field, part of the request to GCP resource,
     The name of GCP service.
