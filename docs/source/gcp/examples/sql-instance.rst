@@ -6,7 +6,7 @@ Execution of the following policy returns instances which are not in an approved
 .. code-block:: yaml
 
     policies:
-    - name: leonid-sql-instance
+    - name: sql-instance
       description: |
         check basic work of Cloud SQL filter on instances: returns instances which are not in an approved set of regions AND not in runnable state
       resource: gcp.sql-instance
