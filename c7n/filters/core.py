@@ -446,12 +446,12 @@ class ValueFilter(Filter):
         return self
 
     def _validate_value_regex(self):
-        """ Specific validation for `value_regex` type
+        """Specific validation for `value_regex` type
 
-        The `value_regex` type works a little differently.
-        In particular it doesn't support OPERATORS that perform operations
-        on a list of values, specifically 'intersect', 'contains', 'difference',
-        'in' and 'not-in'
+        The `value_regex` type works a little differently.  In
+        particular it doesn't support OPERATORS that perform
+        operations on a list of values, specifically 'intersect',
+        'contains', 'difference', 'in' and 'not-in'
         """
         # Sanity check that we can compile
         try:
@@ -463,12 +463,6 @@ class ValueFilter(Filter):
         except re.error as e:
             raise PolicyValidationError(
                 "Invalid value_regex: %s %s" % (e, self.data))
-
-        if 'op' in self.data:
-            if self.data['op'] in {'intersect', 'in', 'not-in', 'ni', 'contains', 'difference'}:
-                raise PolicyValidationError(
-                    "Operator is incompatible with value_regex: %s" % self.data)
-
         return self
 
     def __call__(self, i):

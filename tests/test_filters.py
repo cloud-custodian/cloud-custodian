@@ -484,17 +484,6 @@ class TestValueTypes(BaseFilterTest):
         }
         filters.factory(fdata, {}).validate
 
-        # Invalid `op`
-        fdata = {
-            "type": "value",
-            "key": "tag:metadata",
-            "op": "contains",
-            "value_regex": r"pet=(?:cat|dog);number=([0-9]{1,4})",
-            "value_type": "integer",
-            "value": [12, 13, 14, 15],
-        }
-        self.assertRaises(PolicyValidationError, filters.factory(fdata, {}).validate)
-
     def test_value_regex_match(self):
         fdata = {
             "type": "value",
