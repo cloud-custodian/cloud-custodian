@@ -162,6 +162,7 @@ There are several ways to get a list of possible keys for each resource.
   - ``resource_count`` - compare against the number of matched resources
   - ``size`` - the length of an element
   - ``swap`` - swap the value and the evaluated key
+  - ``date`` - parse the filter's value as a date.
 
 
   Examples:
@@ -187,6 +188,13 @@ There are several ways to get a list of possible keys for each resource.
        op: greater-than
        value_type: integer
        value: 0
+
+     # Apply only to rds instances created after the given date
+     - type: value
+       key: InstanceCreateTime
+       op: greater-than
+       value_type: date
+       value: "2019/05/01"
 
      # Find instances launched within the last 31 days
      - type: value
@@ -264,6 +272,9 @@ Age Filter
   Automatically filter resources older than a given date in Days (see `Dateutil Parser <http://dateutil.readthedocs.org/en/latest/parser.html#dateutil.parser.parse>`_)
   These are implemented on a per resource basis. See the :ref:`Resource-Specific Filters and Actions reference <policy>` for
   resource-specific filters.
+
+  Generally you should use a value filter instead of an age filter, as it supports doing age/expiration comparisons on
+  any date attribute.
 
 
 Event Filter

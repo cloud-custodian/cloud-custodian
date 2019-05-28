@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import calendar
 from datetime import datetime, timedelta
 from dateutil import tz
+from dateutil.parser import parse as parse_date
 import unittest
 
 from c7n.exceptions import PolicyValidationError
@@ -352,6 +353,20 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(now.isoformat()), True)
         self.assertFilter(fdata, i(calendar.timegm(now.timetuple())), True)
         self.assertFilter(fdata, i(str(calendar.timegm(now.timetuple()))), True)
+
+    def test_date(self):
+        def i(d):
+            return instance(LaunchTime=d)
+
+        fdata = {
+            'type': 'value',
+            'key': 'LaunchTime',
+            'op': 'less-than',
+            'value_type': 'date',
+            'value': '2019/05/01'}
+
+        self.assertFilter(fdata, i(parse_date('2019/04/01')), True)
+        self.assertFilter(fdata, i(datetime.now().isoformat()), False)
 
     def test_expiration(self):
 
