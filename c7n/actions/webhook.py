@@ -58,6 +58,9 @@ class Webhook(EventAction):
         }
     )
 
+    def get_permissions(self):
+        return ()
+
     def process(self, resources, event=None):
         self.url = self.data['url']
         self.body = self.data.get('body')
