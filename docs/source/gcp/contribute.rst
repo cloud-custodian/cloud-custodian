@@ -48,14 +48,50 @@ Each resource also contains an internal class called `resource_type`, which cont
     The resource should extend ChildResourceManager instead of QueryResourceManager and use ChildTypeInfo instead of TypeInfo to use the field.
     The `parent_spec` has following fields: `resource`, `child_enum_params`, `parent_get_params`.
 
-    - The field `resource` has value of the resource_name from @resources.register('<resource_name>') that is used for loading parent resource.
+    - The field `resource` has value of the `resource_name` from @resources.register('<resource_name>') that is used for the target parent resource.
 
-    - The field `child_enum_params` has tuples of mappings for building `list` requests to parent resources. It works by the next scenario. First of all it loads a list of instances from parent resource. Further it loads instances for original resources using field values from the loaded parent resources. It uses mappings for fields from `child_enum_params`. The first field in a tuple is a field from parent resource, the second one is the mapped original resource field name.
+    - The field `child_enum_params` has list of mappings tuples for building `list` requests to parent resources. It works by the next scenario. First of all it loads a list of instances from parent resource. Further it loads instances for original resources using GCP resource field values from the loaded parent resources. It uses mappings for GCP resource fields from `child_enum_params`. The first field in a tuple is a field from parent resource, the second one is the mapped original resource field name.
 
-    - The field `parent_get_params` has tuples of mappings for building `get` requests to parent resources. The first field in a tuple is a field from original resource, the second one is the mapped parent resource field name. It's used for invoking `get` requests of parent resources based on the received response in original resource.
+    - The field `parent_get_params` has list of mappings tuples for building `get` requests to parent resources. The first field in a tuple is a field from original GCP resource, the second one is the mapped parent GCP resource field name. It's used for invoking `get` requests of parent resources based on the received response in original resource.
+
+An example that uses `parent_spec` is available below.
+
+.. code-block:: python
+
+    # the class extends ChildResourceManager
+    @resources.register('sql-database')
+    class SqlDatabase(ChildResourceManager):
+
+        # the class extends ChildTypeInfo
+        class resource_type(ChildTypeInfo):
+            service = 'sqladmin'     # the name of the GCP service
+            version = 'v1beta4'      # the version of the GCP service
+            component = 'databases'  # the component of the GCP service
+                # the `list` method in the resource. https://cloud.google.com/sql/docs/postgres/admin-api/v1beta4/databases/list
+                # It requires 2 request params: `project` and `instance`. `Project` is set from the environment variable GOOGLE_CLOUD_PROJECT
+                # `Instance` is set from the parent GCP resource.
+            enum_spec = ('list', 'items[]', None)
+            id = 'name'
+            parent_spec = {
+                # The name of Custodian parent resource.
+                'resource': 'sql-instance',
+                'child_enum_params': [
+                    # Each `name` in response from GCP that are loaded
+                    #   using `sql-instance` resource will be used as `instance` for `sql-database` resource
+                    ('name', 'instance')
+                ],
+                'parent_get_params': [
+                    # The `project` value of `sql-database` resource is used as
+                    # `project` for `sql-instance` resource for a `get` request
+                    ('project', 'project'),
+                    # The `instance` value of `sql-database` resource is used as
+                    # `name` for `sql-instance` resource for a `get` request
+                    ('instance', 'name')
+                ]
+            }
 
 Most resources have get methods that are created based on the corresponding `get` method of the actual GCP resource.
-As a rule the Custodian `get` method has `resource_info` param. The param has fields that are located in Stackdriver logs in `protoPayload.resourceName` and `resource` fields. Examples of the Stackdriver logs are available in tools/c7n_gcp/tests/data/events folder.
+As a rule the Custodian `get` method has `resource_info` param. The param has fields that can be found in Stackdriver logs  in `protoPayload.resourceName` and `resource` fields. Examples of the Stackdriver logs are available in tools/c7n_gcp/tests/data/events folder.
 
 There is an example of the resource below.
 
@@ -98,8 +134,11 @@ then import the new service module in entry.py:
 
 Each resource has to have test cases. There are implemented test cases for resources list methods and get methods.
 
+Testing
+=========
+
 Test cases for resources list methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 To create a test case for `list` method is used following scenario.
 
@@ -121,7 +160,7 @@ The `name of a file` means the folder name that has JSON file(s) with expected r
             session_factory=factory)
 
 The `policy name` means the name of the policy. It can be used any name of the policy.
-The `name of the resource` is the name of testing resource. It's the resource_name from @resources.register('<resource_name>').
+The `name of the resource` is the name of testing resource. It's the `resource_name` from @resources.register('<resource_name>').
 
 - The result of the running policy is a list of resources. Below code can be used for the policy running:
 
@@ -135,7 +174,7 @@ The `name of the resource` is the name of testing resource. It's the resource_na
 
 
 Test cases for resources get methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 To create a test case for `get` method is used following scenario.
 
@@ -161,7 +200,7 @@ The `name of a file` means the folder name that has JSON file(s) with expected r
             session_factory=factory)
 
 The `policy name` means the name of the policy. It can be used any name of the policy.
-The `name of the resource` is the name of testing resource. It's the resource_name from @resources.register('<resource_name>').
+The `name of the resource` is the name of testing resource. It's the `resource_name` from @resources.register('<resource_name>').
 The policy should be tested in gcp-audit mode.
 
 - The next step is invoking `get` method of GCP resource that is used for development. The result of invoking is logged in Stackdriver. The result should be copied from Stackdriver log and be put into a JSON file in tools/c7n_gcp/test/data/events folder.
@@ -178,16 +217,13 @@ The policy should be tested in gcp-audit mode.
 
 - Last step is replacing `record_flight_data` in creating the factory by `replay_flight_data`. After that step recorded data in JSON files will be used instead of real data. Name of project in GOOGLE_CLOUD_PROJECT may be replaced on any one.
 
-Testing
-========
+Running tests
+--------------
 
 Tests for c7n_gcp run automatically with other Custodian tests. See :ref:`Testing for Developers <developer-tests>` for information on how to run Tox.
 
 If you'd like to run tests at the command line or in your IDE then reference `tox.ini` to see the required
 environment variables and command lines for running `pytest`.
-
-Running tests
----------------
 
 You can use `tox` to run all tests or instead you can use `pytest` and run only GCP tests (or only specific set of tests). Running recorded tests still requires some authentication, it is possible to use fake data for credentials to GCP and name of Google Cloud project.
 
