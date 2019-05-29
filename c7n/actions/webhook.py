@@ -15,8 +15,8 @@
 import json
 
 import jmespath
-from six.moves.urllib import request, parse
-from six.moves.urllib.error import URLError
+import requests
+from six.moves.urllib import parse
 
 from c7n import utils
 from .core import EventAction
@@ -37,7 +37,8 @@ class Webhook(EventAction):
                - type: webhook
                  url: http://foo.com
                  parameters:
-                    - resource_name: name
+                    - resource_name: resource.name
+                    - policy_name: policy.name
     """
 
     schema = utils.type_schema(
@@ -47,8 +48,16 @@ class Webhook(EventAction):
             'url': {'type': 'string'},
             'body': {'type': 'string'},
             'batch': {'type': 'boolean'},
-            'method': {'type': 'string'},
+            'batch-size': {'type': 'number'},
+            'method': {'type': 'string', 'enum': ['PUT', 'POST', 'GET', 'PATCH', 'DELETE']},
             'parameters': {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "string",
+                    "description": "query string values"
+                }
+            },
+            'headers': {
                 "type": "object",
                 "additionalProperties": {
                     "type": "string",
@@ -58,43 +67,71 @@ class Webhook(EventAction):
         }
     )
 
-    def get_permissions(self):
-        return ()
-
-    def process(self, resources, event=None):
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(Webhook, self).__init__(data, manager, log_dir)
         self.url = self.data['url']
         self.body = self.data.get('body')
         self.batch = self.data.get('batch', False)
+        self.batch_size = self.data.get('batch-size', 500)
+        self.params = self.data.get('parameters', {})
+        self.headers = self.data.get('headers', {})
+        self.method = self.data.get('method', 'POST' if self.body else 'GET')
+        self.lookup_data = {
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+            'execution_id': self.manager.ctx.execution_id,
+            'execution_start': self.manager.ctx.start_time,
+            'policy': self.manager.data
+        }
 
+    def process(self, resources, event=None):
         if self.batch:
-            self._process_call(resources)
+            for chunk in utils.chunks(resources, self.batch_size):
+                resource_data = self.lookup_data
+                resource_data['resources'] = chunk
+                self._process_call(resource_data)
         else:
             for r in resources:
-                self._process_call(r)
+                resource_data = self.lookup_data
+                resource_data['resource'] = r
+                self._process_call(resource_data)
 
     def _process_call(self, resource):
         prepared_url = self._build_url(resource)
         prepared_body = self._build_body(resource)
-        method = self.data.get('method', 'POST' if prepared_body else 'GET')
-
-        req = request.Request(prepared_url, data=prepared_body, method=method)
+        prepared_headers = self._build_headers(resource)
 
         if prepared_body:
-            req.add_header('Content-Type', 'application/json')
+            prepared_headers['Content-Type'] = 'application/json'
 
         try:
-            response = request.urlopen(req)
-            self.log.info("%s got response %s with URL %s" % (method, response.code, prepared_url))
-        except URLError as e:
-            self.log.error("Error calling %s. Reason: %s" % (prepared_url, e.reason))
+            res = requests.Request(method=self.method,
+                                   url=prepared_url,
+                                   headers=prepared_headers,
+                                   data=prepared_body)
+            res.raise_for_status()
+            self.log.info("%s got response %s with URL %s" %
+                          (self.method, res.status_code, prepared_url))
+        except requests.exceptions.HTTPError as e:
+            self.log.error("Error calling %s. Code: %s" % (prepared_url, e.response.status_code))
+        except requests.exceptions.ConnectionError:
+            self.log.error("Failed to connect to %s." % prepared_url)
+
+    def _build_headers(self, resource):
+        return {k: jmespath.search(v, resource) for k, v in self.headers.items()}
 
     def _build_url(self, resource):
-        params = self.data.get('parameters', {})
+        """
+        Compose URL with query string parameters.
 
-        if not params:
+        Will not lose existing static parameters in the URL string
+        but does not support 'duplicate' parameter entries
+        """
+
+        if not self.params:
             return self.url
 
-        evaluated_params = {k: jmespath.search(v, resource) for k, v in params.items()}
+        evaluated_params = {k: jmespath.search(v, resource) for k, v in self.params.items()}
 
         url_parts = list(parse.urlparse(self.url))
         query = dict(parse.parse_qsl(url_parts[4]))
@@ -104,6 +141,8 @@ class Webhook(EventAction):
         return parse.urlunparse(url_parts)
 
     def _build_body(self, resource):
+        """Create a JSON body and dump it to encoded bytes."""
+
         if not self.body:
             return None
 

@@ -53,8 +53,8 @@ class WebhookTest(BaseTest):
 
         self.assertTrue(self.load_policy(data=policy, validate=True))
 
-    @mock.patch('c7n.actions.webhook.request.urlopen')
-    def test_process_batch(self, urlopen_mock):
+    @mock.patch('c7n.actions.webhook.requests.Request')
+    def test_process_batch(self, request_mock):
         resources = [
             {
                 "name": "test_name",
@@ -66,18 +66,20 @@ class WebhookTest(BaseTest):
             "url": "http://foo.com",
             "batch": True,
             "parameters": {
-                "foo": "[0].name"
+                "foo": "resources[0].name"
             }
         }
 
-        wh = Webhook(data=data)
+        wh = Webhook(data=data, manager=self.get_manager())
         wh.process(resources)
-        req = urlopen_mock.call_args[0][0]
+        req = request_mock.call_args[1]
 
-        self.assertEqual("http://foo.com?foo=test_name", req.full_url)
+        self.assertEqual("http://foo.com?foo=test_name", req['url'])
+        self.assertEqual("GET", req['method'])
+        self.assertEqual({}, req['headers'])
 
-    @mock.patch('c7n.actions.webhook.request.urlopen')
-    def test_process_batch_body(self, urlopen_mock):
+    @mock.patch('c7n.actions.webhook.requests.Request')
+    def test_process_batch_body(self, request_mock):
         resources = [
             {
                 "name": "test_name",
@@ -88,21 +90,29 @@ class WebhookTest(BaseTest):
         data = {
             "url": "http://foo.com",
             "batch": True,
-            "body": "[].name",
+            "body": "resources[].name",
+            "body-size": 10,
+            "headers": {
+                "test": "`header`"
+            },
             "parameters": {
-                "foo": "[0].name"
+                "foo": "resources[0].name"
             }
         }
 
-        wh = Webhook(data=data)
+        wh = Webhook(data=data, manager=self.get_manager())
         wh.process(resources)
-        req = urlopen_mock.call_args[0][0]
+        req = request_mock.call_args[1]
 
-        self.assertEqual("http://foo.com?foo=test_name", req.full_url)
-        self.assertEqual(b'["test_name"]', req.data)
+        self.assertEqual("http://foo.com?foo=test_name", req['url'])
+        self.assertEqual("POST", req['method'])
+        self.assertEqual(b'["test_name"]', req['data'])
+        self.assertEqual(
+            {"test": "header", "Content-Type": "application/json"},
+            req['headers'])
 
-    @mock.patch('c7n.actions.webhook.request.urlopen')
-    def test_process_no_batch(self, urlopen_mock):
+    @mock.patch('c7n.actions.webhook.requests.Request')
+    def test_process_no_batch(self, request_mock):
         resources = [
             {
                 "name": "test1",
@@ -118,21 +128,20 @@ class WebhookTest(BaseTest):
             "url": "http://foo.com",
             "batch": False,
             "parameters": {
-                "foo": "name"
+                "foo": "resource.name"
             }
         }
 
-        wh = Webhook(data=data)
+        wh = Webhook(data=data, manager=self.get_manager())
         wh.process(resources)
+        req1 = request_mock.call_args_list[0][1]
+        req2 = request_mock.call_args_list[1][1]
 
-        req1 = urlopen_mock.call_args_list[0][0][0]
-        req2 = urlopen_mock.call_args_list[1][0][0]
+        self.assertEqual("http://foo.com?foo=test1", req1['url'])
+        self.assertEqual("http://foo.com?foo=test2", req2['url'])
 
-        self.assertEqual("http://foo.com?foo=test1", req1.full_url)
-        self.assertEqual("http://foo.com?foo=test2", req2.full_url)
-
-    @mock.patch('c7n.actions.webhook.request.urlopen')
-    def test_process_existing_query_string(self, urlopen_mock):
+    @mock.patch('c7n.actions.webhook.requests.Request')
+    def test_process_existing_query_string(self, request_mock):
         resources = [
             {
                 "name": "test1",
@@ -148,15 +157,61 @@ class WebhookTest(BaseTest):
             "url": "http://foo.com?existing=test",
             "batch": False,
             "parameters": {
-                "foo": "name"
+                "foo": "resource.name"
             }
         }
 
-        wh = Webhook(data=data)
+        wh = Webhook(data=data, manager=self.get_manager())
         wh.process(resources)
 
-        req1 = urlopen_mock.call_args_list[0][0][0]
-        req2 = urlopen_mock.call_args_list[1][0][0]
+        req1 = request_mock.call_args_list[0][1]
+        req2 = request_mock.call_args_list[1][1]
 
-        self.assertEqual("http://foo.com?existing=test&foo=test1", req1.full_url)
-        self.assertEqual("http://foo.com?existing=test&foo=test2", req2.full_url)
+        self.assertEqual("http://foo.com?existing=test&foo=test1", req1['url'])
+        self.assertEqual("http://foo.com?existing=test&foo=test2", req2['url'])
+
+    @mock.patch('c7n.actions.webhook.requests.Request')
+    def test_process_policy_metadata(self, request_mock):
+        resources = [
+            {
+                "name": "test1",
+                "value": "test_value"
+            },
+            {
+                "name": "test2",
+                "value": "test_value"
+            }
+        ]
+
+        data = {
+            "url": "http://foo.com",
+            "batch": False,
+            "parameters": {
+                "foo": "resource.name",
+                "policy": "policy.name"
+            }
+        }
+
+        wh = Webhook(data=data, manager=self.get_manager())
+        wh.process(resources)
+        req1 = request_mock.call_args_list[0][1]
+        req2 = request_mock.call_args_list[1][1]
+
+        self.assertEqual("http://foo.com?foo=test1&policy=webhook_policy", req1['url'])
+        self.assertEqual("http://foo.com?foo=test2&policy=webhook_policy", req2['url'])
+
+    def get_manager(self):
+        """The tests don't require real resource data
+        or recordings, but they do need a valid manager with
+        policy metadata so we just make one here to use"""
+
+        policy = self.load_policy({
+            "name": "webhook_policy",
+            "resource": "ec2",
+            "actions": [
+                {
+                    "type": "webhook",
+                    "url": "http://foo.com"}
+            ]})
+
+        return policy.resource_manager
