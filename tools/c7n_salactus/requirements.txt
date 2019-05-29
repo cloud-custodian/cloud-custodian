@@ -1,5 +1,5 @@
 argparse>=1.2.1
-setuptools-scm==3.3.2
+setuptools-scm==3.3.3
 arrow>=0.8.0
 boto3>=1.9.94
 botocore>=1.12.94
