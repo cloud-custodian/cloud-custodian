@@ -50,9 +50,9 @@ Each resource also contains an internal class called `resource_type`, which cont
 
     - The field `resource` has value of the `resource_name` from @resources.register('<resource_name>') that is used for the target parent resource.
 
-    - The field `child_enum_params` has list of mappings tuples for building `list` requests to parent resources. It works by the next scenario. First of all it loads a list of instances from parent resource. Further it loads instances for original resources using GCP resource field values from the loaded parent resources. It uses mappings for GCP resource fields from `child_enum_params`. The first field in a tuple is a field from parent resource, the second one is the mapped original resource field name.
+    - The field `child_enum_params` is an array of tuples each of which maps parent instance field (first tuple element) to child's list argument (second tuple element). The mappings are used for building `list` requests to parent resources. It works by the next scenario. First of all it loads a list of instances from parent resource. Further it loads instances for original resources using GCP resource field values from the loaded parent resources. It uses mappings for GCP resource fields from `child_enum_params`. The first field in a tuple is a field from parent resource, the second one is the mapped original resource field name.
 
-    - The field `parent_get_params` has list of mappings tuples for building `get` requests to parent resources. The first field in a tuple is a field from original GCP resource, the second one is the mapped parent GCP resource field name. It's used for invoking `get` requests of parent resources based on the received response in original resource.
+    - The field `parent_get_params` is an array of tuples each of which maps child instance field (first tuple element) to parent's `resource_info` field. The `resource_info` object has fields like Stackdriver log has. There are 2 options for the fields set: either `resource.labels` and `protoPayload.resourceName` or a log of the full event. The mappings are used for building `get` requests to parent resources.
 
 An example that uses `parent_spec` is available below.
 
