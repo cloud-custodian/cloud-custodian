@@ -42,7 +42,7 @@ Each resource also contains an internal class called `resource_type`, which cont
 - ``id`` is required field,
     It's a field name of the response field that have to be used as resource identifier. The `id` value is used for filtering.
 - ``scope`` is optional field, default is None,
-    The scope of the Custodian resource. There are available 3 options: `project` or `None`. If the `scope` has a value `project` the GOOGLE_CLOUD_PROJECT variable will be used for building request to GCP resource. If the scope is `None` the request to GCP is built ignoring the GOOGLE_CLOUD_PROJECT variable.
+    The scope of the Custodian resource. There are available 2 options: `project` or `None`. If the `scope` has a value `project` the GOOGLE_CLOUD_PROJECT variable will be used for building request to GCP resource. If the scope is `None` the request to GCP is built ignoring the GOOGLE_CLOUD_PROJECT variable.
 - ``parent_spec`` is an optional field that allows to build additional requests to parent resources, default is None.
     The field is used when the request to GCP resource should be created with extra parameters that can be loaded from parent resources.
     The resource should extend ChildResourceManager instead of QueryResourceManager and use ChildTypeInfo instead of TypeInfo to use the field.
