@@ -33,13 +33,16 @@ Each resource also contains an internal class called `resource_type`, which cont
 - ``version`` is required field, part of the request to GCP resource,
     It is the `version` of used resource API,
 - ``enum_spec`` is a required field, a tuple of (`enum_operation`, `list_operation`, `extra_args`),
-    Place the name of the GCP resource method as the `enum_operation`.
-    Next, put path to searching array on the `list_operation` place.
-    The `extra_args` param can be used for set up additional params to a request to GCP.
+
+    - `enum_operation`: the name of the GCP resource method used to retrieve the list of resources,
+
+    - `list_operation`: the JMESPath of the field name which contains the resource list in the JSON response body,
+
+    - `extra_args`: can be used to set up additional params for a request to GCP.
 - ``id`` is required field,
     It's a field name of the response field that have to be used as resource identifier. The `id` value is used for filtering.
 - ``scope`` is optional field, default is None,
-    The scope of the Custodian resource. There are available 3 options: `project`, `zone` or `None`. If the `scope` has a value `project` the GOOGLE_CLOUD_PROJECT variable will be used for building request to GCP resource. The `zone` variable can be ignored for Cloud Custodian's GCP plugin. This scope is used by other cloud providers. If the scope is `None` the request to GCP is built ignoring the GOOGLE_CLOUD_PROJECT variable.
+    The scope of the Custodian resource. There are available 3 options: `project` or `None`. If the `scope` has a value `project` the GOOGLE_CLOUD_PROJECT variable will be used for building request to GCP resource. If the scope is `None` the request to GCP is built ignoring the GOOGLE_CLOUD_PROJECT variable.
 - ``parent_spec`` is an optional field that allows to build additional requests to parent resources, default is None.
     The field is used when the request to GCP resource should be created with extra parameters that can be loaded from parent resources.
     The resource should extend ChildResourceManager instead of QueryResourceManager and use ChildTypeInfo instead of TypeInfo to use the field.
