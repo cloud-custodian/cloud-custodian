@@ -485,7 +485,8 @@ class ServiceLimit(Filter):
     schema = type_schema(
         'service-limit',
         threshold={'type': 'number'},
-        refresh_period={'type': 'integer'},
+        refresh_period={'type': 'integer',
+                        'title': 'how long should a check result be considered fresh'},
         limits={'type': 'array', 'items': {'type': 'string'}},
         services={'type': 'array', 'items': {
             'enum': ['EC2', 'ELB', 'VPC', 'AutoScaling',
@@ -494,6 +495,10 @@ class ServiceLimit(Filter):
     permissions = ('support:DescribeTrustedAdvisorCheckResult',)
     check_id = 'eW7HH0l7J9'
     check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
+
+    # When doing a refresh, how long to wait for the check to become ready
+    poll_interval = 5
+    poll_max_intervals = 10
     global_services = set(['IAM'])
 
     def validate(self):
@@ -505,23 +510,28 @@ class ServiceLimit(Filter):
                     % ', '.join(self.global_services))
         return self
 
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client(
-            'support', region_name='us-east-1')
+    @classmethod
+    def get_check_result(cls, client, check_id):
         checks = client.describe_trusted_advisor_check_result(
-            checkId=self.check_id, language='en')['result']
+            checkId=check_id, language='en')['result']
 
         # Check status and if necessary refresh checks
         if checks['status'] == 'not_available':
-            client.refresh_trusted_advisor_check(checkId=self.check_id)
-            for ta_refresh_interval in range(0, 9):
-                time.sleep(3)
+            client.refresh_trusted_advisor_check(checkId=check_id)
+            for _ in range(cls.poll_max_intervals):
+                time.sleep(cls.poll_interval)
                 refresh_response = client.describe_trusted_advisor_check_refresh_statuses(
-                    checkIds=[self.check_id])
+                    checkIds=[check_id])
                 if refresh_response['statuses'][0]['status'] == 'success':
                     checks = client.describe_trusted_advisor_check_result(
-                        checkId=self.check_id, language='en')['result']
+                        checkId=check_id, language='en')['result']
                     break
+        return checks
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name='us-east-1')
+        checks = self.get_check_result(client, self.check_id)
 
         region = self.manager.config.region
         checks['flaggedResources'] = [r for r in checks['flaggedResources']
