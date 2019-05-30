@@ -138,7 +138,8 @@ class FunctionAppUtilsTest(BaseTest):
         self.assertFalse(FunctionAppUtilities.is_consumption_plan(params))
 
     @arm_template('functionapp-reqs.json')
-    def test_publish_functions_package_consumption(self):
+    @patch('time.sleep')
+    def test_publish_functions_package_consumption(self, _1):
         parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights={
                 'id': '',
