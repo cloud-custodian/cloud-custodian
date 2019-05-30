@@ -32,7 +32,8 @@ Each resource also contains an internal class called `resource_type`, which cont
     The name of GCP resource,
 - ``version`` is required field, part of the request to GCP resource,
     It is the `version` of used resource API,
-- ``enum_spec`` is a required field, a tuple of (`enum_operation`, `list_operation`, `extra_args`),
+- ``enum_spec`` is a required field,
+     It has a tuple of (`enum_operation`, `list_operation`, `extra_args`).
 
     - `enum_operation`: the name of the GCP resource method used to retrieve the list of resources,
 
