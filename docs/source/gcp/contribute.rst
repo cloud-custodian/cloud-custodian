@@ -201,7 +201,7 @@ The `name of a file` means the folder name that has JSON file(s) with expected r
 
 The `policy name` means the name of the policy. It can be used any name of the policy.
 The `name of the resource` is the name of testing resource. It's the `resource_name` from @resources.register('<resource_name>').
-The policy should be tested in gcp-audit mode.
+The policy should also be tested in gcp-audit mode to ensure that testing the resource in a serverless environment is covered.
 
 - The next step is invoking `get` method of GCP resource that is used for development. The result of invoking is logged in Stackdriver. The result should be copied from Stackdriver log and be put into a JSON file in tools/c7n_gcp/test/data/events folder.
 
