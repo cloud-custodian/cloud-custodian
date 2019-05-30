@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:c7n-pratyush"
+            },
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:c7n-tag-test"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "cab342d0-9f24-57bd-8c8f-17ba91502272",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cab342d0-9f24-57bd-8c8f-17ba91502272",
+                "content-type": "text/xml",
+                "content-length": "485",
+                "date": "Thu, 30 May 2019 17:00:36 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

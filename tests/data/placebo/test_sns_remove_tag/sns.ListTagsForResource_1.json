@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Tagging",
+                "Value": "added"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "06d926b1-4994-5af2-8f07-73db47d56518",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "06d926b1-4994-5af2-8f07-73db47d56518",
+                "content-type": "text/xml",
+                "content-length": "388",
+                "date": "Thu, 30 May 2019 16:59:45 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -22,6 +22,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema
+from c7n.tags import RemoveTag, Tag, TagDelayedAction
 
 
 @resources.register('sns')
@@ -46,6 +47,99 @@ class SNS(QueryResourceManager):
             'SubscriptionsPending',
             'SubscriptionsDeleted'
         )
+
+    permissions = ('SNS:ListTags',)
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('sns')
+
+        def _augment(r):
+            tags = self.retry(client.list_tags_for_resource,
+                ResourceArn=r['TopicArn'])['Tags']
+            r['Tags'] = tags
+            return r
+
+        resources = super(SNS, self).augment(resources)
+        return list(map(_augment, resources))
+
+
+@SNS.action_registry.register('tag')
+class TagSNS(Tag):
+    """Action to create tag(s) on sns
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: tag-sns
+                resource: sns
+                filters:
+                  - "tag:target-tag": absent
+                actions:
+                  - type: tag
+                    key: target-tag
+                    value: target-tag-value
+    """
+
+    permissions = ('sns:Tag',)
+
+    def process_resource_set(self, client, resources, new_tags):
+        for r in resources:
+            try:
+                client.tag_resource(
+                    ResourceArn=r['TopicArn'],
+                    Tags=new_tags)
+            except client.exceptions.ResourceNotFound:
+                continue
+
+
+@SNS.action_registry.register('remove-tag')
+class UntagMessageBroker(RemoveTag):
+    """Action to remove tag(s) on sns
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sns-remove-tag
+                resource: sns
+                filters:
+                  - "tag:OutdatedTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["OutdatedTag"]
+    """
+
+    permissions = ('sns:Untag',)
+
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            try:
+                client.untag_resource(ResourceArn=r['TopicArn'], TagKeys=tags)
+            except client.exceptions.ResourceNotFound:
+                continue
+
+
+@SNS.action_registry.register('mark-for-op')
+class MarkSNSForOp(TagDelayedAction):
+    """Mark SNS for deferred action
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sns-invalid-tag-mark
+            resource: sns
+            filters:
+              - "tag:InvalidTag": present
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """
 
 
 class SNSPolicyChecker(PolicyChecker):
