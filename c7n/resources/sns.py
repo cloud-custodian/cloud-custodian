@@ -48,7 +48,7 @@ class SNS(QueryResourceManager):
             'SubscriptionsDeleted'
         )
 
-    permissions = ('SNS:ListTags',)
+    permissions = ('SNS:ListTagsForResource',)
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('sns')
@@ -82,7 +82,7 @@ class TagSNS(Tag):
                     value: target-tag-value
     """
 
-    permissions = ('sns:Tag',)
+    permissions = ('sns:TagResource',)
 
     def process_resource_set(self, client, resources, new_tags):
         for r in resources:
@@ -112,7 +112,7 @@ class UntagMessageBroker(RemoveTag):
                     tags: ["OutdatedTag"]
     """
 
-    permissions = ('sns:Untag',)
+    permissions = ('sns:UntagResource',)
 
     def process_resource_set(self, client, resources, tags):
         for r in resources:

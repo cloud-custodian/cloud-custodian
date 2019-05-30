@@ -1,20 +1,15 @@
 {
     "status_code": 200,
     "data": {
-        "Tags": [
-            {
-                "Key": "Tagging",
-                "Value": "present"
-            }
-        ],
+        "Tags": [],
         "ResponseMetadata": {
-            "RequestId": "f5f9e064-7407-5747-bee3-b50e7a46e8ad",
+            "RequestId": "63ff387c-6ba0-5d1c-a219-6d16028a60a5",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "f5f9e064-7407-5747-bee3-b50e7a46e8ad",
+                "x-amzn-requestid": "63ff387c-6ba0-5d1c-a219-6d16028a60a5",
                 "content-type": "text/xml",
-                "content-length": "390",
-                "date": "Thu, 30 May 2019 16:59:45 GMT"
+                "content-length": "290",
+                "date": "Thu, 30 May 2019 23:27:38 GMT"
             },
             "RetryAttempts": 0
         }

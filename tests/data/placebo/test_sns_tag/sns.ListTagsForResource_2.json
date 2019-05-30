@@ -4,17 +4,17 @@
         "Tags": [
             {
                 "Key": "Tagging",
-                "Value": "present"
+                "Value": "added"
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "7ef2cf88-73c5-5a08-a8b8-9ae27e3ec6f9",
+            "RequestId": "04ef1ece-a867-5a68-8bfa-4ba4c16b0393",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "7ef2cf88-73c5-5a08-a8b8-9ae27e3ec6f9",
+                "x-amzn-requestid": "04ef1ece-a867-5a68-8bfa-4ba4c16b0393",
                 "content-type": "text/xml",
-                "content-length": "390",
-                "date": "Thu, 30 May 2019 16:58:35 GMT"
+                "content-length": "388",
+                "date": "Thu, 30 May 2019 23:27:07 GMT"
             },
             "RetryAttempts": 0
         }
