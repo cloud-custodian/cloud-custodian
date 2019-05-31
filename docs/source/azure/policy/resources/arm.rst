@@ -1,7 +1,7 @@
 .. _azure_armresource:
 
-Network Interface
-=================
+Azure ARM Resource
+==================
 
 Filters
 -------
@@ -15,32 +15,3 @@ Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
-Example Policies
-----------------
-
-This set of policies will mark all ARM resources for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
-
-
-.. code-block:: yaml
-
-    policies:
-      - name: mark-test-armresources-for-deletion
-        resource: azure.armresource
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-armresources
-        resource: azure.armresource
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
