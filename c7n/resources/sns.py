@@ -60,7 +60,8 @@ class SNS(QueryResourceManager):
             return r
 
         resources = super(SNS, self).augment(resources)
-        return list(map(_augment, resources))
+        with self.executor_factory(max_workers=3) as w:
+            return list(w.map(_augment, resources))
 
 
 @SNS.action_registry.register('tag')
