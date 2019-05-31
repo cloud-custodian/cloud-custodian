@@ -32,23 +32,30 @@ In the example below, the policy checks that there is only one rule allowing all
                topic: projects/my-gcp-project/topics/my-topic
 
 
-In this variant, the policy checks if a custom DENY rule is in place and notify if absent.
+In this variant, the policy checks if there are any firewall rules with ``sourceRange`` violating ``min-network-prefix-size``.
 
 .. code-block:: yaml
+
+    vars:
+        min-network-prefix-size: &min-network-prefix-size 24
 
     policies:
         - name: appengine-firewall-rules
           description: |
-            Check absence of a required firewall rule
+            Check if firewall rule network prefix size is long enough
           resource: gcp.app-engine-firewall-ingress-rule
           filters:
-          - type: value
-            key: sourceRange
-            value: 192.168.2.0/24
-            op: absent
-          - type: value
-            key: action
-            value: DENY
+            - not:
+              - type: value
+                key: sourceRange
+                op: regex
+                # filtering out the * special character and IP addresses without network prefix length
+                value: "^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$"
+              - type: value
+                key: sourceRange
+                value_type: cidr_size
+                op: ge
+                value: *min-network-prefix-size
           actions:
            - type: notify
              to:
