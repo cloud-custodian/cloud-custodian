@@ -22,7 +22,7 @@ the resource or resource array.
 
 JMESPath queries for query-params, headers and body will have access to the following data:
 
-.. code-block:: json
+.. code-block::
 
     {
         'account_id',
