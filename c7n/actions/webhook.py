@@ -14,8 +14,9 @@
 
 import json
 
+import certifi
 import jmespath
-import requests
+import urllib3
 from six.moves.urllib import parse
 
 from c7n import utils
@@ -36,9 +37,9 @@ class Webhook(EventAction):
               actions:
                - type: webhook
                  url: http://foo.com
-                 parameters:
-                    - resource_name: resource.name
-                    - policy_name: policy.name
+                 query-params:
+                    resource_name: resource.name
+                    policy_name: policy.name
     """
 
     schema = utils.type_schema(
@@ -50,7 +51,7 @@ class Webhook(EventAction):
             'batch': {'type': 'boolean'},
             'batch-size': {'type': 'number'},
             'method': {'type': 'string', 'enum': ['PUT', 'POST', 'GET', 'PATCH', 'DELETE']},
-            'parameters': {
+            'query-params': {
                 "type": "object",
                 "additionalProperties": {
                     "type": "string",
@@ -69,13 +70,14 @@ class Webhook(EventAction):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(Webhook, self).__init__(data, manager, log_dir)
+        self.http = None
         self.url = self.data.get('url')
         self.body = self.data.get('body')
         self.batch = self.data.get('batch', False)
         self.batch_size = self.data.get('batch-size', 500)
-        self.params = self.data.get('parameters', {})
+        self.query_params = self.data.get('query-params', {})
         self.headers = self.data.get('headers', {})
-        self.method = self.data.get('method', 'POST' if self.body else 'GET')
+        self.method = self.data.get('method', 'POST')
         self.lookup_data = {
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region,
@@ -85,6 +87,10 @@ class Webhook(EventAction):
         }
 
     def process(self, resources, event=None):
+        self.http = urllib3.PoolManager(
+            cert_reqs='CERT_REQUIRED',
+            ca_certs=certifi.where())
+
         if self.batch:
             for chunk in utils.chunks(resources, self.batch_size):
                 resource_data = self.lookup_data
@@ -105,23 +111,16 @@ class Webhook(EventAction):
             prepared_headers['Content-Type'] = 'application/json'
 
         try:
-            s = requests.Session()
-            req = requests.Request(method=self.method,
-                                   url=prepared_url,
-                                   headers=prepared_headers,
-                                   data=prepared_body)
-
-            prepped = req.prepare()
-
-            res = s.send(prepped)
-            res.raise_for_status()
+            res = self.http.request(
+                method=self.method,
+                url=prepared_url,
+                body=prepared_body,
+                headers=prepared_headers)
 
             self.log.info("%s got response %s with URL %s" %
-                          (self.method, res.status_code, prepared_url))
-        except requests.exceptions.HTTPError as e:
-            self.log.error("Error calling %s. Code: %s" % (prepared_url, e.response.status_code))
-        except requests.exceptions.ConnectionError:
-            self.log.error("Failed to connect to %s." % prepared_url)
+                          (self.method, res.status, prepared_url))
+        except urllib3.exceptions.HTTPError as e:
+            self.log.error("Error calling %s. Code: %s" % (prepared_url, e.reason))
 
     def _build_headers(self, resource):
         return {k: jmespath.search(v, resource) for k, v in self.headers.items()}
@@ -134,10 +133,10 @@ class Webhook(EventAction):
         but does not support 'duplicate' parameter entries
         """
 
-        if not self.params:
+        if not self.query_params:
             return self.url
 
-        evaluated_params = {k: jmespath.search(v, resource) for k, v in self.params.items()}
+        evaluated_params = {k: jmespath.search(v, resource) for k, v in self.query_params.items()}
 
         url_parts = list(parse.urlparse(self.url))
         query = dict(parse.parse_qsl(url_parts[4]))

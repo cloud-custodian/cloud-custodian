@@ -32,6 +32,7 @@ setup(
         "jsonpatch>=1.21",
         "argcomplete",
         "tabulate>=0.8.2",
-        "requests"
+        "urllib3",
+        "certifi"
     ],
 )
