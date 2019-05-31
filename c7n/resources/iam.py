@@ -1135,7 +1135,7 @@ class CredentialReport(Filter):
     """
     schema = type_schema(
         'credential',
-        value_type={'ref': '#/definitions/filters_common/value_types'},
+        value_type={'$ref': '#/definitions/filters_common/value_types'},
         key={'type': 'string',
              'title': 'report key to search',
              'enum': [

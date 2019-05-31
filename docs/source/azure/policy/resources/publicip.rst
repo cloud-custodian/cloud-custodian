@@ -19,38 +19,12 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all public IP addresses for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
+This policy will find all public IP addresses under DDoS attack over the last 72 hours
 
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-public-ip-for-deletion
-        resource: azure.publicip
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-publicips
-        resource: azure.publicip
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
-
-This policy will find all public IP addresses under DDoS attack over the last 72 hours and notify user@domain.com
-
-.. code-block:: yaml
-
-    policies:
-      - name: notify-publicip-dropping-packets
+      - name: publicip-dropping-packets
         resource: azure.publicip
         filters:
           - type: metric
@@ -59,13 +33,3 @@ This policy will find all public IP addresses under DDoS attack over the last 72
             aggregation: maximum
             threshold: 0
             timeframe: 72
-         actions:
-          - type: notify
-            template: default
-            priority_header: 1
-            subject: Public IP Under DDoS Attack
-            to:
-              - user@domain.com
-            transport:
-              - type: asq
-                queue: https://accountname.queue.core.windows.net/queuename

@@ -18,28 +18,16 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all Batch Accounts for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
+This set of policies will find all Azure Batch services that have more than 100 cores as the limit for the dedicated core quota.
 
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-batch-for-deletion
+      - name: find-batch-with-high-dedicated-cores
         resource: azure.batch
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-batch
-        resource: azure.batch
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
+      resource: azure.batch
+      filters:
+        - type: value
+          key: properties.dedicatedCoreQuota
+          op: gt
+          value: 100

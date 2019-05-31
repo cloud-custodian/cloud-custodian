@@ -24,7 +24,7 @@ This policy will find all Datalake Stores with one million or more write request
 .. code-block:: yaml
 
     policies:
-      - name: notify-datalake-busy
+      - name: datalake-busy
         resource: azure.datalake
         filters:
           - type: metric
@@ -33,13 +33,3 @@ This policy will find all Datalake Stores with one million or more write request
             aggregation: total
             threshold: 1000000
             timeframe: 72
-         actions:
-          - type: notify
-            template: default
-            priority_header: 2
-            subject: Busy Datalake Stores
-            to:
-              - user@domain.com
-            transport:
-              - type: asq
-                queue: https://accountname.queue.core.windows.net/queuename
