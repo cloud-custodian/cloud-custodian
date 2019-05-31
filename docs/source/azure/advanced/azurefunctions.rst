@@ -1,10 +1,11 @@
 .. _azure_azurefunctions:
 
 Azure Functions Support
------------------------
+=======================
 
 Overview
-===========================
+########
+
 The Azure provider supports deploying policies into Azure Functions to allow
 them to run inexpensively in your subscription.
 
@@ -262,17 +263,17 @@ The following variable allows you to specify Management Group name:
 It can be used with Function specific Service Principal credentials described before. Management Group environment variable has the highest priority, so `AZURE_FUNCTION_SUBSCRIPTION_ID` will be ignored.
 
 Timer triggered functions
-=========================
+-------------------------
 
 When Management Groups option is used with periodic mode, Cloud Custodian deploys a single Azure Function App with multiple Azure Functions following single subscription per function rule.
 
 Event triggered functions
-=========================
+-------------------------
 
 When Management Groups option is used with event mode, Cloud Custodian deploys single Azure Function. It creates Event Grid subscription for each Subscription in Management Group delivering events to a single Azure Storage Queue.
 
 Permissions
-===========
+-----------
 
 Service Principal used at the Functions runtime required to have appropriate level of permission in each target subscription.
 

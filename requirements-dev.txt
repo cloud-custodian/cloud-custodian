@@ -10,7 +10,7 @@ pytest-xdist==1.28.0
 pytest-cov==2.7.1
 parameterized==0.7.0
 twine==1.13.0
-tox==3.9.0
+tox==3.12.1
 six >= 1.12.0
 
 # Optional feature testing in c7n
