@@ -239,7 +239,6 @@ class WebhookTest(BaseTest):
         data = {
             "url": "http://foo.com",
             "query-params": {
-                "foo": "resource.name",
                 "policy": "policy.name"
             }
         }
@@ -249,8 +248,8 @@ class WebhookTest(BaseTest):
         req1 = request_mock.call_args_list[0][1]
         req2 = request_mock.call_args_list[1][1]
 
-        self.assertEqual("http://foo.com?foo=test1&policy=webhook_policy", req1['url'])
-        self.assertEqual("http://foo.com?foo=test2&policy=webhook_policy", req2['url'])
+        self.assertEqual("http://foo.com?policy=webhook_policy", req1['url'])
+        self.assertEqual("http://foo.com?policy=webhook_policy", req2['url'])
 
     def _get_manager(self):
         """The tests don't require real resource data
