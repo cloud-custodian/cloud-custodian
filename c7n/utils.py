@@ -35,6 +35,9 @@ from c7n import ipaddress, config
 
 # Try to place nice in lambda exec environment
 # where we don't require yaml
+
+BaseSafeDumper = None
+
 try:
     import yaml
 except ImportError:  # pragma: no cover
