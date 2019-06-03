@@ -11,7 +11,6 @@ jobs:
 
   steps:
     - checkout: self
-      fetchDepth: 1
 
     - task: UsePythonVersion@0
       inputs:
@@ -98,7 +97,6 @@ jobs:
 
   steps:
   - checkout: self
-    fetchDepth: 2
 
   - task: UsePythonVersion@0
     displayName: "Set Python Version"
