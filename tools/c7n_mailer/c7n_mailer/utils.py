@@ -363,3 +363,37 @@ def kms_decrypt(config, logger, session, encrypted_field):
     else:
         logger.debug("No encrypted value to decrypt.")
         return None
+
+
+# https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
+def get_aws_username_from_event(logger, event):
+    if event is None:
+        return None
+    identity = event.get('detail', {}).get('userIdentity', {})
+    if not identity:
+        logger.warning("Could not get recipient from event \n %s" % (
+            format_struct(event)))
+        return None
+    if identity['type'] == 'AssumedRole':
+        logger.debug(
+            'In some cases there is no ldap uid is associated with AssumedRole: %s',
+            identity['arn'])
+        logger.debug(
+            'We will try to assume that identity is in the AssumedRoleSessionName')
+        user = identity['arn'].rsplit('/', 1)[-1]
+        if user is None or user.startswith('i-') or user.startswith('awslambda'):
+            return None
+        if ':' in user:
+            user = user.split(':', 1)[-1]
+        return user
+    if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
+        return identity['userName']
+    if identity['type'] == 'Root':
+        return None
+    # this conditional is left here as a last resort, it should
+    # be better documented with an example UserIdentity json
+    if ':' in identity['principalId']:
+        user_id = identity['principalId'].split(':', 1)[-1]
+    else:
+        user_id = identity['principalId']
+    return user_id

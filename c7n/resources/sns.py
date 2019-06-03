@@ -325,3 +325,34 @@ class SetEncryption(BaseAction):
                 AttributeValue=key
             )
         return resources
+
+
+@SNS.action_registry.register('delete')
+class DeleteTopic(BaseAction):
+    """
+    Deletes a SNS Topic
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: delete-bad-topic
+          resource: aws.sns
+          filters:
+            - TopicArn: arn:aws:sns:us-east-2:123456789012:BadTopic
+          actions:
+            - type: delete
+    """
+
+    schema = type_schema('delete')
+
+    permissions = ('sns:DeleteTopic',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('sns')
+        for r in resources:
+            try:
+                client.delete_topic(TopicArn=r['TopicArn'])
+            except client.exceptions.NotFoundException:
+                continue

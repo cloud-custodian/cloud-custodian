@@ -654,30 +654,30 @@ class TagDelayedAction(Action):
 
         return action_date_string
 
+    def get_config_values(self):
+        d = {
+            'op': self.data.get('op', 'stop'),
+            'tag': self.data.get('tag', DEFAULT_TAG),
+            'msg': self.data.get('msg', self.default_template),
+            'tz': self.data.get('tz', 'utc'),
+            'days': self.data.get('days', 0),
+            'hours': self.data.get('hours', 0)}
+        d['action_date'] = self.generate_timestamp(
+            d['days'], d['hours'])
+        return d
+
     def process(self, resources):
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        cfg = self.get_config_values()
+        self.tz = tzutil.gettz(Time.TZ_ALIASES.get(cfg['tz']))
         self.id_key = self.manager.get_model().id
 
-        # Move this to policy? / no resources bypasses actions?
-        if not len(resources):
-            return
-
-        msg_tmpl = self.data.get('msg', self.default_template)
-
-        op = self.data.get('op', 'stop')
-        tag = self.data.get('tag', DEFAULT_TAG)
-        days = self.data.get('days', 0)
-        hours = self.data.get('hours', 0)
-        action_date = self.generate_timestamp(days, hours)
-
-        msg = msg_tmpl.format(
-            op=op, action_date=action_date)
+        msg = cfg['msg'].format(
+            op=cfg['op'], action_date=cfg['action_date'])
 
         self.log.info("Tagging %d resources for %s on %s" % (
-            len(resources), op, action_date))
+            len(resources), cfg['op'], cfg['action_date']))
 
-        tags = [{'Key': tag, 'Value': msg}]
+        tags = [{'Key': cfg['tag'], 'Value': msg}]
 
         # if the tag implementation has a specified batch size, it's typically
         # due to some restraint on the api so we defer to that.

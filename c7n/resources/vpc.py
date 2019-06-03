@@ -26,7 +26,6 @@ import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
-from c7n.filters.locked import Locked
 from c7n import query, resolver
 from c7n.manager import resources
 from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
@@ -495,13 +494,6 @@ class ConfigSG(query.ConfigSource):
                 if 'Ipv4Ranges' in p:
                     p['IpRanges'] = p.pop('Ipv4Ranges')
         return r
-
-
-@SecurityGroup.filter_registry.register('locked')
-class SecurityGroupLockedFilter(Locked):
-
-    def get_parent_id(self, resource, account_id):
-        return resource.get('VpcId', account_id)
 
 
 @SecurityGroup.filter_registry.register('diff')
@@ -1000,7 +992,7 @@ class SGPermission(Filter):
                 fv['key'] = f
             else:
                 fv = {f: fv}
-            vf = ValueFilter(fv)
+            vf = ValueFilter(fv, self.manager)
             vf.annotate = False
             self.vfilters.append(vf)
         return super(SGPermission, self).process(resources, event)
@@ -1032,7 +1024,7 @@ class SGPermission(Filter):
         match_range = self.data[cidr_key]
         match_range['key'] = cidr_type
 
-        vf = ValueFilter(match_range)
+        vf = ValueFilter(match_range, self.manager)
         vf.annotate = False
 
         for ip_range in ip_perms:
@@ -1062,7 +1054,7 @@ class SGPermission(Filter):
         d = dict(self.data['Description'])
         d['key'] = 'Description'
 
-        vf = ValueFilter(d)
+        vf = ValueFilter(d, self.manager)
         vf.annotate = False
 
         for k in ('Ipv6Ranges', 'IpRanges', 'UserIdGroupPairs', 'PrefixListIds'):

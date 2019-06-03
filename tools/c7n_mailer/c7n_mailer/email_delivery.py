@@ -19,8 +19,8 @@ import six
 from .ldap_lookup import LdapLookup
 from c7n_mailer.utils_email import is_email
 from .utils import (
-    format_struct, get_message_subject, get_resource_tag_targets,
-    get_rendered_jinja, kms_decrypt)
+    get_message_subject, get_resource_tag_targets,
+    get_rendered_jinja, kms_decrypt, get_aws_username_from_event)
 
 # Those headers are defined as follows:
 #  'X-Priority': 1 (Highest), 2 (High), 3 (Normal), 4 (Low), 5 (Lowest)
@@ -104,7 +104,7 @@ class EmailDelivery(object):
 
     def get_event_owner_email(self, targets, event):
         if 'event-owner' in targets:
-            aws_username = self.get_aws_username_from_event(event)
+            aws_username = get_aws_username_from_event(self.logger, event)
             if aws_username:
                 # is using SSO, the target might already be an email
                 if is_email(aws_username):
@@ -328,36 +328,3 @@ class EmailDelivery(object):
             str(len(sqs_message['resources'])),
             sqs_message['action'].get('template', 'default'),
             email_to_addrs))
-
-    # https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
-    def get_aws_username_from_event(self, event):
-        if event is None:
-            return None
-        identity = event.get('detail', {}).get('userIdentity', {})
-        if not identity:
-            self.logger.warning("Could not get recipient from event \n %s" % (
-                format_struct(event)))
-            return None
-        if identity['type'] == 'AssumedRole':
-            self.logger.debug(
-                'In some cases there is no ldap uid is associated with AssumedRole: %s',
-                identity['arn'])
-            self.logger.debug(
-                'We will try to assume that identity is in the AssumedRoleSessionName')
-            user = identity['arn'].rsplit('/', 1)[-1]
-            if user is None or user.startswith('i-') or user.startswith('awslambda'):
-                return None
-            if ':' in user:
-                user = user.split(':', 1)[-1]
-            return user
-        if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
-            return identity['userName']
-        if identity['type'] == 'Root':
-            return None
-        # this conditional is left here as a last resort, it should
-        # be better documented with an example UserIdentity json
-        if ':' in identity['principalId']:
-            user_id = identity['principalId'].split(':', 1)[-1]
-        else:
-            user_id = identity['principalId']
-        return user_id

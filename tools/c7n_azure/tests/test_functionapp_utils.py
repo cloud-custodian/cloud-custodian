@@ -66,7 +66,8 @@ class FunctionAppUtilsTest(BaseTest):
             service_plan={
                 'id': '',
                 'resource_group_name': CONST_GROUP_NAME,
-                'name': 'cloud-custodian-test'
+                'name': 'cloud-custodian-test',
+                'location': 'westus2'
             },
             function_app_resource_group_name=CONST_GROUP_NAME,
             function_app_name='custodian-test-app')
@@ -137,7 +138,8 @@ class FunctionAppUtilsTest(BaseTest):
         self.assertFalse(FunctionAppUtilities.is_consumption_plan(params))
 
     @arm_template('functionapp-reqs.json')
-    def test_publish_functions_package_consumption(self):
+    @patch('time.sleep')
+    def test_publish_functions_package_consumption(self, _1):
         parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights={
                 'id': '',

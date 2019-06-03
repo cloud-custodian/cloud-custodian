@@ -19,38 +19,12 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all web apps for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
+This policy will find all web apps with 10 or less requests over the last 72 hours
 
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-webapp-for-deletion
-        resource: azure.webapp
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-webapp
-        resource: azure.webapp
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
-
-This policy will find all web apps with 10 or less requests over the last 72 hours, mark for deletion and notify user@domain.com
-
-.. code-block:: yaml
-
-    policies:
-      - name: notify-webapp-dropping-messages
+      - name: webapp-dropping-messages
         resource: azure.webapp
         filters:
           - type: metric
@@ -63,22 +37,13 @@ This policy will find all web apps with 10 or less requests over the last 72 hou
           - type: mark-for-op
             op: delete
             days: 7
-          - type: notify
-            template: default
-            priority_header: 2
-            subject: Inactive Web Apps to be Deleted in 7 Days
-            to:
-              - user@domain.com
-            transport:
-              - type: asq
-                queue: https://accountname.queue.core.windows.net/queuename
 
-This policy will find all web apps with 1000 or more server errors over the last 72 hours and notify user@domain.com
+This policy will find all web apps with 1000 or more server errors over the last 72 hours
 
 .. code-block:: yaml
 
     policies:
-      - name: notify-webapp-dropping-messages
+      - name: webapp-high-error-count
         resource: azure.webapp
         filters:
           - type: metric
@@ -87,13 +52,3 @@ This policy will find all web apps with 1000 or more server errors over the last
             aggregation: total
             threshold: 1000
             timeframe: 72
-         actions:
-          - type: notify
-            template: default
-            priority_header: 2
-            subject: Web Apps with Many Server Errors
-            to:
-              - user@domain.com
-            transport:
-              - type: asq
-                queue: https://accountname.queue.core.windows.net/queuename
