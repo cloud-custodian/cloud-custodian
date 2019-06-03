@@ -157,20 +157,50 @@ and if not specified, the mailer will use the default value `slack_default`.
 
 Slack integration for the mailer supports several flavors of messaging, listed below. These are not mutually exclusive and any combination of the types can be used, but the preferred method is [incoming webhooks](https://api.slack.com/incoming-webhooks).
 
-| Requires&nbsp;`slack_token` | Key                  | Type             | Notes                               |
-|:---------:|:---------------------|:-----------------|:------------------------------------|
-| No        | `https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX` | string | **(PREFERRED)** Send to an [incoming webhook](https://api.slack.com/incoming-webhooks) (the channel is defined in the webhook) |
-| Yes       | `slack://owners`          | string      | Send to the recipient list generated within email delivery logic |
-| Yes       | `slack://foo@bar.com`     | string      | Send to the recipient specified by email address foo@bar.com |
-| Yes       | `slack://#custodian-test` | string      | Send to the Slack channel indicated in string, i.e. #custodian-test |
-| No        | `slack://webhook/#c7n-webhook-test` | string      | **(DEPRECATED)** Send to a Slack webhook; appended with the target channel. **IMPORTANT**: *This requires a `slack_webhook` value defined in the `mailer.yml`.* |
-| Yes       | `slack://tag/resource-tag`| string      | Send to target found in resource tag. Example of value in tag: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX |
+| Requires&nbsp;`slack_token` | Key                                                                             | Type   | Notes                                                                                                                                                           |
+|:---------------------------:|:--------------------------------------------------------------------------------|:-------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|             No              | `https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX` | string | **(PREFERRED)** Send to an [incoming webhook](https://api.slack.com/incoming-webhooks) (the channel is defined in the webhook)                                  |
+|             Yes             | `slack://owners`                                                                | string | Send to the recipient list generated within email delivery logic                                                                                                |
+|             Yes             | `slack://foo@bar.com`                                                           | string | Send to the recipient specified by email address foo@bar.com                                                                                                    |
+|             Yes             | `slack://#custodian-test`                                                       | string | Send to the Slack channel indicated in string, i.e. #custodian-test                                                                                             |
+|             No              | `slack://webhook/#c7n-webhook-test`                                             | string | **(DEPRECATED)** Send to a Slack webhook; appended with the target channel. **IMPORTANT**: *This requires a `slack_webhook` value defined in the `mailer.yml`.* |
+|             Yes             | `slack://tag/resource-tag`                                                      | string | Send to target found in resource tag. Example of value in tag: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX                    |
 
 Slack delivery can also be set via a resource's tag name. For example, using "slack://tag/slack_channel" will look for a tag name of 'slack_channel', and if matched on a resource will deliver the message to the value of that resource's tag:
 
 `slack_channel:https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX`
 
 Delivery via tag has been tested with webhooks but should support all delivery methods.
+
+### Splunk HTTP Event Collector (HEC)
+
+The Custodian mailer supports delivery to the HTTP Event Collector (HEC) endpoint of a Splunk instance as a separate notification mechanism for the SQS transport method. To enable Splunk HEC integration, you must specify the URL to the HEC endpoint as well as a valid username and token:
+
+```yaml
+queue_url: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+role: arn:aws:iam::123456790:role/c7n-mailer-test
+splunk_hec_url: https://http-inputs-foo.splunkcloud.com/services/collector/event
+splunk_hec_token: 268b3cc2-f32e-4a19-a1e8-aee08d86ca7f
+```
+
+To send events for a policy to the Splunk HEC endpoint, add a ``to`` address notify action specifying the name of the Splunk index to send events to in the form ``splunkhec://indexName``:
+
+```
+policies:
+  - name: c7n-mailer-test
+    resource: ebs
+    filters:
+     - Attachments: []
+    actions:
+      - type: notify
+        to:
+          - splunkhec://myIndexName
+        transport:
+          type: sqs
+          queue: https://sqs.us-east-1.amazonaws.com/1234567890/c7n-mailer-test
+```
+
+The ``splunkhec://indexName`` address type can be combined in the same notify action with other destination types (e.g. email, Slack, DataDog, etc).
 
 ### Now run:
 
@@ -217,16 +247,16 @@ configuration you specify in a YAML file.  Here is [the
 schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform,
 and here is a description of the options:
 
-| Required? | Key                  | Type             | Notes                               |
-|:---------:|:---------------------|:-----------------|:------------------------------------|
-| &#x2705;  | `queue_url`          | string           | the queue to listen to for messages |
-|           | `from_address`       | string           | default from address                |
-|           | `contact_tags`       | array of strings | tags that we should look at for address information |
-|           | `smtp_server`        | string           | if this is unset, aws ses is used by default. To configure your lambda role to talk to smtpd in your private vpc, see [here](https://docs.aws.amazon.com/lambda/latest/dg/vpc.html) |
-|           | `smtp_port`          | integer          | smtp port                           |
-|           | `smtp_ssl`           | boolean          | this defaults to True               |
-|           | `smtp_username`      | string           |                                     |
-|           | `smtp_password`      | string           |                                     |
+| Required? | Key             | Type             | Notes                                                                                                                                                                               |
+|:---------:|:----------------|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                                                                                                                                                 |
+|           | `from_address`  | string           | default from address                                                                                                                                                                |
+|           | `contact_tags`  | array of strings | tags that we should look at for address information                                                                                                                                 |
+|           | `smtp_server`   | string           | if this is unset, aws ses is used by default. To configure your lambda role to talk to smtpd in your private vpc, see [here](https://docs.aws.amazon.com/lambda/latest/dg/vpc.html) |
+|           | `smtp_port`     | integer          | smtp port                                                                                                                                                                           |
+|           | `smtp_ssl`      | boolean          | this defaults to True                                                                                                                                                               |
+|           | `smtp_username` | string           |                                                                                                                                                                                     |
+|           | `smtp_password` | string           |                                                                                                                                                                                     |
 
 
 #### Standard Lambda Function Config
@@ -244,73 +274,86 @@ and here is a description of the options:
 
 #### Standard Azure Functions Config
 
-| Required? | Key                            | Type             | Notes                                                                 |
-|:---------:|:-------------------------------|:-----------------|:----------------------------------------------------------------------|
-|           | `function_properties`          | object           | Contains `appInsights`, `storageAccount` and `servicePlan` objects    |
-|           | `appInsights`                  | object           | Contains `name`, `location` and `resource_group_name` properties      |
-|           | `storageAccount`               | object           | Contains `name`, `location` and `resource_group_name` properties      |
-|           | `servicePlan`                  | object           | Contains `name`, `location`, `resource_group_name`, `skuTier` and `skuName` properties      |
-|           | `name`                         | string           | |
-|           | `location`                     | string           | Default: `west us 2`|
-|           | `resource_group_name`          | string           | Default `cloud-custodian`|
-|           | `skuTier`                      | string           | Default: `Basic` |
-|           | `skuName`                      | string           | Default: `B1`    |
+| Required? | Key                   | Type   | Notes                                                                                  |
+|:---------:|:----------------------|:-------|:---------------------------------------------------------------------------------------|
+|           | `function_properties` | object | Contains `appInsights`, `storageAccount` and `servicePlan` objects                     |
+|           | `appInsights`         | object | Contains `name`, `location` and `resource_group_name` properties                       |
+|           | `storageAccount`      | object | Contains `name`, `location` and `resource_group_name` properties                       |
+|           | `servicePlan`         | object | Contains `name`, `location`, `resource_group_name`, `skuTier` and `skuName` properties |
+|           | `name`                | string |                                                                                        |
+|           | `location`            | string | Default: `west us 2`                                                                   |
+|           | `resource_group_name` | string | Default `cloud-custodian`                                                              |
+|           | `skuTier`             | string | Default: `Basic`                                                                       |
+|           | `skuName`             | string | Default: `B1`                                                                          |
 
 
 
 
 #### Mailer Infrastructure Config
 
-| Required? | Key                        | Type             | Notes                               |
-|:---------:|:---------------------------|:-----------------|:------------------------------------|
-|           | `cache_engine`             | string           | cache engine; either sqlite or redis|
-|           | `cross_accounts`           | object           | account to assume back into for sending to SNS topics |
-|           | `debug`                    | boolean          | debug on/off                        |
-|           | `ldap_bind_dn`             | string           | eg: ou=people,dc=example,dc=com     |
-|           | `ldap_bind_user`           | string           | eg: FOO\\BAR     |
-|           | `ldap_bind_password`       | string           | ldap bind password     |
-|           | `ldap_bind_password_in_kms`| boolean          | defaults to true, most people (except capone) want to set this to false. If set to true, make sure `ldap_bind_password` contains your KMS encrypted ldap bind password as a base64-encoded string. |
-|           | `ldap_email_attribute`     | string           |                                     |
-|           | `ldap_email_key`           | string           | eg 'mail'     |
-|           | `ldap_manager_attribute`   | string           | eg 'manager'    |
-|           | `ldap_uid_attribute`       | string           |                                     |
-|           | `ldap_uid_regex`           | string           |                                     |
-|           | `ldap_uid_tags`            | string           |                                     |
-|           | `ldap_uri`                 | string           | eg 'ldaps://example.com:636'     |
-|           | `redis_host`               | string           | redis host if cache_engine == redis |
-|           | `redis_port`               | integer          | redis port, default: 6369           |
-|           | `ses_region`               | string           | AWS region that handles SES API calls |
+| Required? | Key                         | Type    | Notes                                                                                                                                                                                              |
+|:---------:|:----------------------------|:--------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|           | `cache_engine`              | string  | cache engine; either sqlite or redis                                                                                                                                                               |
+|           | `cross_accounts`            | object  | account to assume back into for sending to SNS topics                                                                                                                                              |
+|           | `debug`                     | boolean | debug on/off                                                                                                                                                                                       |
+|           | `ldap_bind_dn`              | string  | eg: ou=people,dc=example,dc=com                                                                                                                                                                    |
+|           | `ldap_bind_user`            | string  | eg: FOO\\BAR                                                                                                                                                                                       |
+|           | `ldap_bind_password`        | string  | ldap bind password                                                                                                                                                                                 |
+|           | `ldap_bind_password_in_kms` | boolean | defaults to true, most people (except capone) want to set this to false. If set to true, make sure `ldap_bind_password` contains your KMS encrypted ldap bind password as a base64-encoded string. |
+|           | `ldap_email_attribute`      | string  |                                                                                                                                                                                                    |
+|           | `ldap_email_key`            | string  | eg 'mail'                                                                                                                                                                                          |
+|           | `ldap_manager_attribute`    | string  | eg 'manager'                                                                                                                                                                                       |
+|           | `ldap_uid_attribute`        | string  |                                                                                                                                                                                                    |
+|           | `ldap_uid_regex`            | string  |                                                                                                                                                                                                    |
+|           | `ldap_uid_tags`             | string  |                                                                                                                                                                                                    |
+|           | `ldap_uri`                  | string  | eg 'ldaps://example.com:636'                                                                                                                                                                       |
+|           | `redis_host`                | string  | redis host if cache_engine == redis                                                                                                                                                                |
+|           | `redis_port`                | integer | redis port, default: 6369                                                                                                                                                                          |
+|           | `ses_region`                | string  | AWS region that handles SES API calls                                                                                                                                                              |
 
 
 #### DataDog Config
 
-| Required? | Key                       | Type             | Notes                               |
-|:---------:|:--------------------------|:-----------------|:------------------------------------|
-|           | `datadog_api_key`         | string           | DataDog API key. |
-|           | `datadog_application_key` | string           | Datadog application key. |
+| Required? | Key                       | Type   | Notes                    |
+|:---------:|:--------------------------|:-------|:-------------------------|
+|           | `datadog_api_key`         | string | DataDog API key.         |
+|           | `datadog_application_key` | string | Datadog application key. |
 
 These fields are not necessary if c7n_mailer is run in a instance/lambda/etc with the DataDog agent.
 
 #### Slack Config
 
-| Required? | Key                       | Type             | Notes                               |
-|:---------:|:--------------------------|:-----------------|:------------------------------------|
-|           | `slack_token`             | string           | Slack API token |
+| Required? | Key           | Type   | Notes           |
+|:---------:|:--------------|:-------|:----------------|
+|           | `slack_token` | string | Slack API token |
 
 #### SendGrid Config
 
-| Required? | Key                       | Type             | Notes                               |
-|:---------:|:--------------------------|:-----------------|:------------------------------------|
-|           | `sendgrid_api_key`        | string           | SendGrid API token |
+| Required? | Key                | Type   | Notes              |
+|:---------:|:-------------------|:-------|:-------------------|
+|           | `sendgrid_api_key` | string | SendGrid API token |
 SendGrid is only supported for Azure Cloud use with Azure Storage Queue currently.
+
+#### Splunk HEC Config
+
+The following configuration items are *all* optional. The ones marked "Required for Splunk" are only required if you're sending notifications to ``splunkhec://`` destinations.
+
+| Required for Splunk? | Key                     | Type             | Notes                                                                                                                              |
+|:--------------------:|:------------------------|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------|
+|       &#x2705;       | `splunk_hec_url`        | string           | URL to your Splunk HTTP Event Collector endpoint                                                                                   |
+|       &#x2705;       | `splunk_hec_token`      | string           | Splunk HEC authentication token for specified username                                                                             |
+|                      | `splunk_remove_paths`   | array of strings | List of [RFC6901](http://tools.ietf.org/html/rfc6901) JSON Pointers to remove from the event, if present, before sending to Splunk |
+|                      | `splunk_actions_list`   | boolean          | If true, add an `actions` list to the top-level message sent to Splunk, containing the names of all non-notify actions taken       |
+|                      | `splunk_max_attempts`   | integer          | Maximum number of times to try POSTing data to Splunk HEC (default 4)                                                              |
+|                      | `splunk_hec_max_length` | integer          | Maximum data length that Splunk HEC accepts; an error will be logged for any message sent over this length                         |
 
 #### SDK Config
 
-| Required? | Key                  | Type             | Notes                               |
-|:---------:|:---------------------|:-----------------|:------------------------------------|
-|           | `http_proxy`         | string           |                                     |
-|           | `https_proxy`        | string           |                                     |
-|           | `profile`            | string           |                                     |
+| Required? | Key           | Type   | Notes |
+|:---------:|:--------------|:-------|:------|
+|           | `http_proxy`  | string |       |
+|           | `https_proxy` | string |       |
+|           | `profile`     | string |       |
 
 
 ## Configuring a policy to send email
@@ -464,34 +507,34 @@ You can use `-t` or `--templates` cli argument to pass custom folder with your t
 
 The following variables are available when rendering templates:
 
-| variable | value |
-|:----------|:-----------|
-| `recipient` | email address |
-| `resources` | list of resources that matched the policy filters |
-| `event` | for CWE-push-based lambda policies, the event that triggered |
-| `action` | `notify` action that generated this SQS message |
-| `policy` | policy that triggered this notify action |
-| `account` | short name of the aws account |
-| `region`  | region the policy was executing in |
-| `execution_start` | The time policy started executing |
+| variable          | value                                                        |
+|:------------------|:-------------------------------------------------------------|
+| `recipient`       | email address                                                |
+| `resources`       | list of resources that matched the policy filters            |
+| `event`           | for CWE-push-based lambda policies, the event that triggered |
+| `action`          | `notify` action that generated this SQS message              |
+| `policy`          | policy that triggered this notify action                     |
+| `account`         | short name of the aws account                                |
+| `region`          | region the policy was executing in                           |
+| `execution_start` | The time policy started executing                            |
 
 The following extra global functions are available:
 
-| signature | behavior |
-|:----------|:-----------|
-| `format_struct(struct)` | pretty print a json structure |
-| `resource_tag(resource, key)` | retrieve a tag value from a resource or return an empty string, aliased as get_resource_tag_value |
-| `format_resource(resource, resource_type)` | renders a one line summary of a resource |
-| `date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z')`| customize rendering of an utc datetime string |
-| `seach(expression, value)` | jmespath search value using expression |
-| `yaml_safe(value)` | yaml dumper |
+| signature                                                                    | behavior                                                                                          |
+|:-----------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------|
+| `format_struct(struct)`                                                      | pretty print a json structure                                                                     |
+| `resource_tag(resource, key)`                                                | retrieve a tag value from a resource or return an empty string, aliased as get_resource_tag_value |
+| `format_resource(resource, resource_type)`                                   | renders a one line summary of a resource                                                          |
+| `date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z')` | customize rendering of an utc datetime string                                                     |
+| `seach(expression, value)`                                                   | jmespath search value using expression                                                            |
+| `yaml_safe(value)`                                                           | yaml dumper                                                                                       |
 
 The following extra jinja filters are available:
 
-| filter | behavior |
-|:----------|:-----------|
-| <code>utc_string&#124;date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z')</code> | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time |
-| <code>30&#124;get_date_time_delta</code> | Convert a time [delta](https://docs.python.org/2/library/datetime.html#datetime.timedelta) like '30' days in the future, to a datetime string. You can also use negative values for the past. |
+| filter                                                                                         | behavior                                                                                                                                                                                      |
+|:-----------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <code>utc_string&#124;date_time_format(tz_str='US/Pacific', format='%Y %b %d %H:%M %Z')</code> | pretty [format](https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior) the date / time                                                                                   |
+| <code>30&#124;get_date_time_delta</code>                                                       | Convert a time [delta](https://docs.python.org/2/library/datetime.html#datetime.timedelta) like '30' days in the future, to a datetime string. You can also use negative values for the past. |
 
 
 ## Developer Install (OS X El Capitan)

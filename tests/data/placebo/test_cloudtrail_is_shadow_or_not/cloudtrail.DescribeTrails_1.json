@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "MultiRegion1CloudTrail",
+                "S3BucketName": "cloudtrail-bucket-123456789012",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:123456789012:trail/MultiRegion1CloudTrail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true
+            },
+            {
+                "Name": "MultiRegion2CloudTrail",
+                "S3BucketName": "cloudtrail-bucket-123456789012",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-2",
+                "TrailARN": "arn:aws:cloudtrail:us-east-2:123456789012:trail/MultiRegion2CloudTrail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true
+            },
+            {
+                "Name": "SingleCloudTrail",
+                "S3BucketName": "cloudtrail-bucket-123456789012",
+                "IncludeGlobalServiceEvents": false,
+                "IsMultiRegionTrail": false,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:123456789012:trail/SingleCloudTrail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "eb7e5f92-ea5b-4a4a-b5e4-2cbef4d30dad",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "eb7e5f92-ea5b-4a4a-b5e4-2cbef4d30dad",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "756",
+                "date": "Wed, 23 Jan 2019 01:27:00 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

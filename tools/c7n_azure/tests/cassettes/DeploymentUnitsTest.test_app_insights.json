@@ -4,154 +4,34 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units?api-version=2018-05-01",
                 "body": null,
                 "headers": {}
             },
             "response": {
                 "status": {
-                    "code": 404,
-                    "message": "Not Found"
+                    "code": 200,
+                    "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Thu, 16 May 2019 17:02:57 GMT"
+                    "content-length": [
+                        "227"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-ms-failure-cause": [
-                        "gateway"
-                    ],
-                    "content-length": [
-                        "123"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "error": {
-                            "code": "ResourceGroupNotFound",
-                            "message": "Resource group 'custodian-test-deployment-units' could not be found."
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 404,
-                    "message": "Not Found"
-                },
-                "headers": {
                     "date": [
-                        "Thu, 16 May 2019 17:02:57 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                        "Fri, 24 May 2019 18:36:57 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "x-ms-failure-cause": [
-                        "gateway"
-                    ],
-                    "content-length": [
-                        "123"
                     ]
                 },
                 "body": {
                     "data": {
-                        "error": {
-                            "code": "ResourceGroupNotFound",
-                            "message": "Resource group 'custodian-test-deployment-units' could not be found."
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units?api-version=2018-05-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 404,
-                    "message": "Not Found"
-                },
-                "headers": {
-                    "date": [
-                        "Thu, 16 May 2019 17:02:58 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-ms-failure-cause": [
-                        "gateway"
-                    ],
-                    "content-length": [
-                        "123"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "error": {
-                            "code": "ResourceGroupNotFound",
-                            "message": "Resource group 'custodian-test-deployment-units' could not be found."
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-test-deployment-units?api-version=2018-05-01",
-                "body": "mock_body",
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 201,
-                    "message": "Created"
-                },
-                "headers": {
-                    "date": [
-                        "Thu, 16 May 2019 17:02:58 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "216"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units",
-                        "name": "custodian-test-deployment-units",
-                        "location": "westus2",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units",
+                        "name": "cloud-custodian-test-deployment-units",
+                        "location": "westus",
                         "properties": {
                             "provisioningState": "Succeeded"
                         }
@@ -162,7 +42,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -172,8 +52,8 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Thu, 16 May 2019 17:03:04 GMT"
+                    "access-control-expose-headers": [
+                        "Request-Context"
                     ],
                     "request-context": [
                         "appId=cid-v1:920e14b1-13f3-461a-a4bb-b4fe6f1a4525"
@@ -181,40 +61,40 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Fri, 24 May 2019 18:37:03 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "1199"
                     ],
-                    "access-control-expose-headers": [
-                        "Request-Context"
-                    ],
                     "content-length": [
-                        "887"
+                        "893"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-test-deployment-units/providers/microsoft.insights/components/cloud-custodian-test",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/components/cloud-custodian-test",
                         "name": "cloud-custodian-test",
                         "type": "microsoft.insights/components",
                         "location": "westus2",
                         "tags": {},
                         "kind": "web",
-                        "etag": "\"00004b0c-0000-0600-0000-5cdd97c50000\"",
+                        "etag": "\"0200ee3b-0000-0600-0000-5ce839cc0000\"",
                         "properties": {
                             "Ver": "v2",
                             "ApplicationId": "cloud-custodian-test",
-                            "AppId": "04676f08-51d6-48e5-a61e-9fd66e822521",
+                            "AppId": "5558a5ac-24f9-403e-a167-6c91731d948c",
                             "Application_Type": "web",
                             "Flow_Type": null,
                             "Request_Source": "IbizaWebAppExtensionCreate",
-                            "InstrumentationKey": "599138ac-860c-4d91-9819-ecee608ea5e8",
+                            "InstrumentationKey": "d0b4dcfa-3759-4b15-81e5-411c77d74d58",
                             "Name": "cloud-custodian-test",
-                            "CreationDate": "2019-05-16T17:03:00.9575893+00:00",
+                            "CreationDate": "2019-05-24T18:37:00.2622959+00:00",
                             "PackageId": null,
-                            "TenantId": "aa98974b-5d2a-4d98-a78a-382f3715d07e",
+                            "TenantId": "00000000-0000-0000-0000-000000000003",
                             "HockeyAppId": null,
                             "HockeyAppToken": null,
                             "provisioningState": "Succeeded",
