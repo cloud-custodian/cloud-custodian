@@ -13,7 +13,10 @@
 # limitations under the License.
 
 from c7n_azure.provider import resources
-import c7n_azure.actions
+import c7n_azure.actions.base
+import c7n_azure.actions.delete
+import c7n_azure.actions.notify
+import c7n_azure.actions.tagging
 import c7n_azure.filters
 import c7n_azure.output
 import c7n_azure.policy

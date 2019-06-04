@@ -1,3 +1,5 @@
+.. _azure_examples_resize_app_service_plan:
+
 Resize an Application Service Plan
 ==============================================================
 Count or Size can be provided individually or together.

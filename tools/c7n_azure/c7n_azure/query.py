@@ -14,7 +14,7 @@
 
 import logging
 import six
-from c7n_azure.actions import Notify
+from c7n_azure.actions.notify import Notify
 from c7n_azure import constants
 from c7n_azure.provider import resources
 

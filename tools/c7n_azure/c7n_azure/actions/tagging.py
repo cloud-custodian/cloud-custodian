@@ -1,116 +1,18 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-"""
-Actions to perform on Azure resources
-"""
-import abc
 import datetime
 import logging
 from email.utils import parseaddr
 
-from datetime import timedelta
-
 import jmespath
-import six
 from c7n_azure import constants
-from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.tags import TagHelper
-from c7n_azure.utils import utcnow, ThreadHelper, StringUtils
+from c7n_azure.utils import StringUtils
 from dateutil import tz as tzutils
-from msrestazure.azure_exceptions import CloudError
+from c7n_azure.actions.base import AzureBaseAction, AzureEventAction
 
 from c7n import utils
-from c7n.actions import BaseAction, BaseNotify, EventAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
-from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time
-from c7n.resolver import ValuesFrom
-from c7n.utils import type_schema
-
-
-@six.add_metaclass(abc.ABCMeta)
-class AzureBaseAction(BaseAction):
-    session = None
-    max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
-    chunk_size = constants.DEFAULT_CHUNK_SIZE
-    log = logging.getLogger('custodian.azure.AzureBaseAction')
-
-    def process(self, resources, event=None):
-        self.session = self.manager.get_session()
-        results, exceptions = self.process_in_parallel(resources, event)
-
-        if len(exceptions) > 0:
-            self.handle_exceptions(exceptions)
-
-        return results
-
-    def handle_exceptions(self, exceptions):
-        """raising one exception re-raises the last exception and maintains
-        the stack trace"""
-        raise exceptions[0]
-
-    def process_in_parallel(self, resources, event):
-        return ThreadHelper.execute_in_parallel(
-            resources=resources,
-            event=event,
-            execution_method=self._process_resources,
-            executor_factory=self.executor_factory,
-            log=self.log,
-            max_workers=self.max_workers,
-            chunk_size=self.chunk_size
-        )
-
-    def _process_resources(self, resources, event):
-        self._prepare_processing()
-
-        for r in resources:
-            try:
-                self._process_resource(r)
-            except CloudError as e:
-                self.log.error("Failed to process resource.\n"
-                               "Type: {0}.\n"
-                               "Name: {1}.\n"
-                               "Error: {2}".format(r['type'], r['name'], e))
-
-    def _prepare_processing(self):
-        pass
-
-    @abc.abstractmethod
-    def _process_resource(self, resource):
-        raise NotImplementedError(
-            "Base action class does not implement this behavior")
-
-
-@six.add_metaclass(abc.ABCMeta)
-class AzureEventAction(EventAction, AzureBaseAction):
-
-    def _process_resources(self, resources, event):
-        self._prepare_processing()
-
-        for r in resources:
-            try:
-                self._process_resource(r, event)
-            except CloudError as e:
-                self.log.error("Failed to process resource.\n"
-                               "Type: {0}.\n"
-                               "Name: {1}.\n"
-                               "Error: {2}".format(r['type'], r['name'], e))
-
-    @abc.abstractmethod
-    def _process_resource(self, resource, event):
-        raise NotImplementedError(
-            "Base action class does not implement this behavior")
 
 
 class Tag(AzureBaseAction):
@@ -308,6 +210,9 @@ class AutoTagUser(AzureEventAction):
             return False
 
     def _get_user_from_resource_logs(self, resource):
+        # Makes patching this easier
+        from c7n_azure.utils import utcnow
+
         # Calculate start time
         delta_days = self.data.get('days', self.max_query_days)
         start_time = utcnow() - datetime.timedelta(days=delta_days)
@@ -431,69 +336,6 @@ class TagTrim(AzureBaseAction):
         TagHelper.remove_tags(self, resource, candidates)
 
 
-class Notify(BaseNotify):
-    batch_size = 50
-
-    schema = {
-        'type': 'object',
-        'anyOf': [
-            {'required': ['type', 'transport', 'to']},
-            {'required': ['type', 'transport', 'to_from']}],
-        'properties': {
-            'type': {'enum': ['notify']},
-            'to': {'type': 'array', 'items': {'type': 'string'}},
-            'owner_absent_contact': {'type': 'array', 'items': {'type': 'string'}},
-            'to_from': ValuesFrom.schema,
-            'cc': {'type': 'array', 'items': {'type': 'string'}},
-            'cc_from': ValuesFrom.schema,
-            'cc_manager': {'type': 'boolean'},
-            'from': {'type': 'string'},
-            'subject': {'type': 'string'},
-            'template': {'type': 'string'},
-            'transport': {
-                'oneOf': [
-                    {'type': 'object',
-                     'required': ['type', 'queue'],
-                     'properties': {
-                         'queue': {'type': 'string'},
-                         'type': {'enum': ['asq']}
-                     }}],
-            },
-        }
-    }
-
-    def __init__(self, data=None, manager=None, log_dir=None):
-        super(Notify, self).__init__(data, manager, log_dir)
-
-    def process(self, resources, event=None):
-        session = utils.local_session(self.manager.session_factory)
-        subscription_id = session.get_subscription_id()
-        message = {
-            'event': event,
-            'account_id': subscription_id,
-            'account': subscription_id,
-            'region': 'all',
-            'policy': self.manager.data}
-
-        message['action'] = self.expand_variables(message)
-
-        for batch in utils.chunks(resources, self.batch_size):
-            message['resources'] = batch
-            receipt = self.send_data_message(message, session)
-            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
-                receipt, self.manager.data['name'],
-                self.data.get('template', 'default'), len(batch)))
-
-    def send_data_message(self, message, session):
-        if self.data['transport']['type'] == 'asq':
-            queue_uri = self.data['transport']['queue']
-            return self.send_to_azure_queue(queue_uri, message, session)
-
-    def send_to_azure_queue(self, queue_uri, message, session):
-        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri, session)
-        return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id
-
-
 DEFAULT_TAG = "custodian_status"
 
 
@@ -568,7 +410,7 @@ class TagDelayedAction(AzureBaseAction):
         if days is None or hours is None:
             # maintains default value of days being 4 if nothing is provided
             days = 4
-        action_date = (n + timedelta(days=days, hours=hours))
+        action_date = (n + datetime.timedelta(days=days, hours=hours))
         if hours > 0:
             action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
         else:
@@ -583,14 +425,3 @@ class TagDelayedAction(AzureBaseAction):
         tags[self.tag] = self.msg
 
         TagHelper.update_resource_tags(self, resource, tags)
-
-
-class DeleteAction(AzureBaseAction):
-    schema = type_schema('delete')
-
-    def _prepare_processing(self,):
-        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
-
-    def _process_resource(self, resource):
-        self.client.resources.delete_by_id(resource['id'],
-                                      self.session.resource_api_version(resource['id']))

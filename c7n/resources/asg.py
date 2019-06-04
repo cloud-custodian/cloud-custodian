@@ -18,8 +18,6 @@ from botocore.client import ClientError
 from collections import Counter
 from concurrent.futures import as_completed
 
-from datetime import datetime, timedelta
-from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import logging
@@ -29,12 +27,12 @@ import time
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, AgeFilter, Filter
-from c7n.filters.offhours import OffHour, OnHour, Time
+from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query
-from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
+from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
 from c7n.utils import local_session, type_schema, chunks, get_retry
 
 from .ec2 import deserialize_user_data
@@ -1360,7 +1358,7 @@ class RenameTag(Action):
 
 
 @ASG.action_registry.register('mark-for-op')
-class MarkForOp(Tag):
+class MarkForOp(TagDelayedAction):
     """Action to create a delayed action for a later date
 
     :example:
@@ -1387,61 +1385,25 @@ class MarkForOp(Tag):
         op={'type': 'string'},
         key={'type': 'string'},
         tag={'type': 'string'},
+        tz={'type': 'string'},
         message={'type': 'string'},
         days={'type': 'number', 'minimum': 0},
         hours={'type': 'number', 'minimum': 0})
-
+    schema_alias = False
     default_template = (
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
-    def validate(self):
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
-        if not self.tz:
-            raise PolicyValidationError(
-                "Invalid timezone specified %s on %s" % (self.tz, self.manager.data))
-        op = self.data.get('op')
-        if op not in self.manager.action_registry:
-            raise PolicyValidationError(
-                "Invalid op %s for asg on policy %s" % (op, self.manager.data))
-        return self
-
-    def process(self, asgs):
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
-
-        msg_tmpl = self.data.get('message', self.default_template)
-        key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
-        op = self.data.get('op', 'suspend')
-        days = self.data.get('days', 0)
-        hours = self.data.get('hours', 0)
-
-        action_date = self._generate_timestamp(days, hours)
-        try:
-            msg = msg_tmpl.format(
-                op=op, action_date=action_date)
-        except Exception:
-            self.log.warning("invalid template %s" % msg_tmpl)
-            msg = self.default_template.format(
-                op=op, action_date=action_date)
-
-        self.log.info("Tagging %d asgs for %s on %s" % (
-            len(asgs), op, action_date))
-        client = local_session(self.manager.session_factory).client('autoscaling')
-        self.process_resource_set(client, asgs, [{'Key': key, 'Value': msg}])
-
-    def _generate_timestamp(self, days, hours):
-        n = datetime.now(tz=self.tz)
-        if days == hours == 0:
-            # maintains default value of days being 4 if nothing is provided
-            days = 4
-        action_date = (n + timedelta(days=days, hours=hours))
-        if hours > 0:
-            action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
-        else:
-            action_date_string = action_date.strftime('%Y/%m/%d')
-
-        return action_date_string
+    def get_config_values(self):
+        d = {
+            'op': self.data.get('op', 'stop'),
+            'tag': self.data.get('key', self.data.get('tag', DEFAULT_TAG)),
+            'msg': self.data.get('message', self.default_template),
+            'tz': self.data.get('tz', 'utc'),
+            'days': self.data.get('days', 0),
+            'hours': self.data.get('hours', 0)}
+        d['action_date'] = self.generate_timestamp(
+            d['days'], d['hours'])
+        return d
 
 
 @ASG.action_registry.register('suspend')

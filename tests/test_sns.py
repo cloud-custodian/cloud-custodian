@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 
 from .common import BaseTest, functional
+from c7n.utils import yaml_load
 
 
 class TestSNS(BaseTest):
@@ -593,3 +594,20 @@ class TestSNS(BaseTest):
         self.assertEqual(len(resources), 1)
         attributes = sns.get_topic_attributes(TopicArn=topic)['Attributes']
         self.assertEqual(attributes.get('KmsMasterKeyId'), key_alias)
+
+    def test_sns_delete(self):
+        session_factory = self.replay_flight_data('test_sns_delete_topic')
+        policy = """
+        name: delete-sns
+        resource: aws.sns
+        filters:
+          - TopicArn: arn:aws:sns:us-west-1:644160558196:test
+        actions:
+          - type: delete
+        """
+        p = self.load_policy(yaml_load(policy), session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('sns')
+        resources = client.list_topics()['Topics']
+        self.assertEqual(len(resources), 0)

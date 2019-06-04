@@ -182,15 +182,18 @@ class FunctionAppUtilities(object):
                 properties=app_settings.properties
             )
 
-        # sync the scale controller for the Function App
-        if not cls._sync_function_triggers(function_params):
-            cls.log.error("Unable to sync triggers...")
+            # Sync the scale controller for the Function App.
+            # Not required for the dedicated plans.
+            cls._sync_function_triggers(function_params)
 
         cls.log.info('Finished publishing Function application')
 
     @classmethod
     def _sync_function_triggers(cls, function_params):
         cls.log.info('Sync Triggers...')
+        # This delay replicates behavior of Azure Functions Core tool
+        # Link to the github: https://bit.ly/2K5oXbS
+        time.sleep(5)
         session = local_session(Session)
         web_client = session.client('azure.mgmt.web.WebSiteManagementClient')
 
@@ -218,4 +221,5 @@ class FunctionAppUtilities(object):
                 cls.log.info("Retrying in 5 seconds...")
                 time.sleep(5)
 
+        cls.log.error("Unable to sync triggers...")
         return False

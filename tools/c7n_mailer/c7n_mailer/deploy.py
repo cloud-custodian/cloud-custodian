@@ -44,10 +44,14 @@ def get_archive(config):
         'c7n_mailer',
         # core deps
         'jinja2', 'markupsafe', 'ruamel', 'ldap3', 'pyasn1', 'redis',
+        # for other dependencies
+        'pkg_resources',
         # transport datadog - recursive deps
         'datadog', 'simplejson', 'decorator',
-        # requests (recursive deps), needed by datadog and slackclient
-        'requests', 'urllib3', 'idna', 'chardet', 'certifi'])
+        # requests (recursive deps), needed by datadog, slackclient, splunk
+        'requests', 'urllib3', 'idna', 'chardet', 'certifi',
+        # used by splunk; also dependencies of c7n itself
+        'jsonpointer', 'jsonpatch'])
 
     for d in set(config['templates_folders']):
         if not os.path.exists(d):
