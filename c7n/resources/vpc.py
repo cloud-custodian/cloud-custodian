@@ -1413,8 +1413,9 @@ class DeleteNetworkInterface(BaseAction):
                 self.manager.retry(
                     client.delete_network_interface,
                     NetworkInterfaceId=r['NetworkInterfaceId'])
-            except client.exceptions.NotFoundException:
-                pass
+            except ClientError as err:
+                if not err.response['Error']['Code'] == 'InvalidNetworkInterfaceID.NotFound':
+                    raise
 
 
 @resources.register('route-table')

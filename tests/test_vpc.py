@@ -668,7 +668,8 @@ class NetworkInterfaceTest(BaseTest):
         self.assertEqual(len(resources), 1)
         with self.assertRaises(client.exceptions.ClientError) as e:
             client.describe_network_interfaces(NetworkInterfaceIds=[eni])
-        self.assertEqual(e.exception.response['Error']['Code'], 'InvalidNetworkInterfaceID.NotFound')
+        self.assertEqual(e.exception.response['Error']['Code'],
+            'InvalidNetworkInterfaceID.NotFound')
 
     @functional
     def test_interface_subnet(self):
