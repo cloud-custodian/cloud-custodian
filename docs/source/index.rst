@@ -20,6 +20,7 @@ Navigate below and get started with Cloud Custodian!
    overview/index
    quickstart/index
    filters
+   actions
    quickstart/advanced
    quickstart/policyStructure
    overview/glossary
