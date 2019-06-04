@@ -31,29 +31,3 @@ Deletes all disks that are currently not being managed by a VM
             value: null
         actions:
           - type: delete
-
-This set of policies will mark all disks for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
-
-.. code-block:: yaml
-
-    policies:
-      - name: mark-test-disk-for-deletion
-        resource: azure.disk
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-disk
-        resource: azure.disk
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete

@@ -18,28 +18,15 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all VM Scale Sets for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
+This set of policies will find all VM Scale Sets that are set to overprovision.
 
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-vmscaleset-for-deletion
+      - name: find-vmss-overprovision-true
         resource: azure.vmss
         filters:
           - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-        actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-vmscaleset
-        resource: azure.vmss
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
+            key: properties.overprovision
+            op: equal
+            value: True

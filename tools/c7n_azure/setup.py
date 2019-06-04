@@ -63,7 +63,7 @@ setup(
                       "azure-mgmt-web",
                       "azure-mgmt-monitor",
                       "azure-mgmt-policyinsights",
-                      "azure-mgmt-eventgrid==2.0.0rc2",  # RC2 supports AdvancedFilters
+                      "azure-mgmt-eventgrid",
                       "azure-graphrbac",
                       "azure-keyvault",
                       "azure-storage-blob",
@@ -72,7 +72,6 @@ setup(
                       "requests",
                       "PyJWT",
                       "c7n",
-                      "requests",
                       "azure-cli-core",
                       "adal",
                       "backports.functools_lru_cache",
