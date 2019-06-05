@@ -512,7 +512,8 @@ class AWS(object):
             options.region,
             options.profile,
             options.assume_role,
-            options.external_id)
+            options.external_id,
+            options.credential_helper)
 
     def initialize_policies(self, policy_collection, options):
         """Return a set of policies targetted to the given regions.

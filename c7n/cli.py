@@ -63,6 +63,9 @@ def _default_options(p, blacklist=""):
     provider.add_argument("--external-id", default=None, dest="external_id",
                           help="External Id to provide when assuming a role")
 
+    provider.add_argument("--credential-helper-cmd", default=None, dest="credential_helper",
+                          help="Credential Helper command to invoke to fetch token information")
+
     config = p.add_argument_group(
         "config", "Policy config file(s) and policy selectors")
     # -c is deprecated.  Supported for legacy reasons
