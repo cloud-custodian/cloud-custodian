@@ -50,7 +50,7 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
 
-  - script: sudo apt-get -y install sqlite3
+  - script: sudo apt-get -y install sqlite3 libsqlite3-0
     displayName: 'Install Package Dependencies'
 
   - script: python -m pip install --upgrade pip && pip install tox codecov
