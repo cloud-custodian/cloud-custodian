@@ -16,12 +16,7 @@ import json
 import re
 import redis
 
-try:
-    import sqlite3
-except ImportError:
-    have_sqlite = False
-else:
-    have_sqlite = True
+import sqlite3
 from ldap3 import Connection
 from ldap3.core.exceptions import LDAPSocketOpenError
 
