@@ -664,7 +664,11 @@ class NetworkInterfaceTest(BaseTest):
                 "actions": [
                     {
                         "type": "delete",
-                    }
+                    },
+                    {
+                        # ensure graceful handling of multiple delete attempts
+                        "type": "delete",
+                    },
                 ],
             },
             session_factory=factory,
