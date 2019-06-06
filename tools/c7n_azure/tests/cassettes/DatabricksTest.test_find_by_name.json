@@ -1,0 +1,109 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Databricks/workspaces?api-version=2018-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 06 Jun 2019 19:22:18 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1457"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "managedResourceGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks_managed",
+                                    "parameters": {
+                                        "customPrivateSubnetName": {
+                                            "type": "String",
+                                            "value": ""
+                                        },
+                                        "customPublicSubnetName": {
+                                            "type": "String",
+                                            "value": ""
+                                        },
+                                        "customVirtualNetworkId": {
+                                            "type": "String",
+                                            "value": ""
+                                        },
+                                        "enableNoPublicIp": {
+                                            "type": "Bool",
+                                            "value": false
+                                        },
+                                        "relayNamespaceName": {
+                                            "type": "String",
+                                            "value": "dbrelaype6gvbvlxqb5a"
+                                        },
+                                        "storageAccountName": {
+                                            "type": "String",
+                                            "value": "dbstoragepe6gvbvlxqb5a"
+                                        },
+                                        "storageAccountSkuName": {
+                                            "type": "String",
+                                            "value": "Standard_GRS"
+                                        },
+                                        "vnetAddressPrefix": {
+                                            "type": "String",
+                                            "value": "10.139"
+                                        },
+                                        "resourceTags": {
+                                            "type": "Object",
+                                            "value": {
+                                                "application": "databricks",
+                                                "databricks-environment": "true"
+                                            }
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "authorizations": [
+                                        {
+                                            "principalId": "9a74af6f-d153-4348-988a-e2672920bee9",
+                                            "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                                        }
+                                    ],
+                                    "createdBy": {
+                                        "oid": "3857c640-b81d-4a7b-b006-ca39332fddb2",
+                                        "puid": "10037FFE801B55B5",
+                                        "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                                    },
+                                    "updatedBy": {
+                                        "oid": "3857c640-b81d-4a7b-b006-ca39332fddb2",
+                                        "puid": "10037FFE801B55B5",
+                                        "applicationId": "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_databricks/providers/Microsoft.Databricks/workspaces/custodiandatabricks",
+                                "name": "custodiandatabricks",
+                                "type": "Microsoft.Databricks/workspaces",
+                                "sku": {
+                                    "name": "standard"
+                                },
+                                "location": "southcentralus"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

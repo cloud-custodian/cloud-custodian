@@ -50,6 +50,7 @@ setup(
                       "azure-mgmt-cdn",
                       "azure-mgmt-containerregistry",
                       "azure-mgmt-containerservice",
+                      "azure-mgmt-databricks",
                       "azure-mgmt-datalake-store",
                       "azure-mgmt-datafactory",
                       "azure-mgmt-iothub",
