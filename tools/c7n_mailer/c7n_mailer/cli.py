@@ -111,6 +111,15 @@ CONFIG_SCHEMA = {
         'slack_token': {'type': 'string'},
         'slack_webhook': {'type': 'string'},
         'sendgrid_api_key': {'type': 'string'},
+        'splunk_hec_url': {'type': 'string'},
+        'splunk_hec_token': {'type': 'string'},
+        'splunk_remove_paths': {
+            'type': 'array',
+            'items': {'type': 'string'}
+        },
+        'splunk_actions_list': {'type': 'boolean'},
+        'splunk_max_attempts': {'type': 'integer'},
+        'splunk_hec_max_length': {'type': 'integer'},
 
         # SDK Config
         'profile': {'type': 'string'},

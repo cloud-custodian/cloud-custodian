@@ -26,7 +26,7 @@ requires = [
     "python-dateutil>=2.8",
     "ruamel.yaml==0.15.88",
     "datadog",
-    "sendgrid",
+    "sendgrid==6.0.5",
     "ldap3",
     "c7n",
     "redis"]
@@ -57,7 +57,7 @@ setup(
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
     entry_points={

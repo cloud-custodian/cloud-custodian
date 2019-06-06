@@ -31,10 +31,10 @@ Option 2: Install latest from the repository
 
 .. code-block:: bash
 
-    $ git clone https://github.com/capitalone/cloud-custodian.git
+    $ git clone https://github.com/cloud-custodian/cloud-custodian.git
     $ cd cloud-custodian
-    $ pip install -e ./cloud-custodian
-    $ pip install -e ./cloud-custodian/tools/c7n_azure
+    $ pip install -e .
+    $ pip install -e tools/c7n_azure
 
 
 .. _azure_write-policy:
@@ -94,3 +94,20 @@ files (subsequent runs will append to the log by default rather than
 overwriting it).
 
 See :ref:`filters` for more information on the features of the Value filter used in this sample.
+
+.. _monitor-azure-cc:
+
+Monitor Azure
+-------------
+
+You can generate App Insights metrics by specifying the ``--metrics`` flag and specifying ``azure``::
+
+  $ custodian run -s <output_directory> --metrics azure <policyfile>.yml
+
+You can also upload Cloud Custodian logs to App Insights logs::
+
+  $ custodian run --log-group=azure://cloud-custodian/<dev-account>/<region> -s <output_directory> <policyfile>.yml
+
+And you can output logs and resource records to Azure storage accounts::
+
+  $ custodian run -s azure://<my-bucket><my-prefix> <policyfile>.yml

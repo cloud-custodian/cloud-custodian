@@ -13,12 +13,16 @@
 # limitations under the License.
 
 from c7n_azure.provider import resources
-import c7n_azure.actions
+import c7n_azure.actions.base
+import c7n_azure.actions.delete
+import c7n_azure.actions.notify
+import c7n_azure.actions.tagging
 import c7n_azure.filters
 import c7n_azure.output
 import c7n_azure.policy
 import c7n_azure.resources.cosmos_db
 import c7n_azure.resources.key_vault
+import c7n_azure.resources.key_vault_keys
 import c7n_azure.resources.load_balancer
 import c7n_azure.resources.resourcegroup
 import c7n_azure.resources.public_ip

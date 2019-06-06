@@ -13,7 +13,9 @@
 # limitations under the License.
 import collections
 import datetime
+import enum
 import hashlib
+import isodate
 import logging
 import re
 import time
@@ -27,6 +29,7 @@ from c7n_azure import constants
 from concurrent.futures import as_completed
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
+from netaddr import IPNetwork, IPRange
 
 from c7n.utils import chunks
 from c7n.utils import local_session
@@ -136,7 +139,7 @@ def custodian_azure_send_override(self, request, headers=None, content=None, **k
             else:
                 send_logger.error("Received throttling error, retry time is %i"
                                   "(retry only if < %i seconds)."
-                                  % (retry_after, constants.DEFAULT_MAX_RETRY_AFTER))
+                                  % (retry_after or 0, constants.DEFAULT_MAX_RETRY_AFTER))
                 break
         else:
             break
@@ -380,6 +383,29 @@ class PortsRangeHelper(object):
         return ports
 
 
+class IpRangeHelper(object):
+
+    @staticmethod
+    def parse_ip_ranges(data, key):
+        '''
+        Parses IP range or CIDR mask.
+        :param data: Dictionary where to look for the value.
+        :param key:  Key for the value to be parsed.
+        :return: Set of IP ranges and networks.
+        '''
+
+        if key not in data:
+            return None
+
+        ranges = [[s.strip() for s in r.split('-')] for r in data[key]]
+        result = set()
+        for r in ranges:
+            if len(r) > 2:
+                raise Exception('Invalid range. Use x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.')
+            result.add(IPRange(*r) if len(r) == 2 else IPNetwork(r[0]))
+        return result
+
+
 class AppInsightsHelper(object):
     log = logging.getLogger('custodian.azure.utils.AppInsightsHelper')
 
@@ -418,3 +444,52 @@ class ManagedGroupHelper(object):
         entities = client.entities.list(filter='name eq \'%s\'' % managed_resource_group)
 
         return [e.name for e in entities if e.type == '/subscriptions']
+
+
+def generate_key_vault_url(name):
+    return constants.TEMPLATE_KEYVAULT_URL.format(name)
+
+
+class RetentionPeriod(object):
+
+    PATTERN = re.compile("^P([1-9][0-9]*)([DWMY])$")
+
+    @enum.unique
+    class Units(enum.Enum):
+        day = ('day', 'D')
+        days = ('days', 'D')
+        week = ('week', 'W')
+        weeks = ('weeks', 'W')
+        month = ('month', 'M')
+        months = ('months', 'M')
+        year = ('year', 'Y')
+        years = ('years', 'Y')
+
+        def __init__(self, str_value, iso8601_symbol):
+            self.str_value = str_value
+            self.iso8601_symbol = iso8601_symbol
+
+        def __str__(self):
+            return self.str_value
+
+    @staticmethod
+    def duration_from_period_and_units(period, retention_period_unit):
+        iso8601_str = "P{}{}".format(period, retention_period_unit.iso8601_symbol)
+        duration = isodate.parse_duration(iso8601_str)
+        return duration
+
+    @staticmethod
+    def parse_iso8601_retention_period(iso8601_retention_period):
+        """
+        A simplified iso8601 duration parser that only accepts one duration designator.
+        """
+        match = re.match(RetentionPeriod.PATTERN, iso8601_retention_period)
+        if match is None:
+            raise ValueError("Invalid iso8601_retention_period: {}. "
+            "This parser only accepts a single duration designator."
+            .format(iso8601_retention_period))
+        period = int(match.group(1))
+        iso8601_symbol = match.group(2)
+        units = next(units for units in RetentionPeriod.Units
+            if units.iso8601_symbol == iso8601_symbol)
+        return period, units

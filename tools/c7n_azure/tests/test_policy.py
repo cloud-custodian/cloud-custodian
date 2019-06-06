@@ -249,3 +249,27 @@ class AzurePolicyModeTest(BaseTest):
                              ['Microsoft.Compute/virtualMachines/write',
                               'Microsoft.Resources/subscriptions/resourceGroups/write'])
             self.assertEqual(event_filter.operator_type, 'StringIn')
+
+    def test_extract_properties(self):
+        resource_id = '/subscriptions/{0}/resourceGroups/rg/providers' \
+                      '/Microsoft.Web/serverFarms/test'.format(DEFAULT_SUBSCRIPTION_ID)
+        r = AzureFunctionMode.extract_properties({}, '', {})
+        self.assertEqual(r, {})
+
+        r = AzureFunctionMode.extract_properties({}, 'v', {'v': 'default'})
+        self.assertEqual(r, {'v': 'default'})
+
+        r = AzureFunctionMode.extract_properties({'v': resource_id}, 'v', {'v': 'default'})
+        self.assertEqual(r, {'id': resource_id, 'name': 'test', 'resource_group_name': 'rg'})
+
+        r = AzureFunctionMode.extract_properties(
+            {'v': {'test1': 'value1', 'testCamel': 'valueCamel'}},
+            'v',
+            {'test1': None, 'test_camel': None})
+        self.assertEqual(r, {'test1': 'value1', 'test_camel': 'valueCamel'})
+
+        r = AzureFunctionMode.extract_properties(
+            {'v': {'t1': 'v1', 'nestedValue': {'testCamel': 'valueCamel'}}},
+            'v',
+            {'t1': None, 'nested_value': {'test_camel': None}, 't2': 'v2'})
+        self.assertEqual(r, {'t1': 'v1', 't2': 'v2', 'nested_value': {'test_camel': 'valueCamel'}})

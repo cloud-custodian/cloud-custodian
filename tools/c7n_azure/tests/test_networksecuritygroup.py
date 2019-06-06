@@ -189,10 +189,7 @@ class NetworkSecurityGroupTest(BaseTest):
                  'op': 'eq',
                  'value_type': 'normalize',
                  'value': 'c7n-nsg'},
-                {'type': 'ingress',
-                 'ports': '1000-1100',
-                 'match': 'any',
-                 'access': 'Deny'}],
+            ],
             'actions': [
                 {
                     'type': 'open',
@@ -216,11 +213,7 @@ class NetworkSecurityGroupTest(BaseTest):
                 {'type': 'ingress',
                  'ports': '1000-1100',
                  'match': 'any',
-                 'access': 'Deny'}],
-            'actions': [
-                {'type': 'open',
-                 'ports': '1000-1100',
-                 'direction': 'Inbound'}]
+                 'access': 'Deny'}]
         })
 
         resources = p.run()

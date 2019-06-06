@@ -13,12 +13,13 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template, DEFAULT_TENANT_ID
+from azure_common import BaseTest, arm_template
 from c7n_azure.resources.key_vault import KeyVaultUpdateAccessPolicyAction, WhiteListFilter
 from c7n_azure.session import Session
 from c7n.utils import local_session
-from mock import patch
+from mock import patch, Mock
 from msrestazure.azure_exceptions import CloudError
+from requests import Response
 
 
 class KeyVaultTest(BaseTest):
@@ -83,8 +84,7 @@ class KeyVaultTest(BaseTest):
         self.assertFalse(WhiteListFilter.compare_permissions(p1, p2))
 
     @arm_template('keyvault.json')
-    @patch('c7n_azure.session.Session.get_tenant_id', return_value=DEFAULT_TENANT_ID)
-    def test_whitelist(self, get_tenant_id):
+    def test_whitelist(self):
         """Tests basic whitelist functionality"""
         p = self.load_policy({
             'name': 'test-key-vault',
@@ -130,16 +130,20 @@ class KeyVaultTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     @arm_template('keyvault.json')
-    @patch('c7n_azure.session.Session.get_tenant_id', return_value=DEFAULT_TENANT_ID)
-    def test_whitelist_not_authorized(self, get_tenant_id):
+    @patch('c7n_azure.utils.GraphHelper.get_principal_dictionary', )
+    def test_whitelist_not_authorized(self, get_principal_dictionary):
         """Tests that an exception is thrown when both:
-        * The Microsoft Graph call fails
-        * A Graph provided field is being measured (principleName in this case)
-        Note: to regenerate the cassette for this test case, use a service principle / user who
-        does not have the correct permissions to access Microsoft Graph:
-        See https://docs.microsoft.com/en-us/graph/api/directoryobject-getbyids for required
-        permissions.
-        """
+          The Microsoft Graph call fails.
+
+          This is mocked because it is impractical to have
+          identities with varying levels of graph access for
+          live test runs or recordings"""
+
+        mock_response = Mock(spec=Response)
+        mock_response.status_code = 403
+        mock_response.text = 'forbidden'
+        get_principal_dictionary.side_effect = CloudError(mock_response)
+
         p = self.load_policy({
             'name': 'test-key-vault',
             'resource': 'azure.keyvault',
@@ -161,10 +165,6 @@ class KeyVaultTest(BaseTest):
             p.run()
 
         self.assertEqual(403, e.exception.status_code)
-        self.assertEqual("Operation failed with status: 'Forbidden'. Details: 403 Client Error: "
-                         "Forbidden for url: https://graph.windows.net/"
-                         "ea42f556-5106-4743-99b0-c129bfa71a47/getObjectsByObjectIds?"
-                         "api-version=1.6", e.exception.message)
 
     def test_update_access_policy_action(self):
         with patch(self._get_key_vault_client_string() + '.update_access_policy')\

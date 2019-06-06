@@ -1,0 +1,221 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments?api-version=2018-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:33:10 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "5052"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "A0",
+                                    "tier": "Free"
+                                },
+                                "properties": {
+                                    "displayName": "cctestpolicy",
+                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/06a78e20-9358-41c9-923c-fb736d382a4d",
+                                    "scope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "metadata": {
+                                        "createdBy": "3857c640-b81d-4a7b-b006-ca39332fddb2",
+                                        "createdOn": "2019-05-01T22:48:36.8615186Z",
+                                        "updatedBy": null,
+                                        "updatedOn": null
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/cctestpolicy",
+                                "type": "Microsoft.Authorization/policyAssignments",
+                                "name": "cctestpolicy"
+                            },
+                            {
+                                "sku": {
+                                    "name": "A1",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "displayName": "ASC DataProtection (subscription: ea42f556-5106-4743-99b0-c129bfa71a47)",
+                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/9cb3cc7a-b39b-4b82-bc89-e5a5d9ff7b97",
+                                    "scope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "description": "This policy assignment was automatically created by Azure Security Center",
+                                    "metadata": {
+                                        "assignedBy": "Security Center",
+                                        "createdBy": "6878917f-bc1d-4e4e-bb24-12924205b215",
+                                        "createdOn": "2019-03-04T15:23:23.8847211Z",
+                                        "updatedBy": null,
+                                        "updatedOn": null
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/DataProtectionSecurityCenter",
+                                "type": "Microsoft.Authorization/policyAssignments",
+                                "name": "DataProtectionSecurityCenter"
+                            },
+                            {
+                                "sku": {
+                                    "name": "A1",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "displayName": "ASC Default (subscription: ea42f556-5106-4743-99b0-c129bfa71a47)",
+                                    "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+                                    "scope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "parameters": {
+                                        "diagnosticsLogsInServiceFabricMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "systemUpdatesMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "systemConfigurationsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "endpointProtectionMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diskEncryptionMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "networkSecurityGroupsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "webApplicationFirewallMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "sqlAuditingMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "sqlEncryptionMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "nextGenerationFirewallMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "vulnerabilityAssesmentMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "storageEncryptionMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "jitNetworkAccessMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "adaptiveApplicationControlsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityDesignateLessThanOwnersMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityDesignateMoreThanOneOwnerMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityEnableMFAForOwnerPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityEnableMFAForWritePermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityEnableMFAForReadPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveDeprecatedAccountWithOwnerPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveDeprecatedAccountMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveExternalAccountWithOwnerPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveExternalAccountWithWritePermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "identityRemoveExternalAccountWithReadPermissionsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "secureTransferToStorageAccountMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "aadAuthenticationInSqlServerMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInRedisCacheMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "clusterProtectionLevelInServiceFabricMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "aadAuthenticationInServiceFabricMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "diagnosticsLogsInServiceBusMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInDataLakeAnalyticsMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInDataLakeStoreMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInBatchAccountMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "diagnosticsLogsInEventHubMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "metricAlertsInBatchAccountMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        },
+                                        "namespaceAuthorizationRulesInServiceBusMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "disableUnrestrictedNetworkToStorageAccountMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "classicComputeVMsMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "classicStorageAccountsMonitoringEffect": {
+                                            "value": "Audit"
+                                        },
+                                        "sqlDbVulnerabilityAssesmentMonitoringEffect": {
+                                            "value": "AuditIfNotExists"
+                                        }
+                                    },
+                                    "description": "This policy assignment was automatically created by Azure Security Center",
+                                    "metadata": {
+                                        "assignedBy": "Security Center"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/SecurityCenterBuiltIn",
+                                "type": "Microsoft.Authorization/policyAssignments",
+                                "name": "SecurityCenterBuiltIn"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -14,9 +14,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import base64
+from datetime import datetime, timedelta
+import functools
 import json
 import os
-from datetime import datetime, timedelta
+import time
 
 import jinja2
 import jmespath
@@ -28,7 +30,7 @@ from ruamel import yaml
 
 def get_jinja_env(template_folders):
     env = jinja2.Environment(trim_blocks=True, autoescape=False)
-    env.filters['yaml_safe'] = yaml.safe_dump
+    env.filters['yaml_safe'] = functools.partial(yaml.safe_dump, default_flow_style=False)
     env.filters['date_time_format'] = date_time_format
     env.filters['get_date_time_delta'] = get_date_time_delta
     env.filters['get_date_age'] = get_date_age
@@ -53,6 +55,17 @@ def get_rendered_jinja(
     except Exception as error_msg:
         logger.error("Invalid template reference %s\n%s" % (mail_template, error_msg))
         return
+
+    # recast seconds since epoch as utc iso datestring, template
+    # authors can use date_time_format helper func to convert local
+    # tz. if no execution start time was passed use current time.
+    execution_start = datetime.utcfromtimestamp(
+        sqs_message.get(
+            'execution_start',
+            time.mktime(
+                datetime.utcnow().timetuple())
+        )).isoformat()
+
     rendered_jinja = template.render(
         recipient=target,
         resources=resources,
@@ -61,6 +74,7 @@ def get_rendered_jinja(
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
+        execution_start=execution_start,
         region=sqs_message.get('region', ''))
     return rendered_jinja
 
@@ -349,3 +363,37 @@ def kms_decrypt(config, logger, session, encrypted_field):
     else:
         logger.debug("No encrypted value to decrypt.")
         return None
+
+
+# https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
+def get_aws_username_from_event(logger, event):
+    if event is None:
+        return None
+    identity = event.get('detail', {}).get('userIdentity', {})
+    if not identity:
+        logger.warning("Could not get recipient from event \n %s" % (
+            format_struct(event)))
+        return None
+    if identity['type'] == 'AssumedRole':
+        logger.debug(
+            'In some cases there is no ldap uid is associated with AssumedRole: %s',
+            identity['arn'])
+        logger.debug(
+            'We will try to assume that identity is in the AssumedRoleSessionName')
+        user = identity['arn'].rsplit('/', 1)[-1]
+        if user is None or user.startswith('i-') or user.startswith('awslambda'):
+            return None
+        if ':' in user:
+            user = user.split(':', 1)[-1]
+        return user
+    if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
+        return identity['userName']
+    if identity['type'] == 'Root':
+        return None
+    # this conditional is left here as a last resort, it should
+    # be better documented with an example UserIdentity json
+    if ':' in identity['principalId']:
+        user_id = identity['principalId'].split(':', 1)[-1]
+    else:
+        user_id = identity['principalId']
+    return user_id

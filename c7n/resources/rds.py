@@ -96,6 +96,7 @@ class RDS(QueryResourceManager):
         date = 'InstanceCreateTime'
         dimension = 'DBInstanceIdentifier'
         config_type = 'AWS::RDS::DBInstance'
+        arn = 'DBInstanceArn'
 
         default_report_fields = (
             'DBInstanceIdentifier',
@@ -453,8 +454,7 @@ class TagTrim(tags.TagTrim):
     permissions = ('rds:RemoveTagsFromResource',)
 
     def process_tag_removal(self, client, resource, candidates):
-        arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
-        client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
+        client.remove_tags_from_resource(ResourceName=resource['DBInstanceArn'], TagKeys=candidates)
 
 
 START_STOP_ELIGIBLE_ENGINES = {
@@ -1651,3 +1651,19 @@ class ModifyDb(BaseAction):
                 c.modify_db_instance(**param)
             except c.exceptions.DBInstanceNotFoundFault:
                 raise
+
+
+@resources.register('rds-reserved')
+class ReservedRDS(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'rds'
+        name = id = 'ReservedDBInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_db_instances', 'ReservedDBInstances', None)
+        filter_name = 'ReservedDBInstances'
+        filter_type = 'list'
+        dimension = None
+        type = "reserved-db"
+        arn = "ReservedDBInstanceArn"

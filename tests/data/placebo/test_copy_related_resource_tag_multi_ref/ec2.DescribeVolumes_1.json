@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "Volumes": [
+            {
+                "Attachments": [],
+                "AvailabilityZone": "us-west-2a",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 3,
+                    "day": 6,
+                    "hour": 21,
+                    "minute": 50,
+                    "second": 37,
+                    "microsecond": 143000
+                },
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/68425528-9938-4a15-90f2-f1755263b836",
+                "Size": 8,
+                "SnapshotId": "",
+                "State": "available",
+                "VolumeId": "vol-069d75193c497b8aa",
+                "Iops": 100,
+                "Tags": [
+                    {
+                        "Key": "test",
+                        "Value": "test"
+                    }
+                ],
+                "VolumeType": "gp2"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "a65cf257-c79f-4212-b604-37426556c99a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "951",
+                "date": "Thu, 16 May 2019 17:06:37 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

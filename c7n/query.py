@@ -109,7 +109,7 @@ class ResourceQuery(object):
         resources = self.filter(resource_manager, **params)
         if client_filter:
             # This logic was added to prevent the issue from:
-            # https://github.com/capitalone/cloud-custodian/issues/1398
+            # https://github.com/cloud-custodian/cloud-custodian/issues/1398
             if all(map(lambda r: isinstance(r, six.string_types), resources)):
                 resources = [r for r in resources if r in identities]
             else:
@@ -369,8 +369,6 @@ class QueryResourceManager(ResourceManager):
 
     resource_type = ""
 
-    retry = None
-
     # TODO Check if we can move to describe source
     max_workers = 3
     chunk_size = 20
@@ -555,8 +553,8 @@ class QueryResourceManager(ResourceManager):
                 self.get_model().service,
                 region=not self.resource_type.global_resource and self.config.region or "",
                 account_id=self.account_id,
-                resource_type=self.get_model().arn_type,
-                separator='/')
+                resource_type=self.resource_type.arn_type,
+                separator=self.resource_type.arn_separator)
         return self._generate_arn
 
 

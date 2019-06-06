@@ -21,6 +21,7 @@ from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from mock import patch
 
 from c7n.utils import local_session
+from c7n.mu import PythonPackageArchive
 from c7n_azure.session import Session
 
 CONST_GROUP_NAME = 'test_functionapp-reqs'
@@ -65,7 +66,8 @@ class FunctionAppUtilsTest(BaseTest):
             service_plan={
                 'id': '',
                 'resource_group_name': CONST_GROUP_NAME,
-                'name': 'cloud-custodian-test'
+                'name': 'cloud-custodian-test',
+                'location': 'westus2'
             },
             function_app_resource_group_name=CONST_GROUP_NAME,
             function_app_name='custodian-test-app')
@@ -136,7 +138,8 @@ class FunctionAppUtilsTest(BaseTest):
         self.assertFalse(FunctionAppUtilities.is_consumption_plan(params))
 
     @arm_template('functionapp-reqs.json')
-    def test_publish_functions_package_consumption(self):
+    @patch('time.sleep')
+    def test_publish_functions_package_consumption(self, _1):
         parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights={
                 'id': '',
@@ -158,6 +161,7 @@ class FunctionAppUtilsTest(BaseTest):
             function_app_name='cloud-custodian-test')
 
         package = FunctionPackage("TestPolicy")
+        package.pkg = PythonPackageArchive()
         package.close()
 
         FunctionAppUtilities.publish_functions_package(
