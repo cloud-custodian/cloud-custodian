@@ -1,0 +1,83 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ContainerService/managedClusters?api-version=2019-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Thu, 06 Jun 2019 18:52:50 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1329"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test-aks/providers/Microsoft.ContainerService/managedClusters/cctestaks",
+                                "location": "westus2",
+                                "name": "cctestaks",
+                                "type": "Microsoft.ContainerService/ManagedClusters",
+                                "properties": {
+                                    "provisioningState": "Creating",
+                                    "kubernetesVersion": "1.12.8",
+                                    "dnsPrefix": "cctestaks-dns",
+                                    "agentPoolProfiles": [
+                                        {
+                                            "name": "agentpool",
+                                            "count": 3,
+                                            "vmSize": "Standard_DS2_v2",
+                                            "osDiskSizeGB": 100,
+                                            "maxPods": 110,
+                                            "type": "AvailabilitySet",
+                                            "provisioningState": "Creating",
+                                            "orchestratorVersion": "1.12.8",
+                                            "osType": "Linux"
+                                        }
+                                    ],
+                                    "servicePrincipalProfile": {
+                                        "clientId": "8232a3be-7702-4efe-957c-7d758c1f29d6"
+                                    },
+                                    "addonProfiles": {
+                                        "httpApplicationRouting": {
+                                            "enabled": false,
+                                            "config": null
+                                        }
+                                    },
+                                    "nodeResourceGroup": "MC_test-aks_cctestaks_westus2",
+                                    "enableRBAC": true,
+                                    "networkProfile": {
+                                        "networkPlugin": "kubenet",
+                                        "loadBalancerSku": "basic",
+                                        "podCidr": "10.244.0.0/16",
+                                        "serviceCidr": "10.0.0.0/16",
+                                        "dnsServiceIP": "10.0.0.10",
+                                        "dockerBridgeCidr": "172.17.0.1/16"
+                                    },
+                                    "maxAgentPools": 1
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
