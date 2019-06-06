@@ -660,7 +660,12 @@ class NetworkInterfaceTest(BaseTest):
                         "key": "NetworkInterfaceId",
                         "value": eni,
                     }
-                ]
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                    }
+                ],
             },
             session_factory=factory,
         )
