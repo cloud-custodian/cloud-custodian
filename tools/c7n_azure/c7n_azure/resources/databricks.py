@@ -15,6 +15,7 @@
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
+
 @resources.register('databricks')
 class Databricks(ArmResourceManager):
 
