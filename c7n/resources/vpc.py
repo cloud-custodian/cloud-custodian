@@ -1367,6 +1367,57 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 Groups=groups[idx])
 
 
+@NetworkInterface.action_registry.register('delete')
+class DeleteNetworkInterface(BaseAction):
+    """Delete a network interface.
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: mark-orphaned-enis
+            comment: Flag abandoned Lambda VPC ENIs for deletion
+            resource: eni
+            filters:
+              - Status: available
+              - type: value
+                op: glob
+                key: Description
+                value: "AWS Lambda VPC ENI*"
+              - "tag:custodian_status": absent
+            actions:
+              - type: mark-for-op
+                tag: custodian_status
+                msg: "Orphaned Lambda VPC ENI: {op}@{action_date}"
+                op: delete
+                days: 1
+
+          - name: delete-marked-enis
+            comment: Delete flagged ENIs that have not been cleaned up naturally
+            resource: eni
+            filters:
+              - type: marked-for-op
+                tag: custodian_status
+                op: delete
+            actions:
+              - type: delete
+    """
+    permissions = ('ec2:DeleteNetworkInterface',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.delete_network_interface,
+                    NetworkInterfaceId=r['NetworkInterfaceId'])
+            except ClientError as err:
+                if not err.response['Error']['Code'] == 'InvalidNetworkInterfaceID.NotFound':
+                    raise
+
+
 @resources.register('route-table')
 class RouteTable(query.QueryResourceManager):
 
