@@ -1,3 +1,5 @@
+.. _azure_examples_add_firewall_rules_to_storage:
+
 Add storage firewall
 ====================
 

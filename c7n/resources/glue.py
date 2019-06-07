@@ -21,6 +21,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.tags import universal_augment, register_universal_tags
 
 
 @resources.register('glue-connection')
@@ -31,7 +32,7 @@ class GlueConnection(QueryResourceManager):
         enum_spec = ('get_connections', 'ConnectionList', None)
         id = name = 'Name'
         date = 'CreationTime'
-        arn = False
+        arn_type = "connection"
 
     permissions = ('glue:GetConnections',)
 
@@ -89,9 +90,13 @@ class GlueDevEndpoint(QueryResourceManager):
         enum_spec = ('get_dev_endpoints', 'DevEndpoints', None)
         id = name = 'EndpointName'
         date = 'CreatedTimestamp'
-        arn = False
+        arn_type = "devEndpoint"
 
     permissions = ('glue:GetDevEndpoints',)
+    augment = universal_augment
+
+
+register_universal_tags(GlueDevEndpoint.filter_registry, GlueDevEndpoint.action_registry)
 
 
 @GlueDevEndpoint.action_registry.register('delete')
