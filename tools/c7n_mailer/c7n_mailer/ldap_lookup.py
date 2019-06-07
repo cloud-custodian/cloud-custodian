@@ -18,9 +18,9 @@ import redis
 
 try:
      import sqlite3
- except ImportError:
+except ImportError:
      have_sqlite = False
- else:
+else:
      have_sqlite = True
 from ldap3 import Connection
 from ldap3.core.exceptions import LDAPSocketOpenError
