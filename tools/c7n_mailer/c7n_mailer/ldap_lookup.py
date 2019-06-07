@@ -17,11 +17,11 @@ import re
 import redis
 
 try:
-     import sqlite3
+    import sqlite3
 except ImportError:
-     have_sqlite = False
+    have_sqlite = False
 else:
-     have_sqlite = True
+    have_sqlite = True
 from ldap3 import Connection
 from ldap3.core.exceptions import LDAPSocketOpenError
 
