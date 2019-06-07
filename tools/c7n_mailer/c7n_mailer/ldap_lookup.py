@@ -16,12 +16,7 @@ import json
 import re
 import redis
 
-try:
-    import sqlite3
-except ImportError:
-    have_sqlite = False
-else:
-    have_sqlite = True
+import sqlite3
 from ldap3 import Connection
 from ldap3.core.exceptions import LDAPSocketOpenError
 
@@ -47,8 +42,6 @@ class LdapLookup(object):
             redis_port = int(config.get('redis_port', 6379))
             self.caching = self.get_redis_connection(redis_host, redis_port)
         elif self.cache_engine == 'sqlite':
-            if not have_sqlite:
-                raise RuntimeError('No sqlite available: stackoverflow.com/q/44058239')
             self.caching = LocalSqlite(config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger)
 
     def get_redis_connection(self, redis_host, redis_port):

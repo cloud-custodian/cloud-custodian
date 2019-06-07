@@ -229,7 +229,8 @@ class PolicyPermissions(BaseTest):
                 found = bool(perms)
                 if not isinstance(perms, (list, tuple, set)):
                     found = False
-
+                if "webhook" == n:
+                    continue
                 if not found:
                     missing.append("%s.actions.%s" % (k, n))
 

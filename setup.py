@@ -31,6 +31,8 @@ setup(
         "jsonschema",
         "jsonpatch>=1.21",
         "argcomplete",
-        "tabulate>=0.8.2"
+        "tabulate>=0.8.2",
+        "urllib3",
+        "certifi"
     ],
 )

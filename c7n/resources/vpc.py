@@ -26,7 +26,6 @@ import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
-from c7n.filters.locked import Locked
 from c7n import query, resolver
 from c7n.manager import resources
 from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
@@ -495,13 +494,6 @@ class ConfigSG(query.ConfigSource):
                 if 'Ipv4Ranges' in p:
                     p['IpRanges'] = p.pop('Ipv4Ranges')
         return r
-
-
-@SecurityGroup.filter_registry.register('locked')
-class SecurityGroupLockedFilter(Locked):
-
-    def get_parent_id(self, resource, account_id):
-        return resource.get('VpcId', account_id)
 
 
 @SecurityGroup.filter_registry.register('diff')
@@ -1373,6 +1365,57 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
             client.modify_network_interface_attribute(
                 NetworkInterfaceId=r['NetworkInterfaceId'],
                 Groups=groups[idx])
+
+
+@NetworkInterface.action_registry.register('delete')
+class DeleteNetworkInterface(BaseAction):
+    """Delete a network interface.
+
+    :example:
+
+    .. code-block: yaml
+
+        policies:
+          - name: mark-orphaned-enis
+            comment: Flag abandoned Lambda VPC ENIs for deletion
+            resource: eni
+            filters:
+              - Status: available
+              - type: value
+                op: glob
+                key: Description
+                value: "AWS Lambda VPC ENI*"
+              - "tag:custodian_status": absent
+            actions:
+              - type: mark-for-op
+                tag: custodian_status
+                msg: "Orphaned Lambda VPC ENI: {op}@{action_date}"
+                op: delete
+                days: 1
+
+          - name: delete-marked-enis
+            comment: Delete flagged ENIs that have not been cleaned up naturally
+            resource: eni
+            filters:
+              - type: marked-for-op
+                tag: custodian_status
+                op: delete
+            actions:
+              - type: delete
+    """
+    permissions = ('ec2:DeleteNetworkInterface',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.delete_network_interface,
+                    NetworkInterfaceId=r['NetworkInterfaceId'])
+            except ClientError as err:
+                if not err.response['Error']['Code'] == 'InvalidNetworkInterfaceID.NotFound':
+                    raise
 
 
 @resources.register('route-table')
