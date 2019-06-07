@@ -42,7 +42,6 @@ class RDSParamGroup(QueryResourceManager):
         name = id = 'DBParameterGroupName'
         dimension = 'DBParameterGroupName'
 
-
     filter_registry = pg_filters
     action_registry = pg_actions
 

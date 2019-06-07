@@ -48,4 +48,3 @@ class LoadBalancer(QueryResourceManager):
         name = 'name'
         arn = id = 'arn'
         date = 'createdAt'
-

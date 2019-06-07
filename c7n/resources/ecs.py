@@ -465,7 +465,6 @@ class TaskDefinition(query.QueryResourceManager):
         arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
 
-
     def get_resources(self, ids, cache=True):
         if cache:
             resources = self._get_cached_resources(ids)

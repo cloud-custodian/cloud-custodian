@@ -122,4 +122,3 @@ class HSMClient(QueryResourceManager):
         detail_spec = ('describe_luna_client', 'ClientArn', None, None)
         arn = id = 'ClientArn'
         name = 'Label'
-
