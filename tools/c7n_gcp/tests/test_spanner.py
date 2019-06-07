@@ -91,3 +91,29 @@ class SpannerDatabaseInstanceTest(BaseTest):
         self.assertEqual(instances[0]['c7n:spanner-instance']['displayName'], 'custodian-spanner-1')
         self.assertEqual(instances[0]['c7n:spanner-instance']['name'],
                          'projects/custodian-test-project-0/instances/custodian-spanner-1')
+
+    def test_spanner_database_instance_delete(self):
+        project_id = 'custodian-test-project-0'
+        deleting_instance_name = 'spanner-instance-0'
+        non_deleting_instance_name = 'spanner-instance-1'
+        session_factory = self.replay_flight_data('spanner-database-instance-delete',
+                                                  project_id=project_id)
+        policy = self.load_policy(
+            {'name': 'spanner-instance-delete',
+             'resource': 'gcp.spanner-instance',
+             'filters': [{'displayName': deleting_instance_name}],
+             'actions': ['delete']},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['displayName'], deleting_instance_name)
+
+        session_factory = self.replay_flight_data('spanner-database-instance-after-delete',
+                                                  project_id=project_id)
+        policy = self.load_policy(
+            {'name': 'spanner-instance-after-delete',
+             'resource': 'gcp.spanner-instance'},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['displayName'], non_deleting_instance_name)
