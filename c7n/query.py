@@ -550,7 +550,7 @@ class QueryResourceManager(ResourceManager):
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
                 generate_arn,
-                self.get_model().service,
+                self.resource_type.arn_service or self.resource_type.service,
                 region=not self.resource_type.global_resource and self.config.region or "",
                 account_id=self.account_id,
                 resource_type=self.resource_type.arn_type,

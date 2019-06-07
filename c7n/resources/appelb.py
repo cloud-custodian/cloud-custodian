@@ -66,9 +66,6 @@ class AppELB(QueryResourceManager):
                 "elasticloadbalancing:DescribeLoadBalancerAttributes",
                 "elasticloadbalancing:DescribeTags")
 
-    def get_arn(self, r):
-        return r[self.resource_type.id]
-
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeAppElb(self)

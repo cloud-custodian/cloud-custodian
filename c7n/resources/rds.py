@@ -1656,7 +1656,7 @@ class ModifyDb(BaseAction):
 @resources.register('rds-reserved')
 class ReservedRDS(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'rds'
         name = id = 'ReservedDBInstanceId'
         date = 'StartTime'
@@ -1664,6 +1664,5 @@ class ReservedRDS(QueryResourceManager):
             'describe_reserved_db_instances', 'ReservedDBInstances', None)
         filter_name = 'ReservedDBInstances'
         filter_type = 'list'
-        dimension = None
-        type = "reserved-db"
+        arn_type = "reserved-db"
         arn = "ReservedDBInstanceArn"

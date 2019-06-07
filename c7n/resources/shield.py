@@ -85,8 +85,7 @@ class IsShieldProtected(Filter):
         state = self.data.get('state', False)
         results = []
 
-        for r in resources:
-            arn = self.manager.get_arn(r)
+        for arn, r in zip(self.manager.get_arns(resources), resources):
             r['c7n:ShieldProtected'] = shielded = arn in protected_resources
             if shielded and state:
                 results.append(r)
@@ -118,8 +117,7 @@ class SetShieldProtection(BaseAction):
         if self.data.get('sync', False):
             self.clear_stale(client, protections)
 
-        for r in resources:
-            arn = self.manager.get_arn(r)
+        for arn, r in zip(self.manager.get_arns(resources), resources):
             if state and arn in protected_resources:
                 continue
             if state is False and arn in protected_resources:
@@ -140,7 +138,7 @@ class SetShieldProtection(BaseAction):
         # Get all resources unfiltered
         resources = self.manager.get_resource_manager(
             self.manager.type).resources()
-        resource_arns = set(map(self.manager.get_arn, resources))
+        resource_arns = set(self.manager.get_arns(resources))
 
         pmap = {}
         # Only process stale resources in region for non global resources.
