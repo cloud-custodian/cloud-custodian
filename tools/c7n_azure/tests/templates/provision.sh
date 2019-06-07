@@ -34,6 +34,8 @@ for file in "$templateDirectory"/*.json; do
         vault_name=$(az keyvault list --resource-group $rgName --query [0].name | tr -d '"')
         az keyvault key create --vault-name $vault_name --name cctestrsa --kty RSA
         az keyvault key create --vault-name $vault_name --name cctestec --kty EC
+      elif [[ "$filenameNoExtension" =~ "aks" ]]; then
+        az group deployment create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET
       else
         az group deployment create --resource-group $rgName --template-file $file
       fi
