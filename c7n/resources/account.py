@@ -497,6 +497,7 @@ class ServiceLimit(Filter):
     check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
 
     # When doing a refresh, how long to wait for the check to become ready.
+    # Max wait here is 5 * 10 ~ 50 seconds.
     poll_interval = 5
     poll_max_intervals = 10
     global_services = set(['IAM'])
