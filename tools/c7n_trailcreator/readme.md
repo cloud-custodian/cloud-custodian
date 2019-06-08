@@ -25,6 +25,9 @@ to be specified, and then for each event, we need to know the
 name of the service, the event name, and a jmespath expression
 to get the resource ids.
 
+Here's a a few examples, covering iam-user, iam-role, and and an s3 bucket.
+
+
 ```json
 {
   "resources": [
@@ -39,8 +42,17 @@ to get the resource ids.
       ]
     },
     {
+      "resource": "s3",
+      "events": [
+        {
+          "ids": "requestParameters.bucketName",
+          "event": "CreateBucket",
+          "service": "s3.amazonaws.com"
+        }
+      ]
+    },
+    {
       "resource": "iam-user",
-      "shape": "User",
       "events": [
         {
           "event": "CreateUser",

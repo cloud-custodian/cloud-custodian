@@ -38,7 +38,7 @@ This policy will filter load balancers with an ipv6 frontend public IP
               value_type: normalize
               value: "ipv6"
 
-This policy will find all load balancers with 1000 or less transmitted packets over the last 72 hours and notify user@domain.com
+This policy will find all load balancers with 1000 or less transmitted packets over the last 72 hours
 
 .. code-block:: yaml
 
@@ -52,13 +52,3 @@ This policy will find all load balancers with 1000 or less transmitted packets o
             aggregation: total
             threshold: 1000
             timeframe: 72
-         actions:
-          - type: notify
-            template: default
-            priority_header: 2
-            subject: Inactive Load Balancer
-            to:
-              - user@domain.com
-            transport:
-              - type: asq
-                queue: https://accountname.queue.core.windows.net/queuename

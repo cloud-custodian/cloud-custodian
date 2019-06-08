@@ -1,10 +1,7 @@
 .. _azure_multiplesubs:
 
-Advanced Usage
-==============
-
 Running against multiple subscriptions
---------------------------------------
+======================================
 
 The C7N-Org tool supports running policies against multiple subscriptions.  See the
 `C7N-Org Readme <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_org>`_

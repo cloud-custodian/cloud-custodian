@@ -17,7 +17,7 @@ import six
 from c7n_mailer.utils import (get_message_subject, get_rendered_jinja)
 from c7n_mailer.utils_email import is_email
 from python_http_client import exceptions
-from sendgrid.helpers.mail import Email, Content, Mail
+from sendgrid.helpers.mail import Mail, To, From
 
 
 class SendGridDelivery(object):
@@ -86,7 +86,7 @@ class SendGridDelivery(object):
             queue_message['action'].get('template', 'default'),
             to_addrs_to_email_messages_map))
 
-        from_email = Email(self.config.get('from_address', ''))
+        from_address = self.config.get('from_address', '')
         subject = get_message_subject(queue_message)
         email_format = queue_message['action'].get('template_format', None)
         if not email_format:
@@ -95,11 +95,20 @@ class SendGridDelivery(object):
 
         for email_to_addrs, email_content in six.iteritems(to_addrs_to_email_messages_map):
             for to_address in email_to_addrs:
-                to_email = Email(to_address)
-                content = Content("text/" + email_format, email_content)
-                mail = Mail(from_email, subject, to_email, content)
+                if email_format == "html":
+                    mail = Mail(
+                        from_email=From(from_address),
+                        to_emails=To(to_address),
+                        subject=subject,
+                        html_content=email_content)
+                else:
+                    mail = Mail(
+                        from_email=From(from_address),
+                        to_emails=To(to_address),
+                        subject=subject,
+                        plain_text_content=email_content)
                 try:
-                    self.sendgrid_client.client.mail.send.post(request_body=mail.get())
+                    self.sendgrid_client.send(mail)
                 except (exceptions.UnauthorizedError, exceptions.BadRequestsError) as e:
                     self.logger.warning(
                         "\n**Error \nPolicy:%s \nAccount:%s \nSending to:%s \n\nRequest body:"

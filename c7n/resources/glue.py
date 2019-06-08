@@ -16,11 +16,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
+import functools
+
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
-from c7n.utils import local_session, chunks, type_schema
+from c7n.utils import local_session, chunks, type_schema, generate_arn
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.tags import universal_augment, register_universal_tags
 
 
 @resources.register('glue-connection')
@@ -96,8 +99,28 @@ class GlueDevEndpoint(QueryResourceManager):
         dimension = None
         filter_name = None
         arn = False
+        type = 'devEndpoint'
 
     permissions = ('glue:GetDevEndpoints',)
+
+    augment = universal_augment
+
+    @property
+    def generate_arn(self):
+        self._generate_arn = functools.partial(
+            generate_arn,
+            'glue',
+            region=self.config.region,
+            account_id=self.config.account_id,
+            resource_type='devEndpoint',
+            separator='/')
+        return self._generate_arn
+
+    def get_arns(self, resources):
+        return [self.generate_arn(r['EndpointName']) for r in resources]
+
+
+register_universal_tags(GlueDevEndpoint.filter_registry, GlueDevEndpoint.action_registry)
 
 
 @GlueDevEndpoint.action_registry.register('delete')

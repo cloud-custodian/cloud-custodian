@@ -1,0 +1,20 @@
+policies:
+- name: custodian_functions_test_timer_consumption
+  resource: azure.resourcegroup
+  mode:
+      type: azure-periodic
+      schedule: '0 */5 * * * *'
+      provision-options:
+        servicePlan:
+          resourceGroupName: custodian-function-test-consumption
+  filters:
+    - type: value
+      key: name
+      op: eq
+      value_type: normalize
+      value: custodian-function-test-rg
+    - tag:custodian-function-test-timer-consumption: absent
+  actions:
+    - type: tag
+      tag: custodian-function-test-timer-consumption
+      value: passed

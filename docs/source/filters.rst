@@ -51,7 +51,7 @@ There are several ways to get a list of possible keys for each resource.
 - Via Cloud Provider Documentation
 
     Go to the relevant cloud provider sdk documentation and search for the describe api call for the resource
-    your interested in. The available fields will be listed under the results of that api call.
+    you're interested in. The available fields will be listed under the results of that api call.
 
 
 
@@ -162,6 +162,7 @@ There are several ways to get a list of possible keys for each resource.
   - ``resource_count`` - compare against the number of matched resources
   - ``size`` - the length of an element
   - ``swap`` - swap the value and the evaluated key
+  - ``date`` - parse the filter's value as a date.
 
 
   Examples:
@@ -187,6 +188,13 @@ There are several ways to get a list of possible keys for each resource.
        op: greater-than
        value_type: integer
        value: 0
+
+     # Apply only to rds instances created after the given date
+     - type: value
+       key: InstanceCreateTime
+       op: greater-than
+       value_type: date
+       value: "2019/05/01"
 
      # Find instances launched within the last 31 days
      - type: value
@@ -231,12 +239,42 @@ There are several ways to get a list of possible keys for each resource.
                  - subnet-1b8474522
                  - subnet-2d2736444
 
+- Value Regex:
+
+  When using a Value Filter, a ``value_regex`` can be
+  specified. This will mean that the value used for comparison is the output
+  from evaluating a regex on the value found on a resource using `key`.
+
+  The filter expects that there will be exactly one capturing group, however
+  non-capturing groups can be specified as well, e.g. ``(?:newkey|oldkey)``.
+
+  Note that if the value regex does not find a match, it will return a ``None``
+  value.
+
+  In this example there is an ``expiration`` comparison,
+  which needs a datetime, however the tag containing this information
+  also has other data in it. By setting the ``value_regex``
+  to capture just the datetime part of the tag, the filter can be evaluated
+  as normal.
+
+  .. code-block:: yaml
+
+    # Find expiry from tag contents
+    - type: value
+      key: "tag:metadata"
+      value_type: expiration
+      value_regex: ".*delete_after=([0-9]{4}-[0-9]{2}-[0-9]{2}).*"
+      op: less-than
+      value: 0
 
 Age Filter
 -------------
   Automatically filter resources older than a given date in Days (see `Dateutil Parser <http://dateutil.readthedocs.org/en/latest/parser.html#dateutil.parser.parse>`_)
   These are implemented on a per resource basis. See the :ref:`Resource-Specific Filters and Actions reference <policy>` for
   resource-specific filters.
+
+  Generally you should use a value filter instead of an age filter, as it supports doing age/expiration comparisons on
+  any date attribute.
 
 
 Event Filter

@@ -18,7 +18,7 @@ from c7n_azure.filters import FirewallRulesFilter
 from azure.mgmt.storage.models import IPRule, \
     NetworkRuleSet, StorageAccountUpdateParameters, VirtualNetworkRule
 from c7n.filters.core import type_schema
-from c7n_azure.actions import AzureBaseAction
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from netaddr import IPNetwork

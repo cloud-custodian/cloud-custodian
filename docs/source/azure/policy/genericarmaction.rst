@@ -11,7 +11,7 @@ Tags
   Add/Update tag on a resource
 
   .. c7n-schema:: Tag
-      :module: c7n_azure.actions
+      :module: c7n_azure.actions.tagging
 
   .. code-block:: yaml
 
@@ -30,7 +30,7 @@ Tags
   activity log history.
 
   .. c7n-schema:: AutoTagUser
-      :module: c7n_azure.actions
+      :module: c7n_azure.actions.tagging
 
   .. code-block:: yaml
 
@@ -48,7 +48,7 @@ Tags
       Remove a set of tags.
 
       .. c7n-schema:: RemoveTag
-            :module: c7n_azure.actions
+            :module: c7n_azure.actions.tagging
 
       .. code-block:: yaml
 
@@ -72,7 +72,7 @@ Tags
       listed to preserve.
 
       .. c7n-schema:: TagTrim
-            :module: c7n_azure.actions
+            :module: c7n_azure.actions.tagging
 
       .. code-block:: yaml
 
@@ -113,7 +113,7 @@ Others
       ARM resource type supported by Cloud Custodian.
 
       .. c7n-schema:: DeleteAction
-            :module: c7n_azure.actions
+            :module: c7n_azure.actions.delete
 
       .. code-block:: yaml
 
