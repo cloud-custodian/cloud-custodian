@@ -21,6 +21,7 @@ import json
 
 from .core import BaseAction
 from c7n.utils import type_schema, local_session, chunks, dumps, filter_empty
+from c7n.exceptions import PolicyValidationError
 
 from c7n.manager import resources as aws_resources
 from c7n.version import version
@@ -78,6 +79,26 @@ FindingTypes = {
         "Denial of Service",
         "Resource Consumption",
     ],
+    "Unusual Behaviors": [
+        "Application",
+        "Network Flow",
+        "IP address",
+        "User",
+        "VM",
+        "Container",
+        "Serverless",
+        "Process",
+        "Database",
+        "Data"
+    ],
+    "Sensitive Data Identifications": [
+        "PII",
+        "Passwords",
+        "Legal",
+        "Financial",
+        "Security",
+        "Business"
+    ]
 }
 
 
@@ -148,7 +169,7 @@ class PostFinding(BaseAction):
         batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10},
         types={
             "type": "array",
-            "items": {"type": "string", "enum": build_vocabulary()},
+            "items": {"type": "string"},
         },
         compliance_status={
             "type": "string",
@@ -323,6 +344,14 @@ class PostFinding(BaseAction):
         for r in resources:
             finding_resources.append(self.format_resource(r))
         finding["Resources"] = finding_resources
+
+        for finding_type in self.data["types"]:
+            if not finding_type.split('/')[0] in FindingTypes or len(finding_type.split('/')) > 3:
+                raise PolicyValidationError(
+                    "Finding types must be in the format 'namespace/category/classifier'. "
+                    "Valid namespace values are: {}.".format(" | ".join(
+                        [ns for ns in FindingTypes])))
+
         finding["Types"] = list(self.data["types"])
 
         return filter_empty(finding)
