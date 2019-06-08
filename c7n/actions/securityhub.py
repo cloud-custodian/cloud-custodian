@@ -106,14 +106,6 @@ FindingTypes = {
 SECHUB_VALUE_SIZE_LIMIT = 1024
 
 
-def build_vocabulary():
-    vocab = []
-    for ns, quals in FindingTypes.items():
-        for q in quals:
-            vocab.append("{}/{}".format(ns, q))
-    return vocab
-
-
 class PostFinding(BaseAction):
     """Report a finding to AWS Security Hub.
 
