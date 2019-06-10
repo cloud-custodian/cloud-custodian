@@ -11,3 +11,4 @@ Here are some more specific example policies for these resources:
   :glob:
 
   genericgcpactions
+  resources/*
