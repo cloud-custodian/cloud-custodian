@@ -37,7 +37,9 @@ class SpannerInstance(QueryResourceManager):
 
 @resources.register('spanner-database-instance')
 class SpannerDatabaseInstance(ChildResourceManager):
-
+    """GCP resource:
+        https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases
+    """
     def _get_parent_resource_info(self, child_instance):
         resource_name = None
         if child_instance['name'] is not None:
