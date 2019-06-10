@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from c7n.exceptions import PolicyValidationError
+
+from c7n_azure.resources.sqldatabase import ShortTermBackupRetentionPolicyAction
+
 from azure_common import BaseTest, arm_template
 
 
@@ -257,3 +261,57 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+
+class ShortTermBackupRetentionPolicyActionTest(BaseTest):
+
+    def test_schema_with_valid_short_term_retention_period_values(self):
+        for period in ShortTermBackupRetentionPolicyAction.VALID_RETENTION_PERIOD_DAYS:
+            self._test_retention_period_days(days=period, valid=True)
+
+    def test_schema_with_invalid_short_term_retention_period_values(self):
+        for period in [5, 10, 20, 100]:
+            self._test_retention_period_days(days=period, valid=False)
+
+    def _test_retention_period_days(self, days, valid=True):
+
+        def do_validation():
+            with self.sign_out_patch():
+                p = self.load_policy({
+                    'name': 'short-term-action-schema-validate',
+                    'resource': 'azure.sqldatabase',
+                    'actions': [
+                        {
+                            'type': 'update-short-term-backup-retention-policy',
+                            'retention-period-days': days
+                        }
+                    ]
+                }, validate=True)
+                return p
+
+        if valid:
+            p = do_validation()
+            self.assertTrue(p, "Expected {} to be a valid retention period".format(days))
+        else:
+            with self.assertRaises(PolicyValidationError,
+                    msg="Expected {} to be an invalid retention period".format(days)):
+                do_validation()
+
+
+class LongTermBackupRetentionPolicyActionTest(BaseTest):
+
+    def test_schema_for_long_term_backup_retention_policy_action(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'long-term-action-schema-validate',
+                'resource': 'azure.sqldatabase',
+                'actions': [
+                    {
+                        'type': 'update-long-term-backup-retention-policy',
+                        'backup-type': 'weekly',
+                        'retention-period': 2,
+                        'retention-period-units': 'weeks'
+                    }
+                ]
+            }, validate=True)
+            self.assertTrue(p)

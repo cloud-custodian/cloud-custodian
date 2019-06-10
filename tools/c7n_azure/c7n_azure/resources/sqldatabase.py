@@ -17,6 +17,7 @@ import enum
 import logging
 
 import six
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.filters import scalar_ops
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ChildArmResourceManager
@@ -24,6 +25,7 @@ from c7n_azure.utils import RetentionPeriod, ResourceIdParser, ThreadHelper
 from msrestazure.azure_exceptions import CloudError
 
 from c7n.filters import Filter
+from c7n.filters.core import PolicyValidationError
 from c7n.utils import type_schema
 
 log = logging.getLogger('custodian.azure.sqldatabase')
@@ -238,3 +240,60 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         if actual_duration_units.iso8601_symbol != self.retention_period_units.iso8601_symbol:
             return None
         return actual_duration
+
+
+class BackupRetentionPolicyAction(AzureBaseAction):
+
+    def __init__(self, *args, **kwargs):
+        super(BackupRetentionPolicyAction, self).__init__(*args, **kwargs)
+
+    def _process_resource(self, database):
+        # TODO
+        pass
+
+
+@SqlDatabase.action_registry.register('update-short-term-backup-retention-policy')
+class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
+
+    VALID_RETENTION_PERIOD_DAYS = [7, 14, 21, 28, 35]
+
+    schema = type_schema(
+        'update-short-term-backup-retention-policy',
+        rinherit=ShortTermBackupRetentionPolicyFilter.schema,
+        op=None
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(ShortTermBackupRetentionPolicyAction, self).__init__(*args, **kwargs)
+        self.retention_period_days = self.data['retention-period-days']
+
+    def validate(self):
+        if self.retention_period_days not in \
+                ShortTermBackupRetentionPolicyAction.VALID_RETENTION_PERIOD_DAYS:
+            raise PolicyValidationError(
+                "Invalid retention-period-days: {}. Valid values are: {}".format(
+                    self.retention_period_days,
+                    ShortTermBackupRetentionPolicyAction.VALID_RETENTION_PERIOD_DAYS
+                )
+            )
+        return self
+
+
+@SqlDatabase.action_registry.register('update-long-term-backup-retention-policy')
+class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
+
+    schema = type_schema(
+        'update-long-term-backup-retention-policy',
+        rinherit=LongTermBackupRetentionPolicyFilter.schema,
+        op=None
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(LongTermBackupRetentionPolicyAction, self).__init__(*args, **kwargs)
+        self.backup_type = self.data['backup-type']
+        retention_period = self.data['retention-period']
+        retention_period_units = RetentionPeriod.Units[self.data['retention-period-units']]
+        self.iso8601_duration = RetentionPeriod.iso8601_duration_from_period_and_units(
+            retention_period,
+            retention_period_units
+        )
