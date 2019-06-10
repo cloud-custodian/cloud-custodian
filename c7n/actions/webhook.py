@@ -42,6 +42,7 @@ class Webhook(EventAction):
                     policy_name: policy.name
     """
 
+    schema_alias = True
     schema = utils.type_schema(
         'webhook',
         required=['url'],
