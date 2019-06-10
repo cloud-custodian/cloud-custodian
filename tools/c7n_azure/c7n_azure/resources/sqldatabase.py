@@ -21,6 +21,7 @@ from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.filters import scalar_ops
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ChildArmResourceManager
+from c7n_azure.query import ChildTypeInfo
 from c7n_azure.utils import RetentionPeriod, ResourceIdParser, ThreadHelper
 from msrestazure.azure_exceptions import CloudError
 
@@ -44,6 +45,67 @@ class SqlDatabase(ChildArmResourceManager):
         def extra_args(cls, parent_resource):
             return {'resource_group_name': parent_resource['resourceGroup'],
                     'server_name': parent_resource['name']}
+
+
+class BackupRetentionPolicyHelper(object):
+
+    SHORT_TERM_SQL_OPERATIONS = 'backup_short_term_retention_policies'
+    LONG_TERM_SQL_OPERATIONS = 'backup_long_term_retention_policies'
+
+    @enum.unique
+    class LongTermBackupType(enum.Enum):
+        weekly = ('weekly_retention',)
+        monthly = ('monthly_retention',)
+        yearly = ('yearly_retention',)
+
+        def __init__(self, retention_property):
+            self.retention_property = retention_property
+
+        def get_retention_from_backup_policy(self, backup_policy):
+            return backup_policy[self.retention_property]
+
+        def __str__(self):
+            return self.name
+
+    @staticmethod
+    def get_backup_retention_policy_context(database):
+        server_id = database[ChildTypeInfo.parent_key]
+        resource_group_name = database.get('resourceGroup')
+        if resource_group_name is None:
+            resource_group_name = ResourceIdParser.get_resource_group(server_id)
+        database_name = database['name']
+        server_name = ResourceIdParser.get_resource_name(server_id)
+
+        return resource_group_name, server_name, database_name
+
+    @staticmethod
+    def get_backup_retention_policy(database, get_operation, cache_key):
+
+        policy_key = 'c7n:{}'.format(cache_key)
+        cached_policy = database.get(policy_key)
+        if cached_policy is not None:
+            return cached_policy
+
+        resource_group_name, server_name, database_name = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(database)
+
+        try:
+            response = get_operation(resource_group_name, server_name, database_name)
+        except CloudError as e:
+            if e.status_code == 404:
+                response = None
+            else:
+                log.error(
+                    "Unable to get backup retention policy. "
+                    "(resourceGroup: {}, sqlserver: {}, sqldatabase: {})".format(
+                        resource_group_name, server_name, database_name
+                    )
+                )
+                raise e
+
+        retention_policy = response.as_dict()
+        database[policy_key] = retention_policy
+        return retention_policy
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -89,33 +151,12 @@ class BackupRetentionPolicyFilter(Filter):
         return matched_resources
 
     def _process_resource(self, resource, get_operation):
-        retention_policy = self._get_backup_retention_policy(resource, get_operation)
-        resource['c7n:{}'.format(self.operations_property)] = retention_policy.as_dict()
+        retention_policy = BackupRetentionPolicyHelper.get_backup_retention_policy(
+            resource, get_operation, self.operations_property)
         if retention_policy is None:
             return self._perform_op(0, self.retention_limit)
         retention = self.get_retention_from_backup_policy(retention_policy)
         return retention is not None and self._perform_op(retention, self.retention_limit)
-
-    def _get_backup_retention_policy(self, resource, get_operation):
-        server_id = resource[self.manager.resource_type.parent_key]
-        resource_group_name = resource.get('resourceGroup')
-        if resource_group_name is None:
-            resource_group_name = ResourceIdParser.get_resource_group(server_id)
-        database_name = resource['name']
-        server_name = ResourceIdParser.get_resource_name(server_id)
-
-        try:
-            response = get_operation(resource_group_name, server_name, database_name)
-        except CloudError as e:
-            if e.status_code == 404:
-                response = None
-            else:
-                log.error("Unable to get backup retention policy. "
-                "(resourceGroup: {}, sqlserver: {}, sqldatabase: {})".format(
-                    resource_group_name, server_name, database_name))
-                raise e
-
-        return response
 
     def _perform_op(self, a, b):
         op = scalar_ops.get(self.data.get('op', 'eq'))
@@ -157,10 +198,10 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
     def __init__(self, data, manager=None):
         retention_limit = data.get('retention-period-days')
         super(ShortTermBackupRetentionPolicyFilter, self).__init__(
-            'backup_short_term_retention_policies', retention_limit, data, manager)
+            BackupRetentionPolicyHelper.SHORT_TERM_SQL_OPERATIONS, retention_limit, data, manager)
 
     def get_retention_from_backup_policy(self, retention_policy):
-        return retention_policy.retention_days
+        return retention_policy['retention_days']
 
 
 @SqlDatabase.filter_registry.register('long-term-backup-retention-policy')
@@ -189,27 +230,14 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
 
     """
 
-    @enum.unique
-    class BackupType(enum.Enum):
-        weekly = ('weekly_retention',)
-        monthly = ('monthly_retention',)
-        yearly = ('yearly_retention',)
-
-        def __init__(self, retention_property):
-            self.retention_property = retention_property
-
-        def get_retention_from_backup_policy(self, backup_policy):
-            return getattr(backup_policy, self.retention_property)
-
-        def __str__(self):
-            return self.name
-
     schema = type_schema(
         'long-term-backup-retention-policy',
         required=['backup-type', 'retention-period', 'retention-period-units'],
         rinherit=BackupRetentionPolicyFilter.schema,
         **{
-            'backup-type': {'enum': list([t.name for t in BackupType])},
+            'backup-type': {
+                'enum': list([t.name for t in BackupRetentionPolicyHelper.LongTermBackupType])
+            },
             'retention-period': {'type': 'number'},
             'retention-period-units': {
                 'enum': list([u.name for u in RetentionPeriod.Units])
@@ -223,8 +251,8 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
             data.get('retention-period-units')]
 
         super(LongTermBackupRetentionPolicyFilter, self).__init__(
-            'backup_long_term_retention_policies', retention_period, data, manager)
-        self.backup_type = LongTermBackupRetentionPolicyFilter.BackupType[self.data.get(
+            BackupRetentionPolicyHelper.LONG_TERM_SQL_OPERATIONS, retention_period, data, manager)
+        self.backup_type = BackupRetentionPolicyHelper.LongTermBackupType[self.data.get(
             'backup-type')]
 
     def get_retention_from_backup_policy(self, retention_policy):
@@ -242,14 +270,26 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         return actual_duration
 
 
+@six.add_metaclass(abc.ABCMeta)
 class BackupRetentionPolicyAction(AzureBaseAction):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, operations_property, *args, **kwargs):
         super(BackupRetentionPolicyAction, self).__init__(*args, **kwargs)
+        self.operations_property = operations_property
 
     def _process_resource(self, database):
-        # TODO
-        pass
+        client = self.manager.get_client()
+        update_operation = getattr(client, self.operations_property).create_or_update
+
+        resource_group_name, server_name, database_name = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(database)
+        parameters = self.get_parameters_for_new_retention_policy(database)
+
+        update_operation(resource_group_name, server_name, database_name, parameters).result()
+
+    @abc.abstractmethod
+    def get_parameters_for_new_retention_policy(self, database):
+        raise NotImplementedError()
 
 
 @SqlDatabase.action_registry.register('update-short-term-backup-retention-policy')
@@ -264,7 +304,8 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
     )
 
     def __init__(self, *args, **kwargs):
-        super(ShortTermBackupRetentionPolicyAction, self).__init__(*args, **kwargs)
+        super(ShortTermBackupRetentionPolicyAction, self).__init__(
+            BackupRetentionPolicyHelper.SHORT_TERM_SQL_OPERATIONS, *args, **kwargs)
         self.retention_period_days = self.data['retention-period-days']
 
     def validate(self):
@@ -278,6 +319,9 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
             )
         return self
 
+    def get_parameters_for_new_retention_policy(self, database):
+        return self.retention_period_days
+
 
 @SqlDatabase.action_registry.register('update-long-term-backup-retention-policy')
 class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
@@ -289,11 +333,23 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
     )
 
     def __init__(self, *args, **kwargs):
-        super(LongTermBackupRetentionPolicyAction, self).__init__(*args, **kwargs)
-        self.backup_type = self.data['backup-type']
+        super(LongTermBackupRetentionPolicyAction, self).__init__(
+            BackupRetentionPolicyHelper.LONG_TERM_SQL_OPERATIONS, *args, **kwargs)
+        self.backup_type = BackupRetentionPolicyHelper.LongTermBackupType[self.data.get(
+            'backup-type')]
         retention_period = self.data['retention-period']
         retention_period_units = RetentionPeriod.Units[self.data['retention-period-units']]
         self.iso8601_duration = RetentionPeriod.iso8601_duration_from_period_and_units(
             retention_period,
             retention_period_units
         )
+
+    def get_parameters_for_new_retention_policy(self, database):
+        client = self.manager.get_client()
+        get_operation = getattr(client, self.operations_property).get
+        current_retention_policy = BackupRetentionPolicyHelper.get_backup_retention_policy(database,
+            get_operation, self.operations_property)
+
+        new_retention_policy = current_retention_policy.copy()
+        new_retention_policy[self.backup_type.retention_property] = self.iso8601_duration
+        return new_retention_policy

@@ -477,7 +477,6 @@ class RetentionPeriod(object):
         iso8601_str = "P{}{}".format(period, retention_period_unit.iso8601_symbol)
         return iso8601_str
 
-
     @staticmethod
     def duration_from_period_and_units(period, retention_period_unit):
         iso8601_str = RetentionPeriod.iso8601_duration_from_period_and_units(period,
