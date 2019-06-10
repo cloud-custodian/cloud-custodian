@@ -240,10 +240,15 @@ def setup_parser():
         "--skip-validation",
         action="store_true",
         help="Skips validation of policies (assumes you've run the validate command seperately).")
+
+    metrics_help = ("Emit metrics to provider metrics. Specify 'aws', 'gcp', or 'azure'. "
+            "For more details on aws metrics options, see: "
+            "https://cloudcustodian.io/docs/aws/usage.html#metrics")
+
     run.add_argument(
         "-m", "--metrics-enabled",
         default=None, nargs="?", const="aws",
-        help="Emit metrics to provider metrics")
+        help=metrics_help)
     run.add_argument(
         "--trace",
         dest="tracer",

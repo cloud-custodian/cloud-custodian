@@ -39,38 +39,12 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all Key Vaults for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
+This policy will find all KeyVaults with 10 or less API Hits over the last 72 hours
 
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-keyvaults-for-deletion
-        resource: azure.keyvault
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-keyvaults
-        resource: azure.keyvault
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
-
-This policy will find all KeyVaults with 10 or less API Hits over the last 72 hours and notify user@domain.com
-
-.. code-block:: yaml
-
-    policies:
-      - name: notify-inactive-keyvaults
+      - name: inactive-keyvaults
         resource: azure.keyvault
         filters:
           - type: metric
@@ -79,16 +53,6 @@ This policy will find all KeyVaults with 10 or less API Hits over the last 72 ho
             aggregation: total
             threshold: 10
             timeframe: 72
-         actions:
-          - type: notify
-            template: default
-            priority_header: 2
-            subject: Inactive Key Vault
-            to:
-              - user@domain.com
-            transport:
-              - type: asq
-                queue: https://accountname.queue.core.windows.net/queuename
 
 This policy will find all KeyVaults with an access of Service Principals not in the white list that exceed read-only access
 
