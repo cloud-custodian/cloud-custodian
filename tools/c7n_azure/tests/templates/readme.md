@@ -24,3 +24,4 @@ or do everything
 $ provision.sh
 ```
 
+If you deploy AKS template, you need to set `AZURE_CLIENT_ID` and `AZURE_CLIENT_SECRET` environment variables (AKS requires user to provide service principal). 

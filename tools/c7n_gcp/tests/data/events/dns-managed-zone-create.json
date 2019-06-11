@@ -1,0 +1,68 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.91",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-02-27T13:26:30.268Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "dns.googleapis.com",
+    "methodName": "dns.managedZones.create",
+    "authorizationInfo": [
+      {
+        "permission": "dns.managedZones.create",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "resourceName": "managedZones/custodian",
+    "request": {
+      "project": "cloud-custodian",
+      "managedZone": {
+        "privateVisibilityConfig": {},
+        "visibility": "PRIVATE",
+        "dnsName": "whatever.",
+        "name": "custodian",
+        "description": ""
+      },
+      "@type": "type.googleapis.com/cloud.dns.api.ManagedZonesCreateRequest"
+    },
+    "response": {
+      "managedZone": {
+        "visibility": "PRIVATE",
+        "fingerprint": "5c5e35d416330aff000001692f229785",
+        "rrsetCount": 2,
+        "name": "custodian",
+        "id": "6655816484321954559",
+        "dnsName": "whatever.",
+        "description": "",
+        "nameServers": [
+          "ns-gcp-private.googledomains.com."
+        ],
+        "creationTime": "2019-02-27T13:26:30.021Z"
+      },
+      "@type": "type.googleapis.com/cloud.dns.api.ManagedZonesCreateResponse"
+    }
+  },
+  "insertId": "-m6iex3e12bt0",
+  "resource": {
+    "type": "dns_managed_zone",
+    "labels": {
+      "zone_name": "custodian",
+      "project_id": "cloud-custodian",
+      "location": "global"
+    }
+  },
+  "timestamp": "2019-02-27T13:26:29.665Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-02-27T13:26:30.696811077Z"
+}

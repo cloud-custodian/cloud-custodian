@@ -56,6 +56,9 @@ Navigate below and get started with Cloud Custodian!
 
    gcp/gettingstarted
    gcp/gcp-modes
+   gcp/examples/index
+   gcp/policy/index
+   gcp/contribute
 
 .. toctree::
    :maxdepth: 2
