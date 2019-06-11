@@ -65,7 +65,7 @@ class SNS(QueryResourceManager):
 
 
 @SNS.action_registry.register('tag')
-class TagSNS(Tag):
+class TagTopic(Tag):
     """Action to create tag(s) on sns
 
     :example:
@@ -96,7 +96,7 @@ class TagSNS(Tag):
 
 
 @SNS.action_registry.register('remove-tag')
-class UntagMessageBroker(RemoveTag):
+class UntagTopic(RemoveTag):
     """Action to remove tag(s) on sns
 
     :example:
@@ -124,7 +124,7 @@ class UntagMessageBroker(RemoveTag):
 
 
 @SNS.action_registry.register('mark-for-op')
-class MarkSNSForOp(TagDelayedAction):
+class MarkTopicForOp(TagDelayedAction):
     """Mark SNS for deferred action
 
     :example:
