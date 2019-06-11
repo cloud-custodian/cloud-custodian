@@ -1,0 +1,47 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "dkhanas@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "188.163.232.130",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36,gzip(gfe)"
+    },
+    "serviceName": "bigquery.googleapis.com",
+    "methodName": "google.cloud.bigquery.v2.TableService.InsertTable",
+    "authorizationInfo": [
+      {
+        "resource": "projects/cloud-custodian/datasets/qqqqqqqqqqqqq",
+        "permission": "bigquery.tables.create",
+        "granted": true
+      }
+    ],
+    "resourceName": "projects/cloud-custodian/datasets/qqqqqqqqqqqqq/tables/test",
+    "metadata": {
+      "tableCreation": {
+        "table": {
+          "tableName": "projects/cloud-custodian/datasets/qqqqqqqqqqqqq/tables/test",
+          "schemaJson": "{\n}",
+          "createTime": "2019-05-14T14:49:09.829Z",
+          "updateTime": "2019-05-14T14:49:09.875Z"
+        },
+        "reason": "TABLE_INSERT_REQUEST"
+      },
+      "@type": "type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata"
+    }
+  },
+  "insertId": "p98hxxeb7jka",
+  "resource": {
+    "type": "bigquery_dataset",
+    "labels": {
+      "dataset_id": "qqqqqqqqqqqqq",
+      "project_id": "cloud-custodian"
+    }
+  },
+  "timestamp": "2019-05-14T14:49:09.920Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-05-14T14:49:10.908772407Z"
+}

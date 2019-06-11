@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 
 
 class PubSubTopicTest(BaseTest):
@@ -65,18 +65,24 @@ class PubSubSubscriptionTest(BaseTest):
 
     def test_pubsub_subscription_get(self):
         project_id = 'cloud-custodian'
-        pubsub_subscription_name = 'projects/cloud-custodian/subscriptions/custodian'
+        subscription_name = 'custodian'
+        resource_name = 'projects/{}/subscriptions/{}'.format(project_id, subscription_name)
         session_factory = self.replay_flight_data(
             'pubsub-subscription-get', project_id=project_id)
 
         policy = self.load_policy(
-            {'name': 'gcp-pubsub-subscription-dryrun',
-             'resource': 'gcp.pubsub-subscription'},
+            {'name': 'gcp-pubsub-subscription-audit',
+             'resource': 'gcp.pubsub-subscription',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['google.pubsub.v1.Subscriber.CreateSubscription']
+             }},
             session_factory=session_factory)
 
-        pubsub_subscription_resource = policy.resource_manager.get_resource(
-            {'project_id': project_id, 'name': pubsub_subscription_name})
-        self.assertEqual(pubsub_subscription_resource['name'], pubsub_subscription_name)
+        exec_mode = policy.get_execution_mode()
+        event = event_data('pubsub-subscription-create.json')
+        resources = exec_mode.run(event, None)
+        self.assertEqual(resources[0]['name'], resource_name)
 
 
 class PubSubSnapshotTest(BaseTest):
