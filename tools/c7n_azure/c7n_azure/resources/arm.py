@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import six
-from c7n_azure.actions.tagging import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction
 from c7n_azure.actions.delete import DeleteAction
+from c7n_azure.actions.logic_app import LogicAppAction
+from c7n_azure.actions.tagging import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction
 from c7n_azure.filters import (MetricFilter, TagActionFilter,
                                DiagnosticSettingsFilter, PolicyCompliantFilter)
 from c7n_azure.provider import resources
@@ -71,6 +72,7 @@ class ArmResourceManager(QueryResourceManager):
                 klass.action_registry.register('untag', RemoveTag)
                 klass.action_registry.register('auto-tag-user', AutoTagUser)
                 klass.action_registry.register('tag-trim', TagTrim)
+                klass.action_registry.register('logic-app', LogicAppAction)
                 klass.filter_registry.register('metric', MetricFilter)
                 klass.filter_registry.register('marked-for-op', TagActionFilter)
                 klass.action_registry.register('mark-for-op', TagDelayedAction)
