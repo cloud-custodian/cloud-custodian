@@ -15,6 +15,7 @@
 import abc
 import enum
 import logging
+from azure.mgmt.sql.models import BackupLongTermRetentionPolicy
 
 import six
 from c7n_azure.actions.base import AzureBaseAction
@@ -51,6 +52,8 @@ class BackupRetentionPolicyHelper(object):
 
     SHORT_TERM_SQL_OPERATIONS = 'backup_short_term_retention_policies'
     LONG_TERM_SQL_OPERATIONS = 'backup_long_term_retention_policies'
+
+    WEEK_OF_YEAR = 'week_of_year'
 
     @enum.unique
     class LongTermBackupType(enum.Enum):
@@ -350,6 +353,44 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
         current_retention_policy = BackupRetentionPolicyHelper.get_backup_retention_policy(database,
             get_operation, self.operations_property)
 
-        new_retention_policy = current_retention_policy.copy()
+        new_retention_policy = self._copy_retention_policy(current_retention_policy)
         new_retention_policy[self.backup_type.retention_property] = self.iso8601_duration
+
+        # Make sure that the week_of_year is set properly based on what
+        # the yearly backup retention is. If this is not done, the API will
+        # fail with an invalid parameter value
+        yearly_retention = new_retention_policy[
+            BackupRetentionPolicyHelper.LongTermBackupType.yearly.retention_property
+        ]
+        week_of_year = new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR]
+        if yearly_retention is None:
+            # Without a yearly retention, the week should be 0
+            new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR] = 0
+        elif not week_of_year:
+            # If there is a yearly retention, and the week is not specified, default to week 1
+            new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR] = 1
+
+        return BackupLongTermRetentionPolicy(**new_retention_policy)
+
+    def _copy_retention_policy(self, retention_policy):
+        """
+        Create a copy of a retention policy object with only the required parameters for the
+        BackupLongTermRetentionPolicy class.
+
+        more info:
+          https://docs.microsoft.com/en-us/python/api/azure-mgmt-sql/azure.mgmt.sql.models.backuplongtermretentionpolicy?view=azure-python
+        """
+
+        new_retention_policy = {}
+        for backup_type in BackupRetentionPolicyHelper.LongTermBackupType:
+            key = backup_type.retention_property
+
+            # Even though the api returns `PT0S` as a value for "zero duration", it does not accept
+            # that as a valid input parameter value.
+            # The work-arround is to replace any of these durations with `None`.
+            new_retention_policy[key] = \
+                retention_policy[key] if retention_policy[key] != 'PT0S' else None
+
+        new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR] = \
+            retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR]
         return new_retention_policy
