@@ -1,0 +1,37 @@
+{
+  "body": {
+    "totalItems": 2, 
+    "tables": [
+      {
+        "creationTime": "1551972334903", 
+        "kind": "bigquery#table", 
+        "type": "TABLE", 
+        "id": "cloud-custodian:test.test",
+        "tableReference": {
+          "projectId": "cloud-custodian",
+          "tableId": "test", 
+          "datasetId": "test"
+        }
+      }
+    ],
+    "kind": "bigquery#tableList", 
+    "etag": "a3s9qSOzZm5VY/w0igSFSw=="
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "686", 
+    "x-xss-protection": "0", 
+    "content-location": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/test/tables?alt=json",
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "a3s9qSOzZm5VY/w0igSFSw==", 
+    "cache-control": "private", 
+    "date": "Wed, 24 Apr 2019 09:44:10 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}

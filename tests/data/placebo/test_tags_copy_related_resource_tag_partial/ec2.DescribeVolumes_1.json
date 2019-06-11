@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "Volumes": [
+            {
+                "Attachments": [],
+                "AvailabilityZone": "us-east-1a",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 1,
+                    "hour": 15,
+                    "minute": 14,
+                    "second": 52,
+                    "microsecond": 397000
+                },
+                "Encrypted": false,
+                "Size": 1,
+                "SnapshotId": "",
+                "State": "available",
+                "VolumeId": "vol-017e5d5334d2abaed",
+                "Iops": 100,
+                "Tags": [
+                    {
+                        "Key": "tag1",
+                        "Value": "tag1value"
+                    },
+                    {
+                        "Key": "tag2",
+                        "Value": "tag2value"
+                    },
+                    {
+                        "Key": "tag3",
+                        "Value": "tag3value"
+                    }
+                ],
+                "VolumeType": "gp2"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "04af3ae4-4df3-48d8-b4f2-d8f461064876",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "1104",
+                "date": "Fri, 01 Feb 2019 15:28:33 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

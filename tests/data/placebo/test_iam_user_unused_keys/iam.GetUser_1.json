@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "User": {
+            "Path": "/",
+            "UserName": "Hazmat",
+            "UserId": "AIDAJ3W36CQUDM55DJRZK",
+            "Arn": "arn:aws:iam::644160558196:user/andrewalexander",
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2017,
+                "month": 12,
+                "day": 6,
+                "hour": 16,
+                "minute": 6,
+                "second": 5,
+                "microsecond": 0
+            },
+            "Tags": [
+                {
+                    "Key": "Role",
+                    "Value": "Dev"
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "a59813a6-1f5c-11e9-b74d-b5201ef1df02",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a59813a6-1f5c-11e9-b74d-b5201ef1df02",
+                "content-type": "text/xml",
+                "content-length": "576",
+                "date": "Wed, 23 Jan 2019 22:17:18 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IamInstanceProfileAssociations": [
+            {
+                "InstanceId": "i-01b7ee380879d3fd8", 
+                "State": "associated", 
+                "AssociationId": "iip-assoc-028de94dde8c8ccf0", 
+                "IamInstanceProfile": {
+                    "Id": "AIPAJO5EMJ3YEMNUF5ZWM", 
+                    "Arn": "arn:aws:iam::644160558196:instance-profile/CloudCustodianRole"
+                }
+            }, 
+            {
+                "InstanceId": "i-06305b4b9f5e3f8b8", 
+                "State": "associated", 
+                "AssociationId": "iip-assoc-064944afb6d8735a3", 
+                "IamInstanceProfile": {
+                    "Id": "AIPAJJOHXXHTHDZB5BVFE", 
+                    "Arn": "arn:aws:iam::644160558196:instance-profile/ecsInstanceRole"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "2c22ba6a-a2cf-40ab-a97e-98f420d1e46e", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Fri, 06 Jul 2018 10:20:20 GMT"
+            }
+        }
+    }
+}

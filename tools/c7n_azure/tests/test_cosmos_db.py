@@ -12,12 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from azure_common import BaseTest, arm_template
 
 
 class CosmosDBTest(BaseTest):
     def setUp(self):
         super(CosmosDBTest, self).setUp()
+
+    def test_cosmos_db_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-cosmos-db',
+                'resource': 'azure.cosmosdb'
+            }, validate=True)
+            self.assertTrue(p)
 
     @arm_template('cosmosdb.json')
     def test_find_by_name(self):

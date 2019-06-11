@@ -17,6 +17,7 @@ from botocore.exceptions import ClientError
 
 from c7n.credentials import SessionFactory, assumed_session
 from c7n.version import version
+from c7n.utils import local_session
 
 from .common import BaseTest
 
@@ -48,3 +49,26 @@ class Credential(BaseTest):
             self.fail("sts user not identifyable this way")
 
         self.assertEqual(user["User"]["UserName"], "kapil")
+
+    def test_policy_name_user_agent(self):
+        session = SessionFactory("us-east-1")
+        session.policy_name = "test-policy-name-ua"
+        client = session().client('s3')
+        self.assertTrue(
+            client._client_config.user_agent.startswith(
+                "CloudCustodian(test-policy-name-ua)/%s" % version
+            )
+        )
+
+    def test_local_session_agent_update(self):
+        factory = SessionFactory('us-east-1')
+        factory.policy_name = "check-ebs"
+        client = local_session(factory).client('ec2')
+        self.assertTrue(
+            'check-ebs' in client._client_config.user_agent)
+
+        factory.policy_name = "check-ec2"
+        factory.update(local_session(factory))
+        client = local_session(factory).client('ec2')
+        self.assertTrue(
+            'check-ec2' in client._client_config.user_agent)

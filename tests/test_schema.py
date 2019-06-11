@@ -18,7 +18,7 @@ from json import dumps
 from jsonschema.exceptions import best_match
 
 from c7n.manager import resources
-from c7n.schema import Validator, validate, generate, specific_error
+from c7n.schema import Validator, validate, generate, specific_error, policy_error_scope
 from .common import BaseTest
 
 
@@ -72,6 +72,59 @@ class SchemaTest(BaseTest):
         self.assertEqual(len(result), 2)
         self.assertTrue(isinstance(result[0], ValueError))
         self.assertTrue("monday-morning" in str(result[0]))
+
+    def test_py3_policy_error(self):
+        data = {
+            'policies': [{
+                'name': 'policy-ec2',
+                'resource': 'ec2',
+                'actions': [
+                    {'type': 'terminate',
+                     'force': 'asdf'}]}]}
+        result = validate(data)
+        self.assertEqual(len(result), 2)
+        err, policy = result
+        self.assertTrue("'asdf' is not of type 'boolean'" in str(err).replace("u'", "'"))
+        self.assertEqual(policy, 'policy-ec2')
+
+    def test_semantic_mode_error(self):
+        data = {
+            'policies': [{
+                'name': 'test',
+                'resource': 'ec2',
+                'mode': {
+                    'type': 'periodic',
+                    'scheduled': 'oops'}}]}
+        errors = list(self.validator.iter_errors(data))
+        self.assertEqual(len(errors), 1)
+        error = specific_error(errors[0])
+        self.assertTrue(
+            len(errors[0].absolute_schema_path) < len(error.absolute_schema_path)
+        )
+        self.assertTrue("'scheduled' was unexpected" in str(error))
+        self.assertTrue(len(str(error)) < 2000)
+
+    def test_semantic_error_policy_scope(self):
+
+        data = {
+            'policies': [
+                {'actions': [{'key': 'TagPolicyCompliance',
+                              'type': 'tag',
+                              'value': 'This resource should have tags following policy'}],
+                 'description': 'Identify resources which lack our accounting tags',
+                 'filters': [{'tag:Environment': 'absent'},
+                             {'tag:Service': 'absent'},
+                             {'or': [{'tag:Owner': 'absent'},
+                                     {'tag:ResponsibleParty': 'absent'},
+                                     {'tag:Contact': 'absent'},
+                                     {'tag:Creator': 'absent'}]}],
+                 'name': 'tagging-compliance-waf',
+                 'resource': 'aws.waf'}]}
+
+        errors = list(self.validator.iter_errors(data))
+        self.assertEqual(len(errors), 1)
+        error = policy_error_scope(specific_error(errors[0]), data)
+        self.assertTrue("policy:tagging-compliance-waf" in error.message)
 
     def test_semantic_error(self):
         data = {

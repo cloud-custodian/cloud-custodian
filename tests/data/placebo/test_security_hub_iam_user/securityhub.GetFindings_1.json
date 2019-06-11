@@ -1,0 +1,61 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Findings": [
+            {
+                "GeneratorId": "iam-user-finding", 
+                "Severity": {
+                    "Product": 10, 
+                    "Normalized": 10
+                }, 
+                "Title": "iam-user-finding", 
+                "Resources": [
+                    {
+                        "Region": "us-east-1", 
+                        "Type": "Other", 
+                        "Id": "arn:aws:iam::101010101111:user/developer", 
+                        "Details": {
+                            "Other": {
+                                "CreateDate": "2016-09-10T15:45:42+00:00", 
+                                "UserId": "AIDAJYFPV7WUG3EV7MIIO"
+                            }
+                        }
+                    }
+                ], 
+                "ProductArn": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default", 
+                "ProductFields": {
+                    "aws/securityhub/SeverityLabel": "LOW", 
+                    "resource": "iam-user", 
+                    "ProviderName": "CloudCustodian", 
+                    "ProviderVersion": "0.8.32.1", 
+                    "aws/securityhub/ProductName": "Default", 
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:101010101111:product/101010101111/default/us-east-1/6101010101111/1daf01e749562111375eee2e91ece908/59b0eef56dda256e687a63715c32c706", 
+                    "aws/securityhub/CompanyName": "Personal"
+                }, 
+                "CreatedAt": "2018-12-02T05:36:27.311239+00:00", 
+                "UpdatedAt": "2018-12-02T05:36:27.311239+00:00", 
+                "RecordState": "ACTIVE", 
+                "SchemaVersion": "2018-10-08", 
+                "Id": "us-east-1/101010101111/1daf01e749562111375eee2e91ece908/59b0eef56dda256e687a63715c32c706", 
+                "Types": [
+                    "Software and Configuration Checks/AWS Security Best Practices"
+                ], 
+                "AwsAccountId": "101010101111"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "25e58981-f5f6-11e8-9a41-2b0bded5509f", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "25e58981-f5f6-11e8-9a41-2b0bded5509f", 
+                "content-length": "15792", 
+                "x-amz-apigw-id": "RQ7YFE8QoAMFnRg=", 
+                "x-amzn-trace-id": "Root=1-5c03729a-9ded4e424f2a2b4a5db29720;Sampled=0", 
+                "connection": "keep-alive", 
+                "date": "Sun, 02 Dec 2018 05:50:18 GMT", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

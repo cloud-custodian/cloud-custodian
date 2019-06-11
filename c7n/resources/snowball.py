@@ -30,6 +30,7 @@ class SnowballCluster(QueryResourceManager):
         date = 'CreationDate'
         dimension = None
         filter_name = None
+        arn = False
 
 
 @resources.register('snowball')
@@ -45,3 +46,4 @@ class Snowball(QueryResourceManager):
         date = 'CreationDate'
         dimension = None
         filter_name = None
+        arn = False

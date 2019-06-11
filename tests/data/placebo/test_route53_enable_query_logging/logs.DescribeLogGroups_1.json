@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/route53/cloudcustodian.io",
+                "creationTime": 1543083641059,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/route53/cloudcustodian.io:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "/aws/route53/cloudcustodian.io2",
+                "creationTime": 1543087813690,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/route53/cloudcustodian.io2:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "faa9f7d3-f021-11e8-9d0b-670cfad33338",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "faa9f7d3-f021-11e8-9d0b-670cfad33338",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "425",
+                "date": "Sat, 24 Nov 2018 19:48:55 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

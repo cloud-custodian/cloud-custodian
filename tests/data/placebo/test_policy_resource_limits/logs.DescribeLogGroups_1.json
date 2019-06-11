@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "/aws/lambda/myIOTFunction",
+                "creationTime": 1505170021374,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/lambda/myIOTFunction:*",
+                "storedBytes": 3264526
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "db6a7859-abdd-11e8-8855-79ef72683170",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "db6a7859-abdd-11e8-8855-79ef72683170",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "215",
+                "date": "Wed, 29 Aug 2018 22:49:58 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

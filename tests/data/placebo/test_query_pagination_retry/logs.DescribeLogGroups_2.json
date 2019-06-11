@@ -1,0 +1,19 @@
+{
+    "status_code": 400,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200,
+            "RequestId": "dc1f3c1e-a41d-11e6-a2a7-1fd802fe6512",
+            "HTTPHeaders": {
+                "x-amzn-requestid": "dc1f3c1e-a41d-11e6-a2a7-1fd802fe6512",
+                "date": "Sun, 06 Nov 2016 12:38:02 GMT",
+                "content-length": "1621",
+                "content-type": "application/x-amz-json-1.1"
+            }
+        },
+        "Error": {
+            "Code": "ThrottlingException"
+        }
+    }
+}

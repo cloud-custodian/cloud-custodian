@@ -1,12 +1,22 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "1K86DP6MB03RQURBT2423496GNVV4KQNSO5AEMVJF66Q9ASUAAJG"
-        }, 
         "TableNames": [
-            "rolltop"
-        ]
+            "test-table-kms-filter"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "4MQNNJ5D2EMFPK3L56O63JLH4VVV4KQNSO5AEMVJF66Q9ASUAAJG",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Sat, 26 Jan 2019 15:21:42 GMT",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "40",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "4MQNNJ5D2EMFPK3L56O63JLH4VVV4KQNSO5AEMVJF66Q9ASUAAJG",
+                "x-amz-crc32": "3417179002"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

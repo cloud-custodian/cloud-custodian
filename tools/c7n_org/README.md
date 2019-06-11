@@ -1,4 +1,8 @@
-## What is c7n-org?
+# c7n-org: Multi Account Custodian Execution
+
+[//]: # (         !!! IMPORTANT !!!                    )
+[//]: # (This file is moved during document generation.)
+[//]: # (Only edit the original document at ./tools/c7n_org/README.md)
 
 c7n-org is a tool to run custodian against multiple AWS accounts,
 Azure subscriptions, or GCP projects in parallel.
@@ -39,6 +43,8 @@ accounts:
   - us-east-1
   - us-west-2
   role: arn:aws:iam::123123123123:role/CloudCustodian
+  vars:
+    charge_code: xyz
   tags:
   - type:prod
   - division:some division
@@ -77,7 +83,7 @@ projects:
 We also distribute scripts to generate the necessary config file in the `scripts` folder.
 
 **Note** Currently these are distributed only via git, per
-https://github.com/capitalone/cloud-custodian/issues/2420 we'll
+https://github.com/cloud-custodian/cloud-custodian/issues/2420 we'll
 be looking to incorporate them into a new c7n-org subcommand.
 
 - For **AWS**, the script `orgaccounts.py` generates a config file
@@ -86,8 +92,8 @@ be looking to incorporate them into a new c7n-org subcommand.
 - For **Azure**, the script `azuresubs.py` generates a config file
   from the Azure Resource Management API
 
-    - Please see the **Additional Azure Instructions** section at the
-      bottom of the page for initial setup
+    - Please see the [Additional Azure Instructions](#Additional-Azure-Instructions)
+    - for initial setup and other important info
 
 - For **GCP**, the script `gcpprojects.py` generates a config file from
   the GCP Resource Management API
@@ -155,6 +161,41 @@ specifying `-p` or selecting groups of policies via their tags with
 
 See `c7n-org run --help` for more information.
 
+## Defining and using variables
+
+Each account/subscription/project configuration in the config file can
+also define a variables section `vars` that can be used in policies'
+definitions and are interpolated at execution time. These are in
+addition to the default runtime variables custodian provides like
+`account_id`, `now`, and `region`.
+
+Example of defining in c7n-org config file:
+
+```yaml
+accounts:
+- account_id: '123123123123'
+  name: account-1
+  role: arn:aws:iam::123123123123:role/CloudCustodian
+  vars:
+    charge_code: xyz
+```
+
+Example of using in a policy file:
+
+```yaml
+policies:
+ - name: ec2-check-tag
+   resource: aws.ec2
+   filters:
+      - "tag:CostCenter": "{charge_code}"
+```
+
+**Note** Variable interpolation is sensitive to proper quoting and spacing,
+i.e., `{ charge_code }` would be invalid due to the extra white space. Additionally,
+yaml parsing can transform a value like `{charge_code}` to null, unless it's quoted
+in strings like the above example. Values that do interpolation into other content
+don't require quoting, i.e., "my_{charge_code}".
+
 ## Other commands
 
 c7n-org also supports running arbitrary scripts on AWS against
@@ -172,5 +213,4 @@ subscriptions.
 
 For instructions on creating a service principal and granting access
 across subscriptions, visit the [Azure authentication docs
-page](http://capitalone.github.io/cloud-custodian/docs/azure/authentication.html).
-
+page](https://cloudcustodian.io/docs/azure/authentication.html).

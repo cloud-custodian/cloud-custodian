@@ -268,3 +268,32 @@ class KMSTagging(BaseTest):
         self.assertEqual(resources[0]["KeyId"], key_id)
         tags = client.list_resource_tags(KeyId=key_id)["Tags"]
         self.assertEqual(len(tags), 0)
+
+    def test_kms_key_related(self):
+        session_factory = self.replay_flight_data("test_kms_key_related")
+        p = self.load_policy(
+            {
+                "name": "dms-instance-kms-key-related",
+                "resource": 'dms-instance',
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/aws/dms",
+                        "op": "eq"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        client = session_factory().client("kms")
+        self.assertEqual(len(resources), 1)
+        resource_kms_key = resources[0]['KmsKeyId']
+        aliases = client.list_aliases(KeyId=resource_kms_key)
+        target_key_arn = None
+        if aliases['Aliases'][0]['AliasName'] == 'alias/aws/dms':
+            target_key_id = aliases['Aliases'][0].get('TargetKeyId')
+            target_key_arn = client.describe_key(
+                KeyId=target_key_id).get('KeyMetadata').get('Arn')
+        self.assertEqual(resources[0]['KmsKeyId'], target_key_arn)

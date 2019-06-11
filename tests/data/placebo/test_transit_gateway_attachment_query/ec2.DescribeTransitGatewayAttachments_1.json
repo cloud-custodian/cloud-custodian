@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransitGatewayAttachments": [
+            {
+                "TransitGatewayAttachmentId": "tgw-attach-0aca50c09e4248a85",
+                "TransitGatewayId": "tgw-05e7c047df9e9d1ce",
+                "TransitGatewayOwnerId": "644160558196",
+                "ResourceOwnerId": "644160558196",
+                "ResourceType": "vpc",
+                "ResourceId": "vpc-f1516b97",
+                "State": "available",
+                "Association": {
+                    "TransitGatewayRouteTableId": "tgw-rtb-0fa4bd52512d99611",
+                    "State": "associated"
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 16,
+                    "hour": 16,
+                    "minute": 13,
+                    "second": 28,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "1081eb1d-ca68-4082-bd6c-4797a05dc5cb",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Wed, 16 Jan 2019 17:09:01 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

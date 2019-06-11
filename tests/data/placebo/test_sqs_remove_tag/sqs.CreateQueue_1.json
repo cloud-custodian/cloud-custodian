@@ -1,19 +1,17 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "QueueUrl": "https://us-east-2.queue.amazonaws.com/644160558196/test-sqs", 
+        "QueueUrl": "https://us-west-1.queue.amazonaws.com/644160558196/test-sqs-4",
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "ebf349b0-aceb-5421-b9c9-1bc272353241", 
+            "RequestId": "9eec0bac-041f-5a17-a10a-5f78ca388bdb",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "ebf349b0-aceb-5421-b9c9-1bc272353241", 
-                "content-length": "330", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Tue, 31 Oct 2017 20:27:10 GMT", 
-                "content-type": "text/xml"
-            }
+                "x-amzn-requestid": "9eec0bac-041f-5a17-a10a-5f78ca388bdb",
+                "date": "Wed, 06 Feb 2019 11:58:31 GMT",
+                "content-type": "text/xml",
+                "content-length": "332"
+            },
+            "RetryAttempts": 0
         }
     }
 }

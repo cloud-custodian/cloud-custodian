@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "df7e725d-4c93-11e9-8884-b58447eeb81e",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Fri, 22 Mar 2019 11:16:00 GMT",
+                "content-type": "application/json",
+                "content-length": "2115",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "df7e725d-4c93-11e9-8884-b58447eeb81e",
+                "x-amz-apigw-id": "W8ONlFigCYcFmAA=",
+                "x-amzn-trace-id": "Root=1-5c94c3f0-9b8e0462f41e6ca93e9c2106;Sampled=0"
+            },
+            "RetryAttempts": 0
+        },
+        "cluster": {
+            "name": "devk8s",
+            "arn": "arn:aws:eks:us-east-2:644160558196:cluster/devk8s",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 3,
+                "day": 21,
+                "hour": 13,
+                "minute": 28,
+                "second": 49,
+                "microsecond": 811000
+            },
+            "version": "1.11",
+            "endpoint": "https://1BB97D4E9CC38ECDAB839C96D222D3F6.sk1.us-east-2.eks.amazonaws.com",
+            "roleArn": "arn:aws:iam::644160558196:role/eksctl-devk8s-cluster-ServiceRole-1JNA85I5147VF",
+            "resourcesVpcConfig": {
+                "subnetIds": [
+                    "subnet-0dcc27692f82648fe",
+                    "subnet-07ac22c0a96699e69",
+                    "subnet-029219d5cf80bc951",
+                    "subnet-0c58f79d941cb9b0a",
+                    "subnet-0836bdf0c7d7afee1",
+                    "subnet-05374ecec3d67653c"
+                ],
+                "securityGroupIds": [
+                    "sg-0e7a18bc9826f06a1"
+                ],
+                "vpcId": "vpc-08948fb33475791d9",
+                "endpointPublicAccess": true,
+                "endpointPrivateAccess": true
+            },
+            "status": "UPDATING",
+            "certificateAuthority": {
+                "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRFNU1ETXlNVEUzTXpZd09Gb1hEVEk1TURNeE9ERTNNell3T0Zvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBS3BFCmVvWTIvVTVuYXY2UVZCdFVjZHlTTVRsMTRhUkRORUxJZ2s2QStBQ1hST1BuTFJiY0hYd3B1RVh6anM3Z0J5ZisKblhPZ0t0MERmb0tBME96VEx2enlycnpST0l3bUZTTC91R1FybWFaL2RwWVlTNGx6UzFkVTJOVUFLeXFoTVE0ago5MyttbnFhK1czVjk1SzVNbytmN1JwbFYvNEV0QkFDMXMrUmZ3ekNKQWtiUUNJMmRSNDB2Vmo3SjlTNm95MWh0CkVBRWMycms1b3N1YmdXeUY1RGhRbEFMdXkranBoMnRnejhIYWo3a1IyV3hvcjBCcDJjc3E1aTR0anNlR0lEUVMKK1VzK2ZscHV0ZTI0MjgwWmhyaDJ4QUltLy80ODBGVDQ3KzJLNWNTL0FPSDY0N2QvUWQyZ0V4RXVBQ21tRWZGLwpqa3ZnbUV3OHRBZXJrOGpwSXBzQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFIN2FFU1hzdS95Z3hmd1hRdUdBQzFDdGw4dU0KTHBOd0sraC9weDdsbk1jNitQQkhhTFlZQ0pvMVlKZ0xqdE5EN29CNUhiVnZJTGpLdjV3WkptUEQraDFYeHV0bAp3SGFhNnU5RlZRVzg3V0lXMTQ1RDNJNnhOczBybXd5NDhMcDZpbG5FQkJjWEdRS2tVVGhKQ29VT1RzRDBkaDM0ClVveUtvM0Z0YWsxSG5pZldTVUhHbWZ3aVpPdklWQVluUEZ0YUNSZ2VKZzFCVEZtTWFQTmt0SlFPRjBvek0zZ1IKZ283V2RIR2c5YTQ5Tlg2TE5GRlpQSWQ2TXhWaEJhcTNFK2FySThJVGZSOTA0RlYvYVlYYmxNYWJ6cHJXKzdIRgo0Q3hkeG54WEIwZUlNQmZIYVJXNlUvZ0ZPMTEvTndVYjZyWHBXTG5CVHJpdW9kVytsTnRNRE9iRzZXYz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+            },
+            "platformVersion": "eks.2"
+        }
+    }
+}

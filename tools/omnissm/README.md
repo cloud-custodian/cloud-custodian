@@ -32,6 +32,20 @@ We provide a few bits of automation tooling to enable seamless hybrid mode.
 
 ![(OmniSSM)](assets/omnissm.svg)
 
+# Client Configuration
+
+The OmniSSM agent is configured by environment variables as well as a YAML configuration file and command-line flags. OmniSSM checks for the file `omnissm.yaml` in either `/etc/omnissm/` or the current directory at runtime.
+
+Parameters:
+
+|Flag|Environment Variable|YAML key|Description|
+|----|--------------------|--------|-----------|
+|`-v,--verbose`|`OMNISSM_VERBOSE`|`verbose`|Enable debug logging|
+|`--register-endpoint <endpoint>`|`OMNISSM_REGISTER_ENDPOINT`|`register_endpoint`|Specify a single API endpoint to register with, overriding `register_endpoints`|
+|N/A|N/A|`register_endpoints`|A map of regions to endpoints|
+
+Either the register endpoints map, or the single register endpoint override must be set.
+
 # Links
 
 - Hybrid SSM Manual Install https://amzn.to/2Hlu9o2

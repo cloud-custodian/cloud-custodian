@@ -1,0 +1,55 @@
+{
+    "status_code": 200, 
+    "data": {
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8aca8ccc-f665-11e8-8700-7f377c0f7a24", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8aca8ccc-f665-11e8-8700-7f377c0f7a24", 
+                "content-type": "text/xml", 
+                "content-length": "6955", 
+                "vary": "Accept-Encoding", 
+                "date": "Sun, 02 Dec 2018 19:07:41 GMT"
+            }
+        }, 
+        "InstanceProfiles": [
+            {
+                "InstanceProfileId": "AIPAJO63EBUVI2SO6IJFI", 
+                "Roles": [
+                    {
+                        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+                        "RoleId": "AROAIH7HRV5BF6WFESWRI", 
+                        "CreateDate": {
+                            "hour": 22, 
+                            "__class__": "datetime", 
+                            "month": 8, 
+                            "second": 30, 
+                            "microsecond": 0, 
+                            "year": 2018, 
+                            "day": 19, 
+                            "minute": 32
+                        }, 
+                        "RoleName": "CloudCustodian", 
+                        "Path": "/", 
+                        "Arn": "arn:aws:iam::101010101111:role/CloudCustodian"
+                    }
+                ], 
+                "CreateDate": {
+                    "hour": 22, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 30, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 19, 
+                    "minute": 32
+                }, 
+                "InstanceProfileName": "CloudCustodian", 
+                "Path": "/", 
+                "Arn": "arn:aws:iam::101010101111:instance-profile/CloudCustodian"
+            }
+        ]
+    }
+}

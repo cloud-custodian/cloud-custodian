@@ -1,0 +1,23 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "2d5bd2b2-e820-11e8-999f-c9aec7dbf587", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2d5bd2b2-e820-11e8-999f-c9aec7dbf587", 
+                "content-length": "49", 
+                "x-amz-apigw-id": "QW5WcL1woAMEdtg=", 
+                "connection": "keep-alive", 
+                "date": "Wed, 14 Nov 2018 15:15:53 GMT", 
+                "content-type": "application/json", 
+                "x-amzn-errortype": "NotFoundException"
+            }
+        }, 
+        "Error": {
+            "Message": "Invalid stage identifier specified", 
+            "Code": "NotFoundException"
+        }
+    }
+}

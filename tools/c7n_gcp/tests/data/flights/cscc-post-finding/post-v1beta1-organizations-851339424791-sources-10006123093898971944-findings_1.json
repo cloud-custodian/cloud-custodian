@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "vary": "Origin, X-Origin, Referer",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Sun, 06 Jan 2019 11:14:29 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "409",
+    "content-length": "274",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "error": {
+      "code": 409,
+      "message": "Requested entity already exists",
+      "errors": [
+        {
+          "message": "Requested entity already exists",
+          "domain": "global",
+          "reason": "alreadyExists"
+        }
+      ],
+      "status": "ALREADY_EXISTS"
+    }
+  }
+}

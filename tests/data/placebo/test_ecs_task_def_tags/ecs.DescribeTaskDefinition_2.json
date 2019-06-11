@@ -1,0 +1,100 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskDefinition": {
+            "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/ecs-read-only-root:1",
+            "containerDefinitions": [
+                {
+                    "name": "Db",
+                    "image": "redis:latest",
+                    "cpu": 0,
+                    "portMappings": [
+                        {
+                            "containerPort": 6379,
+                            "hostPort": 6379,
+                            "protocol": "tcp"
+                        }
+                    ],
+                    "essential": true,
+                    "environment": [],
+                    "mountPoints": [
+                        {
+                            "sourceVolume": "host-data",
+                            "containerPath": "/data"
+                        }
+                    ],
+                    "volumesFrom": [],
+                    "readonlyRootFilesystem": true,
+                    "dockerLabels": {
+                        "role": "db"
+                    },
+                    "logConfiguration": {
+                        "logDriver": "awslogs",
+                        "options": {
+                            "awslogs-group": "/ecs/ecs-read-only-root",
+                            "awslogs-region": "us-east-1",
+                            "awslogs-stream-prefix": "ecs"
+                        }
+                    }
+                }
+            ],
+            "family": "ecs-read-only-root",
+            "taskRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
+            "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
+            "networkMode": "awsvpc",
+            "revision": 1,
+            "volumes": [
+                {
+                    "name": "host-data",
+                    "host": {}
+                }
+            ],
+            "status": "ACTIVE",
+            "requiresAttributes": [
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+                },
+                {
+                    "name": "ecs.capability.task-eni"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.task-iam-role"
+                },
+                {
+                    "name": "ecs.capability.execution-role-awslogs"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+                }
+            ],
+            "placementConstraints": [],
+            "compatibilities": [
+                "EC2",
+                "FARGATE"
+            ],
+            "requiresCompatibilities": [
+                "FARGATE"
+            ],
+            "cpu": "256",
+            "memory": "512"
+        },
+        "tags": [],
+        "ResponseMetadata": {
+            "RequestId": "de1eb6ef-3937-11e9-a54b-07c4ec4b052f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "de1eb6ef-3937-11e9-a54b-07c4ec4b052f",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1410",
+                "date": "Mon, 25 Feb 2019 19:59:31 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

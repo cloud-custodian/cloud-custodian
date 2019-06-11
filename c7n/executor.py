@@ -43,11 +43,11 @@ def executor(name, **kw):
 class MainThreadExecutor(object):
     """ For running tests.
 
-    async == True  -> catch exceptions and store them in the future.
-    async == False -> let exceptions bubble up.
+    c7n_async == True  -> catch exceptions and store them in the future.
+    c7n_async == False -> let exceptions bubble up.
     """
 
-    async = True
+    c7n_async = True
 
     # For Dev/Unit Testing with concurrent.futures
     def __init__(self, *args, **kw):
@@ -62,7 +62,7 @@ class MainThreadExecutor(object):
         try:
             return MainThreadFuture(func(*args, **kw))
         except Exception as e:
-            if self.async:
+            if self.c7n_async:
                 return MainThreadFuture(None, exception=e)
             raise
 

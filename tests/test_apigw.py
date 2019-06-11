@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from botocore.exceptions import ClientError
+
 from .common import BaseTest
 
 
@@ -62,6 +64,33 @@ class TestRestAccount(BaseTest):
         self.assertEqual(after_account["cloudwatchRoleArn"], log_role)
 
 
+class TestRestApi(BaseTest):
+
+    def test_rest_api_update(self):
+        session_factory = self.replay_flight_data('test_rest_api_update')
+        p = self.load_policy({
+            'name': 'update-api',
+            'resource': 'rest-api',
+            'filters': [
+                {'name': 'testapi'},
+                {'description': 'for demo only'}
+            ],
+            'actions': [{
+                'type': 'update',
+                'patch': [{
+                    'op': 'replace',
+                    'path': '/description',
+                    'value': 'for replacement'}]
+            }],
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        updated = session_factory().client('apigateway').get_rest_api(
+            restApiId=resources[0]['id'])
+        self.assertEqual(updated['description'], 'for replacement')
+
+
 class TestRestResource(BaseTest):
 
     def test_rest_resource_query(self):
@@ -71,7 +100,6 @@ class TestRestResource(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 4)
         self.assertEqual(
             sorted([(r["restApiId"], r["path"]) for r in resources]),
             [
@@ -81,6 +109,103 @@ class TestRestResource(BaseTest):
                 ("rtmgxfiay5", "/glenns_test"),
             ],
         )
+
+    def test_rest_integration_filter(self):
+        session_factory = self.replay_flight_data("test_rest_integration_filter")
+        p = self.load_policy(
+            {
+                "name": "rest-integration-filter",
+                "resource": "aws.rest-resource",
+                "filters": [
+                    {
+                        "type": "rest-integration",
+                        "key": "type",
+                        "value": "AWS",
+                    }
+                ],
+            }, session_factory=session_factory)
+
+        resources = p.run()
+
+        if len(resources) == 1:
+            integrations = resources[0].get('c7n:matched-method-integrations', [])
+            if len(integrations) == 1:
+                self.assertEqual(integrations[0]['resourceId'], 'ovgcc9m0b7')
+            else:
+                self.assertFail()
+        else:
+            self.assertFail()
+
+    def test_rest_integration_delete(self):
+        session_factory = self.replay_flight_data("test_rest_integration_delete")
+        p = self.load_policy(
+            {
+                "name": "rest-integration-delete",
+                "resource": "rest-resource",
+                "filters": [{"type": "rest-integration", "key": "type", "value": "AWS"}],
+                "actions": [{"type": "delete-integration"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        client = session_factory().client("apigateway")
+        integrations = resources[0].get("c7n:matched-method-integrations", [])
+
+        with self.assertRaises(ClientError) as e:
+            client.get_integration(
+                restApiId=integrations[0]["restApiId"],
+                resourceId=integrations[0]['resourceId'],
+                httpMethod=integrations[0]["resourceHttpMethod"]
+            )
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
+
+    def test_rest_integration_update(self):
+        session_factory = self.replay_flight_data("test_rest_integration_update")
+        p = self.load_policy(
+            {
+                "name": "rest-integration-update",
+                "resource": "rest-resource",
+                "filters": [
+                    {
+                        "type": "rest-integration",
+                        "key": "timeoutInMillis",
+                        "value": "29000",
+                        "op": "not-equal",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "update-integration",
+                        "patch": [
+                            {
+                                "op": "replace",
+                                "path": "/timeoutInMillis",
+                                "value": "29000",
+                            }
+                        ],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        integrations = []
+        for r in resources:
+            integrations.extend(r["c7n:matched-method-integrations"])
+
+        i = integrations.pop()
+
+        client = session_factory().client("apigateway")
+
+        method = client.get_method(
+            restApiId=i["restApiId"],
+            resourceId=i["resourceId"],
+            httpMethod=i["resourceHttpMethod"],
+        )
+        self.assertEqual(method['methodIntegration']['timeoutInMillis'], 29000)
 
     def test_rest_resource_method_update(self):
         session_factory = self.replay_flight_data("test_rest_resource_method_update")
@@ -115,8 +240,7 @@ class TestRestResource(BaseTest):
         self.assertEqual(len(resources), 1)
         methods = []
         for r in resources:
-            methods.extend(r["c7n-matched-resource-methods"])
-        # resource = resources.pop()
+            methods.extend(r["c7n:matched-resource-methods"])
 
         m = methods.pop()
         client = session_factory().client("apigateway")
@@ -187,3 +311,22 @@ class TestRestStage(BaseTest):
             self.assertEqual(m["loggingLevel"], "INFO")
             self.assertEqual(m["dataTraceEnabled"], True)
         self.assertTrue(found)
+
+    def test_rest_stage_delete(self):
+        session_factory = self.replay_flight_data("test_rest_stage_delete")
+        p = self.load_policy(
+            {
+                "name": "rest-stage-delete",
+                "resource": "rest-stage",
+                "filters": [{"type": "value", "key": "stageName", "value": "delete-test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        client = session_factory().client("apigateway")
+        with self.assertRaises(ClientError) as e:
+            client.get_stage(
+                restApiId=resources[0]["restApiId"], stageName=resources[0]["stageName"]
+            )
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')

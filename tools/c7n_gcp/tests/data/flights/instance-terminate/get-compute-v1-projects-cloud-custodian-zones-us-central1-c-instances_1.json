@@ -1,0 +1,107 @@
+{
+  "body": {
+    "items": [
+      {
+        "status": "STOPPING", 
+        "cpuPlatform": "Intel Haswell", 
+        "kind": "compute#instance", 
+        "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/machineTypes/n1-standard-1", 
+        "description": "", 
+        "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c", 
+        "tags": {
+          "fingerprint": "42WmSpB8rSM="
+        }, 
+        "labelFingerprint": "42WmSpB8rSM=", 
+        "disks": [
+          {
+            "index": 0, 
+            "kind": "compute#attachedDisk", 
+            "autoDelete": true, 
+            "deviceName": "instance-1", 
+            "boot": true, 
+            "guestOsFeatures": [
+              {
+                "type": "VIRTIO_SCSI_MULTIQUEUE"
+              }
+            ], 
+            "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/disks/instance-1", 
+            "interface": "SCSI", 
+            "mode": "READ_WRITE", 
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
+            ], 
+            "type": "PERSISTENT"
+          }
+        ], 
+        "metadata": {
+          "kind": "compute#metadata", 
+          "fingerprint": "yXKwbjMeRA0="
+        }, 
+        "startRestricted": false, 
+        "deletionProtection": false, 
+        "scheduling": {
+          "automaticRestart": true, 
+          "preemptible": false, 
+          "onHostMaintenance": "MIGRATE"
+        }, 
+        "canIpForward": false, 
+        "serviceAccounts": [
+          {
+            "scopes": [
+              "https://www.googleapis.com/auth/devstorage.read_only", 
+              "https://www.googleapis.com/auth/logging.write", 
+              "https://www.googleapis.com/auth/monitoring.write", 
+              "https://www.googleapis.com/auth/servicecontrol", 
+              "https://www.googleapis.com/auth/service.management.readonly", 
+              "https://www.googleapis.com/auth/trace.append"
+            ], 
+            "email": "604150802624-compute@developer.gserviceaccount.com"
+          }
+        ], 
+        "networkInterfaces": [
+          {
+            "kind": "compute#networkInterface", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "accessConfigs": [
+              {
+                "kind": "compute#accessConfig", 
+                "type": "ONE_TO_ONE_NAT", 
+                "name": "External NAT", 
+                "natIP": "35.239.233.145"
+              }
+            ], 
+            "networkIP": "10.128.0.2", 
+            "fingerprint": "d3HOkLfGekE=", 
+            "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default", 
+            "name": "nic0"
+          }
+        ], 
+        "creationTimestamp": "2018-07-08T07:53:07.645-07:00", 
+        "id": "997635173265677245", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/instance-1", 
+        "name": "instance-1"
+      }
+    ], 
+    "kind": "compute#instanceList", 
+    "id": "projects/cloud-custodian/zones/us-central1-c/instances", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "2848", 
+    "transfer-encoding": "chunked", 
+    "expires": "Sun, 08 Jul 2018 14:55:52 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Sun, 08 Jul 2018 14:55:52 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances?filter=name+%3D+instance-1&alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"3-SWKWORdSz-Qt1gBPZnAsI2Io4=/ykWw0O6qoxFMGugXq1Jd4_R2vvo=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"43,42,41,39,35\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

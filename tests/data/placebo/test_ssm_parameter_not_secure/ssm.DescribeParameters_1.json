@@ -1,0 +1,51 @@
+{
+    "status_code": 200, 
+    "data": {
+       "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c78732aa-5328-4574-91be-8fcd2ba4bf37", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c78732aa-5328-4574-91be-8fcd2ba4bf37", 
+                "date": "Thu, 16 Aug 2018 15:48:35 GMT", 
+                "content-length": "2345", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "Parameters": [
+            {
+                "LastModifiedUser": "arn:aws:iam::123456789:user/test-user", 
+                "LastModifiedDate": {
+                    "hour": 6, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 45, 
+                    "microsecond": 517000, 
+                    "year": 2018, 
+                    "day": 20, 
+                    "minute": 37
+                }, 
+                "Version": 1, 
+                "Type": "String", 
+                "Name": "test-name"
+            }, 
+            {
+                "KeyId": "alias/aws/ssm", 
+                "Name": "secure-test-name", 
+                "LastModifiedDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 8, 
+                    "second": 35, 
+                    "microsecond": 951000, 
+                    "year": 2018, 
+                    "day": 16, 
+                    "minute": 48
+                }, 
+                "Version": 3, 
+                "LastModifiedUser": "arn:aws:iam::123456789:user/test-user", 
+                "Type": "SecureString"
+            }
+        ]
+    }
+}

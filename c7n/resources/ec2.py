@@ -13,38 +13,40 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import base64
 import itertools
 import operator
 import random
 import re
+import zlib
 
 import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
+import jmespath
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
+from c7n.actions.securityhub import PostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, OPERATORS, DefaultVpcBase
+    FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase
 )
 from c7n.filters.offhours import OffHour, OnHour
-from c7n.filters.health import HealthEventFilter
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
-from c7n import query
+from c7n import query, utils
+from c7n.resources.iam import CheckPermissions
+from c7n.utils import type_schema, filter_empty
 
-from c7n import utils
-from c7n.utils import type_schema
 
+RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
-
-filters.register('health-event', HealthEventFilter)
 
 
 @resources.register('ec2')
@@ -124,7 +126,8 @@ class DescribeEC2(query.DescribeSource):
         various resources, it may also silently fail to do so unless a tag
         is used as a filter.
 
-        See footnote on http://goo.gl/YozD9Q for official documentation.
+        See footnote on for official documentation.
+        https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#Using_Tags_CLI
 
         Apriori we may be using custodian to ensure tags (including
         name), so there isn't a good default to ensure that we will
@@ -181,7 +184,32 @@ class SubnetFilter(net_filters.SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
-filters.register('network-location', net_filters.NetworkLocation)
+@filters.register('vpc')
+class VpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
+@filters.register('check-permissions')
+class ComputePermissions(CheckPermissions):
+
+    def get_iam_arns(self, resources):
+        profile_arn_map = {
+            r['IamInstanceProfile']['Arn']: r['IamInstanceProfile']['Id']
+            for r in resources if 'IamInstanceProfile' in r}
+
+        # py2 compat on dict ordering
+        profile_arns = list(profile_arn_map.items())
+        profile_role_map = {
+            arn: profile['Roles'][0]['Arn']
+            for arn, profile in zip(
+                [p[0] for p in profile_arns],
+                self.manager.get_resource_manager(
+                    'iam-profile').get_resources(
+                        [p[1] for p in profile_arns]))}
+        return [
+            profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
+            for r in resources]
 
 
 @filters.register('state-age')
@@ -198,7 +226,7 @@ class StateTransitionAge(AgeFilter):
                 op: ge
                 days: 7
     """
-    RE_PARSE_AGE = re.compile("\(.*?\)")
+    RE_PARSE_AGE = re.compile(r"\(.*?\)")
 
     # this filter doesn't use date_attribute, but needs to define it
     # to pass AgeFilter's validate method
@@ -206,7 +234,7 @@ class StateTransitionAge(AgeFilter):
 
     schema = type_schema(
         'state-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
     def get_resource_date(self, i):
@@ -226,7 +254,9 @@ class StateTransitionFilter(object):
     filtering elements (filters or actions) to the instances states
     they are valid for.
 
-    For more details see http://goo.gl/TZH9Q5
+    For more details see
+     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
+
     """
     valid_origin_states = ()
 
@@ -403,7 +433,7 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
     def get_permissions(self):
@@ -500,6 +530,19 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
     def process(self, resources, event=None):
         return super(InstanceOffHour, self).process(
             self.filter_instance_state(resources))
+
+
+@filters.register('network-location')
+class EC2NetworkLocation(net_filters.NetworkLocation, StateTransitionFilter):
+
+    valid_origin_states = ('pending', 'running', 'shutting-down', 'stopping',
+                           'stopped')
+
+    def process(self, resources, event=None):
+        resources = self.filter_instance_state(resources)
+        if not resources:
+            return []
+        return super(EC2NetworkLocation, self).process(resources)
 
 
 @filters.register('onhour')
@@ -601,7 +644,7 @@ class UpTimeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-uptime',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
 
@@ -627,7 +670,7 @@ class InstanceAgeFilter(AgeFilter):
 
     schema = type_schema(
         'instance-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'},
         hours={'type': 'number'},
         minutes={'type': 'number'})
@@ -655,6 +698,83 @@ class DefaultVpc(DefaultVpcBase):
 
     def __call__(self, ec2):
         return ec2.get('VpcId') and self.match(ec2.get('VpcId')) or False
+
+
+def deserialize_user_data(user_data):
+    data = base64.b64decode(user_data)
+    # try raw and compressed
+    try:
+        return data.decode('utf8')
+    except UnicodeDecodeError:
+        return zlib.decompress(data, 16).decode('utf8')
+
+
+@filters.register('user-data')
+class UserData(ValueFilter):
+    """Filter on EC2 instances which have matching userdata.
+    Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
+    uses re.match() and userdata spans multiple lines.
+
+        :example:
+
+        .. code-block:: yaml
+
+            policies:
+              - name: ec2_userdata_stop
+                resource: ec2
+                filters:
+                  - type: user-data
+                    op: regex
+                    value: (?smi).*password=
+                actions:
+                  - stop
+    """
+
+    schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    batch_size = 50
+    annotation = 'c7n:user-data'
+    permissions = ('ec2:DescribeInstanceAttribute',)
+
+    def __init__(self, data, manager):
+        super(UserData, self).__init__(data, manager)
+        self.data['key'] = '"c7n:user-data"'
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        results = []
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            for instance_set in utils.chunks(resources, self.batch_size):
+                futures[w.submit(
+                    self.process_instance_set,
+                    client, instance_set)] = instance_set
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Error processing userdata on instance set %s", f.exception())
+                results.extend(f.result())
+        return results
+
+    def process_instance_set(self, client, resources):
+        results = []
+        for r in resources:
+            if self.annotation not in r:
+                try:
+                    result = client.describe_instance_attribute(
+                        Attribute='userData',
+                        InstanceId=r['InstanceId'])
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
+                        continue
+                if 'Value' not in result['UserData']:
+                    r[self.annotation] = None
+                else:
+                    r[self.annotation] = deserialize_user_data(
+                        result['UserData']['Value'])
+            if self.match(r):
+                results.append(r)
+        return results
 
 
 @filters.register('singleton')
@@ -725,6 +845,95 @@ class SingletonFilter(Filter, StateTransitionFilter):
         return False
 
 
+@EC2.filter_registry.register('ssm')
+class SsmStatus(ValueFilter):
+    """Filter ec2 instances by their ssm status information.
+
+    :Example:
+
+    Find ubuntu 18.04 instances are active with ssm.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-recover-instances
+            resource: ec2
+            filters:
+              - type: ssm
+                key: PingStatus
+                value: Online
+              - type: ssm
+                key: PlatformName
+                value: Ubuntu
+              - type: ssm
+                key: PlatformVersion
+                value: 18.04
+    """
+    schema = type_schema('ssm', rinherit=ValueFilter.schema)
+    permissions = ('ssm:DescribeInstanceInformation',)
+    annotation = 'c7n:SsmState'
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('ssm')
+        results = []
+        for resource_set in utils.chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set)
+        for r in resources:
+            if self.match(r[self.annotation]):
+                results.append(r)
+        return results
+
+    def process_resource_set(self, client, resources):
+        instance_ids = [i['InstanceId'] for i in resources]
+        info_map = {
+            info['InstanceId']: info for info in
+            client.describe_instance_information(
+                Filters=[{'Key': 'InstanceIds', 'Values': instance_ids}]).get(
+                    'InstanceInformationList', [])}
+        for r in resources:
+            r[self.annotation] = info_map.get(r['InstanceId'], {})
+
+
+@EC2.action_registry.register("post-finding")
+class InstanceFinding(PostFinding):
+    def format_resource(self, r):
+        ip_addresses = jmespath.search(
+            "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
+
+        # limit to max 10 ip addresses, per security hub service limits
+        ip_addresses = ip_addresses and ip_addresses[:10] or ip_addresses
+        details = {
+            "Type": r["InstanceType"],
+            "ImageId": r["ImageId"],
+            "IpV4Addresses": ip_addresses,
+            "KeyName": r.get("KeyName"),
+            "LaunchedAt": r["LaunchTime"].isoformat()
+        }
+
+        if "VpcId" in r:
+            details["VpcId"] = r["VpcId"]
+        if "SubnetId" in r:
+            details["SubnetId"] = r["SubnetId"]
+        if "IamInstanceProfile" in r:
+            details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
+
+        instance = {
+            "Type": "AwsEc2Instance",
+            "Id": "arn:{}:ec2:{}:{}:instance/{}".format(
+                utils.REGION_PARTITION_MAP.get(self.manager.config.region, 'aws'),
+                self.manager.config.region,
+                self.manager.config.account_id,
+                r["InstanceId"]),
+            "Region": self.manager.config.region,
+            "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
+            "Details": {"AwsEc2Instance": filter_empty(details)},
+        }
+
+        instance = filter_empty(instance)
+        return instance
+
+
 @actions.register('start')
 class Start(BaseAction, StateTransitionFilter):
     """Starts a previously stopped EC2 instance.
@@ -775,8 +984,7 @@ class Start(BaseAction, StateTransitionFilter):
         if failures:
             fail_count = sum(map(len, failures.values()))
             msg = "Could not start %d of %d instances %s" % (
-                fail_count, len(instances),
-                utils.dumps(failures))
+                fail_count, len(instances), utils.dumps(failures))
             self.log.warning(msg)
             raise RuntimeError(msg)
 
@@ -786,12 +994,29 @@ class Start(BaseAction, StateTransitionFilter):
                      'Client.RequestLimitExceeded'),
         retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
-        try:
-            retry(client.start_instances, InstanceIds=instance_ids)
-        except ClientError as e:
-            if e.response['Error']['Code'] in retryable:
-                return True
-            raise
+        while instance_ids:
+            try:
+                retry(client.start_instances, InstanceIds=instance_ids)
+                break
+            except ClientError as e:
+                if e.response['Error']['Code'] in retryable:
+                    # we maxed out on our retries
+                    return True
+                elif e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    instance_ids.remove(extract_instance_id(e))
+                else:
+                    raise
+
+
+def extract_instance_id(state_error):
+    "Extract an instance id from an error"
+    instance_id = None
+    match = RE_ERROR_INSTANCE_ID.search(str(state_error))
+    if match:
+        instance_id = match.groupdict().get('instance_id')
+    if match is None or instance_id is None:
+        raise ValueError("Could not extract instance id from error: %s" % state_error)
+    return instance_id
 
 
 @actions.register('resize')
@@ -930,17 +1155,12 @@ class Stop(BaseAction, StateTransitionFilter):
         return instances
 
     def _run_instances_op(self, op, instance_ids):
-        while True:
+        while instance_ids:
             try:
                 return self.manager.retry(op, InstanceIds=instance_ids)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
-                    msg = e.response['Error']['Message']
-                    e_instance_id = msg[msg.find("'") + 1:msg.rfind("'")]
-                    instance_ids.remove(e_instance_id)
-                    if not instance_ids:
-                        return
-                    continue
+                    instance_ids.remove(extract_instance_id(e))
                 raise
 
 
@@ -1088,10 +1308,10 @@ class Snapshot(BaseAction):
         policies:
           - name: ec2-snapshots
             resource: ec2
-          actions:
-            - type: snapshot
-              copy-tags:
-                - Name
+            actions:
+              - type: snapshot
+                copy-tags:
+                  - Name
     """
 
     schema = type_schema(
@@ -1169,6 +1389,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
+    sg_expr = jmespath.compile("Groups[].GroupId")
 
     def process(self, instances):
         if not len(instances):
@@ -1183,6 +1404,9 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 if i.get('c7n:matched-security-groups'):
                     eni['c7n:matched-security-groups'] = i[
                         'c7n:matched-security-groups']
+                if i.get('c7n:NetworkLocation'):
+                    eni['c7n:NetworkLocation'] = i[
+                        'c7n:NetworkLocation']
                 interfaces.append(eni)
 
         groups = super(EC2ModifyVpcSecurityGroups, self).get_groups(interfaces)
@@ -1209,8 +1433,8 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
             resource: ec2
             filters:
               - singleton
-          actions:
-            - autorecover-alarm
+            actions:
+              - autorecover-alarm
 
     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-recover.html
     """
@@ -1238,7 +1462,9 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
                 AlarmDescription='Auto Recover {}'.format(i['InstanceId']),
                 ActionsEnabled=True,
                 AlarmActions=[
-                    'arn:aws:automate:{}:ec2:recover'.format(
+                    'arn:{}:automate:{}:ec2:recover'.format(
+                        utils.REGION_PARTITION_MAP.get(
+                            self.manager.config.region, 'aws'),
                         i['Placement']['AvailabilityZone'][:-1])
                 ],
                 MetricName='StatusCheckFailed_System',
@@ -1259,7 +1485,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 @actions.register('set-instance-profile')
 class SetInstanceProfile(BaseAction, StateTransitionFilter):
-    """Sets (or removes) the instance profile for a running EC2 instance.
+    """Sets (add, modify, remove) the instance profile for a running EC2 instance.
 
     :Example:
 
@@ -1287,38 +1513,51 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
         'ec2:DisassociateIamInstanceProfile',
         'iam:PassRole')
 
-    valid_origin_states = ('running', 'pending')
+    valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
         instances = self.filter_instance_state(instances)
         if not len(instances):
             return
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
-        profile_name = self.data.get('name', '')
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+        profile_name = self.data.get('name')
+        profile_instances = [i for i in instances if i.get('IamInstanceProfile')]
+
+        if profile_instances:
+            associations = {
+                a['InstanceId']: (a['AssociationId'], a['IamInstanceProfile']['Arn'])
+                for a in client.describe_iam_instance_profile_associations(
+                    Filters=[
+                        {'Name': 'instance-id',
+                         'Values': [i['InstanceId'] for i in profile_instances]},
+                        {'Name': 'state', 'Values': ['associating', 'associated']}]
+                ).get('IamInstanceProfileAssociations', ())}
+        else:
+            associations = {}
 
         for i in instances:
-            if profile_name:
+            if profile_name and i['InstanceId'] not in associations:
                 client.associate_iam_instance_profile(
-                    IamInstanceProfile={'Name': self.data.get('name', '')},
+                    IamInstanceProfile={'Name': profile_name},
                     InstanceId=i['InstanceId'])
+                continue
+            # Removing profile and no profile on instance.
+            elif profile_name is None and i['InstanceId'] not in associations:
+                continue
+
+            p_assoc_id, p_arn = associations[i['InstanceId']]
+
+            # Already associated to target profile, skip
+            if profile_name and p_arn.endswith('/%s' % profile_name):
+                continue
+
+            if profile_name is None:
+                client.disassociate_iam_instance_profile(
+                    AssociationId=p_assoc_id)
             else:
-                response = client.describe_iam_instance_profile_associations(
-                    Filters=[
-                        {
-                            'Name': 'instance-id',
-                            'Values': [i['InstanceId']],
-                        },
-                        {
-                            'Name': 'state',
-                            'Values': ['associating', 'associated']
-                        }
-                    ]
-                )
-                for a in response['IamInstanceProfileAssociations']:
-                    client.disassociate_iam_instance_profile(
-                        AssociationId=a['AssociationId']
-                    )
+                client.replace_iam_instance_profile_association(
+                    IamInstanceProfile={'Name': profile_name},
+                    AssociationId=p_assoc_id)
 
         return instances
 
@@ -1334,14 +1573,14 @@ class PropagateSpotTags(BaseAction):
         policies:
           - name: ec2-spot-instances
             resource: ec2
-          filters:
-            - State.Name: pending
-            - instanceLifecycle: spot
-          actions:
-            - type: propagate-spot-tags
-              only_tags:
-                - Name
-                - BillingTag
+            filters:
+              - State.Name: pending
+              - instanceLifecycle: spot
+            actions:
+              - type: propagate-spot-tags
+                only_tags:
+                  - Name
+                  - BillingTag
     """
 
     schema = type_schema(
@@ -1564,3 +1803,100 @@ class InstanceAttribute(ValueFilter):
             keys.remove('InstanceId')
             resource['c7n:attribute-%s' % attribute] = fetched_attribute[
                 keys[0]]
+
+
+@resources.register('launch-template-version')
+class LaunchTemplate(query.QueryResourceManager):
+
+    class resource_type(object):
+        id = 'LaunchTemplateId'
+        name = 'LaunchTemplateName'
+        service = 'ec2'
+        date = 'CreateTime'
+        dimension = None
+        enum_spec = (
+            'describe_launch_templates', 'LaunchTemplates', None)
+        filter_name = 'LaunchTemplateIds'
+        filter_type = 'list'
+        type = "launch-template"
+
+    def augment(self, resources):
+        client = utils.local_session(
+            self.session_factory).client('ec2')
+        template_versions = []
+        for r in resources:
+            template_versions.extend(
+                client.describe_launch_template_versions(
+                    LaunchTemplateId=r['LaunchTemplateId']).get(
+                        'LaunchTemplateVersions', ()))
+        return template_versions
+
+    def get_resources(self, rids, cache=True):
+        # Launch template versions have a compound primary key
+        #
+        # Support one of four forms of resource ids:
+        #
+        #  - array of launch template ids
+        #  - array of tuples (launch template id, version id)
+        #  - array of dicts (with LaunchTemplateId and VersionNumber)
+        #  - array of dicts (with LaunchTemplateId and LatestVersionNumber)
+        #
+        # If an alias version is given $Latest, $Default, the alias will be
+        # preserved as an annotation on the returned object 'c7n:VersionAlias'
+        if not rids:
+            return []
+
+        t_versions = {}
+        if isinstance(rids[0], tuple):
+            for tid, tversion in rids:
+                t_versions.setdefault(tid, []).append(tversion)
+        elif isinstance(rids[0], dict):
+            for tinfo in rids:
+                t_versions.setdefault(
+                    tinfo['LaunchTemplateId'], []).append(
+                        tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
+        elif isinstance(rids[0], six.string_types):
+            for tid in rids:
+                t_versions[tid] = []
+
+        client = utils.local_session(self.session_factory).client('ec2')
+
+        results = []
+        # We may end up fetching duplicates on $Latest and $Version
+        for tid, tversions in t_versions.items():
+            ltv = client.describe_launch_template_versions(
+                LaunchTemplateId=tid, Versions=tversions).get(
+                    'LaunchTemplateVersions')
+            if not tversions:
+                tversions = [str(t['VersionNumber']) for t in ltv]
+            for tversion, t in zip(tversions, ltv):
+                if not tversion.isdigit():
+                    t['c7n:VersionAlias'] = tversion
+                results.append(t)
+        return results
+
+    def get_asg_templates(self, asgs):
+        templates = {}
+        for a in asgs:
+            if 'LaunchTemplate' not in a:
+                continue
+            t = a['LaunchTemplate']
+            templates.setdefault(
+                (t['LaunchTemplateId'], t['Version']), []).append(
+                    a['AutoScalingGroupName'])
+        return templates
+
+
+@resources.register('ec2-reserved')
+class ReservedInstance(query.QueryResourceManager):
+
+    class resource_type(object):
+        service = 'ec2'
+        name = id = 'ReservedInstancesId'
+        date = 'Start'
+        enum_spec = (
+            'describe_reserved_instances', 'ReservedInstances', None)
+        filter_name = 'ReservedInstancesIds'
+        filter_type = 'list'
+        dimension = None
+        type = "reserved-instances"

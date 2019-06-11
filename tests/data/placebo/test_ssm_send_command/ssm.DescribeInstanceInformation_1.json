@@ -1,0 +1,66 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceInformationList": [
+            {
+                "InstanceId": "i-0ba3874e85bb97244",
+                "PingStatus": "Online",
+                "LastPingDateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 9,
+                    "minute": 15,
+                    "second": 7,
+                    "microsecond": 712000
+                },
+                "AgentVersion": "2.3.274.0",
+                "IsLatestVersion": false,
+                "PlatformType": "Linux",
+                "PlatformName": "Ubuntu",
+                "PlatformVersion": "18.04",
+                "ResourceType": "EC2Instance",
+                "IPAddress": "172.31.10.93",
+                "ComputerName": "ip-172-31-10-93",
+                "AssociationStatus": "Success",
+                "LastAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 9,
+                    "minute": 12,
+                    "second": 3,
+                    "microsecond": 0
+                },
+                "LastSuccessfulAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 9,
+                    "minute": 12,
+                    "second": 3,
+                    "microsecond": 0
+                },
+                "AssociationOverview": {
+                    "InstanceAssociationStatusAggregatedCount": {
+                        "Success": 1
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "7d34aa11-8db8-45cb-a2ca-937b4479a8fa",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7d34aa11-8db8-45cb-a2ca-937b4479a8fa",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "548",
+                "date": "Wed, 30 Jan 2019 14:16:02 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

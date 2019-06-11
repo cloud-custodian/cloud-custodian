@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "IamInstanceProfileAssociation": {
+            "AssociationId": "iip-assoc-0b4737fb704ac546b",
+            "InstanceId": "i-04de9525c693dc500",
+            "IamInstanceProfile": {
+                "Arn": "arn:aws:iam::644160558196:instance-profile/aws-opsworks-ec2-role",
+                "Id": "AIPAJZ2UV4D7S4BXHBKEE"
+            },
+            "State": "associating"
+        },
+        "ResponseMetadata": {
+            "RequestId": "e0374acb-ff1f-4a8d-973d-7cb8eb2db6a8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Tue, 09 Oct 2018 14:17:10 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

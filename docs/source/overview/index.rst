@@ -6,6 +6,3 @@ Overview
 
    capabilities
    glossary
-   roadmap
-   comparisons
-   deployment

@@ -1,21 +1,19 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "d3c49ae7-e94c-58d7-8d57-c89539941ccb", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "d3c49ae7-e94c-58d7-8d57-c89539941ccb", 
-                "content-length": "353", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Tue, 31 Oct 2017 19:27:20 GMT", 
-                "content-type": "text/xml"
-            }
-        }, 
         "Tags": {
-            "tag-for-op": "Resource does not meet policy: delete@2017/11/01"
+            "tag-for-op": "Resource does not meet policy: delete@2019/02/07"
+        },
+        "ResponseMetadata": {
+            "RequestId": "806fa720-e9fd-5e0a-8ab2-f3f422300912",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "806fa720-e9fd-5e0a-8ab2-f3f422300912",
+                "date": "Wed, 06 Feb 2019 11:48:29 GMT",
+                "content-type": "text/xml",
+                "content-length": "353"
+            },
+            "RetryAttempts": 0
         }
     }
 }

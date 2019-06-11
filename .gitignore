@@ -6,6 +6,9 @@ deps/
 include/
 lib/
 bin/
+!tools/c7n_azure/c7n_azure/function_binding_resources/bin
+tools/c7n_azure/c7n_azure/function_binding_resources/obj/
+tools/c7n_azure/c7n_azure/cache
 dist/
 man/
 lib64
@@ -28,3 +31,11 @@ results.xml
 .idea/
 .vscode/
 !.vscode/*.sample
+.pytest_cache/
+pyvenv.cfg
+junit
+/.vs
+docs/source/overview\.rst
+docs/source/tools/c7n-mailer\.md
+docs/source/tools/c7n-org\.md
+docs/source/tools/c7n-policystream\.md

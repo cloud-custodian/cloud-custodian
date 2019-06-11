@@ -19,7 +19,7 @@ import itertools
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction
 from c7n.filters import MetricsFilter, FilterRegistry
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.utils import (
@@ -96,6 +96,12 @@ class SecurityGroup(SecurityGroupFilter):
     RelatedIdsExpression = "VPCOptions.SecurityGroupIds[]"
 
 
+@ElasticSearchDomain.filter_registry.register('vpc')
+class Vpc(VpcFilter):
+
+    RelatedIdsExpression = "VPCOptions.VPCId"
+
+
 @ElasticSearchDomain.filter_registry.register('metrics')
 class Metrics(MetricsFilter):
 
@@ -155,18 +161,11 @@ class ElasticSearchAddTag(Tag):
     """
     permissions = ('es:AddTags',)
 
-    def process_resource_set(self, domains, tags):
-        client = local_session(self.manager.session_factory).client('es')
-        tag_list = []
-        for t in tags:
-            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
+    def process_resource_set(self, client, domains, tags):
         for d in domains:
             try:
-                client.add_tags(ARN=d['ARN'], TagList=tag_list)
-            except Exception as e:
-                self.log.exception(
-                    'Exception tagging es domain %s: %s',
-                    d['DomainName'], e)
+                client.add_tags(ARN=d['ARN'], TagList=tags)
+            except client.exceptions.ResourceNotFoundExecption:
                 continue
 
 
@@ -189,15 +188,11 @@ class ElasticSearchRemoveTag(RemoveTag):
         """
     permissions = ('es:RemoveTags',)
 
-    def process_resource_set(self, domains, tags):
-        client = local_session(self.manager.session_factory).client('es')
+    def process_resource_set(self, client, domains, tags):
         for d in domains:
             try:
                 client.remove_tags(ARN=d['ARN'], TagKeys=tags)
-            except Exception as e:
-                self.log.exception(
-                    'Exception while removing tags from queue %s: %s',
-                    d['DomainName'], e)
+            except client.exceptions.ResourceNotFoundExecption:
                 continue
 
 
@@ -220,18 +215,3 @@ class ElasticSearchMarkForOp(TagDelayedAction):
                         op: delete
                         tag: c7n_es_delete
     """
-    permissions = ('es:AddTags',)
-
-    def process_resource_set(self, domains, tags):
-        client = local_session(self.manager.session_factory).client('es')
-        tag_list = []
-        for t in tags:
-            tag_list.append({'Key': t['Key'], 'Value': t['Value']})
-        for d in domains:
-            try:
-                client.add_tags(ARN=d['ARN'], TagList=tag_list)
-            except Exception as e:
-                self.log.exception(
-                    'Exception tagging es domain %s: %s',
-                    d['DomainName'], e)
-                continue

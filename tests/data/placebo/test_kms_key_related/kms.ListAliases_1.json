@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/dms",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/dms",
+                "TargetKeyId": "f1f33a6b-91aa-4b0a-904c-f2a0378277f0"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "4442dd45-958d-47fd-8863-8660756b5b58",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4442dd45-958d-47fd-8863-8660756b5b58",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "192"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

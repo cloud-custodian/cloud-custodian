@@ -1,0 +1,174 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-916f59f4",
+                        "InstanceId": "i-094207d64930768dc",
+                        "InstanceType": "t2.medium",
+                        "KeyName": "ssm-dev",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2018,
+                            "month": 5,
+                            "day": 23,
+                            "hour": 1,
+                            "minute": 4,
+                            "second": 2,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "disabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-east-2a",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-172-31-10-153.us-east-2.compute.internal",
+                        "PrivateIpAddress": "172.31.10.153",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 80,
+                            "Name": "stopped"
+                        },
+                        "StateTransitionReason": "User initiated (2018-06-07 14:35:24 GMT)",
+                        "SubnetId": "subnet-db9f62b2",
+                        "VpcId": "vpc-5f6c9936",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/sda1",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2018,
+                                        "month": 5,
+                                        "day": 23,
+                                        "hour": 1,
+                                        "minute": 4,
+                                        "second": 3,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-0c6efd2a9f5677a03"
+                                }
+                            }
+                        ],
+                        "ClientToken": "",
+                        "EbsOptimized": false,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "NetworkInterfaces": [
+                            {
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2018,
+                                        "month": 5,
+                                        "day": 23,
+                                        "hour": 1,
+                                        "minute": 4,
+                                        "second": 2,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-2f680dc3",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached"
+                                },
+                                "Description": "Primary network interface",
+                                "Groups": [
+                                    {
+                                        "GroupName": "launch-wizard-2",
+                                        "GroupId": "sg-84bc44ee"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "02:f6:74:08:2b:3a",
+                                "NetworkInterfaceId": "eni-06366857",
+                                "OwnerId": "644160558196",
+                                "PrivateDnsName": "ip-172-31-10-153.us-east-2.compute.internal",
+                                "PrivateIpAddress": "172.31.10.153",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-172-31-10-153.us-east-2.compute.internal",
+                                        "PrivateIpAddress": "172.31.10.153"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-db9f62b2",
+                                "VpcId": "vpc-5f6c9936"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/sda1",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "launch-wizard-2",
+                                "GroupId": "sg-84bc44ee"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "StateReason": {
+                            "Code": "Client.UserInitiatedShutdown",
+                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                        },
+                        "Tags": [
+                            {
+                                "Key": "Name",
+                                "Value": "ssm-test-256"
+                            },
+                            {
+                                "Key": "Expires",
+                                "Value": "2018-09-23"
+                            },
+                            {
+                                "Key": "Launched",
+                                "Value": "2018-09-16"
+                            },
+                            {
+                                "Key": "App",
+                                "Value": "Zebra"
+                            },
+                            {
+                                "Key": "OwnerContact",
+                                "Value": "kapil"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 2,
+                            "ThreadsPerCore": 1
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        }
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ReservationId": "r-0de03f8a0fe5f1f18"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "24a362b5-c6fe-4f5e-9352-1fea51621c36",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Sat, 15 Dec 2018 01:34:51 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

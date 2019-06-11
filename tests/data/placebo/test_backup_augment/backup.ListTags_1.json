@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "9fa6209d-a14a-4d64-bb60-fb1258054575",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "date": "Thu, 17 Jan 2019 15:40:40 GMT",
+                "x-amzn-requestid": "9fa6209d-a14a-4d64-bb60-fb1258054575",
+                "content-length": "43",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        },
+        "Tags": {
+            "App": "Backups"
+        }
+    }
+}

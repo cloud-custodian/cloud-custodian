@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "registryId": "644160558196",
+        "repositoryName": "c7n",
+        "lifecyclePolicyText": "{\"rules\":[{\"rulePriority\":1,\"description\":\"Expire images older than 14 days\",\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"sinceImagePushed\",\"countUnit\":\"days\",\"countNumber\":14},\"action\":{\"type\":\"expire\"}}]}",
+        "lastEvaluatedAt": {
+            "__class__": "datetime",
+            "year": 1969,
+            "month": 12,
+            "day": 31,
+            "hour": 19,
+            "minute": 0,
+            "second": 0,
+            "microsecond": 0
+        },
+        "ResponseMetadata": {
+            "RequestId": "59c4a61b-ee89-11e8-a7a8-6bc3a3b2d177",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "59c4a61b-ee89-11e8-a7a8-6bc3a3b2d177",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "339"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

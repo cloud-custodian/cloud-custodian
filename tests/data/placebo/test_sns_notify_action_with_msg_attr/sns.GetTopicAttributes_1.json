@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__console_sub_0\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:Subscribe\",\"SNS:Receive\"],\"Resource\":\"arn:aws:sns:us-east-1:644160558196:test\",\"Condition\":{\"StringLike\":{\"SNS:Endpoint\":\"alfredmarc.gamulo@capitalone.com\"}}}]}",
+            "Owner": "644160558196",
+            "SubscriptionsPending": "0",
+            "TopicArn": "arn:aws:sns:us-east-1:644160558196:test",
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}",
+            "SubscriptionsConfirmed": "1",
+            "DisplayName": "test",
+            "SubscriptionsDeleted": "0"
+        },
+        "ResponseMetadata": {
+            "RequestId": "2c981b05-f6de-5d07-a5e7-48d418aa901d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2c981b05-f6de-5d07-a5e7-48d418aa901d",
+                "content-type": "text/xml",
+                "content-length": "1918",
+                "date": "Wed, 25 Jul 2018 03:19:15 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

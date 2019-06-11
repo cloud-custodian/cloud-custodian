@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.ctx import ExecutionContext
+from c7n.filters import Filter
 from c7n.resources.ec2 import EC2
 from c7n.tags import Tag
 from .common import BaseTest, instance, Bag, TestConfig as Config
@@ -23,9 +24,76 @@ class TestEC2Manager(BaseTest):
 
     def get_manager(self, data, config=None, session_factory=None):
         ctx = ExecutionContext(
-            session_factory, Bag({"name": "test-policy"}), config or Config.empty()
+            session_factory, Bag(
+                {"name": "test-policy", 'provider_name': 'aws'}), config or Config.empty()
         )
         return EC2(ctx, data)
+
+    def test_manager_iter_filters(self):
+        p = self.load_policy({
+            'name': 'xyz',
+            'resource': 'aws.app-elb',
+            'filters': [
+                {'and': [
+                    {'type': 'listener',
+                     'key': 'Protocol',
+                     'value': 'HTTP'},
+                    {'type': 'listener',
+                     'key': 'DefaultActions[*].Type',
+                     'op': 'ni',
+                     'value_type': 'swap',
+                     'value': 'redirect',
+                     'matched': True}]}]})
+        self.assertEqual(
+            [f.type for f in p.resource_manager.iter_filters()],
+            ['and', 'listener', 'listener'])
+
+    def test_filter_get_block_op(self):
+        class F(Filter):
+            type = 'xyz'
+
+        p = self.load_policy({
+            'name': 'xyz',
+            'resource': 'ec2',
+            'filters': [
+                {'and': [{'or': []}]},
+                {'not': []},
+                {'or': []}
+            ]})
+
+        m = p.resource_manager
+        f = F({}, m)
+        m.filters.append(f)
+        self.assertEqual(f.get_block_operator(), 'and')
+
+        f = F({}, m)
+        m.filters[0].filters[0].filters.append(f)
+        self.assertEqual(f.get_block_operator(), 'or')
+
+        f = F({}, m)
+        m.filters[1].filters.append(f)
+        self.assertEqual(f.get_block_operator(), 'not')
+
+    def test_get_resource_manager(self):
+        p = self.load_policy(
+            {'resource': 'ec2',
+             'name': 'instances'})
+        self.assertEqual(p.resource_manager.get_resource_manager(
+            'aws.lambda').type, 'lambda')
+        self.assertEqual(p.resource_manager.source_type, 'describe')
+        self.assertRaises(
+            ValueError,
+            p.resource_manager.get_resource_manager,
+            'gcp.lambda')
+
+    def test_source_propagate(self):
+        p = self.load_policy(
+            {'resource': 'ec2',
+             'source': 'config',
+             'name': 'instances'})
+        manager = p.resource_manager.get_resource_manager(
+            'aws.security-group')
+        self.assertEqual(manager.source_type, 'config')
 
     def test_manager(self):
         ec2_mgr = self.get_manager(

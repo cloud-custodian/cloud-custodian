@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policies": [
+            {
+                "PolicyName": "IamCreateRoleAndCreatePolicy",
+                "PolicyId": "ANPAIIA2O3QI2VS7PIY6G",
+                "Arn": "arn:aws:iam::644160558196:policy/IamCreateRoleAndCreatePolicy",
+                "Path": "/",
+                "DefaultVersionId": "v4",
+                "AttachmentCount": 0,
+                "PermissionsBoundaryUsageCount": 0,
+                "IsAttachable": true,
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 11,
+                    "day": 1,
+                    "hour": 20,
+                    "minute": 5,
+                    "second": 59,
+                    "microsecond": 0
+                },
+                "UpdateDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 11,
+                    "day": 6,
+                    "hour": 16,
+                    "minute": 50,
+                    "second": 11,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "66efeb7d-2bf2-11e9-b1b5-1bc358e671ee",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "66efeb7d-2bf2-11e9-b1b5-1bc358e671ee",
+                "content-type": "text/xml",
+                "content-length": "24925",
+                "vary": "Accept-Encoding",
+                "date": "Fri, 08 Feb 2019 22:39:31 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

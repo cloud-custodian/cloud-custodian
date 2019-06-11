@@ -1,0 +1,112 @@
+{
+  "body": {
+    "items": [
+      {
+        "status": "STOPPING", 
+        "cpuPlatform": "Intel Haswell", 
+        "kind": "compute#instance", 
+        "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/machineTypes/n1-standard-1", 
+        "description": "", 
+        "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c", 
+        "tags": {
+          "items": [
+            "http-server", 
+            "https-server"
+          ], 
+          "fingerprint": "6smc4R4d39I="
+        }, 
+        "labelFingerprint": "42WmSpB8rSM=", 
+        "disks": [
+          {
+            "index": 0, 
+            "kind": "compute#attachedDisk", 
+            "autoDelete": true, 
+            "deviceName": "instance-1", 
+            "boot": true, 
+            "guestOsFeatures": [
+              {
+                "type": "VIRTIO_SCSI_MULTIQUEUE"
+              }
+            ], 
+            "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/disks/instance-1", 
+            "interface": "SCSI", 
+            "mode": "READ_WRITE", 
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
+            ], 
+            "type": "PERSISTENT"
+          }
+        ], 
+        "metadata": {
+          "kind": "compute#metadata", 
+          "fingerprint": "yXKwbjMeRA0="
+        }, 
+        "startRestricted": false, 
+        "deletionProtection": false, 
+        "scheduling": {
+          "automaticRestart": true, 
+          "preemptible": false, 
+          "onHostMaintenance": "MIGRATE"
+        }, 
+        "canIpForward": false, 
+        "serviceAccounts": [
+          {
+            "scopes": [
+              "https://www.googleapis.com/auth/devstorage.read_only", 
+              "https://www.googleapis.com/auth/logging.write", 
+              "https://www.googleapis.com/auth/monitoring.write", 
+              "https://www.googleapis.com/auth/servicecontrol", 
+              "https://www.googleapis.com/auth/service.management.readonly", 
+              "https://www.googleapis.com/auth/trace.append"
+            ], 
+            "email": "604150802624-compute@developer.gserviceaccount.com"
+          }
+        ], 
+        "networkInterfaces": [
+          {
+            "kind": "compute#networkInterface", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "accessConfigs": [
+              {
+                "networkTier": "PREMIUM", 
+                "kind": "compute#accessConfig", 
+                "type": "ONE_TO_ONE_NAT", 
+                "name": "External NAT", 
+                "natIP": "35.202.43.203"
+              }
+            ], 
+            "networkIP": "10.128.0.2", 
+            "fingerprint": "I9c-TFZkmcc=", 
+            "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default", 
+            "name": "nic0"
+          }
+        ], 
+        "creationTimestamp": "2018-08-03T05:05:46.403-07:00", 
+        "id": "6624228363236670454", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/instance-1", 
+        "name": "instance-1"
+      }
+    ], 
+    "kind": "compute#instanceList", 
+    "id": "projects/cloud-custodian/zones/us-central1-c/instances", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "2943", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 03 Aug 2018 12:20:23 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Fri, 03 Aug 2018 12:20:23 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances?filter=name+%3D+instance-1&alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"-dqp_y3kUQOqc9f5kHIm5ocLQIk=/naJ2iC-_FhlmuDJSGJ9MyWSizJM=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

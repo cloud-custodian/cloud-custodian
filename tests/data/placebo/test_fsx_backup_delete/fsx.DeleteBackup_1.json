@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "BackupId": "backup-0d1fb25003287b260",
+        "Lifecycle": "DELETED",
+        "ResponseMetadata": {
+            "RequestId": "85bdc926-35bf-4f32-a91a-68c183ee31eb",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Fri, 14 Dec 2018 19:53:12 GMT",
+                "x-amzn-requestid": "85bdc926-35bf-4f32-a91a-68c183ee31eb",
+                "content-length": "61",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

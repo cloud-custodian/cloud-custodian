@@ -241,10 +241,10 @@ class TestRedshift(BaseTest):
             ClusterIdentifier=resources[0]["ClusterIdentifier"]
         )
         cluster = response["Clusters"][0]
-        self.assertEquals(
+        self.assertEqual(
             cluster["ClusterIdentifier"], resources[0]["ClusterIdentifier"]
         )
-        self.assertEquals(cluster["ClusterStatus"], "modifying")
+        self.assertEqual(cluster["ClusterStatus"], "modifying")
         self.assertTrue(cluster["PendingModifiedValues"]["EnhancedVpcRouting"])
 
     def test_redshift_public_access(self):
@@ -267,6 +267,29 @@ class TestRedshift(BaseTest):
             cluster["ClusterIdentifier"], resources[0]["ClusterIdentifier"]
         )
         self.assertFalse(cluster["PubliclyAccessible"])
+
+    def test_redshift_kms_alias(self):
+        factory = self.replay_flight_data("test_redshift_kms_key_filter")
+        p = self.load_policy(
+            {
+                "name": "redshift-kms-alias",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "^(alias/aws/)",
+                        "op": "regex"
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['KmsKeyId'],
+            'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5') # NOQA
 
 
 class TestRedshiftSnapshot(BaseTest):

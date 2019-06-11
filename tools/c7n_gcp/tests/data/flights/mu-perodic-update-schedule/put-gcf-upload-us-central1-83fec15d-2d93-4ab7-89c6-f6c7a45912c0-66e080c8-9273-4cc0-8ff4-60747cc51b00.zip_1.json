@@ -1,0 +1,19 @@
+{
+  "headers": {
+    "x-guploader-uploadid": "AEnB2UqAKxWErsldJrnrJmIKitoHmOT_Eq-qw0NW9EfDVc4f5DY7fQVrs-DCjJcXxECfKMZRMpfe4vcbWUMnt6PkGiTMKSO4Kw",
+    "etag": "\"1e7bc064c9b86b8d447eda5ae7b009fc\"",
+    "x-goog-generation": "1545836660162423",
+    "x-goog-metageneration": "1",
+    "x-goog-hash": "crc32c=9o+qEg==, md5=HnvAZMm4a41Eftpa57AJ/A==",
+    "x-goog-stored-content-length": "563382",
+    "x-goog-stored-content-encoding": "identity",
+    "vary": "Origin",
+    "content-length": "0",
+    "date": "Wed, 26 Dec 2018 15:04:20 GMT",
+    "server": "UploadServer",
+    "content-type": "text/html; charset=UTF-8",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "status": "200"
+  },
+  "body": {}
+}

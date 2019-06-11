@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "253D2BBEC4273DEE",
+            "HostId": "4DeV99QifC5pmE2RkggZk9Hr2dqC8598o8IQr83UxwLWgUsEyxUlks7gfGshVKIkDO8fOrh1TkQ=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "4DeV99QifC5pmE2RkggZk9Hr2dqC8598o8IQr83UxwLWgUsEyxUlks7gfGshVKIkDO8fOrh1TkQ=",
+                "x-amz-request-id": "253D2BBEC4273DEE",
+                "date": "Sat, 17 Nov 2018 17:59:31 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": true,
+            "IgnorePublicAcls": false,
+            "BlockPublicPolicy": true,
+            "RestrictPublicBuckets": false
+        }
+    }
+}

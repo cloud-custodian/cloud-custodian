@@ -1,0 +1,34 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Group": {
+            "Path": "/", 
+            "CreateDate": {
+                "hour": 12, 
+                "__class__": "datetime", 
+                "month": 7, 
+                "second": 47, 
+                "microsecond": 0, 
+                "year": 2017, 
+                "day": 19, 
+                "minute": 36
+            }, 
+            "GroupId": "AGPAI6NICSNT546VPVZGS", 
+            "Arn": "arn:aws:iam::redacted:group/ServiceCatalogUsers", 
+            "GroupName": "ServiceCatalogUsers"
+        }, 
+        "Users": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7ded1025-741a-11e8-883c-6584ab69505b", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7ded1025-741a-11e8-883c-6584ab69505b", 
+                "date": "Tue, 19 Jun 2018 23:42:56 GMT", 
+                "content-length": "548", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

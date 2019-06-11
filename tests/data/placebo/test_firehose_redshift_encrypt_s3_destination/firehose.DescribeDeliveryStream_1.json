@@ -1,0 +1,72 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "77473e02-963b-435c-a870-b9beebd45a87", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "77473e02-963b-435c-a870-b9beebd45a87", 
+                "x-amz-id-2": "5ohkdbG6gm+UZKn28QviYDQUVVyBZ+wRplycHXvefpCZ2XqfMl6MT0N5B90CqK+xsekorNx0Rc0EbLQkrjZg4rYgpoiZF+CC", 
+                "content-length": "1122", 
+                "content-type": "application/x-amz-json-1.1", 
+                "date": "Wed, 15 Aug 2018 11:16:46 GMT"
+            }
+        }, 
+        "DeliveryStreamDescription": {
+            "DeliveryStreamType": "DirectPut", 
+            "HasMoreDestinations": false, 
+            "VersionId": "1", 
+            "CreateTimestamp": {
+                "hour": 7, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 47, 
+                "microsecond": 512000, 
+                "year": 2018, 
+                "day": 15, 
+                "minute": 16
+            }, 
+            "DeliveryStreamARN": "arn:aws:firehose:us-east-1:123456789:deliverystream/firehose-rs", 
+            "DeliveryStreamStatus": "ACTIVE", 
+            "DeliveryStreamName": "firehose-rs", 
+            "Destinations": [
+                {
+                    "DestinationId": "destinationId-000000000001", 
+                    "RedshiftDestinationDescription": {
+                        "Username": "test1234", 
+                        "S3DestinationDescription": {
+                            "RoleARN": "arn:aws:iam::123456789:role/firehose_delivery_role", 
+                            "BufferingHints": {
+                                "IntervalInSeconds": 300, 
+                                "SizeInMBs": 5
+                            }, 
+                            "EncryptionConfiguration": {
+                                "NoEncryptionConfig": "NoEncryption"
+                            }, 
+                            "CompressionFormat": "UNCOMPRESSED", 
+                            "CloudWatchLoggingOptions": {
+                                "Enabled": false
+                            }, 
+                            "BucketARN": "arn:aws:s3:::this-bucket"
+                        }, 
+                        "RetryOptions": {
+                            "DurationInSeconds": 3600
+                        }, 
+                        "RoleARN": "arn:aws:iam::123456789:role/firehose_delivery_role", 
+                        "ClusterJDBCURL": "jdbc:redshift://my-redshift-db.asdf.us-west-2.redshift.amazonaws.com:5432/mydb", 
+                        "CopyCommand": {
+                            "DataTableName": "mytable", 
+                            "CopyOptions": "JSON", 
+                            "DataTableColumns": "mycol"
+                        }, 
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": false
+                        }, 
+                        "S3BackupMode": "Disabled"
+                    }
+                }
+            ]
+        }
+    }
+}

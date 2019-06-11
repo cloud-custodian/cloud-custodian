@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "74488be0-0a30-11e9-953d-2fee03bfe843",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 27 Dec 2018 23:38:03 GMT",
+                "content-type": "application/json",
+                "content-length": "1888",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "74488be0-0a30-11e9-953d-2fee03bfe843",
+                "x-amz-apigw-id": "SlxOVER-CYcFq6A=",
+                "x-amzn-trace-id": "Root=1-5c25625b-1a25f83011d333a0ac593250;Sampled=0"
+            },
+            "RetryAttempts": 0
+        },
+        "Findings": [
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23",
+                "ProductArn": "arn:aws:securityhub:us-east-2:644160558196:product/644160558196/default",
+                "GeneratorId": "sec-hub-lambda",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/AWS Security Best Practices"
+                ],
+                "CreatedAt": "2018-12-27T23:35:58.406869+00:00",
+                "UpdatedAt": "2018-12-27T23:35:58.406869+00:00",
+                "Severity": {
+                    "Product": 10,
+                    "Normalized": 10
+                },
+                "Title": "sec-hub-lambda",
+                "ProductFields": {
+                    "resource": "lambda",
+                    "ProviderName": "CloudCustodian",
+                    "ProviderVersion": "0.8.33.0",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-2:644160558196:product/644160558196/default/us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23",
+                    "aws/securityhub/SeverityLabel": "LOW",
+                    "aws/securityhub/ProductName": "Default",
+                    "aws/securityhub/CompanyName": "Personal"
+                },
+                "Resources": [
+                    {
+                        "Type": "Other",
+                        "Id": "arn:aws:lambda:us-east-2:644160558196:function:check",
+                        "Region": "us-east-2",
+                        "Details": {
+                            "Other": {
+                                "FunctionName": "check",
+                                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:check",
+                                "Runtime": "python2.7",
+                                "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+                                "Handler": "lambda_function.lambda_handler",
+                                "CodeSize": "301",
+                                "Timeout": "3",
+                                "MemorySize": "128",
+                                "LastModified": "2018-11-26T19:01:38.558+0000",
+                                "CodeSha256": "D8RkghLf4BvG73/MkNcD780zBP/urgq4HCwGd9ixmGU=",
+                                "Version": "",
+                                "TracingConfig": "{\n\"Mode\": \"PassThrough\"\n}",
+                                "RevisionId": "d384566d-3528-4b18-bcca-e4c4a7389501",
+                                "c7n:resource-type": "lambda"
+                            }
+                        }
+                    }
+                ],
+                "WorkflowState": "NEW",
+                "RecordState": "ACTIVE"
+            }
+        ]
+    }
+}

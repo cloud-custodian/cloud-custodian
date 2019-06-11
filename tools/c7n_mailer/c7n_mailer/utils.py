@@ -14,20 +14,23 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import base64
+from datetime import datetime, timedelta
+import functools
 import json
 import os
-from datetime import datetime, timedelta
+import time
 
 import jinja2
+import jmespath
 from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
 from ruamel import yaml
 
 
-def get_jinja_env():
+def get_jinja_env(template_folders):
     env = jinja2.Environment(trim_blocks=True, autoescape=False)
-    env.filters['yaml_safe'] = yaml.safe_dump
+    env.filters['yaml_safe'] = functools.partial(yaml.safe_dump, default_flow_style=False)
     env.filters['date_time_format'] = date_time_format
     env.filters['get_date_time_delta'] = get_date_time_delta
     env.filters['get_date_age'] = get_date_age
@@ -35,21 +38,15 @@ def get_jinja_env():
     env.globals['format_struct'] = format_struct
     env.globals['resource_tag'] = get_resource_tag_value
     env.globals['get_resource_tag_value'] = get_resource_tag_value
-    env.loader = jinja2.FileSystemLoader(
-        [
-            os.path.abspath(
-                os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)),
-                    '..',
-                    'msg-templates')), os.path.abspath('/')
-        ]
-    )
+    env.globals['search'] = jmespath.search
+    env.loader = jinja2.FileSystemLoader(template_folders)
     return env
 
 
 def get_rendered_jinja(
-        target, sqs_message, resources, logger, specified_template, default_template):
-    env = get_jinja_env()
+        target, sqs_message, resources, logger,
+        specified_template, default_template, template_folders):
+    env = get_jinja_env(template_folders)
     mail_template = sqs_message['action'].get(specified_template, default_template)
     if not os.path.isabs(mail_template):
         mail_template = '%s.j2' % mail_template
@@ -58,6 +55,17 @@ def get_rendered_jinja(
     except Exception as error_msg:
         logger.error("Invalid template reference %s\n%s" % (mail_template, error_msg))
         return
+
+    # recast seconds since epoch as utc iso datestring, template
+    # authors can use date_time_format helper func to convert local
+    # tz. if no execution start time was passed use current time.
+    execution_start = datetime.utcfromtimestamp(
+        sqs_message.get(
+            'execution_start',
+            time.mktime(
+                datetime.utcnow().timetuple())
+        )).isoformat()
+
     rendered_jinja = template.render(
         recipient=target,
         resources=resources,
@@ -66,6 +74,7 @@ def get_rendered_jinja(
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
+        execution_start=execution_start,
         region=sqs_message.get('region', ''))
     return rendered_jinja
 
@@ -91,6 +100,9 @@ def get_message_subject(sqs_message):
     subject = jinja_template.render(
         account=sqs_message.get('account', ''),
         account_id=sqs_message.get('account_id', ''),
+        event=sqs_message.get('event', None),
+        action=sqs_message['action'],
+        policy=sqs_message['policy'],
         region=sqs_message.get('region', '')
     )
     return subject
@@ -150,6 +162,8 @@ def resource_format(resource, resource_type):
     elif resource_type == 'ami':
         return "%s %s %s" % (
             resource.get('Name'), resource['ImageId'], resource['CreationDate'])
+    elif resource_type == 'sagemaker-notebook':
+        return "%s" % (resource['NotebookInstanceName'])
     elif resource_type == 's3':
         return "%s" % (resource['Name'])
     elif resource_type == 'ebs':
@@ -289,6 +303,41 @@ def resource_format(resource, resource_type):
         return "QueueURL: %s QueueArn: %s " % (
             resource['QueueUrl'],
             resource['QueueArn'])
+    elif resource_type == "efs":
+        return "name: %s  id: %s  state: %s" % (
+            resource['Name'],
+            resource['FileSystemId'],
+            resource['LifeCycleState']
+        )
+    elif resource_type == "network-addr":
+        return "ip: %s  id: %s  scope: %s" % (
+            resource['PublicIp'],
+            resource['AllocationId'],
+            resource['Domain']
+        )
+    elif resource_type == "route-table":
+        return "id: %s  vpc: %s" % (
+            resource['RouteTableId'],
+            resource['VpcId']
+        )
+    elif resource_type == "app-elb":
+        return "arn: %s  zones: %s  scheme: %s" % (
+            resource['LoadBalancerArn'],
+            len(resource['AvailabilityZones']),
+            resource['Scheme'])
+    elif resource_type == "nat-gateway":
+        return "id: %s  state: %s  vpc: %s" % (
+            resource['NatGatewayId'],
+            resource['State'],
+            resource['VpcId'])
+    elif resource_type == "internet-gateway":
+        return "id: %s  attachments: %s" % (
+            resource['InternetGatewayId'],
+            len(resource['Attachments']))
+    elif resource_type == 'lambda':
+        return "Name: %s  RunTime: %s  \n" % (
+            resource['FunctionName'],
+            resource['Runtime'])
     else:
         return "%s" % format_struct(resource)
 
@@ -299,7 +348,7 @@ def kms_decrypt(config, logger, session, encrypted_field):
             kms = session.client('kms')
             return kms.decrypt(
                 CiphertextBlob=base64.b64decode(config[encrypted_field]))[
-                    'Plaintext']
+                    'Plaintext'].decode('utf8')
         except (TypeError, base64.binascii.Error) as e:
             logger.warning(
                 "Error: %s Unable to base64 decode %s, will assume plaintext." %
@@ -314,3 +363,37 @@ def kms_decrypt(config, logger, session, encrypted_field):
     else:
         logger.debug("No encrypted value to decrypt.")
         return None
+
+
+# https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
+def get_aws_username_from_event(logger, event):
+    if event is None:
+        return None
+    identity = event.get('detail', {}).get('userIdentity', {})
+    if not identity:
+        logger.warning("Could not get recipient from event \n %s" % (
+            format_struct(event)))
+        return None
+    if identity['type'] == 'AssumedRole':
+        logger.debug(
+            'In some cases there is no ldap uid is associated with AssumedRole: %s',
+            identity['arn'])
+        logger.debug(
+            'We will try to assume that identity is in the AssumedRoleSessionName')
+        user = identity['arn'].rsplit('/', 1)[-1]
+        if user is None or user.startswith('i-') or user.startswith('awslambda'):
+            return None
+        if ':' in user:
+            user = user.split(':', 1)[-1]
+        return user
+    if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
+        return identity['userName']
+    if identity['type'] == 'Root':
+        return None
+    # this conditional is left here as a last resort, it should
+    # be better documented with an example UserIdentity json
+    if ':' in identity['principalId']:
+        user_id = identity['principalId'].split(':', 1)[-1]
+    else:
+        user_id = identity['principalId']
+    return user_id

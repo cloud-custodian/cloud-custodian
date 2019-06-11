@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:my-dev-test-3"
+        },
+        "ResponseMetadata": {
+            "RequestId": "57272eeb-9e91-5fb1-a92b-7d5ba190da61",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Fri, 29 Jun 2018 14:05:53 GMT",
+                "content-type": "text/xml",
+                "content-length": "385",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "57272eeb-9e91-5fb1-a92b-7d5ba190da61"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

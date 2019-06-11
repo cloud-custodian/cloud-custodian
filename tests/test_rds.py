@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import datetime
-from dateutil import zoneinfo
+from dateutil import tz as tzutil
 import json
 import logging
 import os
@@ -237,7 +237,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_rds_mark_hours(self):
-        localtz = zoneinfo.gettz("Etc/UTC")
+        localtz = tzutil.gettz("Etc/UTC")
         dt = datetime.datetime.now(localtz)
         dt = dt.replace(
             year=2018, month=5, day=9, hour=21, minute=20, second=0, microsecond=0
@@ -365,7 +365,7 @@ class RDSTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 5)
 
     def test_rds_retention_copy_tags(self):
         session_factory = self.replay_flight_data("test_rds_retention")
@@ -379,7 +379,7 @@ class RDSTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 5)
 
     def test_rds_restore(self):
         self.patch(rds.RestoreInstance, "executor_factory", MainThreadExecutor)
@@ -476,15 +476,7 @@ class RDSTest(BaseTest):
                 "name": "rds-upgrade-available",
                 "resource": "rds",
                 "filters": [{"type": "upgrade-available", "major": True}],
-                "actions": [
-                    {
-                        "type": "mark-for-op",
-                        "tag": "custodian_upgrade",
-                        "days": 1,
-                        "msg": "Minor engine upgrade available: {op}@{action_date}",
-                        "op": "upgrade",
-                    }
-                ],
+                "actions": []
             },
             session_factory=session_factory,
         )
@@ -542,15 +534,27 @@ class RDSTest(BaseTest):
         self.assertEqual(resources[0]["c7n-rds-engine-upgrade"], "5.6.35")
 
     def test_rds_eligible_start_stop(self):
-        resource = {"DBInstanceIdentifier": "ABC", "DBInstanceStatus": "available"}
+        resource = {"DBInstanceIdentifier": "ABC",
+                    "DBInstanceStatus": "available",
+                    "Engine": "mysql"}
         self.assertTrue(rds._eligible_start_stop(resource, "available"))
 
-        resource = {"DBInstanceIdentifier": "ABC", "DBInstanceStatus": "stopped"}
+        resource = {"DBInstanceIdentifier": "ABC",
+                    "DBInstanceStatus": "stopped",
+                    "Engine": "mysql"}
         self.assertFalse(rds._eligible_start_stop(resource, "available"))
 
         resource = {
             "DBInstanceIdentifier": "ABC",
             "DBInstanceStatus": "available",
+            "Engine": "postgres",
+            "MultiAZ": True,
+        }
+        self.assertTrue(rds._eligible_start_stop(resource))
+        resource = {
+            "DBInstanceIdentifier": "ABC",
+            "DBInstanceStatus": "available",
+            "Engine": "sqlserver-ee",
             "MultiAZ": True,
         }
         self.assertFalse(rds._eligible_start_stop(resource))
@@ -558,6 +562,14 @@ class RDSTest(BaseTest):
         resource = {
             "DBInstanceIdentifier": "ABC",
             "DBInstanceStatus": "available",
+            "Engine": "docdb"
+        }
+        self.assertFalse(rds._eligible_start_stop(resource))
+
+        resource = {
+            "DBInstanceIdentifier": "ABC",
+            "DBInstanceStatus": "available",
+            "Engine": "postgres",
             "ReadReplicaDBInstanceIdentifiers": ["sbbdevslave"],
         }
         self.assertFalse(rds._eligible_start_stop(resource))
@@ -565,6 +577,7 @@ class RDSTest(BaseTest):
         resource = {
             "DBInstanceIdentifier": "ABC",
             "DBInstanceStatus": "available",
+            "Engine": "mysql",
             "ReadReplicaSourceDBInstanceIdentifier": "sbbdev",
         }
         self.assertFalse(rds._eligible_start_stop(resource))
@@ -707,7 +720,39 @@ class RDSTest(BaseTest):
 
         resources = policy.run()
 
-        self.assertEquals(len(resources), 1, "Resources should be unused")
+        self.assertEqual(len(resources), 1, "Resources should be unused")
+
+    def test_rds_modify_db(self):
+        session_factory = self.replay_flight_data("test_rds_modify_db")
+        p = self.load_policy(
+            {
+                "name": "rds-modify-db",
+                "resource": "rds",
+                "filters": [
+                    {"DeletionProtection": True},
+                    {"MasterUsername": "testtest"}
+                ],
+                "actions": [
+                    {
+                        "type": "modify-db",
+                        "update": [
+                            {
+                                "property": 'DeletionProtection',
+                                "value": False
+                            }
+                        ],
+                        "immediate": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("rds")
+        db_info = client.describe_db_instances(DBInstanceIdentifier="testtest")
+        self.assertFalse(db_info["DBInstances"][0]["DeletionProtection"])
 
 
 class RDSSnapshotTest(BaseTest):
@@ -1423,3 +1468,18 @@ class Resize(BaseTest):
         wait_until("modifying")
         wait_until("available")
         self.assertEqual(describe()["AllocatedStorage"], 6)  # nearest gigabyte
+
+
+class TestReservedRDSInstance(BaseTest):
+    def test_reserved_rds_instance_query(self):
+        session_factory = self.replay_flight_data("test_reserved_rds_instance_query")
+        p = self.load_policy(
+            {
+                "name": "filter-rds-reserved-instances",
+                "resource": "aws.rds-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ReservedDBInstanceId"], "ri-2019-05-06-14-19-06-332")

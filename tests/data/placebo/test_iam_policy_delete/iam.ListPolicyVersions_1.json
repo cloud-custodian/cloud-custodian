@@ -1,0 +1,75 @@
+{
+    "status_code": 200,
+    "data": {
+        "Versions": [
+            {
+                "VersionId": "v4",
+                "IsDefaultVersion": true,
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 11,
+                    "day": 6,
+                    "hour": 16,
+                    "minute": 50,
+                    "second": 11,
+                    "microsecond": 0
+                }
+            },
+            {
+                "VersionId": "v3",
+                "IsDefaultVersion": false,
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 11,
+                    "day": 3,
+                    "hour": 20,
+                    "minute": 37,
+                    "second": 2,
+                    "microsecond": 0
+                }
+            },
+            {
+                "VersionId": "v2",
+                "IsDefaultVersion": false,
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 11,
+                    "day": 1,
+                    "hour": 20,
+                    "minute": 48,
+                    "second": 12,
+                    "microsecond": 0
+                }
+            },
+            {
+                "VersionId": "v1",
+                "IsDefaultVersion": false,
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 11,
+                    "day": 1,
+                    "hour": 20,
+                    "minute": 5,
+                    "second": 59,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "670101c1-2bf2-11e9-93e5-11378b8f0a75",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "670101c1-2bf2-11e9-93e5-11378b8f0a75",
+                "content-type": "text/xml",
+                "content-length": "1022",
+                "date": "Fri, 08 Feb 2019 22:39:31 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

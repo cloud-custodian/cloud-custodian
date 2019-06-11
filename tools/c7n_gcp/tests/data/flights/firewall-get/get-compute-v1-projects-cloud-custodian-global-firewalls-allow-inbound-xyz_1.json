@@ -1,0 +1,43 @@
+{
+  "headers": {
+    "expires": "Sun, 04 Nov 2018 13:10:05 GMT",
+    "date": "Sun, 04 Nov 2018 13:10:05 GMT",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "etag": "\"MVck1nZK1y2Nk_4y5UoypDlO31c=/6UeW4kpHSUM2gc7z0bIbcg4Ych0=\"",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "620",
+    "-content-encoding": "gzip",
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/allow-inbound-xyz?alt=json"
+  },
+  "body": {
+    "kind": "compute#firewall",
+    "id": "4746899906201084445",
+    "creationTimestamp": "2018-11-04T03:50:10.647-08:00",
+    "name": "allow-inbound-xyz",
+    "description": "",
+    "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+    "priority": 1000,
+    "sourceRanges": [
+      "0.0.0.0/0"
+    ],
+    "targetServiceAccounts": [
+      "604150802624-compute@developer.gserviceaccount.com"
+    ],
+    "allowed": [
+      {
+        "IPProtocol": "all"
+      }
+    ],
+    "direction": "INGRESS",
+    "disabled": false,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/allow-inbound-xyz"
+  }
+}

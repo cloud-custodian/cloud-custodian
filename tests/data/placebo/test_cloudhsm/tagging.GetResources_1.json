@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:cloudhsm:us-east-1:12345:cluster/cluster-rhuxbiveqa2",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:cloudhsm:us-east-1:12345:hsm/hsm-mp3i7obxqdb",
+                "Tags": [
+                    {
+                        "Key": "foo",
+                        "Value": "bar"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "8bdd9ba5-e928-11e8-baff-67d5e7c0e945",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8bdd9ba5-e928-11e8-baff-67d5e7c0e945",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "287",
+                "date": "Thu, 15 Nov 2018 22:48:18 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

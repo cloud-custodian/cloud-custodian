@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "StreamNames": [
+            "sock-drawer"
+        ], 
+        "HasMoreStreams": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "cb6d2d76-ae4e-80ed-9964-20278305229d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cb6d2d76-ae4e-80ed-9964-20278305229d", 
+                "content-length": "54", 
+                "x-amz-id-2": "/uufCCQh1HZn4rcMzqDFr1B+rfqc/h1+aLrNTiHEeeHoNqX88c1HDT71FjFwapV5y/kAh8IhCfhCkfZWlsULIOz2tlJrgJX0", 
+                "server": "Apache-Coyote/1.1", 
+                "date": "Sat, 12 Aug 2017 14:05:04 GMT", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

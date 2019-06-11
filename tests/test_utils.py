@@ -15,7 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import json
 import os
-import unittest
 import sys
 import tempfile
 import time
@@ -25,6 +24,7 @@ from dateutil.parser import parse as parse_date
 import six
 
 from c7n import ipaddress, utils
+from c7n.config import Config
 
 from .common import BaseTest
 
@@ -114,7 +114,52 @@ class WorkerDecorator(BaseTest):
         self.assertTrue("more carrots" in log_output.getvalue())
 
 
-class UtilTest(unittest.TestCase):
+class UrlConfTest(BaseTest):
+
+    def test_parse_url(self):
+        self.assertEqual(
+            dict(utils.parse_url_config('aws://target?format=json&region=us-west-2')),
+            dict(url='aws://target?format=json&region=us-west-2',
+                 netloc='target',
+                 path='',
+                 scheme='aws',
+                 region='us-west-2',
+                 format='json'))
+
+        self.assertEqual(
+            dict(utils.parse_url_config('')),
+            {'netloc': '', 'path': '', 'scheme': '', 'url': ''})
+
+        self.assertEqual(
+            dict(utils.parse_url_config('aws')),
+            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+
+        self.assertEqual(
+            dict(utils.parse_url_config('aws://')),
+            {'path': '', 'scheme': 'aws', 'netloc': '', 'url': 'aws://'})
+
+
+class UtilTest(BaseTest):
+
+    def test_local_session_region(self):
+        policies = [
+            self.load_policy(
+                {'name': 'ec2', 'resource': 'ec2'},
+                config=Config.empty(region="us-east-1")),
+            self.load_policy(
+                {'name': 'ec2', 'resource': 'ec2'},
+                config=Config.empty(region='us-west-2'))]
+        previous = None
+        previous_region = None
+        for p in policies:
+            self.assertEqual(p.options.region, p.session_factory.region)
+            session = utils.local_session(p.session_factory)
+            self.assertNotEqual(session.region_name, previous_region)
+            self.assertNotEqual(session, previous)
+            previous = session
+            previous_region = p.options.region
+
+        self.assertEqual(utils.local_session(p.session_factory), previous)
 
     def test_format_date(self):
         d = parse_date("2018-02-02 12:00")
@@ -130,7 +175,7 @@ class UtilTest(unittest.TestCase):
 
     def test_group_by(self):
         sorter = lambda x: x  # NOQA E731
-        sorter = sys.version_info.major is 2 and sorted or sorter
+        sorter = sys.version_info.major == 2 and sorted or sorter
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
         self.assertEqual(
             sorter(list(utils.group_by(items, "Type").keys())), [None, "a", "b"]
@@ -202,6 +247,12 @@ class UtilTest(unittest.TestCase):
         self.assertEqual(
             utils.generate_arn("s3", "my_bucket"), "arn:aws:s3:::my_bucket"
         )
+
+        self.assertEqual(
+            utils.generate_arn("s3", "my_bucket", region="us-gov-west-1"),
+            "arn:aws-us-gov:s3:::my_bucket"
+        )
+
         self.assertEqual(
             utils.generate_arn(
                 "cloudformation",
@@ -390,3 +441,15 @@ class UtilTest(unittest.TestCase):
         self.assertEqual(fmt["Key3"], "aa")
         self.assertEqual(fmt["Key4"][2], "aa")
         self.assertEqual(fmt["Key4"][1]["K"], "bb")
+
+        self.assertEqual(
+            utils.format_string_values(
+                {'k': '{1}'}),
+            {'k': '{1}'})
+
+        self.assertEqual(
+            utils.format_string_values(
+                {'k': '{limit}',
+                 'b': '{account_id}'}, account_id=21),
+            {'k': '{limit}',
+             'b': '21'})

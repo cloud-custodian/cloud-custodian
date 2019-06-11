@@ -1,0 +1,213 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-00b3b2755218e3fdd",
+                "LaunchTemplateName": "test-template",
+                "VersionNumber": 4,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 31,
+                    "hour": 11,
+                    "minute": 39,
+                    "second": 44,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/faizan.ahmed@capitalone.com",
+                "DefaultVersion": true,
+                "LaunchTemplateData": {
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sdb",
+                            "Ebs": {
+                                "Encrypted": false,
+                                "VolumeSize": 1
+                            }
+                        }
+                    ],
+                    "ImageId": "ami-0ac019f4fcb7cb7e6",
+                    "InstanceType": "t2.small",
+                    "TagSpecifications": [
+                        {
+                            "ResourceType": "instance",
+                            "Tags": [
+                                {
+                                    "Key": "Env",
+                                    "Value": "Dev"
+                                }
+                            ]
+                        },
+                        {
+                            "ResourceType": "volume",
+                            "Tags": [
+                                {
+                                    "Key": "Env",
+                                    "Value": "Dev"
+                                }
+                            ]
+                        }
+                    ],
+                    "SecurityGroupIds": [
+                        "sg-0b090df1c1f95bc13"
+                    ]
+                }
+            },
+            {
+                "LaunchTemplateId": "lt-00b3b2755218e3fdd",
+                "LaunchTemplateName": "test-template",
+                "VersionNumber": 3,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 31,
+                    "hour": 11,
+                    "minute": 31,
+                    "second": 35,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/faizan.ahmed@capitalone.com",
+                "DefaultVersion": false,
+                "LaunchTemplateData": {
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sdb",
+                            "Ebs": {
+                                "Encrypted": false,
+                                "VolumeSize": 1
+                            }
+                        }
+                    ],
+                    "ImageId": "ami-0ac019f4fcb7cb7e6",
+                    "InstanceType": "t2.small",
+                    "TagSpecifications": [
+                        {
+                            "ResourceType": "instance",
+                            "Tags": [
+                                {
+                                    "Key": "Env",
+                                    "Value": "Dev"
+                                }
+                            ]
+                        },
+                        {
+                            "ResourceType": "volume",
+                            "Tags": [
+                                {
+                                    "Key": "Env",
+                                    "Value": "Dev"
+                                }
+                            ]
+                        }
+                    ],
+                    "SecurityGroupIds": [
+                        "sg-034c1e48ec56c8bcb",
+                        "sg-0b090df1c1f95bc13"
+                    ]
+                }
+            },
+            {
+                "LaunchTemplateId": "lt-00b3b2755218e3fdd",
+                "LaunchTemplateName": "test-template",
+                "VersionNumber": 2,
+                "VersionDescription": "dev2",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 31,
+                    "hour": 11,
+                    "minute": 30,
+                    "second": 6,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/faizan.ahmed@capitalone.com",
+                "DefaultVersion": false,
+                "LaunchTemplateData": {
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sdb",
+                            "Ebs": {
+                                "Encrypted": false,
+                                "VolumeSize": 1
+                            }
+                        }
+                    ],
+                    "ImageId": "ami-0ac019f4fcb7cb7e6",
+                    "InstanceType": "t2.small",
+                    "TagSpecifications": [
+                        {
+                            "ResourceType": "instance",
+                            "Tags": [
+                                {
+                                    "Key": "Env",
+                                    "Value": "Dev"
+                                }
+                            ]
+                        },
+                        {
+                            "ResourceType": "volume",
+                            "Tags": [
+                                {
+                                    "Key": "Env",
+                                    "Value": "Dev"
+                                }
+                            ]
+                        }
+                    ],
+                    "SecurityGroupIds": [
+                        "sg-015ed77d59ea1c12f"
+                    ]
+                }
+            },
+            {
+                "LaunchTemplateId": "lt-00b3b2755218e3fdd",
+                "LaunchTemplateName": "test-template",
+                "VersionNumber": 1,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 3,
+                    "hour": 15,
+                    "minute": 12,
+                    "second": 36,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/faizan.ahmed@capitalone.com",
+                "DefaultVersion": false,
+                "LaunchTemplateData": {
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/sdb",
+                            "Ebs": {
+                                "Encrypted": false,
+                                "VolumeSize": 1
+                            }
+                        }
+                    ],
+                    "ImageId": "ami-009d6802948d06e52",
+                    "InstanceType": "t2.small",
+                    "SecurityGroupIds": [
+                        "sg-015ed77d59ea1c12f"
+                    ]
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "8617e1fd-d32b-488f-9392-299d888f92b1",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Fri, 01 Mar 2019 19:50:57 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

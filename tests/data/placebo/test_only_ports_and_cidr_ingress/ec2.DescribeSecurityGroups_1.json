@@ -1,0 +1,752 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/10/01 15:49:33", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-8", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0075c565291171ba8"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/09/25 14:51:32", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-7", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-018e9e60dfc0df90f"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "cloud-custodian test SG", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 80, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 80, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }, 
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 8080, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 8080, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }, 
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 0, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "10.2.0.0/16"
+                            }
+                        ], 
+                        "ToPort": 62000, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }, 
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1234, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 4321, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }, 
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 443, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 443, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "c7n-only-ports-and-cidr-test", 
+                "VpcId": "vpc-007084954cd5c3c96", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-02a60363e2b087ff8"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/09/24 15:20:43", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-4", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-033fce6be61e68f7c"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/09/24 15:10:07", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-1", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0437cca8648bcc4c1"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/09/24 17:35:51", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-6", 
+                "VpcId": "vpc-0d706a6a97fee8752", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0526564d2edfd2e93"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/10/01 16:13:39", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-12", 
+                "VpcId": "vpc-0156cdc91695ac9dd", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0711cf16fb39770b4"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/09/24 15:15:21", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-3", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-077d4541f4a7df7af"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/09/24 15:09:38", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-07c171b5b19979b2c"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/09/24 17:35:17", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-5", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-081d95b6a63fcedc3"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "123456789012", 
+                                "GroupId": "sg-0828f69f583e2cd6b"
+                            }
+                        ], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-0d706a6a97fee8752", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0828f69f583e2cd6b"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "123456789012", 
+                                "GroupId": "sg-0bd115efd42dd9782"
+                            }
+                        ], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-0156cdc91695ac9dd", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0bd115efd42dd9782"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "123456789012", 
+                                "GroupId": "sg-0c459350495a9bdb5"
+                            }
+                        ], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-007084954cd5c3c96", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0c459350495a9bdb5"
+            }, 
+            {
+                "IpPermissionsEgress": [], 
+                "Description": "Testing c7n SG perms filter issue", 
+                "Tags": [
+                    {
+                        "Value": "jason.antman@coxautoinc.com", 
+                        "Key": "ownerEmail"
+                    }
+                ], 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 80, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 80, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }, 
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 22, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 22, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }, 
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 443, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "ToPort": 443, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "sg_jantmantest_1", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0d40e803b8b644e79"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/10/01 15:51:40", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-10", 
+                "VpcId": "vpc-0156cdc91695ac9dd", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0d7d0328e02aed3a3"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/10/01 15:50:11", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-9", 
+                "VpcId": "vpc-0d706a6a97fee8752", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0ed699502f9770695"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/10/01 16:06:44", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-11", 
+                "VpcId": "vpc-0156cdc91695ac9dd", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0fc432caea02aed11"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "Created from the RDS Management Console: 2018/09/24 15:11:58", 
+                "IpPermissions": [
+                    {
+                        "PrefixListIds": [], 
+                        "FromPort": 1521, 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "66.6.147.81/32"
+                            }
+                        ], 
+                        "ToPort": 1521, 
+                        "IpProtocol": "tcp", 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "rds-launch-wizard-2", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-0fc89f11f492259c8"
+            }, 
+            {
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ], 
+                        "UserIdGroupPairs": [], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "Description": "default VPC security group", 
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1", 
+                        "PrefixListIds": [], 
+                        "IpRanges": [], 
+                        "UserIdGroupPairs": [
+                            {
+                                "UserId": "123456789012", 
+                                "GroupId": "sg-1952d160"
+                            }
+                        ], 
+                        "Ipv6Ranges": []
+                    }
+                ], 
+                "GroupName": "default", 
+                "VpcId": "vpc-6b7e9b0c", 
+                "OwnerId": "123456789012", 
+                "GroupId": "sg-1952d160"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "d7bd0a19-8839-4ae3-b0f5-5351960e758b", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "vary": "Accept-Encoding", 
+                "date": "Thu, 18 Oct 2018 11:59:58 GMT", 
+                "server": "AmazonEC2"
+            }
+        }
+    }
+}

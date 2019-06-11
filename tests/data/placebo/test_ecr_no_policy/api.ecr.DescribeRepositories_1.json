@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [],
+        "ResponseMetadata": {
+            "RequestId": "a6d1d276-294d-11e9-8ed9-ff55339fda5b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a6d1d276-294d-11e9-8ed9-ff55339fda5b",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "19"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

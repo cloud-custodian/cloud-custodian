@@ -424,6 +424,84 @@ class TestSagemakerJob(BaseTest):
         self.assertEqual(len(tags), 0)
 
 
+class TestSagemakerTransformJob(BaseTest):
+
+    def test_sagemaker_transform_job_query(self):
+        session_factory = self.replay_flight_data("test_sagemaker_transform_job_query")
+        p = self.load_policy(
+            {
+                "name": "query-transform-jobs",
+                "resource": "sagemaker-transform-job",
+                "query": [{"StatusEquals": "Completed"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_stop_transform_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_transform_job_stop")
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "stop-transform-job",
+                "resource": "sagemaker-transform-job",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "ModelName",
+                        "value": "kmeans",
+                        "op": "contains",
+                    }
+                ],
+                "actions": [{"type": "stop"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        job = client.describe_transform_job(
+            TransformJobName=resources[0]["TransformJobName"]
+        )
+        self.assertEqual(job["TransformJobStatus"], "Stopping")
+
+    def test_tag_transform_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_transform_job_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-transform-job",
+                "resource": "sagemaker-transform-job",
+                "filters": [{"tag:JobTag": "absent"}],
+                "actions": [{"type": "tag", "key": "JobTag", "value": "JobTagValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["TransformJobArn"])["Tags"]
+        self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["JobTag", "JobTagValue"])
+
+    def test_untag_transform_job(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_transform_job_remove_tag"
+        )
+        p = self.load_policy(
+            {
+                "name": "remove-transform-job-tag",
+                "resource": "sagemaker-transform-job",
+                "filters": [{"tag:JobTag": "JobTagValue"}],
+                "actions": [{"type": "remove-tag", "tags": ["JobTag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["TransformJobArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+
 class TestSagemakerEndpoint(BaseTest):
 
     def test_sagemaker_endpoints(self):

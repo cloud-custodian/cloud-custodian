@@ -16,13 +16,13 @@ from setuptools import setup
 
 setup(
     name="c7n_logexporter",
-    version='0.2',
+    version='0.3',
     description="Cloud Custodian - Cloud Watch Log S3 exporter",
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     py_modules=['c7n_logexporter'],
     entry_points={

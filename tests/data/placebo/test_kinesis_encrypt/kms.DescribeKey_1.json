@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "KeyMetadata": {
+            "Origin": "AWS_KMS", 
+            "KeyId": "b5f0e072-1669-48e5-b110-c4989287ba54", 
+            "Description": "West SQS encryption key", 
+            "KeyManager": "CUSTOMER", 
+            "Enabled": true, 
+            "KeyUsage": "ENCRYPT_DECRYPT", 
+            "KeyState": "Enabled", 
+            "CreationDate": {
+                "hour": 6, 
+                "__class__": "datetime", 
+                "month": 11, 
+                "second": 47, 
+                "microsecond": 647000, 
+                "year": 2017, 
+                "day": 4, 
+                "minute": 45
+            }, 
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/b5f0e072-1669-48e5-b110-c4989287ba54", 
+            "AWSAccountId": "644160558196"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "636538c0-c14d-11e7-b9b8-396ffefb6e91", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "636538c0-c14d-11e7-b9b8-396ffefb6e91", 
+                "content-length": "358", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

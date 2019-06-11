@@ -1,0 +1,49 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Role": {
+            "Description": "Allows EC2 instances to call AWS services on your behalf.", 
+            "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
+            "MaxSessionDuration": 3600, 
+            "RoleId": "AROAIU73WBRLYMEMAYUCK", 
+            "CreateDate": {
+                "hour": 1, 
+                "__class__": "datetime", 
+                "month": 2, 
+                "second": 24, 
+                "microsecond": 0, 
+                "year": 2019, 
+                "day": 19, 
+                "minute": 41
+            }, 
+            "Tags": [
+                {
+                    "Value": "One", 
+                    "Key": "Application"
+                }, 
+                {
+                    "Value": "Dev", 
+                    "Key": "Env"
+                }, 
+                {
+                    "Value": "Dev", 
+                    "Key": "Role"
+                }
+            ], 
+            "RoleName": "test", 
+            "Path": "/", 
+            "Arn": "arn:aws:iam::123456789012:role/test"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bc63462b-3faf-11e9-aed7-b9a6c6a52af8", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bc63462b-3faf-11e9-aed7-b9a6c6a52af8", 
+                "date": "Wed, 06 Mar 2019 01:32:41 GMT", 
+                "content-length": "1166", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

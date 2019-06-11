@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "logStreams": [
+            {
+                "logStreamName": "2018/06/29/[$LATEST]f16430ece01f4404ba59c6f03fd274b6",
+                "creationTime": 1530281202641,
+                "firstEventTimestamp": 1530281202663,
+                "lastEventTimestamp": 1530281202663,
+                "lastIngestionTime": 1530281203966,
+                "uploadSequenceToken": "49583223086134434462789778147011664823562067731898565314",
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/c7n-hello-sqs:log-stream:2018/06/29/[$LATEST]f16430ece01f4404ba59c6f03fd274b6",
+                "storedBytes": 0
+            },
+            {
+                "logStreamName": "2018/06/29/[$LATEST]73900d3745df45b289c61a73e2718b74",
+                "creationTime": 1530281121575,
+                "firstEventTimestamp": 1530281106432,
+                "lastEventTimestamp": 1530281107773,
+                "lastIngestionTime": 1530281121592,
+                "uploadSequenceToken": "49584193858201115809449199208645333593643063264460050066",
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/c7n-hello-sqs:log-stream:2018/06/29/[$LATEST]73900d3745df45b289c61a73e2718b74",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "af5a21e4-7ba5-11e8-a3c4-ed07ccc24f7b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "af5a21e4-7ba5-11e8-a3c4-ed07ccc24f7b",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "912",
+                "date": "Fri, 29 Jun 2018 14:06:57 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

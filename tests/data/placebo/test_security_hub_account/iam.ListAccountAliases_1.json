@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AccountAliases": [
+            "filiatra-primary"
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8a9217d8-f6ba-11e8-8118-bf1c41531853", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8a9217d8-f6ba-11e8-8118-bf1c41531853", 
+                "date": "Mon, 03 Dec 2018 05:16:07 GMT", 
+                "content-length": "395", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

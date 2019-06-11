@@ -1,0 +1,21 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Another backup is already pending.",
+            "Code": "BackupInProgress"
+        },
+        "ResponseMetadata": {
+            "RequestId": "b283a148-0234-4776-b3ac-938c051d83c5",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Tue, 11 Dec 2018 20:19:20 GMT",
+                "x-amzn-requestid": "b283a148-0234-4776-b3ac-938c051d83c5",
+                "content-length": "76",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

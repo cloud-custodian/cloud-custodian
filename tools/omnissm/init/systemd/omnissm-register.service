@@ -1,0 +1,10 @@
+[Unit]
+Description=omnissm-register
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=omnissm-agent register
+
+[Install]
+WantedBy=network-online.target

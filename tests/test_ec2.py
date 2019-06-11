@@ -18,16 +18,45 @@ import unittest
 import time
 
 from datetime import datetime
-from dateutil import tz, zoneinfo
+from dateutil import tz
+import jmespath
 from mock import mock
 from jsonschema.exceptions import ValidationError
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
 from c7n.resources.ec2 import actions, QueryFilter
 from c7n import tags, utils
 
 from .common import BaseTest
+
+
+class TestEc2NetworkLocation(BaseTest):
+    def test_ec2_network_location_terminated(self):
+        factory = self.replay_flight_data("test_ec2_network_location")
+        client = factory().client('ec2')
+        resp = client.describe_instances()
+
+        self.assertTrue(len(resp['Reservations'][0]['Instances']), 1)
+        self.assertTrue(
+            len(resp['Reservations'][0]['Instances'][0]['State']['Name']),
+            'terminated'
+        )
+
+        policy = self.load_policy(
+            {
+                'name': 'ec2-network-location',
+                'resource': 'ec2',
+                'filters': [
+                    {'State.Name': 'terminated'},
+                    {'type': 'network-location',
+                     "key": "tag:some-value"}
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
 
 
 class TestTagAugmentation(BaseTest):
@@ -192,6 +221,47 @@ class TestDisableApiTermination(BaseTest):
                 )
             ),
         )
+
+
+class TestEc2Permissions(BaseTest):
+
+    def test_ec2_permissions(self):
+        factory = self.replay_flight_data('test_ec2_permissions')
+        policy = self.load_policy({
+            'name': 'ec2-perm',
+            'resource': 'aws.ec2',
+            'filters': [{
+                'type': 'check-permissions',
+                'match': 'allowed',
+                'actions': ['lambda:CreateFunction']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:perm-matches' in resources[0])
+
+
+class TestSsm(BaseTest):
+
+    def test_ssm_status(self):
+        session_factory = self.replay_flight_data('test_ec2_ssm_filter')
+        policy = self.load_policy({
+            'name': 'ec2-ssm',
+            'resource': 'aws.ec2',
+            'filters': [
+                {'type': 'ssm',
+                 'key': 'PlatformName',
+                 'value': 'Ubuntu'},
+                {'type': 'ssm',
+                 'key': 'PingStatus',
+                 'value': 'Online'}]},
+            session_factory=session_factory,
+            config={'region': 'us-east-2'})
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertTrue('c7n:SsmState' in resources[0])
+        self.assertEqual(
+            [r['InstanceId'] for r in resources],
+            ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
 
 
 class TestHealthEventsFilter(BaseTest):
@@ -646,7 +716,7 @@ class TestTag(BaseTest):
         self.assertEqual(len(resources), 3)
 
     def test_ec2_mark_zero(self):
-        localtz = zoneinfo.gettz("America/New_York")
+        localtz = tz.gettz("America/New_York")
         dt = datetime.now(localtz)
         dt = dt.replace(year=2017, month=11, day=24, hour=7, minute=00)
         session_factory = self.replay_flight_data("test_ec2_mark_zero")
@@ -695,7 +765,7 @@ class TestTag(BaseTest):
         self.assertEqual(result.date(), dt.date())
 
     def test_ec2_mark_hours(self):
-        localtz = zoneinfo.gettz("America/New_York")
+        localtz = tz.gettz("America/New_York")
         dt = datetime.now(localtz)
         dt = dt.replace(
             year=2018, month=2, day=20, hour=18, minute=00, second=0, microsecond=0
@@ -819,6 +889,48 @@ class TestReboot(BaseTest):
 
 class TestStart(BaseTest):
 
+    def test_invalid_state_extract(self):
+        self.assertEqual(
+            ec2.extract_instance_id(
+                ("An error occurred (IncorrectInstanceState) when calling "
+                 "the StartInstances operation: The instance 'i-abc123' is "
+                 "not in a state from which it can be started.")),
+            'i-abc123')
+        self.assertRaises(
+            ValueError,
+            ec2.extract_instance_id,
+            ("An error occurred (IncorrectInstanceState) when calling "
+             "the StartInstances operation: The instance is "
+             "not in a state from which it can be started."))
+
+    def test_ec2_start_handle_invalid_state(self):
+        policy = self.load_policy({
+            "name": "ec2-test-start",
+            "resource": "ec2",
+            "filters": [],
+            "actions": [{"type": "start"}],
+        })
+
+        client = mock.MagicMock()
+        client.start_instances.side_effect = ClientError(
+            {'Error': {
+                'Code': 'IncorrectInstanceState',
+                'Message': "The instance 'i-08270b9cfb568a1c4' is not in a state from which it can be started" # NOQA
+            }}, 'StartInstances')
+
+        start_action = policy.resource_manager.actions[0]
+        self.assertEqual(
+            start_action.process_instance_set(
+                client, [{'InstanceId': 'i-08270b9cfb568a1c4'}], 'm5.xlarge', 'us-east-1a'),
+            None)
+
+        client2 = mock.MagicMock()
+        client2.start_instances.side_effect = ValueError
+        self.assertRaises(
+            ValueError,
+            start_action.process_instance_set,
+            client2, [{'InstanceId': 'i-08270b9cfb568a1c4'}], 'm5.xlarge', 'us-east-1a')
+
     def test_ec2_start(self):
         session_factory = self.replay_flight_data("test_ec2_start")
         policy = self.load_policy(
@@ -913,36 +1025,75 @@ class TestSnapshot(BaseTest):
 
 class TestSetInstanceProfile(BaseTest):
 
-    def test_ec2_set_instance_profile_assocation(self):
-        session_factory = self.replay_flight_data(
-            "test_ec2_set_instance_profile_association"
-        )
-        policy = self.load_policy(
-            {
-                "name": "ec2-test-set-instance-profile-association",
-                "resource": "ec2",
-                "filters": [
-                    {"tag:Name": "MissingInstanceProfile"},
-                    {"IamInstanceProfile": "absent"},
-                ],
-                "actions": [{"type": "set-instance-profile", "name": "ec2-default"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertGreaterEqual(len(resources), 1)
-        ec2 = session_factory().client("ec2")
-        resources = ec2.describe_instances(
-            InstanceIds=[r["InstanceId"] for r in resources]
-        )
+    def test_ec2_set_instance_profile_missing(self):
+        factory = self.replay_flight_data(
+            'test_ec2_set_instance_profile_missing')
+        p = self.load_policy({
+            'name': 'ec2-set-profile-missing',
+            'resource': 'ec2',
+            'filters': [{'IamInstanceProfile': 'absent'}],
+            'actions': [
+                {
+                    'type': 'set-instance-profile',
+                    'name': 'aws-opsworks-ec2-role'
+                }
+            ]},
+            session_factory=factory)
 
-        for r in resources["Reservations"]:
-            for i in r["Instances"]:
-                self.assertIn("IamInstanceProfile", i)
-                self.assertIn("Arn", i["IamInstanceProfile"])
-                self.assertIn(
-                    ":instance-profile/ec2-default", i["IamInstanceProfile"]["Arn"]
-                )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertFalse(resources[0].get('IamInstanceProfile'))
+
+        client = factory().client('ec2')
+        associations = {
+            a['InstanceId']: a['IamInstanceProfile']['Arn']
+            for a in client.describe_iam_instance_profile_associations(
+                Filters=[
+                    {'Name': 'instance-id',
+                     'Values': [i['InstanceId'] for i in resources]},
+                    {'Name': 'state', 'Values': ['associating', 'associated']}]
+            ).get('IamInstanceProfileAssociations', ())}
+        self.assertEqual(
+            associations,
+            {resources[0]['InstanceId']: 'arn:aws:iam::644160558196:instance-profile/aws-opsworks-ec2-role'}) # noqa
+
+    def test_ec2_set_instance_profile_existing(self):
+        factory = self.replay_flight_data(
+            'test_ec2_set_instance_profile_existing')
+        p = self.load_policy({
+            'name': 'ec2-set-profile-extant',
+            'resource': 'ec2',
+            'filters': [{'tag:Name': 'role-test'}],
+            'actions': [{
+                'type': 'set-instance-profile',
+                'name': 'ecsInstanceRole'}]}, session_factory=factory)
+        client = factory().client('ec2')
+        resources = p.run()
+        # 3 instances covering no role, target role, different role.
+        self.assertEqual(len(resources), 3)
+        previous_associations = {
+            i['InstanceId']: i.get('IamInstanceProfile', {}).get('Arn')
+            for i in resources}
+        self.assertEqual(
+            previous_associations,
+            {u'i-01b7ee380879d3fd8': u'arn:aws:iam::644160558196:instance-profile/CloudCustodianRole', # noqa
+             u'i-06305b4b9f5e3f8b8': u'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole',
+             u'i-0aef5d5ffb60c8615': None})
+
+        # verify changes
+        associations = {
+            a['InstanceId']: a['IamInstanceProfile']['Arn']
+            for a in client.describe_iam_instance_profile_associations(
+                Filters=[
+                    {'Name': 'instance-id',
+                     'Values': [i['InstanceId'] for i in resources]},
+                    {'Name': 'state', 'Values': ['associating', 'associated']}]
+            ).get('IamInstanceProfileAssociations', ())}
+        self.assertEqual(
+            associations,
+            {'i-01b7ee380879d3fd8': 'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole',
+             'i-06305b4b9f5e3f8b8': 'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole',
+             'i-0aef5d5ffb60c8615': 'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole'})
 
     def test_ec2_set_instance_profile_disassocation(self):
         session_factory = self.replay_flight_data(
@@ -1099,7 +1250,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
         }
         self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
 
-    def test_invalid_add_params(self):
+    def test_valid_add_params(self):
         # string invalid
         policy = {
             "name": "add-with-incorrect-param-string",
@@ -1112,7 +1263,7 @@ class TestModifySecurityGroupsActionSchema(BaseTest):
                 },
             ],
         }
-        self.assertRaises(ValidationError, self.load_policy, data=policy, validate=True)
+        self.assertTrue(self.load_policy(data=policy, validate=True))
 
     def test_invalid_isolation_group_params(self):
         policy = {
@@ -1200,12 +1351,7 @@ class TestModifySecurityGroupAction(BaseTest):
         client = session_factory().client("ec2")
 
         default_sg_id = client.describe_security_groups(GroupNames=["default"])[
-            "SecurityGroups"
-        ][
-            0
-        ][
-            "GroupId"
-        ]
+            "SecurityGroups"][0]["GroupId"]
 
         # Catch on anything that uses the *PROD-ONLY* security groups but isn't in a prod role
         policy = self.load_policy(
@@ -1298,8 +1444,35 @@ class TestModifySecurityGroupAction(BaseTest):
 
         first_resources = policy.run()
         self.assertEqual(len(first_resources[0]["NetworkInterfaces"][0]["Groups"]), 1)
+        policy.validate()
         second_resources = policy.run()
         self.assertEqual(len(second_resources[0]["NetworkInterfaces"][0]["Groups"]), 2)
+
+    def test_add_remove_with_name(self):
+        session_factory = self.replay_flight_data(
+            "test_ec2_modify_groups_action_with_name")
+        policy = self.load_policy({
+            "name": "add-remove-sg-with-name",
+            "resource": "ec2",
+            "query": [
+                {'instance-id': "i-094207d64930768dc"}],
+            "actions": [
+                {"type": "modify-security-groups",
+                 "remove": ["launch-wizard-1"],
+                 "add": "launch-wizard-2"}]},
+            session_factory=session_factory, config={'region': 'us-east-2'})
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client('ec2')
+        if self.recording:
+            time.sleep(3)
+        self.assertEqual(
+            jmespath.search(
+                "Reservations[].Instances[].SecurityGroups[].GroupName",
+                client.describe_instances(InstanceIds=["i-094207d64930768dc"])),
+            ["launch-wizard-2"])
 
 
 class TestAutoRecoverAlarmAction(BaseTest):
@@ -1370,4 +1543,56 @@ class TestFilter(BaseTest):
         )
 
         resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestUserData(BaseTest):
+
+    def test_regex_filter(self):
+        session_factory = self.replay_flight_data("test_ec2_userdata")
+        policy = self.load_policy(
+            {
+                "name": "ec2_userdata",
+                "resource": "ec2",
+                'filters': [{'or': [
+                    {'type': 'user-data', 'op': 'regex', 'value': '(?smi).*A[KS]IA'}
+                ]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertGreater(len(resources), 0)
+
+
+class TestLaunchTemplate(BaseTest):
+
+    def test_template_get_resources(self):
+        factory = self.replay_flight_data(
+            'test_launch_template_get')
+        p = self.load_policy({
+            'name': 'ec2-reserved',
+            'resource': 'aws.launch-template-version'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources([
+            'lt-00b3b2755218e3fdd'])
+        self.assertEqual(len(resources), 4)
+
+    def test_launch_template_versions(self):
+        factory = self.replay_flight_data('test_launch_template_query')
+        p = self.load_policy({
+            'name': 'ec2-reserved',
+            'resource': 'aws.launch-template-version'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 8)
+        self.assertTrue(all(['LaunchTemplateData' in r for r in resources]))
+
+
+class TestReservedInstance(BaseTest):
+
+    def test_reserved_instance_query(self):
+        factory = self.replay_flight_data('test_ec2_reserved_instance_query')
+        p = self.load_policy({
+            'name': 'ec2-reserved',
+            'resource': 'aws.ec2-reserved'}, session_factory=factory)
+        resources = p.run()
         self.assertEqual(len(resources), 1)

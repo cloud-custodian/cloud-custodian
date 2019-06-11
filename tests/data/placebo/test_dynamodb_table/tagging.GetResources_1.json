@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:dynamodb:us-east-1:644160558196:table/test-table-kms-filter",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Foo"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    },
+                    {
+                        "Key": "Owner",
+                        "Value": "Bar"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "15b6d484-217e-11e9-872f-c56b57c1cf00",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "15b6d484-217e-11e9-872f-c56b57c1cf00",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "230",
+                "date": "Sat, 26 Jan 2019 15:21:42 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

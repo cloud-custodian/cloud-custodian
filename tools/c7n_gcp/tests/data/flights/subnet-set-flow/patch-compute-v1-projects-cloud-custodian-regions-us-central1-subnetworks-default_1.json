@@ -1,0 +1,35 @@
+{
+  "headers": {
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "date": "Sun, 04 Nov 2018 11:19:59 GMT",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "804",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "6422954994465729328",
+    "name": "operation-1541330398453-579d4f2e19d08-2549fd85-ed5c5b5b",
+    "operationType": "compute.subnetworks.patch",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default",
+    "targetId": "4686700484947109325",
+    "status": "DONE",
+    "user": "kapilt@gmail.com",
+    "progress": 100,
+    "insertTime": "2018-11-04T03:19:59.053-08:00",
+    "startTime": "2018-11-04T03:19:59.057-08:00",
+    "endTime": "2018-11-04T03:19:59.057-08:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/operations/operation-1541330398453-579d4f2e19d08-2549fd85-ed5c5b5b",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1"
+  }
+}

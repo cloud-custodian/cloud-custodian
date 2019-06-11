@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "S3-DataEvents",
+                "S3BucketName": "custodian-skunk-trails",
+                "S3KeyPrefix": "DataEvents",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true,
+                "IsOrganizationTrail": false
+            },
+            {
+                "Name": "skunk-trails",
+                "S3BucketName": "custodian-skunk-trails",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": false,
+                "IsOrganizationTrail": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "0e2a12c2-22c7-4b86-a8ec-3b178dc48f5a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0e2a12c2-22c7-4b86-a8ec-3b178dc48f5a",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "673",
+                "date": "Wed, 23 Jan 2019 00:42:16 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

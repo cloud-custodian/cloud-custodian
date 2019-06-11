@@ -1,0 +1,77 @@
+{
+  "status_code": 200,
+  "data": {
+    "InstanceInformationList": [{
+      "IsLatestVersion": false,
+      "IamRole": "SSMRole",
+      "ComputerName": "ip-11-11-11-11.test.com",
+      "AssociationOverview": {
+        "InstanceAssociationStatusAggregatedCount": {
+          "Success": 1
+        }
+      },
+      "PingStatus": "Online",
+      "Name": "123456111111-i-1111aa11a11a1111a",
+      "LastSuccessfulAssociationExecutionDate": {
+        "hour": 15,
+        "__class__": "datetime",
+        "month": 9,
+        "second": 2,
+        "microsecond": 0,
+        "year": 2018,
+        "day": 20,
+        "minute": 25
+      },
+      "InstanceId": "mi-1111aa111aa11a111",
+      "IPAddress": "11.11.11.11",
+      "AssociationStatus": "Success",
+      "LastAssociationExecutionDate": {
+        "hour": 15,
+        "__class__": "datetime",
+        "month": 9,
+        "second": 2,
+        "microsecond": 0,
+        "year": 2018,
+        "day": 20,
+        "minute": 25
+      },
+      "ResourceType": "ManagedInstance",
+      "ActivationId": "a11aa111-111a-1a11-1aaa-1a1a11aa1a11",
+      "AgentVersion": "2.2.916.0",
+      "PlatformVersion": "7.5",
+      "RegistrationDate": {
+        "hour": 14,
+        "__class__": "datetime",
+        "month": 8,
+        "second": 49,
+        "microsecond": 937000,
+        "year": 2018,
+        "day": 23,
+        "minute": 58
+      },
+      "PlatformName": "Red Hat Enterprise Linux Server",
+      "PlatformType": "Linux",
+      "LastPingDateTime": {
+        "hour": 11,
+        "__class__": "datetime",
+        "month": 9,
+        "second": 59,
+        "microsecond": 650000,
+        "year": 2018,
+        "day": 21,
+        "minute": 57
+      }
+    }],
+    "ResponseMetadata": {
+      "RetryAttempts": 0,
+      "HTTPStatusCode": 200,
+      "RequestId": "5bf6cdd0-fa75-41d5-bfc2-427528d0fa07",
+      "HTTPHeaders": {
+        "x-amzn-requestid": "5bf6cdd0-fa75-41d5-bfc2-427528d0fa07",
+        "date": "Fri, 21 Sep 2018 17:02:23 GMT",
+        "content-length": "7740",
+        "content-type": "application/x-amz-json-1.1"
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "05bb73e0-8fb8-4b08-9529-53223cf25213", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "05bb73e0-8fb8-4b08-9529-53223cf25213", 
+                "x-amz-id-2": "ObogldPeE61Uh6lEztZ3isLgaAKt/RjYROfs2adHrlYOzt5jTVIbmLG2ce4ugWo8bMnIhTNj4OYa+sLF01WA8s9lBMghz6ab", 
+                "content-length": "1016", 
+                "content-type": "application/x-amz-json-1.1", 
+                "date": "Wed, 15 Aug 2018 10:17:14 GMT"
+            }
+        }, 
+        "DeliveryStreamDescription": {
+            "DeliveryStreamType": "DirectPut", 
+            "HasMoreDestinations": false, 
+            "VersionId": "1", 
+            "CreateTimestamp": {
+                "hour": 6, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 15, 
+                "microsecond": 31000, 
+                "year": 2018, 
+                "day": 15, 
+                "minute": 17
+            }, 
+            "DeliveryStreamARN": "arn:aws:firehose:us-east-1:123456789:deliverystream/firehose-splunk", 
+            "DeliveryStreamStatus": "ACTIVE", 
+            "DeliveryStreamName": "firehose-splunk", 
+            "Destinations": [
+                {
+                    "DestinationId": "destinationId-000000000001", 
+                    "SplunkDestinationDescription": {
+                        "S3DestinationDescription": {
+                            "RoleARN": "arn:aws:iam::123456789:role/firehose_delivery_role", 
+                            "BufferingHints": {
+                                "IntervalInSeconds": 300, 
+                                "SizeInMBs": 5
+                            }, 
+                            "EncryptionConfiguration": {
+                                "NoEncryptionConfig": "NoEncryption"
+                            }, 
+                            "CompressionFormat": "UNCOMPRESSED", 
+                            "CloudWatchLoggingOptions": {
+                                "Enabled": false
+                            }, 
+                            "BucketARN": "arn:aws:s3:::this-bucket"
+                        }, 
+                        "HECEndpointType": "Event", 
+                        "HECToken": "12345678-1234-1234-1234-1234567890AB", 
+                        "HECAcknowledgmentTimeoutInSeconds": 180, 
+                        "RetryOptions": {
+                            "DurationInSeconds": 300
+                        }, 
+                        "HECEndpoint": "https://www.mysplunk.com", 
+                        "S3BackupMode": "FailedEventsOnly", 
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": false
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

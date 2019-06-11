@@ -1,0 +1,75 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2018-09-19T22:38:01.000Z",
+                "ImageId": "ami-08ad7d3e6aa17c472",
+                "ImageLocation": "644160558196/test-image",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "644160558196",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "Encrypted": false,
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0d606a352ae1f6a8a",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ],
+                "Description": "",
+                "Hypervisor": "xen",
+                "Name": "test-image",
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "VirtualizationType": "paravirtual"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2018-09-19T22:38:10.000Z",
+                "ImageId": "ami-0b8c027cdf5929808",
+                "ImageLocation": "644160558196/test-image-2",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "644160558196",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "Encrypted": false,
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0507048b4551a4ab4",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2"
+                        }
+                    }
+                ],
+                "Description": "",
+                "Hypervisor": "xen",
+                "Name": "test-image-2",
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "VirtualizationType": "paravirtual"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "e0cb8999-be23-4eea-8f04-25fbb4a7551b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "2727",
+                "vary": "Accept-Encoding",
+                "date": "Wed, 19 Sep 2018 22:44:35 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

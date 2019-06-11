@@ -16,3 +16,7 @@
 bin/
 dist/
 vendor/
+
+*.yaml
+main
+main.zip

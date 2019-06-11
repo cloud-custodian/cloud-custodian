@@ -1,0 +1,41 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "8960745e-7ba5-11e8-8385-175083c0feec",
+            "HTTPStatusCode": 201,
+            "HTTPHeaders": {
+                "date": "Fri, 29 Jun 2018 14:05:55 GMT",
+                "content-type": "application/json",
+                "content-length": "664",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "8960745e-7ba5-11e8-8385-175083c0feec"
+            },
+            "RetryAttempts": 0
+        },
+        "FunctionName": "c7n-hello-sqs",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-hello-sqs",
+        "Runtime": "python2.7",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Handler": "helloworld.main",
+        "CodeSize": 2037392,
+        "Description": "Hello World",
+        "Timeout": 15,
+        "MemorySize": 512,
+        "LastModified": "2018-06-29T14:05:55.306+0000",
+        "CodeSha256": "K6xi0RYM2+mpDcRDiSZwpzod0Dc7wDDFV5FDT9kQ4Ac=",
+        "Version": "4",
+        "VpcConfig": {
+            "SubnetIds": [],
+            "SecurityGroupIds": [],
+            "VpcId": ""
+        },
+        "Environment": {
+            "Variables": {}
+        },
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        },
+        "RevisionId": "78294760-c5d3-4233-ab6d-8daad9849cc1"
+    }
+}

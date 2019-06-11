@@ -1,0 +1,36 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sun, 04 Nov 2018 21:18:51 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1148",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudfunctions.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/functions/hello_http?alt=json"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/locations/us-central1/functions/hello_http",
+    "httpsTrigger": {
+      "url": "https://us-central1-cloud-custodian.cloudfunctions.net/hello_http"
+    },
+    "status": "DELETE_IN_PROGRESS",
+    "entryPoint": "hello_http",
+    "timeout": "60s",
+    "availableMemoryMb": 256,
+    "serviceAccountEmail": "cloud-custodian@appspot.gserviceaccount.com",
+    "updateTime": "2018-11-04T21:18:51Z",
+    "versionId": "13",
+    "labels": {
+      "deployment-tool": "console-cloud"
+    },
+    "sourceUploadUrl": "https://storage.googleapis.com/gcf-upload-us-central1-b1c146e0-8572-49ec-9e43-8ac0cc0f9de5/ec237800-cf05-43f6-a7db-d14ef1c51727.zip?GoogleAccessId=service-604150802624@gcf-admin-robot.iam.gserviceaccount.com&Expires=1530439694&Signature=L5SIK47j0NB7h0K9iFwHU33iKtKUJUkCXSsOgFZHLVn6yq%2FRHYzwuPGHOt1nTa12JKgtfUV56RFjwvOUYwYn214R62jfYHtYTabTy%2BZNDF9aUwQiKl4HmnuNc4ASe3k8xb1JzSSEePD0l13guCQgBo7%2FFZEnZOXzzGGt9bx1TAphnh4%2BmDezaluU7brhD41wJHi%2FJ9GmWyReuGDEe2%2Bg7%2BRi%2BAJL4IDJBA4yEBqsh2G8x%2FqzkE8HWXCsz7JFA%2BkPAKbGphOC4kBhFzpjyCfdTe9qJe%2BC4aesGGIPcHBk6tSNxrFKWdfOain6xVpb7FTcfXBwnG3USkq0M28SGxDNVg%3D%3D",
+    "runtime": "python37"
+  }
+}

@@ -13,9 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from botocore.exceptions import ClientError
-
-import boto3
 import copy
 import csv
 from datetime import datetime, timedelta
@@ -31,24 +28,36 @@ import time
 import six
 import sys
 
+from six.moves.urllib import parse as urlparse
 
-from c7n import ipaddress
+from c7n.exceptions import ClientError, PolicyValidationError
+from c7n import ipaddress, config
 
 # Try to place nice in lambda exec environment
 # where we don't require yaml
+
+BaseSafeDumper = None
+
 try:
     import yaml
 except ImportError:  # pragma: no cover
     yaml = None
 else:
     try:
-        from yaml import CSafeLoader
-        SafeLoader = CSafeLoader
+        from yaml import CSafeLoader as SafeLoader, CSafeDumper as BaseSafeDumper
     except ImportError:  # pragma: no cover
         try:
-            from yaml import SafeLoader
+            from yaml import SafeLoader, SafeDumper as BaseSafeDumper
         except ImportError:
             SafeLoader = None
+            BaseSafeDumper = None
+
+if BaseSafeDumper:
+    class SafeDumper(BaseSafeDumper):
+        def ignore_aliases(self, data):
+            return True
+else:
+    SafeDumper = None
 
 log = logging.getLogger('custodian.utils')
 
@@ -87,7 +96,7 @@ def load_file(path, format=None, vars=None):
         if vars:
             try:
                 contents = contents.format(**vars)
-            except IndexError as e:
+            except IndexError:
                 msg = 'Failed to substitute variable by positional argument.'
                 raise VarsSubstitutionError(msg)
             except KeyError as e:
@@ -95,12 +104,7 @@ def load_file(path, format=None, vars=None):
                 raise VarsSubstitutionError(msg)
 
         if format == 'yaml':
-            try:
-                return yaml_load(contents)
-            except yaml.YAMLError as e:
-                log.error('Error while loading yaml file %s', path)
-                log.error('Skipping this file.  Error message below:\n%s', e)
-                return None
+            return yaml_load(contents)
         elif format == 'json':
             return loads(contents)
 
@@ -109,6 +113,12 @@ def yaml_load(value):
     if yaml is None:
         raise RuntimeError("Yaml not available")
     return yaml.load(value, Loader=SafeLoader)
+
+
+def yaml_dump(value):
+    if yaml is None:
+        raise RuntimeError("Yaml not available")
+    return yaml.dump(value, default_flow_style=False, Dumper=SafeDumper)
 
 
 def loads(body):
@@ -124,6 +134,13 @@ def dumps(data, fh=None, indent=0):
 
 def format_event(evt):
     return json.dumps(evt, indent=2)
+
+
+def filter_empty(d):
+    for k, v in list(d.items()):
+        if not v:
+            del d[k]
+    return d
 
 
 def type_schema(
@@ -156,7 +173,7 @@ def type_schema(
                 'type': {'enum': type_names}}}
 
     # Ref based inheritance and additional properties don't mix well.
-    # http://goo.gl/8UyRvQ
+    # https://stackoverflow.com/questions/22689900/json-schema-allof-with-additionalproperties
     if not inherits:
         s['additionalProperties'] = False
 
@@ -255,20 +272,22 @@ CONN_CACHE = threading.local()
 
 def local_session(factory):
     """Cache a session thread local for up to 45m"""
-    s = getattr(CONN_CACHE, 'session', None)
-    t = getattr(CONN_CACHE, 'time', 0)
+    factory_region = getattr(factory, 'region', 'global')
+    s = getattr(CONN_CACHE, factory_region, {}).get('session')
+    t = getattr(CONN_CACHE, factory_region, {}).get('time')
+
     n = time.time()
     if s is not None and t + (60 * 45) > n:
         return s
     s = factory()
-    CONN_CACHE.session = s
-    CONN_CACHE.time = n
+
+    setattr(CONN_CACHE, factory_region, {'session': s, 'time': n})
     return s
 
 
 def reset_session_cache():
-    setattr(CONN_CACHE, 'session', None)
-    setattr(CONN_CACHE, 'time', 0)
+    for k in [k for k in dir(CONN_CACHE) if not k.startswith('_')]:
+        setattr(CONN_CACHE, k, {})
 
 
 def annotation(i, k):
@@ -311,12 +330,24 @@ def parse_s3(s3_path):
     return s3_path, bucket, key_prefix
 
 
+REGION_PARTITION_MAP = {
+    'us-gov-east-1': 'aws-us-gov',
+    'us-gov-west-1': 'aws-us-gov',
+    'cn-north-1': 'aws-cn',
+    'cn-northwest-1': 'aws-cn'
+}
+
+
 def generate_arn(
         service, resource, partition='aws',
         region=None, account_id=None, resource_type=None, separator='/'):
     """Generate an Amazon Resource Name.
     See http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html.
     """
+    if region and region in REGION_PARTITION_MAP:
+        partition = REGION_PARTITION_MAP[region]
+    if service == 's3':
+        region = ''
     arn = 'arn:%s:%s:%s:%s:' % (
         partition, service, region if region else '', account_id if account_id else '')
     if resource_type:
@@ -451,20 +482,39 @@ def reformat_schema(model):
     return ret
 
 
-_profile_session = None
+# from botocore.utils avoiding runtime dependency for botocore for other providers.
+# license apache 2.0
+def set_value_from_jmespath(source, expression, value, is_first=True):
+    # This takes a (limited) jmespath-like expression & can set a value based
+    # on it.
+    # Limitations:
+    # * Only handles dotted lookups
+    # * No offsets/wildcards/slices/etc.
+    bits = expression.split('.', 1)
+    current_key, remainder = bits[0], bits[1] if len(bits) > 1 else ''
+
+    if not current_key:
+        raise ValueError(expression)
+
+    if remainder:
+        if current_key not in source:
+            # We've got something in the expression that's not present in the
+            # source (new key). If there's any more bits, we'll set the key
+            # with an empty dictionary.
+            source[current_key] = {}
+
+        return set_value_from_jmespath(
+            source[current_key],
+            remainder,
+            value,
+            is_first=False
+        )
+
+    # If we're down to a single key, set it.
+    source[current_key] = value
 
 
-def get_profile_session(options):
-    global _profile_session
-    if _profile_session:
-        return _profile_session
-
-    profile = getattr(options, 'profile', None)
-    _profile_session = boto3.Session(profile_name=profile)
-    return _profile_session
-
-
-def format_string_values(obj, *args, **kwargs):
+def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwargs):
     """
     Format all string values in an object.
     Return the updated object
@@ -480,15 +530,31 @@ def format_string_values(obj, *args, **kwargs):
             new.append(format_string_values(item, *args, **kwargs))
         return new
     elif isinstance(obj, six.string_types):
-        return obj.format(*args, **kwargs)
+        try:
+            return obj.format(*args, **kwargs)
+        except err_fallback:
+            return obj
     else:
         return obj
+
+
+def parse_url_config(url):
+    if url and '://' not in url:
+        url += "://"
+    conf = config.Bag()
+    parsed = urlparse.urlparse(url)
+    for k in ('scheme', 'netloc', 'path'):
+        conf[k] = getattr(parsed, k)
+    for k, v in urlparse.parse_qs(parsed.query).items():
+        conf[k] = v[0]
+    conf['url'] = url
+    return conf
 
 
 class FormatDate(object):
     """a datetime wrapper with extended pyformat syntax"""
 
-    date_increment = re.compile('\+[0-9]+[Mdh]')
+    date_increment = re.compile(r'\+[0-9]+[Mdh]')
 
     def __init__(self, d=None):
         self._d = d
@@ -515,3 +581,67 @@ class FormatDate(object):
         if increments:
             fmt = self.date_increment.sub("", fmt)
         return d.__format__(fmt)
+
+
+class QueryParser(object):
+
+    QuerySchema = {}
+    type_name = ''
+    multi_value = True
+    value_key = 'Values'
+
+    @classmethod
+    def parse(cls, data):
+        filters = []
+        if not isinstance(data, (tuple, list)):
+            raise PolicyValidationError(
+                "%s Query invalid format, must be array of dicts %s" % (
+                    cls.type_name,
+                    data))
+        for d in data:
+            if not isinstance(d, dict):
+                raise PolicyValidationError(
+                    "%s Query Filter Invalid %s" % (cls.type_name, data))
+            if "Name" not in d or cls.value_key not in d:
+                raise PolicyValidationError(
+                    "%s Query Filter Invalid: Missing Key or Values in %s" % (
+                        cls.type_name, data))
+
+            key = d['Name']
+            values = d[cls.value_key]
+
+            if not cls.multi_value and isinstance(values, list):
+                raise PolicyValidationError(
+                    "%s QUery Filter Invalid Key: Value:%s Must be single valued" % (
+                        cls.type_name, key, values))
+            elif not cls.multi_value:
+                values = [values]
+
+            if key not in cls.QuerySchema and not key.startswith('tag:'):
+                raise PolicyValidationError(
+                    "%s Query Filter Invalid Key:%s Valid: %s" % (
+                        cls.type_name, key, ", ".join(cls.QuerySchema.keys())))
+
+            vtype = cls.QuerySchema.get(key)
+            if vtype is None and key.startswith('tag'):
+                vtype = six.string_types
+
+            if not isinstance(values, list):
+                raise PolicyValidationError(
+                    "%s Query Filter Invalid Values, must be array %s" % (
+                        cls.type_name, data,))
+
+            for v in values:
+                if isinstance(vtype, tuple) and vtype != six.string_types:
+                    if v not in vtype:
+                        raise PolicyValidationError(
+                            "%s Query Filter Invalid Value: %s Valid: %s" % (
+                                cls.type_name, v, ", ".join(vtype)))
+                elif not isinstance(v, vtype):
+                    raise PolicyValidationError(
+                        "%s Query Filter Invalid Value Type %s" % (
+                            cls.type_name, data,))
+
+            filters.append(d)
+
+        return filters

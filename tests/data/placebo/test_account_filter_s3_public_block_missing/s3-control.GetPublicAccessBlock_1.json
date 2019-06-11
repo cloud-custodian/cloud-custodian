@@ -1,0 +1,24 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "The public access block configuration was not found",
+            "Code": "NoSuchPublicAccessBlockConfiguration",
+            "AccountId": "644160558196"
+        },
+        "HostId": "LlCWYbNXZnAsp8jH/5E+bRZPDPABNoolyAGUsD1EItH/rOUUDTG4uUs2RNsHx2M1nUimTzMMLpg=",
+        "ResponseMetadata": {
+            "RequestId": "1323BC50F79FCEDC",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "x-amz-request-id": "1323BC50F79FCEDC",
+                "x-amz-id-2": "LlCWYbNXZnAsp8jH/5E+bRZPDPABNoolyAGUsD1EItH/rOUUDTG4uUs2RNsHx2M1nUimTzMMLpg=",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "date": "Sat, 17 Nov 2018 17:19:43 GMT",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

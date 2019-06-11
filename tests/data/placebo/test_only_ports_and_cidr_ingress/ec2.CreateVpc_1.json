@@ -1,0 +1,35 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "428285a4-5e17-4cca-adce-990bbde59710", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Oct 2018 11:59:56 GMT", 
+                "content-length": "883", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "Vpc": {
+            "VpcId": "vpc-007084954cd5c3c96", 
+            "InstanceTenancy": "default", 
+            "Tags": [], 
+            "CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-04f26949fdecdc5b1", 
+                    "CidrBlock": "10.4.0.0/16", 
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                }
+            ], 
+            "Ipv6CidrBlockAssociationSet": [], 
+            "State": "pending", 
+            "DhcpOptionsId": "dopt-df6702bb", 
+            "CidrBlock": "10.4.0.0/16", 
+            "IsDefault": false
+        }
+    }
+}

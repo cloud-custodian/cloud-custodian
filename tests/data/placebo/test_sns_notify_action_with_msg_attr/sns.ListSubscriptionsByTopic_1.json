@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subscriptions": [
+            {
+                "SubscriptionArn": "arn:aws:sns:us-east-1:644160558196:test:78a0cf8e-b309-44f4-844c-9ebfcb3a9b19",
+                "Owner": "644160558196",
+                "Protocol": "sqs",
+                "Endpoint": "arn:aws:sqs:us-east-1:644160558196:test-queue",
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "6c66e76d-936e-5ac1-b383-b4bc7d1c42de",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6c66e76d-936e-5ac1-b383-b4bc7d1c42de",
+                "content-type": "text/xml",
+                "content-length": "703",
+                "date": "Wed, 25 Jul 2018 03:19:14 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

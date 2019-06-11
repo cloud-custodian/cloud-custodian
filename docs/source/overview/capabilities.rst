@@ -1,20 +1,6 @@
 Capabilities
 ------------
 
-Custodian currently provides policy definition around the following
-AWS resources, and much more:
-
-- :ref:`ami`
-- :ref:`asg`
-- :ref:`cfn`
-- :ref:`ebs`
-- :ref:`ec2`
-- :ref:`elb`
-- :ref:`kms`
-- :ref:`rds`
-- :ref:`redshift`
-- :ref:`s3`
-
 Custodian uses a flexible query language for filtering resources to a
 particular subset that allows for compound querying. This essentially allows you
 to filter for things like instances with EBS volumes that are not set to delete
@@ -29,11 +15,49 @@ server, lambda).
 When a user runs Custodian, Custodian will run the specified policy against the account
 and region specified by the user. Custodian will iterate over all resources
 defined in the policy. In the CLI, users specify the account and region they want
-to target. During the run, each policy in the config will generate metrics that
-are sent to CloudWatch in the account that is targeted. The run will also
-generate structured record output and logs that can be sent to an S3 Bucket and
-CloudWatch Log Groups in the account Custodian was run from. If Custodian is being
-run without Assume Roles, all output will be put into the same account. Custodian
-is built with the ability to be run from different accounts and leverage STS
-Role Assumption for cross-account access. Users can leverage the metrics that are
-being generated after each run by creating Custodian Dashboards in CloudWatch.
+to target.
+
+During the run, each policy in the config will generate metrics that can be sent to
+the cloud provider's built-in metrics service (CloudWatch, Application Insights, Stackdriver)
+in the account or subscription that is targeted. The run will also generate structured record
+output and logs that can be sent to the cloud provider's blob storage service (S3,
+Azure Storage Accounts, Google Cloud Storage Bucket) or logging service (CloudWatch
+Logs, Azure Application Insights Logs, Stackdriver logs) in the account Custodian was
+run from.
+
+Custodian currently provides policy definition around AWS, Azure, and Google Cloud
+Platform resources:
+
+**Note**: this is a small sample of all of the available resources, see the
+section :ref:`explore-cc` on how to view the full list of available resources.
+
+
+AWS
+---
+
+- :ref:`ami`
+- :ref:`asg`
+- :ref:`cfn`
+- :ref:`ebs`
+- :ref:`ec2`
+- :ref:`elb`
+- :ref:`kms`
+- :ref:`rds`
+- :ref:`redshift`
+- :ref:`s3`
+
+Azure
+-----
+- :ref:`azure_vm`
+- :ref:`azure_disk`
+- :ref:`azure_storage`
+- :ref:`azure_vnet`
+- :ref:`azure_resourcegroup`
+- :ref:`azure_keyvault`
+- :ref:`azure_sqlserver`
+
+GCP
+---
+- tbd
+
+For multi-account/subscription/project execution, see c7n-org.

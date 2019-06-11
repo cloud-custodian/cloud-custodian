@@ -21,7 +21,8 @@ as the periodic historical exports.
 ## Assumptions
 
  - The archive bucket has already has appropriate bucket policy permissions.
-   See https://goo.gl/DYLRmK for details.
+   For details see:
+   https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/S3ExportTasks.html#S3Permissions
  - Default periodicity for log group archival into s3 is daily.
  - Exporter is run with account credentials that have access to the archive s3 bucket.
  - Catch up archiving is not run in lambda (do a cli run first)

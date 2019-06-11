@@ -66,3 +66,31 @@ The components of salactus are
  - page-iterator - a head to tail object iterator over a given prefix
 
  - keyset-scan - handles pages of 1k objects and dispatches to object visitor
+ 
+# Sample Configuration
+
+The below sample configuration can be used to scan all objects in all
+buckets in the specified account and generate JSON reports on any
+objects that are currently not encrypted. Flip report-only to false
+and it will actually remediate them to be encrypted using AES256.
+
+To get this running you will need to create a role, e.g. salactus-role,
+that can be assumed which has read permissions to CloudWatch, S3, and
+write access to the bucket created or chosen for the reports, e.g.
+salactus-bucket.
+
+``` 
+accounts:
+  - account-id: "123456789012"
+    role: "arn:aws:iam::123456789012:role/salactus-role"
+    name: "AWS Account Alias"
+
+visitors:
+  - type: "encrypt-keys"
+    crypto: AES256
+    report-only: true
+
+object-reporting:
+  bucket: "salactus-bucket"
+  prefix: "object-reports"
+```

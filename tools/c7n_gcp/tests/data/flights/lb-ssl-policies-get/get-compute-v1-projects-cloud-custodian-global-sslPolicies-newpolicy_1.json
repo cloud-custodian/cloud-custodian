@@ -1,0 +1,47 @@
+{
+  "body": {
+    "profile": "COMPATIBLE", 
+    "kind": "compute#sslPolicy", 
+    "name": "newpolicy", 
+    "minTlsVersion": "TLS_1_0", 
+    "fingerprint": "BoVS1G-KySQ=", 
+    "creationTimestamp": "2019-03-11T05:40:52.917-07:00", 
+    "id": "4540081266450229691", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/newpolicy", 
+    "enabledFeatures": [
+      "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA", 
+      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", 
+      "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", 
+      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", 
+      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256", 
+      "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", 
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", 
+      "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA", 
+      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", 
+      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256", 
+      "TLS_RSA_WITH_3DES_EDE_CBC_SHA", 
+      "TLS_RSA_WITH_AES_128_CBC_SHA", 
+      "TLS_RSA_WITH_AES_128_GCM_SHA256", 
+      "TLS_RSA_WITH_AES_256_CBC_SHA", 
+      "TLS_RSA_WITH_AES_256_GCM_SHA384"
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "981", 
+    "transfer-encoding": "chunked", 
+    "expires": "Tue, 12 Mar 2019 07:31:09 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Tue, 12 Mar 2019 07:31:09 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/newpolicy?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"5YamndKM9WW73PHdKEZ714lkJMo=/QugbCU9qv-6vpC-rSZa1UXwUmlA=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

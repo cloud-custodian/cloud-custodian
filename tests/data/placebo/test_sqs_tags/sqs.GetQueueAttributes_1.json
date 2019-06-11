@@ -1,31 +1,29 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "ApproximateNumberOfMessagesNotVisible": "0", 
-            "MessageRetentionPeriod": "345600", 
-            "ApproximateNumberOfMessagesDelayed": "0", 
-            "MaximumMessageSize": "262144", 
-            "CreatedTimestamp": "1509481004", 
-            "ApproximateNumberOfMessages": "0", 
-            "ReceiveMessageWaitTimeSeconds": "0", 
-            "DelaySeconds": "0", 
-            "VisibilityTimeout": "30", 
-            "LastModifiedTimestamp": "1509481004", 
-            "QueueArn": "arn:aws:sqs:us-east-2:644160558196:test-sqs"
-        }, 
+            "QueueArn": "arn:aws:sqs:us-west-1:644160558196:test-sqs-5",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1549454006",
+            "LastModifiedTimestamp": "1549454006",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0"
+        },
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "0880a00c-ef5f-5b45-9ae8-f27e33321766", 
+            "RequestId": "db9684ce-0a49-593b-aa10-d01ac7426448",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "0880a00c-ef5f-5b45-9ae8-f27e33321766", 
-                "content-length": "1162", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Tue, 31 Oct 2017 20:16:45 GMT", 
-                "content-type": "text/xml"
-            }
+                "x-amzn-requestid": "db9684ce-0a49-593b-aa10-d01ac7426448",
+                "date": "Wed, 06 Feb 2019 11:53:47 GMT",
+                "content-type": "text/xml",
+                "content-length": "1164"
+            },
+            "RetryAttempts": 0
         }
     }
 }

@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "IsLogging": false,
+        "LatestDeliveryTime": {
+            "__class__": "datetime",
+            "year": 2018,
+            "month": 1,
+            "day": 14,
+            "hour": 6,
+            "minute": 25,
+            "second": 59,
+            "microsecond": 630000
+        },
+        "StartLoggingTime": {
+            "__class__": "datetime",
+            "year": 2017,
+            "month": 11,
+            "day": 6,
+            "hour": 4,
+            "minute": 22,
+            "second": 45,
+            "microsecond": 693000
+        },
+        "StopLoggingTime": {
+            "__class__": "datetime",
+            "year": 2018,
+            "month": 1,
+            "day": 14,
+            "hour": 6,
+            "minute": 19,
+            "second": 40,
+            "microsecond": 347000
+        },
+        "LatestDigestDeliveryTime": {
+            "__class__": "datetime",
+            "year": 2018,
+            "month": 1,
+            "day": 14,
+            "hour": 6,
+            "minute": 28,
+            "second": 4,
+            "microsecond": 411000
+        },
+        "LatestDeliveryAttemptTime": "2018-01-14T11:25:59Z",
+        "LatestNotificationAttemptTime": "",
+        "LatestNotificationAttemptSucceeded": "",
+        "LatestDeliveryAttemptSucceeded": "2018-01-14T11:25:59Z",
+        "TimeLoggingStarted": "2017-11-06T09:22:45Z",
+        "TimeLoggingStopped": "2018-01-14T11:19:40Z",
+        "ResponseMetadata": {
+            "RequestId": "76852c54-8b5d-480c-98eb-4033167ad743",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "76852c54-8b5d-480c-98eb-4033167ad743",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "441",
+                "date": "Wed, 23 Jan 2019 00:42:16 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

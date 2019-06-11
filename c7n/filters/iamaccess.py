@@ -27,8 +27,11 @@ are.
 
 References
 
-- IAM Policy Evaluation - http://goo.gl/sH5Dt5
-- IAM Policy Reference - http://goo.gl/U0a06y
+- IAM Policy Evaluation
+  https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html
+
+- IAM Policy Reference
+  https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html
 
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -90,6 +93,10 @@ class PolicyChecker(object):
     @property
     def allowed_vpc(self):
         return self.checker_config.get('allowed_vpc', ())
+
+    @property
+    def allowed_orgid(self):
+        return self.checker_config.get('allowed_orgid', ())
 
     # Policy statement handling
     def check(self, policy_text):
@@ -244,6 +251,11 @@ class PolicyChecker(object):
             return False
         return bool(set(map(_account, c['values'])).difference(self.allowed_vpc))
 
+    def handle_aws_principalorgid(self, s, c):
+        if not self.allowed_orgid:
+            return False
+        return bool(set(map(_account, c['values'])).difference(self.allowed_orgid))
+
 
 class CrossAccountAccessFilter(Filter):
     """Check a resource's embedded iam policy for cross account access.
@@ -258,11 +270,13 @@ class CrossAccountAccessFilter(Filter):
         # disregard statements using these conditions.
         whitelist_conditions={'type': 'array', 'items': {'type': 'string'}},
         # white list accounts
-        whitelist_from=ValuesFrom.schema,
+        whitelist_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_vpce_from=ValuesFrom.schema,
+        whitelist_orgids_from={'$ref': '#/definitions/filters_common/value_from'},
+        whitelist_orgids={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_vpce_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist_vpce={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_vpc_from=ValuesFrom.schema,
+        whitelist_vpc_from={'$ref': '#/definitions/filters_common/value_from'},
         whitelist_vpc={'type': 'array', 'items': {'type': 'string'}})
 
     policy_attribute = 'Policy'
@@ -279,11 +293,13 @@ class CrossAccountAccessFilter(Filter):
         self.accounts = self.get_accounts()
         self.vpcs = self.get_vpcs()
         self.vpces = self.get_vpces()
+        self.orgid = self.get_orgids()
         self.checker_config = getattr(self, 'checker_config', None) or {}
         self.checker_config.update(
             {'allowed_accounts': self.accounts,
              'allowed_vpc': self.vpcs,
              'allowed_vpce': self.vpces,
+             'allowed_orgid': self.orgid,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
              'whitelist_conditions': self.conditions})
@@ -312,6 +328,13 @@ class CrossAccountAccessFilter(Filter):
             values = ValuesFrom(self.data['whitelist_vpce_from'], self.manager)
             vpce = vpce.union(values.get_values())
         return vpce
+
+    def get_orgids(self):
+        org_ids = set(self.data.get('whitelist_orgids', ()))
+        if 'whitelist_orgids_from' in self.data:
+            values = ValuesFrom(self.data['whitelist_orgids_from'], self.manager)
+            org_ids = org_ids.union(values.get_values())
+        return org_ids
 
     def get_resource_policy(self, r):
         return r.get(self.policy_attribute, None)

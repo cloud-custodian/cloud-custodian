@@ -340,7 +340,7 @@ def get_or_create_detector_id(client):
     if detectors:
         return detectors[0]
     else:
-        return client.create_detector().get('DetectorId')
+        return client.create_detector(Enable=True).get('DetectorId')
 
 
 def get_master_info(accounts_config, master):

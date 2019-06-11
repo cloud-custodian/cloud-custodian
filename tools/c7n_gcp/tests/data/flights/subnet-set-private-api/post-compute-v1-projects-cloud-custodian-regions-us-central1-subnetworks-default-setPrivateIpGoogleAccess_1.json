@@ -1,0 +1,33 @@
+{
+  "headers": {
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "date": "Sun, 04 Nov 2018 11:26:20 GMT",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "712",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "6021991553679190451",
+    "name": "operation-1541330779774-579d5099c1c31-ff59333e-22157d2d",
+    "operationType": "setPrivateIpGoogleAccess",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default",
+    "targetId": "4686700484947109325",
+    "status": "PENDING",
+    "user": "kapilt@gmail.com",
+    "progress": 0,
+    "insertTime": "2018-11-04T03:26:20.356-08:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/operations/operation-1541330779774-579d5099c1c31-ff59333e-22157d2d",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {
+      "RetryAttempts": 0,
+      "HTTPStatusCode": 200,
+      "RequestId": "db92d985-34ff-4f11-8f44-81c861df6735",
+      "HTTPHeaders": {
+        "x-amzn-requestid": "db92d985-34ff-4f11-8f44-81c861df6735",
+        "date": "Thu, 20 Sep 2018 16:43:25 GMT",
+        "content-length": "2779",
+        "content-type": "application/x-amz-json-1.1"
+      }
+    },
+    "ActivationList": [{
+        "IamRole": "service-role/test-role",
+        "RegistrationLimit": 1,
+        "Description": "222222222222-i-2bb222b222bb2b22b",
+        "ActivationId": "087a84ef-3729-48d2-808d-8880c39acf2e",
+        "RegistrationsCount": 0,
+        "CreatedDate": {
+          "hour": 16,
+          "__class__": "datetime",
+          "month": 5,
+          "second": 35,
+          "microsecond": 991000,
+          "year": 2018,
+          "day": 4,
+          "minute": 12
+        },
+        "DefaultInstanceName": "222222222222-i-2bb222b222bb2b22b",
+        "Expired": true,
+        "ExpirationDate": {
+          "hour": 16,
+          "__class__": "datetime",
+          "month": 5,
+          "second": 35,
+          "microsecond": 991000,
+          "year": 2018,
+          "day": 5,
+          "minute": 12
+        }
+      },
+      {
+        "IamRole": "service-role/test-role",
+        "RegistrationLimit": 1,
+        "Description": "111111111111-i-1111a1a1111a1aa11",
+        "ActivationId": "d6ec257c-5131-4b54-93be-b4218f844ebd",
+        "RegistrationsCount": 1,
+        "CreatedDate": {
+          "hour": 11,
+          "__class__": "datetime",
+          "month": 5,
+          "second": 23,
+          "microsecond": 611000,
+          "year": 2018,
+          "day": 10,
+          "minute": 33
+        },
+        "DefaultInstanceName": "111111111111-i-1111a1a1111a1aa11",
+        "Expired": true,
+        "ExpirationDate": {
+          "hour": 11,
+          "__class__": "datetime",
+          "month": 5,
+          "second": 23,
+          "microsecond": 611000,
+          "year": 2018,
+          "day": 11,
+          "minute": 33
+        }
+      }
+    ]
+  }
+}

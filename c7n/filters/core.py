@@ -23,6 +23,7 @@ import fnmatch
 import logging
 import operator
 import re
+import sys
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -59,6 +60,14 @@ def regex_match(value, regex):
     return bool(re.match(regex, value, flags=re.IGNORECASE))
 
 
+def regex_case_sensitive_match(value, regex):
+    if not isinstance(value, six.string_types):
+        return False
+    # Note python 2.5+ internally cache regex
+    # would be nice to use re2
+    return bool(re.match(regex, value))
+
+
 def operator_in(x, y):
     return x in y
 
@@ -90,12 +99,19 @@ OPERATORS = {
     'less-than': operator.lt,
     'glob': glob_match,
     'regex': regex_match,
+    'regex-case': regex_case_sensitive_match,
     'in': operator_in,
     'ni': operator_ni,
     'not-in': operator_ni,
     'contains': operator.contains,
     'difference': difference,
     'intersect': intersect}
+
+
+VALUE_TYPES = [
+    'age', 'integer', 'expiration', 'normalize', 'size',
+    'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
+    'unique_size', 'date']
 
 
 class FilterRegistry(PluginRegistry):
@@ -130,7 +146,7 @@ class FilterRegistry(PluginRegistry):
                 return And(data, self, manager)
             elif op == 'not':
                 return Not(data, self, manager)
-            return ValueFilter(data, manager).validate()
+            return ValueFilter(data, manager)
         if isinstance(data, six.string_types):
             filter_type = data
             data = {'type': data}
@@ -161,6 +177,9 @@ class Filter(object):
     metrics = ()
     permissions = ()
     schema = {'type': 'object'}
+    # schema aliases get hoisted into a jsonschema definition
+    # location, and then referenced inline.
+    schema_alias = None
 
     def __init__(self, data, manager=None):
         self.data = data
@@ -177,14 +196,63 @@ class Filter(object):
         """ Bulk process resources and return filtered set."""
         return list(filter(self, resources))
 
+    def get_block_operator(self):
+        """Determine the immediate parent boolean operator for a filter"""
+        # Top level operator is `and`
+        block_stack = ['and']
+        for f in self.manager.iter_filters(block_end=True):
+            if f is None:
+                block_stack.pop()
+                continue
+            if f.type in ('and', 'or', 'not'):
+                block_stack.append(f.type)
+            if f == self:
+                break
+        return block_stack[-1]
 
-class Or(Filter):
+    def merge_annotation(self, r, annotation_key, values):
+        block_op = self.get_block_operator()
+        if block_op in ('and', 'not'):
+            r[self.matched_annotation_key] = intersect_list(
+                values,
+                r.get(self.matched_annotation_key))
+
+        if not values and block_op != 'or':
+            return
+
+        r_matched = r.setdefault(self.matched_annotation_key, [])
+        for k in values:
+            if k not in r_matched:
+                r_matched.append(k)
+
+
+def intersect_list(a, b):
+    if b is None:
+        return a
+    elif a is None:
+        return b
+    res = []
+    for x in a:
+        if x in b:
+            res.append(x)
+    return res
+
+
+class BooleanGroupFilter(Filter):
 
     def __init__(self, data, registry, manager):
-        super(Or, self).__init__(data)
+        super(BooleanGroupFilter, self).__init__(data)
         self.registry = registry
         self.filters = registry.parse(list(self.data.values())[0], manager)
         self.manager = manager
+
+    def validate(self):
+        for f in self.filters:
+            f.validate()
+        return self
+
+
+class Or(BooleanGroupFilter):
 
     def process(self, resources, event=None):
         if self.manager:
@@ -208,13 +276,7 @@ class Or(Filter):
         return [resource_map[r_id] for r_id in results]
 
 
-class And(Filter):
-
-    def __init__(self, data, registry, manager):
-        super(And, self).__init__(data)
-        self.registry = registry
-        self.filters = registry.parse(list(self.data.values())[0], manager)
-        self.manager = manager
+class And(BooleanGroupFilter):
 
     def process(self, resources, events=None):
         if self.manager:
@@ -222,6 +284,8 @@ class And(Filter):
 
         for f in self.filters:
             resources = f.process(resources, events)
+            if not resources:
+                break
 
         if self.manager:
             sweeper.sweep(resources)
@@ -229,13 +293,7 @@ class And(Filter):
         return resources
 
 
-class Not(Filter):
-
-    def __init__(self, data, registry, manager):
-        super(Not, self).__init__(data)
-        self.registry = registry
-        self.filters = registry.parse(list(self.data.values())[0], manager)
-        self.manager = manager
+class Not(BooleanGroupFilter):
 
     def process(self, resources, event=None):
         if self.manager:
@@ -259,6 +317,8 @@ class Not(Filter):
 
         for f in self.filters:
             resources = f.process(resources, event)
+            if not resources:
+                break
 
         before = set(resource_map.keys())
         after = set([r[resource_type.id] for r in resources])
@@ -271,7 +331,7 @@ class Not(Filter):
 class AnnotationSweeper(object):
     """Support clearing annotations set within a block filter.
 
-    See https://github.com/capitalone/cloud-custodian/issues/2116
+    See https://github.com/cloud-custodian/cloud-custodian/issues/2116
     """
     def __init__(self, id_key, resources):
         self.id_key = id_key
@@ -310,20 +370,17 @@ class ValueFilter(Filter):
             # Doesn't mix well as enum with inherits that extend
             'type': {'enum': ['value']},
             'key': {'type': 'string'},
-            'value_type': {'enum': [
-                'age', 'integer', 'expiration', 'normalize', 'size',
-                'cidr', 'cidr_size', 'swap', 'resource_count', 'expr', 'unique_size']},
+            'value_type': {'$ref': '#/definitions/filters_common/value_types'},
             'default': {'type': 'object'},
-            'value_from': ValuesFrom.schema,
-            'value': {'oneOf': [
-                {'type': 'array'},
-                {'type': 'string'},
-                {'type': 'boolean'},
-                {'type': 'number'},
-                {'type': 'null'}]},
-            'op': {'enum': list(OPERATORS.keys())}}}
+            'value_regex': {'type': 'string'},
+            'value_from': {'$ref': '#/definitions/filters_common/value_from'},
+            'value': {'$ref': '#/definitions/filters_common/value'},
+            'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
+        }
+    }
 
     annotate = True
+    required_keys = set(('value', 'key'))
 
     def __init__(self, data, manager=None):
         super(ValueFilter, self).__init__(data, manager)
@@ -349,7 +406,8 @@ class ValueFilter(Filter):
                 "`value` must be an integer in resource_count filter %s" % self.data)
 
         # I don't see how to support regex for this?
-        if self.data['op'] not in OPERATORS or self.data['op'] == 'regex':
+        if (self.data['op'] not in OPERATORS or self.data['op'] in {'regex', 'regex-case'} or
+                'value_regex' in self.data):
             raise PolicyValidationError(
                 "Invalid operator in value filter %s" % self.data)
 
@@ -363,24 +421,53 @@ class ValueFilter(Filter):
         # the value filters because it operates on the full resource list
         if self.data.get('value_type') == 'resource_count':
             return self._validate_resource_count()
-
-        if 'key' not in self.data:
+        elif self.data.get('value_type') == 'date':
+            if not parse_date(self.data.get('value')):
+                raise PolicyValidationError(
+                    "value_type: date with invalid date value:%s",
+                    self.data.get('value', ''))
+        if 'key' not in self.data and 'key' in self.required_keys:
             raise PolicyValidationError(
                 "Missing 'key' in value filter %s" % self.data)
-        if 'value' not in self.data and 'value_from' not in self.data:
+        if ('value' not in self.data and
+                'value_from' not in self.data and
+                'value' in self.required_keys):
             raise PolicyValidationError(
                 "Missing 'value' in value filter %s" % self.data)
         if 'op' in self.data:
             if not self.data['op'] in OPERATORS:
                 raise PolicyValidationError(
                     "Invalid operator in value filter %s" % self.data)
-            if self.data['op'] == 'regex':
+            if self.data['op'] in {'regex', 'regex-case'}:
                 # Sanity check that we can compile
                 try:
                     re.compile(self.data['value'])
                 except re.error as e:
                     raise PolicyValidationError(
                         "Invalid regex: %s %s" % (e, self.data))
+        if 'value_regex' in self.data:
+            return self._validate_value_regex()
+
+        return self
+
+    def _validate_value_regex(self):
+        """Specific validation for `value_regex` type
+
+        The `value_regex` type works a little differently.  In
+        particular it doesn't support OPERATORS that perform
+        operations on a list of values, specifically 'intersect',
+        'contains', 'difference', 'in' and 'not-in'
+        """
+        # Sanity check that we can compile
+        try:
+            pattern = re.compile(self.data['value_regex'])
+            if pattern.groups != 1:
+                raise PolicyValidationError(
+                    "value_regex must have a single capturing group: %s" %
+                    self.data)
+        except re.error as e:
+            raise PolicyValidationError(
+                "Invalid value_regex: %s %s" % (e, self.data))
         return self
 
     def __call__(self, i):
@@ -406,10 +493,19 @@ class ValueFilter(Filter):
         if k.startswith('tag:'):
             tk = k.split(':', 1)[1]
             r = None
-            for t in i.get("Tags", []):
-                if t.get('Key') == tk:
-                    r = t.get('Value')
-                    break
+            if 'Tags' in i:
+                for t in i.get("Tags", []):
+                    if t.get('Key') == tk:
+                        r = t.get('Value')
+                        break
+            # GCP schema: 'labels': {'key': 'value'}
+            elif 'labels' in i:
+                r = i.get('labels', {}).get(tk, None)
+            # GCP has a secondary form of labels called tags
+            # as labels without values.
+            # Azure schema: 'tags': {'key': 'value'}
+            elif 'tags' in i:
+                r = i.get('tags', {}).get(tk, None)
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:
@@ -417,12 +513,16 @@ class ValueFilter(Filter):
             r = self.expr[k].search(i)
         else:
             r = self.expr[k].search(i)
+
+        if 'value_regex' in self.data:
+            regex = ValueRegex(self.data['value_regex'])
+            r = regex.get_resource_value(r)
         return r
 
     def match(self, i):
         if self.v is None and len(self.data) == 1:
             [(self.k, self.v)] = self.data.items()
-        elif self.v is None:
+        elif self.v is None and not hasattr(self, 'content_initialized'):
             self.k = self.data.get('key')
             self.op = self.data.get('op')
             if 'value_from' in self.data:
@@ -430,6 +530,7 @@ class ValueFilter(Filter):
                 self.v = values.get_values()
             else:
                 self.v = self.data.get('value')
+            self.content_initialized = True
             self.vtype = self.data.get('value_type')
 
         if i is None:
@@ -476,7 +577,7 @@ class ValueFilter(Filter):
 
         elif self.vtype == 'integer':
             try:
-                value = int(value.strip())
+                value = int(str(value).strip())
             except ValueError:
                 value = 0
         elif self.vtype == 'size':
@@ -491,21 +592,15 @@ class ValueFilter(Filter):
                 return sentinel, 0
         elif self.vtype == 'swap':
             return value, sentinel
+        elif self.vtype == 'date':
+            return parse_date(sentinel), parse_date(value)
         elif self.vtype == 'age':
             if not isinstance(sentinel, datetime.datetime):
                 sentinel = datetime.datetime.now(tz=tzutc()) - timedelta(sentinel)
-            if isinstance(value, (str, int, float)):
-                try:
-                    value = datetime.datetime.fromtimestamp(float(value)).replace(tzinfo=tzutc())
-                except ValueError:
-                    pass
-            if not isinstance(value, datetime.datetime):
-                # EMR bug when testing ages in EMR. This is due to
-                # EMR not having more functionality.
-                try:
-                    value = parse(value, default=datetime.datetime.now(tz=tzutc()))
-                except (AttributeError, TypeError, ValueError):
-                    value = 0
+            value = parse_date(value)
+            if value is None:
+                # compatiblity
+                value = 0
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.
@@ -527,13 +622,9 @@ class ValueFilter(Filter):
         elif self.vtype == 'expiration':
             if not isinstance(sentinel, datetime.datetime):
                 sentinel = datetime.datetime.now(tz=tzutc()) + timedelta(sentinel)
-
-            if not isinstance(value, datetime.datetime):
-                try:
-                    value = parse(value, default=datetime.datetime.now(tz=tzutc()))
-                except (AttributeError, TypeError, ValueError):
-                    value = 0
-
+            value = parse_date(value)
+            if value is None:
+                value = 0
             return sentinel, value
         return sentinel, value
 
@@ -601,3 +692,71 @@ class EventFilter(ValueFilter):
         if self(event):
             return resources
         return []
+
+
+def cast_tz(d, tz):
+    if sys.version_info.major == 2:
+        return d.replace(tzinfo=tz)
+    return d.astimezone(tz)
+
+
+def parse_date(v, tz=None):
+    if v is None:
+        return v
+
+    tz = tz or tzutc()
+
+    if isinstance(v, datetime.datetime):
+        if v.tzinfo is None:
+            return cast_tz(v, tz)
+        return v
+
+    if isinstance(v, six.string_types):
+        try:
+            return cast_tz(parse(v), tz)
+        except (AttributeError, TypeError, ValueError):
+            pass
+
+    if isinstance(v, (int, float) + six.string_types):
+        try:
+            v = cast_tz(datetime.datetime.fromtimestamp(float(v)), tz)
+        except ValueError:
+            pass
+
+    return isinstance(v, datetime.datetime) and v or None
+
+
+class ValueRegex(object):
+    """Allows filtering based on the output of a regex capture.
+    This is useful for parsing data that has a weird format.
+
+    Instead of comparing the contents of the 'resource value' with the 'value',
+    it will instead apply the regex to contents of the 'resource value', and compare
+    the result of the capture group defined in that regex with the 'value'.
+    Therefore you must have a single capture group defined in the regex.
+
+    If the regex doesn't find a match it will return 'None'
+
+    Example of getting a datetime object to make an 'expiration' comparison::
+
+    type: value
+    value_regex: ".*delete_after=([0-9]{4}-[0-9]{2}-[0-9]{2}).*"
+    key: "tag:company_mandated_metadata"
+    value_type: expiration
+    op: lte
+    value: 0
+    """
+
+    def __init__(self, expr):
+        self.expr = expr
+
+    def get_resource_value(self, resource):
+        if resource is None:
+            return resource
+        try:
+            capture = re.match(self.expr, resource)
+        except (ValueError, TypeError):
+            return None
+        if capture is None:  # regex didn't capture anything
+            return None
+        return capture.group(1)

@@ -17,6 +17,7 @@ import datetime
 import functools
 import json
 import os
+import io
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
@@ -612,6 +613,7 @@ class BucketDelete(BaseTest):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3.DeleteBucket, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
+
         session_factory = self.replay_flight_data("test_s3_delete_bucket_with_failure")
         session = session_factory()
         client = session.client("s3")
@@ -650,7 +652,7 @@ class BucketDelete(BaseTest):
         self.assertIn(bname, buckets)
 
         # Make sure file got written
-        denied_file = os.path.join(p.resource_manager.log_dir, "denied.json")
+        denied_file = os.path.join(p.ctx.log_dir, "denied.json")
         self.assertIn(bname, open(denied_file).read())
         #
         # Now delete it for real
@@ -860,7 +862,7 @@ class S3ConfigSource(ConfigTest):
             session_factory=session_factory,
         )
 
-        manager = p.get_resource_manager()
+        manager = p.load_resource_manager()
         resource_a = manager.get_resources([bname])[0]
         results = self.wait_for_config(session, queue_url, bname)
         resource_b = s3.ConfigS3(manager).load_resource(results[0])
@@ -1229,6 +1231,22 @@ class BucketPolicyStatements(BaseTest):
 
 class S3Test(BaseTest):
 
+    def test_bucket_get_resources(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [
+            ('get_bucket_tagging', 'Tags', [], 'TagSet')])
+        session_factory = self.replay_flight_data("test_s3_get_resources")
+        p = self.load_policy(
+            {"name": "bucket-fetch", "resource": "s3"},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(['c7n-codebuild'])
+        self.assertEqual(len(resources), 1)
+        tags = {t['Key']: t['Value'] for t in resources[0].get('Tags')}
+        self.assertEqual(
+            tags, {
+                'Application': 'test', 'Env': 'Dev', 'Owner': 'nicholase',
+                'Retention': '2', 'Retention2': '3', 'test': 'test'})
+
     def test_multipart_large_file(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3.EncryptExtantKeys, "executor_factory", MainThreadExecutor)
@@ -1273,7 +1291,7 @@ class S3Test(BaseTest):
             Bucket=bname,
             Key=key,
             Metadata={"planet": "earth"},
-            Body=wrapper(open("/dev/zero"), size),
+            Body=wrapper(io.BytesIO(bytearray(size)), size),
             ContentLength=size,
         )
         info = client.head_object(Bucket=bname, Key=key)
@@ -1485,6 +1503,7 @@ class S3Test(BaseTest):
                                 "Effect": "Deny",
                                 "Action": "s3:PutObject",
                                 "Principal": "*",
+                                "Resource": "arn:aws:s3:::{bucket_name}/*"
                             }
                         ],
                     },
@@ -1886,7 +1905,7 @@ class S3Test(BaseTest):
         )
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3.RemovePolicyStatement, "executor_factory", MainThreadExecutor)
-        self.patch(MainThreadExecutor, "async", False)
+        self.patch(MainThreadExecutor, "c7n_async", False)
 
         bname = "custodian-policy-test"
         statement = {
@@ -2541,7 +2560,7 @@ class S3Test(BaseTest):
         result = client.head_object(Bucket=bname, Key="testing-abc")
         self.assertTrue(result["ServerSideEncryption"] == "aws:kms")
         data = json.load(
-            open(os.path.join(p.ctx.output_path, "action-encryptextantkeys"))
+            open(os.path.join(p.ctx.output.root_dir, "action-encryptextantkeys"))
         )
         self.assertEqual([{"Count": 2, "Remediated": 0, "Bucket": bname}], data)
 

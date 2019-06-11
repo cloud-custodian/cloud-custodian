@@ -1,29 +1,40 @@
 -r requirements.txt
-coverage>=4.2
-nose==1.3.7
-mock==2.0.0
-Sphinx==1.6.7
-placebo==0.8.1
-flake8
-redis
-ldap3
-sphinx-rtd-theme==0.2.4
-nose-timer==0.7.1
-twine
-fakeredis
-pytest>=3.2.1
-pytest-xdist>=1.2.0
-pytest-cov
-tox
 
-# Local package required for Sphinx docs
--e tools/c7n_sphinxext
+# Test & lint packages
+coverage==4.5.3
+mock==3.0.5
+placebo==0.9.0
+flake8==3.7.7
+pytest==4.5.0
+pytest-xdist==1.28.0
+pytest-cov==2.7.1
+parameterized==0.7.0
+twine==1.13.0
+tox==3.12.1
+six >= 1.12.0
+
+# Optional feature testing in c7n
+psutil==5.6.2
+aws_xray_sdk==2.4.2
+
+-r tools/c7n_mailer/requirements.txt
+-r tools/c7n_azure/requirements.txt
+-r tools/c7n_gcp/requirements.txt
+-r tools/c7n_kube/requirements.txt
+
+# Specific to testing mailer
+fakeredis==1.0.3
+
 # Local package required for c7n_mailer tests
 -e tools/c7n_mailer
 # Local package required for c7n_azure tests
 -e tools/c7n_azure
 # Local package required for c7n_gcp tests
 -e tools/c7n_gcp
+# Local package required for c7n_kube tests
+-e tools/c7n_kube
+# Local package required for c7n_org tests
+-e tools/c7n_org
 
 # requires pandoc, fails on ci server, only used for pypi metadata
 # setuptools-markdown==0.2

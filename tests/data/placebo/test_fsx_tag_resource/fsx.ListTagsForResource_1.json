@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "test"
+            },
+            {
+                "Key": "maid_status",
+                "Value": "Resource does not meet policy: tag@2018/12/11"
+            },
+            {
+                "Key": "test",
+                "Value": "test-value"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "27d98583-23db-4322-877d-7118d21e4920",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Tue, 11 Dec 2018 19:32:45 GMT",
+                "x-amzn-requestid": "27d98583-23db-4322-877d-7118d21e4920",
+                "content-length": "154",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

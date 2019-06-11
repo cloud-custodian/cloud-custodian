@@ -99,8 +99,12 @@ class CodePipeline(BaseTest):
     def test_query_pipeline(self):
         factory = self.replay_flight_data("test_codepipeline")
         p = self.load_policy(
-            {"name": "get-pipes", "resource": "codepipeline"}, session_factory=factory
+            {"name": "get-pipes", "resource": "codepipeline"},
+            session_factory=factory, config={'account_id': '001100'},
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:codepipeline:us-east-1:001100:custodian-deploy'])
         self.assertEqual(len(resources[0]["stages"]), 2)

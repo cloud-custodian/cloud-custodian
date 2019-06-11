@@ -1,0 +1,13 @@
+accounts:
+  - account-id: "123456789012"
+    role: "arn:aws:iam::123456789012:role/salactus-role"
+    name: "AWS Account Alias"
+
+visitors:
+  - type: "encrypt-keys"
+    crypto: AES256
+    report-only: true
+
+object-reporting:
+  bucket: "salactus-bucket"
+  prefix: "object-reports"

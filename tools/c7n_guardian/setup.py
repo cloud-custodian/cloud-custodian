@@ -29,7 +29,7 @@ setup(
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     author="Kapil Thangavelu",
     author_email="kapil.foss@gmail.com",
     license="Apache-2.0",
@@ -37,5 +37,5 @@ setup(
     entry_points={
         'console_scripts': [
             'c7n-guardian = c7n_guardian.cli:cli']},
-    install_requires=["c7n", "click", "jsonschema", "pyyaml"]
+    install_requires=["c7n", "click", "jsonschema", "pyyaml>=4.2b4"]
 )

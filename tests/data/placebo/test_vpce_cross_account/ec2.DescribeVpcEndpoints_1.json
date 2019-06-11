@@ -1,0 +1,67 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-04d9e6bcab6d21762",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-d2d616b5",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1544820888170\",\"Statement\":[{\"Sid\":\"Stmt1544820886686\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"*\",\"Condition\":{\"StringLike\":{\"aws:PrincipalOrgID\":\"o-4amkskbcf1\"}}}]}",
+                "RouteTableIds": [],
+                "SubnetIds": [],
+                "Groups": [],
+                "PrivateDnsEnabled": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 14,
+                    "hour": 20,
+                    "minute": 55,
+                    "second": 2,
+                    "microsecond": 0
+                }
+            },
+            {
+                "VpcEndpointId": "vpce-0d7db6250339b676b",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-d2d616b5",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+                "RouteTableIds": [],
+                "SubnetIds": [],
+                "Groups": [],
+                "PrivateDnsEnabled": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 14,
+                    "hour": 21,
+                    "minute": 1,
+                    "second": 54,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "96de984d-6ea3-44b9-b20a-7f742e49bc73",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "Accept-Encoding",
+                "date": "Fri, 14 Dec 2018 21:02:37 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

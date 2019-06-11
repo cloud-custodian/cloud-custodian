@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "6f13fc53-8da0-46f2-9c69-c1f9fbf471d7",
+            "Arn": "arn:aws:kms:us-west-2:644160558196:key/6f13fc53-8da0-46f2-9c69-c1f9fbf471d7",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 11,
+                "day": 24,
+                "hour": 6,
+                "minute": 53,
+                "second": 56,
+                "microsecond": 87000
+            },
+            "Enabled": true,
+            "Description": "",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER"
+        },
+        "ResponseMetadata": {
+            "RequestId": "afceb2c3-62c2-4858-a010-fabd87f662af",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "afceb2c3-62c2-4858-a010-fabd87f662af",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "335"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import argparse
-from cStringIO import StringIO
 from dateutil.parser import parse
 from functools import partial
 from gzip import GzipFile
@@ -26,6 +25,11 @@ import os
 import tempfile
 import time
 import sqlite3
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import BytesIO as StringIO
 
 from botocore.client import Config
 
@@ -202,7 +206,7 @@ def process_records(records,
         if not user_records:
             return
         # Spool to temporary files to get out of mem
-        fh = tempfile.NamedTemporaryFile(dir=data_dir, delete=False)
+        fh = tempfile.NamedTemporaryFile(dir=data_dir, delete=False, mode='w')
         fh.write(dump(user_records))
         fh.flush()
         fh.close()
@@ -324,6 +328,7 @@ def setup_parser():
 def main():
     logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('botocore').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
     global options
     parser = setup_parser()
     options = parser.parse_args()

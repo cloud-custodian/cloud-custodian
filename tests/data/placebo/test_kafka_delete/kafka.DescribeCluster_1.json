@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "07a04004-24af-11e9-9104-c94ac64d028f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "content-length": "696",
+                "connection": "keep-alive",
+                "date": "Wed, 30 Jan 2019 16:49:37 GMT",
+                "x-amzn-requestid": "07a04004-24af-11e9-9104-c94ac64d028f",
+                "x-amz-apigw-id": "UU5RRHQSoAMFqMg=",
+                "x-amzn-trace-id": "Root=1-5c51d5a1-22ba125cb490a118cb34b4d0;Sampled=0",
+                "x-cache": "Miss from cloudfront",
+                "via": "1.1 29206f4909cacc031d06a0daf330fb6a.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "P_-QZiAnbQXQfd8Vu_U8_c69nYsI4qtWmaCVHFeiFH-38exOcauCWw=="
+            },
+            "RetryAttempts": 0
+        },
+        "ClusterInfo": {
+            "BrokerNodeGroupInfo": {
+                "BrokerAZDistribution": "DEFAULT",
+                "ClientSubnets": [
+                    "subnet-914763e7",
+                    "subnet-3a334610",
+                    "subnet-efbcccb7"
+                ],
+                "InstanceType": "kafka.m5.large",
+                "StorageInfo": {
+                    "EbsStorageInfo": {
+                        "VolumeSize": 1000
+                    }
+                }
+            },
+            "ClusterArn": "arn:aws:kafka:us-east-1:644160558196:cluster/dev/fde9077e-25d9-4292-918a-c299ca3086c2-2",
+            "ClusterName": "dev",
+            "CreationTime": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 1,
+                "day": 30,
+                "hour": 15,
+                "minute": 11,
+                "second": 5,
+                "microsecond": 58000
+            },
+            "CurrentBrokerSoftwareInfo": {
+                "KafkaVersion": "1.1.1"
+            },
+            "CurrentVersion": "K2EUQ1WTGCTBG2",
+            "EncryptionInfo": {
+                "EncryptionAtRest": {
+                    "DataVolumeKMSKeyId": "arn:aws:kms:us-east-1:644160558196:key/133b4e81-8447-4c40-83cd-1db75d52b106"
+                }
+            },
+            "EnhancedMonitoring": "DEFAULT",
+            "NumberOfBrokerNodes": 3,
+            "State": "DELETING"
+        }
+    }
+}

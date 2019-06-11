@@ -22,10 +22,11 @@ class SupportCase(QueryResourceManager):
 
     class resource_type(object):
         service = 'support'
-        enum_spec = ('describe_cases', 'q', None)
+        enum_spec = ('describe_cases', 'cases', None)
         filter_name = 'caseIdList'
         filter_type = 'list'
         id = 'caseId'
         name = 'displayId'
         date = 'timeCreated'
         dimension = None
+        arn = False

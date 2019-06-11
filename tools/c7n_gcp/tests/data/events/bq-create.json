@@ -1,0 +1,90 @@
+ {
+   "protoPayload": {
+     "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+     "status": {},
+     "authenticationInfo": {
+       "principalEmail": "kapilt@gmail.com"
+     },
+     "requestMetadata": {
+       "callerIp": "65.114.164.50",
+       "callerSuppliedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.2 Safari/605.1.15,gzip(gfe)"
+     },
+     "serviceName": "bigquery.googleapis.com",
+     "methodName": "datasetservice.insert",
+     "authorizationInfo": [
+       {
+         "resource": "projects/custodian-1291",
+         "permission": "bigquery.datasets.create",
+         "granted": true
+       }
+     ],
+     "resourceName": "projects/custodian-1291/datasets",
+     "serviceData": {
+       "@type": "type.googleapis.com/google.cloud.bigquery.logging.v1.AuditData",
+       "datasetInsertRequest": {
+         "resource": {
+           "datasetName": {
+             "projectId": "custodian-1291",
+             "datasetId": "devxyz"
+           },
+           "info": {},
+           "acl": {},
+           "defaultTableExpireDuration": "432000s"
+         }
+       },
+       "datasetInsertResponse": {
+         "resource": {
+           "datasetName": {
+             "projectId": "custodian-1291",
+             "datasetId": "devxyz"
+           },
+           "info": {},
+           "createTime": "2018-12-24T07:56:33.635Z",
+           "updateTime": "2018-12-24T07:56:33.635Z",
+           "acl": {
+             "entries": [
+               {
+                 "role": "WRITER",
+                 "specialGroup": "PROJECT_WRITERS",
+                 "viewName": {}
+               },
+               {
+                 "role": "OWNER",
+                 "specialGroup": "PROJECT_OWNERS",
+                 "viewName": {}
+               },
+               {
+                 "role": "OWNER",
+                 "userEmail": "kapilt@gmail.com",
+                 "specialGroup": "PROJECT_OWNERS",
+                 "viewName": {}
+               },
+               {
+                 "role": "READER",
+                 "specialGroup": "PROJECT_READERS",
+                 "viewName": {}
+               }
+             ]
+           },
+           "defaultTableExpireDuration": "432000s"
+         }
+       }
+     },
+     "resourceLocation": {
+       "currentLocations": [
+         "US"
+       ]
+     }
+   },
+   "insertId": "yz0lpmds6hb",
+   "resource": {
+     "type": "bigquery_resource",
+     "labels": {
+       "project_id": "custodian-1291"
+     }
+   },
+   "timestamp": "2018-12-24T07:56:33.708Z",
+   "severity": "NOTICE",
+   "logName": "projects/custodian-1291/logs/cloudaudit.googleapis.com%2Factivity",
+   "receiveTimestamp": "2018-12-24T07:56:34.454830030Z"
+ }

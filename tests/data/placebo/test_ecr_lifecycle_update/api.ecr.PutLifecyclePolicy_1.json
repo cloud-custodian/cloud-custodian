@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "registryId": "644160558196",
+        "repositoryName": "c7n",
+        "lifecyclePolicyText": "{\"rules\":[{\"rulePriority\":1,\"description\":\"Expire images older than 14 days\",\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"sinceImagePushed\",\"countUnit\":\"days\",\"countNumber\":14},\"action\":{\"type\":\"expire\"}}]}",
+        "ResponseMetadata": {
+            "RequestId": "18f1e9af-ee88-11e8-90c6-7b7641b22c8e",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "18f1e9af-ee88-11e8-90c6-7b7641b22c8e",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "317"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -29,6 +29,7 @@ class CloudSearch(QueryResourceManager):
         dimension = "DomainName"
         filter_name = 'DomainNames'
         filter_type = 'list'
+        type = "domain"
 
 
 @CloudSearch.action_registry.register('delete')

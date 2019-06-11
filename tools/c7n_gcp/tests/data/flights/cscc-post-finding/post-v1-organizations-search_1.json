@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sun, 06 Jan 2019 11:14:28 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "279",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "organizations": [
+      {
+        "displayName": "example.io",
+        "owner": {
+          "directoryCustomerId": "D14a97w5s"
+        },
+        "creationTime": "2018-07-28T07:02:05.547Z",
+        "lifecycleState": "ACTIVE",
+        "name": "organizations/851339424791"
+      }
+    ]
+  }
+}

@@ -1,27 +1,35 @@
-.PHONY: build dist
+.PHONY: build dist build-lambda
+
 bucket=c7n-ssm-build
-LDFLAGS="-X main.Version=`git rev-parse HEAD`"
+GCFLAGS="-trimpath $(shell go env GOPATH)/src"
+LDFLAGS="-X main.Revision=`git rev-parse HEAD`"
+functions := $(wildcard functions/*/.)
 
 build:
 	@mkdir -p bin
-	@go build -ldflags $(LDFLAGS) -o bin/omnissm ./cmd/omnissm
+	@go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-agent ./cmd/omnissm-agent
 	
 build-linux:
 	@mkdir -p bin
-	@GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) -o bin/omnissm-linux-amd64 ./cmd/omnissm
+	@GOOS=linux GOARCH=amd64 go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-agent-linux-amd64 ./cmd/omnissm-agent
 
-build-lambda:
+build-windows:
 	@mkdir -p bin
-	@go build -o bin/register ./functions/register
-	@go build -o bin/subscribe ./functions/subscribe
+	@GOOS=windows GOARCH=amd64 go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-agent-windows-amd64.exe ./cmd/omnissm-agent
+
+build-lambda: $(functions)
+$(functions):
+	cd $@ && $(MAKE) build
 
 dist: build-linux
 	@mkdir -p dist
-	@cp bin/omnissm-linux-amd64 dist/omnissm
-	@gzip -c dist/omnissm > dist/omnissm-linux-amd64.gz
-	@rm -f dist/omnissm
+	@cp bin/omnissm-agent-linux-amd64 dist/omnissm-agent
+	@gzip -c dist/omnissm-agent > dist/omnissm-agent-linux-amd64.gz
+	@rm -f dist/omnissm-agent
 
 test:
 	@go test -v ./pkg/... | grep -v '^\?'
 
 all: build build-lambda
+
+.PHONY: $(functions)

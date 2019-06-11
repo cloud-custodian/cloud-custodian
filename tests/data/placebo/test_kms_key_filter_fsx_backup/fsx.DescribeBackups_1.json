@@ -1,0 +1,109 @@
+{
+    "status_code": 200,
+    "data": {
+        "Backups": [
+            {
+                "BackupId": "backup-06ab2ea2a1160ec8c",
+                "Lifecycle": "AVAILABLE",
+                "Type": "USER_INITIATED",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 19,
+                    "hour": 15,
+                    "minute": 47,
+                    "second": 45,
+                    "microsecond": 467000
+                },
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+                "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:backup/backup-06ab2ea2a1160ec8c",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0f2c3ee3a00358df4",
+                    "StorageCapacity": 300,
+                    "WindowsConfiguration": {
+                        "ActiveDirectoryId": "d-9067141d9e",
+                        "WeeklyMaintenanceStartTime": "6:10:30",
+                        "DailyAutomaticBackupStartTime": "03:00",
+                        "AutomaticBackupRetentionDays": 7,
+                        "CopyTagsToBackups": false
+                    }
+                }
+            },
+            {
+                "BackupId": "backup-0d48df2ee8b3dc909",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 11,
+                    "minute": 7,
+                    "second": 55,
+                    "microsecond": 190000
+                },
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+                "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:backup/backup-0d48df2ee8b3dc909",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0140b4049a6649ebc",
+                    "StorageCapacity": 300,
+                    "WindowsConfiguration": {
+                        "ActiveDirectoryId": "d-9067141d9e",
+                        "WeeklyMaintenanceStartTime": "2:03:30",
+                        "DailyAutomaticBackupStartTime": "03:30",
+                        "AutomaticBackupRetentionDays": 7,
+                        "CopyTagsToBackups": false
+                    }
+                }
+            },
+            {
+                "BackupId": "backup-0ff9498d6d8f5f34b",
+                "Lifecycle": "AVAILABLE",
+                "Type": "AUTOMATIC",
+                "ProgressPercent": 100,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 22,
+                    "minute": 43,
+                    "second": 30,
+                    "microsecond": 320000
+                },
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+                "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:backup/backup-0ff9498d6d8f5f34b",
+                "Tags": [],
+                "FileSystem": {
+                    "FileSystemId": "fs-0140b4049a6649ebc",
+                    "StorageCapacity": 300,
+                    "WindowsConfiguration": {
+                        "ActiveDirectoryId": "d-9067141d9e",
+                        "WeeklyMaintenanceStartTime": "2:03:30",
+                        "DailyAutomaticBackupStartTime": "03:30",
+                        "AutomaticBackupRetentionDays": 7,
+                        "CopyTagsToBackups": false
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "8f436a41-dcf0-4751-af53-3021341ae76d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Thu, 31 Jan 2019 22:01:43 GMT",
+                "x-amzn-requestid": "8f436a41-dcf0-4751-af53-3021341ae76d",
+                "content-length": "1792",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

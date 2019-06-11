@@ -1,5 +1,5 @@
 [Unit]
-Description=Timer for OMNISSM Inventory
+Description=Run omnissm-inventory 10 minutes after boot, then every 30 minutes
 
 [Timer]
 # Define target unit (in case the name part is the same, can be omitted)

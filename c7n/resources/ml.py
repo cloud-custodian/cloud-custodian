@@ -33,6 +33,7 @@ class MLModel(QueryResourceManager):
         # need to specify request-mode dimension as well
         # dimension = 'MLModelId'
         dimension = None
+        type = "mlmodel"
 
 
 @MLModel.action_registry.register('delete')

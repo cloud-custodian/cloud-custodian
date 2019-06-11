@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": "test"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "7b18d5c7-599d-4914-a73d-7550d24cd0a1",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Tue, 11 Dec 2018 19:34:45 GMT",
+                "x-amzn-requestid": "7b18d5c7-599d-4914-a73d-7550d24cd0a1",
+                "content-length": "40",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

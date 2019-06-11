@@ -1,0 +1,24 @@
+{
+  "headers": {
+    "x-guploader-uploadid": "AEnB2Uo3XYPs5NZK0O6R3b5cHeG7GEmgDG9zlUDhbD3y0ivHZfQGpU-mp0rqbv2DRSeSecHuW9LwyPl8EhVJS2OmaTwuZOBn4g",
+    "expires": "Wed, 26 Dec 2018 15:04:19 GMT",
+    "date": "Wed, 26 Dec 2018 15:04:19 GMT",
+    "cache-control": "private, max-age=0",
+    "last-modified": "Wed, 26 Dec 2018 14:56:51 GMT",
+    "etag": "\"5faef0cc8027d1d74a7d1612b578d60a\"",
+    "x-goog-generation": "1545836211359954",
+    "x-goog-metageneration": "1",
+    "x-goog-stored-content-encoding": "identity",
+    "x-goog-stored-content-length": "563393",
+    "content-type": "application/zip",
+    "x-goog-hash": "crc32c=b8Z1zw==, md5=X67wzIAn0ddKfRYStXjWCg==",
+    "x-goog-storage-class": "STANDARD",
+    "accept-ranges": "bytes",
+    "content-length": "563393",
+    "server": "UploadServer",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/gcf-sources-us-central1-83fec15d-2d93-4ab7-89c6-f6c7a45912c0/24f8db69-2024-4516-8aaf-4f74ba78f7b6/8/function-source.zip?GoogleAccessId=service-435820424010@gcf-admin-robot.iam.gserviceaccount.com&Expires=1545838459&Signature=Nqj69xsBWZmUK%2Fdqfbi0NMOau11jtLfn1PbB1Khycy6q9xobdBQJSURWdGcEs08xJfU1skXMopuwyIwvaufpws4%2FgCiX9pmvMiBVI30g0dDXuXRGFHyOFndpEZWf%2BB%2BnzcSsE0R6yNRA7GpxiMwy7LkkjJ4jFmhILjIORYeH6ivGHNlBrg6tTb3vuW8064wqgmNE%2FSWOXbQst3TMceXJddat3scO66KV7j7ijIy91IRtU2rXKFT%2BB5WfBjQV0kSISiICSkiwa9RCShCy43qqD9Q49ogi3LmHR4iLWmZbvazCMzJLqMvA2u4vQPt3Wao90OcZ6WRPszQBdiRjOcElng%3D%3D"
+  },
+  "body": {}
+}

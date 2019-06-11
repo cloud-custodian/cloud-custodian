@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "LaunchConfigurationName": "test",
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:d1d0f8b4-0a19-426f-8558-92b1652c7384:launchConfigurationName/test",
+                "ImageId": "ami-08ad7d3e6aa17c472",
+                "KeyName": "",
+                "SecurityGroups": [
+                    "sg-0c3b95fa1ac946098"
+                ],
+                "ClassicLinkVPCSecurityGroups": [],
+                "UserData": "",
+                "InstanceType": "t1.micro",
+                "KernelId": "",
+                "RamdiskId": "",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "SnapshotId": "snap-0d606a352ae1f6a8a",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2",
+                            "DeleteOnTermination": true
+                        }
+                    }
+                ],
+                "InstanceMonitoring": {
+                    "Enabled": false
+                },
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 9,
+                    "day": 19,
+                    "hour": 22,
+                    "minute": 42,
+                    "second": 3,
+                    "microsecond": 56000
+                },
+                "EbsOptimized": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "9550c8e1-bc5d-11e8-8258-f16d61b79e93",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9550c8e1-bc5d-11e8-8258-f16d61b79e93",
+                "content-type": "text/xml",
+                "content-length": "1561",
+                "date": "Wed, 19 Sep 2018 22:44:35 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

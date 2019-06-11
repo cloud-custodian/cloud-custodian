@@ -24,8 +24,7 @@ uses a separate session.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import boto3
-from botocore.exceptions import ClientError
+from c7n.exceptions import ClientError
 
 import itertools
 import logging
@@ -60,7 +59,7 @@ class Error(object):
 class CloudWatchLogHandler(logging.Handler):
     """Python Log Handler to Send to Cloud Watch Logs
 
-    http://goo.gl/eZGAEK
+    https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html
     """
 
     batch_size = 20
@@ -72,7 +71,7 @@ class CloudWatchLogHandler(logging.Handler):
         super(CloudWatchLogHandler, self).__init__()
         self.log_group = log_group
         self.log_stream = log_stream
-        self.session_factory = session_factory or boto3.Session
+        self.session_factory = session_factory
         self.transport = None
         self.queue = Queue.Queue()
         self.threads = []

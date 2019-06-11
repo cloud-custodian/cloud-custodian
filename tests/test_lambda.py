@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 
 from botocore.exceptions import ClientError
-from .common import BaseTest, functional, TestConfig as Config
+from .common import BaseTest, functional
 from c7n.executor import MainThreadExecutor
 from c7n.resources.awslambda import AWSLambda, ReservedConcurrency
 from c7n.mu import PythonPackageArchive
@@ -117,6 +117,42 @@ class LambdaPermissionTest(BaseTest):
         self.assertRaises(ClientError, client.get_policy, FunctionName=name)
 
 
+class LambdaLayerTest(BaseTest):
+
+    def test_lambda_layer_cross_account(self):
+        factory = self.replay_flight_data('test_lambda_layer_cross_account')
+        p = self.load_policy({
+            'name': 'lambda-layer-cross',
+            'resource': 'lambda-layer',
+            'filters': [{'type': 'cross-account'}],
+            'actions': [{'type': 'remove-statements',
+                         'statement_ids': 'matched'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('CrossAccountViolations' in resources[0].keys())
+        client = factory().client('lambda')
+        with self.assertRaises(client.exceptions.ResourceNotFoundException):
+            client.get_layer_version_policy(
+                LayerName=resources[0]['LayerName'],
+                VersionNumber=resources[0]['Version']).get('Policy')
+
+    def test_delete_layer(self):
+        factory = self.replay_flight_data('test_lambda_layer_delete')
+        p = self.load_policy({
+            'name': 'lambda-layer-delete',
+            'resource': 'lambda-layer',
+            'filters': [{'LayerName': 'test'}],
+            'actions': [{'type': 'delete'}]},
+            session_factory=factory)
+        resources = p.run()
+        client = factory().client('lambda')
+        with self.assertRaises(client.exceptions.ResourceNotFoundException):
+            client.get_layer_version(
+                LayerName='test',
+                VersionNumber=resources[0]['Version'])
+
+
 class LambdaTest(BaseTest):
 
     def test_lambda_config_source(self):
@@ -126,12 +162,15 @@ class LambdaTest(BaseTest):
                 "name": "lambda-config",
                 "resource": "lambda",
                 "source": "config",
-                "filters": [{"FunctionName": "omnissm-register"}],
+                'query': [
+                    {'clause': "resourceId = 'omnissm-handle-registrations'"},
+                ],
             },
-            session_factory=factory,
-        )
+            session_factory=factory, config={'region': 'us-east-2'})
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['FunctionName'], 'omnissm-handle-registrations')
         self.assertEqual(
             resources[0]["Tags"], [{"Key": "lambda:createdBy", "Value": "SAM"}]
         )
@@ -277,48 +316,29 @@ class LambdaTagTest(BaseTest):
             {
                 "name": "lambda-tag",
                 "resource": "lambda",
-                "filters": [{"FunctionName": "CloudCustodian"}],
-                "actions": [{"type": "tag", "key": "xyz", "value": "abcdef"}],
+                "filters": [
+                    {"FunctionName": "CloudCustodian"},
+                    {"tag:Env": "Dev"},
+                ],
+                "actions": [
+                    {"type": "tag", "key": "xyz", "value": "abcdef"},
+                    {"type": "remove-tag", "tags": ["Env"]}
+                ]
             },
-            session_factory=session_factory,
-        )
+            session_factory=session_factory, config={
+                'account_id': '644160558196',
+                'region': 'us-west-2'})
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         arn = resources[0]["FunctionArn"]
-        tags = client.list_tags(Resource=arn)["Tags"]
-        self.assertTrue("xyz" in tags.keys())
 
-        policy = self.load_policy(
-            {
-                "name": "lambda-tag",
-                "resource": "lambda",
-                "filters": [{"FunctionName": "CloudCustodian"}],
-                "actions": [{"type": "remove-tag", "tags": ["xyz"]}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        arn = resources[0]["FunctionArn"]
-        tags = client.list_tags(Resource=arn)["Tags"]
-        self.assertFalse("xyz" in tags.keys())
+        after_tags = client.list_tags(Resource=arn)["Tags"]
+        before_tags = {
+            t['Key']: t['Value'] for t in resources[0]['Tags']}
 
-    def test_lambda_tags(self):
-        self.patch(AWSLambda, "executor_factory", MainThreadExecutor)
-        session_factory = self.replay_flight_data("test_lambda_tags")
-        policy = self.load_policy(
-            {
-                "name": "lambda-mark",
-                "resource": "lambda",
-                "filters": [{"tag:Language": "Python"}],
-            },
-            config=Config.empty(),
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["FunctionName"], "CloudCustodian")
+        self.assertEqual(before_tags, {'Env': 'Dev'})
+        self.assertEqual(after_tags, {'xyz': 'abcdef'})
 
     def test_mark_and_match(self):
         session_factory = self.replay_flight_data("test_lambda_mark_and_match")
@@ -337,25 +357,20 @@ class LambdaTagTest(BaseTest):
                     }
                 ],
             },
-            config=Config.empty(),
+            config={'region': 'us-west-2',
+                    'account_id': '644160558196'},
             session_factory=session_factory,
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
-        arn = resources[0]["FunctionArn"]
-        tags = client.list_tags(Resource=arn)["Tags"]
-        self.assertTrue("custodian_next" in tags.keys())
 
-        policy = self.load_policy(
-            {
-                "name": "lambda-mark-filter",
-                "resource": "lambda",
-                "filters": [
-                    {"type": "marked-for-op", "tag": "custodian_next", "op": "delete"}
-                ],
-            },
-            config=Config.empty(),
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
+        arn = resources[0]["FunctionArn"]
+        after_tags = client.list_tags(Resource=arn)["Tags"]
+        before_tags = {
+            t['Key']: t['Value'] for t in resources[0]['Tags']}
+
+        self.assertEqual(before_tags, {'xyz': 'abcdef'})
+        self.assertEqual(
+            after_tags,
+            {'custodian_next': 'Resource does not meet policy: delete@2019/02/09',
+             'xyz': 'abcdef'})

@@ -16,12 +16,7 @@ import json
 import re
 import redis
 
-try:
-    import sqlite3
-except ImportError:
-    have_sqlite = False
-else:
-    have_sqlite = True
+import sqlite3
 from ldap3 import Connection
 from ldap3.core.exceptions import LDAPSocketOpenError
 
@@ -47,8 +42,6 @@ class LdapLookup(object):
             redis_port = int(config.get('redis_port', 6379))
             self.caching = self.get_redis_connection(redis_host, redis_port)
         elif self.cache_engine == 'sqlite':
-            if not have_sqlite:
-                raise RuntimeError('No sqlite available: stackoverflow.com/q/44058239')
             self.caching = LocalSqlite(config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger)
 
     def get_redis_connection(self, redis_host, redis_port):
@@ -117,8 +110,16 @@ class LdapLookup(object):
     def get_dict_from_ldap_object(self, ldap_user_object):
         ldap_user_metadata = {attr.key: attr.value for attr in ldap_user_object}
         ldap_user_metadata['dn'] = ldap_user_object.entry_dn
-        ldap_user_metadata[self.email_key] = ldap_user_metadata[self.email_key].lower()
-        ldap_user_metadata[self.uid_key] = ldap_user_metadata[self.uid_key].lower()
+
+        email_key = ldap_user_metadata.get(self.email_key, None)
+        uid_key = ldap_user_metadata.get(self.uid_key, None)
+
+        if not email_key or not uid_key:
+            return {}
+        else:
+            ldap_user_metadata['self.email_key'] = email_key.lower()
+            ldap_user_metadata['self.uid_key'] = uid_key.lower()
+
         return ldap_user_metadata
 
     # eg, uid = bill_lumbergh
@@ -146,8 +147,11 @@ class LdapLookup(object):
             ldap_user_metadata = self.get_dict_from_ldap_object(self.connection.entries[0])
             if self.cache_engine:
                 self.log.debug('Writing user: %s metadata to cache engine.' % uid)
-                self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
-                self.caching.set(uid, ldap_user_metadata)
+                if ldap_user_metadata.get('dn'):
+                    self.caching.set(ldap_user_metadata['dn'], ldap_user_metadata)
+                    self.caching.set(uid, ldap_user_metadata)
+                else:
+                    self.caching.set(uid, {})
         else:
             if self.cache_engine:
                 self.caching.set(uid, {})
@@ -177,6 +181,7 @@ class LocalSqlite(object):
     def set(self, key, value):
         # note, the ? marks are required to ensure escaping into the database.
         self.sqlite.execute("INSERT INTO ldap_cache VALUES (?, ?)", (key, json.dumps(value)))
+        self.sqlite.commit()
 
 
 # redis can't write complex python objects like dictionaries as values (the way memcache can)

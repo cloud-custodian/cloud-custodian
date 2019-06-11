@@ -1,0 +1,39 @@
+{
+    "status_code": 200, 
+    "data": {
+        "trailList": [
+            {
+                "IncludeGlobalServiceEvents": true, 
+                "Name": "S3-DataEvents", 
+                "S3KeyPrefix": "DataEvents", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents", 
+                "LogFileValidationEnabled": true, 
+                "IsMultiRegionTrail": true, 
+                "HasCustomEventSelectors": true, 
+                "S3BucketName": "custodian-skunk-trails", 
+                "HomeRegion": "us-east-1"
+            }, 
+            {
+                "IncludeGlobalServiceEvents": true, 
+                "Name": "skunk-trails", 
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails", 
+                "LogFileValidationEnabled": true, 
+                "IsMultiRegionTrail": true, 
+                "HasCustomEventSelectors": false, 
+                "S3BucketName": "custodian-skunk-trails", 
+                "HomeRegion": "us-east-1"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6ffede2c-f951-4069-a1d7-9de19f0862ad", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6ffede2c-f951-4069-a1d7-9de19f0862ad", 
+                "date": "Fri, 08 Jun 2018 20:49:27 GMT", 
+                "content-length": "617", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

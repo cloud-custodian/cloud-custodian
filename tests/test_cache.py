@@ -14,11 +14,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from unittest import TestCase
-from c7n import cache
+from c7n import cache, config
 from argparse import Namespace
 from six.moves import cPickle as pickle
 import tempfile
 import mock
+import os
 
 
 class TestCache(TestCase):
@@ -29,6 +30,25 @@ class TestCache(TestCase):
         self.assertIsInstance(cache.factory(test_config), cache.FileCacheManager)
         test_config.cache = None
         self.assertIsInstance(cache.factory(test_config), cache.NullCache)
+
+
+class MemCacheTest(TestCase):
+
+    def test_mem_factory(self):
+        self.assertEqual(
+            cache.factory(config.Bag(cache='memory', cache_period=5)).__class__,
+            cache.InMemoryCache)
+
+    def test_get_set(self):
+        mem_cache = cache.InMemoryCache()
+        mem_cache.save({'region': 'us-east-1'}, {'hello': 'world'})
+        self.assertEqual(mem_cache.size(), 1)
+        self.assertEqual(mem_cache.load(), True)
+
+        mem_cache = cache.InMemoryCache()
+        self.assertEqual(
+            mem_cache.get({'region': 'us-east-1'}),
+            {'hello': 'world'})
 
 
 class FileCacheManagerTest(TestCase):
@@ -43,8 +63,7 @@ class FileCacheManagerTest(TestCase):
         self.test_value = [1, 2, 3]
 
     def test_get_set(self):
-        t = tempfile.NamedTemporaryFile()
-        self.addCleanup(t.close)
+        t = self.temporary_file_with_cleanup()
         c = cache.FileCacheManager(Namespace(cache_period=60, cache=t.name))
         self.assertFalse(c.load())
         k1 = {"account": "12345678901234", "region": "us-west-2", "resource": "ec2"}
@@ -68,11 +87,12 @@ class FileCacheManagerTest(TestCase):
         self.test_cache.data = pickle.loads(test_pickle)
 
         # assert
-        self.assertEquals(self.test_cache.get(self.test_key), self.test_value)
-        self.assertEquals(self.test_cache.get(self.bad_key), None)
+        self.assertEqual(self.test_cache.get(self.test_key), self.test_value)
+        self.assertEqual(self.test_cache.get(self.bad_key), None)
 
     def test_load(self):
-        t = tempfile.NamedTemporaryFile(suffix=".cache")
+        t = self.temporary_file_with_cleanup(suffix=".cache")
+
         load_config = Namespace(cache_period=0, cache=t.name)
         load_cache = cache.FileCacheManager(load_config)
         self.assertFalse(load_cache.load())
@@ -87,7 +107,8 @@ class FileCacheManagerTest(TestCase):
         # path exists then we dont need to create the folder
         mock_exists.return_value = True
         # tempfile to hold the pickle
-        temp_cache_file = tempfile.NamedTemporaryFile()
+        temp_cache_file = self.temporary_file_with_cleanup()
+
         self.test_cache.cache_path = temp_cache_file.name
         # make the call
         self.test_cache.save(self.test_key, self.test_value)
@@ -98,16 +119,17 @@ class FileCacheManagerTest(TestCase):
         self.assertTrue(mock_dump.called)
 
         # mkdir should NOT be called, but pickles should
-        self.assertEquals(mock_mkdir.call_count, 0)
-        self.assertEquals(mock_dump.call_count, 1)
-        self.assertEquals(mock_dumps.call_count, 1)
+        self.assertEqual(mock_mkdir.call_count, 0)
+        self.assertEqual(mock_dump.call_count, 1)
+        self.assertEqual(mock_dumps.call_count, 1)
 
     @mock.patch.object(cache.os, "makedirs")
     @mock.patch.object(cache.os.path, "exists")
     @mock.patch.object(cache.pickle, "dump")
     @mock.patch.object(cache.pickle, "dumps")
     def test_save_doesnt_exists(self, mock_dumps, mock_dump, mock_exists, mock_mkdir):
-        temp_cache_file = tempfile.NamedTemporaryFile()
+        temp_cache_file = self.temporary_file_with_cleanup()
+
         self.test_cache.cache_path = temp_cache_file.name
 
         # path doesnt exists then we will create the folder
@@ -125,6 +147,19 @@ class FileCacheManagerTest(TestCase):
         self.assertTrue(mock_dump.called)
 
         # all 3 should be called once
-        self.assertEquals(mock_mkdir.call_count, 1)
-        self.assertEquals(mock_dump.call_count, 1)
-        self.assertEquals(mock_dumps.call_count, 1)
+        self.assertEqual(mock_mkdir.call_count, 1)
+        self.assertEqual(mock_dump.call_count, 1)
+        self.assertEqual(mock_dumps.call_count, 1)
+
+    def temporary_file_with_cleanup(self, **kwargs):
+        """
+        NamedTemporaryFile with delete=True has
+        significantly different behavior on Windows
+        so we utilize delete=False to simplify maintaining
+        compatibility.
+        """
+        t = tempfile.NamedTemporaryFile(delete=False, **kwargs)
+
+        self.addCleanup(os.unlink, t.name)
+        self.addCleanup(t.close)
+        return t

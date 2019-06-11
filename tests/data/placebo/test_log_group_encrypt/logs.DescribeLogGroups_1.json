@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "c7n-encrypted",
+                "creationTime": 1543060513793,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:c7n-encrypted:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "cda68db7-efdf-11e8-8465-31c45fc1ebe8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cda68db7-efdf-11e8-8465-31c45fc1ebe8",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "185",
+                "date": "Sat, 24 Nov 2018 11:55:13 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

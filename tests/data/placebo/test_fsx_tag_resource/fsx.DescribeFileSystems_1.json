@@ -1,0 +1,68 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 12,
+                    "day": 11,
+                    "hour": 14,
+                    "minute": 24,
+                    "second": 27,
+                    "microsecond": 838000
+                },
+                "FileSystemId": "fs-0bc98cbfb6b356896",
+                "FileSystemType": "WINDOWS",
+                "Lifecycle": "AVAILABLE",
+                "StorageCapacity": 300,
+                "VpcId": "vpc-d2d616b5",
+                "SubnetIds": [
+                    "subnet-3a334610"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-0316083e722388ce3"
+                ],
+                "DNSName": "fs-0bc98cbfb6b356896.test.com",
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d30a034-2787-478a-85e7-1a2b85205fbc",
+                "ResourceARN": "arn:aws:fsx:us-east-1:644160558196:file-system/fs-0bc98cbfb6b356896",
+                "Tags": [
+                    {
+                        "Key": "test",
+                        "Value": "test-value"
+                    },
+                    {
+                        "Key": "maid_status",
+                        "Value": "Resource does not meet policy: tag@2018/12/11"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "test"
+                    }
+                ],
+                "WindowsConfiguration": {
+                    "ActiveDirectoryId": "d-90671463e5",
+                    "ThroughputCapacity": 8,
+                    "WeeklyMaintenanceStartTime": "3:08:30",
+                    "DailyAutomaticBackupStartTime": "04:00",
+                    "AutomaticBackupRetentionDays": 7,
+                    "CopyTagsToBackups": false
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "5b90677a-dea7-43ea-92b0-9c0b6463b708",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Tue, 11 Dec 2018 19:32:44 GMT",
+                "x-amzn-requestid": "5b90677a-dea7-43ea-92b0-9c0b6463b708",
+                "content-length": "879",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

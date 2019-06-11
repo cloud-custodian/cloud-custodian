@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "CpuUtilization",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 6,
+                    "day": 28,
+                    "hour": 9,
+                    "minute": 41,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Average": 5.522026045882309,
+                "Unit": "Percent"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "98fbd099-7b80-11e8-80f8-9150c8220456",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "98fbd099-7b80-11e8-80f8-9150c8220456",
+                "content-type": "text/xml",
+                "content-length": "511",
+                "date": "Fri, 29 Jun 2018 09:41:28 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

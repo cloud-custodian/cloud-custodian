@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReservedInstances": [
+            {
+                "Duration": 31536000,
+                "End": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 2,
+                    "day": 23,
+                    "hour": 11,
+                    "minute": 25,
+                    "second": 2,
+                    "microsecond": 0
+                },
+                "FixedPrice": 30.0,
+                "InstanceCount": 1,
+                "InstanceType": "t2.micro",
+                "ProductDescription": "Linux/UNIX",
+                "ReservedInstancesId": "32881ecb-6734-4b79-94a0-26c759c2da38",
+                "Start": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 23,
+                    "hour": 11,
+                    "minute": 25,
+                    "second": 3,
+                    "microsecond": 340000
+                },
+                "State": "active",
+                "UsagePrice": 0.0,
+                "CurrencyCode": "USD",
+                "InstanceTenancy": "default",
+                "OfferingClass": "standard",
+                "OfferingType": "Partial Upfront",
+                "RecurringCharges": [
+                    {
+                        "Amount": 0.0034,
+                        "Frequency": "Hourly"
+                    }
+                ],
+                "Scope": "Region"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "cfd41aad-88c0-4975-9725-f2385aaa5852",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "1267",
+                "date": "Sat, 23 Feb 2019 11:45:27 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

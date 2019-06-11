@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "80c2a50f-a850-11e8-886c-cbf35802c35f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sat, 25 Aug 2018 10:20:34 GMT",
+                "content-type": "application/json",
+                "content-length": "98",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "80c2a50f-a850-11e8-886c-cbf35802c35f",
+                "x-amz-apigw-id": "MLQJ5G1VCYcFXVg=",
+                "x-amzn-trace-id": "Root=1-5b812d72-ba0006e2a7355cb5aad08027;Sampled=0"
+            },
+            "RetryAttempts": 0
+        },
+        "Policies": [
+            {
+                "PolicyId": "policy-0708be998c6f69368",
+                "Description": "megacache",
+                "State": "ENABLED"
+            }
+        ]
+    }
+}

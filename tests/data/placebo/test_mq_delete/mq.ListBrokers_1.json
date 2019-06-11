@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "cf75e35e-7b80-11e8-aa2f-196aaa6bb56b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "content-length": "351",
+                "connection": "keep-alive",
+                "date": "Fri, 29 Jun 2018 09:43:00 GMT",
+                "x-amzn-requestid": "cf75e35e-7b80-11e8-aa2f-196aaa6bb56b",
+                "x-amz-apigw-id": "JPTNpG6jiYcFc0g=",
+                "x-amzn-trace-id": "Root=1-5b35ff24-a84853261f7cca482c8dd4b2",
+                "x-cache": "Miss from cloudfront",
+                "via": "1.1 01b00ded82405e6c5be64787abc6bcc9.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "zcitBhdtM72Q2jPgMl6LH6NQf1HGEYLPyX0MsHjsZeKRAIfg7QLOHQ=="
+            },
+            "RetryAttempts": 0
+        },
+        "BrokerSummaries": [
+            {
+                "BrokerArn": "arn:aws:mq:us-east-2:644160558196:broker:dev:b-ec204b6b-2cd7-464d-98fe-d80eaf273afb",
+                "BrokerId": "b-ec204b6b-2cd7-464d-98fe-d80eaf273afb",
+                "BrokerName": "dev",
+                "BrokerState": "RUNNING",
+                "DeploymentMode": "SINGLE_INSTANCE",
+                "HostInstanceType": "mq.t2.micro"
+            }
+        ]
+    }
+}

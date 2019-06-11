@@ -1,0 +1,38 @@
+{
+  "body": {
+    "kind": "bigquery#table", 
+    "creationTime": "1557845349829", 
+    "location": "US", 
+    "tableReference": {
+      "projectId": "cloud-custodian", 
+      "tableId": "test", 
+      "datasetId": "qqqqqqqqqqqqq"
+    }, 
+    "numRows": "0", 
+    "numBytes": "0", 
+    "etag": "dTpNKEFHEbwj6eoQ/cnR4Q==", 
+    "numLongTermBytes": "0", 
+    "lastModifiedTime": "1557845349875", 
+    "type": "TABLE", 
+    "id": "cloud-custodian:qqqqqqqqqqqqq.test", 
+    "selfLink": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/qqqqqqqqqqqqq/tables/test", 
+    "schema": {}
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "555", 
+    "x-xss-protection": "0", 
+    "content-location": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/qqqqqqqqqqqqq/tables/test?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "dTpNKEFHEbwj6eoQ/cnR4Q==", 
+    "cache-control": "private", 
+    "date": "Tue, 14 May 2019 14:53:40 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}

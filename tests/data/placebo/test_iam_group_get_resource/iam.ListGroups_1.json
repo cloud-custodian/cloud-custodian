@@ -1,0 +1,180 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "7df3c79f-741a-11e8-8c3e-adb731f35adf", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7df3c79f-741a-11e8-8c3e-adb731f35adf", 
+                "vary": "Accept-Encoding", 
+                "content-length": "3091", 
+                "content-type": "text/xml", 
+                "date": "Tue, 19 Jun 2018 23:42:56 GMT"
+            }
+        }, 
+        "IsTruncated": false, 
+        "Groups": [
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 59, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 43
+                }, 
+                "GroupId": "AGPAICE7JLUEXIYKHXAHE", 
+                "Arn": "arn:aws:iam::redacted:group/redacted", 
+                "GroupName": "Admins"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 20, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 15, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 6, 
+                    "minute": 3
+                }, 
+                "GroupId": "AGPAIA2ERXFSPLP2WYH5M", 
+                "Arn": "arn:aws:iam::redacted:group/redacted", 
+                "GroupName": "APIAdmin"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 15, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 22, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 25, 
+                    "minute": 44
+                }, 
+                "GroupId": "AGPAJSBA5ILUQX2TLKYJC", 
+                "Arn": "arn:aws:iam::redacted:group/redacted", 
+                "GroupName": "Cloudcheckr-CFNUserGroup-D0F98MVM7E7E"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 1, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 8, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 2, 
+                    "minute": 39
+                }, 
+                "GroupId": "AGPAJIRMVXQ736SK5Z5KS", 
+                "Arn": "arn:aws:iam::redacted:group/redacted", 
+                "GroupName": "EOTSS-Dev-BillingTagger"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 12, 
+                    "second": 0, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 14, 
+                    "minute": 14
+                }, 
+                "GroupId": "AGPAJYD7MUT2QL4NNDESI", 
+                "Arn": "arn:aws:iam::redacted:group/redacted", 
+                "GroupName": "ey-test-group"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 49, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 24, 
+                    "minute": 54
+                }, 
+                "GroupId": "AGPAJPSMEFO5EARM5Q5VG", 
+                "Arn": "arn:aws:iam::redacted:group/redacted", 
+                "GroupName": "MassITEngineeringSandboxSupport-CFNUserGroup-G9Z2Y9KQRAQC"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 17, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 5, 
+                    "microsecond": 0, 
+                    "year": 2018, 
+                    "day": 9, 
+                    "minute": 58
+                }, 
+                "GroupId": "AGPAJTQZU7IOWKRXG4Y3M", 
+                "Arn": "arn:aws:iam::redacted:group/monitoring", 
+                "GroupName": "monitoring"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 12, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 47, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 19, 
+                    "minute": 36
+                }, 
+                "GroupId": "AGPAI6NICSNT546VPVZGS", 
+                "Arn": "arn:aws:iam::redacted:group/ServiceCatalogUsers", 
+                "GroupName": "ServiceCatalogUsers"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 5, 
+                    "second": 25, 
+                    "microsecond": 0, 
+                    "year": 2017, 
+                    "day": 5, 
+                    "minute": 28
+                }, 
+                "GroupId": "AGPAI4NLGTYLVFJ4ZDPRM", 
+                "Arn": "arn:aws:iam::redacted:group/redacted", 
+                "GroupName": "SysAdmins"
+            }, 
+            {
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 11, 
+                    "__class__": "datetime", 
+                    "month": 6, 
+                    "second": 37, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 27, 
+                    "minute": 23
+                }, 
+                "GroupId": "AGPAIGQOISAYPTYOGSC24", 
+                "Arn": "arn:aws:iam::redacted:group/redacted", 
+                "GroupName": "Users"
+            }
+        ]
+    }
+}

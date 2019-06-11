@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "GroupId": "sg-02a60363e2b087ff8", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "44615143-02cd-48e2-a47c-19cc85fedf72", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 Oct 2018 11:59:56 GMT", 
+                "content-length": "283", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "server": "AmazonEC2"
+            }
+        }
+    }
+}

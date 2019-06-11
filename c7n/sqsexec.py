@@ -54,6 +54,8 @@ class SQSExecutor(Executor):
         self.futures = {}
 
     def submit(self, func, *args, **kwargs):
+        """Submit a function for serialized execution on sqs
+        """
         self.op_sequence += 1
         self.sqs.send_message(
             QueueUrl=self.map_queue,

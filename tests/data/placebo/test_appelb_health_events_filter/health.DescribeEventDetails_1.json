@@ -1,0 +1,62 @@
+{
+    "status_code": 200, 
+    "data": {
+        "failedSet": [], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "1d2d4e33-c5b9-11e8-af28-6d15edc46571", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1d2d4e33-c5b9-11e8-af28-6d15edc46571", 
+                "date": "Mon, 01 Oct 2018 20:32:28 GMT", 
+                "content-length": "1515", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "successfulSet": [
+            {
+                "event": {
+                    "lastUpdatedTime": {
+                        "hour": 19, 
+                        "__class__": "datetime", 
+                        "month": 7, 
+                        "second": 9, 
+                        "microsecond": 784000, 
+                        "year": 2018, 
+                        "day": 23, 
+                        "minute": 47
+                    }, 
+                    "service": "ELASTICLOADBALANCING", 
+                    "eventTypeCode": "AWS_ELASTICLOADBALANCING_INSUFFICIENT_IPS_IN_SUBNET", 
+                    "startTime": {
+                        "hour": 18, 
+                        "__class__": "datetime", 
+                        "month": 7, 
+                        "second": 26, 
+                        "microsecond": 0, 
+                        "year": 2018, 
+                        "day": 23, 
+                        "minute": 32
+                    }, 
+                    "eventTypeCategory": "issue", 
+                    "endTime": {
+                        "hour": 19, 
+                        "__class__": "datetime", 
+                        "month": 7, 
+                        "second": 9, 
+                        "microsecond": 0, 
+                        "year": 2018, 
+                        "day": 23, 
+                        "minute": 47
+                    }, 
+                    "region": "us-east-1", 
+                    "arn": "arn:aws:health:us-east-1::event/ELASTICLOADBALANCING/AWS_ELASTICLOADBALANCING_INSUFFICIENT_IPS_IN_SUBNET/AWS_ELASTICLOADBALANCING_INSUFFICIENT_IPS_IN_SUBNET_1234567890_12345678901", 
+                    "statusCode": "closed"
+                }, 
+                "eventDescription": {
+                    "latestDescription": "We have detected an issue with the ELBs associated with this event in the us-east-1 region.\n\nThe load balancers are unable to scale up because there are not enough free IP addresses in its subnets. The best practice is to keep at least eight IP addresses available in each subnet.\n\nThere are two ways to address the issue:\n- Configure the load balancers to use a different subnet in the same Availability Zone that has more free IP addresses.\n- Free up IP addresses in the current subnets by deleting unused ENIs or moving other resources to different subnets.\n\nWe strongly recommend that you address this issue to ensure that your load balancers are prepared to handle increases in traffic. For more information, see http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-manage-subnets.html.\n\nIf you require assistance to resolve this issue, contact us by opening a new support case at https://console.aws.amazon.com/support/home."
+                }
+            }
+        ]
+    }
+}

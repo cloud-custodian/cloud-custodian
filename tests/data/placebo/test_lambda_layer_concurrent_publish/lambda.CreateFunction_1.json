@@ -1,0 +1,44 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "a3f1f0ad-2672-11e9-a537-1966109a85c7",
+            "HTTPStatusCode": 201,
+            "HTTPHeaders": {
+                "date": "Fri, 01 Feb 2019 22:42:26 GMT",
+                "content-type": "application/json",
+                "content-length": "807",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "a3f1f0ad-2672-11e9-a537-1966109a85c7"
+            },
+            "RetryAttempts": 0
+        },
+        "FunctionName": "test-foo-bar",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
+        "Runtime": "python2.7",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Handler": "index.handler",
+        "CodeSize": 168,
+        "Description": "test",
+        "Timeout": 3,
+        "MemorySize": 128,
+        "LastModified": "2019-02-01T22:42:23.185+0000",
+        "CodeSha256": "vGPycvFY/krzGmxtrdge41pUwYXQ5jyzBfyVO53ockM=",
+        "Version": "27",
+        "VpcConfig": {
+            "SubnetIds": [],
+            "SecurityGroupIds": [],
+            "VpcId": ""
+        },
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        },
+        "RevisionId": "649d521c-a641-4094-8a7b-51d30875317b",
+        "Layers": [
+            {
+                "Arn": "arn:aws:lambda:us-east-1:644160558196:layer:CustodianLayer:2",
+                "CodeSize": 5835287
+            }
+        ]
+    }
+}

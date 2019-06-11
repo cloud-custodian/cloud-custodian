@@ -1,0 +1,60 @@
+{
+    "status_code": 200, 
+    "data": {
+        "EvaluationResults": [
+            {
+                "Annotation": "Resource is not compliant with policy:good-vol", 
+                "EvaluationResultIdentifier": {
+                    "OrderingTimestamp": {
+                        "hour": 8, 
+                        "__class__": "datetime", 
+                        "month": 7, 
+                        "second": 59, 
+                        "microsecond": 0, 
+                        "year": 2018, 
+                        "day": 11, 
+                        "minute": 10
+                    }, 
+                    "EvaluationResultQualifier": {
+                        "ResourceType": "AWS::EC2::Volume", 
+                        "ResourceId": "vol-0c6efd2a9f5677a03", 
+                        "ConfigRuleName": "custodian-good-vol"
+                    }
+                }, 
+                "ResultRecordedTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 23, 
+                    "microsecond": 955000, 
+                    "year": 2018, 
+                    "day": 11, 
+                    "minute": 20
+                }, 
+                "ConfigRuleInvokedTime": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 7, 
+                    "second": 21, 
+                    "microsecond": 715000, 
+                    "year": 2018, 
+                    "day": 11, 
+                    "minute": 20
+                }, 
+                "ComplianceType": "NON_COMPLIANT"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "860c6831-855e-11e8-8869-77efb7691252", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "860c6831-855e-11e8-8869-77efb7691252", 
+                "date": "Wed, 11 Jul 2018 23:02:45 GMT", 
+                "content-length": "403", 
+                "strict-transport-security": "max-age=86400", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

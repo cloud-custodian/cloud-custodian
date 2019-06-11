@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "MessageId": "9c8b9165-f11b-553a-921a-c2b41f6e015b",
+        "ResponseMetadata": {
+            "RequestId": "24cf0535-a642-5dc1-8393-56e44837b9a0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "24cf0535-a642-5dc1-8393-56e44837b9a0",
+                "content-type": "text/xml",
+                "content-length": "294",
+                "date": "Wed, 25 Jul 2018 03:19:17 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

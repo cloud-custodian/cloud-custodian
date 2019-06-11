@@ -20,8 +20,10 @@ import unittest
 import six
 from c7n_mailer.email_delivery import EmailDelivery
 from common import logger, get_ldap_lookup
-from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1
+from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1, SQS_MESSAGE_4
 from mock import patch, call
+
+from c7n_mailer.utils_email import is_email
 
 # note principalId is very org/domain specific for federated?, it would be good to get
 # confirmation from capone on this event / test.
@@ -50,14 +52,37 @@ class EmailTest(unittest.TestCase):
         self.aws_session = boto3.Session()
         self.email_delivery = MockEmailDelivery(MAILER_CONFIG, self.aws_session, logger)
         self.email_delivery.ldap_lookup.uid_regex = ''
-        tests_dir = '/tools/c7n_mailer/tests/'
-        template_abs_filename = '%s%sexample.jinja' % (os.path.abspath(os.curdir), tests_dir)
+        template_abs_filename = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                             'example.jinja')
+
+        # Jinja paths must always be forward slashes regardless of operating system
+        template_abs_filename = template_abs_filename.replace('\\', '/')
+
         SQS_MESSAGE_1['action']['template'] = template_abs_filename
+        SQS_MESSAGE_4['action']['template'] = template_abs_filename
 
     def test_valid_email(self):
-        self.assertFalse(self.email_delivery.target_is_email('foobar'))
-        self.assertFalse(self.email_delivery.target_is_email('foo@bar'))
-        self.assertTrue(self.email_delivery.target_is_email('foo@bar.com'))
+        self.assertFalse(is_email('foobar'))
+        self.assertFalse(is_email('foo@bar'))
+        self.assertFalse(is_email('slack://foo@bar.com'))
+        self.assertTrue(is_email('foo@bar.com'))
+
+    def test_smtp_creds(self):
+        conf = dict(MAILER_CONFIG)
+        conf['smtp_username'] = 'alice'
+        conf['smtp_password'] = 'bob'
+
+        msg = dict(SQS_MESSAGE_1)
+        deliver = MockEmailDelivery(conf, self.aws_session, logger)
+        messages_map = deliver.get_to_addrs_email_messages_map(msg)
+
+        with patch("smtplib.SMTP") as mock_smtp:
+            with patch('c7n_mailer.email_delivery.kms_decrypt') as mock_decrypt:
+                mock_decrypt.return_value = 'xyz'
+                for email_addrs, mimetext_msg in messages_map.items():
+                    deliver.send_c7n_email(msg, list(email_addrs), mimetext_msg)
+            mock_decrypt.assert_called_once()
+            mock_smtp.assert_has_calls([call().login('alice', 'xyz')])
 
     def test_priority_header_is_valid(self):
         self.assertFalse(self.email_delivery.priority_header_is_valid('0'))
@@ -80,8 +105,6 @@ class EmailTest(unittest.TestCase):
 
     def test_event_owner_ldap_flow(self):
         targets = ['event-owner']
-        username = self.email_delivery.get_aws_username_from_event(CLOUDTRAIL_EVENT)
-        self.assertEqual(username, 'michael_bolton')
         michael_bolton_email = self.email_delivery.get_event_owner_email(targets, CLOUDTRAIL_EVENT)
         self.assertEqual(michael_bolton_email, ['michael_bolton@initech.com'])
 
@@ -260,11 +283,16 @@ class EmailTest(unittest.TestCase):
             RESOURCE_2
         )
 
-        self.assertEquals(ldap_emails, ['milton@initech.com'])
+        self.assertEqual(ldap_emails, ['milton@initech.com'])
 
         ldap_emails = self.email_delivery.get_resource_owner_emails_from_resource(
             SQS_MESSAGE_1,
             RESOURCE_3
         )
 
-        self.assertEquals(ldap_emails, ['milton@initech.com'])
+        self.assertEqual(ldap_emails, ['milton@initech.com'])
+
+    def test_cc_email_functionality(self):
+        email = self.email_delivery.get_mimetext_message(
+            SQS_MESSAGE_4, SQS_MESSAGE_4['resources'], ['hello@example.com'])
+        self.assertEqual(email['Cc'], 'hello@example.com, cc@example.com')

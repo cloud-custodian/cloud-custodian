@@ -16,6 +16,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
+import time
 from botocore.exceptions import ClientError
 from datetime import datetime, timedelta
 
@@ -23,16 +24,22 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters.multiattr import MultiAttrFilter
+from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, generate_arn
 
 from c7n.resources.iam import CredentialReport
 
 
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
+
+
+filters.register('missing', Missing)
 
 
 def get_account(session_factory, config):
@@ -60,6 +67,13 @@ class Account(ResourceManager):
     def get_permissions(cls):
         return ('iam:ListAccountAliases',)
 
+    @classmethod
+    def has_arn(cls):
+        return True
+
+    def get_arns(self, resources):
+        return ["arn:::{account_id}".format(**r) for r in resources]
+
     def get_model(self):
         return self.resource_type
 
@@ -81,7 +95,7 @@ class AccountCredentialReport(CredentialReport):
         results = []
         info = report.get('<root_account>')
         for r in resources:
-            if self.match(info):
+            if self.match(r, info):
                 r['c7n:credential-report'] = info
                 results.append(r)
         return results
@@ -158,6 +172,74 @@ class CloudTrailEnabled(Filter):
         if trails:
             return []
         return resources
+
+
+@filters.register('guard-duty')
+class GuardDutyEnabled(MultiAttrFilter):
+    """Check if the guard duty service is enabled.
+
+    This allows looking at account's detector and its associated
+    master if any.
+
+    :example:
+
+     Check to ensure guard duty is active on account and associated to a master.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: guardduty-enabled
+                resource: account
+                filters:
+                  - type: guard-duty
+                    Detector.Status: ENABLED
+                    Master.AccountId: "00011001"
+                    Master.RelationshipStatus: ENABLED
+    """
+
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['guard-duty']},
+            'match-operator': {'enum': ['or', 'and']}},
+        'patternProperties': {
+            '^Detector': {'oneOf': [{'type': 'object'}, {'type': 'string'}]},
+            '^Master': {'oneOf': [{'type': 'object'}, {'type': 'string'}]}},
+    }
+
+    annotation = "c7n:guard-duty"
+    permissions = (
+        'guardduty:GetMasterAccount',
+        'guardduty:ListDetectors',
+        'guardduty:GetDetector')
+
+    def validate(self):
+        attrs = set()
+        for k in self.data:
+            if k.startswith('Detector') or k.startswith('Master'):
+                attrs.add(k)
+        self.multi_attrs = attrs
+        return super(GuardDutyEnabled, self).validate()
+
+    def get_target(self, resource):
+        if self.annotation in resource:
+            return resource[self.annotation]
+
+        client = local_session(self.manager.session_factory).client('guardduty')
+        # detectors are singletons too.
+        detector_ids = client.list_detectors().get('DetectorIds')
+
+        if not detector_ids:
+            return None
+        else:
+            detector_id = detector_ids.pop()
+
+        detector = client.get_detector(DetectorId=detector_id)
+        detector.pop('ResponseMetadata', None)
+        master = client.get_master_account(DetectorId=detector_id).get('Master')
+        resource[self.annotation] = r = {'Detector': detector, 'Master': master}
+        return r
 
 
 @filters.register('check-config')
@@ -356,7 +438,7 @@ class ServiceLimit(Filter):
 
       # Note this is extant for each active instance type in the account
       # however the total value is against sum of all instance types.
-      # see issue https://github.com/capitalone/cloud-custodian/issues/516
+      # see issue https://github.com/cloud-custodian/cloud-custodian/issues/516
 
       - service: EC2 limit: On-Demand instances - m3.medium
 
@@ -403,7 +485,8 @@ class ServiceLimit(Filter):
     schema = type_schema(
         'service-limit',
         threshold={'type': 'number'},
-        refresh_period={'type': 'integer'},
+        refresh_period={'type': 'integer',
+                        'title': 'how long should a check result be considered fresh'},
         limits={'type': 'array', 'items': {'type': 'string'}},
         services={'type': 'array', 'items': {
             'enum': ['EC2', 'ELB', 'VPC', 'AutoScaling',
@@ -412,6 +495,11 @@ class ServiceLimit(Filter):
     permissions = ('support:DescribeTrustedAdvisorCheckResult',)
     check_id = 'eW7HH0l7J9'
     check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
+
+    # When doing a refresh, how long to wait for the check to become ready.
+    # Max wait here is 5 * 10 ~ 50 seconds.
+    poll_interval = 5
+    poll_max_intervals = 10
     global_services = set(['IAM'])
 
     def validate(self):
@@ -423,11 +511,28 @@ class ServiceLimit(Filter):
                     % ', '.join(self.global_services))
         return self
 
+    @classmethod
+    def get_check_result(cls, client, check_id):
+        checks = client.describe_trusted_advisor_check_result(
+            checkId=check_id, language='en')['result']
+
+        # Check status and if necessary refresh checks
+        if checks['status'] == 'not_available':
+            client.refresh_trusted_advisor_check(checkId=check_id)
+            for _ in range(cls.poll_max_intervals):
+                time.sleep(cls.poll_interval)
+                refresh_response = client.describe_trusted_advisor_check_refresh_statuses(
+                    checkIds=[check_id])
+                if refresh_response['statuses'][0]['status'] == 'success':
+                    checks = client.describe_trusted_advisor_check_result(
+                        checkId=check_id, language='en')['result']
+                    break
+        return checks
+
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'support', region_name='us-east-1')
-        checks = client.describe_trusted_advisor_check_result(
-            checkId=self.check_id, language='en')['result']
+        checks = self.get_check_result(client, self.check_id)
 
         region = self.manager.config.region
         checks['flaggedResources'] = [r for r in checks['flaggedResources']
@@ -523,6 +628,7 @@ class RequestLimitIncrease(BaseAction):
         'VPC': 'amazon-virtual-private-cloud',
         'IAM': 'aws-identity-and-access-management',
         'CloudFormation': 'aws-cloudformation',
+        'Kinesis': 'amazon-kinesis',
     }
 
     def process(self, resources):
@@ -569,14 +675,15 @@ class RequestLimitIncrease(BaseAction):
                 ccEmailAddresses=self.data.get('notify', []))
 
 
-def cloudtrail_policy(original, bucket_name, account_id):
+def cloudtrail_policy(original, bucket_name, account_id, bucket_region):
     '''add CloudTrail permissions to an S3 policy, preserving existing'''
     ct_actions = [
         {
             'Action': 's3:GetBucketAcl',
             'Effect': 'Allow',
             'Principal': {'Service': 'cloudtrail.amazonaws.com'},
-            'Resource': 'arn:aws:s3:::' + bucket_name,
+            'Resource': generate_arn(
+                service='s3', resource=bucket_name, region=bucket_region),
             'Sid': 'AWSCloudTrailAclCheck20150319',
         },
         {
@@ -587,9 +694,8 @@ def cloudtrail_policy(original, bucket_name, account_id):
             },
             'Effect': 'Allow',
             'Principal': {'Service': 'cloudtrail.amazonaws.com'},
-            'Resource': 'arn:aws:s3:::%s/AWSLogs/%s/*' % (
-                bucket_name, account_id
-            ),
+            'Resource': generate_arn(
+                service='s3', resource=bucket_name, region=bucket_region),
             'Sid': 'AWSCloudTrailWrite20150319',
         },
     ]
@@ -606,6 +712,12 @@ def cloudtrail_policy(original, bucket_name, account_id):
         if cta['Action'] not in original_actions:
             policy['Statement'].append(cta)
     return json.dumps(policy)
+
+
+# AWS Account doesn't participate in events (not based on query resource manager)
+# so the event subscriber used by postfinding to register doesn't apply, manually
+# register it.
+Account.action_registry.register('post-finding', OtherResourcePostFinding)
 
 
 @actions.register('enable-cloudtrail')
@@ -666,7 +778,7 @@ class EnableTrail(BaseAction):
         kms = self.data.get('kms', False)
         kms_key = self.data.get('kms-key', '')
 
-        s3client = session.client('s3')
+        s3client = session.client('s3', region_name=bucket_region)
         try:
             s3client.create_bucket(
                 Bucket=bucket_name,
@@ -683,7 +795,8 @@ class EnableTrail(BaseAction):
             current_policy = None
 
         policy_json = cloudtrail_policy(
-            current_policy, bucket_name, self.manager.config.account_id)
+            current_policy, bucket_name,
+            self.manager.config.account_id, bucket_region)
 
         s3client.put_bucket_policy(Bucket=bucket_name, Policy=policy_json)
         trails = client.describe_trails().get('trailList', ())
@@ -766,7 +879,7 @@ class EnableDataEvents(BaseAction):
     """Ensure all buckets in account are setup to log data events.
 
     Note this works via a single trail for data events per
-    (https://goo.gl/1ux7RG).
+    https://aws.amazon.com/about-aws/whats-new/2017/09/aws-cloudtrail-enables-option-to-add-all-amazon-s3-buckets-to-data-events/
 
     This trail should NOT be used for api management events, the
     configuration here is soley for data events. If directed to create
@@ -928,8 +1041,7 @@ class ShieldEnabled(Filter):
 
     def process(self, resources, event=None):
         state = self.data.get('state', False)
-        client = self.manager.session_factory().client('shield')
-
+        client = local_session(self.manager.session_factory).client('shield')
         try:
             subscription = client.describe_subscription().get(
                 'Subscription', None)
@@ -958,7 +1070,7 @@ class SetShieldAdvanced(BaseAction):
         state={'type': 'boolean'})
 
     def process(self, resources):
-        client = self.manager.session_factory().client('shield')
+        client = local_session(self.manager.session_factory).client('shield')
         state = self.data.get('state', True)
 
         if state:
@@ -970,3 +1082,194 @@ class SetShieldAdvanced(BaseAction):
                 if e.response['Error']['Code'] == 'ResourceNotFoundException':
                     return
                 raise
+
+
+@filters.register('xray-encrypt-key')
+class XrayEncrypted(Filter):
+    """Determine if xray is encrypted.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: xray-encrypt-with-default
+                resource: aws.account
+                filters:
+                   - type: xray-encrypt-key
+                     key: default
+              - name: xray-encrypt-with-kms
+                resource: aws.account
+                filters:
+                   - type: xray-encrypt-key
+                     key: kms
+              - name: xray-encrypt-with-specific-key
+                resource: aws.account
+                filters:
+                   - type: xray-encrypt-key
+                     key: alias/my-alias or arn or keyid
+    """
+
+    permissions = ('xray:GetEncryptionConfig',)
+    schema = type_schema(
+        'xray-encrypt-key',
+        required=['key'],
+        key={'type': 'string'}
+    )
+
+    def process(self, resources, event=None):
+        client = self.manager.session_factory().client('xray')
+        gec_result = client.get_encryption_config()['EncryptionConfig']
+        resources[0]['c7n:XrayEncryptionConfig'] = gec_result
+
+        k = self.data.get('key')
+        if k not in ['default', 'kms']:
+            kmsclient = self.manager.session_factory().client('kms')
+            keyid = kmsclient.describe_key(KeyId=k)['KeyMetadata']['Arn']
+            rc = resources if (gec_result['KeyId'] == keyid) else []
+        else:
+            kv = 'KMS' if self.data.get('key') == 'kms' else 'NONE'
+            rc = resources if (gec_result['Type'] == kv) else []
+        return rc
+
+
+@actions.register('set-xray-encrypt')
+class SetXrayEncryption(BaseAction):
+    """Enable specific xray encryption.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: xray-default-encrypt
+                resource: aws.account
+                actions:
+                  - type: set-xray-encrypt
+                    key: default
+              - name: xray-kms-encrypt
+                resource: aws.account
+                actions:
+                  - type: set-xray-encrypt
+                    key: alias/some/alias/key
+    """
+
+    permissions = ('xray:PutEncryptionConfig',)
+    schema = type_schema(
+        'set-xray-encrypt',
+        required=['key'],
+        key={'type': 'string'}
+    )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('xray')
+        key = self.data.get('key')
+        req = {'Type': 'NONE'} if key == 'default' else {'Type': 'KMS', 'KeyId': key}
+        client.put_encryption_config(**req)
+
+
+@filters.register('s3-public-block')
+class S3PublicBlock(ValueFilter):
+    """Check for s3 public blocks on an account.
+
+    https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html
+    """
+
+    annotation_key = 'c7n:s3-public-block'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('s3-public-block', rinherit=ValueFilter.schema)
+    permissions = ('s3:GetAccountPublicAccessBlock',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super(S3PublicBlock, self).process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('s3control')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_public_access_block(
+                    AccountId=r['account_id']).get('PublicAccessBlockConfiguration', {})
+            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                r[self.annotation_key] = {}
+
+    def __call__(self, r):
+        return super(S3PublicBlock, self).__call__(r[self.annotation_key])
+
+
+@actions.register('set-s3-public-block')
+class SetS3PublicBlock(BaseAction):
+    """Configure S3 Public Access Block on an account.
+
+    All public access block attributes can be set. If not specified they are merged
+    with the extant configuration.
+
+    https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html
+
+    :example:
+
+    .. yaml:
+
+      policies:
+        - name: restrict-public-buckets
+          resource: aws.account
+          filters:
+            - not:
+               - type: s3-public-block
+                 key: RestrictPublicBuckets
+                 value: true
+          actions:
+            - type: set-s3-public-block
+              RestrictPublicBuckets: true
+
+    """
+    schema = type_schema(
+        'set-s3-public-block',
+        state={'type': 'boolean', 'default': True},
+        BlockPublicAcls={'type': 'boolean'},
+        IgnorePublicAcls={'type': 'boolean'},
+        BlockPublicPolicy={'type': 'boolean'},
+        RestrictPublicBuckets={'type': 'boolean'})
+
+    permissions = ('s3:PutAccountPublicAccessBlock', 's3:GetAccountPublicAccessBlock')
+
+    def validate(self):
+        config = self.data.copy()
+        config.pop('type')
+        if config.pop('state', None) is False and config:
+            raise PolicyValidationError(
+                "%s cant set state false with controls specified".format(
+                    self.type))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('s3control')
+        if self.data.get('state', True) is False:
+            for r in resources:
+                client.delete_public_access_block(AccountId=r['account_id'])
+            return
+
+        keys = (
+            'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
+
+        for r in resources:
+            # try to merge with existing configuration if not explicitly set.
+            base = {}
+            if S3PublicBlock.annotation_key in r:
+                base = r[S3PublicBlock.annotation_key]
+            else:
+                try:
+                    base = client.get_public_access_block(AccountId=r['account_id']).get(
+                        'PublicAccessBlockConfiguration')
+                except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                    base = {}
+
+            config = {}
+            for k in keys:
+                if k in self.data:
+                    config[k] = self.data[k]
+                elif k in base:
+                    config[k] = base[k]
+
+            client.put_public_access_block(
+                AccountId=r['account_id'],
+                PublicAccessBlockConfiguration=config)

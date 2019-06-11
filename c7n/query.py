@@ -21,20 +21,30 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 import itertools
 import json
-from concurrent.futures import as_completed
 
 import jmespath
 import six
-from botocore.client import ClientError
-from botocore.paginate import set_value_from_jmespath
+import os
 
 from c7n.actions import ActionRegistry
+from c7n.exceptions import ClientError, ResourceLimitExceeded, PolicyExecutionError
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags
 from c7n.utils import (
     local_session, generate_arn, get_retry, chunks, camelResource)
+
+
+try:
+    from botocore.paginate import PageIterator, Paginator
+except ImportError:
+    # Likely using another provider in a serverless environment
+    class PageIterator(object):
+        pass
+
+    class Paginator(object):
+        pass
 
 
 class ResourceQuery(object):
@@ -53,11 +63,10 @@ class ResourceQuery(object):
     def _invoke_client_enum(self, client, enum_op, params, path, retry=None):
         if client.can_paginate(enum_op):
             p = client.get_paginator(enum_op)
-            results = p.paginate(**params)
             if retry:
-                data = pager(results, retry)
-            else:
-                data = results.build_full_result()
+                p.PAGE_ITERATOR_CLS = RetryPageIterator
+            results = p.paginate(**params)
+            data = results.build_full_result()
         else:
             op = getattr(client, enum_op)
             data = op(**params)
@@ -100,7 +109,7 @@ class ResourceQuery(object):
         resources = self.filter(resource_manager, **params)
         if client_filter:
             # This logic was added to prevent the issue from:
-            # https://github.com/capitalone/cloud-custodian/issues/1398
+            # https://github.com/cloud-custodian/cloud-custodian/issues/1398
             if all(map(lambda r: isinstance(r, six.string_types), resources)):
                 resources = [r for r in resources if r in identities]
             else:
@@ -149,9 +158,9 @@ class ChildResourceQuery(ResourceQuery):
         # Have to query separately for each parent's children.
         results = []
         for parent_id in parent_ids:
-            merged_params = dict(params, **{parent_key: parent_id})
+            merged_params = self.get_parent_parameters(params, parent_id, parent_key)
             subset = self._invoke_client_enum(
-                client, enum_op, merged_params, path)
+                client, enum_op, merged_params, path, retry=self.manager.retry)
             if annotate_parent:
                 for r in subset:
                     r[self.parent_key] = parent_id
@@ -160,6 +169,9 @@ class ChildResourceQuery(ResourceQuery):
             elif subset:
                 results.extend(subset)
         return results
+
+    def get_parent_parameters(self, params, parent_id, parent_key):
+        return dict(params, **{parent_key: parent_id})
 
 
 class QueryMeta(type):
@@ -187,8 +199,10 @@ class QueryMeta(type):
                     register_ec2_tags(
                         attrs['filter_registry'], attrs['action_registry'])
             if getattr(m, 'universal_taggable', False):
+                compatibility = isinstance(m.universal_taggable, bool) and True or False
                 register_universal_tags(
-                    attrs['filter_registry'], attrs['action_registry'])
+                    attrs['filter_registry'], attrs['action_registry'],
+                    compatibility=compatibility)
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
@@ -203,15 +217,23 @@ sources = PluginRegistry('sources')
 @sources.register('describe')
 class DescribeSource(object):
 
+    resource_query_factory = ResourceQuery
+
     def __init__(self, manager):
         self.manager = manager
-        self.query = ResourceQuery(self.manager.session_factory)
+        self.query = self.get_query()
 
     def get_resources(self, ids, cache=True):
         return self.query.get(self.manager, ids)
 
     def resources(self, query):
         return self.query.filter(self.manager, **query)
+
+    def get_query(self):
+        return self.resource_query_factory(self.manager.session_factory)
+
+    def get_query_params(self, query_params):
+        return query_params
 
     def get_permissions(self):
         m = self.manager.get_model()
@@ -246,10 +268,6 @@ class ChildDescribeSource(DescribeSource):
 
     resource_query_factory = ChildResourceQuery
 
-    def __init__(self, manager):
-        self.manager = manager
-        self.query = self.get_query()
-
     def get_query(self):
         return self.resource_query_factory(
             self.manager.session_factory, self.manager)
@@ -280,7 +298,44 @@ class ConfigSource(object):
             if not revisions:
                 continue
             results.append(self.load_resource(revisions[0]))
-        return filter(None, results)
+        return list(filter(None, results))
+
+    def get_query_params(self, query):
+        """Parse config select expression from policy and parameter.
+
+        On policy config supports a full statement being given, or
+        a clause that will be added to the where expression.
+
+        If no query is specified, a default query is utilized.
+
+        A valid query should at minimum select fields
+        for configuration, supplementaryConfiguration and
+        must have resourceType qualifier.
+        """
+        if query and not isinstance(query, dict):
+            raise PolicyExecutionError("invalid config source query %s" % (query,))
+
+        if query is None and 'query' in self.manager.data:
+            _q = [q for q in self.manager.data['query'] if 'expr' in q]
+            if _q:
+                query = _q.pop()
+
+        if query is None and 'query' in self.manager.data:
+            _c = [q['clause'] for q in self.manager.data['query'] if 'clause' in q]
+            if _c:
+                _c = _c.pop()
+        elif query:
+            return query
+        else:
+            _c = None
+
+        s = "select configuration, supplementaryConfiguration where resourceType = '{}'".format(
+            self.manager.resource_type.config_type)
+
+        if _c:
+            s += "AND {}".format(_c)
+
+        return {'expr': s}
 
     def load_resource(self, item):
         if isinstance(item['configuration'], six.string_types):
@@ -291,63 +346,28 @@ class ConfigSource(object):
 
     def resources(self, query=None):
         client = local_session(self.manager.session_factory).client('config')
-        paginator = client.get_paginator('list_discovered_resources')
-        pages = paginator.paginate(
-            resourceType=self.manager.get_model().config_type)
+        query = self.get_query_params(query)
+        pager = Paginator(
+            client.select_resource_config,
+            {'input_token': 'NextToken', 'output_token': 'NextToken',
+             'result_key': 'Results'},
+            client.meta.service_model.operation_model('SelectResourceConfig'))
+        pager.PAGE_ITERATOR_CLS = RetryPageIterator
+
         results = []
-
-        with self.manager.executor_factory(max_workers=5) as w:
-            ridents = pager(pages, self.retry)
-            resource_ids = [
-                r['resourceId'] for r in ridents.get('resourceIdentifiers', ())]
-            self.manager.log.debug(
-                "querying %d %s resources",
-                len(resource_ids),
-                self.manager.__class__.__name__.lower())
-
-            for resource_set in chunks(resource_ids, 50):
-                futures = []
-                futures.append(w.submit(self.get_resources, resource_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.manager.log.error(
-                            "Exception getting resources from config \n %s" % (
-                                f.exception()))
-                    results.extend(f.result())
+        for page in pager.paginate(Expression=query['expr']):
+            results.extend([
+                self.load_resource(json.loads(r)) for r in page['Results']])
         return results
 
     def augment(self, resources):
         return resources
 
 
-def pager(p, retry):
-    results = {}
-    iterator = iter(p)
-
-    while True:
-        try:
-            page = retry(next, iterator)
-        except StopIteration:
-            return results
-        if isinstance(page, tuple) and len(page) == 2:
-            page = page[1]
-        for rexpr in p.result_keys:
-            rv = rexpr.search(page)
-            if rv is None:
-                continue
-            ev = rexpr.search(results)
-            if ev is None:
-                set_value_from_jmespath(results, rexpr.expression, rv)
-                continue
-            ev.extend(rv)
-
-
 @six.add_metaclass(QueryMeta)
 class QueryResourceManager(ResourceManager):
 
     resource_type = ""
-
-    retry = None
 
     # TODO Check if we can move to describe source
     max_workers = 3
@@ -362,7 +382,7 @@ class QueryResourceManager(ResourceManager):
             'ThrottlingException',
             'RequestLimitExceeded',
             'Throttled',
-            'ThorttlingException',
+            'Throttling',
             'Client.RequestLimitExceeded')))
 
     def __init__(self, data, options):
@@ -375,6 +395,16 @@ class QueryResourceManager(ResourceManager):
 
     def get_source(self, source_type):
         return sources.get(source_type)(self)
+
+    @classmethod
+    def has_arn(cls):
+        if getattr(cls.resource_type, 'arn', None):
+            return True
+        elif getattr(cls.resource_type, 'type', None) is not None:
+            return True
+        elif cls.__dict__.get('get_arns'):
+            return True
+        return False
 
     @classmethod
     def get_model(cls):
@@ -399,26 +429,50 @@ class QueryResourceManager(ResourceManager):
             'account': self.account_id,
             'region': self.config.region,
             'resource': str(self.__class__.__name__),
+            'source': self.source_type,
             'q': query
         }
 
     def resources(self, query=None):
-        key = self.get_cache_key(query)
+        query = self.source.get_query_params(query)
+        cache_key = self.get_cache_key(query)
+        resources = None
+
         if self._cache.load():
-            resources = self._cache.get(key)
+            resources = self._cache.get(cache_key)
             if resources is not None:
                 self.log.debug("Using cached %s: %d" % (
                     "%s.%s" % (self.__class__.__module__,
                                self.__class__.__name__),
                     len(resources)))
-                return self.filter_resources(resources)
 
-        if query is None:
-            query = {}
+        if resources is None:
+            if query is None:
+                query = {}
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self.source.resources(query)
+            with self.ctx.tracer.subsegment('resource-augment'):
+                resources = self.augment(resources)
+            self._cache.save(cache_key, resources)
 
-        resources = self.augment(self.source.resources(query))
-        self._cache.save(key, resources)
-        return self.filter_resources(resources)
+        resource_count = len(resources)
+        with self.ctx.tracer.subsegment('filter'):
+            resources = self.filter_resources(resources)
+
+        # Check if we're out of a policies execution limits.
+        if self.data == self.ctx.policy.data:
+            self.check_resource_limit(len(resources), resource_count)
+        return resources
+
+    def check_resource_limit(self, selection_count, population_count):
+        """Check if policy's execution affects more resources then its limit.
+
+        Ideally this would be at a higher level but we've hidden
+        filtering behind the resource manager facade for default usage.
+        """
+        p = self.ctx.policy
+        max_resource_limits = MaxResourceLimit(p, selection_count, population_count)
+        return max_resource_limits.check_resource_limits()
 
     def _get_cached_resources(self, ids):
         key = self.get_cache_key(None)
@@ -471,9 +525,19 @@ class QueryResourceManager(ResourceManager):
 
     def get_arns(self, resources):
         arns = []
+
+        m = self.get_model()
+        arn_key = getattr(m, 'arn', None)
+        if arn_key is False:
+            raise ValueError("%s do not have arns" % self.type)
+
+        id_key = m.id
+
         for r in resources:
-            _id = r[self.get_model().id]
-            if 'arn' in _id[:3]:
+            _id = r[id_key]
+            if arn_key:
+                arns.append(r[arn_key])
+            elif 'arn' in _id[:3]:
                 arns.append(_id)
             else:
                 arns.append(self.generate_arn(_id))
@@ -488,10 +552,64 @@ class QueryResourceManager(ResourceManager):
                 generate_arn,
                 self.get_model().service,
                 region=self.config.region,
-                account_id=self.account_id,
+                account_id=self.config.account_id,
                 resource_type=self.get_model().type,
                 separator='/')
         return self._generate_arn
+
+
+class MaxResourceLimit(object):
+
+    C7N_MAXRES_OP = os.environ.get("C7N_MAXRES_OP", 'or')
+
+    def __init__(self, policy, selection_count, population_count):
+        self.p = policy
+        self.op = MaxResourceLimit.C7N_MAXRES_OP
+        self.selection_count = selection_count
+        self.population_count = population_count
+        self.amount = None
+        self.percentage_amount = None
+        self.percent = None
+        self._parse_policy()
+
+    def _parse_policy(self,):
+        if isinstance(self.p.max_resources, dict):
+            self.op = self.p.max_resources.get("op", MaxResourceLimit.C7N_MAXRES_OP).lower()
+            self.percent = self.p.max_resources.get("percent")
+            self.amount = self.p.max_resources.get("amount")
+
+        if isinstance(self.p.max_resources, int):
+            self.amount = self.p.max_resources
+
+        if isinstance(self.p.max_resources_percent, (int, float)):
+            self.percent = self.p.max_resources_percent
+
+        if self.percent:
+            self.percentage_amount = self.population_count * (self.percent / 100.0)
+
+    def check_resource_limits(self):
+        if self.percentage_amount and self.amount:
+            if (self.selection_count > self.amount and
+               self.selection_count > self.percentage_amount and self.op == "and"):
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit} and percentage-limit:%s%% "
+                     "found:{selection_count} total:{population_count}")
+                    % (self.p.name, self.percent), "max-resource and max-percent",
+                    self.amount, self.selection_count, self.population_count)
+
+        if self.amount:
+            if self.selection_count > self.amount and self.op != "and":
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit} "
+                     "found:{selection_count} total: {population_count}") % self.p.name,
+                    "max-resource", self.amount, self.selection_count, self.population_count)
+
+        if self.percentage_amount:
+            if self.selection_count > self.percentage_amount and self.op != "and":
+                raise ResourceLimitExceeded(
+                    ("policy:%s exceeded resource-limit:{limit}%% "
+                     "found:{selection_count} total:{population_count}") % self.p.name,
+                    "max-percent", self.percent, self.selection_count, self.population_count)
 
 
 class ChildResourceManager(QueryResourceManager):
@@ -510,7 +628,7 @@ class ChildResourceManager(QueryResourceManager):
 
 
 def _batch_augment(manager, model, detail_spec, resource_set):
-    detail_op, param_name, param_key, detail_path = detail_spec
+    detail_op, param_name, param_key, detail_path, detail_args = detail_spec
     client = local_session(manager.session_factory).client(
         model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
@@ -520,6 +638,8 @@ def _batch_augment(manager, model, detail_spec, resource_set):
     else:
         args = ()
     kw = {param_name: [param_key and r[param_key] or r for r in resource_set]}
+    if detail_args:
+        kw.update(detail_args)
     response = op(*args, **kw)
     return response[detail_path]
 
@@ -549,3 +669,11 @@ def _scalar_augment(manager, model, detail_spec, resource_set):
             r.update(response)
         results.append(r)
     return results
+
+
+class RetryPageIterator(PageIterator):
+
+    retry = staticmethod(QueryResourceManager.retry)
+
+    def _make_request(self, current_kwargs):
+        return self.retry(self._method, **current_kwargs)

@@ -1,0 +1,114 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceInformationList": [
+            {
+                "InstanceId": "i-0ba3874e85bb97244",
+                "PingStatus": "Online",
+                "LastPingDateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 30,
+                    "second": 7,
+                    "microsecond": 712000
+                },
+                "AgentVersion": "2.3.274.0",
+                "IsLatestVersion": false,
+                "PlatformType": "Linux",
+                "PlatformName": "Ubuntu",
+                "PlatformVersion": "18.04",
+                "ResourceType": "EC2Instance",
+                "IPAddress": "172.31.10.93",
+                "ComputerName": "ip-172-31-10-93",
+                "AssociationStatus": "Success",
+                "LastAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 11,
+                    "second": 45,
+                    "microsecond": 0
+                },
+                "LastSuccessfulAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 11,
+                    "second": 45,
+                    "microsecond": 0
+                },
+                "AssociationOverview": {
+                    "InstanceAssociationStatusAggregatedCount": {
+                        "Success": 1
+                    }
+                }
+            },
+            {
+                "InstanceId": "i-0dea82d960d56dc1d",
+                "PingStatus": "Online",
+                "LastPingDateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 32,
+                    "second": 9,
+                    "microsecond": 353000
+                },
+                "AgentVersion": "2.2.800.0",
+                "IsLatestVersion": false,
+                "PlatformType": "Linux",
+                "PlatformName": "Ubuntu",
+                "PlatformVersion": "18.04",
+                "ResourceType": "EC2Instance",
+                "IPAddress": "172.31.11.50",
+                "ComputerName": "ip-172-31-11-50",
+                "AssociationStatus": "Success",
+                "LastAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 15,
+                    "second": 49,
+                    "microsecond": 0
+                },
+                "LastSuccessfulAssociationExecutionDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 15,
+                    "second": 49,
+                    "microsecond": 0
+                },
+                "AssociationOverview": {
+                    "InstanceAssociationStatusAggregatedCount": {
+                        "Success": 1
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "a3382fc8-57a6-41cd-8579-c50e324de4c2",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a3382fc8-57a6-41cd-8579-c50e324de4c2",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1067",
+                "date": "Wed, 30 Jan 2019 13:34:17 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

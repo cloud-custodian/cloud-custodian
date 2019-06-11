@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "tags": [
+            {
+                "Key": "Env",
+                "Value": "Dev"
+            },
+            {
+                "Key": "maid_status",
+                "Value": "Resource does not meet policy: post-finding@2019/02/07"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "7f9a8238-2952-11e9-a478-83077bbee338",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7f9a8238-2952-11e9-a478-83077bbee338",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "125"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

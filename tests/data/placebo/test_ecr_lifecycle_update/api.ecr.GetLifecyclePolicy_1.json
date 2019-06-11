@@ -1,0 +1,19 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Lifecycle policy does not exist for the repository with name 'c7n' in the registry with id '644160558196'",
+            "Code": "LifecyclePolicyNotFoundException"
+        },
+        "ResponseMetadata": {
+            "RequestId": "18e56635-ee88-11e8-b91d-679790983ea0",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "18e56635-ee88-11e8-b91d-679790983ea0",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "163"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

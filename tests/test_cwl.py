@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest
+from .common import BaseTest, functional
 
 
 class LogGroupTest(BaseTest):
@@ -49,6 +49,7 @@ class LogGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["logGroupName"], "/aws/lambda/ec2-instance-type")
 
+    @functional
     def test_retention(self):
         log_group = "c7n-test-a"
         factory = self.replay_flight_data("test_log_group_retention")
@@ -73,6 +74,7 @@ class LogGroupTest(BaseTest):
             14,
         )
 
+    @functional
     def test_delete(self):
         log_group = "c7n-test-b"
         factory = self.replay_flight_data("test_log_group_delete")
@@ -91,6 +93,31 @@ class LogGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["logGroupName"], log_group)
+        self.assertEqual(client.describe_log_groups(
+            logGroupNamePrefix=log_group)['logGroups'], [])
+
+    @functional
+    def test_encrypt(self):
+        log_group = 'c7n-encrypted'
+        session_factory = self.replay_flight_data('test_log_group_encrypt')
+        client = session_factory(region='us-west-2').client('logs')
+        client.create_log_group(logGroupName=log_group)
+        self.addCleanup(client.delete_log_group, logGroupName=log_group)
+
+        p = self.load_policy(
+            {'name': 'encrypt-log-group',
+             'resource': 'log-group',
+             'filters': [{'logGroupName': log_group}],
+             'actions': [{
+                 'type': 'set-encryption',
+                 'kms-key': 'alias/app-logs'}]},
+            config={'region': 'us-west-2'},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['logGroupName'], log_group)
+        results = client.describe_log_groups(
+            logGroupNamePrefix=log_group)['logGroups']
         self.assertEqual(
-            client.describe_log_groups(logGroupNamePrefix=log_group)["logGroups"], []
-        )
+            results[0]['kmsKeyId'],
+            'arn:aws:kms:us-west-2:644160558196:key/6f13fc53-8da0-46f2-9c69-c1f9fbf471d7')

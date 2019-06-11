@@ -1,0 +1,85 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "43cd96ac-35e0-4fcc-ae25-baab81e909db", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "43cd96ac-35e0-4fcc-ae25-baab81e909db", 
+                "x-amz-id-2": "XWC0VQCh6CBHRqvq8FffEHfD3JV2XyjpBqqVHYPzJAsp5JoBC7mzSa+JRJu38CSEGk/Hexsf+0HRdCI0ctD7FBHbr/KvPKi3", 
+                "content-length": "1208", 
+                "content-type": "application/x-amz-json-1.1", 
+                "date": "Wed, 15 Aug 2018 09:55:43 GMT"
+            }
+        }, 
+        "DeliveryStreamDescription": {
+            "DeliveryStreamType": "DirectPut", 
+            "HasMoreDestinations": false, 
+            "LastUpdateTimestamp": {
+                "hour": 5, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 39, 
+                "microsecond": 301000, 
+                "year": 2018, 
+                "day": 15, 
+                "minute": 54
+            }, 
+            "VersionId": "2", 
+            "CreateTimestamp": {
+                "hour": 5, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 17, 
+                "microsecond": 694000, 
+                "year": 2018, 
+                "day": 15, 
+                "minute": 40
+            }, 
+            "DeliveryStreamARN": "arn:aws:firehose:us-east-1:123456789:deliverystream/firehose-s3", 
+            "DeliveryStreamStatus": "ACTIVE", 
+            "DeliveryStreamName": "firehose-s3", 
+            "Destinations": [
+                {
+                    "DestinationId": "destinationId-000000000001", 
+                    "ExtendedS3DestinationDescription": {
+                        "RoleARN": "arn:aws:iam::123456789:role/firehose_delivery_role", 
+                        "BufferingHints": {
+                            "IntervalInSeconds": 300, 
+                            "SizeInMBs": 5
+                        },
+                        "EncryptionConfiguration": {
+                            "KMSEncryptionConfig": {
+                                "AWSKMSKeyARN": "arn:aws:kms:us-east-1:123456789:alias/aws/s3"
+                            }
+                        }, 
+                        "CompressionFormat": "UNCOMPRESSED", 
+                        "S3BackupMode": "Disabled", 
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": false
+                        }, 
+                        "BucketARN": "arn:aws:s3:::this-bucket"
+                    }, 
+                    "S3DestinationDescription": {
+                        "RoleARN": "arn:aws:iam::123456789:role/firehose_delivery_role", 
+                        "BufferingHints": {
+                            "IntervalInSeconds": 300, 
+                            "SizeInMBs": 5
+                        }, 
+                        "EncryptionConfiguration": {
+                            "KMSEncryptionConfig": {
+                                "AWSKMSKeyARN": "arn:aws:kms:us-east-1:123456789:alias/aws/s3"
+                            }
+                        }, 
+                        "CompressionFormat": "UNCOMPRESSED", 
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": false
+                        }, 
+                        "BucketARN": "arn:aws:s3:::this-bucket"
+                    }
+                }
+            ]
+        }
+    }
+}

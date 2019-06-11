@@ -3,22 +3,6 @@
     "data": {
         "Users": [
             {
-                "UserName": "charmworld", 
-                "Path": "/", 
-                "CreateDate": {
-                    "hour": 21, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 13, 
-                    "microsecond": 0, 
-                    "year": 2012, 
-                    "day": 29, 
-                    "minute": 54
-                }, 
-                "UserId": "AIDAJVYIFZVDJ2DUJHFCO", 
-                "Arn": "arn:aws:iam::619193117841:user/charmworld"
-            }, 
-            {
                 "UserName": "Hazmat", 
                 "Path": "/", 
                 "CreateDate": {
@@ -32,23 +16,7 @@
                     "minute": 34
                 }, 
                 "UserId": "AIDAIBNPVMN4XKBO4M5UM", 
-                "Arn": "arn:aws:iam::619193117841:user/Hazmat"
-            }, 
-            {
-                "UserName": "kaleb", 
-                "Path": "/", 
-                "CreateDate": {
-                    "hour": 23, 
-                    "__class__": "datetime", 
-                    "month": 7, 
-                    "second": 9, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 5, 
-                    "minute": 57
-                }, 
-                "UserId": "AIDAICYTIW2PB6RSMOHDC", 
-                "Arn": "arn:aws:iam::619193117841:user/kaleb"
+                "Arn": "arn:aws:iam::644160558196:user/Hazmat"
             }, 
             {
                 "UserName": "kapilt", 
@@ -64,7 +32,7 @@
                     "minute": 59
                 }, 
                 "UserId": "AIDAIQFMQCY3QRM432ITE", 
-                "Arn": "arn:aws:iam::619193117841:user/kapilt"
+                "Arn": "arn:aws:iam::644160558196:user/kapilt"
             }, 
             {
                 "UserName": "rome", 
@@ -80,39 +48,7 @@
                     "minute": 37
                 }, 
                 "UserId": "AIDAJ2WFT4W7PHV4EOV2O", 
-                "Arn": "arn:aws:iam::619193117841:user/rome"
-            }, 
-            {
-                "UserName": "syracuse", 
-                "Path": "/", 
-                "CreateDate": {
-                    "hour": 14, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 5, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 25, 
-                    "minute": 21
-                }, 
-                "UserId": "AIDAJCVQCRCJJRMFFQU5E", 
-                "Arn": "arn:aws:iam::619193117841:user/syracuse"
-            }, 
-            {
-                "UserName": "tyre", 
-                "Path": "/", 
-                "CreateDate": {
-                    "hour": 13, 
-                    "__class__": "datetime", 
-                    "month": 7, 
-                    "second": 53, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 1, 
-                    "minute": 23
-                }, 
-                "UserId": "AIDAIANBQ6MUWMW7ITPE2", 
-                "Arn": "arn:aws:iam::619193117841:user/tyre"
+                "Arn": "arn:aws:iam::644160558196:user/rome"
             }
         ], 
         "ResponseMetadata": {

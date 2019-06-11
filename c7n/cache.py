@@ -24,16 +24,25 @@ import time
 
 log = logging.getLogger('custodian.cache')
 
+CACHE_NOTIFY = False
+
 
 def factory(config):
+
+    global CACHE_NOTIFY
+
     if not config:
         return NullCache(None)
 
     if not config.cache or not config.cache_period:
-        log.debug("Disabling cache")
+        if not CACHE_NOTIFY:
+            log.debug("Disabling cache")
+            CACHE_NOTIFY = True
         return NullCache(config)
     elif config.cache == 'memory':
-        log.debug("Using in-memory cache")
+        if not CACHE_NOTIFY:
+            log.debug("Using in-memory cache")
+            CACHE_NOTIFY = True
         return InMemoryCache()
 
     return FileCacheManager(config)
@@ -53,6 +62,9 @@ class NullCache(object):
     def save(self, key, data):
         pass
 
+    def size(self):
+        return 0
+
 
 class InMemoryCache(object):
     # Running in a temporary environment, so keep as a cache.
@@ -70,6 +82,9 @@ class InMemoryCache(object):
 
     def save(self, key, data):
         self.data[pickle.dumps(key)] = data
+
+    def size(self):
+        return sum(map(len, self.data.values()))
 
 
 class FileCacheManager(object):
@@ -118,3 +133,6 @@ class FileCacheManager(object):
                 except Exception as e:
                     log.warning("Could not create directory: %s err: %s" % (
                         directory, e))
+
+    def size(self):
+        return os.path.exists(self.cache_path) and os.path.getsize(self.cache_path) or 0

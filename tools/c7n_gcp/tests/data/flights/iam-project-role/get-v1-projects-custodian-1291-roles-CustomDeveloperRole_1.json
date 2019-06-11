@@ -1,0 +1,45 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 24 Dec 2018 09:07:28 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "800",
+    "-content-encoding": "gzip",
+    "content-location": "https://iam.googleapis.com/v1/projects/custodian-1291/roles/CustomDeveloperRole?alt=json"
+  },
+  "body": {
+    "name": "projects/custodian-1291/roles/CustomDeveloperRole",
+    "title": "Developer Role",
+    "description": "Created on: 2018-12-24",
+    "includedPermissions": [
+      "bigquery.config.get",
+      "bigquery.config.update",
+      "bigquery.datasets.create",
+      "bigquery.datasets.delete",
+      "bigquery.datasets.get",
+      "bigquery.datasets.getIamPolicy",
+      "bigquery.datasets.setIamPolicy",
+      "bigquery.datasets.update",
+      "bigquery.jobs.create",
+      "bigquery.jobs.get",
+      "bigquery.jobs.list",
+      "bigquery.jobs.listAll",
+      "bigquery.jobs.update",
+      "bigquery.readsessions.create",
+      "bigquery.savedqueries.create",
+      "bigquery.savedqueries.delete",
+      "bigquery.savedqueries.get",
+      "bigquery.savedqueries.list",
+      "bigquery.savedqueries.update"
+    ],
+    "etag": "BwV9wLA8Cts="
+  }
+}

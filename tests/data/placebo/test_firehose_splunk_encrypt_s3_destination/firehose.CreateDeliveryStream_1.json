@@ -1,0 +1,18 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DeliveryStreamARN": "arn:aws:firehose:us-east-1:123456789:deliverystream/firehose-splunk", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "8a33cab2-ab49-499c-9db5-25d05e896055", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8a33cab2-ab49-499c-9db5-25d05e896055", 
+                "x-amz-id-2": "XR19XBtDNlXuRfs1uIbxoPYEvU0U3DFxcWSgMlvnqeKgobGRp1L1EJ7pF46ichrys8HgJDy69UPm3NahBf5DtPo/M31op6ve", 
+                "content-length": "94", 
+                "content-type": "application/x-amz-json-1.1", 
+                "date": "Wed, 15 Aug 2018 10:17:14 GMT"
+            }
+        }
+    }
+}

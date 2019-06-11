@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusters": [
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/default",
+                "clusterName": "default",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": []
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+                "clusterName": "Default",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": []
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "0780f3f9-b2bb-11e8-aff8-272cea21e48c",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "server": "Server",
+                "date": "Fri, 07 Sep 2018 16:28:18 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "492",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "0780f3f9-b2bb-11e8-aff8-272cea21e48c"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

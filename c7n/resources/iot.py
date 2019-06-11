@@ -24,6 +24,7 @@ class IoT(QueryResourceManager):
         enum_spec = ('list_things', 'things', None)
         name = "thingName"
         id = "thingName"
+        arn = "thingArn"
         dimension = None
         default_report_fields = (
             'thingName',

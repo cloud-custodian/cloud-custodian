@@ -1,0 +1,85 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4e8d8ccf-2944-4cda-842a-c9f378f543b7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4e8d8ccf-2944-4cda-842a-c9f378f543b7", 
+                "x-amz-id-2": "oxrgC58fVQJQ1/Cpgogam55C4vg7bRRMOnfChcJxvrgjjrnqV8mWf1pLMhZodctToJ8Nub/11sSnwEAF9iIInvn1duHVWI6P", 
+                "content-length": "1221", 
+                "content-type": "application/x-amz-json-1.1", 
+                "date": "Wed, 15 Aug 2018 11:07:03 GMT"
+            }
+        }, 
+        "DeliveryStreamDescription": {
+            "DeliveryStreamType": "DirectPut", 
+            "HasMoreDestinations": false, 
+            "LastUpdateTimestamp": {
+                "hour": 7, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 42, 
+                "microsecond": 15000, 
+                "year": 2018, 
+                "day": 15, 
+                "minute": 6
+            }, 
+            "VersionId": "2", 
+            "CreateTimestamp": {
+                "hour": 7, 
+                "__class__": "datetime", 
+                "month": 8, 
+                "second": 22, 
+                "microsecond": 858000, 
+                "year": 2018, 
+                "day": 15, 
+                "minute": 3
+            }, 
+            "DeliveryStreamARN": "arn:aws:firehose:us-east-1:123456789:deliverystream/firehose-es", 
+            "DeliveryStreamStatus": "ACTIVE", 
+            "DeliveryStreamName": "firehose-es", 
+            "Destinations": [
+                {
+                    "DestinationId": "destinationId-000000000001", 
+                    "ElasticsearchDestinationDescription": {
+                        "IndexName": "my-index", 
+                        "RetryOptions": {
+                            "DurationInSeconds": 300
+                        }, 
+                        "RoleARN": "arn:aws:iam::123456789:role/firehose_delivery_role", 
+                        "BufferingHints": {
+                            "IntervalInSeconds": 300, 
+                            "SizeInMBs": 5
+                        }, 
+                        "TypeName": "firehose", 
+                        "S3BackupMode": "FailedDocumentsOnly", 
+                        "CloudWatchLoggingOptions": {
+                            "Enabled": false
+                        }, 
+                        "DomainARN": "arn:aws:es:us-east-1:123456789:domain/this-es", 
+                        "S3DestinationDescription": {
+                            "RoleARN": "arn:aws:iam::123456789:role/firehose_delivery_role", 
+                            "BufferingHints": {
+                                "IntervalInSeconds": 300, 
+                                "SizeInMBs": 5
+                            }, 
+                            "EncryptionConfiguration": {
+                                "KMSEncryptionConfig": {
+                                    "AWSKMSKeyARN": "arn:aws:kms:us-east-1:123456789:alias/aws/s3"
+                                }
+                            }, 
+                            "CompressionFormat": "UNCOMPRESSED", 
+                            "CloudWatchLoggingOptions": {
+                                "Enabled": false
+                            }, 
+                            "BucketARN": "arn:aws:s3:::this-bucket"
+                        }, 
+                        "IndexRotationPeriod": "OneDay"
+                    }
+                }
+            ]
+        }
+    }
+}

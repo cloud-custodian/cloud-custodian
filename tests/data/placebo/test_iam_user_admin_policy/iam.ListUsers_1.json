@@ -27,32 +27,6 @@
                 "UserId": "AIDAI4HREXSL6KOVVKGGU", 
                 "Path": "/", 
                 "Arn": "arn:aws:iam::185106417252:user/alphabet_soup"
-            }, 
-            {
-                "UserName": "root", 
-                "PasswordLastUsed": {
-                    "hour": 19, 
-                    "__class__": "datetime", 
-                    "month": 12, 
-                    "second": 11, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 8, 
-                    "minute": 29
-                }, 
-                "CreateDate": {
-                    "hour": 18, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 56, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 18, 
-                    "minute": 58
-                }, 
-                "UserId": "AIDAJYNHPTL7O6KG7B3AY", 
-                "Path": "/", 
-                "Arn": "arn:aws:iam::185106417252:user/root"
             }
         ], 
         "ResponseMetadata": {

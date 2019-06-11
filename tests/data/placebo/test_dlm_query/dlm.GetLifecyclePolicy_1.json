@@ -1,0 +1,71 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "80eaeda4-a850-11e8-bec5-0f97d63f30ec",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sat, 25 Aug 2018 10:20:34 GMT",
+                "content-type": "application/json",
+                "content-length": "521",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "80eaeda4-a850-11e8-bec5-0f97d63f30ec",
+                "x-amz-apigw-id": "MLQJ8HU3iYcFYGg=",
+                "x-amzn-trace-id": "Root=1-5b812d72-b16cdc9086486f00eaf2dac0;Sampled=0"
+            },
+            "RetryAttempts": 0
+        },
+        "Policy": {
+            "PolicyId": "policy-0708be998c6f69368",
+            "Description": "megacache",
+            "State": "ENABLED",
+            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/AWSDataLifecycleManagerDefaultRole",
+            "DateCreated": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 8,
+                "day": 25,
+                "hour": 10,
+                "minute": 17,
+                "second": 59,
+                "microsecond": 0
+            },
+            "DateModified": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 8,
+                "day": 25,
+                "hour": 10,
+                "minute": 17,
+                "second": 59,
+                "microsecond": 0
+            },
+            "PolicyDetails": {
+                "ResourceTypes": [
+                    "VOLUME"
+                ],
+                "TargetTags": [
+                    {
+                        "Key": "App",
+                        "Value": "Zebra"
+                    }
+                ],
+                "Schedules": [
+                    {
+                        "Name": "Default Schedule",
+                        "CreateRule": {
+                            "Interval": 24,
+                            "IntervalUnit": "HOURS",
+                            "Times": [
+                                "09:00"
+                            ]
+                        },
+                        "RetainRule": {
+                            "Count": 5
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}
