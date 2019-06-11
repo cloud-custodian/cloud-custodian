@@ -35,8 +35,6 @@ FindingTypes = {
     "Sensitive Data Identifications"
 }
 
-
-
 # Mostly undocumented value size limit
 SECHUB_VALUE_SIZE_LIMIT = 1024
 
