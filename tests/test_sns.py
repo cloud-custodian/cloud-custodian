@@ -629,7 +629,7 @@ class TestSNS(BaseTest):
         client = session_factory().client("sns")
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
         self.assertEqual(tags[0]["Value"], "added")
-    
+
     def test_sns_marked_for_op_tag(self):
         session_factory = self.replay_flight_data("test_sns_marked_for_op_tag")
         p = self.load_policy(
