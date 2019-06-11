@@ -53,4 +53,15 @@ This policy will get Network Interfaces that have VirtualNetworkGateway and VNet
               - Internet
               - None
               - VirtualAppliance
+              
+This policy will get Network Interfaces that are not attached to any Virtual Machine.
 
+.. code-block:: yaml
+
+    policies:
+      - name: get-orphaned-nic
+        resource: azure.networkinterface
+        filters:
+          - type: value
+            key: properties.virtualMachine
+            value: null

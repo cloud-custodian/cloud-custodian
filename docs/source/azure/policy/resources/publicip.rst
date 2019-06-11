@@ -33,3 +33,15 @@ This policy will find all public IP addresses under DDoS attack over the last 72
             aggregation: maximum
             threshold: 0
             timeframe: 72
+
+This policy will find all public IP addresses that are not being attached to Network Interface
+
+.. code-block:: yaml
+
+    policies:
+      - name: orphaned-ip
+        resource: azure.publicip
+        filters:
+          - type: value
+            key: properties.ipConfiguration
+            value: null
