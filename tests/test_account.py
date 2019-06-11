@@ -18,11 +18,13 @@ from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session
+from c7n.resources import account
 from jsonschema.exceptions import ValidationError
 
 import datetime
 from dateutil import parser
 import json
+import mock
 import time
 
 from .test_offhours import mock_datetime_now
@@ -312,6 +314,23 @@ class AccountTests(BaseTest):
         with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
             resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_service_limit_poll_status(self):
+
+        client = mock.MagicMock()
+        client.describe_trusted_advisor_check_result.side_effect = [
+            {'result': {'status': 'not_available'}},
+            {'result': True}]
+        client.describe_trusted_advisor_check_refresh_statuses.return_value = {
+            'statuses': [{'status': 'success'}]}
+
+        def time_sleep(interval):
+            return
+
+        self.patch(account.time, 'sleep', time_sleep)
+        self.assertEqual(
+            account.ServiceLimit.get_check_result(client, account.ServiceLimit.check_id),
+            True)
 
     def test_service_limit(self):
         session_factory = self.replay_flight_data("test_account_service_limit")

@@ -37,6 +37,11 @@ class ResourceGroup(ArmResourceManager):
         ]
         return [r.serialize(True) for r in data]
 
+    def augment(self, resources):
+        for resource in resources:
+            resource['type'] = 'Microsoft.Resources/subscriptions/resourceGroups'
+        return resources
+
 
 @ResourceGroup.filter_registry.register('empty-group')
 class EmptyGroup(Filter):

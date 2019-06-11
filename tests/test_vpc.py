@@ -645,6 +645,41 @@ class NetworkInterfaceTest(BaseTest):
             [k for k in resources[0] if k.startswith("c7n")], ["c7n:MatchedFilters"]
         )
 
+    def test_interface_delete(self):
+        factory = self.replay_flight_data("test_network_interface_delete")
+        client = factory().client("ec2")
+        eni = "eni-d834cdcf"
+
+        p = self.load_policy(
+            {
+                "name": "eni-delete",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "NetworkInterfaceId",
+                        "value": eni,
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                    },
+                    {
+                        # ensure graceful handling of multiple delete attempts
+                        "type": "delete",
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(client.exceptions.ClientError) as e:
+            client.describe_network_interfaces(NetworkInterfaceIds=[eni])
+        self.assertEqual(e.exception.response['Error']['Code'],
+            'InvalidNetworkInterfaceID.NotFound')
+
     @functional
     def test_interface_subnet(self):
         factory = self.replay_flight_data("test_network_interface_filter")

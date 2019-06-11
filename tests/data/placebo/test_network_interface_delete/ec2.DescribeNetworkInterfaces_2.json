@@ -1,0 +1,20 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "5c44ef13-e769-4e25-8681-b4f39ce17197", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "date": "Tue, 27 Jun 2017 15:44:28 GMT", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
+        }, 
+        "Error": {
+            "Message": "The networkInterface ID 'eni-d834cdcf' does not exist", 
+            "Code": "InvalidNetworkInterfaceID.NotFound"
+        }
+    }
+}

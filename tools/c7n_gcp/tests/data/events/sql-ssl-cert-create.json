@@ -1,0 +1,91 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.91",
+      "requestAttributes": {
+        "time": "2019-05-11T06:07:17.003Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "cloudsql.googleapis.com",
+    "methodName": "cloudsql.sslCerts.create",
+    "authorizationInfo": [
+      {
+        "resource": "instances/custodian-postgres",
+        "permission": "cloudsql.sslCerts.create",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "resourceName": "instances/custodian-postgres",
+    "request": {
+      "instance": "custodian-postgres",
+      "body": {
+        "commonName": "custodian-test"
+      },
+      "project": "cloud-custodian",
+      "@type": "type.googleapis.com/google.cloud.sql.v1beta4.SqlSslCertsInsertRequest"
+    },
+    "response": {
+      "serverCaCert": {
+        "kind": "sql#sslCert",
+        "commonName": "C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA",
+        "createTime": "2019-03-25T14:21:30.278Z",
+        "instance": "custodian-postgres",
+        "selfLink": "https://content.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres/sslCerts/f9cdf259fa1d1454ea9426829a7c18f980995021",
+        "expirationTime": "2029-03-22T14:22:30.278Z",
+        "sha1Fingerprint": "f9cdf259fa1d1454ea9426829a7c18f980995021",
+        "certSerialNumber": "0",
+        "cert": "-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQsFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2xvdWQgU1FMIFNlcnZlciBDQTEUMBIGA1UEChMLR29vZ2xlLCBJbmMxCzAJ\nBgNVBAYTAlVTMB4XDTE5MDMyNTE0MjEzMFoXDTI5MDMyMjE0MjIzMFowSDEjMCEG\nA1UEAxMaR29vZ2xlIENsb3VkIFNRTCBTZXJ2ZXIgQ0ExFDASBgNVBAoTC0dvb2ds\nZSwgSW5jMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC\nggEBAILjAFjGJicgivnvc+lXK7154VnzGORVfsszulGDBIYXxaOvvPbcNufGeD/r\na7Ujihy8Rs5rt1ikLH3Lc5q6h7RTILBM/fJR2++08k0EDlAv5ljgv1Z6CsmHkVr+\nrodXFKf5JBDN9eStyvil7gzWin7LwnjCWkU7l3BU6NKDTBF/TIY2g4D+UDGAwxxH\nUWFGtPQGapYdN0D4yvYeK047Gqwlh2j/L080pOnchcNYAl2scovStE8V9VZtVn5l\nrBe6DnVB6QMRg0xNR9HLkYq9eXx3OftU9jCRaOAOGdNC8UuQIufZ1pcSxtjt1HRV\nlS5qvG4dSaHg55JOajy047AbBYMCAwEAAaMWMBQwEgYDVR0TAQH/BAgwBgEB/wIB\nADANBgkqhkiG9w0BAQsFAAOCAQEANtjiV3a8FX7NozOVyAyIMzNRscVTNAefuFk1\nkYx6/sqwMt/03+KfGajhhVTdMN7ykL9q2j2a+Qeugf68UqqnGBcyHUwQ8eOXkbIR\nTnEu3KBxtc15qtti+NwiZa4qQ696YooP+k/9I6RGjsQr7akpKHC8oEbLDUlwR1Hf\nP8GTvh5POuA7MO7q9O6W1EXz6c/5LCbrrT0zdaOIehE2W+YRPltgEauu8k1MDyrh\nGdZThXeuiU9Ef8HSFI1sfSoGl2NRHfVLiisDmYc+mBCKL4G/NPibDzT6ASvq2RTf\nGkga+kymJa29g2f4XRDBFIsj44/MO1KAOeD14dmGxoy0q0pKPw==\n-----END CERTIFICATE-----"
+      },
+      "clientCert": {
+        "certPrivateKey": "-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEAijdXLMNSd5DEpk/uF3wgXm1UkY1XQgE4VfoOaadUbKHTSQoa\n7mqoC+Rj4LpgsUwazyhcTC7DDabPjpnCzxjcgbel6R08jhbWB3r3CL8mEsSMKAIn\n5366GTmyFSEQpsv9YOagW3gM+k9UdLmBT2n6ak6q1wbZmmSIY6YwN+o/DDrYvQFG\nEYoOurxAhiMsVDlWi+8gL5+o7ZCh4ZuwtZqSPDEGp7vjyxV/fvSxpn9JoSNP1Q4D\nf8nk9MkwQouwNp6ttvHXNotcxlnzGF8bEZO8NtzMvKzGmIT0WW+7EGjzymHvwTt1\nuQv4o8e4n86ybHLxLP37yghFctZGWaVzre+BzQIDAQABAoIBAFE3f6QwCg90I/nO\nUgu+xo52FBGLSlDgwqfSzhFLYBKNbMgohfa++YwzYnU1T4gfPkmoX8PsXnVxJdmX\nhJ+I7lnS/kzi/yhHRvESUoLzP34bvHft/GDNWLFl87zytwQsLfF405WsD4QuhWQp\ndVCi56D8JOtBfTB6DqLvjrnsjauzLi2ezITttU0EkM/yj+X5YkXrVnWRuE9dV3PU\nEVcYmzOnF5O7jstfYsynxfgikoxhdOio+VDRqOSB6KdeljdOj8dIyqfB6BpzO/kF\nMuJ+SwwwToxniV/kqmYFnBC9t8CupnyjZbg3vu3hgha8CwFDCcnT5P/UOuNsjlSa\nu/WQN8kCgYEA6jlC6w/vA3k/0sei8Fec+oHgpZ/nBc9i0D81bhOO4iL8d0pIaHnW\n+3VWhqSY3LSRRW9vzf/6nGz8eK1M8JhyXO/h5MhKxj0EfEt1CcXNr0dJvIQeGAH7\nK3+kcfko9qbzMp3J+kfIiJ1AL6QhxMHxLxmZf+V7M+jyk+uW7Lji4IcCgYEAlxED\nK7eF48ObhwPW/KGfdKdGhAWHfEZ3RQrqpYdSk3+oEwJUyvMgPckDLl8ppEd4VRNZ\nCLIV+d/qTfvPSK3lbm1Qyc9ezx5gwyB0MUlRyWElknTZyc6k1qWLMEQpqa51U1OI\ncNJ0iuk146DlCTtRhBZpoxNhzQ6endPuYCIURAsCgYBzeDlSUy+dAciCLGNao4bD\nRQYwAM3O4nevfInls4SsXV0jnh5mSzK+ExHOHRUzMV2w4og3AWxWc7Bf+efFcRJo\nWOZ/eHLMmkY81KJlZ/vH3pgudN+1LDzcK/gxLAmS16lrmbh6R6tIFmYPVpZDPu2d\nL7yp/cMoSz5TyEBGgbtvvwKBgDsKrSCS88NXGhwkxguq53ViQ08qEg/iQo87ewYC\n46U+SWRUjutbJoi/XXzsOIw6Wq91hmC9qZUljJ+6AQO442jLVL3rTHTKvKrGrmLs\n8wgv7c1V2iDjoM07mjDdEyN8SeKtTTA7MM1x5Fv48EsxYeSsFdFkq97HDftFb28n\nIqCNAoGAETFV9IG+xJSLOmIy68hJFQfvqT1k3yNsg6a6KkdV0/r0oPR5NAf9cDAC\nVoQoMR6fFKkrWud46efzbRNGwk8TUoVuZ5cG1/4FoIhusRJBex2DZMGTUmXMFjBl\nb7ND2Z6D7hPLWqqy7dhRxajG2jNrjjDpzoNb4FBW7K79T7GXXgg=\n-----END RSA PRIVATE KEY-----",
+        "certInfo": {
+          "instance": "custodian-postgres",
+          "selfLink": "https://content.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres/sslCerts/49a10ed7135e3171ce5e448cc785bc63b5b81e6c",
+          "expirationTime": "2029-05-08T06:07:17.469Z",
+          "sha1Fingerprint": "49a10ed7135e3171ce5e448cc785bc63b5b81e6c",
+          "certSerialNumber": "1429316777",
+          "cert": "-----BEGIN CERTIFICATE-----\nMIIDaDCCAlCgAwIBAgIEVTGkqTANBgkqhkiG9w0BAQsFADCBhjEtMCsGA1UELhMk\nY2ZlODI5NjctODcyNS00OWNiLTg1YWYtNzQ1NDU5OTJlZWJmMTIwMAYDVQQDEylH\nb29nbGUgQ2xvdWQgU1FMIENsaWVudCBDQSBjdXN0b2RpYW4tdGVzdDEUMBIGA1UE\nChMLR29vZ2xlLCBJbmMxCzAJBgNVBAYTAlVTMB4XDTE5MDUxMTA2MDYxN1oXDTI5\nMDUwODA2MDcxN1owPDEXMBUGA1UEAxMOY3VzdG9kaWFuLXRlc3QxFDASBgNVBAoT\nC0dvb2dsZSwgSW5jMQswCQYDVQQGEwJVUzCCASIwDQYJKoZIhvcNAQEBBQADggEP\nADCCAQoCggEBAIo3VyzDUneQxKZP7hd8IF5tVJGNV0IBOFX6DmmnVGyh00kKGu5q\nqAvkY+C6YLFMGs8oXEwuww2mz46Zws8Y3IG3pekdPI4W1gd69wi/JhLEjCgCJ+d+\nuhk5shUhEKbL/WDmoFt4DPpPVHS5gU9p+mpOqtcG2ZpkiGOmMDfqPww62L0BRhGK\nDrq8QIYjLFQ5VovvIC+fqO2QoeGbsLWakjwxBqe748sVf370saZ/SaEjT9UOA3/J\n5PTJMEKLsDaerbbx1zaLXMZZ8xhfGxGTvDbczLysxpiE9FlvuxBo88ph78E7dbkL\n+KPHuJ/Osmxy8Sz9+8oIRXLWRlmlc63vgc0CAwEAAaMnMCUwIwYDVR0RBBwwGoEY\nYWxleC5rYXJwaXRza2lAZ21haWwuY29tMA0GCSqGSIb3DQEBCwUAA4IBAQCSaTA/\nBtrv3VZJcCLtDRxYJIht3tILCRpzsGVW57cy7n51YnCq0SUAr6VMqpytlWmQRyNd\nB/KRZQWEKih6L2s844CVVS4kKeGCyJK4xqZkHGExsK4KpLRkP1maJNK1GvpaJGLh\nJrlD2Nhvb8WfGTdwAu/qjl3PiHEWg61KYqKr+ssazizmJw3n0IZaMYM9g7vViQNl\nckDwrBqV03kN9JtIM9LQyUP3lWmItwtgnH6TTPVkqald4sxoAxoa3Vf6yjsrDRH7\n1tAbSjgF3SIFt4Cla7ZqTlchhRCO/dOSIgOylTnPq94W2C1reDD/vGZH8ztM6GYN\nOFGFRhraPjecPkXp\n-----END CERTIFICATE-----",
+          "kind": "sql#sslCert",
+          "commonName": "custodian-test",
+          "createTime": "2019-05-11T06:06:17.469Z"
+        }
+      },
+      "@type": "type.googleapis.com/google.cloud.sql.v1beta4.SqlSslCertsInsertResponse",
+      "operation": {
+        "targetLink": "https://content.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodian-postgres",
+        "instanceUid": "1-057e25ab-7a5e-4520-847b-8661d2da9fda",
+        "operationType": "UPDATE",
+        "kind": "sql#operation",
+        "insertTime": "2019-05-11T06:07:17.926Z",
+        "status": "PENDING",
+        "name": "40e7e9c1-77d7-4ecf-97df-40fb9d233ec4",
+        "user": "alex.karpitski@gmail.com",
+        "targetProject": "cloud-custodian",
+        "selfLink": "https://content.googleapis.com/sql/v1beta4/projects/cloud-custodian/operations/40e7e9c1-77d7-4ecf-97df-40fb9d233ec4",
+        "targetId": "custodian-postgres"
+      },
+      "kind": "sql#sslCertsInsert"
+    }
+  },
+  "insertId": "x0vtyee6e6dl",
+  "resource": {
+    "type": "cloudsql_database",
+    "labels": {
+      "project_id": "cloud-custodian",
+      "database_id": "cloud-custodian:custodian-postgres",
+      "region": "us-central"
+    }
+  },
+  "timestamp": "2019-05-11T06:07:16.990Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-05-11T06:07:18.322024850Z"
+}

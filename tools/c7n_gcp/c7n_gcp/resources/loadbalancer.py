@@ -19,7 +19,8 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('loadbalancer-address')
 class LoadBalancingAddress(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/addresses
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -38,7 +39,8 @@ class LoadBalancingAddress(QueryResourceManager):
 
 @resources.register('loadbalancer-url-map')
 class LoadBalancingUrlMap(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/urlMaps
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -56,7 +58,8 @@ class LoadBalancingUrlMap(QueryResourceManager):
 
 @resources.register('loadbalancer-target-tcp-proxy')
 class LoadBalancingTargetTcpProxy(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/targetTcpProxies
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -74,7 +77,8 @@ class LoadBalancingTargetTcpProxy(QueryResourceManager):
 
 @resources.register('loadbalancer-target-ssl-proxy')
 class LoadBalancingTargetSslProxy(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/targetSslProxies
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -92,7 +96,8 @@ class LoadBalancingTargetSslProxy(QueryResourceManager):
 
 @resources.register('loadbalancer-ssl-policy')
 class LoadBalancingSslPolicy(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -110,7 +115,8 @@ class LoadBalancingSslPolicy(QueryResourceManager):
 
 @resources.register('loadbalancer-ssl-certificate')
 class LoadBalancingSslCertificate(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/sslCertificates
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -128,7 +134,8 @@ class LoadBalancingSslCertificate(QueryResourceManager):
 
 @resources.register('loadbalancer-target-https-proxy')
 class LoadBalancingTargetHttpsProxy(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/targetHttpsProxies
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -146,7 +153,8 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
 
 @resources.register('loadbalancer-backend-bucket')
 class LoadBalancingBackendBucket(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/backendBuckets
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -164,7 +172,8 @@ class LoadBalancingBackendBucket(QueryResourceManager):
 
 @resources.register('loadbalancer-https-health-check')
 class LoadBalancingHttpsHealthCheck(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/httpsHealthChecks
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -182,7 +191,8 @@ class LoadBalancingHttpsHealthCheck(QueryResourceManager):
 
 @resources.register('loadbalancer-http-health-check')
 class LoadBalancingHttpHealthCheck(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/httpHealthChecks
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -200,7 +210,8 @@ class LoadBalancingHttpHealthCheck(QueryResourceManager):
 
 @resources.register('loadbalancer-health-check')
 class LoadBalancingHealthCheck(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/healthChecks
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -218,7 +229,8 @@ class LoadBalancingHealthCheck(QueryResourceManager):
 
 @resources.register('loadbalancer-target-http-proxy')
 class LoadBalancingTargetHttpProxy(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/targetHttpProxies
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -236,7 +248,8 @@ class LoadBalancingTargetHttpProxy(QueryResourceManager):
 
 @resources.register('loadbalancer-backend-service')
 class LoadBalancingBackendService(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/backendServices
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -254,7 +267,8 @@ class LoadBalancingBackendService(QueryResourceManager):
 
 @resources.register('loadbalancer-target-instance')
 class LoadBalancingTargetInstance(QueryResourceManager):
-
+    """    GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/targetInstances
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -273,7 +287,8 @@ class LoadBalancingTargetInstance(QueryResourceManager):
 
 @resources.register('loadbalancer-target-pool')
 class LoadBalancingTargetPool(QueryResourceManager):
-
+    """    GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/targetPools
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -292,7 +307,8 @@ class LoadBalancingTargetPool(QueryResourceManager):
 
 @resources.register('loadbalancer-forwarding-rule')
 class LoadBalancingForwardingRule(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/addresses
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -311,7 +327,8 @@ class LoadBalancingForwardingRule(QueryResourceManager):
 
 @resources.register('loadbalancer-global-forwarding-rule')
 class LoadBalancingGlobalForwardingRule(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/forwardingRules
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -329,7 +346,8 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
 
 @resources.register('loadbalancer-global-address')
 class LoadBalancingGlobalAddress(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/globalAddresses
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
