@@ -17,26 +17,25 @@ from azure.mgmt.logic import logic_management_client
 from c7n.actions.webhook import Webhook
 from c7n.utils import type_schema
 
-"""Calls an Azure Logic App with optional parameters
-   and body populated from JMESPath queries.
-
-    .. code-block:: yaml
-
-      policies:
-        - name: call-logic-app
-          resource: azure.vm
-          description: |
-            Call logic app with list of VM's
-          actions:
-           - type: logic-app
-             resource-group: custodian-test
-             logic-app-name: cclogicapp
-             batch: true
-             body: 'resources[].{ vm_name: name }'
-"""
-
 
 class LogicAppAction(Webhook):
+    """Calls an Azure Logic App with optional parameters
+       and body populated from JMESPath queries.
+
+        .. code-block:: yaml
+
+          policies:
+            - name: call-logic-app
+              resource: azure.vm
+              description: |
+                Call logic app with list of VM's
+              actions:
+               - type: logic-app
+                 resource-group: custodian-test
+                 logic-app-name: cclogicapp
+                 batch: true
+                 body: 'resources[].{ vm_name: name }'
+    """
 
     schema = type_schema(
         'logic-app',

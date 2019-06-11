@@ -55,7 +55,7 @@ class LogicAppTest(BaseTest):
         self.assertTrue(self.load_policy(data=policy, validate=True))
 
     def test_invalid_policy(self):
-        # Missing URL parameter
+        # Missing logic-app-name parameter
         policy = {
             "name": "logic-app",
             "resource": "azure.vm",
@@ -101,8 +101,8 @@ class LogicAppTest(BaseTest):
         self.assertRegex(req2['url'], regex)
 
     def _get_manager(self):
-        """The tests don't require real resource data
-        or recordings, but they do need a valid manager with
+        """The tests don't require real resource data,
+        but they do need a valid manager with
         policy metadata so we just make one here to use"""
 
         policy = self.load_policy({
