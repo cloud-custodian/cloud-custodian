@@ -28,78 +28,13 @@ from c7n.version import version
 
 
 FindingTypes = {
-    "Software and Configuration Checks": [
-        "Vulnerabilities",
-        "Vulnerabilities/CVE",
-        "AWS Security Best Practices",
-        "AWS Security Best Practices/Network Reachability",
-        "Industry and Regulatory Standards",
-        "Industry and Regulatory Standards/CIS Host Hardening Benchmarks",
-        "Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
-        "Industry and Regulatory Standards/PCI-DSS Controls",
-        "Industry and Regulatory Standards/Cloud Security Alliance Controls",
-        "Industry and Regulatory Standards/ISO 90001 Controls",
-        "Industry and Regulatory Standards/ISO 27001 Controls",
-        "Industry and Regulatory Standards/ISO 27017 Controls",
-        "Industry and Regulatory Standards/ISO 27018 Controls",
-        "Industry and Regulatory Standards/SOC 1",
-        "Industry and Regulatory Standards/SOC 2",
-        "Industry and Regulatory Standards/HIPAA Controls (USA)",
-        "Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
-        "Industry and Regulatory Standards/NIST CSF Controls (USA)",
-        "Industry and Regulatory Standards/IRAP Controls (Australia)",
-        "Industry and Regulatory Standards/K-ISMS Controls (Korea)",
-        "Industry and Regulatory Standards/MTCS Controls (Singapore)",
-        "Industry and Regulatory Standards/FISC Controls (Japan)",
-        "Industry and Regulatory Standards/My Number Act Controls (Japan)",
-        "Industry and Regulatory Standards/ENS Controls (Spain)",
-        "Industry and Regulatory Standards/Cyber Essentials Plus Controls (UK)",
-        "Industry and Regulatory Standards/G-Cloud Controls (UK)",
-        "Industry and Regulatory Standards/C5 Controls (Germany)",
-        "Industry and Regulatory Standards/IT-Grundschutz Controls (Germany)",
-        "Industry and Regulatory Standards/GDPR Controls (Europe)",
-        "Industry and Regulatory Standards/TISAX Controls (Europe)",
-    ],
-    "TTPs": [
-        "Initial Access",
-        "Execution",
-        "Persistence",
-        "Privilege Escalation",
-        "Defense Evasion",
-        "Credential Access",
-        "Discovery",
-        "Lateral Movement",
-        "Collection",
-        "Command and Control",
-    ],
-    "Effects": [
-        "Data Exposure",
-        "Data Exfiltration",
-        "Data Destruction",
-        "Denial of Service",
-        "Resource Consumption",
-    ],
-    "Unusual Behaviors": [
-        "Application",
-        "Network Flow",
-        "IP address",
-        "User",
-        "VM",
-        "Container",
-        "Serverless",
-        "Process",
-        "Database",
-        "Data"
-    ],
-    "Sensitive Data Identifications": [
-        "PII",
-        "Passwords",
-        "Legal",
-        "Financial",
-        "Security",
-        "Business"
-    ]
+    "Software and Configuration Checks",
+    "TTPs",
+    "Effects",
+    "Unusual Behaviors",
+    "Sensitive Data Identifications"
 }
+
 
 
 # Mostly undocumented value size limit
@@ -161,6 +96,7 @@ class PostFinding(BaseAction):
         batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10},
         types={
             "type": "array",
+            "minItems": 1,
             "items": {"type": "string"},
         },
         compliance_status={
@@ -170,6 +106,14 @@ class PostFinding(BaseAction):
     )
 
     NEW_FINDING = 'New'
+
+    def validate(self):
+        for finding_type in self.data["types"]:
+            if finding_type.count('/') > 2 or finding_type.split('/')[0] not in FindingTypes:
+                raise PolicyValidationError(
+                    "Finding types must be in the format 'namespace/category/classifier'."
+                    " Found {}. Valid namespace values are: {}.".format(
+                        finding_type, " | ".join([ns for ns in FindingTypes])))
 
     def get_finding_tag(self, resource):
         finding_tag = None
@@ -336,14 +280,6 @@ class PostFinding(BaseAction):
         for r in resources:
             finding_resources.append(self.format_resource(r))
         finding["Resources"] = finding_resources
-
-        for finding_type in self.data["types"]:
-            if not finding_type.split('/')[0] in FindingTypes or len(finding_type.split('/')) > 3:
-                raise PolicyValidationError(
-                    "Finding types must be in the format 'namespace/category/classifier'. "
-                    "Valid namespace values are: {}.".format(" | ".join(
-                        [ns for ns in FindingTypes])))
-
         finding["Types"] = list(self.data["types"])
 
         return filter_empty(finding)
