@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:c7n-pratyush"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "32d3dae3-2e5e-5ff0-b8fd-8f9aecb25b32",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "32d3dae3-2e5e-5ff0-b8fd-8f9aecb25b32",
+                "content-type": "text/xml",
+                "content-length": "377",
+                "date": "Tue, 11 Jun 2019 14:54:36 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

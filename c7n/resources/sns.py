@@ -22,7 +22,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 
 
 @resources.register('sns')
@@ -62,6 +62,9 @@ class SNS(QueryResourceManager):
         resources = super(SNS, self).augment(resources)
         with self.executor_factory(max_workers=3) as w:
             return list(w.map(_augment, resources))
+
+
+SNS.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @SNS.action_registry.register('tag')
