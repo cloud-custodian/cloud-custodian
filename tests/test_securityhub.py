@@ -29,7 +29,7 @@ class SecurityHubTest(BaseTest):
             'name': 's3',
             'resource': 's3',
             'actions': [{'type': 'post-finding',
-                         'types':  ['Effects/CustomB/CustomA']}]}
+                         'types': ['Effects/CustomB/CustomA']}]}
         self.load_policy(templ)
         templ['actions'][0]['types'] = ['CustomA/CustomB/CustomC']
         self.assertRaises(PolicyValidationError, self.load_policy, templ)
