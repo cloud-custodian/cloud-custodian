@@ -3,7 +3,7 @@
 GCP Modes
 ===========
 
-Custodian can run in numerous modes depending with the default being pull Mode.
+Custodian can run in numerous modes depending with the default being pull mode.
 
 - pull:
     Default mode, which runs locally where custodian is run.

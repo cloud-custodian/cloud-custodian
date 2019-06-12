@@ -21,7 +21,8 @@ todo, needs detail_spec
 
 @resources.register('pubsub-topic')
 class PubSubTopic(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics
+    """
     class resource_type(TypeInfo):
         service = 'pubsub'
         version = 'v1'
@@ -38,7 +39,8 @@ class PubSubTopic(QueryResourceManager):
 
 @resources.register('pubsub-subscription')
 class PubSubSubscription(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions
+    """
     class resource_type(TypeInfo):
         service = 'pubsub'
         version = 'v1'
@@ -50,11 +52,13 @@ class PubSubSubscription(QueryResourceManager):
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
-                'get', {'subscription': resource_info['name']})
+                'get', {'subscription': resource_info['subscription_id']})
 
 
 @resources.register('pubsub-snapshot')
 class PubSubSnapshot(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.snapshots
+    """
     class resource_type(TypeInfo):
         service = 'pubsub'
         version = 'v1'

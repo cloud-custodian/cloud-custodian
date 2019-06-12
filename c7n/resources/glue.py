@@ -160,3 +160,51 @@ class DeleteDevEndpoint(BaseAction):
                     self.log.error(
                         "Exception deleting glue dev endpoint \n %s",
                         f.exception())
+
+
+@resources.register('glue-job')
+class GlueJob(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'glue'
+        enum_spec = ('get_jobs', 'Jobs', None)
+        detail_spec = None
+        id = name = 'Name'
+        date = 'CreatedOn'
+        dimension = None
+        filter_name = None
+        arn = False
+
+    permissions = ('glue:GetJobs',)
+
+    @property
+    def generate_arn(self):
+        self._generate_arn = functools.partial(
+            generate_arn,
+            'glue',
+            region=self.config.region,
+            account_id=self.config.account_id,
+            resource_type='job',
+            separator='/')
+        return self._generate_arn
+
+    def get_arns(self, resources):
+        return [self.generate_arn(r['Name']) for r in resources]
+
+
+register_universal_tags(GlueJob.filter_registry, GlueJob.action_registry)
+
+
+@GlueJob.action_registry.register('delete')
+class DeleteJob(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteJob',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_job(JobName=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                raise

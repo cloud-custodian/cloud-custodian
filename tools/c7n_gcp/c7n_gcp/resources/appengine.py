@@ -21,7 +21,8 @@ from c7n.utils import local_session
 
 @resources.register('app-engine')
 class AppEngineApp(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps
+    """
     class resource_type(TypeInfo):
         service = 'appengine'
         version = 'v1'
@@ -42,7 +43,9 @@ class AppEngineApp(QueryResourceManager):
 
 @resources.register('app-engine-certificate')
 class AppEngineCertificate(ChildResourceManager):
-
+    """GCP resource:
+    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedCertificates
+    """
     def _get_parent_resource_info(self, child_instance):
         return {'resourceName': re.match(
             '(apps/.*?)/authorizedCertificates/.*', child_instance['name']).group(1)}
@@ -71,7 +74,9 @@ class AppEngineCertificate(ChildResourceManager):
 
 @resources.register('app-engine-domain')
 class AppEngineDomain(ChildResourceManager):
-
+    """GCP resource:
+    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedDomains
+    """
     class resource_type(ChildTypeInfo):
         service = 'appengine'
         version = 'v1'
@@ -89,7 +94,9 @@ class AppEngineDomain(ChildResourceManager):
 
 @resources.register('app-engine-domain-mapping')
 class AppEngineDomainMapping(ChildResourceManager):
-
+    """GCP resource:
+    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.domainMappings
+    """
     def _get_parent_resource_info(self, child_instance):
         return {'resourceName': re.match(
             '(apps/.*?)/domainMappings/.*', child_instance['name']).group(1)}
@@ -118,7 +125,9 @@ class AppEngineDomainMapping(ChildResourceManager):
 
 @resources.register('app-engine-firewall-ingress-rule')
 class AppEngineFirewallIngressRule(ChildResourceManager):
-
+    """GCP resource:
+    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.firewall.ingressRules
+    """
     def _get_parent_resource_info(self, child_instance):
         return {'resourceName': 'apps/%s' %
                                 local_session(self.session_factory).get_default_project()}

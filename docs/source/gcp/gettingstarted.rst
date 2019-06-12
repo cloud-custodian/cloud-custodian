@@ -1,7 +1,7 @@
 .. _gcp_gettingstarted:
 
 Getting Started
-===========================
+=================
 
 The GCP provider plugin is an optional package which can be installed in addition to
 the base Cloud Custodian application. It provides the ability to write policies which
@@ -50,8 +50,8 @@ Choose from one of the following methods to configure your credentials, dependin
 use case. In either option, after the configuration is complete, Custodian will implicitly
 pick up your credentials when it runs.
 
-GCP CLI:
-""""""""
+GCP CLI
+"""""""
 If you are a general user accessing a single account, then you can use the GCP CLI to
 configure your credentials.
 
@@ -67,8 +67,8 @@ Executing the command will open a browser window with prompts to finish configur
 your credentials. For more information on this command,
 `view its documentation <https://cloud.google.com/sdk/gcloud/reference/auth/login>`_.
 
-Environment Variables:
-""""""""""""""""""""""
+Environment Variables
+"""""""""""""""""""""
 If you are planning to run Custodian using a service account, then configure your credentials
 using environment variables.
 
