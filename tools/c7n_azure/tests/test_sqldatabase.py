@@ -307,14 +307,17 @@ class ShortTermBackupRetentionPolicyActionSchemaTest(BaseTest):
 # completed operation.
 class ShortTermBackupRetentionPolicyActionTest(BaseTest):
 
-    client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
-        .backup_short_term_retention_policies
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super(ShortTermBackupRetentionPolicyActionTest, cls).setUpClass(*args, **kwargs)
+        cls.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
+            .backup_short_term_retention_policies
 
-    retention_policy_context = [
-        "test_sqlserver",
-        "cctestsqlserverideeowhs5iudo",
-        "cctestdb"
-    ]
+        cls.retention_policy_context = [
+            "test_sqlserver",
+            "cctestsqlserverideeowhs5iudo",
+            "cctestdb"
+        ]
 
     def tearDown(self, *args, **kwargs):
         super(ShortTermBackupRetentionPolicyActionTest, self).tearDown(*args, **kwargs)
@@ -378,14 +381,17 @@ class LongTermBackupRetentionPolicyActionSchemaTest(BaseTest):
 # completed operation.
 class LongTermBackupRetentionPolicyActionTest(BaseTest):
 
-    client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
-        .backup_long_term_retention_policies
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super(LongTermBackupRetentionPolicyActionTest, cls).setUpClass(*args, **kwargs)
+        cls.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
+            .backup_long_term_retention_policies
 
-    retention_policy_context = [
-        "test_sqlserver",
-        "cctestsqlserverideeowhs5iudo",
-        "cclongtermretentiondb"
-    ]
+        cls.retention_policy_context = [
+            "test_sqlserver",
+            "cctestsqlserverideeowhs5iudo",
+            "cclongtermretentiondb"
+        ]
 
     def tearDown(self, *args, **kwargs):
         default_long_term_policy = {
