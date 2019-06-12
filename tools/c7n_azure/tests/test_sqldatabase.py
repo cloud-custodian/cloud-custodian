@@ -19,7 +19,7 @@ from c7n_azure.resources.sqldatabase import ShortTermBackupRetentionPolicyAction
     BackupRetentionPolicyHelper
 from c7n_azure.session import Session
 
-from azure_common import BaseTest, arm_template, requires_arm_polling
+from azure_common import BaseTest, arm_template
 
 
 class SqlDatabaseTest(BaseTest):
@@ -301,7 +301,10 @@ class ShortTermBackupRetentionPolicyActionSchemaTest(BaseTest):
                 do_validation()
 
 
-@requires_arm_polling
+# NOTE: Normally, updating the retention policy on a DB requires ARM polling to know when the
+# operation has finished. However, this polling happens client-side and causes the tests to complete
+# slowly. In order to speed these up, the cassettes were manually modified to immediately return the
+# completed operation.
 class ShortTermBackupRetentionPolicyActionTest(BaseTest):
 
     client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
@@ -319,6 +322,7 @@ class ShortTermBackupRetentionPolicyActionTest(BaseTest):
             *ShortTermBackupRetentionPolicyActionTest.retention_policy_context, 14).result()
         self.assertEqual(reverted_policy.retention_days, 14)
 
+    @arm_template('sqlserver.json')
     def test_update_short_term_backup_retention_policy(self):
         p = self.load_policy({
             'name': 'test-update-short-term-backup-retention-policy',
@@ -368,7 +372,10 @@ class LongTermBackupRetentionPolicyActionSchemaTest(BaseTest):
             self.assertTrue(p)
 
 
-@requires_arm_polling
+# NOTE: Normally, updating the retention policy on a DB requires ARM polling to know when the
+# operation has finished. However, this polling happens client-side and causes the tests to complete
+# slowly. In order to speed these up, the cassettes were manually modified to immediately return the
+# completed operation.
 class LongTermBackupRetentionPolicyActionTest(BaseTest):
 
     client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
@@ -397,6 +404,7 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
         self.assertEqual(reverted_policy.monthly_retention, 'P12M')
         self.assertEqual(reverted_policy.yearly_retention, 'PT0S')
 
+    @arm_template('sqlserver.json')
     def test_update_weekly_retention_policy(self):
 
         p = self.load_policy({
@@ -426,6 +434,7 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
             'P10D'
         )
 
+    @arm_template('sqlserver.json')
     def test_update_monthly_retention_policy(self):
         p = self.load_policy({
             'name': 'test-update-monthly-retention-policy',
@@ -454,6 +463,7 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
             'P6W'
         )
 
+    @arm_template('sqlserver.json')
     def test_update_yearly_retention_policy(self):
         p = self.load_policy({
             'name': 'test-update-yearly-retention-policy',
