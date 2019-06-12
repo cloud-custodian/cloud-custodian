@@ -40,9 +40,22 @@ Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
+- ``update-short-term-backup-retention-policy``
+    - Update the retention period (in days) for a database's short term backup retention policy.
+
+    .. c7n-schema:: ShortTermBackupRetentionPolicyAction
+        :module: c7n_azure.resources.sqldatabase
+
+- ``update-long-term-backup-retention-policy``
+    - Update the retention period for a database's long term backup retention policy.
+
+    .. c7n-schema:: LongTermBackupRetentionPolicyAction
+        :module: c7n_azure.resources.sqldatabase
+
 Example Policies
 ----------------
 
 - :ref:`azure_examples_sqldatabasewithpremiumsku`
 - :ref:`azure_examples_sqldatabaseshorttermbackupretention`
 - :ref:`azure_examples_sqldatabaselongtermbackupretention`
+- :ref:`azure_examples_sqldatabaseupdateretentionpolicies`

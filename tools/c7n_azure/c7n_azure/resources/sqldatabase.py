@@ -297,6 +297,26 @@ class BackupRetentionPolicyAction(AzureBaseAction):
 
 @SqlDatabase.action_registry.register('update-short-term-backup-retention-policy')
 class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
+    """
+
+    Update the short term backup retention policy for a SQL Database.
+
+    :example: Update any SQL Database short term retentions to at least 7 days.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: update-short-term-backup-retention-policy
+                resource: azure.sqldatabase
+                filters:
+                  - type: short-term-backup-retention-policy
+                    op: lt
+                    retention-period-days: 7
+                actions:
+                  - type: update-short-term-backup-retention-policy
+                    retention-period-days: 7
+
+    """
 
     VALID_RETENTION_PERIOD_DAYS = [7, 14, 21, 28, 35]
 
@@ -328,6 +348,34 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
 
 @SqlDatabase.action_registry.register('update-long-term-backup-retention-policy')
 class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
+    """
+
+    Update the long term backup retention policy for a SQL Database.
+
+    There are 3 backup types for a sql database: weekly, monthly, and yearly. And, each
+    of these backups has a retention period that can specified in units of days, weeks,
+    months, or years.
+
+    :example: Enforce a 1 month maximum retention for weekly backups on all SQL Databases
+
+    .. code-block:: yaml
+
+            policies:
+              - name: update-long-term-backup-retention-policy
+                resource: azure.sqldatabase
+                filters:
+                  - type: long-term-backup-retention-policy
+                    backup-type: weekly
+                    op: gt
+                    retention-period: 1
+                    retention-period-units: months
+                actions:
+                  - type: update-long-term-backup-retention-policy
+                    backup-type: weekly
+                    retention-period: 1
+                    retention-period-units: months
+
+    """
 
     schema = type_schema(
         'update-long-term-backup-retention-policy',
