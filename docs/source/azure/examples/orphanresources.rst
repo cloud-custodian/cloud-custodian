@@ -1,5 +1,9 @@
+.. _azure_orphanresources:
+
 Delete or report on orphan resources (NICs, Disks, Public IPs).
 ===============================================================
+
+.. _azure_orphanresources-disk:
 
 - Deletes all disks that are not being managed by a VM
 
@@ -15,6 +19,8 @@ Delete or report on orphan resources (NICs, Disks, Public IPs).
         actions:
           - type: delete
 
+.. _azure_orphanresources-nic:
+
 - Gets all Network Interfaces that are not attached to any VM
 
 .. code-block:: yaml
@@ -27,6 +33,7 @@ Delete or report on orphan resources (NICs, Disks, Public IPs).
             key: properties.virtualMachine
             value: null
 
+.. _azure_orphanresources-publicip:
 
 - Queues an email with Public IPs that are not attached to any Network Interfaces. See `c7n_mailer readme.md <https://github.com/cloud-custodian/cloud-custodian/blob/master/tools/c7n_mailer/README.md#using-on-azure>`_ for more information on how to send an email.
 
