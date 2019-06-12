@@ -3,10 +3,14 @@
 # For standard py37 tox, change working directory to the repository root and run:
 # docker build -t tox_linux . -f tools/dev/docker_tox_linux/Dockerfile && docker run -it tox_linux
 #
-# If you'd like to run sphinx docs and see the HTML output, add a volume for the HTML output and an ARG to the build.
-# For example:
-# docker build -t tox_linux --build-arg TOX_ENV=docs . -f tools/dev/docker_tox_linux/Dockerfile
-# docker run -v local_path_to_save_docs:/src/docs/build -it tox_linux
+# If you'd like to run sphinx docs and see the HTML output you will add a TOX_ENV arg
+# to the `build` and add a volume for the HTML output to the `run`
+#
+# For example, a useful one-liner to build image and then run doc build to `docs/build`:
+#
+# docker build -t tox_linux --build-arg TOX_ENV=docs . -f tools/dev/docker_tox_linux/Dockerfile &&
+# docker run -v 'pwd'/docs/build:/src/docs/build -it tox_linux
+
 
 
 FROM python:3.7-stretch
