@@ -3,18 +3,18 @@
     "data": {
         "Tags": [
             {
-                "Key": "Tagging",
-                "Value": "added"
+                "Key": "custodian_cleanup",
+                "Value": "Resource does not meet policy: delete@2019/06/11"
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "ea8de3c0-d94d-50cc-966f-b6aab0671602",
+            "RequestId": "0975cb7f-075a-5d6c-bd78-9e04087a40ee",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "ea8de3c0-d94d-50cc-966f-b6aab0671602",
+                "x-amzn-requestid": "0975cb7f-075a-5d6c-bd78-9e04087a40ee",
                 "content-type": "text/xml",
-                "content-length": "388",
-                "date": "Thu, 30 May 2019 23:27:37 GMT"
+                "content-length": "441",
+                "date": "Wed, 12 Jun 2019 14:31:59 GMT"
             },
             "RetryAttempts": 0
         }

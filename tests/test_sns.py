@@ -630,11 +630,12 @@ class TestSNS(BaseTest):
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
         self.assertEqual(tags[0]["Value"], "added")
 
-    def test_sns_marked_for_op_tag(self):
-        session_factory = self.replay_flight_data("test_sns_marked_for_op_tag")
+    def test_sns_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_remove_tag")
         p = self.load_policy(
             {
-                "name": "sns-marked-for-op",
+                "name": "untag-sns",
                 "resource": "sns",
                 "filters": [
                     {
@@ -643,25 +644,7 @@ class TestSNS(BaseTest):
                         "op": "delete",
                     }
                 ],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-        client = session_factory().client("sns")
-        tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
-        self.assertEqual(tags[0]["Value"], "Resource does not meet policy: delete@2019/06/11")
-
-    def test_sns_remove_tag(self):
-        session_factory = self.replay_flight_data(
-            "test_sns_remove_tag")
-        p = self.load_policy(
-            {
-                "name": "untag-sns",
-                "resource": "sns",
-                "filters": [{"tag:Tagging": "added"}],
-                "actions": [{"type": "remove-tag", "tags": ["Tagging"]}],
+                "actions": [{"type": "remove-tag", "tags": ["custodian_cleanup"]}],
             },
             session_factory=session_factory,
         )
