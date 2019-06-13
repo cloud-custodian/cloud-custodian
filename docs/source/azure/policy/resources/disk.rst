@@ -18,16 +18,4 @@ Actions
 Example Policies
 ----------------
 
-Deletes all disks that are currently not being managed by a VM
-
-.. code-block:: yaml
-
-    policies:
-      - name: orphaned-disks
-        resource: azure.disk
-        filters:
-          - type: value
-            key: managedBy
-            value: null
-        actions:
-          - type: delete
+:ref:`This policy <azure_orphanresources-disk>` will delete all disks that are not being managed by a VM

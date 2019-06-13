@@ -100,6 +100,9 @@ class PluginRegistry(object):
     def keys(self):
         return self._factories.keys()
 
+    def values(self):
+        return self._factories.values()
+
     def items(self):
         return self._factories.items()
 

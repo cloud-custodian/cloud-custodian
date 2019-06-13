@@ -14,8 +14,7 @@ Filters
     - Filter based on Effective Routes associated with network interfaces such as route names, next hops.
     - Network Interfaces must be attached to a virtual machine and the virtual machine must be powered on.
 
-    .. c7n-schema:: EffectiveRouteTableFilter
-       :module: c7n_azure.resources.network_interface
+    .. c7n-schema:: azure.networkinterface.filters.effective-route-table
 
 Actions
 -------
@@ -54,3 +53,4 @@ This policy will get Network Interfaces that have VirtualNetworkGateway and VNet
               - None
               - VirtualAppliance
 
+:ref:`This policy <azure_orphanresources-nic>` will get Network Interfaces that are not attached to any Virtual Machine. 

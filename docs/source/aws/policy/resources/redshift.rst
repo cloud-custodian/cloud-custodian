@@ -11,8 +11,7 @@ Filters
 ``param``
   Checks the ``ClusterParameterGroups`` for Redshift resource
 
-  .. c7n-schema:: Parameter
-      :module: c7n.resources.redshift
+  .. c7n-schema:: aws.redshift.filters.param
 
 Actions
 -------
@@ -20,5 +19,5 @@ Actions
 ``delete``
   Delete Redshift resource and you can specify if you want to ``skip-snapshot``, default is False
 
-  .. c7n-schema:: Delete
-      :module: c7n.resources.redshift
+  .. c7n-schema:: aws.redshift.actions.delete
+
