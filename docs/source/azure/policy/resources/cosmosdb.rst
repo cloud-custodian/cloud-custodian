@@ -11,6 +11,10 @@ Filters
     - Metric Filter - Filter on metrics from Azure Monitor - (see `Cosmos DB Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftdocumentdbdatabaseaccounts/>`_)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
+- ``firewall-rules``
+    Firewall Rules Filter (see :ref:`azure_filters`)
+
+    .. c7n-schema:: azure.sqlserver.filters.firewall-rules
 
 Actions
 -------

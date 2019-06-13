@@ -18,6 +18,10 @@ Filters
     - Secret permissions: `Get`, `List`, `Set`, `Delete`, `Backup`, `Restore`, `Recover`, `Purge`
     - Certificate permissions: `Get`, `List`, `Delete`, `Create`, `Import`, `Update`, `ManageContacts`, `GetIssuers`, `ListIssuers`, `SetIssuers`, `DeleteIssuers`, `ManageIssuers`, `Recover`, `Backup`, `Restore`, `Purge`
     - Note: if you use `displayName` or `principalName`, you need to use azure cli authentication
+- ``firewall-rules``
+    Firewall Rules Filter (see :ref:`azure_filters`)
+
+    .. c7n-schema:: azure.sqlserver.filters.firewall-rules
 
 Actions
 -------
