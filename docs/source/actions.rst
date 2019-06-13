@@ -16,8 +16,7 @@ You may initiate a call per resource, or a call referencing a batch of resources
 Additionally you may define the body and query string using JMESPath references to
 the resource or resource array.
 
-.. c7n-schema:: Webhook
-    :module: c7n.actions.webhook
+.. c7n-schema:: aws.ec2.actions.webhook
 
 
 JMESPath queries for query-params, headers and body will have access to the following data:

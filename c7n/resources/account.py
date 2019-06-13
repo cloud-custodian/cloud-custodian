@@ -62,6 +62,8 @@ class Account(ResourceManager):
         id = 'account_id'
         name = 'account_name'
         filter_name = None
+        # fake this for doc gen
+        service = "account"
 
     @classmethod
     def get_permissions(cls):

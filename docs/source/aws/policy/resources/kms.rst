@@ -11,8 +11,8 @@ Filters
 ``grant-count``
   Call ``list_grants`` and count ``Grants`` for each ``TargetKeyId``
 
-  .. c7n-schema:: GrantCount
-      :module: c7n.resources.kms
+  .. c7n-schema:: aws.kms.filters.grant-count
+
 
 Actions
 -------

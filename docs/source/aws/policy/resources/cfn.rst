@@ -14,5 +14,5 @@ Actions
 ``delete``
   Delete CloudFormation Stack
 
-  .. c7n-schema:: Delete
-      :module: c7n.resources.cfn
+  .. c7n-schema:: aws.cfn.actions.delete
+

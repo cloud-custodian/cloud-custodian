@@ -11,14 +11,14 @@ Filters
 ``global-grants``
   Check bucket acls for global grants
 
-  .. c7n-schema:: GlobalGrantsFilter
-      :module: c7n.resources.s3
+  .. c7n-schema:: aws.s3.filters.global-grants
 
-``missing-policy-statement``
+
+``missing-statement``
   Find buckets missing a set of named policy statements
 
-  .. c7n-schema:: MissingPolicyStatementFilter
-      :module: c7n.resources.s3
+  .. c7n-schema:: aws.s3.filters.missing-statement
+
 
 Actions
 -------
@@ -26,7 +26,10 @@ Actions
 ``encrypt-keys``
   Scan all keys in a bucket and optionally encrypt them in place
 
-  .. c7n-schema:: EncryptExtantKeys
+  **Note** for any large buckets highly recommended to use tools/c7n_salactus
+  which supports distributed scale out key scanning across billions of keys.
+  
+  .. c7n-schema:: aws.s3.actions.encrypt-keys
       :module: c7n.resources.s3
 
 ``encryption-policy``
@@ -34,17 +37,16 @@ Actions
   applications that are not using encryption, including AWS log
   delivery
 
-  .. c7n-schema:: EncryptionRequiredPolicy
-      :module: c7n.resources.s3
+  .. c7n-schema:: aws.s3.actions.encryption-policy
 
 ``delete-global-grants``
   Delete global grants from bucket ACLs
 
-  .. c7n-schema:: DeleteGlobalGrants
-      :module: c7n.resources.s3
+  .. c7n-schema:: aws.s3.actions.delete-global-grants
+
 
 ``no-op``
   No operation
 
-  .. c7n-schema:: NoOp
-      :module: c7n.resources.s3
+  .. c7n-schema:: aws.s3.actions.no-op
+

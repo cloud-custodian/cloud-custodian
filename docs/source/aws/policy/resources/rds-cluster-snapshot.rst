@@ -10,9 +10,10 @@ Filters
 
 ``age``
   Based on ``SnapshotCreateTime`` of the snapshot, the time stamp when the snapshot was created, in days
+  **Deprecated** use value filter with `value_type: age`
 
-  .. c7n-schema:: RDSSnapshotAge
-      :module: c7n.resources.rdscluster
+  .. c7n-schema:: aws.rds-cluster-snapshot.filters.age
+
 
 Actions
 -------
@@ -20,5 +21,5 @@ Actions
 ``delete``
   Delete DB cluster snapshot
 
-  .. c7n-schema:: RDSClusterSnapshotDelete
-      :module: c7n.resources.rdscluster
+  .. c7n-schema:: aws.rds-cluster-snapshot.actions.delete
+
