@@ -14,8 +14,8 @@ Filters
 - ``frontend-public-ip``
   Filters load balancers by the frontend public IP
 
-  .. c7n-schema:: FrontEndIp
-      :module: c7n_azure.resources.load_balancer
+  .. c7n-schema:: azure.loadbalancer.filters.frontend-public-ip
+
 
 Actions
 -------

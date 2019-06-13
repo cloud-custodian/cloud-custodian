@@ -16,17 +16,17 @@ Actions
   You can specify if you want to ``skip-snapshot``, default is False
   You can specify if you want to ``delete-instances``, default is False
 
-  .. c7n-schema:: Delete
-      :module: c7n.resources.rdscluster
+  .. c7n-schema:: aws.rds-cluster.actions.delete
+
 
 ``snapshot``
   Create a manual DB cluster snapshot
 
-  .. c7n-schema:: Snapshot
-      :module: c7n.resources.rdscluster
+  .. c7n-schema:: aws.rds-cluster.actions.snapshot
+
 
 ``retention``
   Set the DB cluster backup retention period to ``days``
 
-  .. c7n-schema:: RetentionWindow
-      :module: c7n.resources.rdscluster
+  .. c7n-schema:: aws.rds-cluster.actions.retention
+

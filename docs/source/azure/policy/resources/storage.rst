@@ -14,8 +14,7 @@ Filters
 
 - ``firewall-rules`` Firewall Rules Filter (see :ref:`azure_filters`)
 
-  .. c7n-schema:: StorageFirewallRulesFilter
-       :module: c7n_azure.resources.storage
+  .. c7n-schema:: azure.storage.filters.firewall-rules
 
 Actions
 -------
@@ -30,8 +29,8 @@ Actions
     - `virtual-network-rules`: Optional. List of allowed virtual networks. Specify empty list [] to remove all items.
       - `virtual-network-resource-id`: Azure id of a subnet of a virtual network.
 
-  .. c7n-schema:: StorageSetNetworkRulesAction
-       :module: c7n_azure.resources.storage
+  .. c7n-schema:: azure.storage.actions.set-network-rules
+
 
 Example Policies
 ----------------

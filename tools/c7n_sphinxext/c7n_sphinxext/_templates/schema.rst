@@ -5,6 +5,6 @@
 
     Schema:
 
-  .. code-block:: javascript
+  .. code-block:: yaml
 
     {{ schema_json|indent(4) }}

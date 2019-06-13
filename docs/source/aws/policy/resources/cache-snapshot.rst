@@ -9,9 +9,9 @@ Filters
 
 ``age``
   Based on ``SnapshotCreateTime`` of the snapshot, the time stamp when the snapshot was created, in days
+  **Deprecated** use value filter with value_type: age
 
-  .. c7n-schema:: ElastiCacheSnapshotAge
-      :module: c7n.resources.elasticache
+  .. c7n-schema:: aws.cache-snapshot.filters.age
 
 Actions
 -------
@@ -19,5 +19,5 @@ Actions
 ``delete``
   Delete ElastiCache cluster snapshot
 
-  .. c7n-schema:: DeleteElastiCacheSnapshot
-      :module: c7n.resources.elasticache
+  .. c7n-schema:: aws.cache-snapshot.actions.delete
+

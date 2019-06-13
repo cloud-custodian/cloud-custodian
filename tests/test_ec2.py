@@ -994,33 +994,97 @@ class TestOr(BaseTest):
 
 class TestSnapshot(BaseTest):
 
-    def test_ec2_snapshot_no_copy_tags(self):
+    def test_ec2_snapshot_error_process_set(self):
+        p = self.load_policy({
+            'name': 'ec2-test-snapshot', "resource": "ec2",
+            "actions": [{"type": "snapshot"}]})
+        snapshotter = p.resource_manager.actions[0]
+
+        def process_volume_set(client, resource):
+            raise ValueError('something bad happened')
+
+        snapshotter.process_volume_set = process_volume_set
+        log = self.capture_logging('custodian.actions')
+        self.assertRaises(
+            ValueError, snapshotter.process, [{'InstanceId': 'xyz'}])
+        self.assertTrue('something' in log.getvalue())
+
+    def test_ec2_snapshot_error_process_once(self):
+        p = self.load_policy({
+            'name': 'ec2-test-snapshot', "resource": "ec2",
+            "actions": [{"type": "snapshot"}]})
+
+        log = self.capture_logging('custodian.actions')
+        snapshotter = p.resource_manager.actions[0]
+        client = mock.Mock(['create_snapshots'])
+        err_response = {'Error': {'Code': 'InvalidInstanceId.NotFound'}}
+        err = ClientError(err_response, 'create_snapshots')
+        client.create_snapshots.side_effect = err
+        snapshotter.process_volume_set(client, {'InstanceId': 'i-foo'})
+        client.create_snapshots.assert_called_once()
+
+        self.assertTrue('i-foo' in log.getvalue())
+        err_response['Error']['Code'] = 'InvalidRequest'
+        self.assertRaises(
+            ClientError,
+            snapshotter.process_volume_set,
+            client, {'InstanceId': 'i-foo'})
+
+    def test_ec2_snapshot_validate(self):
+        templ = {
+            "name": "ec2-test-snapshot",
+            "resource": "ec2",
+            "filters": [{"tag:Name": "CompileLambda"}],
+            "actions": [{"type": "snapshot"}]}
+
+        self.load_policy(templ)
+        templ['actions'][0]['copy-volume-tags'] = False
+        self.load_policy(templ)
+        templ['actions'][0]['copy-tags'] = ['Name']
+        self.assertRaises(PolicyValidationError, self.load_policy, templ)
+
+    def test_ec2_snapshot_copy_instance_tags_default(self):
         session_factory = self.replay_flight_data("test_ec2_snapshot")
         policy = self.load_policy(
             {
                 "name": "ec2-test-snapshot",
                 "resource": "ec2",
-                "filters": [{"tag:Name": "CompileLambda"}],
-                "actions": [{"type": "snapshot"}],
+                "filters": [{"tag:Name": "Foo"}],
+                "actions": [{"type": "snapshot"}]
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ec2')
+        snaps = client.describe_snapshots(
+            SnapshotIds=resources[0]['c7n:snapshots']).get('Snapshots')
+        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        for s in snaps:
+            self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
+
+    def test_ec2_snapshot_copy_tags(self):
+        session_factory = self.replay_flight_data("test_ec2_snapshot_copy_tags")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-snapshot",
+                "resource": "ec2",
+                "filters": [{"tag:Name": "Foo"}],
+                "actions": [{"type": "snapshot", "copy-tags": ['Name', 'Stage']}]
             },
             session_factory=session_factory,
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
-    def test_ec2_snapshot_copy_tags(self):
-        session_factory = self.replay_flight_data("test_ec2_snapshot")
-        policy = self.load_policy(
-            {
-                "name": "ec2-test-snapshot",
-                "resource": "ec2",
-                "filters": [{"tag:Name": "CompileLambda"}],
-                "actions": [{"type": "snapshot", "copy-tags": ["ASV" "Testing123"]}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ec2')
+        snaps = client.describe_snapshots(
+            SnapshotIds=resources[0]['c7n:snapshots']).get('Snapshots')
+        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        rtags.pop('App')
+        rtags['custodian_snapshot'] = ''
+        for s in snaps:
+            self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
 
 
 class TestSetInstanceProfile(BaseTest):
