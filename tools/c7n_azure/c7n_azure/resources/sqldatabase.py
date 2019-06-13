@@ -22,7 +22,7 @@ from msrestazure.azure_exceptions import CloudError
 
 from c7n.filters import Filter
 from c7n.filters.core import PolicyValidationError
-from c7n.utils import type_schema
+from c7n.utils import c7n_prefix_cache_key, type_schema
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.filters import scalar_ops
 from c7n_azure.provider import resources
@@ -31,10 +31,6 @@ from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper
 
 log = logging.getLogger('custodian.azure.sqldatabase')
-
-
-def c7n_prefix(s):
-    return 'c7n:{}'.format(s)
 
 
 @resources.register('sqldatabase')
@@ -86,7 +82,7 @@ class BackupRetentionPolicyHelper(object):
     @staticmethod
     def get_backup_retention_policy(database, get_operation, cache_key):
 
-        policy_key = c7n_prefix(cache_key)
+        policy_key = c7n_prefix_cache_key(cache_key)
         cached_policy = database.get(policy_key)
         if cached_policy:
             return cached_policy
@@ -294,16 +290,16 @@ class BackupRetentionPolicyBaseAction(AzureBaseAction):
 
         resource_group_name, server_name, database_name = \
             BackupRetentionPolicyHelper.get_backup_retention_policy_context(database)
-        parameters = self.get_parameters_for_new_retention_policy(database)
+        parameters = self._get_parameters_for_new_retention_policy(database)
 
         new_retention_policy = update_operation(
             resource_group_name, server_name, database_name, parameters).result()
 
         # Update the cached version
-        database[c7n_prefix(self.operations_property)] = new_retention_policy.as_dict()
+        database[c7n_prefix_cache_key(self.operations_property)] = new_retention_policy.as_dict()
 
     @abc.abstractmethod
-    def get_parameters_for_new_retention_policy(self, database):
+    def _get_parameters_for_new_retention_policy(self, database):
         raise NotImplementedError()
 
 
@@ -356,7 +352,7 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
             )
         return self
 
-    def get_parameters_for_new_retention_policy(self, database):
+    def _get_parameters_for_new_retention_policy(self, database):
         return self.retention_period_days
 
 
@@ -402,6 +398,7 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
     def __init__(self, *args, **kwargs):
         super(LongTermBackupRetentionPolicyAction, self).__init__(
             BackupRetentionPolicyHelper.LONG_TERM_SQL_OPERATIONS, *args, **kwargs)
+
         self.backup_type = BackupRetentionPolicyHelper.LongTermBackupType[self.data.get(
             'backup-type')]
         retention_period = self.data['retention-period']
@@ -411,11 +408,10 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
             retention_period_units
         )
 
-    def get_parameters_for_new_retention_policy(self, database):
-        client = self.manager.get_client()
-        get_operation = getattr(client, self.operations_property).get
+    def _get_parameters_for_new_retention_policy(self, database):
+        get_retention_policy_operation = getattr(self.client, self.operations_property).get
         current_retention_policy = BackupRetentionPolicyHelper.get_backup_retention_policy(database,
-            get_operation, self.operations_property)
+            get_retention_policy_operation, self.operations_property)
 
         new_retention_policy = self._copy_retention_policy(current_retention_policy) \
             if current_retention_policy else {}

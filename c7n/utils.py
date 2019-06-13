@@ -645,3 +645,7 @@ class QueryParser(object):
             filters.append(d)
 
         return filters
+
+
+def c7n_prefix_cache_key(s):
+    return 'c7n:{}'.format(s)

@@ -42,14 +42,12 @@ Actions
 - ``update-short-term-backup-retention``
     - Update the retention period (in days) for a database's short term backup retention policy.
 
-    .. c7n-schema:: ShortTermBackupRetentionPolicyAction
-        :module: c7n_azure.resources.sqldatabase
+    .. c7n-schema:: azure.sqldatabase.actions.update-short-term-backup-retention-policy
 
 - ``update-long-term-backup-retention``
     - Update the retention period for a database's long term backup retention policy.
 
-    .. c7n-schema:: LongTermBackupRetentionPolicyAction
-        :module: c7n_azure.resources.sqldatabase
+    .. c7n-schema:: azure.sqldatabase.actions.update-long-term-backup-retention-policy
 
 Example Policies
 ----------------
