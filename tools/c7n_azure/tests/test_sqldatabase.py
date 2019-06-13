@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from azure_common import BaseTest, arm_template
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
-
-from c7n_azure.resources.sqldatabase import ShortTermBackupRetentionPolicyAction, \
-    BackupRetentionPolicyHelper
+from c7n_azure.resources.sqldatabase import (
+    BackupRetentionPolicyHelper, ShortTermBackupRetentionPolicyAction)
 from c7n_azure.session import Session
-
-from azure_common import BaseTest, arm_template
 
 
 class SqlDatabaseTest(BaseTest):
@@ -315,7 +313,7 @@ class ShortTermBackupRetentionPolicyActionTest(BaseTest):
 
         cls.retention_policy_context = [
             "test_sqlserver",
-            "cctestsqlserverideeowhs5iudo",
+            "cctestsqlserverideeowhs5iudo",  # TODO change the server name to not use unique suffix
             "cctestdb"
         ]
 

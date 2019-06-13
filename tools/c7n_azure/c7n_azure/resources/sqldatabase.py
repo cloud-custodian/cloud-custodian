@@ -15,22 +15,26 @@
 import abc
 import enum
 import logging
-from azure.mgmt.sql.models import BackupLongTermRetentionPolicy
 
 import six
-from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.filters import scalar_ops
-from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ChildArmResourceManager
-from c7n_azure.query import ChildTypeInfo
-from c7n_azure.utils import RetentionPeriod, ResourceIdParser, ThreadHelper
+from azure.mgmt.sql.models import BackupLongTermRetentionPolicy
 from msrestazure.azure_exceptions import CloudError
 
 from c7n.filters import Filter
 from c7n.filters.core import PolicyValidationError
 from c7n.utils import type_schema
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.filters import scalar_ops
+from c7n_azure.provider import resources
+from c7n_azure.query import ChildTypeInfo
+from c7n_azure.resources.arm import ChildArmResourceManager
+from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper
 
 log = logging.getLogger('custodian.azure.sqldatabase')
+
+
+def c7n_prefix(s):
+    return 'c7n:{}'.format(s)
 
 
 @resources.register('sqldatabase')
@@ -73,9 +77,7 @@ class BackupRetentionPolicyHelper(object):
     @staticmethod
     def get_backup_retention_policy_context(database):
         server_id = database[ChildTypeInfo.parent_key]
-        resource_group_name = database.get('resourceGroup')
-        if resource_group_name is None:
-            resource_group_name = ResourceIdParser.get_resource_group(server_id)
+        resource_group_name = database['resourceGroup']
         database_name = database['name']
         server_name = ResourceIdParser.get_resource_name(server_id)
 
@@ -84,9 +86,9 @@ class BackupRetentionPolicyHelper(object):
     @staticmethod
     def get_backup_retention_policy(database, get_operation, cache_key):
 
-        policy_key = 'c7n:{}'.format(cache_key)
+        policy_key = c7n_prefix(cache_key)
         cached_policy = database.get(policy_key)
-        if cached_policy is not None:
+        if cached_policy:
             return cached_policy
 
         resource_group_name, server_name, database_name = \
@@ -96,7 +98,7 @@ class BackupRetentionPolicyHelper(object):
             response = get_operation(resource_group_name, server_name, database_name)
         except CloudError as e:
             if e.status_code == 404:
-                response = None
+                return None
             else:
                 log.error(
                     "Unable to get backup retention policy. "
@@ -112,7 +114,7 @@ class BackupRetentionPolicyHelper(object):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class BackupRetentionPolicyFilter(Filter):
+class BackupRetentionPolicyBaseFilter(Filter):
 
     schema = type_schema(
         'backup-retention-policy',
@@ -122,7 +124,7 @@ class BackupRetentionPolicyFilter(Filter):
     )
 
     def __init__(self, operations_property, retention_limit, data, manager=None):
-        super(BackupRetentionPolicyFilter, self).__init__(data, manager)
+        super(BackupRetentionPolicyBaseFilter, self).__init__(data, manager)
         self.operations_property = operations_property
         self.retention_limit = retention_limit
 
@@ -168,7 +170,7 @@ class BackupRetentionPolicyFilter(Filter):
 
 @SqlDatabase.filter_registry.register('short-term-backup-retention-policy')
 @SqlDatabase.filter_registry.register('short-term-backup-retention')
-class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
+class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyBaseFilter):
     """
 
     Filter SQL Databases on the length of their short term backup retention policies.
@@ -194,7 +196,7 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         'short-term-backup-retention-policy',
         aliases=['short-term-backup-retention'],
         required=['retention-period-days'],
-        rinherit=BackupRetentionPolicyFilter.schema,
+        rinherit=BackupRetentionPolicyBaseFilter.schema,
         **{
             'retention-period-days': {'type': 'number'}
         }
@@ -211,7 +213,7 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
 
 @SqlDatabase.filter_registry.register('long-term-backup-retention-policy')
 @SqlDatabase.filter_registry.register('long-term-backup-retention')
-class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
+class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyBaseFilter):
     """
 
     Filter SQL Databases on the length of their long term backup retention policies.
@@ -240,7 +242,7 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
         'long-term-backup-retention-policy',
         aliases=['long-term-backup-retention'],
         required=['backup-type', 'retention-period', 'retention-period-units'],
-        rinherit=BackupRetentionPolicyFilter.schema,
+        rinherit=BackupRetentionPolicyBaseFilter.schema,
         **{
             'backup-type': {
                 'enum': list([t.name for t in BackupRetentionPolicyHelper.LongTermBackupType])
@@ -278,21 +280,27 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class BackupRetentionPolicyAction(AzureBaseAction):
+class BackupRetentionPolicyBaseAction(AzureBaseAction):
 
     def __init__(self, operations_property, *args, **kwargs):
-        super(BackupRetentionPolicyAction, self).__init__(*args, **kwargs)
+        super(BackupRetentionPolicyBaseAction, self).__init__(*args, **kwargs)
         self.operations_property = operations_property
 
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
     def _process_resource(self, database):
-        client = self.manager.get_client()
-        update_operation = getattr(client, self.operations_property).create_or_update
+        update_operation = getattr(self.client, self.operations_property).create_or_update
 
         resource_group_name, server_name, database_name = \
             BackupRetentionPolicyHelper.get_backup_retention_policy_context(database)
         parameters = self.get_parameters_for_new_retention_policy(database)
 
-        update_operation(resource_group_name, server_name, database_name, parameters).result()
+        new_retention_policy = update_operation(
+            resource_group_name, server_name, database_name, parameters).result()
+
+        # Update the cached version
+        database[c7n_prefix(self.operations_property)] = new_retention_policy.as_dict()
 
     @abc.abstractmethod
     def get_parameters_for_new_retention_policy(self, database):
@@ -301,7 +309,7 @@ class BackupRetentionPolicyAction(AzureBaseAction):
 
 @SqlDatabase.action_registry.register('update-short-term-backup-retention-policy')
 @SqlDatabase.action_registry.register('update-short-term-backup-retention')
-class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
+class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
     """
 
     Update the short term backup retention policy for a SQL Database.
@@ -354,7 +362,7 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
 
 @SqlDatabase.action_registry.register('update-long-term-backup-retention-policy')
 @SqlDatabase.action_registry.register('update-long-term-backup-retention')
-class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
+class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
     """
 
     Update the long term backup retention policy for a SQL Database.
@@ -398,7 +406,7 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
             'backup-type')]
         retention_period = self.data['retention-period']
         retention_period_units = RetentionPeriod.Units[self.data['retention-period-units']]
-        self.iso8601_duration = RetentionPeriod.iso8601_duration_from_period_and_units(
+        self.iso8601_duration = RetentionPeriod.iso8601_duration(
             retention_period,
             retention_period_units
         )
@@ -409,16 +417,17 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
         current_retention_policy = BackupRetentionPolicyHelper.get_backup_retention_policy(database,
             get_operation, self.operations_property)
 
-        new_retention_policy = self._copy_retention_policy(current_retention_policy)
+        new_retention_policy = self._copy_retention_policy(current_retention_policy) \
+            if current_retention_policy else {}
         new_retention_policy[self.backup_type.retention_property] = self.iso8601_duration
 
         # Make sure that the week_of_year is set properly based on what
         # the yearly backup retention is. If this is not done, the API will
         # fail with an invalid parameter value
-        yearly_retention = new_retention_policy[
+        yearly_retention = new_retention_policy.get(
             BackupRetentionPolicyHelper.LongTermBackupType.yearly.retention_property
-        ]
-        week_of_year = new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR]
+        )
+        week_of_year = new_retention_policy.get(BackupRetentionPolicyHelper.WEEK_OF_YEAR)
         if yearly_retention is None:
             # Without a yearly retention, the week should be 0
             new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR] = 0
@@ -437,15 +446,9 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
           https://docs.microsoft.com/en-us/python/api/azure-mgmt-sql/azure.mgmt.sql.models.backuplongtermretentionpolicy?view=azure-python
         """
 
-        new_retention_policy = {}
-        for backup_type in BackupRetentionPolicyHelper.LongTermBackupType:
-            key = backup_type.retention_property
-
-            # Even though the api returns `PT0S` as a value for "zero duration", it does not accept
-            # that as a valid input parameter value.
-            # The work-arround is to replace any of these durations with `None`.
-            new_retention_policy[key] = \
-                retention_policy[key] if retention_policy[key] != 'PT0S' else None
+        keys = [backup_type.retention_property for backup_type in
+            BackupRetentionPolicyHelper.LongTermBackupType]
+        new_retention_policy = {key: retention_policy[key] for key in keys}
 
         new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR] = \
             retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR]
