@@ -22,7 +22,7 @@ class RemovePolicyBase(BaseAction):
         'remove-statements',
         required=['statement_ids'],
         statement_ids={'oneOf': [
-            {'enum': ['matched']},
+            {'enum': ['matched', "*"]},
             {'type': 'array', 'items': {'type': 'string'}}]})
 
     def process_policy(self, policy, resource, matched_key):

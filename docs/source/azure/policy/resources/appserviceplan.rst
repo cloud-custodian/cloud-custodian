@@ -13,13 +13,12 @@ Filters
 
 - ``onhour``
 
-  .. c7n-schema:: AzureOnHour
-       :module: c7n_azure.filters
+  .. c7n-schema:: azure.appserviceplan.filters.onhour
 
 - ``offhour``
 
-  .. c7n-schema:: AzureOffHour
-       :module: c7n_azure.filters
+  .. c7n-schema:: azure.appserviceplan.filters.offhour
+
 
 Actions
 -------
@@ -28,8 +27,8 @@ Actions
 - ``resize-plan``
   Resize an app service plan by changing either the SKU or the number of instances.
 
-  .. c7n-schema:: ResizePlan
-       :module: c7n_azure.resources.appserviceplan
+  .. c7n-schema:: azure.appserviceplan.actions.resize-plan
+
 
 Example Policies
 ----------------

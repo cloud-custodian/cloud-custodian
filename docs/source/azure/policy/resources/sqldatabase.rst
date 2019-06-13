@@ -21,8 +21,7 @@ Filters
     - If there is no short term backup retention policy set on the database, it is treated as if the retention is zero days.
     - The default comparison operation is `eq`
 
-    .. c7n-schema:: ShortTermBackupRetentionPolicyFilter
-        :module: c7n_azure.resources.sqldatabase
+    .. c7n-schema:: azure.sqldatabase.filters.short-term-backup-retention-policy
 
 
 - ``long-term-backup-retention-policy``
@@ -33,8 +32,8 @@ Filters
     - The `azure.sqldatabase` resource will only get through the filter if the `retention-period-units` field matches the units specified in the actual long term backup retention policy.
         - Example: if the filter is looking for backups less than 1 year, and the retention policy is set to 6 months, then the database will not get through the filter because there is a unit mismatch.
 
-    .. c7n-schema:: LongTermBackupRetentionPolicyFilter
-        :module: c7n_azure.resources.sqldatabase
+    .. c7n-schema:: azure.sqldatabase.filters.long-term-backup-retention-policy
+
 
 Actions
 -------

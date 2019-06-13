@@ -20,20 +20,18 @@ Filters
 - ``role``
   Filters Role Assignments based on name of Role Definition
 
-  .. c7n-schema:: RoleFilter
-      :module: c7n_azure.resources.access_control
+  .. c7n-schema:: azure.roleassignment.filters.role
 
 - ``resource-access``
   Filter Role Assignments based on access to an azure resource
 
-  .. c7n-schema:: ResourceAccessFilter
-      :module: c7n_azure.resources.access_control
+  .. c7n-schema:: azure.roleassignment.filters.resource-access
 
 - ``scope``
   Filter Role Assignments by scope access
 
-  .. c7n-schema:: ScopeFilter
-      :module: c7n_azure.resources.access_control
+  .. c7n-schema:: azure.roleassignment.filters.scope
+
 
 
 Actions

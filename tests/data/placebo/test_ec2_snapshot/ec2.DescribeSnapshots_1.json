@@ -1,0 +1,121 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "Description": "",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "99%",
+                "SnapshotId": "snap-02b46f92846a4be3a",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 11,
+                    "hour": 21,
+                    "minute": 15,
+                    "second": 27,
+                    "microsecond": 936000
+                },
+                "State": "pending",
+                "VolumeId": "vol-05117418b3ad30481",
+                "VolumeSize": 8,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Foo"
+                    },
+                    {
+                        "Key": "App",
+                        "Value": "DevX"
+                    },
+                    {
+                        "Key": "Stage",
+                        "Value": "Dev"
+                    }
+                ]
+            },
+            {
+                "Description": "",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "99%",
+                "SnapshotId": "snap-041502e4149c93d23",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 11,
+                    "hour": 21,
+                    "minute": 15,
+                    "second": 27,
+                    "microsecond": 936000
+                },
+                "State": "pending",
+                "VolumeId": "vol-0188a91cfcb95c342",
+                "VolumeSize": 8,
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "DevX"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "Foo"
+                    },
+                    {
+                        "Key": "Stage",
+                        "Value": "Dev"
+                    }
+                ]
+            },
+            {
+                "Description": "",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "0%",
+                "SnapshotId": "snap-0e0c7752f8351db03",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 11,
+                    "hour": 21,
+                    "minute": 15,
+                    "second": 27,
+                    "microsecond": 936000
+                },
+                "State": "pending",
+                "VolumeId": "vol-0caf24c45a8aa4b11",
+                "VolumeSize": 8,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Foo"
+                    },
+                    {
+                        "Key": "App",
+                        "Value": "DevX"
+                    },
+                    {
+                        "Key": "Stage",
+                        "Value": "Dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "dc83d5e4-52d7-48c9-93a5-d1b92529513c",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "2767",
+                "vary": "accept-encoding",
+                "date": "Tue, 11 Jun 2019 21:15:27 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

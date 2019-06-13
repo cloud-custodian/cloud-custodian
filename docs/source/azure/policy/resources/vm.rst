@@ -13,20 +13,18 @@ Filters
 - ``instance-view``
   Filter based on VM attributes in instance view, such as power state.
 
-  .. c7n-schema:: InstanceViewFilter
-       :module: c7n_azure.resources.vm
+  .. c7n-schema:: azure.vm.filters.instance-view
 
 - ``metric``
   Filter based on metrics from Azure Monitor, such as CPU usage.
 
-  .. c7n-schema:: MetricFilter
-       :module: c7n_azure.filters
+  .. c7n-schema:: azure.vm.filters.metric
+
 
 - ``network-interface``
   Filter based on properties of the network interfaces associated with the virtual machine.
 
-  .. c7n-schema:: NetworkInterfaceFilter
-        :module: c7n_azure.resources.vm
+  .. c7n-schema:: azure.vm.filters.network-interface
 
 - ``off-hours and on-hours``
   Filter based on on-hour and off-hour configurations (see :ref:`offhours`)
@@ -36,26 +34,26 @@ Actions
 - ``start``
   Start the VMs
 
-  .. c7n-schema:: VmStartAction
-       :module: c7n_azure.resources.vm
+  .. c7n-schema:: azure.vm.actions.start
+
 
 - ``poweroff``
   Stop the VMs
 
-  .. c7n-schema:: VmPowerOffAction
-        :module: c7n_azure.resources.vm
+  .. c7n-schema:: azure.vm.actions.poweroff
+
 
 - ``stop``
   Stop the VMs and deallocate resources
 
-  .. c7n-schema:: VmStopAction
-        :module: c7n_azure.resources.vm
+  .. c7n-schema:: azure.vm.actions.stop
+
 
 - ``restart``
   Restart the VMs
 
-  .. c7n-schema:: VmRestartAction
-        :module: c7n_azure.resources.vm 
+  .. c7n-schema:: azure.vm.actions.restart
+
 
 Example Policies
 ----------------

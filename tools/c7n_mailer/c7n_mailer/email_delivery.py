@@ -11,13 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import smtplib
 from email.mime.text import MIMEText
 from itertools import chain
 import six
 
 from .ldap_lookup import LdapLookup
 from c7n_mailer.utils_email import is_email
+from c7n_mailer.smtp_delivery import SmtpDelivery
 from .utils import (
     get_message_subject, get_resource_tag_targets,
     get_rendered_jinja, kms_decrypt, get_aws_username_from_event)
@@ -248,20 +248,6 @@ class EmailDelivery(object):
         # eg: { ('milton@initech.com', 'peter@initech.com'): mimetext_message }
         return to_addrs_to_mimetext_map
 
-    def send_smtp_email(self, smtp_server, message, to_addrs):
-        smtp_port = int(self.config.get('smtp_port', 25))
-        smtp_ssl = bool(self.config.get('smtp_ssl', True))
-        smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
-        if smtp_ssl:
-            smtp_connection.starttls()
-            smtp_connection.ehlo()
-        if self.config.get('smtp_username') or self.config.get('smtp_password'):
-            smtp_username = self.config.get('smtp_username')
-            smtp_password = kms_decrypt(self.config, self.logger, self.session, 'smtp_password')
-            smtp_connection.login(smtp_username, smtp_password)
-        smtp_connection.sendmail(message['From'], to_addrs, message.as_string())
-        smtp_connection.quit()
-
     def set_mimetext_headers(self, message, subject, from_addr, to_addrs, cc_addrs, priority):
         """Sets headers on Mimetext message"""
 
@@ -305,9 +291,11 @@ class EmailDelivery(object):
     def send_c7n_email(self, sqs_message, email_to_addrs, mimetext_msg):
         try:
             # if smtp_server is set in mailer.yml, send through smtp
-            smtp_server = self.config.get('smtp_server')
-            if smtp_server:
-                self.send_smtp_email(smtp_server, mimetext_msg, email_to_addrs)
+            if 'smtp_server' in self.config:
+                smtp_delivery = SmtpDelivery(config=self.config,
+                                             session=self.session,
+                                             logger=self.logger)
+                smtp_delivery.send_message(message=mimetext_msg, to_addrs=email_to_addrs)
             # if smtp_server isn't set in mailer.yml, use aws ses normally.
             else:
                 self.aws_ses.send_raw_email(RawMessage={'Data': mimetext_msg.as_string()})
