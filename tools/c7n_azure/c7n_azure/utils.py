@@ -477,13 +477,6 @@ class RetentionPeriod(object):
         return iso8601_str
 
     @staticmethod
-    def duration(period, retention_period_unit):
-        iso8601_str = RetentionPeriod.iso8601_duration_from_period_and_units(period,
-            retention_period_unit)
-        duration = isodate.parse_duration(iso8601_str)
-        return duration
-
-    @staticmethod
     def parse_iso8601_retention_period(iso8601_retention_period):
         """
         A simplified iso8601 duration parser that only accepts one duration designator.
