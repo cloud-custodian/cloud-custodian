@@ -15,7 +15,7 @@ Filters
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
-- ``short-term-backup-retention-policy``
+- ``short-term-backup-retention``
     - Filter on the retention period (in days) of the database's short term backup retention policy.
     - more info on `Short Term Backups <https://docs.microsoft.com/en-us/azure/sql-database/sql-database-automated-backups>`_
     - If there is no short term backup retention policy set on the database, it is treated as if the retention is zero days.
@@ -25,7 +25,7 @@ Filters
         :module: c7n_azure.resources.sqldatabase
 
 
-- ``long-term-backup-retention-policy``
+- ``long-term-backup-retention``
     - Filter on the retention period of the database's long term backup retention policy.
     - more info on `Long Term Backups <https://docs.microsoft.com/en-us/azure/sql-database/sql-database-long-term-retention>`_
     - If the specified backup type has not been set on the resource, it is treated as if the retention period is zero.
@@ -40,13 +40,13 @@ Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
-- ``update-short-term-backup-retention-policy``
+- ``update-short-term-backup-retention``
     - Update the retention period (in days) for a database's short term backup retention policy.
 
     .. c7n-schema:: ShortTermBackupRetentionPolicyAction
         :module: c7n_azure.resources.sqldatabase
 
-- ``update-long-term-backup-retention-policy``
+- ``update-long-term-backup-retention``
     - Update the retention period for a database's long term backup retention policy.
 
     .. c7n-schema:: LongTermBackupRetentionPolicyAction

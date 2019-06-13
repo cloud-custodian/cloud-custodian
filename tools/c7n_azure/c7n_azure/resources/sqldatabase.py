@@ -167,6 +167,7 @@ class BackupRetentionPolicyFilter(Filter):
 
 
 @SqlDatabase.filter_registry.register('short-term-backup-retention-policy')
+@SqlDatabase.filter_registry.register('short-term-backup-retention')
 class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
     """
 
@@ -191,6 +192,7 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
 
     schema = type_schema(
         'short-term-backup-retention-policy',
+        aliases=['short-term-backup-retention'],
         required=['retention-period-days'],
         rinherit=BackupRetentionPolicyFilter.schema,
         **{
@@ -208,6 +210,7 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
 
 
 @SqlDatabase.filter_registry.register('long-term-backup-retention-policy')
+@SqlDatabase.filter_registry.register('long-term-backup-retention')
 class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
     """
 
@@ -235,6 +238,7 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyFilter):
 
     schema = type_schema(
         'long-term-backup-retention-policy',
+        aliases=['long-term-backup-retention'],
         required=['backup-type', 'retention-period', 'retention-period-units'],
         rinherit=BackupRetentionPolicyFilter.schema,
         **{
@@ -296,6 +300,7 @@ class BackupRetentionPolicyAction(AzureBaseAction):
 
 
 @SqlDatabase.action_registry.register('update-short-term-backup-retention-policy')
+@SqlDatabase.action_registry.register('update-short-term-backup-retention')
 class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
     """
 
@@ -322,6 +327,7 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
 
     schema = type_schema(
         'update-short-term-backup-retention-policy',
+        aliases=['update-short-term-backup-retention'],
         rinherit=ShortTermBackupRetentionPolicyFilter.schema,
         op=None
     )
@@ -347,6 +353,7 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
 
 
 @SqlDatabase.action_registry.register('update-long-term-backup-retention-policy')
+@SqlDatabase.action_registry.register('update-long-term-backup-retention')
 class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
     """
 
@@ -379,6 +386,7 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyAction):
 
     schema = type_schema(
         'update-long-term-backup-retention-policy',
+        aliases=['update-long-term-backup-retention'],
         rinherit=LongTermBackupRetentionPolicyFilter.schema,
         op=None
     )
