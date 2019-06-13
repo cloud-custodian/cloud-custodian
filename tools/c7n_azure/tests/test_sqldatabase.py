@@ -311,16 +311,10 @@ class ShortTermBackupRetentionPolicyActionTest(BaseTest):
         cls.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
             .backup_short_term_retention_policies
 
-        cls.retention_policy_context = [
-            "test_sqlserver",
-            "cctestsqlserverideeowhs5iudo",  # TODO change the server name to not use unique suffix
-            "cctestdb"
-        ]
-
     def tearDown(self, *args, **kwargs):
         super(ShortTermBackupRetentionPolicyActionTest, self).tearDown(*args, **kwargs)
         reverted_policy = ShortTermBackupRetentionPolicyActionTest.client.create_or_update(
-            *ShortTermBackupRetentionPolicyActionTest.retention_policy_context, 14).result()
+            *self.retention_policy_context, 14).result()
         self.assertEqual(reverted_policy.retention_days, 14)
 
     @arm_template('sqlserver.json')
@@ -345,11 +339,13 @@ class ShortTermBackupRetentionPolicyActionTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.retention_policy_context = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(resources[0])
         self._assert_retention_period_equal(28)
 
     def _assert_retention_period_equal(self, days):
         current_retention_period = ShortTermBackupRetentionPolicyActionTest.client.get(
-            *ShortTermBackupRetentionPolicyActionTest.retention_policy_context
+            *self.retention_policy_context
         )
         self.assertEqual(current_retention_period.retention_days, days)
 
@@ -385,12 +381,6 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
         cls.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
             .backup_long_term_retention_policies
 
-        cls.retention_policy_context = [
-            "test_sqlserver",
-            "cctestsqlserverideeowhs5iudo",
-            "cclongtermretentiondb"
-        ]
-
     def tearDown(self, *args, **kwargs):
         default_long_term_policy = {
             'weekly_retention': 'P1M',
@@ -400,7 +390,7 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
 
         super(LongTermBackupRetentionPolicyActionTest, self).tearDown(*args, **kwargs)
         reverted_policy = LongTermBackupRetentionPolicyActionTest.client.create_or_update(
-            *LongTermBackupRetentionPolicyActionTest.retention_policy_context,
+            *self.retention_policy_context,
             default_long_term_policy
         ).result()
 
@@ -433,6 +423,8 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.retention_policy_context = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(resources[0])
         self._assert_retention_period_equal(
             BackupRetentionPolicyHelper.LongTermBackupType.weekly.retention_property,
             'P10D'
@@ -462,6 +454,8 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.retention_policy_context = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(resources[0])
         self._assert_retention_period_equal(
             BackupRetentionPolicyHelper.LongTermBackupType.monthly.retention_property,
             'P6W'
@@ -491,6 +485,8 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.retention_policy_context = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(resources[0])
         self._assert_retention_period_equal(
             BackupRetentionPolicyHelper.LongTermBackupType.yearly.retention_property,
             'P2Y'
@@ -498,6 +494,6 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
 
     def _assert_retention_period_equal(self, retention_property, period):
         current_retention_period = LongTermBackupRetentionPolicyActionTest.client.get(
-            *LongTermBackupRetentionPolicyActionTest.retention_policy_context
+            *self.retention_policy_context
         )
         self.assertEqual(getattr(current_retention_period, retention_property), period)
