@@ -21,7 +21,6 @@ import time
 import uuid
 from concurrent.futures import as_completed
 
-import isodate
 import six
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
 from azure.mgmt.managementgroups import ManagementGroupsAPI
