@@ -122,3 +122,15 @@ jobs:
       testResultsFiles: '**/test-results.xml'
       testRunTitle: 'Python $(python.version) Windows'
     condition: succeededOrFailed()
+
+- job: 'Custodian Container Wrapper'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  variables:
+    GOROOT: '/usr/local/go1.12'
+
+  steps:
+  - script: make release
+    workingDirectory: tools/custodian-container/
+    displayName: 'Build for all platforms'
