@@ -1,0 +1,24 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - tools/custodian-container/*
+
+variables:
+- group: CustodianCoreCI
+
+jobs:
+- job: 'CustodianContainerWrapper'
+  displayName: 'Container Wrapper'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  variables:
+    GOROOT: '/usr/local/go1.12'
+
+  steps:
+  - script: make release
+    workingDirectory: tools/custodian-container/
+    displayName: 'Build for all platforms'
