@@ -21,7 +21,7 @@ const CONTAINER_HOME string = "/home/custodian/"
 const IMAGE_NAME string = "cloudcustodian/c7n:latest"
 
 func main() {
-	fmt.Printf("Custodian Docker (%v)", IMAGE_NAME)
+	fmt.Printf("Custodian Docker (%v)\n", IMAGE_NAME)
 
 	ctx := context.Background()
 
@@ -77,6 +77,7 @@ func Create(image string, dockerClient *client.Client, ctx context.Context) stri
 		},
 		&container.HostConfig{
 			Binds: binds,
+			NetworkMode: "host",
 		},
 		nil,
 		"")
@@ -144,6 +145,12 @@ func GenerateBinds(args []string, outputPath string, policyPath string) []string
 		binds = append(binds, azureCliConfig + ":" + CONTAINER_HOME + ".azure:rw")
 	}
 
+	// AWS config
+	awsConfig := GetAwsConfigPath()
+	if awsConfig != "" {
+		binds = append(binds, awsConfig + ":" + CONTAINER_HOME + ".aws:ro")
+	}
+
 	return binds
 }
 
@@ -207,6 +214,24 @@ func GetAzureCliConfigPath() string {
 		configPath = filepath.Join(os.Getenv("USERPROFILE"), ".azure")
 	} else {
 		configPath = filepath.Join(os.Getenv("HOME"), ".azure")
+	}
+
+	if _, err := os.Stat(configPath); err == nil {
+		return configPath
+	}
+
+	return ""
+}
+
+// Find AWS Config if available so
+// we can mount it on the container.
+func GetAwsConfigPath() string {
+	var configPath string
+
+	if runtime.GOOS == "windows" {
+		configPath = filepath.Join(os.Getenv("USERPROFILE"), ".aws")
+	} else {
+		configPath = filepath.Join(os.Getenv("HOME"), ".aws")
 	}
 
 	if _, err := os.Stat(configPath); err == nil {
