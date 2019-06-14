@@ -22,7 +22,7 @@ from msrestazure.azure_exceptions import CloudError
 
 from c7n.filters import Filter
 from c7n.filters.core import PolicyValidationError
-from c7n.utils import c7n_prefix_cache_key, type_schema
+from c7n.utils import get_annotation_prefix, type_schema
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.filters import scalar_ops
 from c7n_azure.provider import resources
@@ -82,7 +82,7 @@ class BackupRetentionPolicyHelper(object):
     @staticmethod
     def get_backup_retention_policy(database, get_operation, cache_key):
 
-        policy_key = c7n_prefix_cache_key(cache_key)
+        policy_key = get_annotation_prefix(cache_key)
         cached_policy = database.get(policy_key)
         if cached_policy:
             return cached_policy
@@ -296,7 +296,7 @@ class BackupRetentionPolicyBaseAction(AzureBaseAction):
             resource_group_name, server_name, database_name, parameters).result()
 
         # Update the cached version
-        database[c7n_prefix_cache_key(self.operations_property)] = new_retention_policy.as_dict()
+        database[get_annotation_prefix(self.operations_property)] = new_retention_policy.as_dict()
 
     @abc.abstractmethod
     def _get_parameters_for_new_retention_policy(self, database):

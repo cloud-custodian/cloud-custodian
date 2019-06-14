@@ -647,5 +647,5 @@ class QueryParser(object):
         return filters
 
 
-def c7n_prefix_cache_key(s):
+def get_annotation_prefix(s):
     return 'c7n:{}'.format(s)
