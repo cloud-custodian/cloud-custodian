@@ -1,3 +1,5 @@
+// The package provides a transparent pass-through
+// for the Custodian CLI to a Custodian Docker Image
 package main
 
 import (
@@ -7,7 +9,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,31 +18,48 @@ import (
 )
 
 const CONTAINER_HOME string = "/home/custodian/"
+const IMAGE_NAME string = "cloudcustodian/c7n:latest"
 
 func main() {
-	fmt.Println("Custodian Docker Wrapper")
-
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		fmt.Println("Unable to create docker client")
-		panic(err)
-	}
+	fmt.Printf("Custodian Docker (%v)", IMAGE_NAME)
 
 	ctx := context.Background()
 
-	Pull("docker.io/cloudcustodian/c7n:latest", cli, ctx)
-	CreateAndRun("cloudcustodian/c7n:latest", cli, ctx)
+	// Create a docker client
+	dockerClient := GetClient()
+
+	// Ensure latest docker image
+	Pull("docker.io/" + IMAGE_NAME, dockerClient, ctx)
+
+	// Create container
+	id := Create(IMAGE_NAME, dockerClient, ctx)
+
+	// Run
+	Run(id, dockerClient, ctx)
 }
 
-func Pull(image string, cli *client.Client, ctx context.Context) {
-	reader, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
+// Creates a docker client using the host environment variables
+func GetClient() *client.Client {
+	dockerClient, err := client.NewEnvClient()
 	if err != nil {
-		io.Copy(os.Stdout, reader)
-		log.Fatal(err)
+		log.Fatalf("Unable to create docker client. %v", err)
+	}
+	return dockerClient
+}
+
+// Pulls the latest docker image and warns
+// if the image pull fails.  If Docker Hub is offline
+// the user can still execute on the local image if available.
+func Pull(image string, dockerClient *client.Client, ctx context.Context) {
+	_, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{})
+	if err != nil {
+		log.Printf( "Image Pull failed, will use cached image if available. %v", err)
 	}
 }
 
-func CreateAndRun(image string, cli *client.Client, ctx context.Context) (string, error) {
+// Create a container with appropriate arguments.
+// Includes creating mounts and updating paths.
+func Create(image string, dockerClient *client.Client, ctx context.Context) string {
 	// Prepare configuration
 	args := os.Args[1:]
 	originalOutput := SubstituteOutput(args)
@@ -50,7 +68,7 @@ func CreateAndRun(image string, cli *client.Client, ctx context.Context) (string
 	envs := GenerateEnvs()
 
 	// Create container
-	cont, err := cli.ContainerCreate(
+	cont, err := dockerClient.ContainerCreate(
 		ctx,
 		&container.Config{
 			Image: image,
@@ -66,28 +84,37 @@ func CreateAndRun(image string, cli *client.Client, ctx context.Context) (string
 		log.Fatal(err)
 	}
 
-	// Run container
-	err = cli.ContainerStart(ctx, cont.ID, types.ContainerStartOptions{})
+	return cont.ID
+}
+
+// Run container and wait for it to complete.
+// Copy log output to stdout and stderr.
+func Run(id string, dockerClient *client.Client, ctx context.Context) {
+	// Docker Run
+	err := dockerClient.ContainerStart(ctx, id, types.ContainerStartOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	code, err := cli.ContainerWait(ctx, cont.ID)
+	// Wait
+	code, err := dockerClient.ContainerWait(ctx, id)
 	if err != nil {
 		log.Fatalf("Status code: %v with error: %v", code, err)
 	}
 
 	// Output
-	out, err := cli.ContainerLogs(ctx, cont.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	out, err := dockerClient.ContainerLogs(ctx, id, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	stdcopy.StdCopy(os.Stdout, os.Stdout, out)
-
-	return cont.ID, nil
+	_, err = stdcopy.StdCopy(os.Stdout, os.Stdout, out)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
+// Create the bind mounts for input/output
 func GenerateBinds(args []string, outputPath string, policyPath string) []string {
 	// Policy
 	policy, err := filepath.Abs(policyPath)
@@ -120,6 +147,7 @@ func GenerateBinds(args []string, outputPath string, policyPath string) []string
 	return binds
 }
 
+// Fix the policy arguments
 func SubstitutePolicy(args []string) string {
 	originalPolicy := args[len(args)-1]
 	args[len(args)-1] = CONTAINER_HOME+filepath.Base(originalPolicy)
@@ -127,6 +155,7 @@ func SubstitutePolicy(args []string) string {
 	return originalPolicy
 }
 
+// Fix the output arguments
 func SubstituteOutput(args []string) string {
 	var outputPath string
 
@@ -147,11 +176,12 @@ func SubstituteOutput(args []string) string {
 	return ""
 }
 
+// Get list of environment variables
 func GenerateEnvs() []string {
 	var envs []string
 
 	// Bulk include matching variables
-	var re = regexp.MustCompile(`^AWS|^AZURE|^GOOGLE`)
+	var re = regexp.MustCompile(`^AWS|^AZURE_|^MSI_|^GOOGLE`)
 	for _, s := range os.Environ() {
 		if re.MatchString(s) {
 			envs = append(envs, s)
@@ -161,6 +191,8 @@ func GenerateEnvs() []string {
 	return envs
 }
 
+// Find Azure CLI Config if available so
+// we can mount it on the container.
 func GetAzureCliConfigPath() string {
 	// Check for override location
 	azureCliConfig := os.Getenv("AZURE_CONFIG_DIR")

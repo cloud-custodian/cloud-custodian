@@ -1,4 +1,4 @@
-module github.com/capitalone/cloud-custodian/tools/docker-wrapper
+module github.com/capitalone/cloud-custodian/tools/custodian-container
 
 require (
 	github.com/Microsoft/go-winio v0.4.12 // indirect
