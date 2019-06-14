@@ -14,20 +14,20 @@
                     "message": "Ok"
                 },
                 "headers": {
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-gatewayversion": [
-                        "version=2.4.0.0"
-                    ],
                     "date": [
-                        "Fri, 14 Jun 2019 19:07:21 GMT"
+                        "Fri, 14 Jun 2019 23:16:33 GMT"
                     ],
                     "content-location": [
-                        "https://management.documents.azure.com:450/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2015-04-08"
+                        "https://management.documents.azure.com:450/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2015-04-08"
                     ],
-                    "cache-control": [
-                        "no-store, no-cache"
+                    "x-ms-gatewayversion": [
+                        "version=2.4.0.0"
                     ],
                     "content-length": [
                         "1797"
