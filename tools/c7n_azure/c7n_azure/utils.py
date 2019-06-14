@@ -67,6 +67,11 @@ class ResourceIdParser(object):
     def get_resource_name(resource_id):
         return parse_resource_id(resource_id).get('resource_name')
 
+    @staticmethod
+    def get_full_type(resource_id):
+        return '/'.join([ResourceIdParser.get_namespace(resource_id),
+                         ResourceIdParser.get_resource_type(resource_id)])
+
 
 class StringUtils(object):
 

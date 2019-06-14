@@ -26,7 +26,7 @@ class LoadBalancer(ArmResourceManager):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('load_balancers', 'list_all', None)
-        type = 'loadbalancer'
+        resource_type = 'Microsoft.Network/loadBalancers'
 
 
 @LoadBalancer.filter_registry.register('frontend-public-ip')

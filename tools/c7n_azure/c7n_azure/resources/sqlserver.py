@@ -27,6 +27,7 @@ class SqlServer(ArmResourceManager):
         service = 'azure.mgmt.sql'
         client = 'SqlManagementClient'
         enum_spec = ('servers', 'list', None)
+        resource_type = 'Microsoft.Sql/servers'
 
 
 @SqlServer.filter_registry.register('firewall-rules')

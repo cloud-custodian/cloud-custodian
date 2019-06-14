@@ -27,3 +27,4 @@ class Image(ArmResourceManager):
             'location',
             'resourceGroup',
         )
+        resource_type = 'Microsoft.Compute/images'

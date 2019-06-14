@@ -28,3 +28,4 @@ class DataFactory(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.DataFactory/factories'

@@ -23,8 +23,10 @@ class RegistryTest(unittest.TestCase):
     def test_unregister(self):
 
         registry = PluginRegistry('dummy')
-        registry.register('dust', klass=lambda: 1)
+        klass = lambda: 1  # NOQA
+        registry.register('dust', klass)
         self.assertEqual(list(registry.keys()), ['dust'])
+        self.assertEqual(list(registry.values()), [klass])
         registry.unregister('dust')
 
     def test_event_subscriber(self):

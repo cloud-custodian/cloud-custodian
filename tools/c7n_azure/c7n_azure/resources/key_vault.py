@@ -34,6 +34,7 @@ class KeyVault(ArmResourceManager):
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
         enum_spec = ('vaults', 'list', None)
+        resource_type = 'Microsoft.KeyVault/vaults'
 
 
 @KeyVault.filter_registry.register('whitelist')

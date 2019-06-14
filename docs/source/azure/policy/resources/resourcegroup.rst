@@ -13,8 +13,8 @@ Filters
 - ``empty-group``
   Filter based on empty resource groups
 
-  .. c7n-schema:: EmptyGroup
-      :module: c7n_azure.resources.resourcegroup
+  .. c7n-schema:: azure.resourcegroup.filters.empty-group
+
 
 Actions
 -------
@@ -22,8 +22,8 @@ Actions
 - ``delete``
   Delete a resource group
 
-  .. c7n-schema:: DeleteResourceGroup
-      :module: c7n_azure.resources.resourcegroup
+  .. c7n-schema:: azure.resourcegroup.actions.delete
+
 
 
 Example Policies

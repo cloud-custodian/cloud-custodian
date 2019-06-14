@@ -10,9 +10,9 @@ Filters
 
 ``age``
   Based on ``StartTime`` of the snapshot, the time stamp when the snapshot was initiated, in days
+  **Deprecated** use value filter with `value_type: age`
+  .. c7n-schema:: aws.ebs.filters.age
 
-  .. c7n-schema:: SnapshotAge
-      :module: c7n.resources.ebs
 
 Actions
 -------
@@ -20,5 +20,5 @@ Actions
 ``delete``
   Delete EBS Snapshot based on ``skip-ami-snapshots``
 
-  .. c7n-schema:: SnapshotDelete
-      :module: c7n.resources.ebs
+  .. c7n-schema:: aws.ebs.actions.delete
+

@@ -7,10 +7,11 @@ This a plugin to Cloud Custodian that adds Azure support.
 
 The Azure provider must be installed as a separate package in addition to c7n. 
 
+    $ git clone https://github.com/cloud-custodian/cloud-custodian.git
     $ virtualenv custodian
     $ source custodian/bin/activate
-    (custodian) $ pip install c7n
-    (custodian) $ pip install c7n_azure
+    (custodian) $ pip install -e cloud-custodian/.
+    (custodian) $ pip install -e cloud-custodian/tools/c7n_azure/.
 
 
 ## Write your first policy

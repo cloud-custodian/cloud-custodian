@@ -15,8 +15,8 @@ Filters
 - ``firewall-rules``
     Firewall Rules Filter (see :ref:`azure_filters`)
 
-    .. c7n-schema:: SqlServerFirewallRulesFilter
-       :module: c7n_azure.resources.sqlserver
+    .. c7n-schema:: azure.sqlserver.filters.firewall-rules
+
 
 Actions
 -------
