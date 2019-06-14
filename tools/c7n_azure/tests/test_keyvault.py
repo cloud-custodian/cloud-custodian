@@ -205,7 +205,6 @@ class KeyVaultTest(BaseTest):
             .client('azure.mgmt.keyvault.KeyVaultManagementClient').vaults
         return client.__module__ + '.' + client.__class__.__name__
 
-
     @arm_template('keyvault.json')
     def test_firewall_rules_include(self):
         p = self.load_policy({

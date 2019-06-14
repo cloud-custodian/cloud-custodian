@@ -15,8 +15,8 @@ from c7n_azure.filters import FirewallRulesFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 import logging
-
 from netaddr import IPNetwork
+
 
 @resources.register('cosmosdb')
 class CosmosDB(ArmResourceManager):
@@ -31,6 +31,7 @@ class CosmosDB(ArmResourceManager):
             'resourceGroup',
             'kind'
         )
+
 
 @CosmosDB.filter_registry.register('firewall-rules')
 class CosmosDBFirewallRulesFilter(FirewallRulesFilter):

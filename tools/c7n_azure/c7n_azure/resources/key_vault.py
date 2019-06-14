@@ -66,6 +66,7 @@ class KeyVaultFirewallRulesFilter(FirewallRulesFilter):
         resource_rules = set([IPNetwork(r['value']) for r in ip_rules])
         return resource_rules
 
+
 @KeyVault.filter_registry.register('whitelist')
 class WhiteListFilter(Filter):
     schema = type_schema('whitelist', rinherit=None,
