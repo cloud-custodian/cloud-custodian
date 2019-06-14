@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import six
-from c7n_azure.actions.tagging import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction
 from c7n_azure.actions.delete import DeleteAction
+from c7n_azure.actions.tagging import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction
 from c7n_azure.filters import (MetricFilter, TagActionFilter,
                                DiagnosticSettingsFilter, PolicyCompliantFilter)
 from c7n_azure.provider import resources
@@ -23,6 +23,9 @@ from c7n_azure.query import QueryResourceManager, QueryMeta, ChildResourceManage
 from c7n_azure.utils import ResourceIdParser
 
 from c7n.utils import local_session
+
+
+arm_resource_types = {}
 
 
 @six.add_metaclass(TypeMeta)
@@ -36,9 +39,10 @@ class ArmTypeInfo(TypeInfo):
         'location',
         'resourceGroup'
     )
+    resource_type = None
+    enable_tag_operations = True
 
 
-@resources.register('armresource')
 @six.add_metaclass(QueryMeta)
 class ArmResourceManager(QueryResourceManager):
 
@@ -62,25 +66,31 @@ class ArmResourceManager(QueryResourceManager):
         ]
         return [r.serialize(True) for r in data]
 
+    def tag_operation_enabled(self, resource_type):
+        return self.resource_type.enable_tag_operations
+
     @staticmethod
     def register_arm_specific(registry, _):
         for resource in registry.keys():
             klass = registry.get(resource)
             if issubclass(klass, ArmResourceManager):
-                klass.action_registry.register('tag', Tag)
-                klass.action_registry.register('untag', RemoveTag)
-                klass.action_registry.register('auto-tag-user', AutoTagUser)
-                klass.action_registry.register('tag-trim', TagTrim)
+                arm_resource_types[klass.resource_type.resource_type.lower()] = klass.resource_type
+
+                if klass.resource_type.enable_tag_operations:
+                    klass.action_registry.register('tag', Tag)
+                    klass.action_registry.register('untag', RemoveTag)
+                    klass.action_registry.register('auto-tag-user', AutoTagUser)
+                    klass.action_registry.register('tag-trim', TagTrim)
+                    klass.filter_registry.register('marked-for-op', TagActionFilter)
+                    klass.action_registry.register('mark-for-op', TagDelayedAction)
+
                 klass.filter_registry.register('metric', MetricFilter)
-                klass.filter_registry.register('marked-for-op', TagActionFilter)
-                klass.action_registry.register('mark-for-op', TagDelayedAction)
                 klass.filter_registry.register('policy-compliant', PolicyCompliantFilter)
 
                 if resource != 'resourcegroup':
                     klass.action_registry.register('delete', DeleteAction)
 
-                if hasattr(klass.resource_type, 'diagnostic_settings_enabled') \
-                        and klass.resource_type.diagnostic_settings_enabled:
+                if klass.resource_type.diagnostic_settings_enabled:
                     klass.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
 
 

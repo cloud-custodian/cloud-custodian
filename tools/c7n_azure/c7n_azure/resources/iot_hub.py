@@ -28,3 +28,4 @@ class IoTHub(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.Devices/IotHubs'
