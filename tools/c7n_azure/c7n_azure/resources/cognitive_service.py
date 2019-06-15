@@ -28,3 +28,4 @@ class CognitiveService(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.CognitiveServices/accounts'

@@ -28,3 +28,4 @@ class RouteTable(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.Network/routeTables'
