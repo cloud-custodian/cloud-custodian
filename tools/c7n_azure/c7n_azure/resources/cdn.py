@@ -28,3 +28,4 @@ class CdnProfile(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.Cdn/profiles'

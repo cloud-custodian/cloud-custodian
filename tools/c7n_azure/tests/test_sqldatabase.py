@@ -13,6 +13,11 @@
 # limitations under the License.
 
 from azure_common import BaseTest, arm_template
+from c7n.exceptions import PolicyValidationError
+from c7n.utils import local_session
+from c7n_azure.resources.sqldatabase import (
+    BackupRetentionPolicyHelper, ShortTermBackupRetentionPolicyAction)
+from c7n_azure.session import Session
 
 
 class SqlDatabaseTest(BaseTest):
@@ -257,3 +262,238 @@ class LongTermBackupRetentionPolicyFilterTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+
+class ShortTermBackupRetentionPolicyActionSchemaTest(BaseTest):
+
+    def test_schema_with_valid_short_term_retention_period_values(self):
+        for period in ShortTermBackupRetentionPolicyAction.VALID_RETENTION_PERIOD_DAYS:
+            self._test_retention_period_days(days=period, valid=True)
+
+    def test_schema_with_invalid_short_term_retention_period_values(self):
+        for period in [5, 10, 20, 100]:
+            self._test_retention_period_days(days=period, valid=False)
+
+    def _test_retention_period_days(self, days, valid=True):
+
+        def do_validation():
+            with self.sign_out_patch():
+                p = self.load_policy({
+                    'name': 'short-term-action-schema-validate',
+                    'resource': 'azure.sqldatabase',
+                    'actions': [
+                        {
+                            'type': 'update-short-term-backup-retention-policy',
+                            'retention-period-days': days
+                        }
+                    ]
+                }, validate=True)
+                return p
+
+        if valid:
+            p = do_validation()
+            self.assertTrue(p, "Expected {} to be a valid retention period".format(days))
+        else:
+            with self.assertRaises(PolicyValidationError,
+                    msg="Expected {} to be an invalid retention period".format(days)):
+                do_validation()
+
+
+# NOTE: Normally, updating the retention policy on a DB requires ARM polling to know when the
+# operation has finished. However, this polling happens client-side and causes the tests to complete
+# slowly. In order to speed these up, the cassettes were manually modified to immediately return the
+# completed operation.
+class ShortTermBackupRetentionPolicyActionTest(BaseTest):
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super(ShortTermBackupRetentionPolicyActionTest, cls).setUpClass(*args, **kwargs)
+        cls.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
+            .backup_short_term_retention_policies
+
+    def tearDown(self, *args, **kwargs):
+        super(ShortTermBackupRetentionPolicyActionTest, self).tearDown(*args, **kwargs)
+        reverted_policy = ShortTermBackupRetentionPolicyActionTest.client.create_or_update(
+            *self.retention_policy_context, 14).result()
+        self.assertEqual(reverted_policy.retention_days, 14)
+
+    @arm_template('sqlserver.json')
+    def test_update_short_term_backup_retention_policy(self):
+        p = self.load_policy({
+            'name': 'test-update-short-term-backup-retention-policy',
+            'resource': 'azure.sqldatabase',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cctestdb'
+                },
+            ],
+            'actions': [
+                {
+                    'type': 'update-short-term-backup-retention-policy',
+                    'retention-period-days': 28
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.retention_policy_context = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(resources[0])
+        self._assert_retention_period_equal(28)
+
+    def _assert_retention_period_equal(self, days):
+        current_retention_period = ShortTermBackupRetentionPolicyActionTest.client.get(
+            *self.retention_policy_context
+        )
+        self.assertEqual(current_retention_period.retention_days, days)
+
+
+class LongTermBackupRetentionPolicyActionSchemaTest(BaseTest):
+
+    def test_schema_for_long_term_backup_retention_policy_action(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'long-term-action-schema-validate',
+                'resource': 'azure.sqldatabase',
+                'actions': [
+                    {
+                        'type': 'update-long-term-backup-retention-policy',
+                        'backup-type': 'weekly',
+                        'retention-period': 2,
+                        'retention-period-units': 'weeks'
+                    }
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+
+# NOTE: Normally, updating the retention policy on a DB requires ARM polling to know when the
+# operation has finished. However, this polling happens client-side and causes the tests to complete
+# slowly. In order to speed these up, the cassettes were manually modified to immediately return the
+# completed operation.
+class LongTermBackupRetentionPolicyActionTest(BaseTest):
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super(LongTermBackupRetentionPolicyActionTest, cls).setUpClass(*args, **kwargs)
+        cls.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient') \
+            .backup_long_term_retention_policies
+
+    def tearDown(self, *args, **kwargs):
+        default_long_term_policy = {
+            'weekly_retention': 'P1M',
+            'monthly_retention': 'P12M',
+            'yearly_retention': None
+        }
+
+        super(LongTermBackupRetentionPolicyActionTest, self).tearDown(*args, **kwargs)
+        reverted_policy = LongTermBackupRetentionPolicyActionTest.client.create_or_update(
+            *self.retention_policy_context,
+            default_long_term_policy
+        ).result()
+
+        self.assertEqual(reverted_policy.weekly_retention, 'P1M')
+        self.assertEqual(reverted_policy.monthly_retention, 'P12M')
+        self.assertEqual(reverted_policy.yearly_retention, 'PT0S')
+
+    @arm_template('sqlserver.json')
+    def test_update_weekly_retention_policy(self):
+
+        p = self.load_policy({
+            'name': 'test-update-weekly-retention-policy',
+            'resource': 'azure.sqldatabase',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cclongtermretentiondb'
+                },
+            ],
+            'actions': [
+                {
+                    'type': 'update-long-term-backup-retention-policy',
+                    'backup-type': 'weekly',
+                    'retention-period': 10,
+                    'retention-period-units': 'days',
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.retention_policy_context = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(resources[0])
+        self._assert_retention_period_equal(
+            BackupRetentionPolicyHelper.LongTermBackupType.weekly.retention_property,
+            'P10D'
+        )
+
+    @arm_template('sqlserver.json')
+    def test_update_monthly_retention_policy(self):
+        p = self.load_policy({
+            'name': 'test-update-monthly-retention-policy',
+            'resource': 'azure.sqldatabase',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cclongtermretentiondb'
+                },
+            ],
+            'actions': [
+                {
+                    'type': 'update-long-term-backup-retention-policy',
+                    'backup-type': 'monthly',
+                    'retention-period': 6,
+                    'retention-period-units': 'weeks',
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.retention_policy_context = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(resources[0])
+        self._assert_retention_period_equal(
+            BackupRetentionPolicyHelper.LongTermBackupType.monthly.retention_property,
+            'P6W'
+        )
+
+    @arm_template('sqlserver.json')
+    def test_update_yearly_retention_policy(self):
+        p = self.load_policy({
+            'name': 'test-update-yearly-retention-policy',
+            'resource': 'azure.sqldatabase',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'eq',
+                    'value': 'cclongtermretentiondb'
+                },
+            ],
+            'actions': [
+                {
+                    'type': 'update-long-term-backup-retention-policy',
+                    'backup-type': 'yearly',
+                    'retention-period': 2,
+                    'retention-period-units': 'years',
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.retention_policy_context = \
+            BackupRetentionPolicyHelper.get_backup_retention_policy_context(resources[0])
+        self._assert_retention_period_equal(
+            BackupRetentionPolicyHelper.LongTermBackupType.yearly.retention_property,
+            'P2Y'
+        )
+
+    def _assert_retention_period_equal(self, retention_property, period):
+        current_retention_period = LongTermBackupRetentionPolicyActionTest.client.get(
+            *self.retention_policy_context
+        )
+        self.assertEqual(getattr(current_retention_period, retention_property), period)

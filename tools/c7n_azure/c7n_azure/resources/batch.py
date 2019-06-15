@@ -28,3 +28,4 @@ class Batch(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.Batch/batchAccounts'
