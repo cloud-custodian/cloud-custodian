@@ -45,6 +45,8 @@ SKIP_REASON = "Azure Pipelines still broken"
 class MailerLdapTest(unittest.TestCase):
 
     def setUp(self):
+        if not have_sqlite:
+            return
         self.ldap_lookup = get_ldap_lookup(cache_engine='sqlite')
 
     @pytest.mark.skipif(azure_pipelines_broken(), reason=SKIP_REASON)
