@@ -313,8 +313,10 @@ class ShortTermBackupRetentionPolicyActionTest(BaseTest):
 
     def tearDown(self, *args, **kwargs):
         super(ShortTermBackupRetentionPolicyActionTest, self).tearDown(*args, **kwargs)
+        args = list(self.retention_policy_context)
+        args.append(14)
         reverted_policy = ShortTermBackupRetentionPolicyActionTest.client.create_or_update(
-            *self.retention_policy_context, 14).result()
+            *args).result()
         self.assertEqual(reverted_policy.retention_days, 14)
 
     @arm_template('sqlserver.json')
