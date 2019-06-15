@@ -15,6 +15,7 @@
 import unittest
 
 import pytest
+import sys
 
 from common import get_ldap_lookup, PETER, BILL
 from c7n_mailer.ldap_lookup import have_sqlite
@@ -36,7 +37,7 @@ def azure_pipelines_broken():
     As an alternative while we look for alternatives, this checks for tests
     known failing with broken python installations and skips them.\
     """
-    return bool(have_sqlite)
+    return (sys.version_info.major, sys.version_info.minor) in ((2, 7), (3, 7))
 
 
 SKIP_REASON = "Azure Pipelines still broken"
