@@ -103,7 +103,7 @@ Tags
 Logic App
 ---------
 
-``LogicAppAction``
+``LogicApp``
   Call the HTTP Endpoint on an Azure Logic App.
 
   Your policy credentials are used to get the trigger endpoint URL with secrets
@@ -111,8 +111,7 @@ Logic App
 
   This action is based on the ``webhook`` action and supports the same options.
 
-  .. c7n-schema:: LogicAppAction
-      :module: c7n_azure.actions.logic_app
+  .. c7n-schema:: azure.vm.actions.logic-app
 
   .. code-block:: yaml
 
