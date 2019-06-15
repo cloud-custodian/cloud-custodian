@@ -70,6 +70,22 @@ class LogicAppTest(BaseTest):
         with self.assertRaises(ValidationError):
             self.load_policy(data=policy, validate=True)
 
+        # Extra URL parameter
+        policy = {
+            "name": "logic-app",
+            "resource": "azure.vm",
+            "actions": [
+                {
+                    "type": "logic-app",
+                    "resource-group": "test_logic-app",
+                    "url": "http://foo.com"
+                }
+            ],
+        }
+
+        with self.assertRaises(ValidationError):
+            self.load_policy(data=policy, validate=True)
+
     @arm_template('logic-app.json')
     @mock.patch('c7n.actions.webhook.urllib3.PoolManager.request')
     def test_get_callback(self, request_mock):

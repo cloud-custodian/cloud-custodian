@@ -109,7 +109,7 @@ Logic App
   Your policy credentials are used to get the trigger endpoint URL with secrets
   using the resource group and app name.
 
-  This action is based on the Webhook action and supports the same options.
+  This action is based on the ``webhook`` action and supports the same options.
 
   .. c7n-schema:: LogicAppAction
       :module: c7n_azure.actions.logic_app

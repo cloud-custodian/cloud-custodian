@@ -40,26 +40,11 @@ class LogicAppAction(Webhook):
     schema = type_schema(
         'logic-app',
         required=['resource-group', 'logic-app-name'],
+        rinherit=Webhook.schema,
+        url=None,
         **{
             'resource-group': {'type': 'string'},
-            'logic-app-name': {'type': 'string'},
-            'body': {'type': 'string'},
-            'batch': {'type': 'boolean'},
-            'batch-size': {'type': 'number'},
-            'query-params': {
-                "type": "object",
-                "additionalProperties": {
-                    "type": "string",
-                    "description": "query string values"
-                }
-            },
-            'headers': {
-                "type": "object",
-                "additionalProperties": {
-                    "type": "string",
-                    "description": "header values"
-                }
-            }
+            'logic-app-name': {'type': 'string'}
         }
     )
 
