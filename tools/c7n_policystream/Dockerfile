@@ -20,7 +20,7 @@ WORKDIR /src
 RUN adduser --home /home/custodian --disabled-login custodian
 
 RUN apt-get --yes update && apt-get --yes upgrade \
-	&& apt-get --yes install build-essential libgit2-dev libffi-dev python3-pip \
+	&& apt-get --yes install build-essential libgit2-dev libffi-dev python3-pip python3-dev python3-setuptools python3-six python3-wheel \
 	&& pip3 install -r requirements.txt  . \
 	&& pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
 	&& pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
