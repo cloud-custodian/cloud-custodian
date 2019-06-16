@@ -29,3 +29,4 @@ class CosmosDB(ArmResourceManager):
             'resourceGroup',
             'kind'
         )
+        resource_type = 'Microsoft.DocumentDB/databaseAccounts'

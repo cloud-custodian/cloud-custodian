@@ -1,0 +1,109 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 12 Jun 2019 19:06:45 GMT"
+                    ],
+                    "content-length": [
+                        "5092"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_disk2_940c13b1ee61416ba97c4c68af01a3a5",
+                                "name": "cctestvm_disk2_940c13b1ee61416ba97c4c68af01a3a5",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_5f09339a9e1b4b8883e45fd1c7d8601b",
+                                "name": "cctestvm_OsDisk_1_5f09339a9e1b4b8883e45fd1c7d8601b",
+                                "type": "Microsoft.Compute/disks",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "name": "cctestvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic",
+                                "name": "myVMNic",
+                                "type": "Microsoft.Network/networkInterfaces",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/publicIPAddresses/myPublicIP",
+                                "name": "myPublicIP",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/virtualNetworks/MyVNET",
+                                "name": "MyVNET",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "southcentralus"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Storage/storageAccounts/45mqcga7pkswisalinuxvm",
+                                "name": "45mqcga7pkswisalinuxvm",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "location": "southcentralus",
+                                "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

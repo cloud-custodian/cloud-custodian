@@ -32,6 +32,7 @@ class Storage(ArmResourceManager):
         client = 'StorageManagementClient'
         enum_spec = ('storage_accounts', 'list', None)
         diagnostic_settings_enabled = False
+        resource_type = 'Microsoft.Storage/storageAccounts'
 
 
 @Storage.action_registry.register('set-network-rules')

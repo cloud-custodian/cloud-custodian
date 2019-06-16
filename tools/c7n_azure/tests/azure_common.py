@@ -214,7 +214,9 @@ class AzureVCRBaseTest(VCRTestCase):
 
             # Replace Activity Log API responses
             value_array = data.get('value', [])
-            if value_array and value_array[0].get('eventTimestamp'):
+            if value_array and \
+                    isinstance(value_array[0], dict) and \
+                    value_array[0].get('eventTimestamp'):
                 response['body']['data'] = ACTIVITY_LOG_RESPONSE
                 return response
 

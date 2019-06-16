@@ -28,6 +28,7 @@ class ResourceGroup(ArmResourceManager):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
         enum_spec = ('resource_groups', 'list', None)
+        resource_type = 'Microsoft.Resources/subscriptions/resourceGroups'
 
     def get_resources(self, resource_ids):
         resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')

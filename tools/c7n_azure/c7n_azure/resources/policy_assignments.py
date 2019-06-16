@@ -23,4 +23,4 @@ class PolicyAssignments(ArmResourceManager):
         service = 'azure.mgmt.resource.policy'
         client = 'PolicyClient'
         enum_spec = ('policy_assignments', 'list', None)
-        type = 'policyassignments'
+        resource_type = 'Microsoft.Authorization/policyAssignments'
