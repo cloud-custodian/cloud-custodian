@@ -170,6 +170,11 @@ func GenerateBinds(args []string, outputPath string, policyPath string) []string
 
 // Fix the policy arguments
 func SubstitutePolicy(args []string) string {
+	if strings.EqualFold(args[0], "schema")  ||
+		strings.EqualFold(args[0], "version") {
+		return ""
+	}
+
 	originalPolicy := args[len(args)-1]
 	args[len(args)-1] = CONTAINER_HOME+filepath.Base(originalPolicy)
 
