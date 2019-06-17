@@ -113,8 +113,8 @@ class LogicAppTest(BaseTest):
         regex = r'https://.*/workflows/.*/triggers/manual/paths/invoke' \
                 + r'\?api-version=.*triggers%2Fmanual%2Frun'
 
-        self.assertRegex(req1['url'], regex)
-        self.assertRegex(req2['url'], regex)
+        self.assertTrue(regex.search(regex, req1['url']))
+        self.assertTrue(regex.search(regex, req2['url']))
 
     def _get_manager(self):
         """The tests don't require real resource data,

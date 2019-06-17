@@ -391,10 +391,11 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
         }
 
         super(LongTermBackupRetentionPolicyActionTest, self).tearDown(*args, **kwargs)
+
+        params = list(self.retention_policy_context)
+        params.append(default_long_term_policy)
         reverted_policy = LongTermBackupRetentionPolicyActionTest.client.create_or_update(
-            *self.retention_policy_context,
-            default_long_term_policy
-        ).result()
+            *params).result()
 
         self.assertEqual(reverted_policy.weekly_retention, 'P1M')
         self.assertEqual(reverted_policy.monthly_retention, 'P12M')
