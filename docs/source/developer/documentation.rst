@@ -92,7 +92,7 @@ To do so, use the following command:
     $ make -f docs/Makefile.sphinx html
 
 
-You can also build documentation via the provided tox dockerfile.  You'll need to build and
+You can also build documentation via the provided tox dockerfile.  You will need to build and
 run from the root of your source enlistment each time you edit documentation files:
 
 .. code-block::
