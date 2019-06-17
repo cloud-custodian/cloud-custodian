@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import mock
+import re
 
 from azure_common import BaseTest, arm_template
 from jsonschema.exceptions import ValidationError
@@ -113,8 +114,8 @@ class LogicAppTest(BaseTest):
         regex = r'https://.*/workflows/.*/triggers/manual/paths/invoke' \
                 + r'\?api-version=.*triggers%2Fmanual%2Frun'
 
-        self.assertTrue(regex.search(regex, req1['url']))
-        self.assertTrue(regex.search(regex, req2['url']))
+        self.assertTrue(re.search(regex, req1['url']))
+        self.assertTrue(re.search(regex, req2['url']))
 
     def _get_manager(self):
         """The tests don't require real resource data,
