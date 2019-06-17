@@ -13,5 +13,4 @@ Here are some more specific example policies for these resources:
   delayedoperation
   genericarmaction
   genericarmfilter
-  filters
   resources/*

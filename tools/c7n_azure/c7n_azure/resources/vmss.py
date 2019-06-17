@@ -28,3 +28,4 @@ class VMScaleSet(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.Compute/virtualMachineScaleSets'

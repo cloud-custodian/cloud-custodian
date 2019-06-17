@@ -63,7 +63,7 @@ class AzureBaseAction(BaseAction):
         for r in resources:
             try:
                 self._process_resource(r)
-            except CloudError as e:
+            except Exception as e:
                 self.log.error("Failed to process resource.\n"
                                "Type: {0}.\n"
                                "Name: {1}.\n"

@@ -28,3 +28,4 @@ class Redis(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.Cache/Redis'

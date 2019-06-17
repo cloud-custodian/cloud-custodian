@@ -28,17 +28,16 @@ from msrestazure.azure_exceptions import CloudError
 
 @resources.register('networksecuritygroup')
 class NetworkSecurityGroup(ArmResourceManager):
-    class resource_type(object):
+    class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('network_security_groups', 'list_all', None)
-        id = 'id'
-        name = 'name'
         default_report_fields = (
             'name',
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.Network/networkSecurityGroups'
 
 
 DIRECTION = 'direction'

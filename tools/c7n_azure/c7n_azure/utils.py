@@ -15,24 +15,22 @@ import collections
 import datetime
 import enum
 import hashlib
-import isodate
 import logging
 import re
 import time
 import uuid
+from concurrent.futures import as_completed
 
 import six
-from azure.graphrbac.models import GetObjectsParameters, DirectoryObject
+from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
 from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
-from c7n_azure import constants
-from concurrent.futures import as_completed
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange
 
-from c7n.utils import chunks
-from c7n.utils import local_session
+from c7n.utils import chunks, local_session
+from c7n_azure import constants
 
 
 class ResourceIdParser(object):
@@ -66,6 +64,11 @@ class ResourceIdParser(object):
     @staticmethod
     def get_resource_name(resource_id):
         return parse_resource_id(resource_id).get('resource_name')
+
+    @staticmethod
+    def get_full_type(resource_id):
+        return '/'.join([ResourceIdParser.get_namespace(resource_id),
+                         ResourceIdParser.get_resource_type(resource_id)])
 
 
 class StringUtils(object):
@@ -473,10 +476,9 @@ class RetentionPeriod(object):
             return self.str_value
 
     @staticmethod
-    def duration_from_period_and_units(period, retention_period_unit):
+    def iso8601_duration(period, retention_period_unit):
         iso8601_str = "P{}{}".format(period, retention_period_unit.iso8601_symbol)
-        duration = isodate.parse_duration(iso8601_str)
-        return duration
+        return iso8601_str
 
     @staticmethod
     def parse_iso8601_retention_period(iso8601_retention_period):
