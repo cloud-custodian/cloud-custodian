@@ -6,3 +6,4 @@ pygit2
 PyYAML>=4.2b4
 sqlalchemy
 urllib3>=1.24.1
+six>=1.12.0

@@ -28,3 +28,4 @@ class DataLakeStore(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.DataLakeStore/accounts'

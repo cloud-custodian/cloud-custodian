@@ -611,3 +611,75 @@ class TestSNS(BaseTest):
         client = session_factory().client('sns')
         resources = client.list_topics()['Topics']
         self.assertEqual(len(resources), 0)
+
+    def test_sns_tag(self):
+        session_factory = self.replay_flight_data("test_sns_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-sns",
+                "resource": "sns",
+                "filters": [{"tag:Tagging": "absent"}],
+                "actions": [{"type": "tag", "key": "Tagging", "value": "added"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("sns")
+        tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
+        self.assertEqual(tags[0]["Value"], "added")
+
+    def test_sns_remove_tag(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_remove_tag")
+        p = self.load_policy(
+            {
+                "name": "untag-sns",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                    }
+                ],
+                "actions": [{"type": "remove-tag", "tags": ["custodian_cleanup"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("sns")
+        tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_sns_mark_for_op(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_mark_for_op"
+        )
+        p = self.load_policy(
+            {
+                "name": "sns-untagged-delete",
+                "resource": "sns",
+                "filters": [
+                    {"tag:Tagging": "absent"},
+                    {"tag:custodian_cleanup": "absent"},
+                ],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "days": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("sns")
+        tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
+        self.assertTrue(tags[0]["Key"], "custodian_cleanup")

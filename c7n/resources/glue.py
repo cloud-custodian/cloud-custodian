@@ -24,6 +24,7 @@ from c7n.utils import local_session, chunks, type_schema, generate_arn
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.tags import universal_augment, register_universal_tags
+from c7n.filters import StateTransitionFilter
 
 
 @resources.register('glue-connection')
@@ -173,9 +174,12 @@ class GlueJob(QueryResourceManager):
         date = 'CreatedOn'
         dimension = None
         filter_name = None
+        type = 'job'
         arn = False
 
     permissions = ('glue:GetJobs',)
+
+    augment = universal_augment
 
     @property
     def generate_arn(self):
@@ -207,4 +211,59 @@ class DeleteJob(BaseAction):
             try:
                 client.delete_job(JobName=r['Name'])
             except client.exceptions.EntityNotFoundException:
-                raise
+                continue
+
+
+@resources.register('glue-crawler')
+class GlueCrawler(QueryResourceManager):
+
+    class resource_type(object):
+        service = 'glue'
+        enum_spec = ('get_crawlers', 'Crawlers', None)
+        detail_spec = None
+        id = name = 'Name'
+        date = 'CreatedOn'
+        dimension = None
+        filter_name = None,
+        type = 'crawler'
+        arn = False
+        state_key = 'State'
+
+    permissions = ('glue:GetCrawlers',)
+
+    augment = universal_augment
+
+    @property
+    def generate_arn(self):
+        self._generate_arn = functools.partial(
+            generate_arn,
+            'glue',
+            region=self.config.region,
+            account_id=self.config.account_id,
+            resource_type='crawler',
+            separator='/')
+        return self._generate_arn
+
+    def get_arns(self, resources):
+        return [self.generate_arn(r['Name']) for r in resources]
+
+
+register_universal_tags(GlueCrawler.filter_registry, GlueCrawler.action_registry)
+
+
+@GlueCrawler.action_registry.register('delete')
+class DeleteCrawler(BaseAction, StateTransitionFilter):
+
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteCrawler',)
+    valid_origin_states = ('READY', 'FAILED')
+
+    def process(self, resources):
+        resources = self.filter_resource_state(resources)
+
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_crawler(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue

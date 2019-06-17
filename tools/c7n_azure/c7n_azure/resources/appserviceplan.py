@@ -34,6 +34,8 @@ class AppServicePlan(ArmResourceManager):
             'resourceGroup',
             'kind'
         )
+        resource_type = 'Microsoft.Web/sites'
+        enable_tag_operations = False
 
     @staticmethod
     def register(registry, _):

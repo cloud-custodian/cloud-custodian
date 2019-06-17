@@ -35,14 +35,13 @@ class TagHelper:
             )
         # other Azure resources
         else:
-            # generic armresource tagging isn't supported yet Github issue #2637
-            if tag_action.manager.type == 'armresource':
-                raise NotImplementedError('Cannot tag generic ARM resources.')
-
-            api_version = tag_action.session.resource_api_version(resource['id'])
-
             # deserialize the original object
             az_resource = GenericResource.deserialize(resource)
+
+            if not tag_action.manager.tag_operation_enabled(az_resource.type):
+                raise NotImplementedError('Cannot tag resource with type {0}'
+                                          .format(az_resource.type))
+            api_version = tag_action.session.resource_api_version(resource['id'])
 
             # create a GenericResource object with the required parameters
             generic_resource = GenericResource(location=az_resource.location,
