@@ -33,6 +33,7 @@ class CosmosDB(ArmResourceManager):
         )
         resource_type = 'Microsoft.DocumentDB/databaseAccounts'
 
+
 @CosmosDB.filter_registry.register('firewall-rules')
 class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
 
