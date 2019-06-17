@@ -15,6 +15,7 @@
 import logging
 import six
 from c7n_azure.actions.notify import Notify
+from c7n_azure.actions.logic_app import LogicAppAction
 from c7n_azure import constants
 from c7n_azure.provider import resources
 
@@ -250,6 +251,7 @@ class QueryResourceManager(ResourceManager):
         for resource in registry.keys():
             klass = registry.get(resource)
             klass.action_registry.register('notify', Notify)
+            klass.action_registry.register('logic-app', LogicAppAction)
 
 
 @six.add_metaclass(QueryMeta)

@@ -17,6 +17,7 @@ import c7n_azure.actions.base
 import c7n_azure.actions.delete
 import c7n_azure.actions.notify
 import c7n_azure.actions.tagging
+import c7n_azure.actions.logic_app
 import c7n_azure.filters
 import c7n_azure.output
 import c7n_azure.policy
