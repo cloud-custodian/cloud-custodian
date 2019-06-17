@@ -1,0 +1,134 @@
+# Copyright 2019 Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import mock
+
+from azure_common import BaseTest, arm_template
+from jsonschema.exceptions import ValidationError
+from c7n_azure.actions.logic_app import LogicAppAction
+
+
+class LogicAppTest(BaseTest):
+
+    def test_valid_policy(self):
+        policy = {
+            "name": "logic-app",
+            "resource": "azure.vm",
+            "actions": [
+                {
+                    "type": "logic-app",
+                    "resource-group": "test_logic-app",
+                    "logic-app-name": "cclogicapp"
+                }
+            ],
+        }
+
+        self.assertTrue(self.load_policy(data=policy, validate=True))
+
+        policy = {
+            "name": "logic-app",
+            "resource": "azure.vm",
+            "actions": [
+                {
+                    "type": "logic-app",
+                    "resource-group": "test_logic-app",
+                    "logic-app-name": "cclogicapp",
+                    "batch": True,
+                    "query-params": {
+                        "foo": "bar"
+                    }
+                }
+            ],
+        }
+
+        self.assertTrue(self.load_policy(data=policy, validate=True))
+
+    def test_invalid_policy(self):
+        # Missing logic-app-name parameter
+        policy = {
+            "name": "logic-app",
+            "resource": "azure.vm",
+            "actions": [
+                {
+                    "type": "logic-app",
+                    "resource-group": "test_logic-app"
+                }
+            ],
+        }
+
+        with self.assertRaises(ValidationError):
+            self.load_policy(data=policy, validate=True)
+
+        # Extra URL parameter
+        policy = {
+            "name": "logic-app",
+            "resource": "azure.vm",
+            "actions": [
+                {
+                    "type": "logic-app",
+                    "resource-group": "test_logic-app",
+                    "url": "http://foo.com"
+                }
+            ],
+        }
+
+        with self.assertRaises(ValidationError):
+            self.load_policy(data=policy, validate=True)
+
+    @arm_template('logic-app.json')
+    @mock.patch('c7n.actions.webhook.urllib3.PoolManager.request')
+    def test_get_callback(self, request_mock):
+        resources = [
+            {
+                "name": "test1",
+                "value": "test_value"
+            },
+            {
+                "name": "test2",
+                "value": "test_value"
+            }
+        ]
+
+        data = {
+            "resource-group": "test_logic-app",
+            "logic-app-name": "cclogicapp"
+        }
+
+        la = LogicAppAction(data=data, manager=self._get_manager())
+        la.process(resources)
+        req1 = request_mock.call_args_list[0][1]
+        req2 = request_mock.call_args_list[1][1]
+
+        regex = r'https://.*/workflows/.*/triggers/manual/paths/invoke' \
+                + r'\?api-version=.*triggers%2Fmanual%2Frun'
+
+        self.assertRegex(req1['url'], regex)
+        self.assertRegex(req2['url'], regex)
+
+    def _get_manager(self):
+        """The tests don't require real resource data,
+        but they do need a valid manager with
+        policy metadata so we just make one here to use"""
+
+        policy = self.load_policy({
+            "name": "webhook_policy",
+            "resource": "azure.vm",
+            "actions": [
+                {
+                    "type": "logic-app",
+                    "resource-group": "test_logic-app",
+                    "logic-app-name": "cclogicapp"}
+            ]})
+
+        return policy.resource_manager

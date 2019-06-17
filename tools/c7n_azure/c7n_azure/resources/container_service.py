@@ -28,3 +28,4 @@ class ContainerService(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.ContainerService/containerServices'

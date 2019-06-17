@@ -191,7 +191,7 @@ class ArmResourceTest(BaseTest):
         return_value='')
     def test_delete_armresource(self, delete_action_mock, filter_mock):
         p = self.load_policy({
-            'name': 'delete-arm-resource',
+            'name': 'delete-armresource',
             'resource': 'azure.armresource',
             'filters': [
                 {'type': 'value',
@@ -212,7 +212,7 @@ class ArmResourceTest(BaseTest):
         return_value='')
     def test_delete_armresource_specific_name(self, delete_action_mock, filter_mock):
         p = self.load_policy({
-            'name': 'delete-arm-resource',
+            'name': 'delete-armresource',
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'value',
@@ -226,3 +226,43 @@ class ArmResourceTest(BaseTest):
         })
         p.run()
         delete_action_mock.assert_called_with([self.fake_arm_resources[0]])
+
+    def test_arm_resource_resource_type_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-armresource-filter',
+                'resource': 'azure.armresource',
+                'filters': [
+                    {
+                        'type': 'resource-type',
+                        'values': ['Microsoft.Storage/storageAccounts', 'Microsoft.Web/serverFarms']
+                    }
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
+    @arm_template('vm.json')
+    def test_arm_resource_resource_type(self):
+        p = self.load_policy({
+            'name': 'test-azure-armresource-filter',
+            'resource': 'azure.armresource',
+            'filters': [
+                {
+                    'type': 'resource-type',
+                    'values': [
+                        'Microsoft.Network/virtualNetworks',
+                        'Microsoft.Storage/storageAccounts',
+                        'Microsoft.Compute/virtualMachines'
+                    ]
+                },
+                {
+                    'type': 'value',
+                    'key': 'resourceGroup',
+                    'value_type': 'normalize',
+                    'op': 'eq',
+                    'value': 'test_vm'
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
