@@ -123,8 +123,8 @@ jobs:
       testRunTitle: 'Python $(python.version) Windows'
     condition: succeededOrFailed()
 
-- job: 'CustodianContainerWrapper'
-  displayName: 'Container Wrapper'
+- job: 'CustodianCask'
+  displayName: 'Container Cask'
   pool:
     vmImage: 'Ubuntu-16.04'
 
@@ -133,5 +133,5 @@ jobs:
 
   steps:
   - script: make release
-    workingDirectory: tools/custodian-container/
+    workingDirectory: tools/cask/
     displayName: 'Build for all platforms'

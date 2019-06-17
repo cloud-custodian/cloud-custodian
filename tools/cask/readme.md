@@ -1,7 +1,7 @@
-custodian-container
+custodian-cask
 ===================
 
-custodian-container is a Go wrapper over the `cloudcustodian/c7n:latest`
+custodian-cask is a Go wrapper over the `cloudcustodian/c7n:latest`
 Docker image.  It allows you to use the docker image with the same CLI you
 would use for a local Custodian installation. 
 
@@ -13,12 +13,12 @@ Build
 -----
 
 ```
-cd cloud-custodian\tools\custodian-container
-go build -o custodianc
+cd cloud-custodian\tools\custodian-cask
+go build -o custodian-cask
 ```
 
 Run
 ---
 ```
-custodianc run -s . policy.yml
+custodian-cask run -s . policy.yml
 ```
