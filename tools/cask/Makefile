@@ -2,7 +2,7 @@
 test:
 	go test .
 
-BINARY := mytool
+BINARY := cask
 VERSION ?= vlatest
 
 .PHONY: windows
