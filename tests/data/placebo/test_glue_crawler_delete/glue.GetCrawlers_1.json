@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "Crawlers": [
+            {
+                "Name": "test",
+                "Role": "c7n-glue-test",
+                "Targets": {
+                    "S3Targets": [
+                        {
+                            "Path": "s3://c7n-codebuild",
+                            "Exclusions": []
+                        }
+                    ],
+                    "JdbcTargets": [],
+                    "DynamoDBTargets": []
+                },
+                "DatabaseName": "test",
+                "Classifiers": [],
+                "SchemaChangePolicy": {
+                    "UpdateBehavior": "UPDATE_IN_DATABASE",
+                    "DeleteBehavior": "DEPRECATE_IN_DATABASE"
+                },
+                "State": "READY",
+                "CrawlElapsedTime": 0,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 14,
+                    "hour": 10,
+                    "minute": 15,
+                    "second": 30,
+                    "microsecond": 0
+                },
+                "LastUpdated": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 14,
+                    "hour": 10,
+                    "minute": 15,
+                    "second": 30,
+                    "microsecond": 0
+                },
+                "Version": 1
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "f4f06652-8eae-11e9-aeca-67564555c648",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Fri, 14 Jun 2019 14:16:09 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "428",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "f4f06652-8eae-11e9-aeca-67564555c648"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

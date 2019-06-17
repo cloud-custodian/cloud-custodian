@@ -100,7 +100,34 @@ Tags
                     - downtime
                     - custodian_status
 
-Others
+Logic App
+---------
+
+``LogicApp``
+  Call the HTTP Endpoint on an Azure Logic App.
+
+  Your policy credentials are used to get the trigger endpoint URL with secrets
+  using the resource group and app name.
+
+  This action is based on the ``webhook`` action and supports the same options.
+
+  .. c7n-schema:: azure.vm.actions.logic-app
+
+  .. code-block:: yaml
+
+      policies:
+        - name: call-logic-app
+          resource: azure.vm
+          description: |
+            Call logic app with list of VM's
+          actions:
+           - type: logic-app
+             resource-group: custodian-test
+             logic-app-name: cclogicapp
+             batch: true
+             body: 'resources[].{ vm_name: name }'
+
+Delete
 -------
 
 ``DeleteAction``

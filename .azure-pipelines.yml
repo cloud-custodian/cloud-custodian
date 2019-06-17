@@ -15,7 +15,7 @@ jobs:
 
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.6'
+        versionSpec: '3.7'
         architecture: 'x64'
 
     - script: python -m pip install --upgrade pip && pip install flake8
@@ -29,16 +29,16 @@ jobs:
     vmImage: 'Ubuntu-16.04'
   strategy:
     matrix:
-#      Python27:
-#        python.version: '2.7'
-#        TOXENV: py27
+      Python27:
+        python.version: '2.7'
+        TOXENV: py27
       Python36:
         python.version: '3.6'
         TOXENV: py36-cov
-#      Python37:
-#        python.version: '3.7'
-#        TOXENV: py37
-#    maxParallel: 3
+      Python37:
+        python.version: '3.7'
+        TOXENV: py37
+    maxParallel: 3
 
   steps:
   - checkout: self
@@ -74,7 +74,7 @@ jobs:
 
   - script: TOXENV=docs tox
     displayName: "Docs Build"
-    condition: "eq(variables['python.version'], '3.6')"
+    condition: "eq(variables['python.version'], '3.7')"
 
   - task: PublishTestResults@2
     displayName: "Publish Test Results Azure"
@@ -89,13 +89,13 @@ jobs:
     vmImage: 'windows-2019'
   strategy:
     matrix:
-#      Python36:
-#        python.version: '3.6'
-#        TOXENV: py36
+      Python36:
+        python.version: '3.6'
+        TOXENV: py36
       Python37:
         python.version: '3.7'
         TOXENV: py37
-#    maxParallel: 3
+    maxParallel: 3
 
   steps:
   - checkout: self
