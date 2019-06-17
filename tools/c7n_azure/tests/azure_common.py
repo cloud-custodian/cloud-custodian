@@ -106,7 +106,8 @@ class AzureVCRBaseTest(VCRTestCase):
                         'vary',
                         'pragma',
                         'transfer-encoding',
-                        'expires']
+                        'expires',
+                        'content-location']
 
     def is_playback(self):
         # You can't do this in setup because it is actually required by the base class
@@ -178,8 +179,6 @@ class AzureVCRBaseTest(VCRTestCase):
         response['headers'] = {k.lower(): v for (k, v) in
                                response['headers'].items()
                                if k.lower() not in self.FILTERED_HEADERS}
-
-        response['headers']['content-location'] = [AzureVCRBaseTest._replace_subscription_id(cl) for cl in response['headers']['content-location']]
 
         content_type = response['headers'].get('content-type', (None,))[0]
         if not content_type or 'application/json' not in content_type:

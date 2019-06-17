@@ -14,17 +14,14 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
                     "content-type": [
                         "application/json"
                     ],
                     "date": [
-                        "Fri, 14 Jun 2019 23:16:32 GMT"
+                        "Mon, 17 Jun 2019 18:55:21 GMT"
                     ],
-                    "content-location": [
-                        "https://management.documents.azure.com:450/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2015-04-08"
+                    "cache-control": [
+                        "no-store, no-cache"
                     ],
                     "x-ms-gatewayversion": [
                         "version=2.4.0.0"
