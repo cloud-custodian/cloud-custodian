@@ -109,6 +109,7 @@ class ReservedConcurrency(ValueFilter):
     annotation_key = "c7n:FunctionInfo"
     value_key = '"c7n:FunctionInfo".Concurrency.ReservedConcurrentExecutions'
     schema = type_schema('reserved-concurrency', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('lambda:GetFunction',)
 
     def validate(self):
@@ -180,6 +181,7 @@ class LambdaEventSource(ValueFilter):
 
     annotation_key = "c7n:EventSources"
     schema = type_schema('event-source', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('lambda:GetPolicy',)
 
     def process(self, resources, event=None):

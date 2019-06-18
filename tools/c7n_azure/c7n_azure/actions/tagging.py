@@ -39,6 +39,7 @@ class Tag(AzureBaseAction):
             'tags': {'type': 'object'}
         }
     )
+    schema_alias = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(Tag, self).__init__(data, manager, log_dir)
@@ -78,6 +79,7 @@ class RemoveTag(AzureBaseAction):
     schema = utils.type_schema(
         'untag',
         tags={'type': 'array', 'items': {'type': 'string'}})
+    schema_alias = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(RemoveTag, self).__init__(data, manager, log_dir)
@@ -131,6 +133,7 @@ class AutoTagUser(AzureEventAction):
         **{'update': {'type': 'boolean'},
            'tag': {'type': 'string'},
            'days': {'type': 'integer'}})
+    schema_alias = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
@@ -300,6 +303,7 @@ class TagTrim(AzureBaseAction):
         'tag-trim',
         space={'type': 'integer'},
         preserve={'type': 'array', 'items': {'type': 'string'}})
+    schema_alias = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(TagTrim, self).__init__(data, manager, log_dir)
@@ -370,6 +374,7 @@ class TagDelayedAction(AzureBaseAction):
         hours={'type': 'integer', 'minimum': 0, 'exclusiveMinimum': False},
         tz={'type': 'string'},
         op={'type': 'string'})
+    schema_alias = True
 
     default_template = 'Resource does not meet policy: {op}@{action_date}'
 

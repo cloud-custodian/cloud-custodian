@@ -360,7 +360,7 @@ class DhcpOptionsFilter(Filter):
 
      :example:
 
-     .. code-block: yaml
+     .. code-block:: yaml
 
           policies:
              - name: vpcs-in-domain
@@ -1122,13 +1122,27 @@ class SGPermission(Filter):
             return True
 
 
+SGPermissionSchema = {
+    'IpProtocol': {'enum': [-1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+    'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
+    'FromPort': {'type': 'integer'},
+    'ToPort': {'type': 'integer'},
+    'UserIdGroupPairs': {},
+    'IpRanges': {},
+    'PrefixListIds': {},
+    'Description': {},
+    'Cidr': {},
+    'CidrV6': {},
+}
+
+
 @SecurityGroup.filter_registry.register('ingress')
 class IPPermission(SGPermission):
 
     ip_permissions_key = "IpPermissions"
     schema = {
         'type': 'object',
-        # 'additionalProperties': True,
+        'additionalProperties': False,
         'properties': {
             'type': {'enum': ['ingress']},
             'match-operator': {'type': 'string', 'enum': ['or', 'and']},
@@ -1136,6 +1150,7 @@ class IPPermission(SGPermission):
             'SelfReference': {'type': 'boolean'}
         },
         'required': ['type']}
+    schema['properties'].update(SGPermissionSchema)
 
 
 @SecurityGroup.filter_registry.register('egress')
@@ -1144,13 +1159,14 @@ class IPPermissionEgress(SGPermission):
     ip_permissions_key = "IpPermissionsEgress"
     schema = {
         'type': 'object',
-        # 'additionalProperties': True,
+        'additionalProperties': False,
         'properties': {
             'type': {'enum': ['egress']},
             'match-operator': {'type': 'string', 'enum': ['or', 'and']},
             'SelfReference': {'type': 'boolean'}
         },
         'required': ['type']}
+    schema['properties'].update(SGPermissionSchema)
 
 
 @SecurityGroup.action_registry.register('delete')
@@ -1364,7 +1380,7 @@ class DeleteNetworkInterface(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: mark-orphaned-enis
@@ -1465,6 +1481,7 @@ class Route(ValueFilter):
     """Filter a route table by its routes' attributes."""
 
     schema = type_schema('route', rinherit=ValueFilter.schema)
+    schema_alias = False
 
     def process(self, resources, event=None):
         results = []
@@ -1912,7 +1929,7 @@ class CreateFlowLogs(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: vpc-enable-flow-logs

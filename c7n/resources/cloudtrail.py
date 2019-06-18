@@ -86,6 +86,7 @@ class Status(ValueFilter):
     """
 
     schema = type_schema('status', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('cloudtrail:GetTrailStatus',)
     annotation_key = 'c7n:TrailStatus'
 

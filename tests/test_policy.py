@@ -21,6 +21,7 @@ import shutil
 import tempfile
 
 from c7n import policy, manager
+from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
@@ -195,6 +196,43 @@ class PolicyMeta(BaseTest):
                 legacy.add(k)
         if legacy:
             raise SyntaxError("legacy arn type info %s" % (', '.join(legacy)))
+
+    def _visit_filters_and_actions(self, visitor):
+        names = []
+        for cloud_name, cloud in clouds.items():
+            for resource_name, resource in cloud.resources.items():
+                for fname, f in resource.filter_registry.items():
+                    if fname in ('and', 'or', 'not'):
+                        continue
+                    if visitor(f):
+                        names.append("%s.%s.filters.%s" % (
+                            cloud_name, resource_name, fname))
+                for aname, a in resource.action_registry.items():
+                    if visitor(a):
+                        names.append('%s.%s.actions.%s' % (
+                            cloud_name, resource_name, aname))
+        return names
+
+    def test_filter_action_additional(self):
+
+        def visitor(e):
+            if e.type == 'notify':
+                return
+            return e.schema.get('additionalProperties', True) is True
+
+        names = self._visit_filters_and_actions(visitor)
+        if names:
+            self.fail(
+                "missing additionalProperties: Fallse on actions/filters\n %s" % (
+                    " \n".join(names)))
+
+    def test_filter_action_type(self):
+        def visitor(e):
+            return 'type' not in e.schema['properties']
+
+        names = self._visit_filters_and_actions(visitor)
+        if names:
+            self.fail("missing type on actions/filters\n %s" % (" \n".join(names)))
 
     def test_resource_arn_info(self):
         missing = []

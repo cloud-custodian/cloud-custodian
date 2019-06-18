@@ -327,7 +327,7 @@ class EncryptLogGroup(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: encrypt-log-group

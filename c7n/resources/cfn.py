@@ -125,7 +125,7 @@ class CloudFormationAddTag(Tag):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: add-cfn-tag
@@ -182,7 +182,7 @@ class CloudFormationRemoveTag(RemoveTag):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: add-cfn-tag

@@ -57,7 +57,7 @@ class DeleteConnection(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: delete-jdbc-connections
@@ -106,7 +106,7 @@ class DeleteDevEndpoint(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: delete-public-dev-endpoints

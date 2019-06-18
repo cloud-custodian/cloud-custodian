@@ -457,7 +457,7 @@ class RemoveTag(Action):
     concurrency = 2
 
     schema = utils.type_schema(
-        'untag', aliases=('unmark', 'remove-tag'),
+        'remove-tag', aliases=('unmark', 'untag', 'remove-tag'),
         tags={'type': 'array', 'items': {'type': 'string'}})
     schema_alias = True
     permissions = ('ec2:DeleteTags',)

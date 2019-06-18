@@ -71,6 +71,7 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
     """
 
     schema = type_schema('connection-status', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('workspaces:DescribeConnectionStatus',)
     annotation_key = 'c7n:ConnectionStatus'
 

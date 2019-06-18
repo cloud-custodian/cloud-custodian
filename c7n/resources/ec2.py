@@ -291,6 +291,7 @@ class AttachedVolume(ValueFilter):
         'ebs', rinherit=ValueFilter.schema,
         **{'operator': {'enum': ['and', 'or']},
            'skip-devices': {'type': 'array', 'items': {'type': 'string'}}})
+    schema_alias = False
 
     def get_permissions(self):
         return self.manager.get_resource_manager('ebs').get_permissions()
@@ -453,6 +454,7 @@ class ImageAge(AgeFilter, InstanceImageBase):
 class InstanceImage(ValueFilter, InstanceImageBase):
 
     schema = type_schema('image', rinherit=ValueFilter.schema)
+    schema_alias = False
 
     def get_permissions(self):
         return self.manager.get_resource_manager('ami').get_permissions()
@@ -729,6 +731,7 @@ class UserData(ValueFilter):
     """
 
     schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    schema_alias = False
     batch_size = 50
     annotation = 'c7n:user-data'
     permissions = ('ec2:DescribeInstanceAttribute',)
@@ -868,6 +871,7 @@ class SsmStatus(ValueFilter):
                 value: 18.04
     """
     schema = type_schema('ssm', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('ssm:DescribeInstanceInformation',)
     annotation = 'c7n:SsmState'
 
@@ -1566,7 +1570,7 @@ class PropagateSpotTags(BaseAction):
 
     :Example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: ec2-spot-instances
@@ -1776,6 +1780,7 @@ class InstanceAttribute(ValueFilter):
         rinherit=ValueFilter.schema,
         attribute={'enum': valid_attrs},
         required=('attribute',))
+    schema_alias = False
 
     def get_permissions(self):
         return ('ec2:DescribeInstanceAttribute',)

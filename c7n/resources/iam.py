@@ -913,18 +913,19 @@ class AllowAllIamPolicies(Filter):
     The policy will trigger on the following IAM policy (statement).
     For example:
 
-    .. code-block: json
-     {
-         'Version': '2012-10-17',
-         'Statement': [{
-             'Action': '*',
-             'Resource': '*',
-             'Effect': 'Allow'
-         }]
-     }
+    .. code-block:: json
+
+      {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Action": "*",
+              "Resource": "*",
+              "Effect": "Allow"
+          }]
+      }
 
     Additionally, the policy checks if the statement has no 'Condition' or
-    'NotAction'
+    'NotAction'.
 
     For example, if the user wants to check all used policies and filter on
     allow all:
@@ -1020,7 +1021,7 @@ class PolicyDelete(BaseAction):
 
 @InstanceProfile.filter_registry.register('used')
 class UsedInstanceProfiles(IamRoleUsage):
-    """Filter IAM profiles that are being used
+    """Filter IAM profiles that are being used.
 
     :example:
 
@@ -1337,6 +1338,7 @@ class UserPolicy(ValueFilter):
     """
 
     schema = type_schema('policy', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('iam:ListAttachedUserPolicies',)
 
     def user_policies(self, user_set):
@@ -1383,6 +1385,7 @@ class GroupMembership(ValueFilter):
     """
 
     schema = type_schema('group', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('iam:ListGroupsForUser',)
 
     def get_user_groups(self, client, user_set):
@@ -1427,6 +1430,7 @@ class UserAccessKey(ValueFilter):
     """
 
     schema = type_schema('access-key', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('iam:ListAccessKeys',)
     annotation_key = 'c7n:AccessKeys'
     matched_annotation_key = 'c7n:matched-keys'
@@ -1481,6 +1485,7 @@ class UserMfaDevice(ValueFilter):
     """
 
     schema = type_schema('mfa-device', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('iam:ListMfaDevices',)
 
     def __init__(self, *args, **kw):

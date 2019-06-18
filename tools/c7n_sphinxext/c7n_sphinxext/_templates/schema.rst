@@ -7,4 +7,4 @@
 
   .. code-block:: yaml
 
-    {{ schema_json|indent(4) }}
+    {{ schema_yaml|indent(4) }}

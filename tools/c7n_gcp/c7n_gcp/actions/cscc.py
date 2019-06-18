@@ -56,7 +56,7 @@ class PostFinding(MethodAction):
             'org-domain': {'type': 'string'},
             'org-id': {'type': 'integer'},
             'category': {'type': 'string'}})
-
+    schema_alias = True
     method_spec = {'op': 'create', 'result': 'name', 'annotation_key': 'c7n:Finding'}
 
     # create throws error if already exists, patch method has bad docs.

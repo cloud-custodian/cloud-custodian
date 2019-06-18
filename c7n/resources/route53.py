@@ -159,7 +159,7 @@ class Route53DomainAddTag(Tag):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: route53-tag
@@ -187,7 +187,7 @@ class Route53DomainRemoveTag(RemoveTag):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: route53-expired-tag
@@ -227,7 +227,7 @@ class SetQueryLogging(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: enablednsquerylogging

@@ -22,6 +22,8 @@ from .core import ValueFilter, OPERATORS
 
 class RelatedResourceFilter(ValueFilter):
 
+    schema_alias = False
+
     RelatedResource = None
     RelatedIdsExpression = None
     AnnotationKey = None

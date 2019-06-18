@@ -300,28 +300,6 @@ class RemovePolicyStatement(RemovePolicyBase):
 
 @SNS.action_registry.register('modify-policy')
 class ModifyPolicyStatement(ModifyPolicyBase):
-    """Action to modify policy statements from SNS
-
-    :example:
-
-    .. code-block:: yaml
-
-           policies:
-              - name: sns-cross-account
-                resource: sns
-                filters:
-                  - type: cross-account
-                actions:
-                  - type: modify-policy
-                    add-statements: [{
-                        "Sid": "ReplaceWithMe",
-                        "Effect": "Allow",
-                        "Principal": "*",
-                        "Action": ["SNS:GetTopicAttributes"],
-                        "Resource": topic_arn,
-                            }]
-                    remove-statements: '*'
-    """
 
     permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')
 
@@ -380,21 +358,21 @@ class SetEncryption(BaseAction):
               actions:
                 - type: set-encryption
                   key: alias/cmk/key
-                  enabled: True
+                  enabled: true
 
             - name: set-sns-topic-encryption-with-id
               resource: sns
               actions:
                 - type: set-encryption
                   key: abcdefgh-1234-1234-1234-123456789012
-                  enabled: True
+                  enabled: true
 
             - name: set-sns-topic-encryption-with-arn
               resource: sns
               actions:
                 - type: set-encryption
                   key: arn:aws:kms:us-west-1:123456789012:key/abcdefgh-1234-1234-1234-123456789012
-                  enabled: True
+                  enabled: true
     """
 
     schema = type_schema(

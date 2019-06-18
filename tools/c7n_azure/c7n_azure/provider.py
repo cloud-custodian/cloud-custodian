@@ -23,6 +23,7 @@ from .session import Session
 @clouds.register('azure')
 class Azure(Provider):
 
+    display_name = 'Azure'
     resource_prefix = 'azure'
     resources = PluginRegistry('%s.resources' % resource_prefix)
 

@@ -448,6 +448,7 @@ class Instance(ValueFilter):
     """
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
+    schema_alias = False
     annotate = False
 
     def get_permissions(self):

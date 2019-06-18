@@ -665,6 +665,7 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
 
     schema = type_schema(
         'listener', rinherit=ValueFilter.schema, matched={'type': 'boolean'})
+    schema_alias = False
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
 
     def validate(self):
@@ -799,6 +800,7 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
     """Filter ALB based on matching target group value"""
 
     schema = type_schema('target-group', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ("elasticloadbalancing:DescribeTargetGroups",)
 
     def process(self, albs, event=None):

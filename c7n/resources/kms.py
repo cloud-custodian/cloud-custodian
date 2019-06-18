@@ -88,6 +88,7 @@ class KeyRotationStatus(ValueFilter):
     """
 
     schema = type_schema('key-rotation-status', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('kms:GetKeyRotationStatus',)
 
     def process(self, resources, event=None):
@@ -203,6 +204,7 @@ class GrantCount(Filter):
 class ResourceKmsKeyAlias(ValueFilter):
 
     schema = type_schema('kms-alias', rinherit=ValueFilter.schema)
+    schema_alias = False
 
     def get_permissions(self):
         return KeyAlias(self.manager.ctx, {}).get_permissions()
@@ -295,7 +297,7 @@ class KmsKeyRotation(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policy:
           - name: enable-cmk-rotation

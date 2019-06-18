@@ -189,6 +189,7 @@ class ServiceMetrics(MetricsFilter):
 class RelatedTaskDefinitionFilter(ValueFilter):
 
     schema = type_schema('task-definition', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('ecs:DescribeTaskDefinition',
                    'ecs:ListTaskDefinitions')
     related_key = 'taskDefinition'

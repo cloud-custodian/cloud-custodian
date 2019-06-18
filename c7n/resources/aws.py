@@ -462,6 +462,7 @@ class S3Output(DirectoryOutput):
 @clouds.register('aws')
 class AWS(object):
 
+    display_name = 'AWS'
     resource_prefix = 'aws'
     # legacy path for older plugins
     resources = PluginRegistry('resources')

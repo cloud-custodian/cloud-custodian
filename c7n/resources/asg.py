@@ -229,6 +229,7 @@ class LaunchConfigFilter(ValueFilter):
     """
     schema = type_schema(
         'launch-config', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ("autoscaling:DescribeLaunchConfigurations",)
 
     def process(self, asgs, event=None):
@@ -377,13 +378,13 @@ class ValidConfigFilter(ConfigValidFilter):
 
     :example:
 
-        .. code-base: yaml
+      .. code-block:: yaml
 
-            policies:
-              - name: asg-valid-config
-                resource: asg
-                filters:
-                  - valid
+          policies:
+            - name: asg-valid-config
+              resource: asg
+              filters:
+               - valid
     """
 
     schema = type_schema('valid')
@@ -412,7 +413,7 @@ class InvalidConfigFilter(ConfigValidFilter):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block:: yaml
 
             policies:
               - name: asg-invalid-config
@@ -597,6 +598,7 @@ class ImageFilter(ValueFilter):
         "autoscaling:DescribeLaunchConfigurations")
 
     schema = type_schema('image', rinherit=ValueFilter.schema)
+    schema_alias = True
 
     def process(self, asgs, event=None):
         self.launch_info = LaunchInfo(self.manager).initialize(asgs)
@@ -637,6 +639,7 @@ class VpcIdFilter(ValueFilter):
     schema = type_schema(
         'vpc-id', rinherit=ValueFilter.schema)
     schema['properties'].pop('key')
+    schema_alias = False
     permissions = ('ec2:DescribeSubnets',)
 
     # TODO: annotation
@@ -680,7 +683,7 @@ class PropagatedTagFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+       .. code-block:: yaml
 
             policies:
               - name: asg-non-propagated-tags
@@ -787,9 +790,9 @@ class UserDataFilter(ValueFilter):
     Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
     uses re.match() and userdata spans multiple lines.
 
-        :example:
+    :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: lc_userdata
@@ -803,6 +806,7 @@ class UserDataFilter(ValueFilter):
     """
 
     schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    schema_alias = False
     batch_size = 50
     annotation = 'c7n:user-data'
 

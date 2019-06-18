@@ -976,7 +976,7 @@ class BucketNotificationFilter(ValueFilter):
         required=['kind'],
         kind={'type': 'string', 'enum': ['lambda', 'sns', 'sqs']},
         rinherit=ValueFilter.schema)
-
+    schema_alias = False
     annotation_key = 'c7n:MatchedNotificationConfigurationIds'
 
     permissions = ('s3:GetBucketNotification',)
@@ -2313,7 +2313,7 @@ class DataEvents(Filter):
 class Inventory(ValueFilter):
     """Filter inventories for a bucket"""
     schema = type_schema('inventory', rinherit=ValueFilter.schema)
-
+    schema_alias = False
     permissions = ('s3:GetInventoryConfiguration',)
 
     def process(self, buckets, event=None):

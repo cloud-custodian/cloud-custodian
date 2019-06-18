@@ -90,7 +90,7 @@ class UpdateComputeEnvironment(BaseAction, StateTransitionFilter):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: update-environments
@@ -141,7 +141,7 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: delete-environments
@@ -176,7 +176,7 @@ class DefinitionDeregister(BaseAction, StateTransitionFilter):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: deregister-definition
