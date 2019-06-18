@@ -23,6 +23,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -65,10 +66,12 @@ func GetClient() *client.Client {
 // if the image pull fails.  If Docker Hub is offline
 // the user can still execute on the local image if available.
 func Pull(image string, dockerClient *client.Client, ctx context.Context) {
-	_, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{})
+	out, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{ })
 	if err != nil {
 		log.Printf( "Image Pull failed, will use cached image if available. %v", err)
 	}
+
+	io.Copy(os.Stdout, out)
 }
 
 // Create a container with appropriate arguments.
@@ -189,11 +192,17 @@ func SubstituteOutput(args []string) string {
 		arg := args[i]
 		if arg == "-s" || arg == "--output-dir" {
 			outputPath = args[i+1]
+				if IsLocalStorage(outputPath) {
+					args[i+1] = CONTAINER_HOME + "output"
+					return outputPath
 
-			if !(strings.HasPrefix(outputPath, "s3://") ||
-				strings.HasPrefix(outputPath, "azure://") ||
-				strings.HasPrefix(outputPath, "gs://")) {
-				args[i+1] = CONTAINER_HOME + "output"
+				}
+		}
+
+		if strings.HasPrefix(arg, "-s=") || strings.HasPrefix(arg, "--output-dir=") {
+			outputPath = strings.Split(arg, "=")[1]
+			if IsLocalStorage(outputPath) {
+				args[i] = "-s=" + CONTAINER_HOME + "output"
 				return outputPath
 			}
 		}
@@ -258,4 +267,10 @@ func GetAwsConfigPath() string {
 	}
 
 	return ""
+}
+
+func IsLocalStorage(output string) bool {
+	return !(strings.HasPrefix(output, "s3://") ||
+			strings.HasPrefix(output, "azure://") ||
+			strings.HasPrefix(output, "gs://"))
 }
