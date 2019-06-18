@@ -27,17 +27,16 @@ log = logging.getLogger('custodian.azure.networkinterface')
 
 @resources.register('networkinterface')
 class NetworkInterface(ArmResourceManager):
-    class resource_type(object):
+    class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('network_interfaces', 'list_all', None)
-        id = 'id'
-        name = 'name'
         default_report_fields = (
             'name',
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.Network/networkInterfaces'
 
 
 @NetworkInterface.filter_registry.register('effective-route-table')

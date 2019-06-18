@@ -645,3 +645,7 @@ class QueryParser(object):
             filters.append(d)
 
         return filters
+
+
+def get_annotation_prefix(s):
+    return 'c7n:{}'.format(s)

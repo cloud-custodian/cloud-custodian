@@ -12,10 +12,13 @@ Filters
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
 
-- ``firewall-rules`` Firewall Rules Filter (see :ref:`azure_filters`)
+- ``firewall-rules`` Firewall Rules Filter
+    Filter based on firewall rules. Rules can be specified as x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.
 
-  .. c7n-schema:: StorageFirewallRulesFilter
-       :module: c7n_azure.resources.storage
+    - `include`: the list of IP ranges or CIDR that firewall rules must include. The list must be a subset of the exact rules as is, the ranges will not be combined.
+    - `equal`: the list of IP ranges or CIDR that firewall rules must match exactly.
+
+  .. c7n-schema:: azure.storage.filters.firewall-rules
 
 Actions
 -------
@@ -30,8 +33,8 @@ Actions
     - `virtual-network-rules`: Optional. List of allowed virtual networks. Specify empty list [] to remove all items.
       - `virtual-network-resource-id`: Azure id of a subnet of a virtual network.
 
-  .. c7n-schema:: StorageSetNetworkRulesAction
-       :module: c7n_azure.resources.storage
+  .. c7n-schema:: azure.storage.actions.set-network-rules
+
 
 Example Policies
 ----------------

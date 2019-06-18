@@ -252,12 +252,6 @@ and here is a description of the options:
 | &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                                                                                                                                                 |
 |           | `from_address`  | string           | default from address                                                                                                                                                                |
 |           | `contact_tags`  | array of strings | tags that we should look at for address information                                                                                                                                 |
-|           | `smtp_server`   | string           | if this is unset, aws ses is used by default. To configure your lambda role to talk to smtpd in your private vpc, see [here](https://docs.aws.amazon.com/lambda/latest/dg/vpc.html) |
-|           | `smtp_port`     | integer          | smtp port                                                                                                                                                                           |
-|           | `smtp_ssl`      | boolean          | this defaults to True                                                                                                                                                               |
-|           | `smtp_username` | string           |                                                                                                                                                                                     |
-|           | `smtp_password` | string           |                                                                                                                                                                                     |
-
 
 #### Standard Lambda Function Config
 
@@ -311,6 +305,17 @@ and here is a description of the options:
 |           | `redis_port`                | integer | redis port, default: 6369                                                                                                                                                                          |
 |           | `ses_region`                | string  | AWS region that handles SES API calls                                                                                                                                                              |
 
+#### SMTP Config
+
+| Required? | Key             | Type             | Notes                                                                                                                                                                               |
+|:---------:|:----------------|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|           | `smtp_server`   | string           | to configure your lambda role to talk to smtpd in your private vpc, see [here](https://docs.aws.amazon.com/lambda/latest/dg/vpc.html) |                                             |
+|           | `smtp_port`     | integer          | smtp port (default is 25)                                                                                                                                                           |
+|           | `smtp_ssl`      | boolean          | this defaults to True                                                                                                                                                               |
+|           | `smtp_username` | string           |                                                                                                                                                                                     |
+|           | `smtp_password` | string           |                                                                                                                                                                                     |
+
+If `smtp_server` is unset, `c7n_mailer` will use AWS SES or Azure SendGrid.
 
 #### DataDog Config
 

@@ -10,8 +10,7 @@ Tags
 ``Tag``
   Add/Update tag on a resource
 
-  .. c7n-schema:: Tag
-      :module: c7n_azure.actions.tagging
+  .. c7n-schema:: azure.resourcegroup.actions.tag
 
   .. code-block:: yaml
 
@@ -29,8 +28,7 @@ Tags
   Create a tag listing name of user who created a resource based on scanning
   activity log history.
 
-  .. c7n-schema:: AutoTagUser
-      :module: c7n_azure.actions.tagging
+  .. c7n-schema:: azure.resourcegroup.actions.auto-tag-user
 
   .. code-block:: yaml
 
@@ -47,8 +45,7 @@ Tags
 ``RemoveTag``
       Remove a set of tags.
 
-      .. c7n-schema:: RemoveTag
-            :module: c7n_azure.actions.tagging
+      .. c7n-schema:: azure.vm.actions.untag
 
       .. code-block:: yaml
 
@@ -71,8 +68,7 @@ Tags
       Setting the space value to 0 removes all tags but those
       listed to preserve.
 
-      .. c7n-schema:: TagTrim
-            :module: c7n_azure.actions.tagging
+      .. c7n-schema:: azure.resourcegroup.actions.tag-trim
 
       .. code-block:: yaml
 
@@ -104,7 +100,34 @@ Tags
                     - downtime
                     - custodian_status
 
-Others
+Logic App
+---------
+
+``LogicApp``
+  Call the HTTP Endpoint on an Azure Logic App.
+
+  Your policy credentials are used to get the trigger endpoint URL with secrets
+  using the resource group and app name.
+
+  This action is based on the ``webhook`` action and supports the same options.
+
+  .. c7n-schema:: azure.vm.actions.logic-app
+
+  .. code-block:: yaml
+
+      policies:
+        - name: call-logic-app
+          resource: azure.vm
+          description: |
+            Call logic app with list of VM's
+          actions:
+           - type: logic-app
+             resource-group: custodian-test
+             logic-app-name: cclogicapp
+             batch: true
+             body: 'resources[].{ vm_name: name }'
+
+Delete
 -------
 
 ``DeleteAction``
@@ -112,8 +135,7 @@ Others
       generic resource type `armresource` or on any other more specific
       ARM resource type supported by Cloud Custodian.
 
-      .. c7n-schema:: DeleteAction
-            :module: c7n_azure.actions.delete
+      .. c7n-schema:: azure.networksecuritygroup.actions.delete
 
       .. code-block:: yaml
 

@@ -33,8 +33,8 @@ Actions
     - Secret permissions: `Get`, `List`, `Set`, `Delete`, `Backup`, `Restore`, `Recover`, `Purge`
     - Certificate permissions: `Get`, `List`, `Delete`, `Create`, `Import`, `Update`, `ManageContacts`, `GetIssuers`, `ListIssuers`, `SetIssuers`, `DeleteIssuers`, `ManageIssuers`, `Recover`, `Backup`, `Restore`, `Purge`
 
-  .. c7n-schema:: KeyVaultUpdateAccessPolicyAction
-       :module: c7n_azure.resources.key_vault
+  .. c7n-schema:: azure.keyvault.actions.update-access-policy
+
 
 Example Policies
 ----------------
