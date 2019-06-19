@@ -99,6 +99,7 @@ class PutMetric(BaseAction):
     schema = {
         'type': 'object',
         'required': ['type', 'key', 'namespace', 'metric_name'],
+        'additionalProperties': False,
         'properties': {
             'type': {'enum': ['put-metric', ]},
             'key': {'type': 'string'},  # jmes path

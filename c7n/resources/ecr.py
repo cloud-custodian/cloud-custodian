@@ -19,7 +19,7 @@ from c7n.actions import RemovePolicyBase, Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import local_session, type_schema
 
@@ -27,12 +27,12 @@ from c7n.utils import local_session, type_schema
 @resources.register('ecr')
 class ECR(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'ecr'
         enum_spec = ('describe_repositories', 'repositories', None)
         name = "repositoryName"
         arn = id = "repositoryArn"
-        dimension = None
+        arn_type = 'repository'
         filter_name = 'repositoryNames'
         filter_type = 'list'
 

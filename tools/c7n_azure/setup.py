@@ -26,7 +26,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.5.3',
+    version='0.5.4',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -42,6 +42,7 @@ setup(
             'azure = c7n_azure.entry:initialize_azure']
     },
     install_requires=["azure-mgmt-authorization",
+                      "azure-mgmt-apimanagement",
                       "azure-mgmt-applicationinsights==0.1.1",
                       "azure-mgmt-batch",
                       "azure-mgmt-cognitiveservices",
@@ -50,6 +51,7 @@ setup(
                       "azure-mgmt-cdn",
                       "azure-mgmt-containerregistry",
                       "azure-mgmt-containerservice",
+                      "azure-mgmt-databricks",
                       "azure-mgmt-datalake-store",
                       "azure-mgmt-datafactory",
                       "azure-mgmt-iothub",
@@ -63,7 +65,8 @@ setup(
                       "azure-mgmt-web",
                       "azure-mgmt-monitor",
                       "azure-mgmt-policyinsights",
-                      "azure-mgmt-eventgrid==2.0.0rc2",  # RC2 supports AdvancedFilters
+                      "azure-mgmt-eventgrid",
+                      "azure-mgmt-logic",
                       "azure-graphrbac",
                       "azure-keyvault",
                       "azure-storage-blob",
@@ -72,7 +75,6 @@ setup(
                       "requests",
                       "PyJWT",
                       "c7n",
-                      "requests",
                       "azure-cli-core",
                       "adal",
                       "backports.functools_lru_cache",

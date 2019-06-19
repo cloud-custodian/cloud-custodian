@@ -42,6 +42,46 @@ class OutputXrayTracerTest(BaseTest):
             TraceSegmentDocuments=[doc.serialize()])
 
 
+class ArnResolverTest(BaseTest):
+
+    table = [
+        ('arn:aws:waf::123456789012:webacl/3bffd3ed-fa2e-445e-869f-a6a7cf153fd3', 'waf'),
+        ('arn:aws:waf-regional:us-east-1:123456789012:webacl/3bffd3ed-fa2e-445e-869f-a6a7cf153fd3', 'waf-regional'), # NOQA
+        ('arn:aws:acm:region:account-id:certificate/certificate-id', 'acm-certificate'),
+        ('arn:aws:cloudwatch:region:account-id:alarm:alarm-name', 'alarm'),
+        ('arn:aws:logs:us-east-1:123456789012:log-group:my-log-group', 'log-group'),
+        ('arn:aws:codebuild:us-east-1:123456789012:project/my-demo-project', 'codebuild'),
+        ('arn:aws:cognito-idp:region:account-id:userpool/user-pool-id', 'user-pool'),
+        ('arn:aws:config:region:account-id:config-rule/config-rule-id', 'config-rule'),
+        ('arn:aws:directconnect:us-east-1:123456789012:dxcon/dxcon-fgase048', 'directconnect'),
+        ('arn:aws:dynamodb:region:account-id:table/tablename', 'dynamodb-table'),
+        ('arn:aws:ec2:region:account-id:instance/instance-id', 'ec2'),
+        ('arn:aws:ec2:region:account-id:vpc/vpc-id', 'vpc'),
+        ('arn:aws:ds:region:account-id:directory/directoryId', 'directory'),
+        ('arn:aws:elasticbeanstalk:region:account-id:application/applicationname', 'elasticbeanstalk'), # NOQA
+        ('arn:aws:ecr:region:account-id:repository/repository-name', 'ecr'),
+        ('arn:aws:elasticache:us-east-2:123456789012:cluster:myCluster', 'cache-cluster'),
+        ('arn:aws:es:us-east-1:123456789012:domain/streaming-logs', 'elasticsearch'),
+        ('arn:aws:elasticfilesystem:region:account-id:file-system/file-system-id', 'efs'),
+        ('arn:aws:ecs:us-east-1:123456789012:task/my-cluster/1abf0f6d-a411-4033-b8eb-a4eed3ad252a', 'ecs-task'), # NOQA
+        ('arn:aws:autoscaling:region:account-id:autoScalingGroup:groupid:autoScalingGroupName/groupfriendlyname', 'asg') # NOQA
+    ]
+
+    def test_arn_meta(self):
+
+        legacy = set()
+        for k, v in aws.AWS.resources.items():
+            if getattr(v.resource_type, 'type', None) is not None:
+                legacy.add(k)
+        self.assertFalse(legacy)
+
+    def test_arn_resolver(self):
+        for value, expected in self.table:
+            arn = aws.Arn.parse(value)
+            result = aws.ArnResolver.resolve_type(arn)
+            self.assertEqual(result, expected)
+
+
 class ArnTest(BaseTest):
 
     def test_eb_arn(self):

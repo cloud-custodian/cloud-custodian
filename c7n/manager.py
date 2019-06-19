@@ -24,6 +24,7 @@ try:
     from c7n.resources.aws import AWS
     resources = AWS.resources
 except ImportError:
+    raise
     resources = PluginRegistry('resources')
 
 from c7n.utils import dumps

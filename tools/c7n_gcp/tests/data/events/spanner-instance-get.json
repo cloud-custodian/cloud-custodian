@@ -1,0 +1,50 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "yauhen_shaliou@comelfo.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.21.63.2",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-15T13:24:45.508395511Z",
+        "auth": {
+          "accessLevels": [
+            "no_matching_definitions"
+          ]
+        }
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "spanner.googleapis.com",
+    "methodName": "google.spanner.admin.instance.v1.InstanceAdmin.GetInstance",
+    "authorizationInfo": [
+      {
+        "resource": "projects/custodian-test-project-0/instances/custodian-spanner-1",
+        "permission": "spanner.instances.get",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "spanner",
+          "name": "projects/custodian-test-project-0/instances/custodian-spanner-1",
+          "type": "spanner.instances"
+        }
+      }
+    ],
+    "resourceName": "projects/custodian-test-project-0/instances/custodian-spanner-1"
+  },
+  "insertId": "wqzadma7",
+  "resource": {
+    "type": "spanner_instance",
+    "labels": {
+      "instance_id": "custodian-spanner-1",
+      "project_id": "custodian-test-project-0",
+      "location": "",
+      "instance_config": ""
+    }
+  },
+  "timestamp": "2019-05-15T13:24:45.507967189Z",
+  "severity": "INFO",
+  "logName": "projects/custodian-test-project-0/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2019-05-15T13:24:47.066598571Z"
+}

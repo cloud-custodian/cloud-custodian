@@ -13,11 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
-import logging
-import re
-
 from datetime import datetime
+import re
 
 from concurrent.futures import as_completed
 from dateutil.tz import tzutc
@@ -28,13 +25,10 @@ from c7n.actions import (
 from c7n.filters import FilterRegistry, AgeFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, generate_arn,
-    get_retry, chunks, snapshot_identifier, type_schema)
-
-log = logging.getLogger('custodian.elasticache')
+    local_session, chunks, snapshot_identifier, type_schema)
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
@@ -45,9 +39,10 @@ TTYPE = re.compile('cache.t1')
 @resources.register('cache-cluster')
 class ElastiCacheCluster(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elasticache'
-        type = 'cluster'
+        arn_type = 'cluster'
+        arn_separator = ":"
         enum_spec = ('describe_cache_clusters',
                      'CacheClusters[]', None)
         name = id = 'CacheClusterId'
@@ -59,22 +54,8 @@ class ElastiCacheCluster(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    _generate_arn = None
-    retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('elasticache:ListTagsForResource',)
     augment = universal_augment
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                'elasticache',
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type='cluster',
-                separator=':')
-        return self._generate_arn
 
 
 @filters.register('security-group')
@@ -276,50 +257,34 @@ class ElasticacheClusterModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 @resources.register('cache-subnet-group')
 class ElastiCacheSubnetGroup(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elasticache'
-        type = 'subnet-group'
+        arn_type = 'subnet-group'
         enum_spec = ('describe_cache_subnet_groups',
                      'CacheSubnetGroups', None)
         name = id = 'CacheSubnetGroupName'
         filter_name = 'CacheSubnetGroupName'
         filter_type = 'scalar'
-        date = None
-        dimension = None
 
 
 @resources.register('cache-snapshot')
 class ElastiCacheSnapshot(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elasticache'
-        type = 'snapshot'
+        arn_type = 'snapshot'
+        arn_separator = ":"
         enum_spec = ('describe_snapshots', 'Snapshots', None)
         name = id = 'SnapshotName'
         filter_name = 'SnapshotName'
         filter_type = 'scalar'
         date = 'StartTime'
-        dimension = None
         universal_taggable = True
 
     permissions = ('elasticache:ListTagsForResource',)
-    filter_registry = FilterRegistry('elasticache-snapshot.filters')
-    action_registry = ActionRegistry('elasticache-snapshot.actions')
-    _generate_arn = None
-    retry = staticmethod(get_retry(('Throttled',)))
-    augment = universal_augment
 
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                'elasticache',
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type='snapshot',
-                separator=':')
-        return self._generate_arn
+    def augment(self, resources):
+        return universal_augment(self, resources)
 
 
 @ElastiCacheSnapshot.filter_registry.register('age')
@@ -386,7 +351,7 @@ class DeleteElastiCacheSnapshot(BaseAction):
     permissions = ('elasticache:DeleteSnapshot',)
 
     def process(self, snapshots):
-        log.info("Deleting %d ElastiCache snapshots", len(snapshots))
+        self.log.info("Deleting %d ElastiCache snapshots", len(snapshots))
         with self.executor_factory(max_workers=3) as w:
             futures = []
             client = local_session(self.manager.session_factory).client('elasticache')

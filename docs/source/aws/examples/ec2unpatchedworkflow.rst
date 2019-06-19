@@ -112,7 +112,7 @@ notify the resource owners X number of days ahead of the scheduled marked-for-op
        filters:
          - type: marked-for-op
            tag: c7n_stopped_instance
-           op: stop
+           op: terminate
        actions:
          - type: terminate
            force: true

@@ -44,6 +44,7 @@ class Notify(BaseNotify):
 
     schema = {
         'type': 'object',
+        'addtionalProperties': False,
         'anyOf': [
             {'required': ['type', 'transport', 'to']},
             {'required': ['type', 'transport', 'to_from']}],
@@ -69,6 +70,7 @@ class Notify(BaseNotify):
             },
         }
     }
+    schema_alias = True
 
     @staticmethod
     def register_notify_action(registry, _):

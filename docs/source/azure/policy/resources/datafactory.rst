@@ -19,38 +19,12 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all Data Factories for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
+This policy will find all Data Factories with 10 or more failures in pipeline runs over the last 72 hours
 
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-datafactories-for-deletion
-        resource: azure.datafactory
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-datafactories
-        resource: azure.datafactory
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
-
-This policy will find all Data Factories with 10 or more failures in pipeline runs over the last 72 hours and notify user@domain.com
-
-.. code-block:: yaml
-
-    policies:
-      - name: notify-datafactory-dropping-messages
+      - name: datafactory-dropping-messages
         resource: azure.datafactory
         filters:
           - type: metric
@@ -59,13 +33,3 @@ This policy will find all Data Factories with 10 or more failures in pipeline ru
             aggregation: total
             threshold: 10
             timeframe: 72
-         actions:
-          - type: notify
-            template: default
-            priority_header: 2
-            subject: Datafactory Pipeline Failing
-            to:
-              - user@domain.com
-            transport:
-              - type: asq
-                queue: https://accountname.queue.core.windows.net/queuename

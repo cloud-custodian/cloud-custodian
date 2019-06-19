@@ -19,31 +19,22 @@ import itertools
 
 from c7n.filters import ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment, register_universal_tags
-from c7n.utils import generate_arn, local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema, chunks
 
 
 @resources.register('workspaces')
 class Workspace(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'workspaces'
         enum_spec = ('describe_workspaces', 'Workspaces', None)
-        type = 'workspace'
+        arn_type = 'workspace'
         name = id = dimension = 'WorkspaceId'
-        filter_name = None
 
-    augment = universal_augment
-    _generate_arn = None
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'workspaces', region=self.config.region,
-                account_id=self.account_id, resource_type='workspace', separator='/')
-        return self._generate_arn
+    def augment(self, resources):
+        return universal_augment(self, resources)
 
 
 register_universal_tags(Workspace.filter_registry, Workspace.action_registry)
@@ -80,6 +71,7 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
     """
 
     schema = type_schema('connection-status', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('workspaces:DescribeConnectionStatus',)
     annotation_key = 'c7n:ConnectionStatus'
 

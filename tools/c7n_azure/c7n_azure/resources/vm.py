@@ -34,6 +34,7 @@ class VirtualMachine(ArmResourceManager):
             'resourceGroup',
             'properties.hardwareProfile.vmSize',
         )
+        resource_type = 'Microsoft.Compute/virtualMachines'
 
     @staticmethod
     def register(registry, _):
@@ -48,6 +49,7 @@ resources.subscribe(resources.EVENT_FINAL, VirtualMachine.register)
 @VirtualMachine.filter_registry.register('instance-view')
 class InstanceViewFilter(ValueFilter):
     schema = type_schema('instance-view', rinherit=ValueFilter.schema)
+    schema_alias = True
 
     def __call__(self, i):
         if 'instanceView' not in i:

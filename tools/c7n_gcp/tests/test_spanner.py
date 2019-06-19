@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 
 
 class SpannerInstanceTest(BaseTest):
@@ -33,19 +33,61 @@ class SpannerInstanceTest(BaseTest):
         self.assertEqual(resources[0]['displayName'], 'test-instance')
 
     def test_spanner_instance_get(self):
-        project_id = 'atomic-shine-231410'
-        session_factory = self.replay_flight_data('spanner-instance-get', project_id=project_id)
-
-        policy = {
-            'name': 'one-spanner-instance',
-            'resource': 'gcp.spanner-instance'
-        }
-
+        session_factory = self.replay_flight_data('spanner-instance-get')
         policy = self.load_policy(
-            policy,
+            {'name': 'one-spanner-instance',
+             'resource': 'gcp.spanner-instance',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': []
+             }},
             session_factory=session_factory)
 
-        instance = policy.resource_manager.get_resource(
-            {'name': 'projects/atomic-shine-231410/instances/test-instance'})
+        exec_mode = policy.get_execution_mode()
+        event = event_data('spanner-instance-get.json')
+        instances = exec_mode.run(event, None)
 
-        self.assertEqual(instance['state'], 'READY')
+        self.assertEqual(instances[0]['state'], 'READY')
+        self.assertEqual(instances[0]['config'],
+                         'projects/custodian-test-project-0/instanceConfigs/regional-asia-east1')
+        self.assertEqual(instances[0]['name'],
+                         'projects/custodian-test-project-0/instances/custodian-spanner-1')
+
+
+class SpannerDatabaseInstanceTest(BaseTest):
+
+    def test_spanner_database_instance_query(self):
+        project_id = 'custodiantestproject'
+        session_factory = self.replay_flight_data('spanner-database-instance-query',
+                                                  project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'all-spanner-database-instances',
+             'resource': 'gcp.spanner-database-instance'},
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['c7n:spanner-instance']['displayName'], 'custodian-spanner')
+        self.assertEqual(resources[0]['c7n:spanner-instance']['state'], 'READY')
+        self.assertEqual(resources[0]['c7n:spanner-instance']['nodeCount'], 1)
+
+    def test_spanner_database_instance_get(self):
+        session_factory = self.replay_flight_data('spanner-database-instance-get')
+        policy = self.load_policy(
+            {'name': 'one-spanner-database-instance',
+             'resource': 'gcp.spanner-database-instance',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': []
+             }},
+            session_factory=session_factory)
+
+        exec_mode = policy.get_execution_mode()
+        event = event_data('spanner-database-instance-get.json')
+
+        instances = exec_mode.run(event, None)
+
+        self.assertEqual(instances[0]['state'], 'READY')
+        self.assertEqual(instances[0]['c7n:spanner-instance']['displayName'], 'custodian-spanner-1')
+        self.assertEqual(instances[0]['c7n:spanner-instance']['name'],
+                         'projects/custodian-test-project-0/instances/custodian-spanner-1')

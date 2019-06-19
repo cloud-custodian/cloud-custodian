@@ -17,14 +17,14 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
 
 @resources.register('ml-model')
 class MLModel(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'machinelearning'
         enum_spec = ('describe_ml_models', 'Results', None)
         id = 'MLModelId'
@@ -32,8 +32,7 @@ class MLModel(QueryResourceManager):
         date = 'CreatedAt'
         # need to specify request-mode dimension as well
         # dimension = 'MLModelId'
-        dimension = None
-        type = "mlmodel"
+        arn_type = "mlmodel"
 
 
 @MLModel.action_registry.register('delete')

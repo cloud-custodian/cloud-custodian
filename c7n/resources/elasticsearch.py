@@ -13,52 +13,29 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
-import logging
 import itertools
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction
-from c7n.filters import MetricsFilter, FilterRegistry
+from c7n.filters import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
-from c7n.utils import (
-    chunks, local_session, get_retry, type_schema, generate_arn)
+from c7n.query import QueryResourceManager, TypeInfo
+from c7n.utils import chunks, local_session, type_schema
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
-
-log = logging.getLogger('custodian.es')
-filters = FilterRegistry('es.filters')
-filters.register('marked-for-op', TagActionFilter)
 
 
 @resources.register('elasticsearch')
 class ElasticSearchDomain(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'es'
-        type = "elasticsearch"
+        arn = 'ARN'
+        arn_type = 'domain'
         enum_spec = (
             'list_domain_names', 'DomainNames[].DomainName', None)
         id = 'DomainName'
         name = 'Name'
         dimension = "DomainName"
-        filter_name = None
-
-    filter_registry = filters
-    _generate_arn = _account_id = None
-    retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                'es',
-                region=self.config.region,
-                account_id=self.config.account_id,
-                resource_type='domain',
-                separator='/')
-        return self._generate_arn
 
     def get_resources(self, resource_ids):
         client = local_session(self.session_factory).client('es')
@@ -82,6 +59,9 @@ class ElasticSearchDomain(QueryResourceManager):
         with self.executor_factory(max_workers=1) as w:
             return list(itertools.chain(
                 *w.map(_augment, chunks(domains, 5))))
+
+
+ElasticSearchDomain.filter_registry.register('marked-for-op', TagActionFilter)
 
 
 @ElasticSearchDomain.filter_registry.register('subnet')

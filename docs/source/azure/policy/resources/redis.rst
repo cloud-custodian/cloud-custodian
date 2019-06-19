@@ -24,7 +24,7 @@ This policy will find all Redis caches with more than 1000 cache misses in the l
 .. code-block:: yaml
 
     policies:
-      - name: notify-redis-cache-misses
+      - name: redis-cache-misses
         resource: azure.redis
         filters:
           - type: metric
@@ -33,13 +33,3 @@ This policy will find all Redis caches with more than 1000 cache misses in the l
             aggregation: count
             threshold: 1000
             timeframe: 72
-         actions:
-          - type: notify
-            template: default
-            priority_header: 2
-            subject: Many Cache Misses
-            to:
-              - user@domain.com
-            transport:
-              - type: asq
-                queue: https://accountname.queue.core.windows.net/queuename

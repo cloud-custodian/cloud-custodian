@@ -37,7 +37,7 @@ Run ``custodian schema <cloud-provider>`` to see the available resources for a
 specific cloud provider: ``custodian schema aws``
 
 Run ``custodian schema <cloud-provider>.<resource>`` to see the available
-:ref:`filters and actions <policy>` for each resource.
+filters and actions for each resource.
 
 Drill down to get more information about available policy settings for each
 resource, where the model for the command is::

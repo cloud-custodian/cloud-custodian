@@ -29,6 +29,20 @@
                     "family": "A",
                     "name": "Standard"
                 },
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "defaultAction": "Deny",
+                    "ipRules": [
+                        {
+                            "value": "3.1.1.1",
+                            "action": "Allow"
+                        },
+                        {
+                            "value": "1.2.2.128/25",
+                            "action": "Allow"
+                          }
+                    ]
+                },
                 "tenantId": "[parameters('tenantId')]",
                 "accessPolicies": [
                     {

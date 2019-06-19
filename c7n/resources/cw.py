@@ -20,7 +20,7 @@ from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, MetricsFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
-from c7n.query import QueryResourceManager, ChildResourceManager
+from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.tags import universal_augment, register_universal_tags
@@ -30,16 +30,15 @@ from c7n.utils import type_schema, local_session, chunks, get_retry
 @resources.register('alarm')
 class Alarm(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudwatch'
-        type = 'alarm'
+        arn_type = 'alarm'
         enum_spec = ('describe_alarms', 'MetricAlarms', None)
         id = 'AlarmArn'
         filter_name = 'AlarmNames'
         filter_type = 'list'
         name = 'AlarmName'
         date = 'AlarmConfigurationUpdatedTimestamp'
-        dimension = None
         config_type = 'AWS::CloudWatch::Alarm'
 
     retry = staticmethod(get_retry(('Throttled',)))
@@ -83,15 +82,14 @@ class AlarmDelete(BaseAction):
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'events'
-        type = 'event-rule'
+        arn_type = 'event-rule'
         enum_spec = ('list_rules', 'Rules', None)
         name = "Name"
         id = "Name"
         filter_name = "NamePrefix"
         filter_type = "scalar"
-        dimension = None
 
 
 @EventRule.filter_registry.register('metrics')
@@ -104,14 +102,13 @@ class EventRuleMetrics(MetricsFilter):
 @resources.register('event-rule-target')
 class EventRuleTarget(ChildResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'events'
-        type = 'event-rule-target'
+        arn = False
+        arn_type = 'event-rule-target'
         enum_spec = ('list_targets_by_rule', 'Targets', None)
         parent_spec = ('event-rule', 'Rule', True)
         name = id = 'Id'
-        dimension = None
-        filter_type = filter_name = None
 
 
 @EventRuleTarget.filter_registry.register('cross-account')
@@ -152,9 +149,9 @@ class DeleteTarget(BaseAction):
 @resources.register('log-group')
 class LogGroup(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'logs'
-        type = 'log-group'
+        arn_type = 'log-group'
         enum_spec = ('describe_log_groups', 'logGroups', None)
         name = 'logGroupName'
         id = 'arn'
@@ -330,7 +327,7 @@ class EncryptLogGroup(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: encrypt-log-group

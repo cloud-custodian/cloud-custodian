@@ -228,7 +228,7 @@ class ShieldMetrics(MetricsFilter):
     def get_dimensions(self, resource):
         return [{
             'Name': 'ResourceArn',
-            'Value': self.manager.get_arn(resource)}]
+            'Value': self.manager.get_arns([resource])[0]}]
 
     def process(self, resources, event=None):
         self.data['namespace'] = self.namespace

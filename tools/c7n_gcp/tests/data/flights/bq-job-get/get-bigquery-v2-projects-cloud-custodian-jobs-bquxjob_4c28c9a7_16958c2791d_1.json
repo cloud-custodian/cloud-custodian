@@ -1,0 +1,54 @@
+{
+  "body": {
+    "status": {
+      "state": "DONE"
+    }, 
+    "kind": "bigquery#job", 
+    "statistics": {
+      "endTime": "1551972334944", 
+      "creationTime": "1551972334246", 
+      "startTime": "1551972334848"
+    }, 
+    "jobReference": {
+      "projectId": "cloud-custodian", 
+      "location": "US", 
+      "jobId": "bquxjob_4c28c9a7_16958c2791d"
+    }, 
+    "etag": "K1fahti7rVq58vRvaSVAIA==", 
+    "selfLink": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/jobs/bquxjob_4c28c9a7_16958c2791d?location=US", 
+    "configuration": {
+      "copy": {
+        "destinationTable": {
+          "projectId": "cloud-custodian", 
+          "tableId": "test", 
+          "datasetId": "test"
+        }, 
+        "sourceTable": {
+          "projectId": "cloud-custodian", 
+          "tableId": "testset", 
+          "datasetId": "test"
+        }
+      }, 
+      "jobType": "COPY"
+    }, 
+    "id": "cloud-custodian:US.bquxjob_4c28c9a7_16958c2791d", 
+    "user_email": "dkhanas@gmail.com"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "931", 
+    "x-xss-protection": "0", 
+    "content-location": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/jobs/bquxjob_4c28c9a7_16958c2791d?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "K1fahti7rVq58vRvaSVAIA==", 
+    "cache-control": "private", 
+    "date": "Tue, 14 May 2019 14:46:13 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}

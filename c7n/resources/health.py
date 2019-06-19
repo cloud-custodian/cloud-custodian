@@ -18,7 +18,7 @@ import itertools
 import six
 
 from c7n.exceptions import PolicyValidationError
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.utils import local_session, chunks
 
@@ -28,15 +28,12 @@ class HealthEvents(QueryResourceManager):
     """Query resource manager for AWS health events
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'health'
-        type = 'event'
+        arn_type = 'event'
         enum_spec = ('describe_events', 'events', None)
         name = 'eventTypeCode'
         id = 'arn'
-        filter_name = None
-        filter_type = None
-        dimension = None
         date = 'startTime'
 
     permissions = (

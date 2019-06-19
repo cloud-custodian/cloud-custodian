@@ -3,7 +3,10 @@ from c7n_azure.actions.base import AzureBaseAction
 
 
 class DeleteAction(AzureBaseAction):
+    """Delete a resource."""
+
     schema = type_schema('delete')
+    schema_alias = True
 
     def _prepare_processing(self,):
         self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')

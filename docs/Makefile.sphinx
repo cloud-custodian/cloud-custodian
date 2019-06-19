@@ -8,7 +8,7 @@ endif
 # You can set these variables from the command line.
 SPHINXBINS    ?= .tox/$(VIRTUALENV)/bin
 SRCDIR        ?= docs/source
-SPHINXOPTS    ?= -W
+SPHINXOPTS    ?=
 SPHINXBUILD   ?= $(SPHINXBINS)/sphinx-build
 PAPER         ?=
 BUILDDIR      ?= $(SRCDIR)/../build
@@ -72,7 +72,13 @@ html:
 	cp tools/c7n_trailcreator/readme.md $(SRCDIR)/tools/c7n-trailcreator.md
 #	cp tools/c7n_guardian/readme.md $(SRCDIR)/tools/c7n-guardian.md
 
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	mkdir -p $(SRCDIR)/aws/resources
+	c7n-sphinxext --provider aws --output-dir $(SRCDIR)/aws/resources --group-by=resource_type.service
+	mkdir -p $(SRCDIR)/gcp/resources
+	c7n-sphinxext --provider gcp --output-dir $(SRCDIR)/gcp/resources --group-by=resource_type.service
+	mkdir -p $(SRCDIR)/azure/resources
+	c7n-sphinxext --provider azure --output-dir $(SRCDIR)/azure/resources --group-by=resource_type.service
+	$(SPHINXBUILD) -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 #
 # Remove the copies so folks dont accidentally edit the copy

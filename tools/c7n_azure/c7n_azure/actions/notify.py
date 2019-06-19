@@ -35,6 +35,7 @@ class Notify(BaseNotify):
             },
         }
     }
+    schema_alias = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(Notify, self).__init__(data, manager, log_dir)

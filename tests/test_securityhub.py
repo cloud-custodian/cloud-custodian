@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from jsonschema.exceptions import ValidationError
+from c7n.exceptions import PolicyValidationError
 from .common import BaseTest
 
 import time
@@ -20,6 +22,21 @@ LambdaFindingId = "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f593
 
 
 class SecurityHubTest(BaseTest):
+
+    def test_custom_classifier(self):
+
+        templ = {
+            'name': 's3',
+            'resource': 's3',
+            'actions': [{'type': 'post-finding',
+                         'types': ['Effects/CustomB/CustomA']}]}
+        self.load_policy(templ)
+        templ['actions'][0]['types'] = ['CustomA/CustomB/CustomC']
+        self.assertRaises(PolicyValidationError, self.load_policy, templ)
+        templ['actions'][0]['types'] = ['Effects/CustomB/CustomA/CustomD']
+        self.assertRaises(PolicyValidationError, self.load_policy, templ)
+        templ['actions'][0]['types'] = []
+        self.assertRaises(ValidationError, self.load_policy, templ, validate=True)
 
     def test_s3_bucket_arn(self):
         policy = self.load_policy({
