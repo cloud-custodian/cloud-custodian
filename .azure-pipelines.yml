@@ -131,7 +131,7 @@ jobs:
   steps:
   - task: GoTool@0
     inputs:
-    version: '1.12.6'
+      version: '1.12.6'
 
   - script: make release
     workingDirectory: tools/cask/
