@@ -22,8 +22,8 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/stdcopy"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -71,7 +71,7 @@ func Pull(image string, dockerClient *client.Client, ctx context.Context) {
 		log.Printf( "Image Pull failed, will use cached image if available. %v", err)
 	}
 
-	io.Copy(os.Stdout, out)
+	_ = jsonmessage.DisplayJSONMessagesStream(out, os.Stdout, 1, true, nil)
 }
 
 // Create a container with appropriate arguments.
@@ -114,14 +114,8 @@ func Run(id string, dockerClient *client.Client, ctx context.Context) {
 		log.Fatal(err)
 	}
 
-	// Wait
-	code, err := dockerClient.ContainerWait(ctx, id)
-	if err != nil {
-		log.Fatalf("Status code: %v with error: %v", code, err)
-	}
-
 	// Output
-	out, err := dockerClient.ContainerLogs(ctx, id, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	out, err := dockerClient.ContainerLogs(ctx, id, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Follow: true})
 	if err != nil {
 		log.Fatal(err)
 	}
