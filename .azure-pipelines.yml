@@ -128,10 +128,11 @@ jobs:
   pool:
     vmImage: 'Ubuntu-16.04'
 
-  variables:
-    GOROOT: '/usr/local/go1.12'
-
   steps:
+  - task: GoTool@0
+    inputs:
+    version: '1.12.6'
+
   - script: make release
     workingDirectory: tools/cask/
     displayName: 'Build for all platforms'

@@ -10,7 +10,9 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
-	golang.org/x/net v0.0.0-20190611141213-3f473d35a33a // indirect
+	golang.org/x/crypto v0.0.0-20190618222545-ea8f1a30c443 // indirect
+	golang.org/x/net v0.0.0-20190619014844-b5b0513f8c1b // indirect
+	golang.org/x/sys v0.0.0-20190618155005-516e3c20635f // indirect
 
 )
 
