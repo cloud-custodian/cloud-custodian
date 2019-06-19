@@ -573,7 +573,7 @@ class ValueFilter(Filter):
             return sentinel, value.strip().lower()
 
         elif self.vtype == 'expr':
-            return sentinel, self.get_resource_value(value, resource)
+            return self.get_resource_value(sentinel, resource), value
 
         elif self.vtype == 'integer':
             try:
