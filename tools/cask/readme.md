@@ -22,3 +22,8 @@ Run
 ```
 custodian-cask run -s . policy.yml
 ```
+
+You may override the default docker image with the environment variable `CUSTODIAN_IMAGE`
+
+Cask will only attempt to pull any specific image once per hour.  
+You can delete $(tmp)\custodian-cask* if you'd like to force an update.

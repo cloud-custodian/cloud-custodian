@@ -18,6 +18,8 @@ package main
 
 import (
 	"context"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -30,24 +32,30 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"time"
 )
 
 const CONTAINER_HOME string = "/home/custodian/"
-const IMAGE_NAME string = "cloudcustodian/c7n:latest"
+const DEFAULT_IMAGE_NAME string = "cloudcustodian/c7n:latest"
+const IMAGE_OVERRIDE_ENV = "CUSTODIAN_IMAGE"
+const UPDATE_INTERVAL = time.Hour
 
 func main() {
-	fmt.Printf("Custodian Cask (%v)\n", IMAGE_NAME)
+	// Select image from env or default
+	activeImage := DockerImageName()
+
+	fmt.Printf("Custodian Cask (%v)\n", activeImage)
 
 	ctx := context.Background()
 
 	// Create a docker client
 	dockerClient := GetClient()
 
-	// Ensure latest docker image
-	Pull("docker.io/" + IMAGE_NAME, dockerClient, ctx)
+	// Update docker image if needed
+	Update("docker.io/" + activeImage, dockerClient, ctx)
 
 	// Create container
-	id := Create(IMAGE_NAME, dockerClient, ctx)
+	id := Create(activeImage, dockerClient, ctx)
 
 	// Run
 	Run(id, dockerClient, ctx)
@@ -62,16 +70,33 @@ func GetClient() *client.Client {
 	return dockerClient
 }
 
-// Pulls the latest docker image and warns
-// if the image pull fails.  If Docker Hub is offline
-// the user can still execute on the local image if available.
-func Pull(image string, dockerClient *client.Client, ctx context.Context) {
+// Pulls the latest docker image and creates
+// a marker file so it is not pulled again until
+// the specified time elapses or the file is deleted.
+func Update(image string, dockerClient *client.Client, ctx context.Context) {
+	updateMarker := UpdateMarkerFilename(image)
+	now := time.Now()
+
+	// Check if there is a marker indicating last pull for this image
+	info, err := os.Stat(updateMarker)
+	if err == nil && info.ModTime().Add(UPDATE_INTERVAL).After(now) {
+		fmt.Printf("Skipped image pull - Last checked %d minutes ago.\n\n", uint(now.Sub(info.ModTime()).Minutes()))
+		return
+	}
+
+	// Pull the image
 	out, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{ })
 	if err != nil {
 		log.Printf( "Image Pull failed, will use cached image if available. %v", err)
 	}
 
 	_ = jsonmessage.DisplayJSONMessagesStream(out, os.Stdout, 1, true, nil)
+
+	// Update the marker file
+	_, err = os.OpenFile(updateMarker, os.O_RDONLY|os.O_CREATE, 0666)
+	if err != nil {
+		log.Printf( "Unable to write to temporary directory. %v", err)
+	}
 }
 
 // Create a container with appropriate arguments.
@@ -81,7 +106,7 @@ func Create(image string, dockerClient *client.Client, ctx context.Context) stri
 	args := os.Args[1:]
 	originalOutput := SubstituteOutput(args)
 	originalPolicy := SubstitutePolicy(args)
-	binds := GenerateBinds(args, originalOutput, originalPolicy)
+	binds := GenerateBinds(originalOutput, originalPolicy)
 	envs := GenerateEnvs()
 
 	// Create container
@@ -127,7 +152,7 @@ func Run(id string, dockerClient *client.Client, ctx context.Context) {
 }
 
 // Create the bind mounts for input/output
-func GenerateBinds(args []string, outputPath string, policyPath string) []string {
+func GenerateBinds(outputPath string, policyPath string) []string {
 	// Policy
 	policy, err := filepath.Abs(policyPath)
 	if err != nil {
@@ -167,13 +192,14 @@ func GenerateBinds(args []string, outputPath string, policyPath string) []string
 
 // Fix the policy arguments
 func SubstitutePolicy(args []string) string {
-	if strings.EqualFold(args[0], "schema")  ||
+	if len(args) == 0 ||
+		strings.EqualFold(args[0], "schema")  ||
 		strings.EqualFold(args[0], "version") {
 		return ""
 	}
 
 	originalPolicy := args[len(args)-1]
-	args[len(args)-1] = CONTAINER_HOME+filepath.Base(originalPolicy)
+	args[len(args)-1] = CONTAINER_HOME + filepath.Base(originalPolicy)
 
 	return originalPolicy
 }
@@ -267,4 +293,19 @@ func IsLocalStorage(output string) bool {
 	return !(strings.HasPrefix(output, "s3://") ||
 			strings.HasPrefix(output, "azure://") ||
 			strings.HasPrefix(output, "gs://"))
+}
+
+func DockerImageName() string {
+	image := os.Getenv(IMAGE_OVERRIDE_ENV)
+	if len(image) == 0 {
+		return DEFAULT_IMAGE_NAME
+	}
+	return image
+}
+
+func UpdateMarkerFilename(image string) string {
+	sha := sha1.New()
+	sha.Write([]byte(image))
+	hash := hex.EncodeToString(sha.Sum(nil))
+	return filepath.Join(os.TempDir(), "custodian-cask-update-" + hash[0:5])
 }
