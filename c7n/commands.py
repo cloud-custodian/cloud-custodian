@@ -16,7 +16,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
-import jmespath
 import inspect
 import logging
 import os
@@ -31,7 +30,7 @@ from yaml.constructor import ConstructorError
 from c7n.exceptions import ClientError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.schema import generate
+from c7n.schema import ElementSchema, generate
 from c7n.utils import dumps, load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
 from c7n import provider
@@ -383,7 +382,7 @@ def schema_cmd(options):
 
     resource_mapping = schema.resource_vocabulary()
     if options.summary:
-        schema.summary(resource_mapping)
+        schema.pprint_schema_summary(resource_mapping)
         return
 
     # Here are the formats for what we accept:
@@ -518,28 +517,13 @@ def _print_cls_schema(cls):
     print("\nSchema\n------\n")
     if hasattr(cls, 'schema'):
         definitions = generate()['definitions']
-        component_schema = dict(cls.schema)
-        component_schema = _expand_schema(component_schema, definitions)
-        component_schema.pop('additionalProperties', None)
-        component_schema.pop('type', None)
+        component_schema = ElementSchema.schema(definitions, cls)
         print(yaml_dump(component_schema))
     else:
         # Shouldn't ever hit this, so exclude from cover
         print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
     print('')
     return
-
-
-def _expand_schema(schema, definitions):
-    """Expand references in schema to their full schema"""
-    for k, v in list(schema.items()):
-        if k == '$ref':
-            # the value here is in the form of: '#/definitions/path/to/key'
-            path = '.'.join(v.split('/')[2:])
-            return jmespath.search(path, definitions)
-        if isinstance(v, dict):
-            schema[k] = _expand_schema(v, definitions)
-    return schema
 
 
 def _metrics_get_endpoints(options):

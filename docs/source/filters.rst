@@ -4,8 +4,7 @@ Generic Filters
 ===============
 
 The following filters can be applied to all policies for all resources. See the
-:ref:`Filters and Actions reference <policy>` for
-aws resource-specific filters.
+provider specific resource reference for additional information.
 
 Value Filter
 -------------
@@ -266,15 +265,6 @@ There are several ways to get a list of possible keys for each resource.
       value_regex: ".*delete_after=([0-9]{4}-[0-9]{2}-[0-9]{2}).*"
       op: less-than
       value: 0
-
-Age Filter
--------------
-  Automatically filter resources older than a given date in Days (see `Dateutil Parser <http://dateutil.readthedocs.org/en/latest/parser.html#dateutil.parser.parse>`_)
-  These are implemented on a per resource basis. See the :ref:`Resource-Specific Filters and Actions reference <policy>` for
-  resource-specific filters.
-
-  Generally you should use a value filter instead of an age filter, as it supports doing age/expiration comparisons on
-  any date attribute.
 
 
 Event Filter

@@ -130,14 +130,14 @@ class Router(QueryResourceManager):
         version = 'v1'
         component = 'routers'
         enum_spec = ('aggregatedList', 'items.*.routers[]', None)
-        id = "name"
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'router': resource_info['name'],
-                        'region': resource_info['region'].rsplit('/', 1)[-1]})
+                        'region': resource_info['region'],
+                        'router': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('route')
@@ -148,13 +148,13 @@ class Route(QueryResourceManager):
         version = 'v1'
         component = 'routes'
         enum_spec = ('list', 'items[]', None)
-        id = "name"
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'route': resource_info['name']})
+                        'route': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('interconnect')
@@ -171,7 +171,7 @@ class Interconnect(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'interconnect': resource_info['name']})
+                        'interconnect': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('interconnect-attachment')
@@ -186,7 +186,11 @@ class InterconnectAttachment(QueryResourceManager):
 
         @staticmethod
         def get(client, resource_info):
+            project, region, name = re.match(
+                'projects/(.*?)/regions/(.*?)/interconnectAttachments/(.*?)',
+                resource_info['resourceName']).groups()
+
             return client.execute_command(
-                'get', {'project': resource_info['project_id'],
-                        'interconnectAttachment': resource_info['name'],
-                        'region': resource_info['region'].rsplit('/', 1)[-1]})
+                'get', {'project': project,
+                        'interconnectAttachment': name,
+                        'region': region})

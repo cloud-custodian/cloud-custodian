@@ -19,7 +19,7 @@ from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
 from .aws import shape_validate, Arn
@@ -30,14 +30,13 @@ log = logging.getLogger('c7n.resources.cloudtrail')
 @resources.register('cloudtrail')
 class CloudTrail(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudtrail'
         enum_spec = ('describe_trails', 'trailList', None)
         filter_name = 'trailNameList'
         filter_type = 'list'
         arn = id = 'TrailARN'
         name = 'Name'
-        dimension = None
         config_type = "AWS::CloudTrail::Trail"
 
 
@@ -87,6 +86,7 @@ class Status(ValueFilter):
     """
 
     schema = type_schema('status', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('cloudtrail:GetTrailStatus',)
     annotation_key = 'c7n:TrailStatus'
 

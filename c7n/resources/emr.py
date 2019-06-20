@@ -22,7 +22,7 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import (
     local_session, type_schema, get_retry)
 from c7n.tags import (
@@ -40,16 +40,14 @@ class EMRCluster(QueryResourceManager):
     """Resource manager for Elastic MapReduce clusters
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'emr'
-        type = 'emr'
+        arn_type = 'emr'
         cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
         enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
         name = 'Name'
         id = 'Id'
         date = "Status.Timeline.CreationDateTime"
-        filter_name = None
-        dimension = None
 
     action_registry = actions
     filter_registry = filters

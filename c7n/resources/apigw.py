@@ -30,6 +30,8 @@ ANNOTATION_KEY_MATCHED_INTEGRATIONS = 'c7n:matched-method-integrations'
 
 @resources.register('rest-account')
 class RestAccount(ResourceManager):
+    # note this is not using a regular resource manager or type info
+    # its a pseudo resource, like an aws account
 
     filter_registry = FilterRegistry('rest-account.filters')
     action_registry = ActionRegistry('rest-account.actions')
@@ -37,7 +39,7 @@ class RestAccount(ResourceManager):
     class resource_type(object):
         service = 'apigateway'
         name = id = 'account_id'
-        dimensions = None
+        dimension = None
         arn = False
 
     @classmethod
@@ -118,12 +120,11 @@ class UpdateAccount(BaseAction):
 @resources.register('rest-api')
 class RestApi(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'apigateway'
-        type = 'restapis'
+        arn_type = 'restapis'
         enum_spec = ('get_rest_apis', 'items', None)
         id = 'id'
-        filter_name = None
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
@@ -182,15 +183,13 @@ class RestStage(query.ChildResourceManager):
 
     child_source = 'describe-rest-stage'
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'apigateway'
         parent_spec = ('rest-api', 'restApiId', None)
         enum_spec = ('get_stages', 'item', None)
         name = id = 'stageName'
         date = 'createdDate'
-        dimension = None
         universal_taggable = True
-        type = None
         config_type = "AWS::ApiGateway::Stage"
 
     def get_source(self, source_type):
@@ -265,7 +264,7 @@ class DeleteStage(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: delete-rest-stage
@@ -295,13 +294,12 @@ class RestResource(query.ChildResourceManager):
 
     child_source = 'describe-rest-resource'
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'apigateway'
         parent_spec = ('rest-api', 'restApiId', None)
         enum_spec = ('get_resources', 'items', None)
         id = 'id'
         name = 'path'
-        dimension = None
 
 
 @query.sources.register('describe-rest-resource')
@@ -324,13 +322,10 @@ class DescribeRestResource(query.ChildDescribeSource):
 @resources.register('rest-vpclink')
 class RestApiVpcLink(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'apigateway'
-        type = None
-        dimension = None
         enum_spec = ('get_vpc_links', 'items', None)
         id = 'id'
-        filter_name = None
         name = 'name'
 
 
@@ -357,6 +352,7 @@ class FilterRestIntegration(ValueFilter):
             'all', 'ANY', 'PUT', 'GET', "POST",
             "DELETE", "OPTIONS", "HEAD", "PATCH"]},
         rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('apigateway:GET',)
 
     def process(self, resources, event=None):
@@ -427,7 +423,7 @@ class UpdateRestIntegration(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: enforce-timeout-on-api-integration
@@ -481,7 +477,7 @@ class DeleteRestIntegration(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: enforce-no-resource-integration-with-type-aws
@@ -533,6 +529,7 @@ class FilterRestMethod(ValueFilter):
             'all', 'ANY', 'PUT', 'GET', "POST",
             "DELETE", "OPTIONS", "HEAD", "PATCH"]},
         rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('apigateway:GET',)
 
     def process(self, resources, event=None):
@@ -594,7 +591,7 @@ class UpdateRestMethod(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: enforce-iam-permissions-on-api

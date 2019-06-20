@@ -4,8 +4,7 @@ Generic Actions
 ===============
 
 The following actions can be applied to all policies for all resources. See the
-:ref:`Filters and Actions reference <policy>` for
-aws resource-specific actions.
+provider specific resource references.
 
 Webhook Action
 --------------

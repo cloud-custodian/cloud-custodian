@@ -26,7 +26,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.5.3',
+    version='0.5.4',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -42,6 +42,7 @@ setup(
             'azure = c7n_azure.entry:initialize_azure']
     },
     install_requires=["azure-mgmt-authorization",
+                      "azure-mgmt-apimanagement",
                       "azure-mgmt-applicationinsights==0.1.1",
                       "azure-mgmt-batch",
                       "azure-mgmt-cognitiveservices",

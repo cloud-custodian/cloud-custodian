@@ -168,12 +168,10 @@ class TestGlueTag(BaseTest):
         session_factory = self.replay_flight_data("test_glue_job_tags")
         client = session_factory().client("glue")
 
-        tags = client.get_tags(ResourceArn='arn:aws:glue:us-east-1:644160558196:job/test')
-        self.assertEqual(tags.get('Tags'), {})
-
         policy = {
             'name': 'test',
             'resource': 'glue-job',
+            'filters': [{'tag:abcd': 'absent'}],
             'actions': [
                 {
                     'type': 'tag',
@@ -196,10 +194,10 @@ class TestGlueTag(BaseTest):
 
     def test_glue_job_untag(self):
         session_factory = self.replay_flight_data("test_glue_job_untag")
-
         policy = {
             'name': 'test',
             'resource': 'glue-job',
+            'filters': [{'tag:abcd': 'present'}],
             'actions': [{'type': 'remove-tag', 'tags': ['abcd']}]
         }
         p = self.load_policy(
@@ -213,6 +211,57 @@ class TestGlueTag(BaseTest):
         tags = client.get_tags(ResourceArn=arn)
 
         self.assertEqual(arn, 'arn:aws:glue:us-east-1:644160558196:job/test')
+        self.assertEqual(tags.get('Tags'), {})
+        self.assertEqual(len(resources), 1)
+
+    def test_glue_crawler_tag(self):
+        session_factory = self.replay_flight_data("test_crawler_tags")
+        client = session_factory().client("glue")
+
+        policy = {
+            'name': 'test',
+            'resource': 'glue-crawler',
+            'filters': [{'tag:abcd': 'absent'}],
+            'actions': [
+                {
+                    'type': 'tag',
+                    'key': 'abcd',
+                    'value': 'xyz'
+                },
+            ]
+        }
+        p = self.load_policy(
+            policy,
+            config={'account_id': '644160558196'},
+            session_factory=session_factory)
+
+        resources = p.run()
+        arn = p.resource_manager.generate_arn(resources[0]['Name'])
+        self.assertEqual(arn, 'arn:aws:glue:us-east-1:644160558196:crawler/test')
+        tags = client.get_tags(ResourceArn=arn)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(tags.get('Tags'), {'abcd': 'xyz'})
+
+    def test_glue_crawler_untag(self):
+        session_factory = self.replay_flight_data("test_glue_crawler_untag")
+
+        policy = {
+            'name': 'test',
+            'resource': 'glue-crawler',
+            'filters': [{'tag:abcd': 'present'}],
+            'actions': [{'type': 'remove-tag', 'tags': ['abcd']}]
+        }
+        p = self.load_policy(
+            policy,
+            config={'account_id': '644160558196'},
+            session_factory=session_factory)
+
+        resources = p.run()
+        client = session_factory().client("glue")
+        arn = p.resource_manager.generate_arn(resources[0]['Name'])
+        tags = client.get_tags(ResourceArn=arn)
+
+        self.assertEqual(arn, 'arn:aws:glue:us-east-1:644160558196:crawler/test')
         self.assertEqual(tags.get('Tags'), {})
         self.assertEqual(len(resources), 1)
 
@@ -235,3 +284,23 @@ class TestGlueJobs(BaseTest):
         client = session_factory().client("glue")
         jobs = client.get_jobs()["Jobs"]
         self.assertFalse(jobs)
+
+
+class TestGlueCrawlers(BaseTest):
+
+    def test_crawlers_delete(self):
+        session_factory = self.replay_flight_data("test_glue_crawler_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-crawler-delete",
+                "resource": "glue-crawler",
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        crawlers = client.get_crawlers()["Crawlers"]
+        self.assertFalse("test" in [c.get("Name") for c in crawlers])

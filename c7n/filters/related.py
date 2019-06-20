@@ -22,6 +22,8 @@ from .core import ValueFilter, OPERATORS
 
 class RelatedResourceFilter(ValueFilter):
 
+    schema_alias = False
+
     RelatedResource = None
     RelatedIdsExpression = None
     AnnotationKey = None
@@ -86,7 +88,7 @@ class RelatedResourceFilter(ValueFilter):
             if robj is None:
                 self.log.warning(
                     "Resource %s:%s references non existant %s: %s",
-                    model.type,
+                    self.manager.type,
                     resource[model.id],
                     self.RelatedResource.rsplit('.', 1)[-1],
                     rid)

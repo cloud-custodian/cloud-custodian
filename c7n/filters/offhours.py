@@ -259,7 +259,10 @@ def parens_removed(u):
 
 
 class Time(Filter):
-
+    """
+    Schedule offhours for resources see :ref:`offhours <offhours>`
+    for features and configuration.
+    """
     schema = {
         'type': 'object',
         'properties': {
@@ -273,7 +276,7 @@ class Time(Filter):
             'skip-days-from': ValuesFrom.schema,
         }
     }
-
+    schema_alias = True
     time_type = None
 
     # Defaults and constants

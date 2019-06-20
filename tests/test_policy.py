@@ -21,11 +21,12 @@ import shutil
 import tempfile
 
 from c7n import policy, manager
+from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
-from c7n.query import ConfigSource
+from c7n.query import ConfigSource, TypeInfo
 
 from .common import BaseTest, event_data, Bag, TestConfig as Config
 
@@ -58,7 +59,7 @@ class DummyResource(manager.ResourceManager):
         return [_a(p1), _a(p2)]
 
 
-class PolicyPermissions(BaseTest):
+class PolicyMeta(BaseTest):
 
     def test_policy_detail_spec_permissions(self):
         policy = self.load_policy(
@@ -103,17 +104,6 @@ class PolicyPermissions(BaseTest):
             ),
         )
 
-    def xtest_resource_filter_name(self):
-        # resources without a filter name won't play nice in
-        # lambda policies
-        missing = []
-        marker = object
-        for k, v in manager.resources.items():
-            if getattr(v.resource_type, "filter_name", marker) is marker:
-                missing.append(k)
-        if missing:
-            self.fail("Missing filter name %s" % (", ".join(missing)))
-
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
         # resource augmentation, scan resources to ensure
@@ -157,6 +147,18 @@ class PolicyPermissions(BaseTest):
         if bad:
             self.fail("%s have config types but no config source" % (", ".join(bad)))
 
+    def test_resource_arn_override_generator(self):
+        overrides = set()
+        for k, v in manager.resources.items():
+            arn_gen = bool(v.__dict__.get('get_arns') or v.__dict__.get('generate_arn'))
+
+            if arn_gen:
+                overrides.add(k)
+
+        overrides = overrides.difference(set(('account', 's3', 'hostedzone', 'log-group')))
+        if overrides:
+            raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
+
     def test_resource_name(self):
         names = []
         for k, v in manager.resources.items():
@@ -164,6 +166,73 @@ class PolicyPermissions(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_resource_meta_with_class(self):
+        missing = set()
+        for k, v in manager.resources.items():
+            if k in ('rest-account', 'account'):
+                continue
+            if not issubclass(v.resource_type, TypeInfo):
+                missing.add(k)
+        if missing:
+            raise SyntaxError("missing type info class %s" % (', '.join(missing)))
+
+    def test_resource_type_empty_metadata(self):
+        empty = set()
+        for k, v in manager.resources.items():
+            if k in ('rest-account', 'account'):
+                continue
+            for rk, rv in v.resource_type.__dict__.items():
+                if rk[0].isalnum() and rv is None:
+                    empty.add(k)
+        if empty:
+            raise ValueError("Empty Resource Metadata %s" % (', '.join(empty)))
+
+    def test_resource_legacy_type(self):
+        legacy = set()
+        marker = object()
+        for k, v in manager.resources.items():
+            if getattr(v.resource_type, 'type', marker) is not marker:
+                legacy.add(k)
+        if legacy:
+            raise SyntaxError("legacy arn type info %s" % (', '.join(legacy)))
+
+    def _visit_filters_and_actions(self, visitor):
+        names = []
+        for cloud_name, cloud in clouds.items():
+            for resource_name, resource in cloud.resources.items():
+                for fname, f in resource.filter_registry.items():
+                    if fname in ('and', 'or', 'not'):
+                        continue
+                    if visitor(f):
+                        names.append("%s.%s.filters.%s" % (
+                            cloud_name, resource_name, fname))
+                for aname, a in resource.action_registry.items():
+                    if visitor(a):
+                        names.append('%s.%s.actions.%s' % (
+                            cloud_name, resource_name, aname))
+        return names
+
+    def test_filter_action_additional(self):
+
+        def visitor(e):
+            if e.type == 'notify':
+                return
+            return e.schema.get('additionalProperties', True) is True
+
+        names = self._visit_filters_and_actions(visitor)
+        if names:
+            self.fail(
+                "missing additionalProperties: Fallse on actions/filters\n %s" % (
+                    " \n".join(names)))
+
+    def test_filter_action_type(self):
+        def visitor(e):
+            return 'type' not in e.schema['properties']
+
+        names = self._visit_filters_and_actions(visitor)
+        if names:
+            self.fail("missing type on actions/filters\n %s" % (" \n".join(names)))
 
     def test_resource_arn_info(self):
         missing = []
@@ -175,6 +244,7 @@ class PolicyPermissions(BaseTest):
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
+            'healthcheck', 'event-rule-target',
             'support-case', 'transit-attachment', 'config-recorder'))
 
         missing_method = []
@@ -191,6 +261,8 @@ class PolicyPermissions(BaseTest):
             if getattr(rtype, 'arn', None) is not None:
                 continue
             if getattr(rtype, 'type', None) is not None:
+                continue
+            if getattr(rtype, 'arn_type', None) is not None:
                 continue
             missing.append(k)
 

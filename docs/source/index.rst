@@ -16,18 +16,15 @@ Navigate below and get started with Cloud Custodian!
    :maxdepth: 2
    :caption: Introduction
 
-   overview
-   overview/index
    quickstart/index
    filters
    actions
    quickstart/advanced
    quickstart/policyStructure
-   overview/glossary
-   overview/deployment
+   deployment
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: AWS
 
    aws/gettingstarted
@@ -35,8 +32,7 @@ Navigate below and get started with Cloud Custodian!
    aws/aws-modes
    aws/usage
    aws/lambda
-   aws/mu
-   aws/policy/index
+   aws/resources/index
 
 .. toctree::
    :maxdepth: 1
@@ -49,6 +45,7 @@ Navigate below and get started with Cloud Custodian!
    azure/azure-modes
    azure/advanced/index
    azure/contribute
+   azure/resources/index
 
 .. toctree::
    :maxdepth: 1
@@ -59,6 +56,7 @@ Navigate below and get started with Cloud Custodian!
    gcp/examples/index
    gcp/policy/index
    gcp/contribute
+   gcp/resources/index
 
 
 .. toctree::
