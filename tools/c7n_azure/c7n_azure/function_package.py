@@ -123,24 +123,36 @@ class FunctionPackage(object):
         c7n_azure_root = os.path.dirname(__file__)
         return os.path.join(c7n_azure_root, 'cache')
 
-    def build(self, policy, modules, non_binary_packages, excluded_packages, queue_name=None,):
+    def build(self, policy, modules, non_binary_packages, excluded_packages, queue_name=None, cache_name='cache'):
+        cache_zip_file = self.build_cache(modules, excluded_packages, non_binary_packages, cache_name)
 
+        self.pkg = PythonPackageArchive(cache_file=cache_zip_file)
+
+        exclude = os.path.normpath('/cache/') + os.path.sep
+        self.pkg.add_modules(lambda f: (exclude in f),
+                             [m.replace('-', '_') for m in modules])
+
+        # add config and policy
+        self._add_functions_required_files(policy, queue_name)
+
+    def build_cache(self, modules, excluded_packages, non_binary_packages, cache_name):
         wheels_folder = os.path.join(self.cache_folder, 'wheels')
         wheels_install_folder = os.path.join(self.cache_folder, 'dependencies')
-
-        cache_zip_file = os.path.join(self.cache_folder, 'cache.zip')
-        cache_metadata_file = os.path.join(self.cache_folder, 'metadata.json')
-
-        packages = \
-            DependencyManager.get_dependency_packages_list(modules, excluded_packages)
+        cache_zip_file = os.path.join(self.cache_folder, cache_name + '.zip')
+        cache_metadata_file = os.path.join(self.cache_folder, cache_name + '.json')
+        packages = DependencyManager.get_dependency_packages_list(modules, excluded_packages)
 
         if not DependencyManager.check_cache(cache_metadata_file, cache_zip_file, packages):
             cache_pkg = PythonPackageArchive()
             self.log.info("Cached packages not found or requirements were changed.")
+
             # If cache check fails, wipe all previous wheels, installations etc
-            if os.path.exists(self.cache_folder):
-                self.log.info("Removing cache folder...")
-                shutil.rmtree(self.cache_folder)
+            self.log.info("Removing cache...")
+            for f in [cache_zip_file, cache_metadata_file]:
+                try:
+                    os.remove(f)
+                except OSError:
+                    pass
 
             self.log.info("Preparing non binary wheels...")
             DependencyManager.prepare_non_binary_wheels(non_binary_packages, wheels_folder)
@@ -175,15 +187,7 @@ class FunctionPackage(object):
             DependencyManager.create_cache_metadata(cache_metadata_file,
                                                     cache_zip_file,
                                                     packages)
-
-        self.pkg = PythonPackageArchive(cache_file=cache_zip_file)
-
-        exclude = os.path.normpath('/cache/') + os.path.sep
-        self.pkg.add_modules(lambda f: (exclude in f),
-                             [m.replace('-', '_') for m in modules])
-
-        # add config and policy
-        self._add_functions_required_files(policy, queue_name)
+        return cache_zip_file
 
     def wait_for_status(self, deployment_creds, retries=10, delay=15):
         for r in range(retries):

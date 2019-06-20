@@ -176,10 +176,11 @@ class FunctionPackageTest(BaseTest):
 
     @patch('c7n_azure.function_package.FunctionPackage._add_functions_required_files')
     @patch('shutil.rmtree')
+    @patch('os.remove')
     @patch('c7n_azure.function_package.FunctionPackage.cache_folder',
            new_callable=PropertyMock,
            return_value=test_files_folder)
-    def test_package_build_no_cache(self, _1, rmtree_mock, add_files_mock):
+    def test_package_build_no_cache(self, _1, remove_mock, rmtree_mock, add_files_mock):
         functions = [('check_cache', False),
                      ('prepare_non_binary_wheels', None),
                      ('download_wheels', None),
@@ -204,7 +205,8 @@ class FunctionPackageTest(BaseTest):
 
         add_files_mock.assert_called_once()
 
-        self.assertEqual(rmtree_mock.call_count, 3)
+        self.assertEqual(rmtree_mock.call_count, 2)
+        self.assertEqual(remove_mock.call_count, 2)
         self.assertEqual(add_modules_mock.call_count, 3)
         self.assertTrue(os.path.exists(cache_zip))
 
