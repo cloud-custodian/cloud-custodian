@@ -33,7 +33,7 @@ jobs:
   - script: pip install awscli --upgrade
     displayName: "Install AWS CLI"
 
-  - script: aws s3 cp tools/cask/release/ s3://c7n-dev/downloads/custodian-cask-$(date +"%m_%d_%Y")/ --recursive  --acl public-read
+  - script: aws s3 cp tools/cask/release/ s3://c7n-dev/downloads/custodian-cask-$(Build.BuildNumber)/ --recursive  --acl public-read
     displayName: "Upload Release"
     env:
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
