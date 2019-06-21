@@ -22,6 +22,7 @@ from functools import partial
 @clouds.register('gcp')
 class GoogleCloud(Provider):
 
+    display_name = 'GCP'
     resource_prefix = 'gcp'
     resources = PluginRegistry('%s.resources' % resource_prefix)
 

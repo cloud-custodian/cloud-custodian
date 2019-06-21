@@ -16,20 +16,19 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
 
 @resources.register('kafka')
 class Kafka(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'kafka'
         enum_spec = ('list_clusters', 'ClusterInfoList', None)
         arn = id = 'ClusterArn'
         name = 'ClusterName'
         date = 'CreationTime'
-        dimension = None
         filter_name = 'ClusterNameFilter'
         filter_type = 'scalar'
 

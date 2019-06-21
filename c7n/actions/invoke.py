@@ -55,6 +55,7 @@ class LambdaInvoke(EventAction):
     schema = {
         'type': 'object',
         'required': ['type', 'function'],
+        'additionalProperties': False,
         'properties': {
             'type': {'enum': ['invoke-lambda']},
             'function': {'type': 'string'},
@@ -62,6 +63,7 @@ class LambdaInvoke(EventAction):
             'qualifier': {'type': 'string'},
             'batch_size': {'type': 'integer'},
             'timeout': {'type': 'integer'},
+            'vars': {'type': 'object'},
         }
     }
 

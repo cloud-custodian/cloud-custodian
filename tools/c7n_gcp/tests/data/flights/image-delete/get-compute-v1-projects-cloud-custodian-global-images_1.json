@@ -1,0 +1,34 @@
+{
+  "headers": {},
+  "body": {
+    "items": [
+      {
+        "kind": "compute#image",
+        "id": "1111111111111111111",
+        "creationTimestamp": "2019-01-01T00:00:00.000-00:00",
+        "name": "image-1",
+        "description": "",
+        "sourceType": "RAW",
+        "status": "READY",
+        "archiveSizeBytes": "1111111111",
+        "diskSizeGb": "50",
+        "sourceDisk": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-f/disks/disk-id",
+        "sourceDiskId": "1111111111111111111",
+        "licenses": [
+          "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
+        ],
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images/image-1",
+        "labelFingerprint": "42WmSpB8rSM=",
+        "labelFingerprint": "xxxxxxxxxxxx",
+        "guestOsFeatures": [
+          {
+            "type": "VIRTIO_SCSI_MULTIQUEUE"
+          }
+        ],
+        "licenseCodes": [
+          "1111111111111111111"
+        ]
+      }    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images"
+  }
+}

@@ -17,20 +17,18 @@ import itertools
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 
 
 @resources.register('simpledb')
 class SimpleDB(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = "sdb"
         enum_spec = ("list_domains", "DomainNames", None)
         id = name = "DomainName"
-        dimension = None
-        filter_name = None
-        type = "domain"
+        arn_type = "domain"
 
     permissions = ('sdb:DomainMetadata',)
 

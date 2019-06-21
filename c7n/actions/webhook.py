@@ -14,7 +14,11 @@
 
 import json
 
-import certifi
+try:
+    import certifi
+except ImportError:
+    certifi = None
+
 import jmespath
 import urllib3
 from six.moves.urllib import parse
@@ -90,7 +94,7 @@ class Webhook(EventAction):
     def process(self, resources, event=None):
         self.http = urllib3.PoolManager(
             cert_reqs='CERT_REQUIRED',
-            ca_certs=certifi.where())
+            ca_certs=certifi and certifi.where() or None)
 
         if self.batch:
             for chunk in utils.chunks(resources, self.batch_size):

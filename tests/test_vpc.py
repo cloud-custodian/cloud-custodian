@@ -2206,7 +2206,7 @@ class SecurityGroupTest(BaseTest):
 
     def test_egress_validation_error(self):
         self.assertRaises(
-            PolicyValidationError,
+            Exception,
             self.load_policy,
             {
                 "name": "sg-find2",

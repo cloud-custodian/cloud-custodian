@@ -17,7 +17,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import time
-
+import os
 
 LOADED = False
 
@@ -96,11 +96,36 @@ def load_resources():
     import c7n.resources.vpc
     import c7n.resources.waf
     import c7n.resources.fsx
-    import c7n.resources.workspaces
+    import c7n.resources.workspaces  # NOQA
 
     # Load external plugins (private sdks etc)
+    #
+    # We default to loading known cloud providers
+    # to avoid the runtime costs in serverless
+    # environments of scanning the entire python
+    # path for entry points.
     from c7n.manager import resources
-    resources.load_plugins()
+    if 'C7N_EXTPLUGINS' in os.environ:
+        resources.load_plugins()
+    else:
+        try:
+            from c7n_azure.entry import initialize_azure
+            initialize_azure()
+        except ImportError:
+            pass
+
+        try:
+            from c7n_gcp.entry import initialize_gcp
+            initialize_gcp()
+        except ImportError:
+            pass
+
+        try:
+            from c7n_kube.entry import initialize_kube
+            initialize_kube()
+        except ImportError:
+            pass
+
     resources.notify(resources.EVENT_FINAL)
 
     LOADED = True

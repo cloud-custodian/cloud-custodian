@@ -49,7 +49,7 @@ Custodian tag filter by simply specifying the ``stop`` action:
         filters:
           - "tag:Custodian": present
         actions:
-          - stop .. _aws-run-policy:
+          - stop
 
 Run your policy
 ---------------

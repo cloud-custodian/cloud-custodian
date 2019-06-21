@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 
 
 class FirewallTest(BaseTest):
@@ -109,24 +109,23 @@ class RouterTest(BaseTest):
         self.assertEqual(resources[0]['name'], 'test-router')
 
     def test_router_get(self):
-        project_id = 'atomic-shine-231410'
-        session_factory = self.replay_flight_data('router-get', project_id=project_id)
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('router-get', project_id=project_id)
 
-        policy = {
-            'name': 'one-router',
-            'resource': 'gcp.router'
-        }
+        p = self.load_policy({
+            'name': 'router-created',
+            'resource': 'gcp.router',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['beta.compute.routers.insert']}},
+            session_factory=factory)
 
-        policy = self.load_policy(
-            policy,
-            session_factory=session_factory)
+        exec_mode = p.get_execution_mode()
+        event = event_data('router-create.json')
+        routers = exec_mode.run(event, None)
 
-        router = policy.resource_manager.get_resource(
-            {'project_id': project_id,
-             'region': 'us-central1',
-             'name': 'test-router'})
-
-        self.assertEqual(router['bgp']['asn'], 65000)
+        self.assertEqual(len(routers), 1)
+        self.assertEqual(routers[0]['bgp']['asn'], 65001)
 
 
 class RouteTest(BaseTest):
@@ -147,20 +146,20 @@ class RouteTest(BaseTest):
         self.assertEqual(resources[0]['destRange'], '10.160.0.0/20')
 
     def test_route_get(self):
-        project_id = 'atomic-shine-231410'
-        session_factory = self.replay_flight_data('route-get', project_id=project_id)
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('route-get', project_id=project_id)
 
-        policy = {
-            'name': 'one-route',
-            'resource': 'gcp.route'
-        }
+        p = self.load_policy({
+            'name': 'route-created',
+            'resource': 'gcp.route',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['v1.compute.routes.insert']}},
+            session_factory=factory)
 
-        policy = self.load_policy(
-            policy,
-            session_factory=session_factory)
+        exec_mode = p.get_execution_mode()
+        event = event_data('route-create.json')
+        routes = exec_mode.run(event, None)
 
-        route = policy.resource_manager.get_resource(
-            {'project_id': project_id,
-             'name': 'default-route-748fda88a0393274'})
-
-        self.assertEqual(route['destRange'], '192.168.0.0/24')
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(routes[0]['destRange'], '10.0.0.0/24')

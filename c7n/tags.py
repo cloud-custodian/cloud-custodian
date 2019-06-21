@@ -97,12 +97,9 @@ def universal_augment(self, resources):
     from c7n.query import RetryPageIterator
     paginator = client.get_paginator('get_resources')
     paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-    resource_type = getattr(self.get_model(), 'resource_type', None)
 
-    if not resource_type:
-        resource_type = self.get_model().service
-        if self.get_model().type:
-            resource_type += ":" + self.get_model().type
+    m = self.get_model()
+    resource_type = "%s:%s" % (m.arn_service or m.service, m.arn_type)
 
     resource_tag_map_list = list(itertools.chain(
         *[p['ResourceTagMappingList'] for p in paginator.paginate(
@@ -460,7 +457,7 @@ class RemoveTag(Action):
     concurrency = 2
 
     schema = utils.type_schema(
-        'untag', aliases=('unmark', 'remove-tag'),
+        'remove-tag', aliases=('unmark', 'untag', 'remove-tag'),
         tags={'type': 'array', 'items': {'type': 'string'}})
     schema_alias = True
     permissions = ('ec2:DeleteTags',)

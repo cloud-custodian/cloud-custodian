@@ -19,7 +19,7 @@ from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
 from c7n.filters import CrossAccountAccessFilter, PolicyChecker
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
@@ -28,17 +28,14 @@ from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 @resources.register('sns')
 class SNS(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'sns'
-        type = 'topic'
+        arn_type = 'topic'
         enum_spec = ('list_topics', 'Topics', None)
         detail_spec = (
             'get_topic_attributes', 'TopicArn', 'TopicArn', 'Attributes')
         id = 'TopicArn'
-        filter_name = None
-        filter_type = None
         name = 'DisplayName'
-        date = None
         dimension = 'TopicName'
         default_report_fields = (
             'TopicArn',
@@ -303,28 +300,6 @@ class RemovePolicyStatement(RemovePolicyBase):
 
 @SNS.action_registry.register('modify-policy')
 class ModifyPolicyStatement(ModifyPolicyBase):
-    """Action to modify policy statements from SNS
-
-    :example:
-
-    .. code-block:: yaml
-
-           policies:
-              - name: sns-cross-account
-                resource: sns
-                filters:
-                  - type: cross-account
-                actions:
-                  - type: modify-policy
-                    add-statements: [{
-                        "Sid": "ReplaceWithMe",
-                        "Effect": "Allow",
-                        "Principal": "*",
-                        "Action": ["SNS:GetTopicAttributes"],
-                        "Resource": topic_arn,
-                            }]
-                    remove-statements: '*'
-    """
 
     permissions = ('sns:SetTopicAttributes', 'sns:GetTopicAttributes')
 
@@ -383,21 +358,21 @@ class SetEncryption(BaseAction):
               actions:
                 - type: set-encryption
                   key: alias/cmk/key
-                  enabled: True
+                  enabled: true
 
             - name: set-sns-topic-encryption-with-id
               resource: sns
               actions:
                 - type: set-encryption
                   key: abcdefgh-1234-1234-1234-123456789012
-                  enabled: True
+                  enabled: true
 
             - name: set-sns-topic-encryption-with-arn
               resource: sns
               actions:
                 - type: set-encryption
                   key: arn:aws:kms:us-west-1:123456789012:key/abcdefgh-1234-1234-1234-123456789012
-                  enabled: True
+                  enabled: true
     """
 
     schema = type_schema(

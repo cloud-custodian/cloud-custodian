@@ -122,3 +122,17 @@ jobs:
       testResultsFiles: '**/test-results.xml'
       testRunTitle: 'Python $(python.version) Windows'
     condition: succeededOrFailed()
+
+- job: 'CustodianCask'
+  displayName: 'Container Cask'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+  - task: GoTool@0
+    inputs:
+      version: '1.12.6'
+
+  - script: make release
+    workingDirectory: tools/cask/
+    displayName: 'Build for all platforms'

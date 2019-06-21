@@ -52,6 +52,8 @@ class EmptyGroup(Filter):
     #   filters:
     #       - type: empty-group
 
+    schema = type_schema('empty-group')
+
     def __call__(self, group):
         resources_iterator = (
             self.manager
