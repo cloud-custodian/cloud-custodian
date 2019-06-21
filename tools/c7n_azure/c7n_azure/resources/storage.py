@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 from concurrent.futures import as_completed
 
+import jsonpickle
 from azure.cosmosdb.table import TableService
 from azure.mgmt.storage.models import IPRule, \
     NetworkRuleSet, StorageAccountUpdateParameters, VirtualNetworkRule
@@ -28,13 +30,9 @@ from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
 from netaddr import IPNetwork
 
-# from azure.storage.blob import BaseBlobService
 from c7n.filters.core import type_schema
 from c7n.utils import chunks
 from c7n.utils import local_session
-
-import jsonpickle
-import json
 
 
 @resources.register('storage')
@@ -161,7 +159,8 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
         matched = []
         for resource in resources:
             settings = json.loads(jsonpickle.encode(self.get_settings(resource, session)))
-            filtered_settings = super(StorageDiagnosticSettingsFilter, self).process([settings], event=None)
+            filtered_settings = super(StorageDiagnosticSettingsFilter, self).process([settings],
+                                                                                     event=None)
 
             if filtered_settings:
                 matched.append(resource)
@@ -223,20 +222,24 @@ class StorageSettingsUtilities(object):
 
     @staticmethod
     def get_blob_settings(storage_account, session):
-        client = StorageSettingsUtilities._get_blob_client_from_storage_account(storage_account, session)
+        client = StorageSettingsUtilities._get_blob_client_from_storage_account(
+            storage_account, session)
         return client.get_blob_service_properties()
 
     @staticmethod
     def get_file_settings(storage_account, session):
-        file_client = StorageSettingsUtilities._get_file_client_from_storage_account(storage_account, session)
+        file_client = StorageSettingsUtilities._get_file_client_from_storage_account(
+            storage_account, session)
         return file_client.get_file_service_properties()
 
     @staticmethod
     def get_table_settings(storage_account, session):
-        table_client = StorageSettingsUtilities._get_table_client_from_storage_account(storage_account, session)
+        table_client = StorageSettingsUtilities._get_table_client_from_storage_account(
+            storage_account, session)
         return table_client.get_table_service_properties()
 
     @staticmethod
     def get_queue_settings(storage_account, session):
-        queue_client = StorageSettingsUtilities._get_queue_client_from_storage_account(storage_account, session)
+        queue_client = StorageSettingsUtilities._get_queue_client_from_storage_account(
+            storage_account, session)
         return queue_client.get_queue_service_properties()

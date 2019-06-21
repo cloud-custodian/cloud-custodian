@@ -73,7 +73,7 @@ setup(
                       "azure-storage-file",
                       "azure-cosmosdb-table",
                       "distlib",
-                      "jsonpickles",
+                      "jsonpickle",
                       "requests",
                       "PyJWT",
                       "c7n",
