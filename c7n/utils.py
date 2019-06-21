@@ -35,19 +35,29 @@ from c7n import ipaddress, config
 
 # Try to place nice in lambda exec environment
 # where we don't require yaml
+
+BaseSafeDumper = None
+
 try:
     import yaml
 except ImportError:  # pragma: no cover
     yaml = None
 else:
     try:
-        from yaml import CSafeLoader
-        SafeLoader = CSafeLoader
+        from yaml import CSafeLoader as SafeLoader, CSafeDumper as BaseSafeDumper
     except ImportError:  # pragma: no cover
         try:
-            from yaml import SafeLoader
+            from yaml import SafeLoader, SafeDumper as BaseSafeDumper
         except ImportError:
             SafeLoader = None
+            BaseSafeDumper = None
+
+if BaseSafeDumper:
+    class SafeDumper(BaseSafeDumper):
+        def ignore_aliases(self, data):
+            return True
+else:
+    SafeDumper = None
 
 log = logging.getLogger('custodian.utils')
 
@@ -103,6 +113,12 @@ def yaml_load(value):
     if yaml is None:
         raise RuntimeError("Yaml not available")
     return yaml.load(value, Loader=SafeLoader)
+
+
+def yaml_dump(value):
+    if yaml is None:
+        raise RuntimeError("Yaml not available")
+    return yaml.dump(value, default_flow_style=False, Dumper=SafeDumper)
 
 
 def loads(body):
@@ -629,3 +645,7 @@ class QueryParser(object):
             filters.append(d)
 
         return filters
+
+
+def get_annotation_prefix(s):
+    return 'c7n:{}'.format(s)

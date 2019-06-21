@@ -1,7 +1,7 @@
 .. _azure_armresource:
 
-Network Interface
-=================
+Azure ARM Resource
+==================
 
 Filters
 -------
@@ -10,37 +10,14 @@ Filters
 - ARM Resource Filters (see :ref:`azure_genericarmfilter`)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
+- ``resource-type`` filter
+    - Filter on ARM resource types, including resource type namespaces
+    - Provide a list of resource types (case-insensitive) in a ``values`` array
+
+    .. c7n-schema:: azure.armresource.filters.resource-type
+
 
 Actions
 -------
 - ARM Resource Actions (see :ref:`azure_genericarmaction`)
 
-Example Policies
-----------------
-
-This set of policies will mark all ARM resources for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
-
-
-.. code-block:: yaml
-
-    policies:
-      - name: mark-test-armresources-for-deletion
-        resource: azure.armresource
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-armresources
-        resource: azure.armresource
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete

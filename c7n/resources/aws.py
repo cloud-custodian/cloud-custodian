@@ -134,7 +134,7 @@ def shape_validate(params, shape_name, service):
 
 class Arn(namedtuple('_Arn', (
         'arn', 'partition', 'service', 'region',
-        'account_id', 'resource', 'resource_type'))):
+        'account_id', 'resource', 'resource_type', 'separator'))):
 
     __slots__ = ()
 
@@ -144,11 +144,35 @@ class Arn(namedtuple('_Arn', (
         # a few resources use qualifiers without specifying type
         if parts[2] in ('s3', 'apigateway', 'execute-api'):
             parts.append(None)
+            parts.append(None)
         elif '/' in parts[-1]:
             parts.extend(reversed(parts.pop(-1).split('/', 1)))
+            parts.append('/')
         elif ':' in parts[-1]:
             parts.extend(reversed(parts.pop(-1).split(':', 1)))
+            parts.append(':')
         return cls(*parts)
+
+
+class ArnResolver(object):
+
+    def __init__(self, manager):
+        self.manager = manager
+
+    @staticmethod
+    def resolve_type(arn):
+        for type_name, klass in AWS.resources.items():
+            if type_name in ('rest-account', 'account') or klass.resource_type.arn is False:
+                continue
+            if arn.service != (klass.resource_type.arn_service or klass.resource_type.service):
+                continue
+            if (type_name in ('asg', 'ecs-task') and
+                    "%s%s" % (klass.resource_type.arn_type, klass.resource_type.arn_separator)
+                    in arn.resource_type):
+                return type_name
+            elif (klass.resource_type.arn_type is not None and
+                    klass.resource_type.arn_type == arn.resource_type):
+                return type_name
 
 
 @metrics_outputs.register('aws')
@@ -438,6 +462,7 @@ class S3Output(DirectoryOutput):
 @clouds.register('aws')
 class AWS(object):
 
+    display_name = 'AWS'
     resource_prefix = 'aws'
     # legacy path for older plugins
     resources = PluginRegistry('resources')

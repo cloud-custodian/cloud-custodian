@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from azure.graphrbac import GraphRbacManagementClient
-from c7n_azure.actions import AzureBaseAction
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.filters import FirewallRulesFilter
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
 
@@ -24,6 +25,9 @@ from c7n_azure.utils import GraphHelper
 from c7n_azure.resources.arm import ArmResourceManager
 
 import logging
+
+from netaddr import IPNetwork
+
 log = logging.getLogger('custodian.azure.keyvault')
 
 
@@ -34,6 +38,34 @@ class KeyVault(ArmResourceManager):
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
         enum_spec = ('vaults', 'list', None)
+        resource_type = 'Microsoft.KeyVault/vaults'
+
+
+@KeyVault.filter_registry.register('firewall-rules')
+class KeyVaultFirewallRulesFilter(FirewallRulesFilter):
+
+    def __init__(self, data, manager=None):
+        super(KeyVaultFirewallRulesFilter, self).__init__(data, manager)
+        self._log = log
+
+    @property
+    def log(self):
+        return self._log
+
+    def _query_rules(self, resource):
+
+        if 'properties' not in resource:
+            client = self.manager.get_client()
+            vault = client.vaults.get(resource['resourceGroup'], resource['name'])
+            resource['properties'] = vault.properties.serialize()
+
+        if 'networkAcls' not in resource['properties']:
+            return []
+
+        ip_rules = resource['properties']['networkAcls']['ipRules']
+
+        resource_rules = set([IPNetwork(r['value']) for r in ip_rules])
+        return resource_rules
 
 
 @KeyVault.filter_registry.register('whitelist')

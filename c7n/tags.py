@@ -97,12 +97,9 @@ def universal_augment(self, resources):
     from c7n.query import RetryPageIterator
     paginator = client.get_paginator('get_resources')
     paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-    resource_type = getattr(self.get_model(), 'resource_type', None)
 
-    if not resource_type:
-        resource_type = self.get_model().service
-        if self.get_model().type:
-            resource_type += ":" + self.get_model().type
+    m = self.get_model()
+    resource_type = "%s:%s" % (m.arn_service or m.service, m.arn_type)
 
     resource_tag_map_list = list(itertools.chain(
         *[p['ResourceTagMappingList'] for p in paginator.paginate(
@@ -460,7 +457,7 @@ class RemoveTag(Action):
     concurrency = 2
 
     schema = utils.type_schema(
-        'untag', aliases=('unmark', 'remove-tag'),
+        'remove-tag', aliases=('unmark', 'untag', 'remove-tag'),
         tags={'type': 'array', 'items': {'type': 'string'}})
     schema_alias = True
     permissions = ('ec2:DeleteTags',)
@@ -654,30 +651,30 @@ class TagDelayedAction(Action):
 
         return action_date_string
 
+    def get_config_values(self):
+        d = {
+            'op': self.data.get('op', 'stop'),
+            'tag': self.data.get('tag', DEFAULT_TAG),
+            'msg': self.data.get('msg', self.default_template),
+            'tz': self.data.get('tz', 'utc'),
+            'days': self.data.get('days', 0),
+            'hours': self.data.get('hours', 0)}
+        d['action_date'] = self.generate_timestamp(
+            d['days'], d['hours'])
+        return d
+
     def process(self, resources):
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        cfg = self.get_config_values()
+        self.tz = tzutil.gettz(Time.TZ_ALIASES.get(cfg['tz']))
         self.id_key = self.manager.get_model().id
 
-        # Move this to policy? / no resources bypasses actions?
-        if not len(resources):
-            return
-
-        msg_tmpl = self.data.get('msg', self.default_template)
-
-        op = self.data.get('op', 'stop')
-        tag = self.data.get('tag', DEFAULT_TAG)
-        days = self.data.get('days', 0)
-        hours = self.data.get('hours', 0)
-        action_date = self.generate_timestamp(days, hours)
-
-        msg = msg_tmpl.format(
-            op=op, action_date=action_date)
+        msg = cfg['msg'].format(
+            op=cfg['op'], action_date=cfg['action_date'])
 
         self.log.info("Tagging %d resources for %s on %s" % (
-            len(resources), op, action_date))
+            len(resources), cfg['op'], cfg['action_date']))
 
-        tags = [{'Key': tag, 'Value': msg}]
+        tags = [{'Key': cfg['tag'], 'Value': msg}]
 
         # if the tag implementation has a specified batch size, it's typically
         # due to some restraint on the api so we defer to that.
@@ -1020,9 +1017,11 @@ class CopyRelatedResourceTag(Tag):
         return self
 
     def process(self, resources):
-        related_resources = dict(
-            zip(jmespath.search('[].%s' % self.data['key'], resources), resources))
-        related_ids = set(related_resources)
+        related_resources = list(
+            zip(jmespath.search('[].[%s || "c7n:NotFound"]|[]' % self.data['key'], resources),
+                resources))
+        related_ids = set([r[0] for r in related_resources])
+        related_ids.discard('c7n:NotFound')
         related_tag_map = self.get_resource_tag_map(self.data['resource'], related_ids)
 
         missing_related_tags = related_ids.difference(related_tag_map.keys())
@@ -1038,7 +1037,7 @@ class CopyRelatedResourceTag(Tag):
 
         stats = Counter()
 
-        for related, r in related_resources.items():
+        for related, r in related_resources:
             if related in missing_related_tags or not related_tag_map[related]:
                 stats['missing'] += 1
             elif self.process_resource(

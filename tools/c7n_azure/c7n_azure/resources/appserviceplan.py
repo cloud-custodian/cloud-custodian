@@ -16,7 +16,7 @@ from c7n import utils
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.actions import AzureBaseAction
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.filters import AzureOffHour, AzureOnHour
 from azure.mgmt.web import models
 
@@ -34,6 +34,8 @@ class AppServicePlan(ArmResourceManager):
             'resourceGroup',
             'kind'
         )
+        resource_type = 'Microsoft.Web/sites'
+        enable_tag_operations = False
 
     @staticmethod
     def register(registry, _):

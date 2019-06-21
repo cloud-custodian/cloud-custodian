@@ -32,13 +32,12 @@ from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 @resources.register('dynamodb-table')
 class Table(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'dynamodb'
-        type = 'table'
+        arn_type = 'table'
         enum_spec = ('list_tables', 'TableNames', None)
         detail_spec = ("describe_table", "TableName", None, "Table")
         id = 'TableName'
-        filter_name = None
         name = 'TableName'
         date = 'CreationDateTime'
         dimension = 'TableName'
@@ -293,17 +292,14 @@ class CreateBackup(BaseAction, StatusFilter):
 
 @resources.register('dynamodb-backup')
 class Backup(query.QueryResourceManager):
-    class resource_type(object):
+
+    class resource_type(query.TypeInfo):
         service = 'dynamodb'
-        type = 'table'
+        arn = 'BackupArn'
         enum_spec = ('list_backups', 'BackupSummaries', None)
-        detail_spec = None
-        id = 'Table'
-        filter_name = None
-        name = 'TableName'
+        id = 'BackupArn'
+        name = 'BackupName'
         date = 'BackupCreationDateTime'
-        dimension = 'TableName'
-        config_type = 'AWS::DynamoDB::Table'
 
 
 @Backup.action_registry.register('delete')
@@ -359,7 +355,7 @@ class DeleteBackup(BaseAction, StatusFilter):
 class Stream(query.QueryResourceManager):
     # Note stream management takes place on the table resource
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'dynamodbstreams'
         # Note max rate of 5 calls per second
         enum_spec = ('list_streams', 'Streams', None)
@@ -367,12 +363,7 @@ class Stream(query.QueryResourceManager):
         detail_spec = (
             "describe_stream", "StreamArn", "StreamArn", "StreamDescription")
         arn = id = 'StreamArn'
-
-        # TODO, we default to filtering by id, but the api takes table names, which
-        # require additional client side filtering as multiple streams may be present
-        # per table.
-        # filter_name = 'TableName'
-        filter_name = None
+        arn_type = 'stream'
 
         name = 'TableName'
         date = 'CreationDateTime'
@@ -382,17 +373,13 @@ class Stream(query.QueryResourceManager):
 @resources.register('dax')
 class DynamoDbAccelerator(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'dax'
-        type = 'cluster'
+        arn_type = 'cluster'
         enum_spec = ('describe_clusters', 'Clusters', None)
-        detail_spec = None
         id = 'ClusterArn'
         name = 'ClusterName'
         config_type = 'AWS::DAX::Cluster'
-        filter_name = None
-        dimension = None
-        date = None
 
     permissions = ('dax:ListTags',)
 
@@ -541,7 +528,7 @@ class DaxDeleteCluster(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: dax-delete-cluster
@@ -571,7 +558,7 @@ class DaxUpdateCluster(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: dax-update-cluster

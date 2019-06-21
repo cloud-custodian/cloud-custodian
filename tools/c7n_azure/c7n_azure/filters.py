@@ -82,7 +82,9 @@ class MetricFilter(Filter):
     schema = {
         'type': 'object',
         'required': ['type', 'metric', 'op', 'threshold'],
+        'additionalProperties': False,
         'properties': {
+            'type': {'enum': ['metric']},
             'metric': {'type': 'string'},
             'op': {'enum': list(scalar_ops.keys())},
             'threshold': {'type': 'number'},
@@ -94,6 +96,7 @@ class MetricFilter(Filter):
             'filter': {'type': 'string'}
         }
     }
+    schema_alias = True
 
     def __init__(self, data, manager=None):
         super(MetricFilter, self).__init__(data, manager)
@@ -118,7 +121,7 @@ class MetricFilter(Filter):
 
     def process(self, resources, event=None):
         # Import utcnow function as it may have been overridden for testing purposes
-        from c7n_azure.actions import utcnow
+        from c7n_azure.utils import utcnow
 
         # Get timespan
         end_time = utcnow()
@@ -208,7 +211,7 @@ class TagActionFilter(Filter):
         skew={'type': 'number', 'minimum': 0},
         skew_hours={'type': 'number', 'minimum': 0},
         op={'type': 'string'})
-
+    schema_alias = True
     current_date = None
 
     def validate(self):
@@ -268,6 +271,7 @@ class TagActionFilter(Filter):
 class DiagnosticSettingsFilter(ValueFilter):
 
     schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
+    schema_alias = True
 
     def process(self, resources, event=None):
         futures = []
@@ -330,6 +334,7 @@ class PolicyCompliantFilter(Filter):
     schema = type_schema('policy-compliant', required=['type', 'compliant'],
                          compliant={'type': 'boolean'},
                          definitions={'type': 'array'})
+    schema_alias = True
 
     def __init__(self, data, manager=None):
         super(PolicyCompliantFilter, self).__init__(data, manager)
@@ -411,6 +416,7 @@ class FirewallRulesFilter(Filter):
             'include': {'type': 'array', 'items': {'type': 'string'}},
             'equal': {'type': 'array', 'items': {'type': 'string'}}
         })
+    schema_alias = True
 
     def __init__(self, data, manager=None):
         super(FirewallRulesFilter, self).__init__(data, manager)

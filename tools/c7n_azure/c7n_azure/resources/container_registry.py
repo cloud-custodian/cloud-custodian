@@ -28,3 +28,4 @@ class ContainerRegistry(ArmResourceManager):
             'location',
             'resourceGroup'
         )
+        resource_type = 'Microsoft.ContainerRegistry/registries'

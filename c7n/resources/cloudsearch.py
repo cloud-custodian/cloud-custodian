@@ -15,21 +15,21 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
 
 @resources.register('cloudsearch')
 class CloudSearch(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = "cloudsearch"
         enum_spec = ("describe_domains", "DomainStatusList", None)
         name = id = "DomainName"
         dimension = "DomainName"
         filter_name = 'DomainNames'
         filter_type = 'list'
-        type = "domain"
+        arn_type = "domain"
 
 
 @CloudSearch.action_registry.register('delete')

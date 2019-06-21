@@ -197,9 +197,10 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     return accounts_config, custodian_config, executor
 
 
-def resolve_regions(regions, partition='aws'):
+def resolve_regions(regions):
     if 'all' in regions:
-        return boto3.Session().get_available_regions('ec2', partition)
+        client = boto3.client('ec2')
+        return [region['RegionName'] for region in client.describe_regions()['Regions']]
     if not regions:
         return ('us-east-1', 'us-west-2')
     return regions
@@ -552,8 +553,8 @@ def run_account(account, region, policies_config, output_path,
             except ClientError as e:
                 success = False
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    log.warning('Access denied account:%s region:%s',
-                                account['name'], region)
+                    log.warning('Access denied api:%s policy:%s account:%s region:%s',
+                                e.operation_name, p.name, account['name'], region)
                     return policy_counts, success
                 log.error(
                     "Exception running policy:%s account:%s region:%s error:%s",

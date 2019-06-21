@@ -1,0 +1,50 @@
+{
+  "body": {
+    "kind": "bigquery#dataset", 
+    "datasetReference": {
+      "projectId": "cloud-custodian", 
+      "datasetId": "qqqqqqqqqqqqq"
+    }, 
+    "creationTime": "1557228042634", 
+    "access": [
+      {
+        "specialGroup": "projectWriters", 
+        "role": "WRITER"
+      }, 
+      {
+        "specialGroup": "projectOwners", 
+        "role": "OWNER"
+      }, 
+      {
+        "role": "OWNER", 
+        "userByEmail": "dkhanas@gmail.com"
+      }, 
+      {
+        "specialGroup": "projectReaders", 
+        "role": "READER"
+      }
+    ], 
+    "etag": "kuKgEnxs629GqyyvY8Vitw==", 
+    "location": "US", 
+    "lastModifiedTime": "1557228042634", 
+    "id": "cloud-custodian:qqqqqqqqqqqqq", 
+    "selfLink": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/qqqqqqqqqqqqq"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "741", 
+    "x-xss-protection": "0", 
+    "content-location": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/qqqqqqqqqqqqq?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "kuKgEnxs629GqyyvY8Vitw==", 
+    "cache-control": "private", 
+    "date": "Tue, 14 May 2019 14:53:40 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}

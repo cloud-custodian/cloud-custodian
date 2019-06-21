@@ -11,6 +11,14 @@ Filters
     - Metric Filter - Filter on metrics from Azure Monitor - (see `Cosmos DB Supported Metrics <https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-supported-metrics#microsoftdocumentdbdatabaseaccounts/>`_)
     - Tag Filter - Filter on tag presence and/or values
     - Marked-For-Op Filter - Filter on tag that indicates a scheduled operation for a resource
+    
+- ``firewall-rules`` Firewall Rules Filter
+    Filter based on firewall rules. Rules can be specified as x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.
+
+    - `include`: the list of IP ranges or CIDR that firewall rules must include. The list must be a subset of the exact rules as is, the ranges will not be combined.
+    - `equal`: the list of IP ranges or CIDR that firewall rules must match exactly.
+
+  .. c7n-schema:: azure.storage.filters.firewall-rules
 
 Actions
 -------
@@ -19,38 +27,12 @@ Actions
 Example Policies
 ----------------
 
-This set of policies will mark all CosmosDB for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
+This policy will find all CosmosDB with 1000 or less total requests over the last 72 hours
 
 .. code-block:: yaml
 
     policies:
-      - name: mark-test-cosmosdb-for-deletion
-        resource: azure.cosmosdb
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-marked-cosmosdbs
-        resource: azure.cosmosdb
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
-
-This policy will find all CosmosDB with 1000 or less total requests over the last 72 hours and notify user@domain.com
-
-.. code-block:: yaml
-
-    policies:
-      - name: notify-cosmosdb-inactive
+      - name: cosmosdb-inactive
         resource: azure.cosmosdb
         filters:
           - type: metric
@@ -59,13 +41,3 @@ This policy will find all CosmosDB with 1000 or less total requests over the las
             aggregation: total
             threshold: 1000
             timeframe: 72
-         actions:
-          - type: notify
-            template: default
-            priority_header: 2
-            subject: Inactive CosmosDB
-            to:
-              - user@domain.com
-            transport:
-              - type: asq
-                queue: https://accountname.queue.core.windows.net/queuename

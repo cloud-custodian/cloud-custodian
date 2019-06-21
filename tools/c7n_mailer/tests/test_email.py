@@ -77,7 +77,7 @@ class EmailTest(unittest.TestCase):
         messages_map = deliver.get_to_addrs_email_messages_map(msg)
 
         with patch("smtplib.SMTP") as mock_smtp:
-            with patch('c7n_mailer.email_delivery.kms_decrypt') as mock_decrypt:
+            with patch('c7n_mailer.utils.kms_decrypt') as mock_decrypt:
                 mock_decrypt.return_value = 'xyz'
                 for email_addrs, mimetext_msg in messages_map.items():
                     deliver.send_c7n_email(msg, list(email_addrs), mimetext_msg)
@@ -105,8 +105,6 @@ class EmailTest(unittest.TestCase):
 
     def test_event_owner_ldap_flow(self):
         targets = ['event-owner']
-        username = self.email_delivery.get_aws_username_from_event(CLOUDTRAIL_EVENT)
-        self.assertEqual(username, 'michael_bolton')
         michael_bolton_email = self.email_delivery.get_event_owner_email(targets, CLOUDTRAIL_EVENT)
         self.assertEqual(michael_bolton_email, ['michael_bolton@initech.com'])
 

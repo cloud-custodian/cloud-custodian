@@ -49,6 +49,10 @@ class UtilsTest(BaseTest):
     def test_get_resource_type(self):
         self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID), "virtualMachines")
 
+    def test_get_full_type(self):
+        self.assertEqual(ResourceIdParser.get_full_type(RESOURCE_ID),
+                         "Microsoft.Compute/virtualMachines")
+
     def test_resource_name(self):
         self.assertEqual(ResourceIdParser.get_resource_name(RESOURCE_ID), "nametest")
 

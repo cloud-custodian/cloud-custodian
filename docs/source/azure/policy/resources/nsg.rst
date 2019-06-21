@@ -20,8 +20,7 @@ Filters
     - `ipProtocol`: `TCP`, `UDP` or `*`. Default: `*`
     - `access`: `Allow`, `Deny`
 
-  .. c7n-schema:: IngressFilter
-      :module: c7n_azure.resources.network_security_group
+  .. c7n-schema:: azure.networksecuritygroup.filters.ingress
 
 - ``egress`` Filter based on Outbound Security Rules
     - `ports`: ports to include (`0-65535` if not specified)
@@ -32,8 +31,7 @@ Filters
     - `ipProtocol`: `TCP`, `UDP` or `*`. Default: `*`
     - `access`: `Allow`, `Deny`
 
-  .. c7n-schema:: EgressFilter
-      :module: c7n_azure.resources.network_security_group
+  .. c7n-schema:: azure.networksecuritygroup.filters.egress
 
 
 Actions
@@ -47,8 +45,7 @@ Actions
     - `direction`: `Inbound`, `Outbound`
     - `access`: `Allow`, `Deny`
 
-  .. c7n-schema:: CloseRules
-      :module: c7n_azure.resources.network_security_group
+  .. c7n-schema:: azure.networksecuritygroup.actions.open
 
 - ``close`` Deny access to security rules
     - `ports`: ports to include (`0-65535` if not specified)
@@ -58,8 +55,7 @@ Actions
     - `direction`: `Inbound`, `Outbound`
     - `access`: `Allow`, `Deny`
 
-  .. c7n-schema:: OpenRules
-      :module: c7n_azure.resources.network_security_group
+  .. c7n-schema:: azure.networksecuritygroup.actions.close
 
 
 Example Policies

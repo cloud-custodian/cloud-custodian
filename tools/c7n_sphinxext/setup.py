@@ -25,5 +25,8 @@ setup(
     url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
-    entry_points={},
+    install_requires=['c7n', 'Sphinx'],
+    entry_points={
+        'console_scripts': [
+            'c7n-sphinxext = c7n_sphinxext.docgen:main']}
 )

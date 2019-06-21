@@ -29,6 +29,10 @@ class Provider(object):
     """Provider Base Class"""
 
     @abc.abstractproperty
+    def display_name(self):
+        """display name for the provider in docs"""
+
+    @abc.abstractproperty
     def resources(self):
         """resources registry for this cloud provider"""
 

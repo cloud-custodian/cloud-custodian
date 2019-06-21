@@ -1,0 +1,60 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.91",
+      "requestAttributes": {
+        "time": "2019-03-01T11:30:34.525Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "dns.googleapis.com",
+    "methodName": "dns.policies.create",
+    "authorizationInfo": [
+      {
+        "permission": "dns.policies.create",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "resourceName": "policies/custodian",
+    "request": {
+      "@type": "type.googleapis.com/cloud.dns.api.PoliciesCreateRequest",
+      "policy": {
+        "description": "whatever",
+        "name": "custodian"
+      },
+      "project": "cloud-custodian"
+    },
+    "response": {
+      "@type": "type.googleapis.com/cloud.dns.api.PoliciesCreateResponse",
+      "policy": {
+        "internetResolution": "YES",
+        "enableLogging": false,
+        "fingerprint": "3fd1cbfb5c64a8e20000016939052ce3",
+        "name": "custodian",
+        "enableInboundForwarding": false,
+        "id": "4598680974969317602",
+        "description": "whatever"
+      }
+    }
+  },
+  "insertId": "-9z1o23dcjmw",
+  "resource": {
+    "type": "dns_policy",
+    "labels": {
+      "project_id": "cloud-custodian",
+      "location": "global",
+      "policy_name": "custodian"
+    }
+  },
+  "timestamp": "2019-03-01T11:30:34.298Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-03-01T11:30:34.839268143Z"
+}

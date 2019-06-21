@@ -7,3 +7,5 @@ tabulate>=0.8.2
 jsonpatch>=1.2.1
 futures>=3.1.1
 python-dateutil>=2.6
+urllib3
+certifi

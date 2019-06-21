@@ -14,17 +14,16 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 
 
 @resources.register('directconnect')
 class DirectConnect(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'directconnect'
         enum_spec = ('describe_connections', 'connections', None)
         id = 'connectionId'
         name = 'connectionName'
         filter_name = 'connectionId'
-        dimension = None
-        type = "dxcon"
+        arn_type = "dxcon"

@@ -17,20 +17,17 @@
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-gatewayversion": [
-                        "version=2.2.0.0"
-                    ],
                     "date": [
-                        "Thu, 02 May 2019 19:11:12 GMT"
-                    ],
-                    "content-location": [
-                        "https://management.documents.azure.com:450/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2015-04-08"
+                        "Mon, 17 Jun 2019 18:55:19 GMT"
                     ],
                     "cache-control": [
                         "no-store, no-cache"
                     ],
+                    "x-ms-gatewayversion": [
+                        "version=2.4.0.0"
+                    ],
                     "content-length": [
-                        "1639"
+                        "1797"
                     ]
                 },
                 "body": {
@@ -48,7 +45,7 @@
                                 "properties": {
                                     "provisioningState": "Succeeded",
                                     "documentEndpoint": "https://cctestcosmosdb.documents.azure.com:443/",
-                                    "ipRangeFilter": "",
+                                    "ipRangeFilter": "1.2.2.128/25,3.1.1.1,104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26",
                                     "enableAutomaticFailover": false,
                                     "enableMultipleWriteLocations": false,
                                     "isVirtualNetworkFilterEnabled": false,
@@ -69,7 +66,8 @@
                                             "locationName": "South Central US",
                                             "documentEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/",
                                             "provisioningState": "Succeeded",
-                                            "failoverPriority": 0
+                                            "failoverPriority": 0,
+                                            "isZoneRedundant": false
                                         }
                                     ],
                                     "readLocations": [
@@ -78,7 +76,8 @@
                                             "locationName": "South Central US",
                                             "documentEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/",
                                             "provisioningState": "Succeeded",
-                                            "failoverPriority": 0
+                                            "failoverPriority": 0,
+                                            "isZoneRedundant": false
                                         }
                                     ],
                                     "locations": [
@@ -87,7 +86,8 @@
                                             "locationName": "South Central US",
                                             "documentEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/",
                                             "provisioningState": "Succeeded",
-                                            "failoverPriority": 0
+                                            "failoverPriority": 0,
+                                            "isZoneRedundant": false
                                         }
                                     ],
                                     "failoverPolicies": [

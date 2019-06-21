@@ -12,8 +12,8 @@ Metric Filter
 ``MetricFilter``
 Filters Azure resources based on live metrics from the Azure monitor.
 
-.. c7n-schema:: MetricFilter
-    :module: c7n_azure.filters
+.. c7n-schema:: azure.vm.filters.metric
+
 
 Metrics for Custodian-supported Azure resources:
 
@@ -89,8 +89,7 @@ Tag Filter
 The "tag filter" is implicitly just the ValueFilter (see :ref:`filters`).
 It can be used to filter resources on the presence, absence or value of a tag.
 
-.. c7n-schema:: ValueFilter
-    :module: c7n.filters.core
+.. c7n-schema:: azure.vm.filters.value
 
 
 Example Policies
@@ -131,15 +130,15 @@ This policy will find all CosmosDBs with the tag 'Tag1' and value 'Value1'
 Marked-For-Op Filter
 --------------------
 
-``TagActionFilter``
-Filters Azure resources based on previously scheduled operations via tags.
+``marked-for-op``
+    Filters Azure resources based on previously scheduled operations via tags.
 
-.. c7n-schema:: TagActionFilter
-    :module: c7n_azure.filters
-
+    .. c7n-schema:: azure.vm.filters.marked-for-op
 
 Example Policies
 ~~~~~~~~~~~~~~~~
+
+- :ref:`azure_example_delayedoperation`
 
 Find VMs that have been marked for stopping and stop them
 
@@ -199,8 +198,7 @@ Diagnostic Settings Filter
 The diagnostic settings filter is implicitly just the ValueFilter (see :ref:`filters`) on the diagnostic settings for
 an azure resource.
 
-.. c7n-schema:: DiagnosticSettingsFilter
-    :module: c7n_azure.filters
+.. c7n-schema:: azure.loadbalancer.filters.diagnostic-settings
 
 
 Example Policies

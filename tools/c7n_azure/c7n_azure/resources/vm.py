@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from c7n_azure.actions import AzureBaseAction
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.filters import AzureOffHour, AzureOnHour
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
@@ -34,6 +34,7 @@ class VirtualMachine(ArmResourceManager):
             'resourceGroup',
             'properties.hardwareProfile.vmSize',
         )
+        resource_type = 'Microsoft.Compute/virtualMachines'
 
     @staticmethod
     def register(registry, _):
@@ -48,6 +49,7 @@ resources.subscribe(resources.EVENT_FINAL, VirtualMachine.register)
 @VirtualMachine.filter_registry.register('instance-view')
 class InstanceViewFilter(ValueFilter):
     schema = type_schema('instance-view', rinherit=ValueFilter.schema)
+    schema_alias = True
 
     def __call__(self, i):
         if 'instanceView' not in i:

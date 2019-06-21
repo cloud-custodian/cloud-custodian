@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 
 
 class DnsManagedZoneTest(BaseTest):
@@ -21,7 +21,7 @@ class DnsManagedZoneTest(BaseTest):
         project_id = 'cloud-custodian'
         managed_zone_name = 'custodian'
         session_factory = self.replay_flight_data(
-            'managed-zone-query', project_id=project_id)
+            'dns-managed-zone-query', project_id=project_id)
 
         policy = self.load_policy(
             {'name': 'gcp-dns-managed-zone-dryrun',
@@ -33,18 +33,23 @@ class DnsManagedZoneTest(BaseTest):
 
     def test_managed_zone_get(self):
         project_id = 'cloud-custodian'
-        managed_zone_name = 'custodian'
+        resource_name = 'custodian'
         session_factory = self.replay_flight_data(
-            'managed-zone-get', project_id=project_id)
+            'dns-managed-zone-get', project_id=project_id)
 
         policy = self.load_policy(
             {'name': 'gcp-dns-managed-zone-dryrun',
-             'resource': 'gcp.dns-managed-zone'},
-            session_factory=session_factory)
+             'resource': 'gcp.dns-managed-zone',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['dns.managedZones.create']
+             }}, session_factory=session_factory)
 
-        managed_zone_resource = policy.resource_manager.get_resource(
-            {'name': managed_zone_name, 'project_id': project_id})
-        self.assertEqual(managed_zone_resource['name'], managed_zone_name)
+        exec_mode = policy.get_execution_mode()
+        event = event_data('dns-managed-zone-create.json')
+        resources = exec_mode.run(event, None)
+
+        self.assertEqual(resources[0]['name'], resource_name)
 
 
 class DnsPolicyTest(BaseTest):
@@ -53,7 +58,7 @@ class DnsPolicyTest(BaseTest):
         project_id = 'cloud-custodian'
         policy_name = 'custodian'
         session_factory = self.replay_flight_data(
-            'policy-query', project_id=project_id)
+            'dns-policy-query', project_id=project_id)
 
         policy = self.load_policy(
             {'name': 'gcp-dns-policy-dryrun',
@@ -67,13 +72,18 @@ class DnsPolicyTest(BaseTest):
         project_id = 'cloud-custodian'
         policy_name = 'custodian'
         session_factory = self.replay_flight_data(
-            'policy-get', project_id=project_id)
+            'dns-policy-get', project_id=project_id)
 
         policy = self.load_policy(
             {'name': 'gcp-dns-policy-dryrun',
-             'resource': 'gcp.dns-policy'},
-            session_factory=session_factory)
+             'resource': 'gcp.dns-policy',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['dns.policies.create']
+             }}, session_factory=session_factory)
 
-        policy_resource = policy.resource_manager.get_resource(
-            {'name': policy_name, 'project_id': project_id})
-        self.assertEqual(policy_resource['name'], policy_name)
+        exec_mode = policy.get_execution_mode()
+        event = event_data('dns-policy-create.json')
+        resources = exec_mode.run(event, None)
+
+        self.assertEqual(resources[0]['name'], policy_name)

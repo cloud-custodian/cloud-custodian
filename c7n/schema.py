@@ -29,6 +29,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import Counter
 import json
+import inspect
 import logging
 
 from jsonschema import Draft4Validator as Validator
@@ -271,7 +272,8 @@ def generate(resource_types=()):
                     resource_type,
                     resource_defs,
                     alias_name,
-                    definitions
+                    definitions,
+                    cloud_name
                 ))
 
     schema = {
@@ -294,7 +296,10 @@ def generate(resource_types=()):
     return schema
 
 
-def process_resource(type_name, resource_type, resource_defs, alias_name=None, definitions=None):
+def process_resource(
+        type_name, resource_type, resource_defs, alias_name=None,
+        definitions=None, provider_name=None):
+
     r = resource_defs.setdefault(type_name, {'actions': {}, 'filters': {}})
 
     seen_actions = set()  # Aliases get processed once
@@ -305,14 +310,15 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None, d
         else:
             seen_actions.add(a)
         if a.schema_alias:
-            if action_name in definitions['actions']:
+            action_alias = "%s.%s" % (provider_name, action_name)
+            if action_alias in definitions['actions']:
 
-                if definitions['actions'][action_name] != a.schema: # NOQA
+                if definitions['actions'][action_alias] != a.schema: # NOQA
                     msg = "Schema mismatch on type:{} action:{} w/ schema alias ".format(
                         type_name, action_name)
                     raise SyntaxError(msg)
-            definitions['actions'][action_name] = a.schema
-            action_refs.append({'$ref': '#/definitions/actions/%s' % action_name})
+            definitions['actions'][action_alias] = a.schema
+            action_refs.append({'$ref': '#/definitions/actions/%s' % action_alias})
         else:
             r['actions'][action_name] = a.schema
             action_refs.append(
@@ -414,12 +420,14 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
     for type_name, resource_type in resources.items():
         classes = {'actions': {}, 'filters': {}, 'resource': resource_type}
         actions = []
-        for action_name, cls in resource_type.action_registry.items():
+        for cls in ElementSchema.elements(resource_type.action_registry):
+            action_name = ElementSchema.name(cls)
             actions.append(action_name)
             classes['actions'][action_name] = cls
 
         filters = []
-        for filter_name, cls in resource_type.filter_registry.items():
+        for cls in ElementSchema.elements(resource_type.filter_registry):
+            filter_name = ElementSchema.name(cls)
             filters.append(filter_name)
             classes['filters'][filter_name] = cls
 
@@ -436,7 +444,104 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
     return vocabulary
 
 
-def summary(vocabulary):
+class ElementSchema(object):
+    """Utility functions for working with resource's filters and actions.
+    """
+
+    @staticmethod
+    def elements(registry):
+        """Given a resource registry return sorted de-aliased values.
+        """
+        seen = {}
+        for k, v in registry.items():
+            if k in ('and', 'or', 'not'):
+                continue
+            if v in seen:
+                continue
+            else:
+                seen[ElementSchema.name(v)] = v
+        return [seen[k] for k in sorted(seen)]
+
+    @staticmethod
+    def resolve(vocabulary, schema_path):
+        """Given a resource vocabulary and a dotted path, resolve an element.
+        """
+        current = vocabulary
+        frag = None
+        if schema_path.startswith('.'):
+            # The preprended '.' is an odd artifact
+            schema_path = schema_path[1:]
+        parts = schema_path.split('.')
+        while parts:
+            k = parts.pop(0)
+            if frag:
+                k = "%s.%s" % (frag, k)
+                frag = None
+                parts.insert(0, 'classes')
+            elif k in clouds:
+                frag = k
+                if len(parts) == 1:
+                    parts.append('resource')
+                continue
+            if k not in current:
+                raise ValueError("Invalid schema path %s" % schema_path)
+            current = current[k]
+        return current
+
+    @staticmethod
+    def name(cls):
+        """For a filter or action return its name."""
+        return cls.schema['properties']['type']['enum'][0]
+
+    @staticmethod
+    def doc(cls):
+        """Return 'best' formatted doc string for a given class.
+
+        Walks up class hierarchy, skipping known bad. Returns
+        empty string if no suitable doc string found.
+        """
+        # walk up class hierarchy for nearest
+        # good doc string, skip known
+        if cls.__doc__ is not None:
+            return inspect.cleandoc(cls.__doc__)
+        doc = None
+        for b in cls.__bases__:
+            if b in (ValueFilter, object):
+                continue
+            doc = b.__doc__ or ElementSchema.doc(b)
+        if doc is not None:
+            return inspect.cleandoc(doc)
+        return ""
+
+    @staticmethod
+    def schema(definitions, cls):
+        """Return a pretty'ified version of an element schema."""
+        schema = isinstance(cls, type) and dict(cls.schema) or dict(cls)
+        schema.pop('type', None)
+        schema.pop('additionalProperties', None)
+        return ElementSchema._expand_schema(schema, definitions)
+
+    @staticmethod
+    def _expand_schema(schema, definitions):
+        """Expand references in schema to their full schema"""
+        for k, v in list(schema.items()):
+            if k == '$ref':
+                # the value here is in the form of: '#/definitions/path/to/key'
+                parts = v.split('/')
+                if ['#', 'definitions'] != parts[0:2]:
+                    raise ValueError("Invalid Ref %s" % v)
+                current = definitions
+                for p in parts[2:]:
+                    if p not in current:
+                        return None
+                    current = current[p]
+                return ElementSchema._expand_schema(current, definitions)
+            elif isinstance(v, dict):
+                schema[k] = ElementSchema._expand_schema(v, definitions)
+        return schema
+
+
+def pprint_schema_summary(vocabulary):
     providers = {}
     non_providers = {}
 

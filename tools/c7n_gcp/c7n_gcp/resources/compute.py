@@ -112,6 +112,19 @@ class Image(QueryResourceManager):
                         'resourceId': resource_info['image_id']})
 
 
+@Image.action_registry.register('delete')
+class DeleteImage(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    attr_filter = ('status', ('READY'))
+    path_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*)')
+
+    def get_resource_params(self, m, r):
+        project, image_id = self.path_param_re.match(r['selfLink']).groups()
+        return {'project': project, 'image': image_id}
+
+
 @resources.register('disk')
 class Disk(QueryResourceManager):
 
