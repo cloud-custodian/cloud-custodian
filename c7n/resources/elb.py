@@ -17,7 +17,6 @@ Elastic Load Balancers
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from concurrent.futures import as_completed
-import logging
 import re
 
 from botocore.exceptions import ClientError
@@ -32,12 +31,11 @@ from datetime import datetime
 from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource
-from c7n.utils import local_session, chunks, type_schema, get_retry, generate_arn
+from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
+from c7n.utils import local_session, chunks, type_schema
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
-log = logging.getLogger('custodian.elb')
 
 filters = FilterRegistry('elb.filters')
 actions = ActionRegistry('elb.actions')
@@ -51,13 +49,12 @@ filters.register('shield-metrics', ShieldMetrics)
 @resources.register('elb')
 class ELB(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elb'
-        resource_type = 'elasticloadbalancing:loadbalancer'
-        type = 'loadbalancer'
+        arn_type = 'loadbalancer'
+        arn_service = 'elasticloadbalancing'
         enum_spec = ('describe_load_balancers',
                      'LoadBalancerDescriptions', None)
-        detail_spec = None
         id = 'LoadBalancerName'
         filter_name = 'LoadBalancerNames'
         filter_type = 'list'
@@ -74,24 +71,12 @@ class ELB(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
-    retry = staticmethod(get_retry(('Throttling',)))
 
     @classmethod
     def get_permissions(cls):
         return ('elasticloadbalancing:DescribeLoadBalancers',
                 'elasticloadbalancing:DescribeLoadBalancerAttributes',
                 'elasticloadbalancing:DescribeTags')
-
-    def get_arn(self, r):
-        return generate_arn(
-            account_id=self.config.account_id,
-            service='elasticloadbalancing',
-            resource_type='loadbalancer',
-            resource=r[self.resource_type.id],
-            region=self.config.region)
-
-    def get_arns(self, resources):
-        return map(self.get_arn, resources)
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -268,7 +253,7 @@ class SetSslListenerPolicy(BaseAction):
 
             for f in as_completed(futures):
                 if f.exception():
-                    log.error(
+                    self.log.error(
                         "set-ssl-listener-policy error on lb:%s error:%s",
                         futures[f][rid], f.exception())
                     error = f.exception()
@@ -463,6 +448,7 @@ class Instance(ValueFilter):
     """
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
+    schema_alias = False
     annotate = False
 
     def get_permissions(self):

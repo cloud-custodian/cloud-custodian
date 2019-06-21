@@ -14,13 +14,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 
 
 @resources.register('support-case')
 class SupportCase(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'support'
         enum_spec = ('describe_cases', 'cases', None)
         filter_name = 'caseIdList'
@@ -28,5 +28,4 @@ class SupportCase(QueryResourceManager):
         id = 'caseId'
         name = 'displayId'
         date = 'timeCreated'
-        dimension = None
         arn = False

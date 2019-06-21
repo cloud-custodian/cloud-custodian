@@ -1,17 +1,14 @@
-.. _azure_delayedoperation:
+.. _azure_example_delayedoperation:
 
 Delayed Operations
 ==================
 
 You can use `mark-for-op` action and `marked-for-op` filter to implement delayed actions, such as delete a resource if
-it remains non-compliant for a few days. 
-
-Example Policies
-----------------
+it remains non-compliant for a few days.
 
 This set of policies tags all empty resource groups with a special tag. If tagged group remains empty, it will be remove after 7 days.
 
-If resource group is no longer empty, tag is removed. 
+If resource group is no longer empty, tag is removed.
 
 
 .. code-block:: yaml

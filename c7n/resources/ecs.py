@@ -52,15 +52,13 @@ def ecs_taggable(model, r):
 @resources.register('ecs')
 class ECSCluster(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         enum_spec = ('list_clusters', 'clusterArns', None)
         batch_detail_spec = (
             'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
         arn = id = "clusterArn"
-        dimension = None
-        filter_name = None
 
     def augment(self, resources):
         resources = super(ECSCluster, self).augment(resources)
@@ -160,15 +158,13 @@ class Service(query.ChildResourceManager):
 
     chunk_size = 10
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         name = 'serviceName'
         arn = id = 'serviceArn'
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
-        dimension = None
         supports_trailevents = True
-        filter_name = None
 
     @property
     def source_type(self):
@@ -193,6 +189,7 @@ class ServiceMetrics(MetricsFilter):
 class RelatedTaskDefinitionFilter(ValueFilter):
 
     schema = type_schema('task-definition', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('ecs:DescribeTaskDefinition',
                    'ecs:ListTaskDefinitions')
     related_key = 'taskDefinition'
@@ -390,14 +387,13 @@ class Task(query.ChildResourceManager):
 
     chunk_size = 100
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         arn = id = name = 'taskArn'
+        arn_type = 'task'
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
-        dimension = None
         supports_trailevents = True
-        filter_name = None
 
     @property
     def source_type(self):
@@ -465,13 +461,10 @@ class StopTask(BaseAction):
 @resources.register('ecs-task-definition')
 class TaskDefinition(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
-        dimension = None
-        filter_name = None
-        filter_type = None
 
     def get_resources(self, ids, cache=True):
         if cache:
@@ -531,12 +524,11 @@ class ContainerInstance(query.ChildResourceManager):
 
     chunk_size = 100
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         id = name = 'containerInstance'
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
-        dimension = None
         arn = "containerInstanceArn"
 
     @property

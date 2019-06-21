@@ -53,6 +53,30 @@ def remove_statements(match_ids, statements, matched=()):
 
 
 class ModifyPolicyBase(BaseAction):
+    """Action to modify resource IAM policy statements.
+
+    Applies to all resources with embedded IAM Policies.
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: sns-cross-account
+                resource: sns
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: modify-policy
+                    add-statements: [{
+                        "Sid": "ReplaceWithMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["SNS:GetTopicAttributes"],
+                        "Resource": topic_arn,
+                            }]
+                    remove-statements: '*'
+    """
 
     schema_alias = True
     schema = utils.type_schema(

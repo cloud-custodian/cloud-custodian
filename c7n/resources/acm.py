@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session
 
@@ -23,19 +23,17 @@ from c7n.utils import type_schema, local_session
 @resources.register('acm-certificate')
 class Certificate(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'acm'
         enum_spec = ('list_certificates', 'CertificateSummaryList', None)
         id = 'CertificateArn'
         name = 'DomainName'
         date = 'CreatedAt'
-        dimension = None
         detail_spec = (
             "describe_certificate", "CertificateArn",
             'CertificateArn', 'Certificate')
         config_type = "AWS::ACM::Certificate"
-        filter_name = None
-        type = 'certificate'
+        arn_type = 'certificate'
         universal_taggable = object()
 
     def get_source(self, source_type):

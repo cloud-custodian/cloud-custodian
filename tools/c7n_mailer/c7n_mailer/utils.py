@@ -15,7 +15,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import base64
 from datetime import datetime, timedelta
-from enum import Enum
 import functools
 import json
 import os
@@ -29,7 +28,7 @@ from dateutil.tz import gettz, tzutc
 from ruamel import yaml
 
 
-class Providers(Enum):
+class Providers(object):
     AWS = 0
     Azure = 1
 

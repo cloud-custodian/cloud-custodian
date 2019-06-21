@@ -17,7 +17,7 @@ from c7n.actions import Action
 from c7n.filters.metrics import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 
@@ -25,7 +25,7 @@ from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter
 @resources.register('message-broker')
 class MessageBroker(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'mq'
         enum_spec = ('list_brokers', 'BrokerSummaries', None)
         detail_spec = (
@@ -34,9 +34,7 @@ class MessageBroker(QueryResourceManager):
         id = 'BrokerId'
         arn = 'BrokerArn'
         name = 'BrokerName'
-        date = None
         dimension = 'Broker'
-        filter_name = None
         metrics_namespace = 'AWS/AmazonMQ'
 
     def augment(self, resources):

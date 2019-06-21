@@ -130,14 +130,15 @@ This policy will find all CosmosDBs with the tag 'Tag1' and value 'Value1'
 Marked-For-Op Filter
 --------------------
 
-``TagActionFilter``
-Filters Azure resources based on previously scheduled operations via tags.
+``marked-for-op``
+    Filters Azure resources based on previously scheduled operations via tags.
 
-.. c7n-schema:: azure.vm.filters.marked-for-op
-
+    .. c7n-schema:: azure.vm.filters.marked-for-op
 
 Example Policies
 ~~~~~~~~~~~~~~~~
+
+- :ref:`azure_example_delayedoperation`
 
 Find VMs that have been marked for stopping and stop them
 

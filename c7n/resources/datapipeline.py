@@ -20,7 +20,7 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.filters import FilterRegistry
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import chunks, local_session, get_retry, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
@@ -36,17 +36,15 @@ class DataPipeline(QueryResourceManager):
 
     filter_registry = filters
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'datapipeline'
-        type = 'dataPipeline'
+        arn_type = 'dataPipeline'
         id = 'id'
         name = 'name'
-        date = None
         dimension = 'name'
         batch_detail_spec = (
-            'describe_pipeline', 'pipelineIds', 'id', 'pipelineDescriptionList', None)
+            'describe_pipelines', 'pipelineIds', 'id', 'pipelineDescriptionList', None)
         enum_spec = ('list_pipelines', 'pipelineIdList', None)
-        filter_name = None
 
     def augment(self, resources):
         filter(None, _datapipeline_info(

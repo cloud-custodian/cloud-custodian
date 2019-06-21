@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
 import jmespath
 import json
 import six
@@ -29,7 +28,7 @@ from c7n.manager import resources
 from c7n import query
 from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, generate_arn
+from c7n.utils import local_session, type_schema
 
 ErrAccessDenied = "AccessDeniedException"
 
@@ -37,30 +36,16 @@ ErrAccessDenied = "AccessDeniedException"
 @resources.register('lambda')
 class AWSLambda(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'lambda'
-        type = 'function'
+        arn_type = 'function'
+        arn_separator = ":"
         enum_spec = ('list_functions', 'Functions', None)
         name = id = 'FunctionName'
-        filter_name = None
         date = 'LastModified'
         dimension = 'FunctionName'
         config_type = "AWS::Lambda::Function"
         universal_taggable = object()
-
-    @property
-    def generate_arn(self):
-        """ Generates generic arn if ID is not already arn format.
-        """
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                self.get_model().service,
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type=self.get_model().type,
-                separator=':')
-        return self._generate_arn
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -124,6 +109,7 @@ class ReservedConcurrency(ValueFilter):
     annotation_key = "c7n:FunctionInfo"
     value_key = '"c7n:FunctionInfo".Concurrency.ReservedConcurrentExecutions'
     schema = type_schema('reserved-concurrency', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('lambda:GetFunction',)
 
     def validate(self):
@@ -195,6 +181,7 @@ class LambdaEventSource(ValueFilter):
 
     annotation_key = "c7n:EventSources"
     schema = type_schema('event-source', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('lambda:GetPolicy',)
 
     def process(self, resources, event=None):
@@ -430,15 +417,13 @@ class LambdaLayerVersion(query.QueryResourceManager):
 
     """
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'lambda'
-        type = 'function'
         enum_spec = ('list_layers', 'Layers', None)
         name = id = 'LayerName'
-        filter_name = None
         date = 'CreatedDate'
-        dimension = None
-        config_type = None
+        arn = "LayerVersionArn"
+        arn_type = "layer"
 
     def augment(self, resources):
         versions = {}

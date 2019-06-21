@@ -59,46 +59,59 @@ Tags
                    tags: ['TagName', 'TagName2']
 
 ``TagTrim``
-      Automatically remove tags from an azure resource.
+    Automatically remove tags from an azure resource.
 
-      Azure Resources and Resource Groups have a limit of 15 tags.
-      In order to make additional tag space on a set of resources,
-      this action can be used to remove enough tags to make the
-      desired amount of space while preserving a given set of tags.
-      Setting the space value to 0 removes all tags but those
-      listed to preserve.
+    Azure Resources and Resource Groups have a limit of 15 tags.
+    In order to make additional tag space on a set of resources,
+    this action can be used to remove enough tags to make the
+    desired amount of space while preserving a given set of tags.
+    Setting the space value to 0 removes all tags but those
+    listed to preserve.
 
-      .. c7n-schema:: azure.resourcegroup.actions.tag-trim
+    .. c7n-schema:: azure.resourcegroup.actions.tag-trim
 
-      .. code-block:: yaml
+    .. code-block:: yaml
 
-          - policies:
-             - name: azure-tag-trim
-               comment: |
-                 Any instances with 14 or more tags get tags removed until
-                 they match the target tag count, in this case 13, so
-                 that we free up tag slots for another usage.
-               resource: azure.resourcegroup
-               filters:
-                   # Filter down to resources that do not have the space
-                   # to add additional required tags. For example, if an
-                   # additional 2 tags need to be added to a resource, with
-                   # 15 tags as the limit, then filter down to resources that
-                   # have 14 or more tags since they will need to have tags
-                   # removed for the 2 extra. This also ensures that metrics
-                   # reporting is correct for the policy.
-                   type: value
-                   key: "[length(Tags)][0]"
-                   op: ge
-                   value: 14
-               actions:
-                 - type: tag-trim
-                   space: 2
-                   preserve:
-                    - OwnerContact
-                    - Environment
-                    - downtime
-                    - custodian_status
+      - policies:
+         - name: azure-tag-trim
+           comment: |
+             Any instances with 14 or more tags get tags removed until
+             they match the target tag count, in this case 13, so
+             that we free up tag slots for another usage.
+           resource: azure.resourcegroup
+           filters:
+               # Filter down to resources that do not have the space
+               # to add additional required tags. For example, if an
+               # additional 2 tags need to be added to a resource, with
+               # 15 tags as the limit, then filter down to resources that
+               # have 14 or more tags since they will need to have tags
+               # removed for the 2 extra. This also ensures that metrics
+               # reporting is correct for the policy.
+               type: value
+               key: "[length(Tags)][0]"
+               op: ge
+               value: 14
+           actions:
+             - type: tag-trim
+               space: 2
+               preserve:
+                - OwnerContact
+                - Environment
+                - downtime
+                - custodian_status
+
+Delayed operations
+------------------
+
+``mark-for-op``
+    Mark Azure resources for a future operations via tags.
+
+    .. c7n-schema:: azure.vm.actions.mark-for-op
+
+Examples
+~~~~~~~~
+
+- :ref:`azure_example_delayedoperation`
 
 Logic App
 ---------
