@@ -483,11 +483,12 @@ class FirewallRulesFilter(Filter):
 
 
 class ResourceLockFilter(Filter):
-    """Filter locked resources.
-     Lock can be of 2 types: ReadOnly and CanNotDelete. To filter any lock, use "Any".
-     Lock type is optional, by default any lock will be applied to the filter.
+    """
+    Filter locked resources.
+    Lock can be of 2 types: ReadOnly and CanNotDelete. To filter any lock, use "Any".
+    Lock type is optional, by default any lock will be applied to the filter.
 
-     Example of policy that gets keyvaults with ReadOnly lock:
+    :example: Get all keyvaults with ReadOnly lock:
 
     .. code-block :: yaml
 
@@ -498,7 +499,7 @@ class ResourceLockFilter(Filter):
             - type: resource-lock
               lock-type: ReadOnly
 
-    Example of policy that gets locked sqldatabases (any type of lock):
+    :example: Get all locked sqldatabases (any type of lock):
 
     .. code-block :: yaml
 
@@ -508,7 +509,7 @@ class ResourceLockFilter(Filter):
           filters:
             - type: resource-lock
 
-    Example of policy that gets all unlocked resource groups:
+    :example: Get all unlocked resource groups:
 
     .. code-block :: yaml
 

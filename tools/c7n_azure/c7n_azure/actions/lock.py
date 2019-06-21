@@ -9,19 +9,19 @@ from azure.mgmt.resource.locks.models import ManagementLockObject
 class LockAction(AzureBaseAction):
 
     """
-      Perform lock operation on any ARM resource. Can be used with
-      generic resource type `armresource` or on any other more specific
-      ARM resource type supported by Cloud Custodian.
+    Perform lock operation on any ARM resource. Can be used with
+    generic resource type `armresource` or on any other more specific
+    ARM resource type supported by Cloud Custodian.
 
-      Lock can be of 2 types: ReadOnly and CanNotDelete. Lock type is required.
+    Lock can be of 2 types: ReadOnly and CanNotDelete. Lock type is required.
 
-      To create or delete management locks, you must have proper access.
-      See [Who can create or delete locks](https://docs.microsoft.com/en-us/azure/
-      azure-resource-manager/resource-group-lock-resources#who-can-create-or-delete-locks)
+    To create or delete management locks, you must have proper access.
+    See [Who can create or delete locks](https://docs.microsoft.com/en-us/azure/
+    azure-resource-manager/resource-group-lock-resources#who-can-create-or-delete-locks)
 
-      Example of the policy that adds ReadOnly lock to all keyvaults:
+    :example: Add ReadOnly lock to all keyvaults:
 
-     .. code-block:: yaml
+    .. code-block:: yaml
 
        policies:
           - name: lock-keyvaults
