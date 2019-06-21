@@ -13,15 +13,28 @@
 # limitations under the License.
 
 import logging
+from concurrent.futures import as_completed
 
-from c7n_azure.filters import FirewallRulesFilter
+from azure.cosmosdb.table import TableService
 from azure.mgmt.storage.models import IPRule, \
     NetworkRuleSet, StorageAccountUpdateParameters, VirtualNetworkRule
-from c7n.filters.core import type_schema
+from azure.storage.blob import BlockBlobService
+from azure.storage.file import FileService
+from azure.storage.queue import QueueService
 from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.filters import FirewallRulesFilter, ValueFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.storage_utils import StorageUtilities
 from netaddr import IPNetwork
+
+# from azure.storage.blob import BaseBlobService
+from c7n.filters.core import type_schema
+from c7n.utils import chunks
+from c7n.utils import local_session
+
+import jsonpickle
+import json
 
 
 @resources.register('storage')
@@ -104,3 +117,126 @@ class StorageFirewallRulesFilter(FirewallRulesFilter):
         resource_rules = set([IPNetwork(r['value']) for r in ip_rules])
 
         return resource_rules
+
+
+@Storage.filter_registry.register('storage-diagnostic-settings')
+class StorageDiagnosticSettingsFilter(ValueFilter):
+    BLOB_TYPE = 'blob'
+    QUEUE_TYPE = 'queue'
+    TABLE_TYPE = 'table'
+    FILE_TYPE = 'file'
+
+    def __init__(self, data, manager=None):
+        super(StorageDiagnosticSettingsFilter, self).__init__(data, manager)
+        self.storage_type = data['storage_type']
+
+    schema = type_schema('storage-diagnostic-settings',
+                         rinherit=ValueFilter.schema,
+                         storage_type={
+                             'type': 'string',
+                             'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]},
+                         required=['storage_type'],
+                         )
+
+    def process(self, resources, event=None):
+        futures = []
+        results = []
+        session = local_session(self.manager.session_factory)
+        # Process each resource in a separate thread, returning all that pass filter
+        with self.executor_factory(max_workers=3) as w:
+            for resource_set in chunks(resources, 20):
+                futures.append(w.submit(self.process_resource_set, resource_set, session))
+
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.warning(
+                        "Storage diagnostic settings filter error: %s" % f.exception())
+                    continue
+                else:
+                    results.extend(f.result())
+
+            return results
+
+    def process_resource_set(self, resources, session):
+        matched = []
+        for resource in resources:
+            settings = json.loads(jsonpickle.encode(self.get_settings(resource, session)))
+            filtered_settings = super(StorageDiagnosticSettingsFilter, self).process([settings], event=None)
+
+            if filtered_settings:
+                matched.append(resource)
+
+        return matched
+
+    def get_settings(self, storage_account, session):
+        if self.storage_type == self.BLOB_TYPE:
+            return StorageSettingsUtilities.get_blob_settings(storage_account, session)
+        elif self.storage_type == self.FILE_TYPE:
+            return StorageSettingsUtilities.get_file_settings(storage_account, session)
+        elif self.storage_type == self.TABLE_TYPE:
+            return StorageSettingsUtilities.get_table_settings(storage_account, session)
+        elif self.storage_type == self.QUEUE_TYPE:
+            return StorageSettingsUtilities.get_queue_settings(storage_account, session)
+
+
+class StorageSettingsUtilities(object):
+
+    @staticmethod
+    def _get_blob_client_from_storage_account(storage_account, session):
+        token = StorageUtilities.get_storage_token(session)
+
+        return BlockBlobService(
+            account_name=storage_account['name'],
+            token_credential=token
+        )
+
+    @staticmethod
+    def _get_file_client_from_storage_account(storage_account, session):
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+
+        storage_keys = storage_client.storage_accounts.list_keys(storage_account['resourceGroup'],
+                                                                 storage_account['name'])
+        primary_key = storage_keys.keys[0].value
+
+        return FileService(
+            account_name=storage_account['name'],
+            account_key=primary_key
+        )
+
+    @staticmethod
+    def _get_table_client_from_storage_account(storage_account, session):
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+
+        storage_keys = storage_client.storage_accounts.list_keys(storage_account['resourceGroup'],
+                                                                 storage_account['name'])
+        primary_key = storage_keys.keys[0].value
+
+        return TableService(
+            account_name=storage_account['name'],
+            account_key=primary_key
+        )
+
+    @staticmethod
+    def _get_queue_client_from_storage_account(storage_account, session):
+        token = StorageUtilities.get_storage_token(session)
+        return QueueService(account_name=storage_account['name'], token_credential=token)
+
+    @staticmethod
+    def get_blob_settings(storage_account, session):
+        client = StorageSettingsUtilities._get_blob_client_from_storage_account(storage_account, session)
+        return client.get_blob_service_properties()
+
+    @staticmethod
+    def get_file_settings(storage_account, session):
+        file_client = StorageSettingsUtilities._get_file_client_from_storage_account(storage_account, session)
+        return file_client.get_file_service_properties()
+
+    @staticmethod
+    def get_table_settings(storage_account, session):
+        table_client = StorageSettingsUtilities._get_table_client_from_storage_account(storage_account, session)
+        return table_client.get_table_service_properties()
+
+    @staticmethod
+    def get_queue_settings(storage_account, session):
+        queue_client = StorageSettingsUtilities._get_queue_client_from_storage_account(storage_account, session)
+        return queue_client.get_queue_service_properties()
