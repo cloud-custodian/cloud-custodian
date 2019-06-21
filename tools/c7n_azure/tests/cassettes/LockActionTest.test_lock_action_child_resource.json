@@ -1,0 +1,684 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2015-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "836"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "3a249a44-0c5a-45f5-9784-cd5dd7c1c8f5",
+                        "0cf1e7d7-6a37-4996-a47a-bb4922834f79"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 21 Jun 2019 17:14:36 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "anzoloch",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "anzoloch-cc-sql-server.database.windows.net"
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server",
+                                "name": "anzoloch-cc-sql-server",
+                                "type": "Microsoft.Sql/servers"
+                            },
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "cctestsqlserverj6y6cbbtaphs4.database.windows.net"
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "name": "cctestsqlserverj6y6cbbtaphs4",
+                                "type": "Microsoft.Sql/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server/databases?api-version=2017-10-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 21 Jun 2019 17:14:36 GMT"
+                    ],
+                    "content-length": [
+                        "1973"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "GP_Gen5",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "kind": "v12.0,user,vcore",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 34359738368,
+                                    "status": "Online",
+                                    "databaseId": "97ddcd26-f09d-4c8d-a411-25d180b00667",
+                                    "creationDate": "2019-06-18T21:30:51.817Z",
+                                    "currentServiceObjectiveName": "GP_Gen5_2",
+                                    "requestedServiceObjectiveName": "GP_Gen5_2",
+                                    "defaultSecondaryLocation": "westus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "licenseType": "LicenseIncluded",
+                                    "maxLogSizeBytes": 10307502080,
+                                    "earliestRestoreDate": "2019-06-18T21:32:04.377Z",
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "GP_Gen5",
+                                        "tier": "GeneralPurpose",
+                                        "family": "Gen5",
+                                        "capacity": 2
+                                    }
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server/databases/anzoloch-cc-sql",
+                                "name": "anzoloch-cc-sql",
+                                "type": "Microsoft.Sql/servers/databases"
+                            },
+                            {
+                                "sku": {
+                                    "name": "System",
+                                    "tier": "System",
+                                    "capacity": 0
+                                },
+                                "kind": "v12.0,system",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 32212254720,
+                                    "status": "Online",
+                                    "databaseId": "32648a5a-8459-451d-9e7f-77020fd29a25",
+                                    "creationDate": "2019-06-18T21:29:34.22Z",
+                                    "currentServiceObjectiveName": "System2",
+                                    "requestedServiceObjectiveName": "System2",
+                                    "defaultSecondaryLocation": "westus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "System",
+                                        "tier": "System",
+                                        "capacity": 0
+                                    }
+                                },
+                                "location": "eastus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server/databases/master",
+                                "name": "master",
+                                "type": "Microsoft.Sql/servers/databases"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases?api-version=2017-10-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 21 Jun 2019 17:14:37 GMT"
+                    ],
+                    "content-length": [
+                        "2740"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard",
+                                    "tier": "Standard",
+                                    "capacity": 10
+                                },
+                                "kind": "v12.0,user",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 268435456000,
+                                    "status": "Online",
+                                    "databaseId": "bd2e2abb-449a-4da2-9479-d976d6052640",
+                                    "creationDate": "2019-06-21T17:01:59.717Z",
+                                    "currentServiceObjectiveName": "S0",
+                                    "requestedServiceObjectiveName": "S0",
+                                    "defaultSecondaryLocation": "centralus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "earliestRestoreDate": "2019-06-21T17:11:40.62Z",
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "Standard",
+                                        "tier": "Standard",
+                                        "capacity": 10
+                                    }
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cclongtermretentiondb",
+                                "name": "cclongtermretentiondb",
+                                "type": "Microsoft.Sql/servers/databases"
+                            },
+                            {
+                                "sku": {
+                                    "name": "Premium",
+                                    "tier": "Premium",
+                                    "capacity": 125
+                                },
+                                "kind": "v12.0,user",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 2147483648,
+                                    "status": "Online",
+                                    "databaseId": "1479fa50-c05f-407e-b584-f631a08285ac",
+                                    "creationDate": "2019-06-21T17:02:19.107Z",
+                                    "currentServiceObjectiveName": "P1",
+                                    "requestedServiceObjectiveName": "P1",
+                                    "defaultSecondaryLocation": "centralus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "earliestRestoreDate": "2019-06-21T17:03:10.143Z",
+                                    "readScale": "Enabled",
+                                    "readReplicaCount": 1,
+                                    "currentSku": {
+                                        "name": "Premium",
+                                        "tier": "Premium",
+                                        "capacity": 125
+                                    }
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb",
+                                "name": "cctestdb",
+                                "type": "Microsoft.Sql/servers/databases"
+                            },
+                            {
+                                "sku": {
+                                    "name": "System",
+                                    "tier": "System",
+                                    "capacity": 0
+                                },
+                                "kind": "v12.0,system",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 32212254720,
+                                    "status": "Online",
+                                    "databaseId": "7dfe2f7a-b721-48f7-975d-533e535f5956",
+                                    "creationDate": "2019-06-21T17:00:43.383Z",
+                                    "currentServiceObjectiveName": "System2",
+                                    "requestedServiceObjectiveName": "System2",
+                                    "defaultSecondaryLocation": "centralus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "System",
+                                        "tier": "System",
+                                        "capacity": 0
+                                    }
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/master",
+                                "name": "master",
+                                "type": "Microsoft.Sql/servers/databases"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql%2Fservers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/lock_cctestdb_CanNotDelete?api-version=2016-09-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "350"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 21 Jun 2019 17:14:37 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "level": "CanNotDelete"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/lock_cctestdb_CanNotDelete",
+                        "type": "Microsoft.Authorization/locks",
+                        "name": "lock_cctestdb_CanNotDelete"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2015-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "836"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "5046c509-a2b7-4415-be4e-87123de9703f",
+                        "4d1aef9a-50d5-484d-abbb-3b633d9b224d"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 21 Jun 2019 17:14:37 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "anzoloch",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "anzoloch-cc-sql-server.database.windows.net"
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server",
+                                "name": "anzoloch-cc-sql-server",
+                                "type": "Microsoft.Sql/servers"
+                            },
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "cctestsqlserverj6y6cbbtaphs4.database.windows.net"
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "name": "cctestsqlserverj6y6cbbtaphs4",
+                                "type": "Microsoft.Sql/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server/databases?api-version=2017-10-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 21 Jun 2019 17:14:38 GMT"
+                    ],
+                    "content-length": [
+                        "1973"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "GP_Gen5",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "kind": "v12.0,user,vcore",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 34359738368,
+                                    "status": "Online",
+                                    "databaseId": "97ddcd26-f09d-4c8d-a411-25d180b00667",
+                                    "creationDate": "2019-06-18T21:30:51.817Z",
+                                    "currentServiceObjectiveName": "GP_Gen5_2",
+                                    "requestedServiceObjectiveName": "GP_Gen5_2",
+                                    "defaultSecondaryLocation": "westus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "licenseType": "LicenseIncluded",
+                                    "maxLogSizeBytes": 10307502080,
+                                    "earliestRestoreDate": "2019-06-18T21:32:04.377Z",
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "GP_Gen5",
+                                        "tier": "GeneralPurpose",
+                                        "family": "Gen5",
+                                        "capacity": 2
+                                    }
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server/databases/anzoloch-cc-sql",
+                                "name": "anzoloch-cc-sql",
+                                "type": "Microsoft.Sql/servers/databases"
+                            },
+                            {
+                                "sku": {
+                                    "name": "System",
+                                    "tier": "System",
+                                    "capacity": 0
+                                },
+                                "kind": "v12.0,system",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 32212254720,
+                                    "status": "Online",
+                                    "databaseId": "32648a5a-8459-451d-9e7f-77020fd29a25",
+                                    "creationDate": "2019-06-18T21:29:34.22Z",
+                                    "currentServiceObjectiveName": "System2",
+                                    "requestedServiceObjectiveName": "System2",
+                                    "defaultSecondaryLocation": "westus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "System",
+                                        "tier": "System",
+                                        "capacity": 0
+                                    }
+                                },
+                                "location": "eastus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc-sql/providers/Microsoft.Sql/servers/anzoloch-cc-sql-server/databases/master",
+                                "name": "master",
+                                "type": "Microsoft.Sql/servers/databases"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases?api-version=2017-10-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 21 Jun 2019 17:14:37 GMT"
+                    ],
+                    "content-length": [
+                        "2740"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard",
+                                    "tier": "Standard",
+                                    "capacity": 10
+                                },
+                                "kind": "v12.0,user",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 268435456000,
+                                    "status": "Online",
+                                    "databaseId": "bd2e2abb-449a-4da2-9479-d976d6052640",
+                                    "creationDate": "2019-06-21T17:01:59.717Z",
+                                    "currentServiceObjectiveName": "S0",
+                                    "requestedServiceObjectiveName": "S0",
+                                    "defaultSecondaryLocation": "centralus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "earliestRestoreDate": "2019-06-21T17:11:40.62Z",
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "Standard",
+                                        "tier": "Standard",
+                                        "capacity": 10
+                                    }
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cclongtermretentiondb",
+                                "name": "cclongtermretentiondb",
+                                "type": "Microsoft.Sql/servers/databases"
+                            },
+                            {
+                                "sku": {
+                                    "name": "Premium",
+                                    "tier": "Premium",
+                                    "capacity": 125
+                                },
+                                "kind": "v12.0,user",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 2147483648,
+                                    "status": "Online",
+                                    "databaseId": "1479fa50-c05f-407e-b584-f631a08285ac",
+                                    "creationDate": "2019-06-21T17:02:19.107Z",
+                                    "currentServiceObjectiveName": "P1",
+                                    "requestedServiceObjectiveName": "P1",
+                                    "defaultSecondaryLocation": "centralus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "earliestRestoreDate": "2019-06-21T17:03:10.143Z",
+                                    "readScale": "Enabled",
+                                    "readReplicaCount": 1,
+                                    "currentSku": {
+                                        "name": "Premium",
+                                        "tier": "Premium",
+                                        "capacity": 125
+                                    }
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb",
+                                "name": "cctestdb",
+                                "type": "Microsoft.Sql/servers/databases"
+                            },
+                            {
+                                "sku": {
+                                    "name": "System",
+                                    "tier": "System",
+                                    "capacity": 0
+                                },
+                                "kind": "v12.0,system",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "properties": {
+                                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "maxSizeBytes": 32212254720,
+                                    "status": "Online",
+                                    "databaseId": "7dfe2f7a-b721-48f7-975d-533e535f5956",
+                                    "creationDate": "2019-06-21T17:00:43.383Z",
+                                    "currentServiceObjectiveName": "System2",
+                                    "requestedServiceObjectiveName": "System2",
+                                    "defaultSecondaryLocation": "centralus",
+                                    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                                    "zoneRedundant": false,
+                                    "readScale": "Disabled",
+                                    "readReplicaCount": 0,
+                                    "currentSku": {
+                                        "name": "System",
+                                        "tier": "System",
+                                        "capacity": 0
+                                    }
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/master",
+                                "name": "master",
+                                "type": "Microsoft.Sql/servers/databases"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql%2Fservers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Fri, 21 Jun 2019 17:14:38 GMT"
+                    ],
+                    "content-length": [
+                        "362"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "level": "CanNotDelete"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/lock_cctestdb_CanNotDelete",
+                                "type": "Microsoft.Authorization/locks",
+                                "name": "lock_cctestdb_CanNotDelete"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

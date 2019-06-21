@@ -37,7 +37,10 @@ class ResourceIdParser(object):
 
     @staticmethod
     def get_namespace(resource_id):
-        return parse_resource_id(resource_id).get('namespace')
+        parsed = parse_resource_id(resource_id)
+        if parsed.get('children'):
+            return '/'.join([parsed.get('namespace'), parsed.get('type')])
+        return parsed.get('namespace')
 
     @staticmethod
     def get_subscription_id(resource_id):
@@ -58,7 +61,8 @@ class ResourceIdParser(object):
         # types sequence. "type" stores root type.
         child_type_keys = [k for k in parsed.keys() if k.find("child_type_") != -1]
         types = [parsed.get(k) for k in sorted(child_type_keys)]
-        types.insert(0, parsed.get('type'))
+        if not types:
+            types.insert(0, parsed.get('type'))
         return '/'.join(types)
 
     @staticmethod

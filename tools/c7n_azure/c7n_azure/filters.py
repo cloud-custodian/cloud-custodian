@@ -18,8 +18,10 @@ from datetime import timedelta
 
 import six
 from azure.mgmt.policyinsights import PolicyInsightsClient
+from azure.mgmt.resource.locks import ManagementLockClient
+
 from c7n_azure.tags import TagHelper
-from c7n_azure.utils import IpRangeHelper
+from c7n_azure.utils import IpRangeHelper, ResourceIdParser, StringUtils
 from c7n_azure.utils import Math
 from c7n_azure.utils import ThreadHelper
 from c7n_azure.utils import now
@@ -472,3 +474,78 @@ class FirewallRulesFilter(Filter):
             return self.policy_include.issubset(resource_rules)
         else:  # validated earlier, can never happen
             raise FilterValidationError("Internal error.")
+
+
+class ResourceLockFilter(Filter):
+    """Filter locked resources.
+     Lock can be of 2 types: ReadOnly and CanNotDelete. To filter any lock, use "Any".
+     Lock type is optional, by default any lock will be applied to the filter.
+
+     Example of policy that gets keyvaults with ReadOnly lock:
+
+    .. code-block :: yaml
+
+       policies:
+        - name: lock-filter
+          resource: azure.keyvault
+          filters:
+            - type: resource-lock
+              lock-type: ReadOnly
+
+    Example of policy that gets locked sqldatabases (any type of lock):
+
+    .. code-block :: yaml
+
+       policies:
+        - name: lock-filter
+          resource: azure.sqldatabase
+          filters:
+            - type: resource-lock
+
+    Example of policy that gets all unlocked resource groups:
+
+    .. code-block :: yaml
+
+       policies:
+        - name: lock-filter
+          resource: azure.resourcegroup
+          filters:
+            - not:
+                - type: resource-lock
+
+    """
+
+    schema = type_schema(
+        'resource-lock', required=['type'],
+        **{
+            'lock-type': {'type': 'string'}
+        })
+
+    def __init__(self, data, manager=None):
+        super(ResourceLockFilter, self).__init__(data, manager)
+        self.lock_type = self.data.get('lock-type', 'any')
+
+    def process(self, resources, event=None):
+        s = self.manager.get_session()
+        client = ManagementLockClient(s.get_credentials(), s.subscription_id)
+        result = []
+        for resource in resources:
+            if resource.get('resourceGroup') is None:
+                locks = [r.serialize(True) for r in
+                         client.management_locks.list_at_resource_group_level(
+                    resource['name'])]
+            else:
+                locks = [r.serialize(True) for r in client.management_locks.list_at_resource_level(
+                    resource['resourceGroup'],
+                    ResourceIdParser.get_namespace(resource['id']),
+                    ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
+                    ResourceIdParser.get_resource_type(resource['id']),
+                    resource['name'])]
+
+            for lock in locks:
+                if StringUtils.equal('any', self.lock_type) or \
+                        StringUtils.equal(lock['properties']['level'], self.lock_type):
+                    result.append(resource)
+                    break
+
+        return result
