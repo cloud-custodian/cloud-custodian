@@ -13,11 +13,12 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import Tag, RemoveTag
-from c7n.utils import type_schema, local_session
+from c7n.utils import type_schema, local_session, dumps
 
 
 @resources.register('step-machine')
@@ -56,24 +57,24 @@ class InvokeStepFunction(Action):
         arn = self.data['state-machine']
         if not arn.startswith('arn'):
             arn = 'arn:aws:states:{}:{}:stateMachine:{}'.format(
-                self.manager.ctx.region, self.manager.ctx.account_id, arn)
+                self.manager.config.region, self.manager.config.account_id, arn)
         params = {'stateMachineArn': arn}
         for arn, r in zip(self.manager.get_arns(resources), resources):
             pinput = {}
             if self.data.get('policy', True):
                 pinput['policy'] = dict(self.manager.data)
             pinput['resource'] = self.data.get('resource', True) and dict(r) or arn
-            params['input'] = pinput
+            params['input'] = dumps(pinput)
             r['c7n:execution-arn'] = self.manager.retry(
                 client.start_execution, **params).get('executionArn')
 
     @classmethod
     def register(cls, registry, key):
-        for r in registry.values():
+        for _, r in registry.items():
             r.action_registry.register('invoke-sfn', cls)
 
 
-resources.register(InvokeStepFunction.register, resources.EVENT_FINAL)
+resources.subscribe(resources.EVENT_FINAL, InvokeStepFunction.register)
 
 
 @StepFunction.action_registry.register('tag')
