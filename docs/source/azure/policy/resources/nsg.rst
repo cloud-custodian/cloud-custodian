@@ -71,7 +71,7 @@ This policy will deny access to all ports that are NOT 22, 23 or 24 for all Netw
          filters:
           - type: ingress
             exceptPorts: '22-24'
-            ports-op: 'any'
+            match: 'any'
             access: 'Allow'
          actions:
           - type: close

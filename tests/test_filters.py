@@ -172,7 +172,6 @@ class TestValueFilter(unittest.TestCase):
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (1, 2))
 
-
         vf.vtype = "unique_size"
         value = [1, 2, 3, 1, 5]
         res = vf.process_value_type(sentinel, value, resource)

@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "executionArn": "arn:aws:states:us-east-1:644160558196:execution:Helloworld:283ac279-1625-4a31-ae74-43e44d789bc1",
+        "startDate": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 6,
+            "day": 24,
+            "hour": 11,
+            "minute": 35,
+            "second": 10,
+            "microsecond": 366000
+        },
+        "ResponseMetadata": {
+            "RequestId": "a6bbf4aa-9695-11e9-babd-4b277c0ed644",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a6bbf4aa-9695-11e9-babd-4b277c0ed644",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "143"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
