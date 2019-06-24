@@ -37,7 +37,14 @@ class Folder(QueryResourceManager):
         version = 'v2'
         component = 'folders'
         scope = 'global'
+        enum_spec = ('list', 'folders', None)
         id = "name"
+
+    def get_resource_query(self):
+        if 'query' in self.data:
+            for child in self.data.get('query'):
+                if 'parent' in child:
+                    return {'parent': child['parent']}
 
 
 @resources.register('project')
