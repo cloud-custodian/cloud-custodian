@@ -28,16 +28,15 @@ RUN apt-get --yes update \
       FunctionPackage('cache').build_cache( \
       modules=['c7n', 'c7n-azure', 'applicationinsights'], \
       non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'pyrsistent'], \
-      excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'], \
-      cache_name='cache')" \
+      excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])" \
  # Pre-cache Azure Mailer package
  && python -c "from c7n_azure.function_package import FunctionPackage; \
-      FunctionPackage('cache').build_cache( \
+      from c7n_mailer.azure import deploy; \
+      FunctionPackage('cache', cache_override_path=deploy.cache_path()).build_cache( \
       modules=['c7n', 'c7n-azure', 'c7n-mailer', 'applicationinsights'], \
       non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'jmespath', \
                    'datadog', 'MarkupSafe', 'simplejson', 'pyrsistent'], \
-      excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'], \
-      cache_name='cache_mailer')" \
+      excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])" \
  && apt-get --yes remove build-essential \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
  && rm -Rf /var/cache/apt/ \

@@ -34,12 +34,13 @@ from c7n_azure.session import Session
 
 class FunctionPackage(object):
 
-    def __init__(self, name, function_path=None, target_subscription_ids=None):
+    def __init__(self, name, function_path=None, target_subscription_ids=None, cache_override_path=None):
         self.log = logging.getLogger('custodian.azure.function_package')
         self.pkg = None
         self.name = name
         self.function_path = function_path or os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'function.py')
+        self.cache_override_path = cache_override_path
         self.enable_ssl_cert = not distutils.util.strtobool(
             os.environ.get(ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, 'no'))
 
@@ -120,11 +121,14 @@ class FunctionPackage(object):
 
     @property
     def cache_folder(self):
+        if self.cache_override_path:
+            return self.cache_override_path
+
         c7n_azure_root = os.path.dirname(__file__)
         return os.path.join(c7n_azure_root, 'cache')
 
-    def build(self, policy, modules, non_binary_packages, excluded_packages, queue_name=None, cache_name='cache'):
-        cache_zip_file = self.build_cache(modules, excluded_packages, non_binary_packages, cache_name)
+    def build(self, policy, modules, non_binary_packages, excluded_packages, queue_name=None):
+        cache_zip_file = self.build_cache(modules, excluded_packages, non_binary_packages)
 
         self.pkg = PythonPackageArchive(cache_file=cache_zip_file)
 
@@ -135,11 +139,11 @@ class FunctionPackage(object):
         # add config and policy
         self._add_functions_required_files(policy, queue_name)
 
-    def build_cache(self, modules, excluded_packages, non_binary_packages, cache_name):
+    def build_cache(self, modules, excluded_packages, non_binary_packages):
         wheels_folder = os.path.join(self.cache_folder, 'wheels')
         wheels_install_folder = os.path.join(self.cache_folder, 'dependencies')
-        cache_zip_file = os.path.join(self.cache_folder, cache_name + '.zip')
-        cache_metadata_file = os.path.join(self.cache_folder, cache_name + '.json')
+        cache_zip_file = os.path.join(self.cache_folder, 'cache.zip')
+        cache_metadata_file = os.path.join(self.cache_folder, 'metadata.json')
         packages = DependencyManager.get_dependency_packages_list(modules, excluded_packages)
 
         if not DependencyManager.check_cache(cache_metadata_file, cache_zip_file, packages):
@@ -147,12 +151,9 @@ class FunctionPackage(object):
             self.log.info("Cached packages not found or requirements were changed.")
 
             # If cache check fails, wipe all previous wheels, installations etc
-            self.log.info("Removing cache...")
-            for f in [cache_zip_file, cache_metadata_file]:
-                try:
-                    os.remove(f)
-                except OSError:
-                    pass
+            if os.path.exists(self.cache_folder):
+                self.log.info("Removing cache folder...")
+                shutil.rmtree(self.cache_folder)
 
             self.log.info("Preparing non binary wheels...")
             DependencyManager.prepare_non_binary_wheels(non_binary_packages, wheels_folder)
