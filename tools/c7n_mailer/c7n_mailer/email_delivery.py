@@ -151,9 +151,17 @@ class EmailDelivery(object):
             ldap_uid_emails = ldap_uid_emails + ldap_emails_set
         return ldap_uid_emails
 
-    def get_resource_owner_emails_from_resource(self, sqs_message, resource):
-        if 'resource-owner' not in sqs_message['action']['to']:
-            return []
+    def get_resource_owner_emails_from_resource(self, sqs_message, resource, mail=True):
+        if mail:
+            self.logger.debug("get_resource_owner_emails_from_resource invoked by mail")
+            if 'resource-owner' not in sqs_message['action']['to']:
+                return []
+        else:
+            self.logger.debug("get_resource_owner_emails_from_resource invoked by Slack")
+            if 'slack://owners' not in sqs_message['action']['to']:
+                return []
+
+
         resource_owner_tag_keys = self.config.get('contact_tags', [])
         resource_owner_tag_values = get_resource_tag_targets(resource, resource_owner_tag_keys)
         explicit_emails = self.get_valid_emails_from_list(resource_owner_tag_values)
@@ -193,7 +201,7 @@ class EmailDelivery(object):
     # this function returns a dictionary with a tuple of emails as the key
     # and the list of resources as the value. This helps ensure minimal emails
     # are sent, while only ever sending emails to the respective parties.
-    def get_email_to_addrs_to_resources_map(self, sqs_message):
+    def get_email_to_addrs_to_resources_map(self, sqs_message, mail=True):
         # policy_to_emails always get sent to any email msg that goes out
         # these were manually set by the policy writer in notify to section
         # or it's an email from an aws event username from an ldap_lookup
@@ -224,8 +232,10 @@ class EmailDelivery(object):
             # add in any emails from resource-owners to resource_owners
             ro_emails = self.get_resource_owner_emails_from_resource(
                 sqs_message,
-                resource
+                resource,
+                mail=mail
             )
+
 
             resource_emails = resource_emails + ro_emails
             # if 'owner_absent_contact' was specified in the policy and no resource
@@ -239,6 +249,7 @@ class EmailDelivery(object):
             # only if there are valid emails available, add it to the map
             if resource_emails:
                 email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(resource)
+
         if email_to_addrs_to_resources_map == {}:
             self.logger.debug('Found no email addresses, sending no emails.')
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
