@@ -112,6 +112,7 @@ class EmailDelivery(object):
                 # if the LDAP config is set, lookup in ldap
                 elif self.config.get('ldap_uri', False):
                     return self.ldap_lookup.get_email_to_addrs_from_uid(aws_username)
+
                 # the org_domain setting is configured, append the org_domain
                 # to the username from AWS
                 elif self.config.get('org_domain', False):
@@ -158,11 +159,18 @@ class EmailDelivery(object):
         explicit_emails = self.get_valid_emails_from_list(resource_owner_tag_values)
 
         # resolve the contact info from ldap
+        ldap_emails = []
+        org_emails = []
         non_email_ids = list(set(resource_owner_tag_values).difference(explicit_emails))
-        ldap_emails = list(chain.from_iterable([self.ldap_lookup.get_email_to_addrs_from_uid
-                                              (uid) for uid in non_email_ids]))
+        if self.config.get('ldap_uri', False):
+            ldap_emails = list(chain.from_iterable([self.ldap_lookup.get_email_to_addrs_from_uid
+                                                    (uid) for uid in non_email_ids]))
 
-        return list(chain(explicit_emails, ldap_emails))
+        elif self.config.get('org_domain', False):
+            org_domain = self.config.get('org_domain', False)
+            org_emails = [uid + '@' + org_domain for uid in non_email_ids]
+
+        return list(chain(explicit_emails, ldap_emails, org_emails))
 
     def get_account_emails(self, sqs_message):
         email_list = []
