@@ -18,7 +18,7 @@ from c7n.actions import Action
 from c7n.manager import resources
 from c7n.query import QueryResourceManager
 from c7n.tags import Tag, RemoveTag
-from c7n.utils import type_schema, local_session, dumps
+from c7n.utils import type_schema, local_session, dumps, chunks
 
 
 @resources.register('step-machine')
@@ -39,14 +39,48 @@ class StepFunction(QueryResourceManager):
 
 
 class InvokeStepFunction(Action):
-    """Invoke step function on resource.
+    """Invoke step function on resources.
+
+    By default this will invoke a step function for each resource
+    providing both the `policy` and `resource` as input.
+
+    That behavior can be configured setting policy and bulk
+    boolean flags on the action.
+
+    If bulk action parameter is set to true, then the step
+    function will be invoked in bulk, with a set of resource arns
+    under the `resources` key.
+
+    The size of the batch can be configured via the batch-size
+    parameter. Note step function state (input, execution, etc)must
+    fit within 32k, we default to batch size 250.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: invoke-step-function
+           resource: s3
+           filters:
+             - is-log-target
+             - "tag:IngestSetup": absent
+           actions:
+             - type: invoke-sfn
+               # This will cause the workflow to be invoked
+               # with many resources arns in a single execution.
+               # Note this is *not* the default.
+               bulk: true
+               batch-size: 10
+               state-machine: LogIngestSetup
     """
 
     schema = type_schema(
         'invoke-sfn',
         required=['state-machine'],
         **{'state-machine': {'type': 'string'},
-           'resource': {'type': 'boolean'},
+           'batch-size': {'type': 'integer'},
+           'bulk': {'type': 'boolean'},
            'policy': {'type': 'boolean'}})
     schema_alias = True
     permissions = ('stepfunctions:StartExecution',)
@@ -58,15 +92,31 @@ class InvokeStepFunction(Action):
         if not arn.startswith('arn'):
             arn = 'arn:aws:states:{}:{}:stateMachine:{}'.format(
                 self.manager.config.region, self.manager.config.account_id, arn)
+
         params = {'stateMachineArn': arn}
-        for arn, r in zip(self.manager.get_arns(resources), resources):
-            pinput = {}
-            if self.data.get('policy', True):
-                pinput['policy'] = dict(self.manager.data)
-            pinput['resource'] = self.data.get('resource', True) and dict(r) or arn
+        pinput = {}
+
+        if self.data.get('policy', True):
+            pinput['policy'] = dict(self.manager.data)
+
+        resource_set = list(zip(self.manager.get_arns(resources), resources))
+        if self.data.get('bulk', False) is True:
+            return self.invoke_batch(client, params, pinput, resource_set)
+
+        for arn, r in resource_set:
+            pinput['resource'] = r
             params['input'] = dumps(pinput)
             r['c7n:execution-arn'] = self.manager.retry(
                 client.start_execution, **params).get('executionArn')
+
+    def invoke_batch(self, client, params, pinput, resource_set):
+        for batch_rset in chunks(resource_set, self.data.get('batch-size', 250)):
+            pinput['resources'] = [rarn for rarn, _ in batch_rset]
+            params['input'] = dumps(pinput)
+            exec_arn = self.manager.retry(
+                client.start_execution, **params).get('executionArn')
+            for _, r in resource_set:
+                r['c7n:execution-arn'] = exec_arn
 
     @classmethod
     def register(cls, registry, key):

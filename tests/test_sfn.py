@@ -17,6 +17,29 @@ from .common import BaseTest
 
 class TestStepFunction(BaseTest):
 
+    def test_invoke_batch(self):
+        factory = self.replay_flight_data('test_invoke_sfn_bulk')
+        p = self.load_policy({
+            'name': 'test-invoke-sfn-bulk',
+            'resource': 'step-machine',
+            'actions': [{
+                'type': 'invoke-sfn',
+                'bulk': True,
+                'state-machine': 'Helloworld'}]},
+            session_factory=factory,
+            config={'account_id': '644160558196'})
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'Helloworld')
+        self.assertTrue('c7n:execution-arn' in resources[0])
+        client = factory().client('stepfunctions')
+        self.assertEqual(
+            client.describe_execution(
+                executionArn=resources[0]['c7n:execution-arn'])['status'],
+            'SUCCEEDED')
+
     def test_invoke_sfn(self):
         factory = self.replay_flight_data('test_invoke_sfn')
         p = self.load_policy({
