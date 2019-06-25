@@ -34,9 +34,9 @@ jobs:
     displayName: "Install AWS CLI"
 
   - script: |
-      echo $(Build.BuildNumber) >> latest
+      echo $(Build.BuildNumber) >> latest.dat
       aws s3 cp tools/cask/release/ s3://c7n-dev/downloads/custodian-cask/ --recursive --acl public-read
-      aws s3 cp latest s3://c7n-dev/downloads/custodian-cask/latest --recursive --acl public-read --content-type text/plain
+      aws s3 cp latest.dat s3://c7n-dev/downloads/custodian-cask/latest --recursive --acl public-read --content-type text/plain
     displayName: "Upload Release"
     env:
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
