@@ -38,9 +38,9 @@ jobs:
       touch empty
       aws s3 cp tools/cask/release/ s3://c7n-dev/downloads/custodian-cask/ --recursive --acl public-read
       aws s3 cp latest s3://c7n-dev/downloads/custodian-cask/latest --recursive --acl public-read --content-type text/plain
-      aws s3 cp empty s3://c7n-dev/downloads/custodian-cask/windows-latest/custodian-cask.exe --acl public-read --website-redirect s3://c7n-dev/downloads/custodian-cask/windows-$(Build.BuildNumber)/custodian-cask.exe
-      aws s3 cp empty s3://c7n-dev/downloads/custodian-cask/linux-latest/custodian-cask --acl public-read --website-redirect s3://c7n-dev/downloads/custodian-cask/linux-$(Build.BuildNumber)/custodian-cask
-      aws s3 cp empty s3://c7n-dev/downloads/custodian-cask/darwin-latest/custodian-cask --acl public-read --website-redirect s3://c7n-dev/downloads/custodian-cask/darwin-$(Build.BuildNumber)/custodian-cask
+      aws s3 cp empty s3://c7n-dev/downloads/custodian-cask/windows-latest/custodian-cask.exe --acl public-read --website-redirect https://cloudcustodian.io/downloads/custodian-cask/windows-$(Build.BuildNumber)/custodian-cask.exe
+      aws s3 cp empty s3://c7n-dev/downloads/custodian-cask/linux-latest/custodian-cask --acl public-read --website-redirect https://cloudcustodian.io/downloads/custodian-cask/linux-$(Build.BuildNumber)/custodian-cask
+      aws s3 cp empty s3://c7n-dev/downloads/custodian-cask/darwin-latest/custodian-cask --acl public-read --website-redirect https://cloudcustodian.io/custodian-cask/darwin-$(Build.BuildNumber)/custodian-cask
     displayName: "Upload Release"
     env:
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
