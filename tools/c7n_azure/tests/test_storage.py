@@ -144,3 +144,87 @@ class StorageTest(BaseTest):
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
+
+    @arm_template('storage.json')
+    def test_diagnostic_settings_blob_storage_type(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctstorage*'},
+                {'type': 'storage-diagnostic-settings',
+                 'storage_type': 'blob',
+                 'key': 'logging.delete',
+                 'value': False}],
+        }, validate=True)
+
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertTrue('blob' in resources[0])
+
+    @arm_template('storage.json')
+    def test_diagnostic_settings_file_storage_type(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctstorage*'},
+                {'type': 'storage-diagnostic-settings',
+                 'storage_type': 'file',
+                 'key': 'hour_metrics.enabled',
+                 'value': True}],
+        }, validate=True)
+
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertTrue('file' in resources[0])
+
+    @arm_template('storage.json')
+    def test_diagnostic_settings_queue_storage_type(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctstorage*'},
+                {'type': 'storage-diagnostic-settings',
+                 'storage_type': 'queue',
+                 'key': 'logging.delete',
+                 'value': False}],
+        }, validate=True)
+
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertTrue('queue' in resources[0])
+
+    @arm_template('storage.json')
+    def test_diagnostic_settings_table_storage_type(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctstorage*'},
+                {'type': 'storage-diagnostic-settings',
+                 'storage_type': 'table',
+                 'key': 'logging.delete',
+                 'value': False}],
+        }, validate=True)
+
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertTrue('table' in resources[0])

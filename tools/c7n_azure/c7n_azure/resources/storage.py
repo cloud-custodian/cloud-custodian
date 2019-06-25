@@ -14,7 +14,6 @@
 
 import json
 import logging
-from concurrent.futures import as_completed
 
 import jsonpickle
 from azure.cosmosdb.table import TableService
@@ -28,10 +27,10 @@ from c7n_azure.filters import FirewallRulesFilter, ValueFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.utils import ThreadHelper
 from netaddr import IPNetwork
 
 from c7n.filters.core import type_schema
-from c7n.utils import chunks
 from c7n.utils import local_session
 
 
@@ -127,6 +126,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
     def __init__(self, data, manager=None):
         super(StorageDiagnosticSettingsFilter, self).__init__(data, manager)
         self.storage_type = data['storage_type']
+        self.log = logging.getLogger('custodian.azure.storage')
 
     schema = type_schema('storage-diagnostic-settings',
                          rinherit=ValueFilter.schema,
@@ -137,53 +137,61 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
                          )
 
     def process(self, resources, event=None):
-        futures = []
-        results = []
         session = local_session(self.manager.session_factory)
-        # Process each resource in a separate thread, returning all that pass filter
-        with self.executor_factory(max_workers=3) as w:
-            for resource_set in chunks(resources, 20):
-                futures.append(w.submit(self.process_resource_set, resource_set, session))
+        token = StorageUtilities.get_storage_token(session)
+        result, errors = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self.process_resource_set,
+            executor_factory=self.executor_factory,
+            log=self.log,
+            session=session,
+            token=token
+        )
+        return result
 
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.warning(
-                        "Storage diagnostic settings filter error: %s" % f.exception())
-                    continue
-                else:
-                    results.extend(f.result())
-
-            return results
-
-    def process_resource_set(self, resources, session):
+    def process_resource_set(self, resources, event=None, session=None, token=None):
         matched = []
         for resource in resources:
-            settings = json.loads(jsonpickle.encode(self.get_settings(resource, session)))
+            settings = self._get_settings(resource, session, token)
             filtered_settings = super(StorageDiagnosticSettingsFilter, self).process([settings],
-                                                                                     event=None)
+                                                                                     event)
 
             if filtered_settings:
                 matched.append(resource)
 
         return matched
 
-    def get_settings(self, storage_account, session):
+    def _get_settings(self, storage_account, session=None, token=None):
         if self.storage_type == self.BLOB_TYPE:
-            return StorageSettingsUtilities.get_blob_settings(storage_account, session)
+            if not (self.BLOB_TYPE in storage_account):
+                storage_account[self.BLOB_TYPE] = json.loads(jsonpickle.encode(
+                    StorageSettingsUtilities.get_blob_settings(storage_account, token)))
+            return storage_account[self.BLOB_TYPE]
+
         elif self.storage_type == self.FILE_TYPE:
-            return StorageSettingsUtilities.get_file_settings(storage_account, session)
+            if not (self.FILE_TYPE in storage_account):
+                storage_account[self.FILE_TYPE] = json.loads(jsonpickle.encode(
+                    StorageSettingsUtilities.get_file_settings(storage_account, session)))
+            return storage_account[self.FILE_TYPE]
+
         elif self.storage_type == self.TABLE_TYPE:
-            return StorageSettingsUtilities.get_table_settings(storage_account, session)
+            if not (self.TABLE_TYPE in storage_account):
+                storage_account[self.TABLE_TYPE] = json.loads(jsonpickle.encode(
+                    StorageSettingsUtilities.get_table_settings(storage_account, session)))
+            return storage_account[self.TABLE_TYPE]
+
         elif self.storage_type == self.QUEUE_TYPE:
-            return StorageSettingsUtilities.get_queue_settings(storage_account, session)
+            if not (self.QUEUE_TYPE in storage_account):
+                storage_account[self.QUEUE_TYPE] = json.loads(jsonpickle.encode(
+                    StorageSettingsUtilities.get_queue_settings(storage_account, token)))
+            return storage_account[self.QUEUE_TYPE]
 
 
 class StorageSettingsUtilities(object):
 
     @staticmethod
-    def _get_blob_client_from_storage_account(storage_account, session):
-        token = StorageUtilities.get_storage_token(session)
-
+    def _get_blob_client_from_storage_account(storage_account, token):
         return BlockBlobService(
             account_name=storage_account['name'],
             token_credential=token
@@ -191,11 +199,9 @@ class StorageSettingsUtilities(object):
 
     @staticmethod
     def _get_file_client_from_storage_account(storage_account, session):
-        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
-
-        storage_keys = storage_client.storage_accounts.list_keys(storage_account['resourceGroup'],
-                                                                 storage_account['name'])
-        primary_key = storage_keys.keys[0].value
+        primary_key = StorageUtilities.get_storage_primary_key(storage_account['resourceGroup'],
+                                                               storage_account['name'],
+                                                               session)
 
         return FileService(
             account_name=storage_account['name'],
@@ -204,11 +210,9 @@ class StorageSettingsUtilities(object):
 
     @staticmethod
     def _get_table_client_from_storage_account(storage_account, session):
-        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
-
-        storage_keys = storage_client.storage_accounts.list_keys(storage_account['resourceGroup'],
-                                                                 storage_account['name'])
-        primary_key = storage_keys.keys[0].value
+        primary_key = StorageUtilities.get_storage_primary_key(storage_account['resourceGroup'],
+                                                               storage_account['name'],
+                                                               session)
 
         return TableService(
             account_name=storage_account['name'],
@@ -216,8 +220,7 @@ class StorageSettingsUtilities(object):
         )
 
     @staticmethod
-    def _get_queue_client_from_storage_account(storage_account, session):
-        token = StorageUtilities.get_storage_token(session)
+    def _get_queue_client_from_storage_account(storage_account, token):
         return QueueService(account_name=storage_account['name'], token_credential=token)
 
     @staticmethod
