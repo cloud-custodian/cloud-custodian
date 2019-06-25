@@ -12,7 +12,6 @@ ADD setup.py README.md requirements.txt /src/
 ADD c7n /src/c7n/
 ADD tools/c7n_gcp /src/tools/c7n_gcp
 ADD tools/c7n_azure /src/tools/c7n_azure
-ADD tools/c7n_mailer /src/tools/c7n_mailer
 
 WORKDIR /src
 
@@ -22,20 +21,11 @@ RUN apt-get --yes update \
  && pip3 install -r requirements.txt  . \
  && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
  && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
- && pip3 install -r tools/c7n_mailer/requirements.txt tools/c7n_mailer \
  # Pre-cache Azure Functions package
  && python -c "from c7n_azure.function_package import FunctionPackage; \
       FunctionPackage('cache').build_cache( \
       modules=['c7n', 'c7n-azure', 'applicationinsights'], \
       non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'pyrsistent'], \
-      excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])" \
- # Pre-cache Azure Mailer package
- && python -c "from c7n_azure.function_package import FunctionPackage; \
-      from c7n_mailer.azure import deploy; \
-      FunctionPackage('cache', cache_override_path=deploy.cache_path()).build_cache( \
-      modules=['c7n', 'c7n-azure', 'c7n-mailer', 'applicationinsights'], \
-      non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'jmespath', \
-                   'datadog', 'MarkupSafe', 'simplejson', 'pyrsistent'], \
       excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])" \
  && apt-get --yes remove build-essential \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \

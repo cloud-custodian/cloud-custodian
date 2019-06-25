@@ -34,7 +34,7 @@ from c7n_azure.session import Session
 
 class FunctionPackage(object):
 
-    def __init__(self, name, function_path=None, target_subscription_ids=None, cache_override_path=None):
+    def __init__(self, name, function_path=None, target_sub_ids=None, cache_override_path=None):
         self.log = logging.getLogger('custodian.azure.function_package')
         self.pkg = None
         self.name = name
@@ -44,10 +44,10 @@ class FunctionPackage(object):
         self.enable_ssl_cert = not distutils.util.strtobool(
             os.environ.get(ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, 'no'))
 
-        if target_subscription_ids is not None:
-            self.target_subscription_ids = target_subscription_ids
+        if target_sub_ids is not None:
+            self.target_sub_ids = target_sub_ids
         else:
-            self.target_subscription_ids = [None]
+            self.target_sub_ids = [None]
 
         if not self.enable_ssl_cert:
             self.log.warning('SSL Certificate Validation is disabled')
@@ -55,11 +55,11 @@ class FunctionPackage(object):
     def _add_functions_required_files(self, policy, queue_name=None):
         s = local_session(Session)
 
-        for target_subscription_id in self.target_subscription_ids:
-            name = self.name + ("_" + target_subscription_id if target_subscription_id else "")
+        for target_sub_id in self.target_sub_ids:
+            name = self.name + ("_" + target_sub_id if target_sub_id else "")
             # generate and add auth
             self.pkg.add_contents(dest=name + '/auth.json',
-                                  contents=s.get_functions_auth_string(target_subscription_id))
+                                  contents=s.get_functions_auth_string(target_sub_id))
 
             self.pkg.add_file(self.function_path,
                               dest=name + '/function.py')
@@ -132,9 +132,7 @@ class FunctionPackage(object):
 
         self.pkg = PythonPackageArchive(cache_file=cache_zip_file)
 
-        exclude = os.path.normpath('/cache/') + os.path.sep
-        self.pkg.add_modules(lambda f: (exclude in f),
-                             [m.replace('-', '_') for m in modules])
+        self.pkg.add_modules(None, [m.replace('-', '_') for m in modules])
 
         # add config and policy
         self._add_functions_required_files(policy, queue_name)
