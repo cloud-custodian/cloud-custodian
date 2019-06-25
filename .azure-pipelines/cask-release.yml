@@ -34,6 +34,7 @@ jobs:
     displayName: "Install AWS CLI"
 
   - script: |
+      echo $(AWS_ACCESS_KEY_ID)
       echo $(Build.BuildNumber) >> latest
       aws s3 cp tools/cask/release/ s3://c7n-dev/downloads/custodian-cask/ --recursive --acl public-read
       aws s3 cp latest s3://c7n-dev/downloads/custodian-cask/latest --acl public-read
