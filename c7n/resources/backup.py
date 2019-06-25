@@ -14,23 +14,20 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session
 
 
 @resources.register('backup-plan')
 class BackupPlan(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'backup'
         enum_spec = ('list_backup_plans', 'BackupPlansList', None)
         detail_spec = ('get_backup_plan', 'BackupPlanId', 'BackupPlanId', 'BackupPlan')
         id = 'BackupPlanName'
         name = 'BackupPlanId'
         arn = 'BackupPlanArn'
-        dimension = None
-        filter_name = None
-        filter_type = None
 
     def augment(self, resources):
         super(BackupPlan, self).augment(resources)

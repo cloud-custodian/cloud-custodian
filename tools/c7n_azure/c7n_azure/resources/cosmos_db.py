@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from c7n_azure.filters import FirewallRulesFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+import logging
+from netaddr import IPNetwork
 
 
 @resources.register('cosmosdb')
@@ -30,3 +32,23 @@ class CosmosDB(ArmResourceManager):
             'kind'
         )
         resource_type = 'Microsoft.DocumentDB/databaseAccounts'
+
+
+@CosmosDB.filter_registry.register('firewall-rules')
+class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
+
+    def __init__(self, data, manager=None):
+        super(CosmosDBFirewallRulesFilter, self).__init__(data, manager)
+        self._log = logging.getLogger('custodian.azure.cosmosdb')
+
+    @property
+    def log(self):
+        return self._log
+
+    def _query_rules(self, resource):
+
+        ip_range_string = resource['properties']['ipRangeFilter']
+
+        resource_rules = set([IPNetwork(ip_range) for ip_range in ip_range_string.split(',')])
+
+        return resource_rules

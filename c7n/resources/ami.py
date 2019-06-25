@@ -24,7 +24,7 @@ from c7n.exceptions import ClientError
 from c7n.filters import (
     AgeFilter, Filter, CrossAccountAccessFilter)
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource
+from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema, chunks
 
@@ -35,17 +35,15 @@ log = logging.getLogger('custodian.ami')
 @resources.register('ami')
 class AMI(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'ec2'
-        type = 'image'
+        arn_type = 'image'
         enum_spec = (
             'describe_images', 'Images', None)
-        detail_spec = None
         id = 'ImageId'
         filter_name = 'ImageIds'
         filter_type = 'list'
         name = 'Name'
-        dimension = None
         date = 'CreationDate'
 
     def resources(self, query=None):

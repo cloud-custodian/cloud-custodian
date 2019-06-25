@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "executionArn": "arn:aws:states:us-east-1:644160558196:execution:Helloworld:283ac279-1625-4a31-ae74-43e44d789bc1",
+        "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:Helloworld",
+        "name": "283ac279-1625-4a31-ae74-43e44d789bc1",
+        "status": "SUCCEEDED",
+        "startDate": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 6,
+            "day": 24,
+            "hour": 11,
+            "minute": 35,
+            "second": 10,
+            "microsecond": 366000
+        },
+        "stopDate": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 6,
+            "day": 24,
+            "hour": 11,
+            "minute": 35,
+            "second": 10,
+            "microsecond": 480000
+        },
+        "input": "{\n\"policy\": {\n\"name\": \"test-invoke-sfn\",\n\"resource\": \"step-machine\",\n\"actions\": [\n{\n\"type\": \"invoke-sfn\",\n\"state-machine\": \"Helloworld\"\n}\n]\n},\n\"resource\": {\n\"stateMachineArn\": \"arn:aws:states:us-east-1:644160558196:stateMachine:Helloworld\",\n\"name\": \"Helloworld\",\n\"creationDate\": \"2019-06-24T11:33:30.570000-04:00\",\n\"status\": \"ACTIVE\",\n\"definition\": \"{\\n  \\\"Comment\\\": \\\"A Hello World example of the Amazon States Language using a Pass state\\\",\\n  \\\"StartAt\\\": \\\"HelloWorld\\\",\\n  \\\"States\\\": {\\n    \\\"HelloWorld\\\": {\\n      \\\"Type\\\": \\\"Pass\\\",\\n      \\\"Result\\\": \\\"Hello World!\\\",\\n      \\\"End\\\": true\\n    }\\n  }\\n}\\n\",\n\"roleArn\": \"arn:aws:iam::644160558196:role/service-role/SfnDev\"\n}\n}",
+        "output": "\"Hello World!\"",
+        "ResponseMetadata": {
+            "RequestId": "a6dc752f-9695-11e9-ae07-7568ddb8b446",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a6dc752f-9695-11e9-ae07-7568ddb8b446",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "1165"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

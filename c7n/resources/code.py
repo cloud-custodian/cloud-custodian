@@ -18,28 +18,26 @@ from botocore.exceptions import ClientError
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import local_session, get_retry, type_schema
+from c7n.utils import local_session, type_schema
 
 
 @resources.register('codecommit')
 class CodeRepository(QueryResourceManager):
 
-    retry = staticmethod(get_retry(('Throttling',)))
-
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'codecommit'
         enum_spec = ('list_repositories', 'repositories', None)
         batch_detail_spec = (
             'batch_get_repositories', 'repositoryNames', 'repositoryName',
             'repositories', None)
-        id = 'repositoryId'
+        name = id = 'repositoryName'
         arn = "Arn"
-        name = 'repositoryName'
         date = 'creationDate'
-        dimension = None
-        filter_name = None
+
+    def get_resources(self, ids, cache=True):
+        return self.augment([{'repositoryName': i} for i in ids])
 
 
 @CodeRepository.action_registry.register('delete')
@@ -79,7 +77,7 @@ class DeleteRepository(BaseAction):
 @resources.register('codebuild')
 class CodeBuildProject(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'codebuild'
         enum_spec = ('list_projects', 'projects', None)
         batch_detail_spec = (
@@ -87,10 +85,9 @@ class CodeBuildProject(QueryResourceManager):
         name = id = 'name'
         arn = 'arn'
         date = 'created'
-        dimension = None
-        filter_name = None
+        dimension = 'ProjectName'
         config_type = "AWS::CodeBuild::Project"
-        type = 'project'
+        arn_type = 'project'
         universal_taggable = object()
 
     def get_source(self, source_type):
@@ -165,14 +162,11 @@ class DeleteProject(BaseAction):
 @resources.register('codepipeline')
 class CodeDeployPipeline(QueryResourceManager):
 
-    retry = staticmethod(get_retry(('Throttling',)))
-
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'codepipeline'
         enum_spec = ('list_pipelines', 'pipelines', None)
         detail_spec = ('get_pipeline', 'name', 'name', 'pipeline')
-        dimension = filter_name = None
         name = id = 'name'
         date = 'created'
-        filter_name = None
-        type = ""
+        # Note this is purposeful, codepipeline don't have a separate type specifier.
+        arn_type = ""

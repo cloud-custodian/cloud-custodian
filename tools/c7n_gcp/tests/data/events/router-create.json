@@ -1,0 +1,90 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "nonono@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "1.1.1.1",
+      "callerSuppliedUserAgent": "Mozilla",
+      "requestAttributes": {
+        "time": "2019-05-04T08:32:02.542Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "beta.compute.routers.insert",
+    "authorizationInfo": [
+      {
+        "permission": "compute.routers.create",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/mitrop-custodian/regions/us-central1/routers/test-router-2",
+          "type": "compute.routers"
+        }
+      },
+      {
+        "permission": "compute.networks.updatePolicy",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/mitrop-custodian/global/networks/default",
+          "type": "compute.networks"
+        }
+      }
+    ],
+    "resourceName": "projects/mitrop-custodian/regions/us-central1/routers/test-router-2",
+    "request": {
+      "name": "test-router-2",
+      "selfLink": "projects/mitrop-custodian/regions/us-central1/routers/test-router-2",
+      "bgp": {
+        "asn": "65001",
+        "advertiseMode": "DEFAULT"
+      },
+      "@type": "type.googleapis.com/compute.routers.insert",
+      "network": "projects/mitrop-custodian/global/networks/default",
+      "description": ""
+    },
+    "response": {
+      "selfLink": "https://www.googleapis.com/compute/beta/projects/mitrop-custodian/regions/us-central1/operations/operation-1556958722339-5880bb3933176-a52ee586-261b2bbe",
+      "targetLink": "https://www.googleapis.com/compute/beta/projects/mitrop-custodian/regions/us-central1/routers/test-router-2",
+      "operationType": "insert",
+      "selfLinkWithId": "https://www.googleapis.com/compute/beta/projects/mitrop-custodian/regions/us-central1/operations/274800363496861932",
+      "region": "https://www.googleapis.com/compute/beta/projects/mitrop-custodian/regions/us-central1",
+      "status": "RUNNING",
+      "name": "operation-1556958722339-5880bb3933176-a52ee586-261b2bbe",
+      "targetId": "5859183108806471916",
+      "id": "274800363496861932",
+      "@type": "type.googleapis.com/operation",
+      "startTime": "2019-05-04T01:32:03.292-07:00",
+      "progress": "0",
+      "insertTime": "2019-05-04T01:32:03.277-07:00",
+      "user": "no@gmail.com"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1"
+      ]
+    }
+  },
+  "insertId": "-e5askcd30dm",
+  "resource": {
+    "type": "gce_router",
+    "labels": {
+      "router_id": "5859183108806471916",
+      "project_id": "mitrop-custodian",
+      "region": "us-central1"
+    }
+  },
+  "timestamp": "2019-05-04T08:32:02.438Z",
+  "severity": "NOTICE",
+  "logName": "projects/mitrop-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "id": "operation-1556958722339-5880bb3933176-a52ee586-261b2bbe",
+    "producer": "type.googleapis.com",
+    "first": true
+  },
+  "receiveTimestamp": "2019-05-04T08:32:04.335483569Z"
+}

@@ -37,6 +37,7 @@ class Subscription(ResourceManager):
         id = 'subscriptionId'
         name = 'displayName'
         filter_name = None
+        service = 'subscription'
 
     def get_model(self):
         return self.resource_type

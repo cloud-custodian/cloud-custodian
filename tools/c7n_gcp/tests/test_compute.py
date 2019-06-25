@@ -138,3 +138,29 @@ class SnapshotTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class ImageTest(BaseTest):
+
+    def test_image_query(self):
+        factory = self.replay_flight_data(
+            'image-query', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'all-images',
+             'resource': 'gcp.image'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_image_delete(self):
+        factory = self.replay_flight_data(
+            'image-delete', project_id='cloud-custodian')
+        p = self.load_policy(
+            {'name': 'all-images',
+             'resource': 'gcp.image',
+             'filters': [
+                 {'name': 'image-1'}],
+             'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

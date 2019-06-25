@@ -106,7 +106,8 @@ class AzureVCRBaseTest(VCRTestCase):
                         'vary',
                         'pragma',
                         'transfer-encoding',
-                        'expires']
+                        'expires',
+                        'content-location']
 
     def is_playback(self):
         # You can't do this in setup because it is actually required by the base class

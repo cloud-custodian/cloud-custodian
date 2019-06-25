@@ -16,20 +16,19 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 
 
 @resources.register('config-recorder')
 class ConfigRecorder(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = "config"
         enum_spec = ('describe_configuration_recorders', 'ConfigurationRecorders', None)
         id = name = "name"
         filter_name = 'ConfigurationRecorderNames'
         filter_type = 'list'
-        dimension = None
         arn = False
 
     def augment(self, resources):
@@ -55,12 +54,12 @@ class ConfigRecorder(QueryResourceManager):
 @resources.register('config-rule')
 class ConfigRule(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = "config"
         enum_spec = ("describe_config_rules", "ConfigRules", None)
         id = name = "ConfigRuleName"
         arn = "ConfigRuleArn"
-        dimension = None
+        arn_type = 'config-rule'
         filter_name = 'ConfigRuleNames'
         filter_type = 'list'
 
@@ -69,6 +68,7 @@ class ConfigRule(QueryResourceManager):
 class RuleStatus(ValueFilter):
 
     schema = type_schema('status', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('config:DescribeConfigRuleEvaluationStatus',)
     annotate = False
 

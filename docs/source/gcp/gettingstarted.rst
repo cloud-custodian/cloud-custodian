@@ -1,11 +1,11 @@
 .. _gcp_gettingstarted:
 
-Getting Started
-=================
+Getting Started (Beta)
+======================
 
-The GCP provider plugin is an optional package which can be installed in addition to
-the base Cloud Custodian application. It provides the ability to write policies which
-interact with GCP related resources.
+The GCP provider (Beta) is an optional package which can be installed to enable
+writing policies which interact with GCP related resources.
+
 
 .. _gcp_install-cc:
 

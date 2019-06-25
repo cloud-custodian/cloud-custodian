@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
 from .aws import shape_validate
@@ -25,15 +25,14 @@ from .aws import shape_validate
 @resources.register('eks')
 class EKS(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'eks'
         enum_spec = ('list_clusters', 'clusters', None)
         arn = 'arn'
+        arn_type = 'cluster'
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'
-        dimension = None
-        filter_name = None
 
 
 @EKS.filter_registry.register('subnet')

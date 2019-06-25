@@ -28,3 +28,22 @@ class OrganizationTest(BaseTest):
 
         organization_resources = policy.run()
         self.assertEqual(organization_resources[0]['name'], organization_name)
+
+
+class FolderTest(BaseTest):
+
+    def test_folder_query(self):
+        resource_name = 'folders/112838955399'
+        parent = 'organizations/926683928810'
+        session_factory = self.replay_flight_data('folder-query')
+
+        policy = self.load_policy(
+            {'name': 'gcp-folder-dryrun',
+             'resource': 'gcp.folder',
+             'query':
+                 [{'parent': parent}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(resources[0]['parent'], parent)

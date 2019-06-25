@@ -10,7 +10,6 @@ Here are some more specific example policies for these resources:
   :titlesonly:
   :glob:
 
-  delayedoperation
   genericarmaction
   genericarmfilter
   resources/*
