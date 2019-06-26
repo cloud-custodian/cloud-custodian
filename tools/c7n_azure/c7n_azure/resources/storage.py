@@ -118,12 +118,13 @@ class StorageFirewallRulesFilter(FirewallRulesFilter):
 
 @Storage.filter_registry.register('storage-diagnostic-settings')
 class StorageDiagnosticSettingsFilter(ValueFilter):
-    """Filters storage accounts based on its diagnostic settings. The filter requires specifying the storage type
-    (blob, queue, table, file) and will filter based on the settings for that specific type.
+    """Filters storage accounts based on its diagnostic settings. The filter requires
+    specifying the storage type (blob, queue, table, file) and will filter based on
+    the settings for that specific type.
 
      :example:
 
-    Find all storage accounts that have a 'delete' logging setting disabled.
+        Find all storage accounts that have a 'delete' logging setting disabled.
 
      .. code-block:: yaml
 
