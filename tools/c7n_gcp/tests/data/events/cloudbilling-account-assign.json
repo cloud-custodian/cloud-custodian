@@ -1,0 +1,82 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.94",
+      "requestAttributes": {},
+      "destinationAttributes": {}
+    },
+    "serviceName": "cloudbilling.googleapis.com",
+    "methodName": "AssignResourceToBillingAccount",
+    "authorizationInfo": [
+      {
+        "resource": "billingAccounts/CU570D-1A4CU5-70D1A4",
+        "permission": "billing.resourceAssociations.create",
+        "granted": true,
+        "resourceAttributes": {}
+      },
+      {
+        "resource": "projects/cloud-custodian",
+        "permission": "resourcemanager.projects.createBillingAssignment",
+        "granted": true,
+        "resourceAttributes": {}
+      },
+      {
+        "resource": "billingAccounts/CU570D-1A4CU5-70D1A4",
+        "permission": "billing.resourceAssociations.create",
+        "granted": true,
+        "resourceAttributes": {}
+      },
+      {
+        "resource": "projects/cloud-custodian",
+        "permission": "resourcemanager.projects.deleteBillingAssignment",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "resourceName": "projects/cloud-custodian",
+    "request": {
+      "billingAccountName": "billingAccounts/CU570D-1A4CU5-70D1A4",
+      "@type": "type.googleapis.com/google.internal.cloudbilling.billingaccount.v1.AssignResourceToBillingAccountRequest",
+      "resourceName": "projects/2030697917"
+    },
+    "response": {
+      "permissionInfo": {},
+      "@type": "type.googleapis.com/google.internal.cloudbilling.billingaccount.v1.ResourceBillingInfo",
+      "billingAccountAssignmentType": "EXPLICIT",
+      "resourceIdentifier": {
+        "resourceName": "projects/2030697917",
+        "projectId": "cloud-custodian"
+      },
+      "billingAccountInfo": {
+        "billingAccountName": "billingAccounts/CU570D-1A4CU5-70D1A4",
+        "billingAccountDisplayName": "Custodian Billing Account",
+        "billingAccountState": {
+          "auditEntry": {
+            "time": "2019-05-20T09:59:23.191Z"
+          }
+        },
+        "supportedBusinessEntities": [
+          "businessEntity/CLOUD_PLATFORM",
+          "businessEntity/SEARCH",
+          "businessEntity/GEO"
+        ]
+      }
+    }
+  },
+  "insertId": "pjl00dd96nm",
+  "resource": {
+    "type": "project",
+    "labels": {
+      "project_id": "cloud-custodian"
+    }
+  },
+  "timestamp": "2019-05-20T12:06:27.208Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-05-20T12:06:29.023807450Z"
+}

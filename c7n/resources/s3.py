@@ -659,7 +659,7 @@ class GlobalGrantsFilter(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: s3-delete-global-grants
+              - name: remove-global-grants
                 resource: s3
                 filters:
                   - type: global-grants

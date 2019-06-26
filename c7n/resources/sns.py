@@ -254,7 +254,7 @@ class RemovePolicyStatement(RemovePolicyBase):
     .. code-block:: yaml
 
            policies:
-              - name: sns-cross-account
+              - name: remove-sns-cross-account
                 resource: sns
                 filters:
                   - type: cross-account

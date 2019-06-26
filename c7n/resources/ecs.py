@@ -231,7 +231,7 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     .. code-block:: yaml
 
        policies:
-         - name: fargate-readonly-tasks
+         - name: fargate-find-stop-image
            resource: ecs-task
            filters:
              - launchType: FARGATE
