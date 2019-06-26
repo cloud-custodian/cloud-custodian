@@ -337,7 +337,7 @@ class DeleteElastiCacheSnapshot(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: elasticache-stale-snapshots
+              - name: delete-elasticache-stale-snapshots
                 resource: cache-snapshot
                 filters:
                   - type: age

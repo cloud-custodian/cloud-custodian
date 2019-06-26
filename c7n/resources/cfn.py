@@ -185,7 +185,7 @@ class CloudFormationRemoveTag(RemoveTag):
     .. code-block:: yaml
 
         policies:
-          - name: add-cfn-tag
+          - name: remove-cfn-tag
             resource: cfn
             filters:
               - 'tag:DesiredTag': present

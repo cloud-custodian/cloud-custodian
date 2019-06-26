@@ -44,7 +44,7 @@ class Tag(Tag):
     .. code-block:: yaml
 
             policies:
-              - name: cloudhsm
+              - name: cloudhsm-tag
                 resource: aws.cloudhsm-cluster
                 filters:
                   - "tag:OwnerName": missing
@@ -73,7 +73,7 @@ class RemoveTag(RemoveTag):
     .. code-block:: yaml
 
             policies:
-              - name: cloudhsm
+              - name: cloudhsm-remove-tag
                 resource: aws.cloudhsm-cluster
                 filters:
                   - "tag:OldTagKey": present

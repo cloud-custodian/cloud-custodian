@@ -177,7 +177,7 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-sg
                 resource: vpc
                 filters:
                   - type: security-group
@@ -211,7 +211,7 @@ class VpcSubnetFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-subnet
                 resource: vpc
                 filters:
                   - type: subnet
@@ -245,7 +245,7 @@ class VpcNatGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-nat
                 resource: vpc
                 filters:
                   - type: nat-gateway
@@ -279,7 +279,7 @@ class VpcInternetGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-igw
                 resource: vpc
                 filters:
                   - type: internet-gateway

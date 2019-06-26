@@ -322,7 +322,7 @@ class SnapshotSkipAmiSnapshots(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: delete-stale-snapshots
+              - name: delete-ebs-stale-snapshots
                 resource: ebs-snapshot
                 filters:
                   - type: age
@@ -547,7 +547,7 @@ class VolumeDetach(BaseAction):
      .. code-block:: yaml
 
              policies:
-               - name: instance-ebs-volumes
+               - name: detach-ebs-volumes
                  resource: ebs
                  filters:
                    - VolumeId :  volumeid
@@ -582,7 +582,9 @@ class AttachedInstanceFilter(ValueFilter):
               - name: instance-ebs-volumes
                 resource: ebs
                 filters:
-                  - instance
+                  - type: instance
+                    key: tag:Name
+                    value: OldManBySea
     """
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
@@ -1376,7 +1378,7 @@ class ModifyVolume(BaseAction):
     .. code-block:: yaml
 
            policies:
-            - name: ebs-remove-piops
+            - name: ebs-upsize-piops
               resource: ebs
               filters:
                 - VolumeType: io1

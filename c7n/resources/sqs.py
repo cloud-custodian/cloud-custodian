@@ -130,8 +130,8 @@ class KmsFilter(KmsRelatedFilter):
         .. code-block:: yaml
 
             policies:
-                - name: efs-kms-key-filters
-                  resource: efs
+                - name: sqs-kms-key-filters
+                  resource: aws.sqs
                   filters:
                     - or:
                       - type: value
@@ -155,7 +155,7 @@ class RemovePolicyStatement(RemovePolicyBase):
     .. code-block:: yaml
 
            policies:
-              - name: sqs-cross-account
+              - name: remove-sqs-cross-account
                 resource: sqs
                 filters:
                   - type: cross-account
