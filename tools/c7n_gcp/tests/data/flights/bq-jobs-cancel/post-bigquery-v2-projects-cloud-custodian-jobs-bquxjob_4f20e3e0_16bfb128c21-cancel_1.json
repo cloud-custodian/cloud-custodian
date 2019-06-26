@@ -1,0 +1,158 @@
+{
+  "body": {
+    "kind": "bigquery#jobCancelResponse", 
+    "job": {
+      "status": {
+        "state": "RUNNING"
+      }, 
+      "kind": "bigquery#job", 
+      "statistics": {
+        "query": {
+          "timeline": [
+            {
+              "totalSlotMs": "9646", 
+              "activeUnits": "58", 
+              "completedUnits": "9", 
+              "elapsedMs": "775", 
+              "pendingUnits": "3035"
+            }
+          ], 
+          "statementType": "SELECT", 
+          "queryPlan": [
+            {
+              "status": "RUNNING", 
+              "parallelInputs": "3043", 
+              "shuffleOutputBytes": "0", 
+              "name": "S00: Input", 
+              "computeMsMax": "3437", 
+              "waitMsMax": "0", 
+              "readMsMax": "251", 
+              "computeMsAvg": "1", 
+              "shuffleOutputBytesSpilled": "0", 
+              "waitMsAvg": "0", 
+              "recordsWritten": "0", 
+              "steps": [
+                {
+                  "kind": "READ", 
+                  "substeps": [
+                    "$30:start_position", 
+                    "FROM bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0"
+                  ]
+                }, 
+                {
+                  "kind": "AGGREGATE", 
+                  "substeps": [
+                    "$60 := MIN($30)"
+                  ]
+                }, 
+                {
+                  "kind": "WRITE", 
+                  "substeps": [
+                    "$60", 
+                    "TO __stage00_output"
+                  ]
+                }
+              ], 
+              "recordsRead": "0", 
+              "writeMsAvg": "0", 
+              "completedParallelInputs": "9", 
+              "readMsAvg": "0", 
+              "id": "0", 
+              "writeMsMax": "12"
+            }, 
+            {
+              "status": "RUNNING", 
+              "parallelInputs": "1", 
+              "shuffleOutputBytes": "0", 
+              "name": "S01: Output", 
+              "computeMsMax": "0", 
+              "inputStages": [
+                "0"
+              ], 
+              "readMsMax": "0", 
+              "computeMsAvg": "0", 
+              "id": "1", 
+              "waitMsAvg": "0", 
+              "recordsWritten": "0", 
+              "steps": [
+                {
+                  "kind": "READ", 
+                  "substeps": [
+                    "$60", 
+                    "FROM __stage00_output"
+                  ]
+                }, 
+                {
+                  "kind": "AGGREGATE", 
+                  "substeps": [
+                    "$50 := MIN($60)"
+                  ]
+                }, 
+                {
+                  "kind": "WRITE", 
+                  "substeps": [
+                    "$50", 
+                    "TO __stage01_output"
+                  ]
+                }
+              ], 
+              "recordsRead": "0", 
+              "writeMsAvg": "0", 
+              "completedParallelInputs": "0", 
+              "readMsAvg": "0", 
+              "shuffleOutputBytesSpilled": "0", 
+              "waitMsMax": "0", 
+              "writeMsMax": "0"
+            }
+          ], 
+          "estimatedBytesProcessed": "421466275948", 
+          "totalSlotMs": "9646"
+        }, 
+        "creationTime": "1563286010871", 
+        "startTime": "1563286011109", 
+        "totalSlotMs": "9646"
+      }, 
+      "jobReference": {
+        "projectId": "cloud-custodian",
+        "location": "US", 
+        "jobId": "bquxjob_4f20e3e0_16bfb128c21"
+      }, 
+      "etag": "Zj2tFtole9jze+wRi/tjYg==", 
+      "configuration": {
+        "query": {
+          "useQueryCache": false, 
+          "useLegacySql": false, 
+          "destinationTable": {
+            "projectId": "cloud-custodian",
+            "tableId": "anonea7c2978_e0a3_45c2_87e1_2b567b4753d2", 
+            "datasetId": "_b8ee5f662348751c5edf24cd96f6ff08fbfbfc31"
+          }, 
+          "priority": "INTERACTIVE", 
+          "writeDisposition": "WRITE_TRUNCATE", 
+          "allowLargeResults": false, 
+          "createDisposition": "CREATE_IF_NEEDED", 
+          "query": "WITH GH AS (\nSELECT A.repo_name, A.mode FROM `bigquery-public-data.github_repos.files` as A\nJOIN `bigquery-public-data.github_repos.files` as B ON A.id = B.id\nWHERE A.repo_name NOT LIKE '%aaaa%')\n\nSELECT A.reference_name FROM `bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0` as A\nJOIN `bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0` as B on A.reference_name = A.reference_name\nJOIN GH as C on 1=1\nWHERE A.start_position <> B.end_position AND A.start_position = (SELECT MIN(start_position) FROM `bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0`)"
+        }, 
+        "jobType": "QUERY"
+      }, 
+      "id": "cloud-custodian:US.bquxjob_4f20e3e0_16bfb128c21",
+      "selfLink": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/jobs/bquxjob_4f20e3e0_16bfb128c21?location=US"
+    }
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "4735", 
+    "x-xss-protection": "0", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "Zj2tFtole9jze+wRi/tjYg==", 
+    "cache-control": "private", 
+    "date": "Tue, 16 Jul 2019 14:07:07 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}

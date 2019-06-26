@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from time import sleep
 
 from gcp_common import BaseTest, event_data
 
@@ -67,6 +68,33 @@ class BigQueryJobTest(BaseTest):
         self.assertEqual(job[0]['jobReference']['location'], location)
         self.assertEqual(job[0]['jobReference']['projectId'], project_id)
         self.assertEqual(job[0]['id'], "{}:{}.{}".format(project_id, location, job_id))
+
+    def test_job_cancel(self):
+        project_id = 'cloud-custodian'
+        job_id = 'bquxjob_4f20e3e0_16bfb128c21'
+        session_factory = self.replay_flight_data(
+            'bq-jobs-cancel', project_id=project_id)
+
+        policy = self.load_policy({
+            'name': 'bq-jobs-cancel',
+            'resource': 'gcp.bq-job',
+            'filters': [{'type': 'value',
+                         'key': 'jobReference.jobId',
+                         'value': job_id}],
+            'actions': [{'type': 'cancel'}]},
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(resources[0]['jobReference']['jobId'], job_id)
+
+        if self.recording:
+            sleep(1)
+
+        client = policy.resource_manager.get_client()
+        result = client.execute_query('get', {'projectId': project_id,
+                                              'jobId': job_id})
+        self.assertEqual(result['jobReference']['jobId'], job_id)
+        self.assertEqual(result[u'status'][u'errorResult'][u'message'],
+                         'Job execution was cancelled: User requested cancellation')
 
 
 class BigQueryProjectTest(BaseTest):

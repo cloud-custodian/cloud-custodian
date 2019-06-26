@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import jmespath
+from c7n.utils import type_schema
 
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
 
@@ -78,6 +80,32 @@ class BigQueryJob(QueryResourceManager):
                     'protoPayload.metadata.tableCreation.jobName', event
                 ).rsplit('/', 1)[-1]
             })
+
+
+@BigQueryJob.action_registry.register('cancel')
+class BigQueryJobStop(MethodAction):
+    """
+    `Cancels <https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/cancel>`_
+    a BigQuery job. The action does not specify any parameters.
+
+    Example:
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-bq-job-cancel
+            resource: gcp.bq-job
+            filters:
+              - type: value
+                key: jobReference.jobId
+                value: jobIdToCancel
+            actions:
+              - type: cancel
+    """
+    schema = type_schema('cancel')
+    method_spec = {'op': 'cancel'}
+
+    def get_resource_params(self, model, resource):
+        return resource['jobReference']
 
 
 @resources.register('bq-project')

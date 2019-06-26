@@ -1,0 +1,45 @@
+{
+  "body": {
+    "kind": "bigquery#jobList", 
+    "etag": "6bhJTImG+wuch9ODpNTGAA==", 
+    "jobs": [
+      {
+        "status": {
+          "state": "RUNNING"
+        }, 
+        "kind": "bigquery#job", 
+        "statistics": {
+          "query": {
+            "statementType": "SELECT"
+          }, 
+          "creationTime": "1563286010871", 
+          "startTime": "1563286011109"
+        }, 
+        "jobReference": {
+          "projectId": "cloud-custodian",
+          "location": "US", 
+          "jobId": "bquxjob_4f20e3e0_16bfb128c21"
+        }, 
+        "state": "RUNNING", 
+        "id": "cloud-custodian:US.bquxjob_4f20e3e0_16bfb128c21"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "119661", 
+    "x-xss-protection": "0", 
+    "content-location": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/jobs?alt=json&allUsers=true",
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "6bhJTImG+wuch9ODpNTGAA==", 
+    "cache-control": "private", 
+    "date": "Tue, 16 Jul 2019 14:07:06 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}

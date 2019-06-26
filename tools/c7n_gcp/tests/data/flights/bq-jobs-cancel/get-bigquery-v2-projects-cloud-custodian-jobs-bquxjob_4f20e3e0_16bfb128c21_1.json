@@ -1,0 +1,670 @@
+{
+  "body": {
+    "status": {
+      "state": "DONE", 
+      "errors": [
+        {
+          "reason": "stopped", 
+          "message": "Job execution was cancelled: User requested cancellation"
+        }
+      ], 
+      "errorResult": {
+        "reason": "stopped", 
+        "message": "Job execution was cancelled: User requested cancellation"
+      }
+    }, 
+    "kind": "bigquery#job", 
+    "statistics": {
+      "totalSlotMs": "63161735", 
+      "creationTime": "1563286010871", 
+      "totalBytesProcessed": "23883088970", 
+      "startTime": "1563286011109", 
+      "query": {
+        "totalSlotMs": "63161735", 
+        "queryPlan": [
+          {
+            "status": "COMPLETE", 
+            "parallelInputs": "3043", 
+            "shuffleOutputBytes": "0", 
+            "name": "S00: Input", 
+            "computeMsMax": "1098549", 
+            "waitMsMax": "0", 
+            "readMsMax": "842", 
+            "computeMsAvg": "361", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "$30:start_position", 
+                  "FROM bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0"
+                ]
+              }, 
+              {
+                "kind": "AGGREGATE", 
+                "substeps": [
+                  "$60 := MIN($30)"
+                ]
+              }, 
+              {
+                "kind": "WRITE", 
+                "substeps": [
+                  "$60", 
+                  "TO __stage00_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "7", 
+            "completedParallelInputs": "3043", 
+            "readMsAvg": "229", 
+            "id": "0", 
+            "writeMsMax": "688"
+          }, 
+          {
+            "status": "COMPLETE", 
+            "parallelInputs": "1", 
+            "shuffleOutputBytes": "0", 
+            "name": "S01: Output", 
+            "computeMsMax": "11", 
+            "inputStages": [
+              "0"
+            ], 
+            "readMsMax": "0", 
+            "computeMsAvg": "11", 
+            "id": "1", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "$60", 
+                  "FROM __stage00_output"
+                ]
+              }, 
+              {
+                "kind": "AGGREGATE", 
+                "substeps": [
+                  "$50 := MIN($60)"
+                ]
+              }, 
+              {
+                "kind": "WRITE", 
+                "substeps": [
+                  "$50", 
+                  "TO __stage01_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "9", 
+            "completedParallelInputs": "1", 
+            "readMsAvg": "0", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsMax": "0", 
+            "writeMsMax": "9"
+          }, 
+          {
+            "status": "COMPLETE", 
+            "parallelInputs": "451", 
+            "shuffleOutputBytes": "0", 
+            "name": "S02: Input", 
+            "computeMsMax": "3548404", 
+            "waitMsMax": "0", 
+            "readMsMax": "1013", 
+            "computeMsAvg": "7867", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "$1:id", 
+                  "FROM bigquery-public-data.github_repos.files"
+                ]
+              }, 
+              {
+                "kind": "WRITE", 
+                "substeps": [
+                  "$1", 
+                  "TO __stage02_output", 
+                  "BY HASH($1)"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "722", 
+            "completedParallelInputs": "451", 
+            "readMsAvg": "362", 
+            "id": "2", 
+            "writeMsMax": "6112"
+          }, 
+          {
+            "status": "COMPLETE", 
+            "parallelInputs": "451", 
+            "shuffleOutputBytes": "0", 
+            "name": "S03: Input", 
+            "computeMsMax": "3565584", 
+            "waitMsMax": "0", 
+            "readMsMax": "1073", 
+            "computeMsAvg": "7905", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "$21:id, $20:repo_name", 
+                  "FROM bigquery-public-data.github_repos.files", 
+                  "WHERE not(like($20, '%aaaa%'))"
+                ]
+              }, 
+              {
+                "kind": "WRITE", 
+                "substeps": [
+                  "$21", 
+                  "TO __stage03_output", 
+                  "BY HASH($21)"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "300", 
+            "completedParallelInputs": "451", 
+            "readMsAvg": "319", 
+            "id": "3", 
+            "writeMsMax": "2667"
+          }, 
+          {
+            "status": "COMPLETE", 
+            "parallelInputs": "3043", 
+            "shuffleOutputBytes": "0", 
+            "name": "S05: Input", 
+            "computeMsMax": "2065596", 
+            "waitMsMax": "0", 
+            "readMsMax": "537", 
+            "computeMsAvg": "678", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "$50", 
+                  "FROM __stage01_output"
+                ]
+              }, 
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "$40:reference_name, $41:start_position", 
+                  "FROM bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0", 
+                  "WHERE equal($40, $40)"
+                ]
+              }, 
+              {
+                "kind": "FILTER", 
+                "substeps": [
+                  "equal($41, $50)"
+                ]
+              }, 
+              {
+                "kind": "WRITE", 
+                "substeps": [
+                  "$40, $41", 
+                  "TO __stage05_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "5", 
+            "completedParallelInputs": "3043", 
+            "readMsAvg": "118", 
+            "id": "5", 
+            "writeMsMax": "341"
+          }, 
+          {
+            "status": "RUNNING", 
+            "parallelInputs": "31", 
+            "shuffleOutputBytes": "0", 
+            "name": "S06: Repartition", 
+            "computeMsMax": "0", 
+            "inputStages": [
+              "3"
+            ], 
+            "readMsMax": "0", 
+            "computeMsAvg": "0", 
+            "id": "6", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "FROM __stage03_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "0", 
+            "completedParallelInputs": "0", 
+            "readMsAvg": "0", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsMax": "0", 
+            "writeMsMax": "0"
+          }, 
+          {
+            "status": "COMPLETE", 
+            "parallelInputs": "31", 
+            "shuffleOutputBytes": "0", 
+            "name": "S07: Repartition", 
+            "computeMsMax": "111058", 
+            "inputStages": [
+              "2"
+            ], 
+            "readMsMax": "0", 
+            "computeMsAvg": "3582", 
+            "id": "7", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "FROM __stage02_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "229", 
+            "completedParallelInputs": "31", 
+            "readMsAvg": "0", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsMax": "0", 
+            "writeMsMax": "674"
+          }, 
+          {
+            "status": "RUNNING", 
+            "parallelInputs": "45", 
+            "shuffleOutputBytes": "0", 
+            "name": "S08: Repartition", 
+            "computeMsMax": "0", 
+            "inputStages": [
+              "6", 
+              "3"
+            ], 
+            "readMsMax": "0", 
+            "computeMsAvg": "0", 
+            "id": "8", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "FROM __stage06_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "0", 
+            "completedParallelInputs": "0", 
+            "readMsAvg": "0", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsMax": "0", 
+            "writeMsMax": "0"
+          }, 
+          {
+            "status": "COMPLETE", 
+            "parallelInputs": "45", 
+            "shuffleOutputBytes": "0", 
+            "name": "S09: Repartition", 
+            "computeMsMax": "193060", 
+            "inputStages": [
+              "7", 
+              "2"
+            ], 
+            "readMsMax": "0", 
+            "computeMsAvg": "4290", 
+            "id": "9", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "FROM __stage07_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "378", 
+            "completedParallelInputs": "45", 
+            "readMsAvg": "0", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsMax": "0", 
+            "writeMsMax": "888"
+          }, 
+          {
+            "status": "RUNNING", 
+            "parallelInputs": "24", 
+            "shuffleOutputBytes": "0", 
+            "name": "S0A: Output", 
+            "computeMsMax": "0", 
+            "inputStages": [
+              "8", 
+              "3"
+            ], 
+            "readMsMax": "0", 
+            "computeMsAvg": "0", 
+            "id": "10", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "FROM __stage08_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "0", 
+            "completedParallelInputs": "0", 
+            "readMsAvg": "0", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsMax": "0", 
+            "writeMsMax": "0"
+          }, 
+          {
+            "status": "COMPLETE", 
+            "parallelInputs": "24", 
+            "shuffleOutputBytes": "0", 
+            "name": "S0B: Output", 
+            "computeMsMax": "107364", 
+            "inputStages": [
+              "9", 
+              "2"
+            ], 
+            "readMsMax": "0", 
+            "computeMsAvg": "4473", 
+            "id": "11", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "FROM __stage09_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "616", 
+            "completedParallelInputs": "24", 
+            "readMsAvg": "0", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsMax": "0", 
+            "writeMsMax": "3040"
+          }, 
+          {
+            "status": "COMPLETE", 
+            "parallelInputs": "40", 
+            "shuffleOutputBytes": "0", 
+            "name": "S0C: Coalesce", 
+            "computeMsMax": "335", 
+            "inputStages": [
+              "5"
+            ], 
+            "readMsMax": "0", 
+            "computeMsAvg": "8", 
+            "id": "12", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "FROM __stage05_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "8", 
+            "completedParallelInputs": "40", 
+            "readMsAvg": "0", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsMax": "0", 
+            "writeMsMax": "11"
+          }, 
+          {
+            "status": "RUNNING", 
+            "parallelInputs": "3043", 
+            "shuffleOutputBytes": "0", 
+            "name": "S0D: Output", 
+            "computeMsMax": "0", 
+            "inputStages": [
+              "12"
+            ], 
+            "readMsMax": "0", 
+            "computeMsAvg": "0", 
+            "id": "13", 
+            "waitMsAvg": "0", 
+            "recordsWritten": "0", 
+            "steps": [
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "$10:end_position", 
+                  "FROM bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0"
+                ]
+              }, 
+              {
+                "kind": "READ", 
+                "substeps": [
+                  "$40, $41", 
+                  "FROM __stage0C_output"
+                ]
+              }, 
+              {
+                "kind": "FILTER", 
+                "substeps": [
+                  "not_equal($71, $72)"
+                ]
+              }, 
+              {
+                "kind": "JOIN", 
+                "substeps": [
+                  "CROSS EACH  WITH ALL "
+                ]
+              }, 
+              {
+                "kind": "WRITE", 
+                "substeps": [
+                  "$70", 
+                  "TO __stage0D_output"
+                ]
+              }
+            ], 
+            "recordsRead": "0", 
+            "writeMsAvg": "0", 
+            "completedParallelInputs": "0", 
+            "readMsAvg": "0", 
+            "shuffleOutputBytesSpilled": "0", 
+            "waitMsMax": "0", 
+            "writeMsMax": "0"
+          }
+        ], 
+        "estimatedBytesProcessed": "421466275948", 
+        "timeline": [
+          {
+            "totalSlotMs": "9646", 
+            "activeUnits": "58", 
+            "completedUnits": "9", 
+            "elapsedMs": "775", 
+            "pendingUnits": "3035"
+          }, 
+          {
+            "totalSlotMs": "108067", 
+            "activeUnits": "869", 
+            "completedUnits": "143", 
+            "elapsedMs": "1788", 
+            "pendingUnits": "2901"
+          }, 
+          {
+            "totalSlotMs": "1905004", 
+            "activeUnits": "1870", 
+            "completedUnits": "2791", 
+            "elapsedMs": "2790", 
+            "pendingUnits": "253"
+          }, 
+          {
+            "totalSlotMs": "2340653", 
+            "activeUnits": "2508", 
+            "completedUnits": "3044", 
+            "elapsedMs": "3805", 
+            "pendingUnits": "6988"
+          }, 
+          {
+            "totalSlotMs": "8627899", 
+            "activeUnits": "6249", 
+            "completedUnits": "4006", 
+            "elapsedMs": "4873", 
+            "pendingUnits": "6226"
+          }, 
+          {
+            "totalSlotMs": "17444777", 
+            "activeUnits": "4206", 
+            "completedUnits": "6089", 
+            "elapsedMs": "5900", 
+            "pendingUnits": "1100"
+          }, 
+          {
+            "totalSlotMs": "19656494", 
+            "activeUnits": "1284", 
+            "completedUnits": "6145", 
+            "elapsedMs": "6948", 
+            "pendingUnits": "4127"
+          }, 
+          {
+            "totalSlotMs": "22191482", 
+            "activeUnits": "1666", 
+            "completedUnits": "6496", 
+            "elapsedMs": "7962", 
+            "pendingUnits": "3776"
+          }, 
+          {
+            "totalSlotMs": "24743857", 
+            "activeUnits": "1389", 
+            "completedUnits": "6890", 
+            "elapsedMs": "8964", 
+            "pendingUnits": "3382"
+          }, 
+          {
+            "totalSlotMs": "27331381", 
+            "activeUnits": "1901", 
+            "completedUnits": "6985", 
+            "elapsedMs": "9988", 
+            "pendingUnits": "3287"
+          }, 
+          {
+            "totalSlotMs": "30845890", 
+            "activeUnits": "2460", 
+            "completedUnits": "7101", 
+            "elapsedMs": "10992", 
+            "pendingUnits": "3171"
+          }, 
+          {
+            "totalSlotMs": "35667848", 
+            "activeUnits": "3008", 
+            "completedUnits": "7111", 
+            "elapsedMs": "12029", 
+            "pendingUnits": "3161"
+          }, 
+          {
+            "totalSlotMs": "41301838", 
+            "activeUnits": "3193", 
+            "completedUnits": "7120", 
+            "elapsedMs": "13054", 
+            "pendingUnits": "3152"
+          }, 
+          {
+            "totalSlotMs": "47337728", 
+            "activeUnits": "3183", 
+            "completedUnits": "7128", 
+            "elapsedMs": "14096", 
+            "pendingUnits": "3144"
+          }, 
+          {
+            "totalSlotMs": "54267956", 
+            "activeUnits": "3182", 
+            "completedUnits": "7129", 
+            "elapsedMs": "15282", 
+            "pendingUnits": "3143"
+          }, 
+          {
+            "totalSlotMs": "63161735", 
+            "activeUnits": "3184", 
+            "completedUnits": "7129", 
+            "elapsedMs": "16789", 
+            "pendingUnits": "3143"
+          }
+        ], 
+        "statementType": "SELECT", 
+        "totalBytesBilled": "23883415552", 
+        "totalBytesProcessed": "23883088970", 
+        "billingTier": 1
+      }, 
+      "endTime": "1563286028476"
+    }, 
+    "jobReference": {
+      "projectId": "cloud-custodian",
+      "location": "US", 
+      "jobId": "bquxjob_4f20e3e0_16bfb128c21"
+    }, 
+    "etag": "1IggsQD4yLIaxpBouxvV0g==", 
+    "selfLink": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/jobs/bquxjob_4f20e3e0_16bfb128c21?location=US",
+    "configuration": {
+      "query": {
+        "useQueryCache": false, 
+        "useLegacySql": false, 
+        "destinationTable": {
+          "projectId": "cloud-custodian",
+          "tableId": "anonea7c2978_e0a3_45c2_87e1_2b567b4753d2", 
+          "datasetId": "_b8ee5f662348751c5edf24cd96f6ff08fbfbfc31"
+        }, 
+        "priority": "INTERACTIVE", 
+        "writeDisposition": "WRITE_TRUNCATE", 
+        "allowLargeResults": false, 
+        "createDisposition": "CREATE_IF_NEEDED", 
+        "query": "WITH GH AS (\nSELECT A.repo_name, A.mode FROM `bigquery-public-data.github_repos.files` as A\nJOIN `bigquery-public-data.github_repos.files` as B ON A.id = B.id\nWHERE A.repo_name NOT LIKE '%aaaa%')\n\nSELECT A.reference_name FROM `bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0` as A\nJOIN `bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0` as B on A.reference_name = A.reference_name\nJOIN GH as C on 1=1\nWHERE A.start_position <> B.end_position AND A.start_position = (SELECT MIN(start_position) FROM `bigquery-public-data.genomics_rice.Rice3K_DeepVariant_Os_Nipponbare_Reference_IRGSP_1_0`)"
+      }, 
+      "jobType": "QUERY"
+    }, 
+    "id": "cloud-custodian:US.bquxjob_4f20e3e0_16bfb128c21",
+    "user_email": "alex.karpitski@gmail.com"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "18444", 
+    "x-xss-protection": "0", 
+    "content-location": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/jobs/bquxjob_4f20e3e0_16bfb128c21?alt=json",
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "etag": "1IggsQD4yLIaxpBouxvV0g==", 
+    "cache-control": "private", 
+    "date": "Tue, 16 Jul 2019 14:08:47 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
+  }
+}
