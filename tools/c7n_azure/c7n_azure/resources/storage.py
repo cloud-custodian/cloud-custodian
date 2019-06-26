@@ -31,7 +31,7 @@ from c7n_azure.utils import ThreadHelper
 from netaddr import IPNetwork
 
 from c7n.filters.core import type_schema
-from c7n.utils import local_session
+from c7n.utils import local_session, get_annotation_prefix
 
 
 @resources.register('storage')
@@ -155,18 +155,18 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
     TABLE_TYPE = 'table'
     FILE_TYPE = 'file'
 
-    def __init__(self, data, manager=None):
-        super(StorageDiagnosticSettingsFilter, self).__init__(data, manager)
-        self.storage_type = data['storage_type']
-        self.log = logging.getLogger('custodian.azure.storage')
-
     schema = type_schema('storage-diagnostic-settings',
                          rinherit=ValueFilter.schema,
-                         storage_type={
+                         **{'storage-type': {
                              'type': 'string',
-                             'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]},
-                         required=['storage_type'],
+                             'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]}},
+                         required=['storage-type'],
                          )
+
+    def __init__(self, data, manager=None):
+        super(StorageDiagnosticSettingsFilter, self).__init__(data, manager)
+        self.storage_type = data['storage-type']
+        self.log = logging.getLogger('custodian.azure.storage')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
@@ -196,28 +196,32 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     def _get_settings(self, storage_account, session=None, token=None):
         if self.storage_type == self.BLOB_TYPE:
-            if not (self.BLOB_TYPE in storage_account):
-                storage_account[self.BLOB_TYPE] = json.loads(jsonpickle.encode(
+            blob_property = get_annotation_prefix(self.BLOB_TYPE)
+            if not (blob_property in storage_account):
+                storage_account[blob_property] = json.loads(jsonpickle.encode(
                     StorageSettingsUtilities.get_blob_settings(storage_account, token)))
-            return storage_account[self.BLOB_TYPE]
+            return storage_account[blob_property]
 
         elif self.storage_type == self.FILE_TYPE:
-            if not (self.FILE_TYPE in storage_account):
-                storage_account[self.FILE_TYPE] = json.loads(jsonpickle.encode(
+            file_property = get_annotation_prefix(self.FILE_TYPE)
+            if not (file_property in storage_account):
+                storage_account[file_property] = json.loads(jsonpickle.encode(
                     StorageSettingsUtilities.get_file_settings(storage_account, session)))
-            return storage_account[self.FILE_TYPE]
+            return storage_account[file_property]
 
         elif self.storage_type == self.TABLE_TYPE:
-            if not (self.TABLE_TYPE in storage_account):
-                storage_account[self.TABLE_TYPE] = json.loads(jsonpickle.encode(
+            table_property = get_annotation_prefix(self.TABLE_TYPE)
+            if not (table_property in storage_account):
+                storage_account[table_property] = json.loads(jsonpickle.encode(
                     StorageSettingsUtilities.get_table_settings(storage_account, session)))
-            return storage_account[self.TABLE_TYPE]
+            return storage_account[table_property]
 
         elif self.storage_type == self.QUEUE_TYPE:
-            if not (self.QUEUE_TYPE in storage_account):
-                storage_account[self.QUEUE_TYPE] = json.loads(jsonpickle.encode(
+            queue_property = get_annotation_prefix(self.QUEUE_TYPE)
+            if not (queue_property in storage_account):
+                storage_account[queue_property] = json.loads(jsonpickle.encode(
                     StorageSettingsUtilities.get_queue_settings(storage_account, token)))
-            return storage_account[self.QUEUE_TYPE]
+            return storage_account[queue_property]
 
 
 class StorageSettingsUtilities(object):

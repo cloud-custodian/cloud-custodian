@@ -17,6 +17,8 @@ from azure_common import BaseTest, arm_template
 from c7n_azure.resources.storage import StorageSettingsUtilities
 from mock import patch, MagicMock
 
+from c7n.utils import get_annotation_prefix
+
 
 class StorageTest(BaseTest):
     def setUp(self):
@@ -159,14 +161,14 @@ class StorageTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'},
                 {'type': 'storage-diagnostic-settings',
-                 'storage_type': 'blob',
+                 'storage-type': 'blob',
                  'key': 'logging.delete',
                  'value': False}],
         }, validate=True)
 
         resources = p.run()
         self.assertEqual(1, len(resources))
-        self.assertTrue('blob' in resources[0])
+        self.assertTrue(get_annotation_prefix('blob') in resources[0])
 
     @arm_template('storage.json')
     def test_diagnostic_settings_file_storage_type(self):
@@ -180,14 +182,14 @@ class StorageTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'},
                 {'type': 'storage-diagnostic-settings',
-                 'storage_type': 'file',
+                 'storage-type': 'file',
                  'key': 'hour_metrics.enabled',
                  'value': True}],
         }, validate=True)
 
         resources = p.run()
         self.assertEqual(1, len(resources))
-        self.assertTrue('file' in resources[0])
+        self.assertTrue(get_annotation_prefix('file') in resources[0])
 
     @arm_template('storage.json')
     def test_diagnostic_settings_queue_storage_type(self):
@@ -201,14 +203,14 @@ class StorageTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'},
                 {'type': 'storage-diagnostic-settings',
-                 'storage_type': 'queue',
+                 'storage-type': 'queue',
                  'key': 'logging.delete',
                  'value': False}],
         }, validate=True)
 
         resources = p.run()
         self.assertEqual(1, len(resources))
-        self.assertTrue('queue' in resources[0])
+        self.assertTrue(get_annotation_prefix('queue') in resources[0])
 
     @arm_template('storage.json')
     def test_diagnostic_settings_table_storage_type(self):
@@ -222,14 +224,14 @@ class StorageTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'},
                 {'type': 'storage-diagnostic-settings',
-                 'storage_type': 'table',
+                 'storage-type': 'table',
                  'key': 'logging.delete',
                  'value': False}],
         }, validate=True)
 
         resources = p.run()
         self.assertEqual(1, len(resources))
-        self.assertTrue('table' in resources[0])
+        self.assertTrue(get_annotation_prefix('table') in resources[0])
 
     @patch('azure.storage.blob.blockblobservice.BlockBlobService.get_blob_service_properties')
     def test_storage_settings_get_blob_settings(self, mock_blob_properties_call):
