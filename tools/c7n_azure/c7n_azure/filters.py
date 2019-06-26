@@ -484,15 +484,16 @@ class FirewallRulesFilter(Filter):
 class ResourceLockFilter(Filter):
     """
     Filter locked resources.
-    Lock can be of 2 types: ReadOnly and CanNotDelete. To filter any lock, use "Any".
+    Lock can be of 2 types: ReadOnly and CanNotDelete. To filter any lock, use "Any" type.
     Lock type is optional, by default any lock will be applied to the filter.
+    To get unlocked resources, use "Absent" type.
 
     :example: Get all keyvaults with ReadOnly lock:
 
     .. code-block :: yaml
 
        policies:
-        - name: lock-filter
+        - name: locked-keyvaults
           resource: azure.keyvault
           filters:
             - type: resource-lock
@@ -503,7 +504,7 @@ class ResourceLockFilter(Filter):
     .. code-block :: yaml
 
        policies:
-        - name: lock-filter
+        - name: locked-sqldatabases
           resource: azure.sqldatabase
           filters:
             - type: resource-lock
@@ -513,7 +514,7 @@ class ResourceLockFilter(Filter):
     .. code-block :: yaml
 
        policies:
-        - name: lock-filter
+        - name: unlock-rgs
           resource: azure.resourcegroup
           filters:
             - type: resource-lock
@@ -526,6 +527,8 @@ class ResourceLockFilter(Filter):
         **{
             'lock-type': {'enum': ['ReadOnly', 'CanNotDelete', 'Any', 'Absent']},
         })
+
+    schema_alias = True
 
     def __init__(self, data, manager=None):
         super(ResourceLockFilter, self).__init__(data, manager)

@@ -29,8 +29,8 @@ class LockAction(AzureBaseAction):
     Lock can be of 2 types: ReadOnly and CanNotDelete. Lock type is required.
 
     To create or delete management locks, you must have proper access.
-    See [Who can create or delete locks](https://docs.microsoft.com/en-us/azure/
-    azure-resource-manager/resource-group-lock-resources#who-can-create-or-delete-locks)
+    See `Who can create or delete locks <https://docs.microsoft.com/en-us/azure/
+    azure-resource-manager/resource-group-lock-resources#who-can-create-or-delete-locks>`_
 
     :example: Add ReadOnly lock to all keyvaults:
 
@@ -51,6 +51,8 @@ class LockAction(AzureBaseAction):
             'lock-type': {'enum': ['ReadOnly', 'CanNotDelete']}
         }
     )
+
+    schema_alias = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(LockAction, self).__init__(data, manager, log_dir)
