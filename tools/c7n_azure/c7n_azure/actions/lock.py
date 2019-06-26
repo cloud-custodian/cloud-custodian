@@ -1,8 +1,21 @@
+# Copyright 2019 Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from c7n_azure.utils import ResourceIdParser
 
 from c7n.utils import type_schema
 from c7n_azure.actions.base import AzureBaseAction
-from azure.mgmt.resource.locks import ManagementLockClient
 from azure.mgmt.resource.locks.models import ManagementLockObject
 
 
@@ -35,32 +48,31 @@ class LockAction(AzureBaseAction):
         'lock',
         required=['lock-type'],
         **{
-            'lock-type': {'type': 'string'}
+            'lock-type': {'enum': ['ReadOnly', 'CanNotDelete']}
         }
     )
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(LockAction, self).__init__(data, manager, log_dir)
-        self.method = 'POST'
         self.lock_type = self.data['lock-type']
 
-    def _process_resource(self, resource):
-        s = self.manager.get_session()
-        client = ManagementLockClient(s.get_credentials(), s.subscription_id)
+    def _prepare_processing(self):
+        self.client = self.manager.get_client('azure.mgmt.resource.locks.ManagementLockClient')
 
+    def _process_resource(self, resource):
         if resource.get('resourceGroup') is None:
-            client.management_locks.create_or_update_at_resource_group_level(
+            self.client.management_locks.create_or_update_at_resource_group_level(
                 resource['name'],
                 'lock_' + resource['name'] + '_' + self.lock_type,
                 ManagementLockObject(level=self.lock_type)
             )
         else:
-            client.management_locks.create_or_update_at_resource_level(
+            self.client.management_locks.create_or_update_at_resource_level(
                 resource['resourceGroup'],
                 ResourceIdParser.get_namespace(resource['id']),
                 ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
                 ResourceIdParser.get_resource_type(resource['id']),
                 resource['name'],
-                'lock_' + resource['name'] + '_' + self.lock_type,
+                'custodian_lock_' + resource['name'] + '_' + self.lock_type,
                 ManagementLockObject(level=self.lock_type)
             )

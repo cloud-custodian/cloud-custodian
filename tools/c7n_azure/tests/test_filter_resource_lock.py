@@ -86,3 +86,16 @@ class ResourceLockFilter(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @arm_template('cosmosdb.json')
+    def test_find_by_lock_type_absent(self):
+        p = self.load_policy({
+            'name': 'test-lock-filter',
+            'resource': 'azure.cosmosdb',
+            'filters': [
+                {'type': 'resource-lock',
+                 'lock-type': 'Absent'}
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

@@ -18,7 +18,6 @@ from datetime import timedelta
 
 import six
 from azure.mgmt.policyinsights import PolicyInsightsClient
-from azure.mgmt.resource.locks import ManagementLockClient
 
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import IpRangeHelper, ResourceIdParser, StringUtils
@@ -517,24 +516,34 @@ class ResourceLockFilter(Filter):
         - name: lock-filter
           resource: azure.resourcegroup
           filters:
-            - not:
-                - type: resource-lock
+            - type: resource-lock
+              lock-type: Absent
 
     """
 
     schema = type_schema(
         'resource-lock', required=['type'],
         **{
-            'lock-type': {'type': 'string'}
+            'lock-type': {'enum': ['ReadOnly', 'CanNotDelete', 'Any', 'Absent']},
         })
 
     def __init__(self, data, manager=None):
         super(ResourceLockFilter, self).__init__(data, manager)
-        self.lock_type = self.data.get('lock-type', 'any')
+        self.lock_type = self.data.get('lock-type', 'Any')
 
     def process(self, resources, event=None):
-        s = self.manager.get_session()
-        client = ManagementLockClient(s.get_credentials(), s.subscription_id)
+        result, _ = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=self.log
+        )
+
+        return result
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client('azure.mgmt.resource.locks.ManagementLockClient')
         result = []
         for resource in resources:
             if resource.get('resourceGroup') is None:
@@ -549,10 +558,13 @@ class ResourceLockFilter(Filter):
                     ResourceIdParser.get_resource_type(resource['id']),
                     resource['name'])]
 
-            for lock in locks:
-                if StringUtils.equal('any', self.lock_type) or \
-                        StringUtils.equal(lock['properties']['level'], self.lock_type):
-                    result.append(resource)
-                    break
+            if StringUtils.equal('Absent', self.lock_type) and not locks:
+                result.append(resource)
+            else:
+                for lock in locks:
+                    if StringUtils.equal('Any', self.lock_type) or \
+                            StringUtils.equal(lock['properties']['level'], self.lock_type):
+                        result.append(resource)
+                        break
 
         return result

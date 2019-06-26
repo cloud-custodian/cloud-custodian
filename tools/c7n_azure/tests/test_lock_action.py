@@ -13,10 +13,38 @@
 # limitations under the License.
 
 from azure_common import BaseTest, arm_template
+from c7n_azure.utils import ResourceIdParser
 from jsonschema.exceptions import ValidationError
+from c7n_azure.session import Session
+
+from c7n.utils import local_session
 
 
 class LockActionTest(BaseTest):
+
+    def setUp(self):
+        super(LockActionTest, self).setUp()
+        self.client = local_session(Session).client(
+            'azure.mgmt.resource.locks.ManagementLockClient')
+        self.resources = []
+
+    def tearDown(self):
+        if self.resources:
+            self.assertEqual(len(self.resources), 1)
+            resource = self.resources[0]
+            if resource.get('resourceGroup') is None:
+                self.client.management_locks.delete_at_resource_group_level(
+                    resource['name'],
+                    resource['lock'])
+            else:
+                self.client.management_locks.delete_at_resource_level(
+                    resource['resourceGroup'],
+                    ResourceIdParser.get_namespace(resource['id']),
+                    ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
+                    ResourceIdParser.get_resource_type(resource['id']),
+                    resource['name'],
+                    resource['lock']
+                )
 
     def test_valid_policy(self):
         policy = {
@@ -66,20 +94,20 @@ class LockActionTest(BaseTest):
                 }
             ],
         })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.resources = p.run()
+        self.assertEqual(len(self.resources), 1)
+        self.assertEqual(self.resources[0]['name'], 'cctestcosmosdb')
 
-        p = self.load_policy({
-            'name': 'test-lock-filter',
-            'resource': 'azure.cosmosdb',
-            'filters': [
-                {'type': 'resource-lock',
-                 'lock-type': 'ReadOnly'}
-            ]
-        })
-        resources = p.run()
+        locks = [r.serialize(True) for r in self.client.management_locks.list_at_resource_level(
+            'test_cosmosdb',
+            'Microsoft.DocumentDB',
+            '',
+            'databaseAccounts',
+            'cctestcosmosdb')]
 
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(locks), 1)
+        self.assertEqual(locks[0]['properties']['level'], 'ReadOnly')
+        self.resources[0]['lock'] = locks[0]['name']
 
     @arm_template('cosmosdb.json')
     def test_lock_action_resource_group(self):
@@ -100,42 +128,16 @@ class LockActionTest(BaseTest):
                 }
             ],
         })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.resources = p.run()
+        self.assertEqual(len(self.resources), 1)
+        self.assertEqual(self.resources[0]['name'], 'test_cosmosdb')
 
-        p = self.load_policy({
-            'name': 'test-lock-filter',
-            'resource': 'azure.resourcegroup',
-            'filters': [
-                {
-                    'type': 'value',
-                    'key': 'name',
-                    'value': 'test_cosmosdb'
-                },
-                {'type': 'resource-lock',
-                 'lock-type': 'CanNotDelete'}
-            ]
-        })
-        resources = p.run()
+        locks = [r.serialize(True) for r in
+                 self.client.management_locks.list_at_resource_group_level('test_cosmosdb')]
 
-        self.assertEqual(len(resources), 1)
-
-        p = self.load_policy({
-            'name': 'test-lock-filter',
-            'resource': 'azure.cosmosdb',
-
-            'filters': [
-                {
-                    'type': 'value',
-                    'key': 'name',
-                    'value': 'cctestcosmosdb'
-                },
-                {'type': 'resource-lock',
-                 'lock-type': 'CanNotDelete'}
-            ]
-        })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(locks), 1)
+        self.assertEqual(locks[0]['properties']['level'], 'CanNotDelete')
+        self.resources[0]['lock'] = locks[0]['name']
 
     @arm_template('sqlserver.json')
     def test_lock_action_child_resource(self):
@@ -156,24 +158,17 @@ class LockActionTest(BaseTest):
                 }
             ],
         })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.resources = p.run()
+        self.assertEqual(len(self.resources), 1)
+        self.assertEqual(self.resources[0]['name'], 'cctestdb')
 
-        p = self.load_policy({
-            'name': 'test-lock-filter',
-            'resource': 'azure.sqldatabase',
-            'filters': [
-                {
-                    'type': 'value',
-                    'key': 'name',
-                    'value': 'cctestdb'
-                },
-                {
-                    'type': 'resource-lock',
-                    'lock-type': 'CanNotDelete'
-                }
-            ]
-        })
-        resources = p.run()
+        locks = [r.serialize(True) for r in self.client.management_locks.list_at_resource_level(
+            'test_sqlserver',
+            'Microsoft.Sql/servers',
+            'cctestsqlserverj6y6cbbtaphs4',
+            'databases',
+            'cctestdb')]
 
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(locks), 1)
+        self.assertEqual(locks[0]['properties']['level'], 'CanNotDelete')
+        self.resources[0]['lock'] = locks[0]['name']

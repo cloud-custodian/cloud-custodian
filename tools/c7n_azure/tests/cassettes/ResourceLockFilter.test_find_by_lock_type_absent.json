@@ -14,17 +14,17 @@
                     "message": "Ok"
                 },
                 "headers": {
+                    "date": [
+                        "Wed, 26 Jun 2019 17:16:04 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
                     "cache-control": [
                         "no-store, no-cache"
                     ],
                     "x-ms-gatewayversion": [
                         "version=2.4.0.0"
-                    ],
-                    "date": [
-                        "Wed, 26 Jun 2019 17:06:20 GMT"
-                    ],
-                    "content-type": [
-                        "application/json"
                     ],
                     "content-length": [
                         "1797"
@@ -108,47 +108,6 @@
         },
         {
             "request": {
-                "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestcosmosdb_ReadOnly?api-version=2016-09-01",
-                "body": "mock_body",
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 201,
-                    "message": "Created"
-                },
-                "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "352"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
-                    ],
-                    "date": [
-                        "Wed, 26 Jun 2019 17:06:20 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "properties": {
-                            "level": "ReadOnly"
-                        },
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestcosmosdb_ReadOnly",
-                        "type": "Microsoft.Authorization/locks",
-                        "name": "custodian_lock_cctestcosmosdb_ReadOnly"
-                    }
-                }
-            }
-        },
-        {
-            "request": {
                 "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
                 "body": null,
@@ -160,63 +119,23 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "date": [
-                        "Wed, 26 Jun 2019 17:06:20 GMT"
+                        "Wed, 26 Jun 2019 17:16:05 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "content-length": [
-                        "364"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "value": [
-                            {
-                                "properties": {
-                                    "level": "ReadOnly"
-                                },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestcosmosdb_ReadOnly",
-                                "type": "Microsoft.Authorization/locks",
-                                "name": "custodian_lock_cctestcosmosdb_ReadOnly"
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "DELETE",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestcosmosdb_ReadOnly?api-version=2016-09-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
                     "cache-control": [
                         "no-cache"
                     ],
                     "content-length": [
-                        "0"
-                    ],
-                    "date": [
-                        "Wed, 26 Jun 2019 17:06:21 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-deletes": [
-                        "14999"
+                        "12"
                     ]
                 },
                 "body": {
-                    "string": ""
+                    "data": {
+                        "value": []
+                    }
                 }
             }
         }
