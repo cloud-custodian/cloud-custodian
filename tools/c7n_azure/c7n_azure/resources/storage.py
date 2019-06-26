@@ -118,6 +118,37 @@ class StorageFirewallRulesFilter(FirewallRulesFilter):
 
 @Storage.filter_registry.register('storage-diagnostic-settings')
 class StorageDiagnosticSettingsFilter(ValueFilter):
+    """Filters storage accounts based on its diagnostic settings. The filter requires specifying the storage type
+    (blob, queue, table, file) and will filter based on the settings for that specific type.
+
+     :example:
+
+    Find all storage accounts that have a 'delete' logging setting disabled.
+
+     .. code-block:: yaml
+
+        policies:
+            - name: find-accounts-with-delete-logging-disabled
+              resource: azure.storage
+              filters:
+                -or:
+                    - type: storage-diagnostic-settings
+                      storage_type: blob
+                      key: logging.delete
+                      op: eq
+                      value: False
+                    - type: storage-diagnostic-settings
+                      storage_type: queue
+                      key: logging.delete
+                      op: eq
+                      value: False
+                    - type: storage-diagnostic-settings
+                      storage_type: table
+                      key: logging.delete
+                      op: eq
+                      value: False
+    """
+
     BLOB_TYPE = 'blob'
     QUEUE_TYPE = 'queue'
     TABLE_TYPE = 'table'
