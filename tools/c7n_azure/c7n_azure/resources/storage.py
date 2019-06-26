@@ -131,7 +131,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
             - name: find-accounts-with-delete-logging-disabled
               resource: azure.storage
               filters:
-                -or:
+                - or:
                     - type: storage-diagnostic-settings
                       storage_type: blob
                       key: logging.delete
