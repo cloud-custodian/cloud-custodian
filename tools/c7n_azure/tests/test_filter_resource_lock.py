@@ -81,7 +81,7 @@ class ResourceLockFilter(BaseTest):
             'resource': 'azure.keyvault',
             'filters': [
                 {'type': 'resource-lock',
-                 'lock-type': 'any'}
+                 'lock-type': 'Any'}
             ]
         })
         resources = p.run()
