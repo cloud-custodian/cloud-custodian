@@ -165,7 +165,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     def __init__(self, data, manager=None):
         super(StorageDiagnosticSettingsFilter, self).__init__(data, manager)
-        self.storage_type = data['storage-type']
+        self.storage_type = data.get('storage-type')
         self.log = logging.getLogger('custodian.azure.storage')
 
     def process(self, resources, event=None):
