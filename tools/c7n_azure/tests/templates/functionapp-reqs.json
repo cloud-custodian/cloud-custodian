@@ -10,7 +10,7 @@
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('storageAccountName')]",
-      "location": "westus2",
+      "location": "centralus",
       "properties": {
         "accountType": "Standard_LRS"
       }
@@ -19,17 +19,20 @@
       "apiVersion": "2016-09-01",
       "name": "[variables('appHostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
-      "location": "westus2",
+      "location": "centralus",
       "properties": {
         "name": "[variables('appHostingPlanName')]",
-        "workerSizeId": "0",
+        "perSiteScaling": false,
         "reserved": true,
-        "numberOfWorkers": "1",
-        "hostingEnvironment": ""
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0
       },
       "sku": {
-        "Tier": "Basic",
-        "Name": "B1"
+        "name": "B1",
+        "tier": "Basic",
+        "size": "B1",
+        "family": "B",
+        "capacity": 1
       },
       "kind": "linux"
     },
@@ -38,9 +41,6 @@
       "name": "cloud-custodian-test",
       "type": "microsoft.insights/components",
       "location": "westus2",
-      "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', 'cloud-custodian-test')]": "Resource"
-      },
       "properties": {
         "ApplicationId": "cloud-custodian-test",
         "Request_Source": "IbizaWebAppExtensionCreate"
@@ -51,7 +51,7 @@
       "kind": "functionapp,linux,container",
       "name": "[variables('functionAppName')]",
       "apiVersion": "2016-08-01",
-      "location": "westus2",
+      "location": "centralus",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
