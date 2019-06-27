@@ -57,7 +57,7 @@ class MLModelTest(BaseTest):
 class MLJobTest(BaseTest):
 
     def test_jobs_query(self):
-        project_id = 'mythic-tribute-232915'  # 'cloud-custodian'
+        project_id = 'cloud-custodian'
 
         session_factory = self.replay_flight_data(
             'ml-jobs-query', project_id)
@@ -73,7 +73,7 @@ class MLJobTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_jobs_get(self):
-        project_id = 'mythic-tribute-232915'  # 'cloud-custodian'
+        project_id = 'cloud-custodian'
         id = "test_job"
 
         session_factory = self.replay_flight_data(
@@ -92,3 +92,46 @@ class MLJobTest(BaseTest):
         })
 
         self.assertEqual(resource['jobId'], id)
+
+
+class MLOperationTest(BaseTest):
+
+    def test_operations_query(self):
+        project_id = 'cloud-custodian'
+
+        session_factory = self.replay_flight_data(
+            'ml-operations-query', project_id)
+
+        policy = self.load_policy(
+            {
+                'name': 'ml-operations-query',
+                'resource': 'gcp.ml-operation'
+            },
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_operations_get(self):
+        project_id = 'cloud-custodian'
+        name = "delete_model_test-1553258598"
+
+        session_factory = self.replay_flight_data(
+            'ml-operations-query-get', project_id)
+
+        policy = self.load_policy(
+            {
+                'name': 'ml-operations-query-get',
+                'resource': 'gcp.ml-operation'
+            },
+            session_factory=session_factory)
+
+        resource = policy.resource_manager.get_resource({
+            "name": name,
+            "project_id": project_id,
+        })
+
+        self.assertEqual(resource['name'], 'projects/{}/operations/{}'.format(
+            project_id,
+            name
+        ))

@@ -56,3 +56,24 @@ class MLJob(QueryResourceManager):
                 'get', {'name': 'projects/{}/jobs/{}'.format(
                     resource_info['project_id'],
                     resource_info['name'].rsplit('/', 1)[-1])})
+
+
+@resources.register('ml-operation')
+class MLOperation(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ml'
+        version = 'v1'
+        component = 'projects.operations'
+        enum_spec = ('list', 'operations[]', None)
+        scope = 'project'
+        scope_key = 'name'
+        scope_template = 'projects/{}'
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_query(
+                'get', {'name': 'projects/{}/operations/{}'.format(
+                    resource_info['project_id'],
+                    resource_info['name'])})
