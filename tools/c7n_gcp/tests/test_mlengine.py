@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from gcp_common import BaseTest
+
+from gcp_common import BaseTest, event_data
 
 
 class MLModelTest(BaseTest):
@@ -36,22 +37,19 @@ class MLModelTest(BaseTest):
         project_id = 'cloud-custodian'
         name = "test_model"
 
-        session_factory = self.replay_flight_data(
-            'ml-models-query-get', project_id)
-
-        policy = self.load_policy(
-            {
-                'name': 'ml-models-query-get',
-                'resource': 'gcp.ml-model'
-            },
-            session_factory=session_factory)
-
-        resource = policy.resource_manager.get_resource({
-            "name": name,
-            "project_id": project_id,
-        })
-
-        self.assertEqual(resource['name'], "projects/cloud-custodian/models/{}".format(name))
+        factory = self.replay_flight_data('ml-model-get', project_id=project_id)
+        p = self.load_policy({
+            'name': 'ml-model-get',
+            'resource': 'gcp.ml-model',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.ml.v1.ModelService.CreateModel']
+            }
+        }, session_factory=factory)
+        exec_mode = p.get_execution_mode()
+        event = event_data('ml-model-create.json')
+        models = exec_mode.run(event, None)
+        self.assertIn(name, models[0])
 
 
 class MLJobTest(BaseTest):
@@ -92,46 +90,3 @@ class MLJobTest(BaseTest):
         })
 
         self.assertEqual(resource['jobId'], id)
-
-
-class MLOperationTest(BaseTest):
-
-    def test_operations_query(self):
-        project_id = 'cloud-custodian'
-
-        session_factory = self.replay_flight_data(
-            'ml-operations-query', project_id)
-
-        policy = self.load_policy(
-            {
-                'name': 'ml-operations-query',
-                'resource': 'gcp.ml-operation'
-            },
-            session_factory=session_factory)
-
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-    def test_operations_get(self):
-        project_id = 'cloud-custodian'
-        name = "delete_model_test-1553258598"
-
-        session_factory = self.replay_flight_data(
-            'ml-operations-query-get', project_id)
-
-        policy = self.load_policy(
-            {
-                'name': 'ml-operations-query-get',
-                'resource': 'gcp.ml-operation'
-            },
-            session_factory=session_factory)
-
-        resource = policy.resource_manager.get_resource({
-            "name": name,
-            "project_id": project_id,
-        })
-
-        self.assertEqual(resource['name'], 'projects/{}/operations/{}'.format(
-            project_id,
-            name
-        ))
