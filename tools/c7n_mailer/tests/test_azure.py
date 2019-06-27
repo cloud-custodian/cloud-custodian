@@ -23,7 +23,7 @@ from c7n_mailer.azure.sendgrid_delivery import SendGridDelivery
 from c7n_mailer.azure import deploy
 from common import MAILER_CONFIG_AZURE, ASQ_MESSAGE, ASQ_MESSAGE_TAG, logger
 
-from mock import MagicMock, patch, Mock, ANY
+from mock import MagicMock, patch, ANY
 
 
 class AzureTest(unittest.TestCase):
