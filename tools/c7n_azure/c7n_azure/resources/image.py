@@ -45,4 +45,3 @@ class Image(ArmResourceManager):
             'resourceGroup',
         )
         resource_type = 'Microsoft.Compute/images'
-
