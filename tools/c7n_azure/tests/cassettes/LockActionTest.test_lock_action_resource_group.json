@@ -1,0 +1,288 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "3110"
+                    ],
+                    "date": [
+                        "Wed, 26 Jun 2019 17:06:22 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anluong-custodian",
+                                "name": "anluong-custodian",
+                                "location": "westus2",
+                                "tags": {
+                                    "RG-Owner": "anluong@microsoft.com",
+                                    "CreatorEmail": "anluong@microsoft.com"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-11",
+                                "name": "anzoloch-11",
+                                "location": "centralus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc",
+                                "name": "anzoloch-cc",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-test-cc",
+                                "name": "anzoloch-test-cc",
+                                "location": "westus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/catay-function-app",
+                                "name": "catay-function-app",
+                                "location": "centralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/catay-test",
+                                "name": "catay-test",
+                                "location": "westus2",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian",
+                                "name": "cloud-custodian",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-cask",
+                                "name": "custodian-cask",
+                                "location": "westus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-sendgrid",
+                                "name": "custodian-sendgrid",
+                                "location": "centralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/erwelch-test",
+                                "name": "erwelch-test",
+                                "location": "westus2",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/NetworkWatcherRG",
+                                "name": "NetworkWatcherRG",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb",
+                                "name": "test_cosmosdb",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs",
+                                "name": "test_functionapp-reqs",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault",
+                                "name": "test_keyvault",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver",
+                                "name": "test_sqlserver",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage",
+                                "name": "test_storage",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/lock_test_cosmosdb_CanNotDelete?api-version=2016-09-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "279"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "date": [
+                        "Wed, 26 Jun 2019 17:06:23 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "level": "CanNotDelete"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/lock_test_cosmosdb_CanNotDelete",
+                        "type": "Microsoft.Authorization/locks",
+                        "name": "lock_test_cosmosdb_CanNotDelete"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 26 Jun 2019 17:06:23 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "291"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "level": "CanNotDelete"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/lock_test_cosmosdb_CanNotDelete",
+                                "type": "Microsoft.Authorization/locks",
+                                "name": "lock_test_cosmosdb_CanNotDelete"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/lock_test_cosmosdb_CanNotDelete?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "date": [
+                        "Wed, 26 Jun 2019 17:06:24 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "14999"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        }
+    ]
+}

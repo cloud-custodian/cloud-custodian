@@ -18,8 +18,9 @@ from datetime import timedelta
 
 import six
 from azure.mgmt.policyinsights import PolicyInsightsClient
+
 from c7n_azure.tags import TagHelper
-from c7n_azure.utils import IpRangeHelper
+from c7n_azure.utils import IpRangeHelper, ResourceIdParser, StringUtils
 from c7n_azure.utils import Math
 from c7n_azure.utils import ThreadHelper
 from c7n_azure.utils import now
@@ -478,3 +479,96 @@ class FirewallRulesFilter(Filter):
             return self.policy_include.issubset(resource_rules)
         else:  # validated earlier, can never happen
             raise FilterValidationError("Internal error.")
+
+
+class ResourceLockFilter(Filter):
+    """
+    Filter locked resources.
+    Lock can be of 2 types: ReadOnly and CanNotDelete. To filter any lock, use "Any" type.
+    Lock type is optional, by default any lock will be applied to the filter.
+    To get unlocked resources, use "Absent" type.
+
+    :example: Get all keyvaults with ReadOnly lock:
+
+    .. code-block :: yaml
+
+       policies:
+        - name: locked-keyvaults
+          resource: azure.keyvault
+          filters:
+            - type: resource-lock
+              lock-type: ReadOnly
+
+    :example: Get all locked sqldatabases (any type of lock):
+
+    .. code-block :: yaml
+
+       policies:
+        - name: locked-sqldatabases
+          resource: azure.sqldatabase
+          filters:
+            - type: resource-lock
+
+    :example: Get all unlocked resource groups:
+
+    .. code-block :: yaml
+
+       policies:
+        - name: unlock-rgs
+          resource: azure.resourcegroup
+          filters:
+            - type: resource-lock
+              lock-type: Absent
+
+    """
+
+    schema = type_schema(
+        'resource-lock', required=['type'],
+        **{
+            'lock-type': {'enum': ['ReadOnly', 'CanNotDelete', 'Any', 'Absent']},
+        })
+
+    schema_alias = True
+
+    def __init__(self, data, manager=None):
+        super(ResourceLockFilter, self).__init__(data, manager)
+        self.lock_type = self.data.get('lock-type', 'Any')
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=self.log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client('azure.mgmt.resource.locks.ManagementLockClient')
+        result = []
+        for resource in resources:
+            if resource.get('resourceGroup') is None:
+                locks = [r.serialize(True) for r in
+                         client.management_locks.list_at_resource_group_level(
+                    resource['name'])]
+            else:
+                locks = [r.serialize(True) for r in client.management_locks.list_at_resource_level(
+                    resource['resourceGroup'],
+                    ResourceIdParser.get_namespace(resource['id']),
+                    ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
+                    ResourceIdParser.get_resource_type(resource['id']),
+                    resource['name'])]
+
+            if StringUtils.equal('Absent', self.lock_type) and not locks:
+                result.append(resource)
+            else:
+                for lock in locks:
+                    if StringUtils.equal('Any', self.lock_type) or \
+                            StringUtils.equal(lock['properties']['level'], self.lock_type):
+                        result.append(resource)
+                        break
+
+        return result
