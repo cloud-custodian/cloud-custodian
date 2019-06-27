@@ -156,14 +156,15 @@ class ThreadHelper:
     @staticmethod
     def execute_in_parallel(resources, event, execution_method, executor_factory, log,
                             max_workers=constants.DEFAULT_MAX_THREAD_WORKERS,
-                            chunk_size=constants.DEFAULT_CHUNK_SIZE):
+                            chunk_size=constants.DEFAULT_CHUNK_SIZE,
+                            **kwargs):
         futures = []
         results = []
         exceptions = []
 
         if ThreadHelper.disable_multi_threading:
             try:
-                result = execution_method(resources, event)
+                result = execution_method(resources, event, **kwargs)
                 if result:
                     results.extend(result)
             except Exception as e:
@@ -171,7 +172,7 @@ class ThreadHelper:
         else:
             with executor_factory(max_workers=max_workers) as w:
                 for resource_set in chunks(resources, chunk_size):
-                    futures.append(w.submit(execution_method, resource_set, event))
+                    futures.append(w.submit(execution_method, resource_set, event, **kwargs))
 
                 for f in as_completed(futures):
                     if f.exception():

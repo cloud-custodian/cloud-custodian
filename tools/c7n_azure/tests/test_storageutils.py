@@ -14,9 +14,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template, requires_arm_polling
-from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.session import Session
+from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser
+from azure.mgmt.storage.models import StorageAccountListKeysResult, StorageAccountKey
+from mock import patch
+
+from c7n.utils import local_session
 
 
 @requires_arm_polling
@@ -96,6 +100,21 @@ class StorageUtilsTest(BaseTest):
         token = StorageUtilities.get_storage_token(self.session)
         self.assertIsNotNone(token.token)
 
+    def test_get_storage_primary_key(self):
+        key1 = StorageAccountKey()
+        key1.key_name = "key1"
+        key1.value = "mock_storage_key"
+
+        data = StorageAccountListKeysResult()
+        data.keys = [key1]
+
+        with patch(self._get_storage_client_string() + '.list_keys', return_value=data) \
+                as list_keys_mock:
+            primary_key = StorageUtilities.get_storage_primary_key(
+                'mock_rg_group', 'mock_account', self.session)
+            list_keys_mock.assert_called_with('mock_rg_group', 'mock_account')
+            self.assertEqual(primary_key, data.keys[0].value)
+
     @arm_template('storage.json')
     def test_get_blob_client_from_storage_account_without_sas(self):
         account = self.setup_account()
@@ -138,3 +157,8 @@ class StorageUtilsTest(BaseTest):
         sas = blob_client.generate_blob_shared_access_signature('test', 'test.txt')
 
         self.assertIsNotNone(sas)
+
+    def _get_storage_client_string(self):
+        client = local_session(Session)\
+            .client('azure.mgmt.storage.StorageManagementClient').storage_accounts
+        return client.__module__ + '.' + client.__class__.__name__

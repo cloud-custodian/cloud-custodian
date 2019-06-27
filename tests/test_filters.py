@@ -161,21 +161,32 @@ class TestValueFilter(unittest.TestCase):
         self.assertEqual(res, (sentinel, 0))
 
         vf.vtype = "expr"
-        value = "tag:xtra"
-        sentinel = None
+        value = None
+        sentinel = "tag:xtra"
         res = vf.process_value_type(sentinel, value, resource)
-        self.assertEqual(res, (None, "hello"))
+        self.assertEqual(res, ("hello", None))
 
         vf.vtype = "expr"
-        value = "a"
-        sentinel = None
+        value = None
+        sentinel = "a"
         res = vf.process_value_type(sentinel, value, resource)
-        self.assertEqual(res, (None, 1))
+        self.assertEqual(res, (1, None))
 
         vf.vtype = "unique_size"
         value = [1, 2, 3, 1, 5]
+        sentinel = None
         res = vf.process_value_type(sentinel, value, resource)
         self.assertEqual(res, (None, 4))
+
+    def test_value_type_expr(self):
+        resource = {'a': 1, 'b': 1}
+        vf = filters.factory({
+            "type": "value",
+            "value": "b",
+            "op": 'eq',
+            "value_type": "expr",
+            "key": "a"})
+        self.assertTrue(vf.match(resource))
 
     def test_value_match(self):
         resource = {"a": 1, "Tags": [{"Key": "xtra", "Value": "hello"}]}

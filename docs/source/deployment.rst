@@ -28,7 +28,7 @@ need to add a README or any other files to it first.
 
 .. code-block:: bash
 
-    $ mkdir my-policies 
+    $ mkdir my-policies
     $ cd my-policies
     $ git init
     $ git remote add origin <github repo url>
@@ -81,8 +81,8 @@ configuration to our repo:
 
     trigger:
     - master
-    
-    jobs: 
+
+    jobs:
       - job: 'Validate'
         pool:
           vmImage: 'Ubuntu-16.04'
@@ -300,4 +300,6 @@ in the output directory.
 Additional Resources
 --------------------
 
-- https://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/
+- `manheim-c7n-tools <https://github.com/manheim/manheim-c7n-tools>`_ - Manheim's Cloud
+  Custodian (c7n) wrapper package, policy generator/interpolator, runner, error scanner,
+  and supporting tools.

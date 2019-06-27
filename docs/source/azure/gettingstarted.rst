@@ -79,9 +79,9 @@ If successful, you should see output similar to the following on the command lin
     2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: tag: 1 execution_time: 0.67
 
 
-You should also find a new ``my-first-policy`` directory with a log and other
-files (subsequent runs will append to the log by default rather than
-overwriting it).
+You should also find a new ``my-first-policy`` directory with a log and a ``resources.json``.  The ``resources.json``
+file shows you the raw data that results from your policy after filtering is applied.  This file can help you understand the
+fields available for your resources while developing your policy.
 
 See :ref:`filters` for more information on the features of the Value filter used in this sample.
 

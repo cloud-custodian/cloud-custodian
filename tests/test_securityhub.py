@@ -62,6 +62,7 @@ class SecurityHubTest(BaseTest):
                 "actions": [
                     {
                         "type": "post-finding",
+                        'description': 'This one is important',
                         "types": [
                             "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"  # NOQA
                         ],

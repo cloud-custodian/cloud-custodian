@@ -99,7 +99,7 @@ page.
 
 - :ref:`AWS <aws-gettingstarted>`
 - :ref:`Azure <azure_gettingstarted>`
-- GCP <tbd>
+- :ref:`GCP <gcp_gettingstarted>`
 
 Troubleshooting & Tinkering
 +++++++++++++++++++++++++++

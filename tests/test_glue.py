@@ -304,3 +304,42 @@ class TestGlueCrawlers(BaseTest):
         client = session_factory().client("glue")
         crawlers = client.get_crawlers()["Crawlers"]
         self.assertFalse("test" in [c.get("Name") for c in crawlers])
+
+
+class TestGlueTables(BaseTest):
+    def test_tables_delete(self):
+        session_factory = self.replay_flight_data("test_glue_table_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-table-delete",
+                "resource": "glue-table",
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        tables = client.get_tables(DatabaseName='test')["TableList"]
+        self.assertFalse("test" in [t.get("Name") for t in tables])
+
+
+class TestGlueDatabases(BaseTest):
+
+    def test_databases_delete(self):
+        session_factory = self.replay_flight_data("test_glue_database_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-database-delete",
+                "resource": "glue-database",
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        databases = client.get_databases()
+        self.assertFalse("test" in [t.get("Name") for t in databases.get("DatabaseList", [])])

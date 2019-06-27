@@ -1583,7 +1583,7 @@ class Delete(Action):
     .. code-block:: yaml
 
             policies:
-              - name: asg-unencrypted
+              - name: asg-delete-bad-encryption
                 resource: asg
                 filters:
                   - type: not-encrypted
