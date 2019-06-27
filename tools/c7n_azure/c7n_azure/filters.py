@@ -535,15 +535,16 @@ class ResourceLockFilter(Filter):
         self.lock_type = self.data.get('lock-type', 'Any')
 
     def process(self, resources, event=None):
-        result, _ = ThreadHelper.execute_in_parallel(
+        resources, exceptions = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
             execution_method=self._process_resource_set,
             executor_factory=self.executor_factory,
             log=self.log
         )
-
-        return result
+        if exceptions:
+            raise exceptions[0]
+        return resources
 
     def _process_resource_set(self, resources, event=None):
         client = self.manager.get_client('azure.mgmt.resource.locks.ManagementLockClient')

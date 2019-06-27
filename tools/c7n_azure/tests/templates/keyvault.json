@@ -16,7 +16,7 @@
         }
     },
     "variables": {
-         "kvname": "[concat('cckeyvault1')]"
+         "kvname": "[concat('cckeyvault1', uniqueString(resourceGroup().id))]"
     },
     "resources": [
         {
