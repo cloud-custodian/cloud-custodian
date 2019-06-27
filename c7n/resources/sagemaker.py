@@ -719,7 +719,7 @@ class SagemakerTransformJobStop(BaseAction):
     .. code-block:: yaml
 
         policies:
-          - name: stop-ml-job
+          - name: stop-tranform-job
             resource: sagemaker-transform-job
             filters:
               - TransformJobName: ml-job-10

@@ -111,7 +111,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     .. code-block:: yaml
 
             policies:
-              - name: elb-delete-unused
+              - name: mark-elb-delete-unused
                 resource: elb
                 filters:
                   - "tag:custodian_cleanup": absent

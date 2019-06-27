@@ -32,10 +32,12 @@ class CodeRepository(QueryResourceManager):
         batch_detail_spec = (
             'batch_get_repositories', 'repositoryNames', 'repositoryName',
             'repositories', None)
-        id = 'repositoryId'
+        name = id = 'repositoryName'
         arn = "Arn"
-        name = 'repositoryName'
         date = 'creationDate'
+
+    def get_resources(self, ids, cache=True):
+        return self.augment([{'repositoryName': i} for i in ids])
 
 
 @CodeRepository.action_registry.register('delete')

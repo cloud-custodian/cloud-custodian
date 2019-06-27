@@ -857,7 +857,7 @@ class SsmStatus(ValueFilter):
     .. code-block:: yaml
 
         policies:
-          - name: ec2-recover-instances
+          - name: ec2-ssm-check
             resource: ec2
             filters:
               - type: ssm

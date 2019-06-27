@@ -77,7 +77,7 @@ class Status(ValueFilter):
     .. code-block:: yaml
 
         policies:
-          - name: cloudtrail-not-active
+          - name: cloudtrail-check-status
             resource: aws.cloudtrail
             filters:
             - type: status
@@ -174,7 +174,7 @@ class SetLogging(Action):
     .. code-block:: yaml
 
       policies:
-        - name: cloudtrail-not-active
+        - name: cloudtrail-set-active
           resource: aws.cloudtrail
           filters:
            - type: status

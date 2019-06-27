@@ -468,7 +468,7 @@ class ServiceLimit(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: account-service-limits
+              - name: increase-account-service-limits
                 resource: account
                 filters:
                   - type: service-limit
@@ -582,7 +582,7 @@ class RequestLimitIncrease(BaseAction):
     .. code-block:: yaml
 
         policies:
-          - name: account-service-limits
+          - name: raise-account-service-limits
             resource: account
             filters:
               - type: service-limit

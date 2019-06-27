@@ -33,31 +33,23 @@ from six.moves.urllib import parse as urlparse
 from c7n.exceptions import ClientError, PolicyValidationError
 from c7n import ipaddress, config
 
-# Try to place nice in lambda exec environment
-# where we don't require yaml
-
-BaseSafeDumper = None
+# Try to play nice in a serverless environment, where we don't require yaml
 
 try:
     import yaml
 except ImportError:  # pragma: no cover
-    yaml = None
+    SafeLoader = BaseSafeDumper = yaml = None
 else:
     try:
         from yaml import CSafeLoader as SafeLoader, CSafeDumper as BaseSafeDumper
     except ImportError:  # pragma: no cover
-        try:
-            from yaml import SafeLoader, SafeDumper as BaseSafeDumper
-        except ImportError:
-            SafeLoader = None
-            BaseSafeDumper = None
+        from yaml import SafeLoader, SafeDumper as BaseSafeDumper
 
-if BaseSafeDumper:
-    class SafeDumper(BaseSafeDumper):
-        def ignore_aliases(self, data):
-            return True
-else:
-    SafeDumper = None
+
+class SafeDumper(BaseSafeDumper or object):
+    def ignore_aliases(self, data):
+        return True
+
 
 log = logging.getLogger('custodian.utils')
 
