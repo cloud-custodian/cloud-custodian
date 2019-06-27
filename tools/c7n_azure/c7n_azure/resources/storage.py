@@ -157,10 +157,10 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     schema = type_schema('storage-diagnostic-settings',
                          rinherit=ValueFilter.schema,
+                         required=['storage-type'],
                          **{'storage-type': {
                              'type': 'string',
-                             'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]}},
-                         required=['storage-type'],
+                             'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]}}
                          )
 
     def __init__(self, data, manager=None):
