@@ -110,3 +110,5 @@ like this:
           - type: value
             key: properties.virtualMachine
             value: null
+        actions:
+          - type: delete
