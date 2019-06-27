@@ -18,6 +18,8 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('dataflow-job')
 class DataflowJob(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.jobs
+    """
 
     class resource_type(TypeInfo):
         service = 'dataflow'

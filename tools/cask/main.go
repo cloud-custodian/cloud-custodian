@@ -88,9 +88,9 @@ func Update(image string, dockerClient *client.Client, ctx context.Context) {
 	out, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{ })
 	if err != nil {
 		log.Printf( "Image Pull failed, will use cached image if available. %v", err)
+	} else {
+		_ = jsonmessage.DisplayJSONMessagesStream(out, os.Stdout, 1, true, nil)
 	}
-
-	_ = jsonmessage.DisplayJSONMessagesStream(out, os.Stdout, 1, true, nil)
 
 	// Update the marker file
 	_, err = os.OpenFile(updateMarker, os.O_RDONLY|os.O_CREATE, 0666)

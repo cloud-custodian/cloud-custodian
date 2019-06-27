@@ -114,7 +114,7 @@ class Parameter(ValueFilter):
     .. code-block:: yaml
 
             policies:
-              - name: redshift-no-ssl
+              - name: redshift-param-ssl
                 resource: redshift
                 filters:
                   - type: param

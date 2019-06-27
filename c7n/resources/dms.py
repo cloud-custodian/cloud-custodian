@@ -258,7 +258,7 @@ class InstanceMarkForOp(TagDelayedAction):
         .. code-block:: yaml
 
             policies:
-                - name: delete-single-az-dms
+                - name: delete-dms
                   resource: dms-instance
                   filters:
                     - MultiAZ: False

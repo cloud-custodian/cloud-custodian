@@ -105,7 +105,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     .. code-block:: yaml
 
             policies:
-              - name: mark-for-delete
+              - name: eb-mark-for-delete
                 resource: elasticbeanstalk-environment
                 filters:
                   - type: value

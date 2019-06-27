@@ -322,7 +322,7 @@ class PolicyCompliantFilter(Filter):
     .. code-block :: yaml
 
        policies:
-        - name: vm-stop-marked
+        - name: non-compliant-vms
           resource: azure.vm
           filters:
             - type: policy-compliant

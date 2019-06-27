@@ -102,6 +102,20 @@ class SqlDatabaseTest(BaseTest):
         databases = policy.run()
         self.assertEqual(databases[0]['name'], database_name)
 
+    def test_sqldatabase_stopped_instance_query(self):
+        project_id = 'mitrop-custodian'
+        session_factory = self.replay_flight_data(
+            'sqldatabase-stopped-instance-query',
+            project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'all-sql-databases',
+             'resource': 'gcp.sql-database'},
+            session_factory=session_factory)
+
+        databases = policy.run()
+        self.assertEqual(len(databases), 0)
+
     def test_sqldatabase_get(self):
         project_id = 'mitropject'
         session_factory = self.replay_flight_data('sqldatabase-get', project_id=project_id)

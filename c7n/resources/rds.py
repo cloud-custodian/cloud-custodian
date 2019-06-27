@@ -745,7 +745,7 @@ class ResizeInstance(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: rds-snapshot-retention
+              - name: rds-resize-up
                 resource: rds
                 filters:
                   - type: metrics
@@ -766,7 +766,7 @@ class ResizeInstance(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: rds-snapshot-retention
+              - name: rds-resize-down
                 resource: rds
                 filters:
                   - type: metrics
@@ -1413,7 +1413,7 @@ class RDSSubnetGroupDeleteAction(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: rds-subnet-group-delete-unused
+              - name: rds-subnet-group-delete
                 resource: rds-subnet-group
                 filters:
                   - Instances: []

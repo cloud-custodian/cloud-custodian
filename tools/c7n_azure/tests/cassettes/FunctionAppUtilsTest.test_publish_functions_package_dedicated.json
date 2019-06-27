@@ -4,101 +4,7 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/publishingcredentials/list?api-version=2018-02-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 500,
-                    "message": "Internal Server Error"
-                },
-                "headers": {
-                    "x-ms-failure-cause": [
-                        "gateway"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "connection": [
-                        "close"
-                    ],
-                    "content-length": [
-                        "720"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 20:34:26 GMT"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "error": {
-                            "code": "MultipleErrorsOccurred",
-                            "message": "Multiple error occurred: . Please see details.",
-                            "details": [
-                                {
-                                    "code": "InternalServerError",
-                                    "message": "Encountered internal server error. Diagnostic information: timestamp '20190502T203427Z', subscription id 'ea42f556-5106-4743-99b0-c129bfa71a47', tracking id '5f19c6f6-23ca-4ffa-9389-23498777cdd4', request correlation id '5f19c6f6-23ca-4ffa-9389-23498777cdd4'."
-                                },
-                                {
-                                    "code": "InternalServerError",
-                                    "message": "Encountered internal server error. Diagnostic information: timestamp '20190502T203427Z', subscription id 'ea42f556-5106-4743-99b0-c129bfa71a47', tracking id '5f19c6f6-23ca-4ffa-9389-23498777cdd4', request correlation id '5f19c6f6-23ca-4ffa-9389-23498777cdd4'."
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/publishingcredentials/list?api-version=2018-02-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 500,
-                    "message": "Internal Server Error"
-                },
-                "headers": {
-                    "x-ms-failure-cause": [
-                        "gateway"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "connection": [
-                        "close"
-                    ],
-                    "content-length": [
-                        "312"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 20:34:37 GMT"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "error": {
-                            "code": "InternalServerError",
-                            "message": "Encountered internal server error. Diagnostic information: timestamp '20190502T203438Z', subscription id 'ea42f556-5106-4743-99b0-c129bfa71a47', tracking id '416c39e7-6f24-4f64-818f-54a5d93ca41c', request correlation id '416c39e7-6f24-4f64-818f-54a5d93ca41c'."
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/publishingcredentials/list?api-version=2018-02-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/publishingcredentials/list?api-version=2018-11-01",
                 "body": null,
                 "headers": {}
             },
@@ -108,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "11999"
-                    ],
                     "content-type": [
                         "application/json"
+                    ],
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:27 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Thu, 02 May 2019 20:34:45 GMT"
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
                     ],
                     "content-length": [
-                        "695"
+                        "696"
                     ]
                 },
                 "body": {
@@ -129,16 +35,16 @@
                         "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/publishingcredentials/$cloud-custodian-test",
                         "name": "cloud-custodian-test",
                         "type": "Microsoft.Web/sites/publishingcredentials",
-                        "location": "West US 2",
+                        "location": "Central US",
                         "properties": {
                             "name": null,
                             "publishingUserName": "$cloud-custodian-test",
-                            "publishingPassword": "QqrcY8pcgoG0RF5aPnDGwkjXP5bKqEa1yRidE8NBR1khwGToy2Ze5ElQQAH4",
+                            "publishingPassword": "CDjFhFmrq7l6Wq0hAd1c3ocrGufWuMEmX7GYXBfjANf5jcfLResHaHsHX1xy",
                             "publishingPasswordHash": null,
                             "publishingPasswordHashSalt": null,
                             "metadata": null,
                             "isDeleted": false,
-                            "scmUri": "https://$cloud-custodian-test:QqrcY8pcgoG0RF5aPnDGwkjXP5bKqEa1yRidE8NBR1khwGToy2Ze5ElQQAH4@cloud-custodian-test.scm.azurewebsites.net"
+                            "scmUri": "https://$cloud-custodian-test:CDjFhFmrq7l6Wq0hAd1c3ocrGufWuMEmX7GYXBfjANf5jcfLResHaHsHX1xy@cloud-custodian-test.scm.azurewebsites.net"
                         }
                     }
                 }
@@ -157,66 +63,24 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "etag": [
-                        "\"6ac6b952\""
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "content-length": [
-                        "2"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "date": [
-                        "Thu, 02 May 2019 20:34:45 GMT"
+                        "Thu, 27 Jun 2019 00:53:29 GMT"
+                    ],
+                    "etag": [
+                        "\"fffffffffc0bdf9b\""
                     ],
                     "set-cookie": [
-                        "ARRAffinity=e566830fcb90564433d8116337d77fee023c24beb241ecfd5bdebeab53f12868;Path=/;HttpOnly;Domain=cloud-custodian-test.scm.azurewebsites.net"
+                        "ARRAffinity=07f9cf5840a21c88ad9faf3878ff016f7bcbae6c77a45c73e38dd7fa16d576c6;Path=/;HttpOnly;Domain=cloud-custodian-test.scm.azurewebsites.net"
+                    ],
+                    "content-length": [
+                        "2"
                     ]
                 },
                 "body": {
                     "data": []
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/syncfunctiontriggers?api-version=2018-02-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 20:34:48 GMT"
-                    ],
-                    "set-cookie": [
-                        "ARRAffinity=e566830fcb90564433d8116337d77fee023c24beb241ecfd5bdebeab53f12868;Path=/;HttpOnly;Domain=cloud-custodian-test.scm.azurewebsites.net"
-                    ],
-                    "content-length": [
-                        "20"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "status": "success"
-                    }
                 }
             }
         }

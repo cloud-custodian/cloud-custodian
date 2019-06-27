@@ -62,6 +62,8 @@ class PostFinding(BaseAction):
            - shield-enabled
          actions:
            - type: post-finding
+             description: |
+                Shield should be enabled on account to allow for DDOS protection (1 time 3k USD Charge).
              severity_normalized: 6
              types:
                - "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
@@ -82,6 +84,7 @@ class PostFinding(BaseAction):
         "post-finding",
         required=["types"],
         title={"type": "string"},
+        description={'type': 'string'},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         confidence={"type": "number", "min": 0, "max": 100},
@@ -220,9 +223,14 @@ class PostFinding(BaseAction):
                 self.ProductName,
             ),
             "AwsAccountId": self.manager.config.account_id,
+            # Long search chain for description values, as this was
+            # made required long after users had policies deployed, so
+            # use explicit description, or policy description, or
+            # explicit title, or policy name, in that order.
             "Description": self.data.get(
-                "description", policy.data.get("description", "")
-            ).strip(),
+                "description", policy.data.get(
+                    "description",
+                    self.data.get('title', policy.name))).strip(),
             "Title": self.data.get("title", policy.name),
             'Id': finding_id,
             "GeneratorId": policy.name,
