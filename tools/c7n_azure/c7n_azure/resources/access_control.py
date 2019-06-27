@@ -48,10 +48,6 @@ class RoleAssignment(QueryResourceManager):
     `read all users' full profiles`. Azure CLI authentication will
     provide the necessary permissions to run the policy locally.
 
-    Model:
-    `RoleAssignment <https://docs.microsoft.com/en-us/python/api/azure-mgmt-authorization/
-    azure.mgmt.authorization.v2015_07_01.models.role_assignment?view=azure-python>`_
-
     :example:
 
     .. code-block:: yaml
@@ -106,10 +102,6 @@ class RoleAssignment(QueryResourceManager):
 class RoleDefinition(QueryResourceManager):
     """Role definitions define sets of permissions that can be assigned
     to an identity.
-
-    Model:
-    `RoleDefinition <https://docs.microsoft.com/en-us/python/api/azure-mgmt-authorization/
-    azure.mgmt.authorization.v2015_07_01.models.role_definition.roledefinition?view=azure-python>`_
 
     :example:
 
