@@ -18,6 +18,22 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('api-management')
 class ApiManagement(ArmResourceManager):
+    """API Management Resource
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: api-management-no-vnet
+            resource: azure.api-management
+            filters:
+              - type: value
+                key: properties.virtualNetworkType
+                op: eq
+                value: None
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.apimanagement'
