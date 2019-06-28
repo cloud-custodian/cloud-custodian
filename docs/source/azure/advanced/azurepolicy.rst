@@ -21,9 +21,9 @@ notifying users about violations.  Rules can do anything the Azure SDK can do, a
 implement custom ones in Python if you need to.
 
 When reviewing your requirements, we recommend first identifying the requirements that can
-be implemented via Azure Policy.  Custodian can then be used to implement remaining requirements,
-and to add a second layer of protection or mitigation actions to requirements covered by
-Azure Policy.
+be implemented via Azure Policy.  Custodian can then be used to implement the remaining 
+requirements.  Custodian is also frequently used to add a second layer of protection or 
+mitigation actions to requirements covered by Azure Policy.
 
 In the event that you prefer to manage everything through Cloud Custodian for consistency in a
 multi-cloud environment you can take advantage of the Custodian support for managing Azure Policy
@@ -110,3 +110,5 @@ like this:
           - type: value
             key: properties.virtualMachine
             value: null
+        actions:
+          - type: delete
