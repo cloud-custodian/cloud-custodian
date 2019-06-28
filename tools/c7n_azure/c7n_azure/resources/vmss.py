@@ -18,6 +18,23 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('vmss')
 class VMScaleSet(ArmResourceManager):
+    """Virtual Machine Scale Set Resource
+
+    :example:
+    This policy will find all VM Scale Sets that are set to overprovision
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-vmss-overprovision-true
+            resource: azure.vmss
+            filters:
+              - type: value
+                key: properties.overprovision
+                op: equal
+                value: True
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.compute'

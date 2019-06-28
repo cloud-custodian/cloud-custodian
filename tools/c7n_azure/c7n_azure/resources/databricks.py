@@ -18,6 +18,23 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('databricks')
 class Databricks(ArmResourceManager):
+    """Databricks Resource
+
+    :example:
+    Returns all databricks named my-test-databricks
+
+    .. code-block:: yaml
+
+        policies:
+          - name: get-databricks
+            resource: azure.databricks
+            filters:
+              - type: value
+                key: name
+                op: eq
+                value: my-test-databricks
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.databricks.databricks_client'

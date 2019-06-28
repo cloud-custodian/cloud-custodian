@@ -18,6 +18,23 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('image')
 class Image(ArmResourceManager):
+    """Virtual Machine Image
+
+    :example:
+    Returns all virtual machine images named my-test-vm-image
+
+    .. code-block:: yaml
+
+        policies:
+          - name: get-vm-image
+            resource: azure.image
+            filters:
+              - type: value
+                key: name
+                op: eq
+                value: my-test-vm-image
+
+    """
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
