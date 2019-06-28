@@ -18,6 +18,25 @@ from c7n_azure.provider import resources
 
 @resources.register('iothub')
 class IoTHub(ArmResourceManager):
+    """IoT Hub Resource
+
+    :example:
+    This policy will find all IoT Hubs with 1000 or more dropped messages over the last 72 hours
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iothubs-dropping-messages
+            resource: azure.iothub
+            filters:
+              - type: metric
+                metric: d2c.telemetry.egress.dropped
+                op: ge
+                aggregation: total
+                threshold: 1000
+                timeframe: 72
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.iothub'

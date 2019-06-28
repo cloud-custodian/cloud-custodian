@@ -30,6 +30,59 @@ log = logging.getLogger('custodian.azure.keyvault.keys')
 
 @resources.register('keyvault-keys')
 class KeyVaultKeys(ChildResourceManager):
+    """Key Vault Keys Resource
+
+    :example:
+    This policy will find all Keys in `keyvault_test` and `keyvault_prod` KeyVaults
+
+    .. code-block:: yaml
+
+        policies:
+          - name: keyvault-keys
+            description:
+              List all keys from 'keyvault_test' and 'keyvault_prod' vaults
+            resource: azure.keyvault-keys
+            filters:
+              - type: keyvault
+                vaults:
+                  - keyvault_test
+                  - keyvault_prod
+
+    :example:
+    This policy will find all Keys in all KeyVaults that are older than 30 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: keyvault-keys
+            description:
+              List all keys that are older than 30 days
+            resource: azure.keyvault-keys
+            filters:
+              - type: value
+                key: attributes.created
+                value_type: age
+                op: gt
+                value: 30
+
+    :example:
+    If your company wants to enforce usage of HSM-backed keys in the KeyVaults,
+    you can use this policy to find all Keys in all KeyVaults not backed by an HSM module.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: keyvault-keys
+            description:
+              List all non-HSM keys
+            resource: azure.keyvault-keys
+            filters:
+              - not:
+                 - type: key-type
+                   key-types:
+                     - RSA-HSM, EC-HSM
+
+    """
 
     class resource_type(ChildTypeInfo):
         resource = constants.RESOURCE_VAULT
