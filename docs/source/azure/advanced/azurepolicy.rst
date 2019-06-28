@@ -1,4 +1,4 @@
-.. _azure_policy:
+.. _azure_azurepolicy:
 
 Custodian and Azure Policy
 ===========================
