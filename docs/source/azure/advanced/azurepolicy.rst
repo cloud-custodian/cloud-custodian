@@ -1,7 +1,7 @@
 .. _azure_azurepolicy:
 
-Custodian and Azure Policy
-===========================
+Azure Policy Comparison
+=======================
 
 Cloud Custodian and Azure Policy have significant overlap in scenarios they can accomplish with
 regard to compliance implementations. These areas of overlap can make it unclear to new users
@@ -32,7 +32,7 @@ is configured correctly.
 
 
 Examples
-========
+--------
 
 In Azure Policy we can require users to include an owner tag on every Virtual Machine.
 If they create any deployment without one the Portal or API will return an error code.
