@@ -30,6 +30,13 @@ from c7n_azure.utils import ManagedGroupHelper
 RESOURCE_ID = (
     "/subscriptions/%s/resourceGroups/"
     "rgtest/providers/Microsoft.Compute/virtualMachines/nametest" % DEFAULT_SUBSCRIPTION_ID)
+
+
+RESOURCE_ID_CHILD = (
+    "/subscriptions/%s/resourceGroups/"
+    "rgtest/providers/Microsoft.Sql/servers/testserver/"
+    "databases/testdb" % DEFAULT_SUBSCRIPTION_ID)
+
 GUID = '00000000-0000-0000-0000-000000000000'
 
 
@@ -42,12 +49,14 @@ class UtilsTest(BaseTest):
 
     def test_get_namespace(self):
         self.assertEqual(ResourceIdParser.get_namespace(RESOURCE_ID), "Microsoft.Compute")
+        self.assertEqual(ResourceIdParser.get_namespace(RESOURCE_ID_CHILD), "Microsoft.Sql/servers")
 
     def test_get_resource_group(self):
         self.assertEqual(ResourceIdParser.get_resource_group(RESOURCE_ID), "rgtest")
 
     def test_get_resource_type(self):
         self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID), "virtualMachines")
+        self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID_CHILD), "databases")
 
     def test_get_full_type(self):
         self.assertEqual(ResourceIdParser.get_full_type(RESOURCE_ID),
