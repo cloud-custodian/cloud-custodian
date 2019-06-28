@@ -30,7 +30,7 @@ jobs:
       versionSpec: '3.7'
       architecture: 'x64'
 
-  - script: pip install awscli --upgrade
+  - script: pip install awscli
     displayName: "Install AWS CLI"
 
   - script: |
