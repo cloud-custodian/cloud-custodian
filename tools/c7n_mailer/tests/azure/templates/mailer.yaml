@@ -1,0 +1,8 @@
+queue_url: asq://${storage_name}.queue.core.windows.net/${queue_name}
+from_address: cloud@custodian.com
+smtp_server: ${smtp_server}
+smtp_username: ${username}
+smtp_password: ${password}
+function_properties:
+  servicePlan:
+    resourceGroupName: ${rg_name}

@@ -1,7 +1,7 @@
 .. _azure_authentication:
 
-Authentication
-==============
+Authentication & Access
+=======================
 
 The plugin supports four distinct authentication types, including Azure CLI integration, service principal,
 MSI, and raw tokens.
@@ -113,7 +113,7 @@ You must set `AZURE_SUBSCRIPTION_ID` as with the other authentication types.
     AZURE_CLIENT_ID=clientId
 
 Azure Storage access
-====================
+--------------------
 
 If your service principal will be writing logs to storage or leveraging queues
 for mailer you should assign Storage roles, either at the subscription

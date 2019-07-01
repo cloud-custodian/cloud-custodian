@@ -36,6 +36,19 @@ from c7n.utils import local_session, get_annotation_prefix
 
 @resources.register('storage')
 class Storage(ArmResourceManager):
+    """Storage Account Resource
+
+    :example:
+
+    Finds all Storage Accounts in the subscription.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-all-storage-accounts
+              resource: azure.storage
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.storage'
@@ -47,6 +60,44 @@ class Storage(ArmResourceManager):
 
 @Storage.action_registry.register('set-network-rules')
 class StorageSetNetworkRulesAction(AzureBaseAction):
+    """ Set Network Rules Action
+
+    Updates Azure Storage Firewalls and Virtual Networks settings.
+
+    :example:
+
+    Find storage accounts without any firewall rules.
+
+    Configure default-action to ``Deny`` and then allow:
+    - Azure Logging and Metrics services
+    - Two specific IPs
+    - Two subnets
+
+    .. code-block:: yaml
+
+        policies:
+            - name: add-storage-firewall
+              resource: azure.storage
+
+            filters:
+                - type: value
+                  key: properties.networkAcls.ipRules
+                  value_type: size
+                  op: eq
+                  value: 0
+
+            actions:
+                - type: set-network-rules
+                  default-action: Deny
+                  bypass: [Logging, Metrics]
+                  ip-rules:
+                      - ip-address-or-range: 11.12.13.14
+                      - ip-address-or-range: 21.22.23.24
+                  virtual-network-rules:
+                      - virtual-network-resource-id: <subnet_resource_id>
+                      - virtual-network-resource-id: <subnet_resource_id>
+
+    """
 
     schema = type_schema(
         'set-network-rules',
@@ -134,17 +185,17 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
               filters:
                 - or:
                     - type: storage-diagnostic-settings
-                      storage_type: blob
+                      storage-type: blob
                       key: logging.delete
                       op: eq
                       value: False
                     - type: storage-diagnostic-settings
-                      storage_type: queue
+                      storage-type: queue
                       key: logging.delete
                       op: eq
                       value: False
                     - type: storage-diagnostic-settings
-                      storage_type: table
+                      storage-type: table
                       key: logging.delete
                       op: eq
                       value: False

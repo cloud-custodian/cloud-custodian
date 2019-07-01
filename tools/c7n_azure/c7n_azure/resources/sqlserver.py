@@ -22,6 +22,19 @@ from netaddr import IPRange
 
 @resources.register('sqlserver')
 class SqlServer(ArmResourceManager):
+    """SQL Server Resource
+
+    :example:
+
+    Finds all SQL Servers in the subscription.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-all-sql-servers
+              resource: azure.sqlserver
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.sql'

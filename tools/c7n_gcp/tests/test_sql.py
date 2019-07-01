@@ -86,61 +86,6 @@ class SqlInstanceTest(BaseTest):
             self.assertTrue("does not exist" in str(e))
 
 
-class SqlDatabaseTest(BaseTest):
-
-    def test_sqldatabase_query(self):
-        project_id = 'mitropject'
-        session_factory = self.replay_flight_data('sqldatabase-query', project_id=project_id)
-
-        database_name = 'postgres'
-
-        policy = self.load_policy(
-            {'name': 'all-sql-databases',
-             'resource': 'gcp.sql-database'},
-            session_factory=session_factory)
-
-        databases = policy.run()
-        self.assertEqual(databases[0]['name'], database_name)
-
-    def test_sqldatabase_stopped_instance_query(self):
-        project_id = 'mitrop-custodian'
-        session_factory = self.replay_flight_data(
-            'sqldatabase-stopped-instance-query',
-            project_id=project_id)
-
-        policy = self.load_policy(
-            {'name': 'all-sql-databases',
-             'resource': 'gcp.sql-database'},
-            session_factory=session_factory)
-
-        databases = policy.run()
-        self.assertEqual(len(databases), 0)
-
-    def test_sqldatabase_get(self):
-        project_id = 'mitropject'
-        session_factory = self.replay_flight_data('sqldatabase-get', project_id=project_id)
-
-        database_name = 'postgres'
-        instance_name = 'testpg'
-
-        policy = self.load_policy(
-            {'name': 'one-sql-database',
-             'resource': 'gcp.sql-database'},
-            session_factory=session_factory)
-
-        resource_manager = policy.resource_manager
-
-        database = resource_manager.get_resource(
-            {'project': 'mitropject',
-             'name': database_name,
-             'instance': instance_name})
-
-        annotation_key = resource_manager.resource_type.get_parent_annotation_key()
-
-        self.assertEqual(database['name'], database_name)
-        self.assertEqual(database[annotation_key]['name'], instance_name)
-
-
 class SqlUserTest(BaseTest):
 
     def test_sqluser_query(self):

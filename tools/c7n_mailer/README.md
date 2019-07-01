@@ -271,12 +271,12 @@ and here is a description of the options:
 | Required? | Key                   | Type   | Notes                                                                                  |
 |:---------:|:----------------------|:-------|:---------------------------------------------------------------------------------------|
 |           | `function_properties` | object | Contains `appInsights`, `storageAccount` and `servicePlan` objects                     |
-|           | `appInsights`         | object | Contains `name`, `location` and `resource_group_name` properties                       |
-|           | `storageAccount`      | object | Contains `name`, `location` and `resource_group_name` properties                       |
-|           | `servicePlan`         | object | Contains `name`, `location`, `resource_group_name`, `skuTier` and `skuName` properties |
+|           | `appInsights`         | object | Contains `name`, `location` and `resourceGroupName` properties                       |
+|           | `storageAccount`      | object | Contains `name`, `location` and `resourceGroupName` properties                       |
+|           | `servicePlan`         | object | Contains `name`, `location`, `resourceGroupName`, `skuTier` and `skuName` properties |
 |           | `name`                | string |                                                                                        |
 |           | `location`            | string | Default: `west us 2`                                                                   |
-|           | `resource_group_name` | string | Default `cloud-custodian`                                                              |
+|           | `resourceGroupName`   | string | Default `cloud-custodian`                                                              |
 |           | `skuTier`             | string | Default: `Basic`                                                                       |
 |           | `skuName`             | string | Default: `B1`                                                                          |
 
