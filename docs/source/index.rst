@@ -54,6 +54,7 @@ Navigate below and get started with Cloud Custodian!
    azure/gettingstarted
    azure/authentication
    azure/examples/index
+   azure/scenarios/index
    azure/policy/index
    azure/azure-modes
    azure/advanced/index
