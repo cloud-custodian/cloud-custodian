@@ -18,6 +18,19 @@ from c7n_azure.resources.arm import ChildArmResourceManager
 
 @resources.register('recordset')
 class RecordSet(ChildArmResourceManager):
+    """Record Set Resource
+
+    :example:
+
+    Finds all Record Sets for all DNS Zones in the subscription
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-all-record-sets
+              resource: azure.recordset
+
+    """
 
     class resource_type(ChildArmResourceManager.resource_type):
         service = 'azure.mgmt.dns.v2018_05_01'
