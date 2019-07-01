@@ -39,7 +39,8 @@ class LoadBalancer(ArmResourceManager):
                   value: "ipv6"
 
     :example:
-    This policy will find all load balancers with 1000 or less transmitted packets over the last 72 hours
+    This policy will find all load balancers with 1000 or less transmitted packets
+    over the last 72 hours
 
     .. code-block:: yaml
 

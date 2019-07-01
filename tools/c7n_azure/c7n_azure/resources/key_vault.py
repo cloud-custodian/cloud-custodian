@@ -53,7 +53,8 @@ class KeyVault(ArmResourceManager):
                 timeframe: 72
 
     :example:
-    This policy will find all KeyVaults with an access of Service Principals not in the white list that exceed read-only access
+    This policy will find all KeyVaults with an access of Service Principals not in the white list
+    that exceed read-only access
 
     .. code-block:: yaml
 
