@@ -30,7 +30,7 @@
           "regions": [
             "us-central1"
           ],
-          "name": "test_model_1",
+          "name": "test_model",
           "description": "",
           "onlinePredictionLogging": false
         },
@@ -42,7 +42,7 @@
         "regions": [
           "us-central1"
         ],
-        "name": "projects/second-impact-244209/models/test_model_1",
+        "name": "projects/second-impact-244209/models/test_model",
         "etag": "aBqikbr66gg="
       }
     },

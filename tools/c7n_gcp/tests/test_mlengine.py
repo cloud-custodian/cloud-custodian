@@ -49,7 +49,7 @@ class MLModelTest(BaseTest):
         exec_mode = p.get_execution_mode()
         event = event_data('ml-model-create.json')
         models = exec_mode.run(event, None)
-        self.assertIn(name, models[0])
+        self.assertIn(name, models[0]['name'])
 
 
 class MLJobTest(BaseTest):
@@ -72,21 +72,18 @@ class MLJobTest(BaseTest):
 
     def test_jobs_get(self):
         project_id = 'cloud-custodian'
-        id = "test_job"
+        name = "test_job"
 
-        session_factory = self.replay_flight_data(
-            'ml-jobs-query-get', project_id)
-
-        policy = self.load_policy(
-            {
-                'name': 'ml-jobs-query-get',
-                'resource': 'gcp.ml-job'
-            },
-            session_factory=session_factory)
-
-        resource = policy.resource_manager.get_resource({
-            "name": id,
-            "project_id": project_id,
-        })
-
-        self.assertEqual(resource['jobId'], id)
+        factory = self.replay_flight_data('ml-job-get', project_id=project_id)
+        p = self.load_policy({
+            'name': 'ml-job-get',
+            'resource': 'gcp.ml-job',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.ml.v1.JobService.CreateJob']
+            }
+        }, session_factory=factory)
+        exec_mode = p.get_execution_mode()
+        event = event_data('ml-job-create.json')
+        jobs = exec_mode.run(event, None)
+        self.assertIn(name, jobs[0]['jobId'])

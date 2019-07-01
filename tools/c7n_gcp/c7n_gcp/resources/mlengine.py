@@ -50,11 +50,12 @@ class MLJob(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'jobId'
+        id = 'name'
+        get_requires_event = True
 
         @staticmethod
-        def get(client, resource_info):
+        def get(client, event):
             return client.execute_query(
                 'get', {'name': 'projects/{}/jobs/{}'.format(
-                    resource_info['project_id'],
-                    resource_info['name'])})
+                    jmespath.search('resource.labels.project_id', event),
+                    jmespath.search('protoPayload.response.jobId', event))})
