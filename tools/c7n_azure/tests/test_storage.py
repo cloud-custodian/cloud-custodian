@@ -59,7 +59,7 @@ class StorageTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'ccipstorage*'},
                 {'type': 'firewall-rules',
-                 'include': ['3.1.1.1']}],
+                 'include': ['1.2.2.129']}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

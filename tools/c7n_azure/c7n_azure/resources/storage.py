@@ -28,7 +28,7 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ThreadHelper
-from netaddr import IPNetwork
+from netaddr import IPSet
 
 from c7n.filters.core import type_schema
 from c7n.utils import local_session, get_annotation_prefix
@@ -162,7 +162,7 @@ class StorageFirewallRulesFilter(FirewallRulesFilter):
 
         ip_rules = resource['properties']['networkAcls']['ipRules']
 
-        resource_rules = set([IPNetwork(r['value']) for r in ip_rules])
+        resource_rules = IPSet([r['value'] for r in ip_rules])
 
         return resource_rules
 
