@@ -1,0 +1,43 @@
+{
+   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+   "contentVersion": "1.0.0.0",
+   "parameters": {
+      "dnsZoneName": {
+         "type": "string",
+         "defaultValue": "[concat(uniqueString(resourceGroup().id), '.cloudcustodiantest.com')]"
+      },
+      "wwwRecordName": {
+         "type": "string",
+         "defaultValue": "www"
+      }
+   },
+   "resources": [
+      {
+         "type": "Microsoft.Network/dnszones",
+         "name": "[parameters('dnsZoneName')]",
+         "apiVersion": "2016-04-01",
+         "location": "global",
+         "properties": {}
+      },
+      {
+         "type": "Microsoft.Network/dnszones/A",
+         "name": "[concat(parameters('dnsZoneName'), '/', parameters('wwwRecordName'))]",
+         "apiVersion": "2016-04-01",
+         "location": "global",
+         "dependsOn": [
+            "[parameters('dnsZoneName')]"
+         ],
+         "properties": {
+            "TTL": 3600,
+            "ARecords": [
+               {
+                  "ipv4Address": "1.2.3.4"
+               },
+               {
+                  "ipv4Address": "1.2.3.5"
+               }
+            ]
+         }
+      }
+   ]
+}
