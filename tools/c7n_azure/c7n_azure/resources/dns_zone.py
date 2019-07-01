@@ -36,7 +36,7 @@ class DnsZone(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
-        service = 'azure.mgmt.dns.v2018_05_01'
+        service = 'azure.mgmt.dns'
         client = 'DnsManagementClient'
         enum_spec = ('zones', 'list', {})
         resource_type = 'Microsoft.Network/dnszones'

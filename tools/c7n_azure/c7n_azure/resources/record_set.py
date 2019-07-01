@@ -33,7 +33,7 @@ class RecordSet(ChildArmResourceManager):
     """
 
     class resource_type(ChildArmResourceManager.resource_type):
-        service = 'azure.mgmt.dns.v2018_05_01'
+        service = 'azure.mgmt.dns'
         client = 'DnsManagementClient'
         enum_spec = ('record_sets', 'list_by_dns_zone', None)
         parent_manager_name = 'dnszone'
