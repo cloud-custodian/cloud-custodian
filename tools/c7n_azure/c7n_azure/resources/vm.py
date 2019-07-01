@@ -22,6 +22,114 @@ from c7n.filters.related import RelatedResourceFilter
 
 @resources.register('vm')
 class VirtualMachine(ArmResourceManager):
+    """Virtual Machine Resource
+
+    :example:
+    Stop all running VMs
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-running-vms
+            resource: azure.vm
+            filters:
+              - type: instance-view
+                key: statuses[].code
+                op: in
+                value_type: swap
+                value: PowerState/running
+            actions:
+              - type: stop
+
+    :example:
+    Start all VMs
+
+    .. code-block:: yaml
+
+        policies:
+          - name: start-vms
+            resource: azure.vm
+            actions:
+              - type: start
+
+    :example:
+    Restart all VMs
+
+    .. code-block:: yaml
+
+        policies:
+          - name: start-vms
+            resource: azure.vm
+            actions:
+              - type: restart
+
+    :example:
+    Delete specific VM by name
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-running-vms
+            resource: azure.vm
+            filters:
+              - type: value
+                key: name
+                op: eq
+                value_type: normalize
+                value: fake_vm_name
+            actions:
+              - type: delete
+
+    :example:
+    Find all VMs with a Public IP address
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vms-with-public-ip
+            resource: azure.vm
+            filters:
+              - type: network-interface
+                key: 'properties.ipConfigurations[].properties.publicIPAddress.id'
+                value: not-null
+
+    :example:
+    This policy will find all VMs that have Percentage CPU usage >= 75% over the last 72 hours
+
+    .. code-block:: yaml
+
+        policies:
+          - name: busy-vms
+            resource: azure.vm
+            filters:
+              - type: metric
+                metric: Percentage CPU
+                op: ge
+                aggregation: average
+                threshold: 75
+                timeframe: 72
+
+    :example:
+    This policy will find all VMs that have Percentage CPU usage <= 1% over the last 72 hours,
+    mark for deletion in 7 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-unused-vms
+            resource: azure.vm
+            filters:
+              - type: metric
+                metric: Percentage CPU
+                op: le
+                aggregation: average
+                threshold: 1
+                timeframe: 72
+             actions:
+              - type: mark-for-op
+                op: delete
+                days: 7
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.compute'

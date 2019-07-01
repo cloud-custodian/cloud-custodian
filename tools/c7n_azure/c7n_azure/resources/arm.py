@@ -46,6 +46,19 @@ class ArmTypeInfo(TypeInfo):
 
 @six.add_metaclass(QueryMeta)
 class ArmResourceManager(QueryResourceManager):
+    """Azure Arm Resource
+
+    :example: This policy will find all ARM resources with the tag 'Tag1' present
+
+    .. code-block:: yaml
+
+        policies
+          - name: find-resources-with-Tag1
+            resource: azure.armresource
+            filters:
+              - tag:Tag1: present
+
+    """
 
     class resource_type(ArmTypeInfo):
         service = 'azure.mgmt.resource'

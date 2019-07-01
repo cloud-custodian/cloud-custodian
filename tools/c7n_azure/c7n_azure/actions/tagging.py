@@ -18,6 +18,8 @@ from c7n.filters.offhours import Time
 class Tag(AzureBaseAction):
     """Adds tags to Azure resources
 
+    :example: This policy will tag all existing resource groups with a value such as Environment
+
         .. code-block:: yaml
 
           policies:
@@ -65,6 +67,9 @@ class Tag(AzureBaseAction):
 class RemoveTag(AzureBaseAction):
     """Removes tags from Azure resources
 
+    :example:
+    This policy will remove tag for all existing resource groups with a key such as Environment
+
         .. code-block:: yaml
 
           policies:
@@ -98,6 +103,9 @@ class RemoveTag(AzureBaseAction):
 
 class AutoTagUser(AzureEventAction):
     """Attempts to tag a resource with the first user who created/modified it.
+
+    :example:
+    This policy will tag all existing resource groups with the 'CreatorEmail' tag
 
     .. code-block:: yaml
 
@@ -267,6 +275,7 @@ class TagTrim(AzureBaseAction):
     Setting the space value to 0 removes all tags but those
     listed to preserve.
 
+    :example:
     .. code-block :: yaml
 
        policies:
@@ -352,18 +361,20 @@ class TagDelayedAction(AzureBaseAction):
     If neither 'days' nor 'hours' is specified, Cloud Custodian will default
     to marking the resource for action 4 days in the future.
 
-    .. code-block :: yaml
+    :example:
 
-       policies:
-        - name: vm-mark-for-stop
-          resource: azure.vm
-          filters:
-            - type: value
-              key: Name
-              value: instance-to-stop-in-four-days
-          actions:
-            - type: mark-for-op
-              op: stop
+        .. code-block :: yaml
+
+           policies:
+            - name: vm-mark-for-stop
+              resource: azure.vm
+              filters:
+                - type: value
+                  key: Name
+                  value: instance-to-stop-in-four-days
+              actions:
+                - type: mark-for-op
+                  op: stop
     """
 
     schema = utils.type_schema(

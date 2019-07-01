@@ -18,6 +18,22 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('vnet')
 class Vnet(ArmResourceManager):
+    """Virtual Networks Resource
+
+    :example:
+    This set of policies will find all Virtual Networks that do not have DDOS protection enabled.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-vnets-ddos-protection-disabled
+            resource: azure.vnet
+            filters:
+              - type: value
+                key: properties.enableDdosProtection
+                op: equal
+                value: False
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.network'

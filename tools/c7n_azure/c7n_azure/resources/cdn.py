@@ -18,6 +18,23 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('cdnprofile')
 class CdnProfile(ArmResourceManager):
+    """CDN Resource
+
+    :example:
+    Returns all CDNs with Standard_Verizon sku
+
+    .. code-block:: yaml
+
+        policies:
+          - name: standard-verizon
+            resource: azure.cdnprofile
+            filters:
+              - type: value
+                key: sku
+                op: in
+                value_type: normalize
+                value: Standard_Verizon
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.cdn'

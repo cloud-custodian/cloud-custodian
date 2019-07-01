@@ -18,6 +18,25 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('aks')
 class KubernetesService(ArmResourceManager):
+    """Azure Kubernetes Service Resource
+
+    :example:
+    Returns all aks clusters that did not provision successfully
+
+    .. code-block:: yaml
+
+        policies:
+          - name: broken-aks
+            resource: azure.aks
+            filters:
+              - type: value
+                key: properties.provisioningState
+                op: not-equal
+                value_type: normalize
+                value: succeeded
+
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.containerservice'
