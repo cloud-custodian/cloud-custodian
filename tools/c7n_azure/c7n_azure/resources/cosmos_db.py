@@ -115,7 +115,7 @@ class CosmosDBDatabase(ChildResourceManager):
         raise_on_exception = False
         annotate_parent = True
 
-    def enumerate_resources(self, parent_resource, **params):
+    def enumerate_resources(self, parent_resource, type_info, **params):
         data_client = CosmosDB.get_data_client(parent_resource, self)
 
         try:
@@ -160,7 +160,7 @@ class CosmosDBCollection(ChildResourceManager):
         raise_on_exception = False
         annotate_parent = True
 
-    def enumerate_resources(self, parent_resource, **params):
+    def enumerate_resources(self, parent_resource, type_info, **params):
         data_client = CosmosDB.get_data_client(parent_resource, self)
 
         try:

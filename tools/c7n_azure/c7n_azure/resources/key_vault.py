@@ -26,7 +26,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 import logging
 
-from netaddr import IPNetwork
+from netaddr import IPSet
 
 log = logging.getLogger('custodian.azure.keyvault')
 
@@ -64,7 +64,7 @@ class KeyVaultFirewallRulesFilter(FirewallRulesFilter):
 
         ip_rules = resource['properties']['networkAcls']['ipRules']
 
-        resource_rules = set([IPNetwork(r['value']) for r in ip_rules])
+        resource_rules = IPSet([r['value'] for r in ip_rules])
         return resource_rules
 
 

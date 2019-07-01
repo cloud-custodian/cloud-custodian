@@ -92,20 +92,21 @@ class ChildResourceQuery(ResourceQuery):
         results = []
         for parent in parents.resources():
             try:
-                subset = self.manager.enumerate_resources(parent, **params)
+                subset = self.manager.enumerate_resources(parent, m, **params)
+
+                if subset:
+                    # If required, append parent resource ID to all child resources
+                    if m.annotate_parent:
+                        for r in subset:
+                            r[m.parent_key] = parent[parents.resource_type.id]
+
+                    results.extend(subset)
+
             except Exception as e:
                 log.warning('Child enumeration failed for {0}. {1}'
                             .format(parent[parents.resource_type.id], e))
                 if m.raise_on_exception:
                     raise e
-
-            if subset:
-                # If required, append parent resource ID to all child resources
-                if m.annotate_parent:
-                    for r in subset:
-                        r[m.parent_key] = parent[parents.resource_type.id]
-
-                results.extend(subset)
 
         return results
 
@@ -263,7 +264,7 @@ class ChildResourceManager(QueryResourceManager):
 
         return self._session
 
-    def enumerate_resources(self, parent_resource, **params):
+    def enumerate_resources(self, parent_resource, type_info, **params):
         client = self.get_client()
 
         enum_op, list_op, extra_args = self.resource_type.enum_spec
@@ -274,7 +275,7 @@ class ChildResourceManager(QueryResourceManager):
         if extra_args:
             params.update({key: extra_args[key](parent_resource) for key in extra_args.keys()})
 
-        params.update(self.extra_args(parent_resource))
+        params.update(type_info.extra_args(parent_resource))
 
         # Some resources might not have enum_op piece (non-arm resources)
         if enum_op:
