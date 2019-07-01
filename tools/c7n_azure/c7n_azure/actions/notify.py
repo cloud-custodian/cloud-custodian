@@ -7,7 +7,6 @@ from c7n.resolver import ValuesFrom
 
 class Notify(BaseNotify):
     """
-
     Action to queue email.
 
     See `c7n_mailer readme.md <https://github.com/cloud-custodian/cloud-custodian/blob/

@@ -24,6 +24,7 @@ class DeleteAction(AzureBaseAction):
                    op: in
                 actions:
                  - type: delete
+
     :example:
     This policy will delete any Network Security Group  with 'test' in the name
 
