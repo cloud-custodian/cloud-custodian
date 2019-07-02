@@ -1,0 +1,37 @@
+{
+   "attachments":[
+      {
+         "fallback":"Cloud Custodian Policy Violation",
+         "title":"Custodian",
+         "color":"danger",
+         "fields":[
+            {
+               "title":"Resources",
+               "value":"{%- for resource in resources -%}
+                        {{ format_resource(resource, policy['resource']) | replace('\\"', '"') | replace('"', '\\"') }}
+                        {%- endfor -%}"
+            },
+            {
+               "title":"Account",
+               "value":"{{ account }}"
+            },
+            {
+               "title":"Region",
+               "value":"{{ region }}"
+            },
+            {
+               "title":"Violation Description",
+               "value":"{{ action['violation_desc'] }}"
+            },
+            {
+               "title":"Action Description",
+               "value":"{{ action['action_desc'] }}"
+            }
+         ]
+      }
+   ],
+   {%- if not recipient.startswith('https://') %}
+   "channel":"{{ recipient }}",
+   {%- endif -%}
+   "username":"cloud-custodian"
+}

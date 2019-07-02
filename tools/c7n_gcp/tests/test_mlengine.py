@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from gcp_common import BaseTest
+
+from gcp_common import BaseTest, event_data
 
 
 class MLModelTest(BaseTest):
@@ -36,28 +37,25 @@ class MLModelTest(BaseTest):
         project_id = 'cloud-custodian'
         name = "test_model"
 
-        session_factory = self.replay_flight_data(
-            'ml-models-query-get', project_id)
-
-        policy = self.load_policy(
-            {
-                'name': 'ml-models-query-get',
-                'resource': 'gcp.ml-model'
-            },
-            session_factory=session_factory)
-
-        resource = policy.resource_manager.get_resource({
-            "name": name,
-            "project_id": project_id,
-        })
-
-        self.assertEqual(resource['name'], "projects/cloud-custodian/models/{}".format(name))
+        factory = self.replay_flight_data('ml-model-get', project_id=project_id)
+        p = self.load_policy({
+            'name': 'ml-model-get',
+            'resource': 'gcp.ml-model',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.ml.v1.ModelService.CreateModel']
+            }
+        }, session_factory=factory)
+        exec_mode = p.get_execution_mode()
+        event = event_data('ml-model-create.json')
+        models = exec_mode.run(event, None)
+        self.assertIn(name, models[0]['name'])
 
 
 class MLJobTest(BaseTest):
 
     def test_jobs_query(self):
-        project_id = 'mythic-tribute-232915'  # 'cloud-custodian'
+        project_id = 'cloud-custodian'
 
         session_factory = self.replay_flight_data(
             'ml-jobs-query', project_id)
@@ -73,22 +71,19 @@ class MLJobTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_jobs_get(self):
-        project_id = 'mythic-tribute-232915'  # 'cloud-custodian'
-        id = "test_job"
+        project_id = 'cloud-custodian'
+        name = "test_job"
 
-        session_factory = self.replay_flight_data(
-            'ml-jobs-query-get', project_id)
-
-        policy = self.load_policy(
-            {
-                'name': 'ml-jobs-query-get',
-                'resource': 'gcp.ml-job'
-            },
-            session_factory=session_factory)
-
-        resource = policy.resource_manager.get_resource({
-            "name": id,
-            "project_id": project_id,
-        })
-
-        self.assertEqual(resource['jobId'], id)
+        factory = self.replay_flight_data('ml-job-get', project_id=project_id)
+        p = self.load_policy({
+            'name': 'ml-job-get',
+            'resource': 'gcp.ml-job',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['google.cloud.ml.v1.JobService.CreateJob']
+            }
+        }, session_factory=factory)
+        exec_mode = p.get_execution_mode()
+        event = event_data('ml-job-create.json')
+        jobs = exec_mode.run(event, None)
+        self.assertIn(name, jobs[0]['jobId'])

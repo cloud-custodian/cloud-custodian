@@ -17,6 +17,7 @@ from azure_common import BaseTest, arm_template
 
 
 class CosmosDBTest(BaseTest):
+
     def setUp(self):
         super(CosmosDBTest, self).setUp()
 
@@ -25,6 +26,18 @@ class CosmosDBTest(BaseTest):
             p = self.load_policy({
                 'name': 'test-azure-cosmos-db',
                 'resource': 'azure.cosmosdb'
+            }, validate=True)
+            self.assertTrue(p)
+
+            p = self.load_policy({
+                'name': 'test-azure-cosmos-db',
+                'resource': 'azure.cosmosdb-database'
+            }, validate=True)
+            self.assertTrue(p)
+
+            p = self.load_policy({
+                'name': 'test-azure-cosmos-db',
+                'resource': 'azure.cosmosdb-collection'
             }, validate=True)
             self.assertTrue(p)
 
@@ -44,6 +57,36 @@ class CosmosDBTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('cosmosdb.json')
+    def test_find_by_name_database(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-database',
+            'filters': [
+                {'type': 'value',
+                 'key': 'id',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestcdatabase'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('cosmosdb.json')
+    def test_find_by_name_collection(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-collection',
+            'filters': [
+                {'type': 'value',
+                 'key': 'id',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cccontainer'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('cosmosdb.json')
     def test_firewall_rules_include(self):
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
@@ -54,19 +97,7 @@ class CosmosDBTest(BaseTest):
         })
         resources = p.run()
         print(resources)
-        self.assertEqual(len(resources), 1)
-
-    @arm_template('cosmosdb.json')
-    def test_firewall_rules_not_include_all_ranges(self):
-        p = self.load_policy({
-            'name': 'test-azure-cosmosdb',
-            'resource': 'azure.cosmosdb',
-            'filters': [
-                {'type': 'firewall-rules',
-                 'include': ['3.1.1.1', '3.1.1.2-3.1.1.2']}],
-        }, validate=True)
-        resources = p.run()
-        self.assertEqual(0, len(resources))
+        self.assertEqual(1, len(resources))
 
     @arm_template('cosmosdb.json')
     def test_firewall_rules_include_cidr(self):
@@ -81,25 +112,29 @@ class CosmosDBTest(BaseTest):
         self.assertEqual(1, len(resources))
 
     @arm_template('cosmosdb.json')
-    def test_firewall_rules_not_include_cidr(self):
-        p = self.load_policy({
-            'name': 'test-azure-cosmosdb',
-            'resource': 'azure.cosmosdb',
-            'filters': [
-                {'type': 'firewall-rules',
-                 'include': ['2.2.2.128/25']}],
-        }, validate=True)
-        resources = p.run()
-        self.assertEqual(0, len(resources))
-
-    @arm_template('cosmosdb.json')
     def test_firewall_rules_not_equal(self):
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
             'resource': 'azure.cosmosdb',
             'filters': [
                 {'type': 'firewall-rules',
-                 'equal': ['3.1.1.1-3.1.1.2', '3.1.1.1-3.1.1.1', '1.2.2.128/25']}],
+                 'equal': ['1.0.0.0/1']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
+
+    @arm_template('cosmosdb.json')
+    def test_offer_collection(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-collection',
+            'filters': [
+                {'type': 'offer',
+                 'key': 'content.offerThroughput',
+                 'op': 'gt',
+                 'value': 100}],
+        })
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('Hash', resources[0]['partitionKey']['kind'])

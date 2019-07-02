@@ -21,7 +21,7 @@ if os.path.exists('README.md'):
 
 setup(
     name="c7n_org",
-    version='0.5.2',
+    version='0.5.3',
     description="Cloud Custodian - Multi Account",
     classifiers=[
         "Topic :: System :: Systems Administration",
@@ -29,6 +29,7 @@ setup(
     ],
     url="https://github.com/cloud-custodian/cloud-custodian",
     long_description=description,
+    long_description_content_type='text/markdown',
     author="Kapil Thangavelu",
     author_email="kapil.foss@gmail.com",
     license="Apache-2.0",

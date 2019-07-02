@@ -23,6 +23,19 @@ from c7n.utils import type_schema
 
 @resources.register('resourcegroup')
 class ResourceGroup(ArmResourceManager):
+    """Resource Group Resource
+
+    :example:
+
+    Finds all Resource Groups in the subscription.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-all-resource-groups
+              resource: azure.resourcegroup
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.resource'

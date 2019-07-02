@@ -14,8 +14,8 @@
 
 import sendgrid
 import six
-from c7n_mailer.utils import (get_message_subject, get_rendered_jinja)
-from c7n_mailer.utils_email import is_email
+from c7n_mailer.utils import (get_message_subject)
+from c7n_mailer.utils_email import is_email, get_mimetext_message
 from python_http_client import exceptions
 from sendgrid.helpers.mail import Mail, To, From
 
@@ -34,7 +34,9 @@ class SendGridDelivery(object):
 
         to_addrs_to_content_map = {}
         for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
-            to_addrs_to_content_map[to_addrs] = self.get_message_content(
+            to_addrs_to_content_map[to_addrs] = get_mimetext_message(
+                self.config,
+                self.logger,
                 queue_message,
                 resources,
                 list(to_addrs)
@@ -72,11 +74,6 @@ class SendGridDelivery(object):
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
         return email_to_addrs_to_resources_map
 
-    def get_message_content(self, queue_message, resources, to_addrs):
-        return get_rendered_jinja(
-            to_addrs, queue_message, resources, self.logger,
-            'template', 'default', self.config['templates_folders'])
-
     def sendgrid_handler(self, queue_message, to_addrs_to_email_messages_map):
         self.logger.info("Sending account:%s policy:%s %s:%s email:%s to %s" % (
             queue_message.get('account', ''),
@@ -93,20 +90,20 @@ class SendGridDelivery(object):
             email_format = queue_message['action'].get(
                 'template', 'default').endswith('html') and 'html' or 'plain'
 
-        for email_to_addrs, email_content in six.iteritems(to_addrs_to_email_messages_map):
+        for email_to_addrs, message in six.iteritems(to_addrs_to_email_messages_map):
             for to_address in email_to_addrs:
                 if email_format == "html":
                     mail = Mail(
                         from_email=From(from_address),
                         to_emails=To(to_address),
                         subject=subject,
-                        html_content=email_content)
+                        html_content=message.as_string())
                 else:
                     mail = Mail(
                         from_email=From(from_address),
                         to_emails=To(to_address),
                         subject=subject,
-                        plain_text_content=email_content)
+                        plain_text_content=message.as_string())
                 try:
                     self.sendgrid_client.send(mail)
                 except (exceptions.UnauthorizedError, exceptions.BadRequestsError) as e:

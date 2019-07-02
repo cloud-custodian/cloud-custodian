@@ -26,7 +26,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.5.4',
+    version='0.5.5',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -54,6 +54,7 @@ setup(
                       "azure-mgmt-databricks",
                       "azure-mgmt-datalake-store",
                       "azure-mgmt-datafactory",
+                      "azure-mgmt-dns",
                       "azure-mgmt-iothub",
                       "azure-mgmt-keyvault",
                       "azure-mgmt-managementgroups",
@@ -67,6 +68,7 @@ setup(
                       "azure-mgmt-policyinsights",
                       "azure-mgmt-eventgrid",
                       "azure-mgmt-logic",
+                      "azure-cosmos",
                       "azure-graphrbac",
                       "azure-keyvault",
                       "azure-storage-blob",

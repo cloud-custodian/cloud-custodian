@@ -97,6 +97,34 @@ RESOURCE_2 = {
     'Size': 8
 }
 
+RESOURCE_3 = {
+    'AvailabilityZone': 'us-east-1c',
+    "CreateTime": "2019-05-07T19:09:46.148Z",
+    'Attachments': [
+        {
+            "AttachTime": "2019-05-07T19:09:46.000Z",
+            "Device": "/dev/xvda",
+            "InstanceId": "i-00000000000000000",
+            "State": "attached",
+            "VolumeId": "vol-00000000000000000",
+            "DeleteOnTermination": 'true'
+        }
+    ],
+    'Tags': [
+        {
+            'Value': 'milton@initech.com',
+            'Key': 'SupportEmail'
+        },
+        {
+            'Value': 'peter',
+            'Key': 'CreatorName'
+        }
+    ],
+    'VolumeId': 'vol-21a0e7ea9b19f0043',
+    'Size': 8,
+    'State': "in-use"
+}
+
 SQS_MESSAGE_1 = {
     'account': 'core-services-dev',
     'account_id': '000000000000',
@@ -232,6 +260,41 @@ SQS_MESSAGE_4 = {
     'event': None,
     'resources': [RESOURCE_1]
 }
+
+SQS_MESSAGE_5 = {
+    'account': 'core-services-dev',
+    'account_id': '000000000000',
+    'region': 'us-east-1',
+    'action': {
+        'to': ['slack://#test-channel'],
+        'template': 'default.html',
+        'type': 'notify',
+        'transport': {'queue': 'xxx', 'type': 'sqs'},
+        'subject': '{{ account }} AWS EBS Volumes will be DELETED in 15 DAYS!'
+    },
+    'policy': {
+        'filters': [{'Attachments': []}, {'tag:maid_status': 'absent'}],
+        'resource': 'ebs',
+        'actions': [
+            {
+                'type': 'mark-for-op',
+                'days': 15,
+                'op': 'delete'
+            },
+            {
+                'to': ['slack://tag/SlackChannel'],
+                'template': 'slack_default.j2',
+                'type': 'notify',
+                'subject': 'EBS Volumes will be DELETED in 15 DAYS!'
+            }
+        ],
+        'comments': 'We are deleting your EBS volumes.',
+        'name': 'ebs-mark-unattached-deletion'
+    },
+    'event': None,
+    'resources': [RESOURCE_3]
+}
+
 
 ASQ_MESSAGE = '''{
    "account":"subscription",

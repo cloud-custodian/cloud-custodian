@@ -18,6 +18,19 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('routetable')
 class RouteTable(ArmResourceManager):
+    """Route Table Resource
+
+    :example:
+
+    Finds all Route Tables in the subscription.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-all-route-tables
+              resource: azure.routetable
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.network'

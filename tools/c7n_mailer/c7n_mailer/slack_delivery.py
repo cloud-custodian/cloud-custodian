@@ -90,10 +90,16 @@ class SlackDelivery(object):
                     resource_list,
                     self.logger, 'slack_template', 'slack_default',
                     self.config['templates_folders'])
-            elif target.startswith('slack://tag/') and 'tags' in resource:
+            elif target.startswith('slack://tag/') and 'Tags' in resource:
                 tag_name = target.split('tag/', 1)[1]
-                result = resource.get('tags', {}).get(tag_name, None)
-                resolved_addrs = result
+                result = next((item for item in resource.get('Tags', [])
+                               if item["Key"] == tag_name), None)
+                if not result:
+                    self.logger.debug(
+                        "No %s tag found in resource." % tag_name)
+                    continue
+
+                resolved_addrs = result['Value']
                 slack_messages[resolved_addrs] = get_rendered_jinja(
                     resolved_addrs, sqs_message,
                     resource_list,
@@ -143,7 +149,7 @@ class SlackDelivery(object):
                 elif response["error"] == "invalid_auth":
                     raise Exception("Invalid Slack token.")
                 elif response["error"] == "users_not_found":
-                    self.logger.info("Slack user ID not found.")
+                    self.logger.info("Slack user ID for email address %s not found.", address)
                     if self.caching:
                         self.caching.set(address, {})
                     continue
@@ -177,14 +183,21 @@ class SlackDelivery(object):
                 headers={'Content-Type': 'application/json;charset=utf-8',
                          'Authorization': 'Bearer %s' % self.config.get('slack_token')})
 
+        response_json = response.json()
         if response.status_code == 429 and "Retry-After" in response.headers:
             self.logger.info(
                 "Slack API rate limiting. Waiting %d seconds",
-                int(response.headers['retry-after']))
+                int(response.headers['Retry-After']))
             time.sleep(int(response.headers['Retry-After']))
             return
-        elif response.status_code != 200:  # pragma: no cover
+
+        elif response.status_code != 200:
             self.logger.info(
                 "Error in sending Slack message status:%s response: %s",
-                response.status_code, response.text())
+                response.status_code, response.text)
+            return
+
+        elif not response_json['ok']:
+            self.logger.info("Error in sending Slack message. Status:%s, response:%s",
+                             response.status_code, response_json['error'])
             return

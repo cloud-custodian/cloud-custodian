@@ -12,4 +12,4 @@ Topics for advanced usage of the Azure provider
   multiplesubs
   bloboutput
   appinsightslogging
-  policy
+  azurepolicy

@@ -17,11 +17,24 @@ import logging
 from c7n_azure.filters import FirewallRulesFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from netaddr import IPRange
+from netaddr import IPRange, IPSet
 
 
 @resources.register('sqlserver')
 class SqlServer(ArmResourceManager):
+    """SQL Server Resource
+
+    :example:
+
+    Finds all SQL Servers in the subscription.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-all-sql-servers
+              resource: azure.sqlserver
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.sql'
@@ -51,6 +64,9 @@ class SqlServerFirewallRulesFilter(FirewallRulesFilter):
             resource['resourceGroup'],
             resource['name'])
 
-        resource_rules = set([IPRange(r.start_ip_address, r.end_ip_address) for r in query])
+        resource_rules = IPSet()
+
+        for r in query:
+            resource_rules.add(IPRange(r.start_ip_address, r.end_ip_address))
 
         return resource_rules

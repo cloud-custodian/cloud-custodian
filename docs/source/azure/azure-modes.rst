@@ -3,7 +3,7 @@
 Azure Modes
 ===========
 
-Custodian can run in numerous modes depending with the default being pull Mode.
+Custodian can run in numerous modes with the default being pull Mode.
 
 - pull:
     Default mode, which runs locally where custodian is run.
@@ -21,3 +21,5 @@ Custodian can run in numerous modes depending with the default being pull Mode.
     <https://azure.microsoft.com/en-us/services/event-grid/>`_ for more details.
 
   .. c7n-schema:: mode.azure-event-grid
+
+For more information about running custodian with Azure Functions, see :ref:`azure_azurefunctions`

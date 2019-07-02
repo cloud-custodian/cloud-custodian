@@ -16,10 +16,10 @@ This creates a virtual env in your enlistment and installs all packages as edita
 You can also simply do `pip install -r requirements-dev.txt` to install all dev/test dependencies.
 
 Adding New Azure Resources
-==========================
+--------------------------
 
 Install Azure Dependencies
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Custodian interfaces with ARM resources using Azure's SDKs.
 Install the resources SDK in ``setup.py``.
@@ -32,7 +32,7 @@ Install the resources SDK in ``setup.py``.
                       ...
 
 Create New Azure Resource
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Create your new Azure Resource.
 
@@ -62,7 +62,7 @@ Create your new Azure Resource.
 
 
 Load New Azure Resource
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Once the required dependecies are installed and created the new Azure Resource, custodian will
 load all registered resources. Import the resource in
@@ -73,7 +73,7 @@ load all registered resources. Import the resource in
     import c7n_azure.resources.container_registry
 
 Testing
-=======
+-------
 
 Tests for c7n_azure run automatically with other Custodian tests.  See :ref:`Testing for Developers <developer-tests>`
 for information on how to run Tox.
@@ -83,7 +83,7 @@ environment variables and command lines for running `pytest`.
 
 
 Test framework
---------------
+~~~~~~~~~~~~~~
 
 c7n_azure uses `VCR.py` for tests.
 This framework is used for tests in the official Azure Python SDK.
@@ -91,7 +91,7 @@ This framework is used for tests in the official Azure Python SDK.
 VCRpy documentation can be found here: `VCR.py documentation <https://vcrpy.readthedocs.io/en/latest/>`_.
 
 ARM templates
--------------
+~~~~~~~~~~~~~
 
 To ensure VCR cassettes can be easily re-recorded, there are ARM templates to deploy Azure tests infrastructure.
 
@@ -129,7 +129,7 @@ required infrastructure if needed.
     def test_template(self):
 
 Cassettes
----------
+~~~~~~~~~
 
 `AzureVCRBaseTest` attempts to automatically obscure keys and other secrets in cassettes and replace subscription ids,
 but it is required to verify cassettes don't contain any sensitive information before submitting.
@@ -137,7 +137,7 @@ but it is required to verify cassettes don't contain any sensitive information b
 For long standing operations cassette can be modified to reduce test execution time (in case recorded cassette contains some responses with Retry-After headers or Azure SDK waits until resource is provisioned).
 
 Running tests
--------------
+~~~~~~~~~~~~~
 
 You can use `tox` to run all tests or instead you can use `pytest` and run only Azure tests (or only specific set of tests). Runing recorded tests still requires some authentication, it is possible to use fake data for authorization token and subscription id.
 
