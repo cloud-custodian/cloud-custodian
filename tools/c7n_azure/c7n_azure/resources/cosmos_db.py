@@ -187,6 +187,27 @@ class CosmosDBCollection(CosmosDBChildResource):
 @CosmosDBCollection.filter_registry.register('offer')
 @CosmosDBDatabase.filter_registry.register('offer')
 class CosmosDBOfferFilter(ValueFilter):
+    """CosmosDB Offer Filter
+
+    Allows access to the offer on a collection or database.
+
+    :example:
+    This policy will find all collections with a V2 offer which indicates
+    throughput is provisioned at the collection scope.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cosmosdb-high-throughput
+            resource: azure.cosmosdb-collection
+            filters:
+              - type: offer
+                key: offerVersion
+                op: eq
+                value: 'V2'
+
+    """
+
     schema = type_schema('offer', rinherit=ValueFilter.schema)
     schema_alias = True
 
