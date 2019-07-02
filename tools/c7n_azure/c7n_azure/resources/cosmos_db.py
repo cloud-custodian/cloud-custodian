@@ -124,8 +124,9 @@ class CosmosDBDatabase(CosmosDBChildResource):
             databases = list(data_client.ReadDatabases())
         except HTTPFailure as e:
             if e.status_code == 403:
-                log.error("Identity does not have permissions to read CosmosDB accounts"
-                          " or firewall is blocking access.")
+                log.error("403 Forbidden. Ensure identity has `Cosmos DB Account Reader` or"
+                          "`DocumentDB Accounts Contributor` and that firewall is not "
+                          "blocking access.")
             else:
                 log.error(e)
             return None
@@ -164,8 +165,9 @@ class CosmosDBCollection(CosmosDBChildResource):
             databases = list(data_client.ReadDatabases())
         except HTTPFailure as e:
             if e.status_code == 403:
-                log.error("Identity does not have permissions to read CosmosDB accounts"
-                          " or firewall is blocking access.")
+                log.error("403 Forbidden. Ensure identity has `Cosmos DB Account Reader` or"
+                          "`DocumentDB Accounts Contributor` and that firewall is not "
+                          "blocking access.")
             else:
                 log.error(e)
             return None
