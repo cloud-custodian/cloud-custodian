@@ -14,15 +14,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template
+from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
 from c7n_azure.resources.storage import StorageSettingsUtilities
+from c7n_azure.storage_utils import StorageUtilities
 from mock import patch, MagicMock
 
 from c7n.utils import get_annotation_prefix
+from c7n.utils import local_session
 
 
 class StorageTest(BaseTest):
     def setUp(self):
         super(StorageTest, self).setUp()
+        StorageUtilities.get_storage_primary_key.cache_clear()
 
     def test_storage_schema_validate(self):
         with self.sign_out_patch():
@@ -233,6 +237,132 @@ class StorageTest(BaseTest):
         self.assertEqual(1, len(resources))
         self.assertTrue(get_annotation_prefix('table') in resources[0])
 
+    @arm_template('storage.json')
+    def test_enable_log_settings(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cclgstorage*'}],
+            'actions': [
+                {
+                    'type': 'set-log-settings',
+                    'storage-types': ['blob', 'queue', 'table'],
+                    'retention': 5,
+                    'log': ['read', 'write', 'delete']
+                }
+            ]
+        }, validate=True)
+
+        resources = p.run()
+        session = local_session(p.session_factory)
+        token = StorageUtilities.get_storage_token(session)
+        blob_settings = StorageSettingsUtilities.get_settings(
+            BLOB_TYPE, resources[0], token=token)
+        queue_settings = StorageSettingsUtilities.get_settings(
+            QUEUE_TYPE, resources[0], token=token)
+        table_settings = StorageSettingsUtilities.get_settings(
+            TABLE_TYPE, resources[0], session=session)
+
+        # assert all logging settings are enabled
+        self.assertTrue(blob_settings.logging.delete and
+                        blob_settings.logging.read and blob_settings.logging.write)
+        self.assertTrue(queue_settings.logging.delete and
+                        queue_settings.logging.read and queue_settings.logging.write)
+        self.assertTrue(table_settings.logging.delete and
+                        table_settings.logging.read and table_settings.logging.write)
+
+        # assert retention policy is enabled
+        self.assertTrue(blob_settings.logging.retention_policy.enabled)
+        self.assertTrue(queue_settings.logging.retention_policy.enabled)
+        self.assertTrue(table_settings.logging.retention_policy.enabled)
+
+        # assert retention days is set to 5
+        self.assertEqual(blob_settings.logging.retention_policy.days, 5)
+        self.assertEqual(table_settings.logging.retention_policy.days, 5)
+        self.assertEqual(queue_settings.logging.retention_policy.days, 5)
+
+    @arm_template('storage.json')
+    def test_disable_log_settings(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cclgstorage*'}],
+            'actions': [
+                {
+                    'type': 'set-log-settings',
+                    'storage-types': ['blob', 'queue', 'table'],
+                    'retention': 5,
+                    'log': ['delete']
+                }
+            ]
+        }, validate=True)
+
+        resources = p.run()
+        session = local_session(p.session_factory)
+        token = StorageUtilities.get_storage_token(session)
+        blob_settings = StorageSettingsUtilities.get_settings(
+            BLOB_TYPE, resources[0], token=token)
+        queue_settings = StorageSettingsUtilities.get_settings(
+            QUEUE_TYPE, resources[0], token=token)
+        table_settings = StorageSettingsUtilities.get_settings(
+            TABLE_TYPE, resources[0], session=session)
+
+        # assert read and write logging settings are disabled
+        self.assertFalse(blob_settings.logging.read and blob_settings.logging.write)
+        self.assertFalse(queue_settings.logging.read and queue_settings.logging.write)
+        self.assertFalse(table_settings.logging.read and table_settings.logging.write)
+
+        # assert delete logging settings are enabled
+        self.assertTrue(blob_settings.logging.delete)
+        self.assertTrue(queue_settings.logging.delete)
+        self.assertTrue(table_settings.logging.delete)
+
+    @arm_template('storage.json')
+    def test_disable_retention_log_settings(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cclgstorage*'}],
+            'actions': [
+                {
+                    'type': 'set-log-settings',
+                    'storage-types': ['blob', 'queue', 'table'],
+                    'retention': 0,
+                    'log': ['read', 'write', 'delete']
+                }
+            ]
+        }, validate=True)
+
+        resources = p.run()
+        session = local_session(p.session_factory)
+        token = StorageUtilities.get_storage_token(session)
+        blob_settings = StorageSettingsUtilities.get_settings(
+            BLOB_TYPE, resources[0], token=token)
+        queue_settings = StorageSettingsUtilities.get_settings(
+            QUEUE_TYPE, resources[0], token=token)
+        table_settings = StorageSettingsUtilities.get_settings(
+            TABLE_TYPE, resources[0], session=session)
+
+        # assert retention policy is disabled
+        self.assertFalse(blob_settings.logging.retention_policy.enabled)
+        self.assertFalse(queue_settings.logging.retention_policy.enabled)
+        self.assertFalse(table_settings.logging.retention_policy.enabled)
+
     @patch('azure.storage.blob.blockblobservice.BlockBlobService.get_blob_service_properties')
     def test_storage_settings_get_blob_settings(self, mock_blob_properties_call):
         mock_storage_account = {
@@ -240,7 +370,7 @@ class StorageTest(BaseTest):
             "name": "mock_storage_account"
         }
         mock_token = 'mock_token'
-        StorageSettingsUtilities.get_blob_settings(mock_storage_account, mock_token)
+        StorageSettingsUtilities.get_settings(BLOB_TYPE, mock_storage_account, token=mock_token)
         mock_blob_properties_call.assert_called_once()
 
     @patch('azure.storage.file.fileservice.FileService.get_file_service_properties')
@@ -253,7 +383,7 @@ class StorageTest(BaseTest):
             "name": "mock_storage_account"
         }
         mock_session = MagicMock()
-        StorageSettingsUtilities.get_file_settings(mock_storage_account, mock_session)
+        StorageSettingsUtilities.get_settings(FILE_TYPE, mock_storage_account, session=mock_session)
         mock_get_storage_key.assert_called_with(
             'mock_resource_group', 'mock_storage_account', mock_session)
         mock_file_properties_call.assert_called_once()
@@ -268,7 +398,8 @@ class StorageTest(BaseTest):
             "name": "mock_storage_account"
         }
         mock_session = MagicMock()
-        StorageSettingsUtilities.get_table_settings(mock_storage_account, mock_session)
+        StorageSettingsUtilities.get_settings(
+            TABLE_TYPE, mock_storage_account, session=mock_session)
         mock_get_storage_key.assert_called_with(
             'mock_resource_group', 'mock_storage_account', mock_session)
         mock_get_table_properties.assert_called_once()
@@ -280,5 +411,53 @@ class StorageTest(BaseTest):
             "name": "mock_storage_account"
         }
         mock_token = 'mock_token'
-        StorageSettingsUtilities.get_queue_settings(mock_storage_account, mock_token)
+        StorageSettingsUtilities.get_settings(
+            QUEUE_TYPE, mock_storage_account, token=mock_token)
         mock_get_queue_properties.assert_called_once()
+
+    @patch('azure.storage.queue.queueservice.QueueService.set_queue_service_properties')
+    def test_storage_settings_update_logging_queue(self, mock_set_queue_properties):
+        mock_storage_account = {
+            "resourceGroup": "mock_resource_group",
+            "name": "mock_storage_account"
+        }
+        mock_token = 'mock_token'
+        log_settings = MagicMock()
+
+        StorageSettingsUtilities.update_logging(
+            QUEUE_TYPE, mock_storage_account, log_settings, token=mock_token)
+
+        mock_set_queue_properties.assert_called_once()
+
+    @patch('azure.cosmosdb.table.tableservice.TableService.set_table_service_properties')
+    @patch('c7n_azure.storage_utils.StorageUtilities.get_storage_primary_key',
+           return_value='mock_primary_key')
+    def test_storage_settings_update_logging_table(self, mock_get_storage_key,
+                                                   mock_set_table_properties):
+        mock_storage_account = {
+            "resourceGroup": "mock_resource_group",
+            "name": "mock_storage_account"
+        }
+        mock_session = MagicMock()
+        log_settings = MagicMock()
+
+        StorageSettingsUtilities.update_logging(
+            TABLE_TYPE, mock_storage_account, log_settings, session=mock_session)
+
+        mock_get_storage_key.assert_called_with(
+            'mock_resource_group', 'mock_storage_account', mock_session)
+        mock_set_table_properties.assert_called_once()
+
+    @patch('azure.storage.blob.blockblobservice.BlockBlobService.set_blob_service_properties')
+    def test_storage_settings_update_logging_blob(self, mock_set_blob_properties):
+        mock_storage_account = {
+            "resourceGroup": "mock_resource_group",
+            "name": "mock_storage_account"
+        }
+        mock_token = 'mock_token'
+        log_settings = MagicMock()
+
+        StorageSettingsUtilities.update_logging(
+            BLOB_TYPE, mock_storage_account, log_settings, token=mock_token)
+
+        mock_set_blob_properties.assert_called_once()

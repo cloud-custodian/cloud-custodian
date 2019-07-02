@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import jmespath
 
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
@@ -28,13 +29,14 @@ class MLModel(QueryResourceManager):
         scope_key = 'parent'
         scope_template = 'projects/{}'
         id = 'name'
+        get_requires_event = True
 
         @staticmethod
-        def get(client, resource_info):
+        def get(client, event):
             return client.execute_query(
-                'get', {'name': 'projects/{}/models/{}'.format(
-                    resource_info['project_id'],
-                    resource_info['name'].rsplit('/', 1)[-1])})
+                'get', {'name': jmespath.search(
+                    'protoPayload.response.name', event
+                )})
 
 
 @resources.register('ml-job')
@@ -48,11 +50,12 @@ class MLJob(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'jobId'
+        id = 'name'
+        get_requires_event = True
 
         @staticmethod
-        def get(client, resource_info):
+        def get(client, event):
             return client.execute_query(
                 'get', {'name': 'projects/{}/jobs/{}'.format(
-                    resource_info['project_id'],
-                    resource_info['name'].rsplit('/', 1)[-1])})
+                    jmespath.search('resource.labels.project_id', event),
+                    jmespath.search('protoPayload.response.jobId', event))})

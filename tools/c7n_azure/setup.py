@@ -54,6 +54,7 @@ setup(
                       "azure-mgmt-databricks",
                       "azure-mgmt-datalake-store",
                       "azure-mgmt-datafactory",
+                      "azure-mgmt-dns",
                       "azure-mgmt-iothub",
                       "azure-mgmt-keyvault",
                       "azure-mgmt-managementgroups",
