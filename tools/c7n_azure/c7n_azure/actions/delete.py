@@ -13,15 +13,16 @@ class DeleteAction(AzureBaseAction):
 
     .. code-block:: yaml
 
-          - policies:
+            policies:
               - name: delete-test-resources
+                resource: azure.armresource
                 description: |
                   Deletes any ARM resource with 'test' in the name
-                resource: azure.armresource
                 filters:
-                 - type: value
-                   name: test
-                   op: in
+                  - type: value
+                    key: name
+                    value: test
+                    op: contains
                 actions:
                  - type: delete
 
@@ -30,17 +31,18 @@ class DeleteAction(AzureBaseAction):
 
     .. code-block:: yaml
 
-          - policies:
-              - name: delete-test-nsg
-                description: |
-                  Deletes any Network Security Group with 'test' in the name
-                resource: azure.networksecuritygroup
-                filters:
-                 - type: value
-                   name: test
-                   op: in
-                actions:
-                 - type: delete
+            policies:
+               - name: delete-test-nsg
+                 description: |
+                   Deletes any Network Security Group with 'test' in the name
+                 resource: azure.networksecuritygroup
+                 filters:
+                   - type: value
+                     key: name
+                     value: test
+                     op: contains
+                 actions:
+                  - type: delete
 
     """
 
