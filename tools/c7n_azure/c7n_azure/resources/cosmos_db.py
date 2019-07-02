@@ -75,20 +75,28 @@ class CosmosDB(ArmResourceManager):
         )
         resource_type = 'Microsoft.DocumentDB/databaseAccounts'
 
+
+class CosmosDBChildResource(ChildResourceManager):
+
+    class resource_type(ChildTypeInfo):
+        parent_spec = ('cosmosdb', True)
+        parent_manager_name = 'cosmosdb'
+        raise_on_exception = False
+        annotate_parent = True
+
     @staticmethod
     @lru_cache()
-    def get_cosmos_key(resource_group, resource_name, resource_manager):
-        client = resource_manager.get_parent_manager().get_client()
+    def get_cosmos_key(resource_group, resource_name, client):
         key_result = client.database_accounts.get_read_only_keys(
             resource_group,
             resource_name)
         return key_result.primary_readonly_master_key
 
-    @staticmethod
-    def get_data_client(parent_resource, resource_manager):
-        key = CosmosDB.get_cosmos_key(
+    def get_data_client(self, parent_resource):
+        key = CosmosDBChildResource.get_cosmos_key(
             parent_resource['resourceGroup'],
-            parent_resource.get('name'), resource_manager)
+            parent_resource.get('name'),
+            self.get_parent_manager().get_client())
         data_client = CosmosClient(
             url_connection=parent_resource.get('properties').get('documentEndpoint'),
             auth={'masterKey': key})
@@ -96,7 +104,7 @@ class CosmosDB(ArmResourceManager):
 
 
 @resources.register('cosmosdb-database')
-class CosmosDBDatabase(ChildResourceManager):
+class CosmosDBDatabase(CosmosDBChildResource):
     """CosmosDB Database Resource
 
     :example:
@@ -109,14 +117,9 @@ class CosmosDBDatabase(ChildResourceManager):
             resource: azure.cosmosdb-database
 
     """
-    class resource_type(ChildTypeInfo):
-        parent_spec = ('cosmosdb', True)
-        parent_manager_name = 'cosmosdb'
-        raise_on_exception = False
-        annotate_parent = True
 
     def enumerate_resources(self, parent_resource, type_info, **params):
-        data_client = CosmosDB.get_data_client(parent_resource, self)
+        data_client = self.get_data_client(parent_resource)
 
         try:
             databases = list(data_client.ReadDatabases())
@@ -125,7 +128,7 @@ class CosmosDBDatabase(ChildResourceManager):
                 log.error("Identity does not have permissions to read CosmosDB accounts"
                           " or firewall is blocking access.")
             else:
-                print(e)
+                log.error(e)
             return None
 
         for d in databases:
@@ -136,7 +139,7 @@ class CosmosDBDatabase(ChildResourceManager):
 
 
 @resources.register('cosmosdb-collection')
-class CosmosDBCollection(ChildResourceManager):
+class CosmosDBCollection(CosmosDBChildResource):
     """CosmosDB Collection Resource
 
     :example:
@@ -154,14 +157,9 @@ class CosmosDBCollection(ChildResourceManager):
                 value: 100
 
     """
-    class resource_type(ChildTypeInfo):
-        parent_spec = ('cosmosdb', True)
-        parent_manager_name = 'cosmosdb'
-        raise_on_exception = False
-        annotate_parent = True
 
     def enumerate_resources(self, parent_resource, type_info, **params):
-        data_client = CosmosDB.get_data_client(parent_resource, self)
+        data_client = self.get_data_client(parent_resource)
 
         try:
             databases = list(data_client.ReadDatabases())
@@ -170,7 +168,7 @@ class CosmosDBCollection(ChildResourceManager):
                 log.error("Identity does not have permissions to read CosmosDB accounts"
                           " or firewall is blocking access.")
             else:
-                print(e)
+                log.error(e)
             return None
 
         collections = []
@@ -209,7 +207,7 @@ class CosmosDBOfferFilter(ValueFilter):
             for f in as_completed(futures):
                 if f.exception():
                     self.log.warning(
-                        "Diagnostic settings filter error: %s" % f.exception())
+                        "Offer filter error: %s" % f.exception())
                     continue
                 else:
                     results.extend(f.result())
@@ -226,10 +224,10 @@ class CosmosDBOfferFilter(ValueFilter):
 
                 # Get the data client keys
                 parent_key = resources[0]['c7n:parent-id']
-                key = CosmosDB.get_cosmos_key(
+                key = CosmosDBChildResource.get_cosmos_key(
                     ResourceIdParser.get_resource_group(parent_key),
                     ResourceIdParser.get_resource_name(parent_key),
-                    self.manager)
+                    self.manager.get_parent_manager().get_client())
 
                 # Build a data client
                 data_client = CosmosClient(
