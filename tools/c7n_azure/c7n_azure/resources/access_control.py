@@ -37,6 +37,29 @@ log = logging.getLogger('custodian.azure.access_control')
 
 @resources.register('roleassignment')
 class RoleAssignment(QueryResourceManager):
+    """Role assignments map role definitions to principals. The Azure
+    object only contains the unique ID of the principal, however we
+    attempt to augment the object with the prinicpal name, display name
+    and type from AAD.
+
+    Augmenting with data from AAD requires executing account to have
+    permissions to read from the Microsoft AAD Graph. For Service Principal
+    Authorization the Service Principal must have the permissions to
+    `read all users' full profiles`. Azure CLI authentication will
+    provide the necessary permissions to run the policy locally.
+
+    :example:
+
+    .. code-block:: yaml
+        policies:
+            - name: role-assignment-owner
+              resource: azure.roleassignment
+              filters:
+                - type: role
+                  key: properties.roleName
+                  op: eq
+                  value: Owner
+    """
 
     class resource_type(object):
         service = 'azure.mgmt.authorization'
@@ -77,6 +100,22 @@ class RoleAssignment(QueryResourceManager):
 
 @resources.register('roledefinition')
 class RoleDefinition(QueryResourceManager):
+    """Role definitions define sets of permissions that can be assigned
+    to an identity.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: role-definition-permissions
+              resource: azure.roledefinition
+              filters:
+                - type: value
+                  key: properties.permissions[].actions[]
+                  value: Microsoft.Authorization/*/read
+                  op: contains
+    """
 
     class resource_type(object):
         service = 'azure.mgmt.authorization'
@@ -129,18 +168,18 @@ def is_scope(scope, scope_type):
 class RoleFilter(RelatedResourceFilter):
     """Filters role assignments based on role definitions
 
-    :Example:
+    :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-               - name: assignments-by-role-definition
-                 resource: azure.roleassignment
-                 filters:
-                    - type: role
-                      key: properties.roleName
-                      op: in
-                      value: Owner
+        policies:
+           - name: assignments-by-role-definition
+             resource: azure.roleassignment
+             filters:
+                - type: role
+                  key: properties.roleName
+                  op: in
+                  value: Owner
     """
 
     schema = type_schema('role', rinherit=ValueFilter.schema)
@@ -154,16 +193,16 @@ class ResourceAccessFilter(RelatedResourceFilter):
     """Filters role assignments that have access to a certain
     type of azure resource.
 
-    :Example:
+    :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-               - name: assignments-by-azure-resource
-                 resource: azure.roleassignment
-                 filters:
-                    - type: resource-access
-                      relatedResource: azure.vm
+        policies:
+           - name: assignments-by-azure-resource
+             resource: azure.roleassignment
+             filters:
+                - type: resource-access
+                  relatedResource: azure.vm
     """
 
     schema = type_schema(
@@ -207,18 +246,38 @@ class ResourceAccessFilter(RelatedResourceFilter):
 
 @RoleAssignment.filter_registry.register('scope')
 class ScopeFilter(Filter):
-    """Filters role assignments that have subscription level scope access
+    """
+    Filter role assignments by assignment scope.
 
-    :example:
+    :examples:
+
+    Role assignments that have subscription level scope access
 
     .. code-block:: yaml
 
-            policies:
-              - name: assignments-with-subscription-scope
-                resource: azure.roleassignment
-                filters:
+        policies:
+          - name: assignments-with-subscription-scope
+            resource: azure.roleassignment
+            filters:
+              - type: scope
+                value: subscription
+
+
+    Role assignments with scope other than Subscription or Resource Group.
+
+    .. code-block:: yaml
+
+        policies:
+           - name: assignments-other-level-scope
+             resource: azure.roleassignment
+             filters:
+                - not:
                   - type: scope
                     value: subscription
+                - not:
+                  - type: scope
+                    value: resource-group
+
     """
 
     schema = type_schema(

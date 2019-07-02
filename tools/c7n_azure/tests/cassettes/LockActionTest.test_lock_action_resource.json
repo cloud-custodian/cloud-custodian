@@ -1,0 +1,224 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DocumentDB/databaseAccounts?api-version=2015-04-08",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "Ok"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-ms-gatewayversion": [
+                        "version=2.4.0.0"
+                    ],
+                    "date": [
+                        "Wed, 26 Jun 2019 17:06:20 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "content-length": [
+                        "1797"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb",
+                                "name": "cctestcosmosdb",
+                                "location": "South Central US",
+                                "type": "Microsoft.DocumentDB/databaseAccounts",
+                                "kind": "MongoDB",
+                                "tags": {
+                                    "defaultExperience": "MongoDB"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "documentEndpoint": "https://cctestcosmosdb.documents.azure.com:443/",
+                                    "ipRangeFilter": "1.2.2.128/25,3.1.1.1,104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26",
+                                    "enableAutomaticFailover": false,
+                                    "enableMultipleWriteLocations": false,
+                                    "isVirtualNetworkFilterEnabled": false,
+                                    "virtualNetworkRules": [],
+                                    "EnabledApiTypes": "MongoDB",
+                                    "databaseAccountOfferType": "Standard",
+                                    "consistencyPolicy": {
+                                        "defaultConsistencyLevel": "Session",
+                                        "maxIntervalInSeconds": 5,
+                                        "maxStalenessPrefix": 100
+                                    },
+                                    "configurationOverrides": {
+                                        "EnableBsonSchema": "True"
+                                    },
+                                    "writeLocations": [
+                                        {
+                                            "id": "cctestcosmosdb-southcentralus",
+                                            "locationName": "South Central US",
+                                            "documentEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/",
+                                            "provisioningState": "Succeeded",
+                                            "failoverPriority": 0,
+                                            "isZoneRedundant": false
+                                        }
+                                    ],
+                                    "readLocations": [
+                                        {
+                                            "id": "cctestcosmosdb-southcentralus",
+                                            "locationName": "South Central US",
+                                            "documentEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/",
+                                            "provisioningState": "Succeeded",
+                                            "failoverPriority": 0,
+                                            "isZoneRedundant": false
+                                        }
+                                    ],
+                                    "locations": [
+                                        {
+                                            "id": "cctestcosmosdb-southcentralus",
+                                            "locationName": "South Central US",
+                                            "documentEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/",
+                                            "provisioningState": "Succeeded",
+                                            "failoverPriority": 0,
+                                            "isZoneRedundant": false
+                                        }
+                                    ],
+                                    "failoverPolicies": [
+                                        {
+                                            "id": "cctestcosmosdb-southcentralus",
+                                            "locationName": "South Central US",
+                                            "failoverPriority": 0
+                                        }
+                                    ],
+                                    "cors": [],
+                                    "capabilities": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestcosmosdb_ReadOnly?api-version=2016-09-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "352"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "date": [
+                        "Wed, 26 Jun 2019 17:06:20 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "level": "ReadOnly"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestcosmosdb_ReadOnly",
+                        "type": "Microsoft.Authorization/locks",
+                        "name": "custodian_lock_cctestcosmosdb_ReadOnly"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 26 Jun 2019 17:06:20 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "364"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "level": "ReadOnly"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestcosmosdb_ReadOnly",
+                                "type": "Microsoft.Authorization/locks",
+                                "name": "custodian_lock_cctestcosmosdb_ReadOnly"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestcosmosdb_ReadOnly?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "date": [
+                        "Wed, 26 Jun 2019 17:06:21 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "14999"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        }
+    ]
+}

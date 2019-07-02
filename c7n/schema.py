@@ -187,6 +187,8 @@ def generate(resource_types=()):
             # Shortcut form of value filter as k=v
             'valuekv': {
                 'type': 'object',
+                'additionalProperties': {'oneOf': [{'type': 'number'}, {'type': 'null'},
+                    {'type': 'array', 'maxItems': 0}, {'type': 'string'}, {'type': 'boolean'}]},
                 'minProperties': 1,
                 'maxProperties': 1},
         },
@@ -249,6 +251,7 @@ def generate(resource_types=()):
         },
         'max-resources-properties': {
             'type': 'object',
+            'additionalProperties': False,
             'properties': {
                 'amount': {"type": 'integer', 'minimum': 1},
                 'op': {'enum': ['or', 'and']},
@@ -302,13 +305,9 @@ def process_resource(
 
     r = resource_defs.setdefault(type_name, {'actions': {}, 'filters': {}})
 
-    seen_actions = set()  # Aliases get processed once
     action_refs = []
-    for action_name, a in resource_type.action_registry.items():
-        if a in seen_actions:
-            continue
-        else:
-            seen_actions.add(a)
+    for a in ElementSchema.elements(resource_type.action_registry):
+        action_name = a.type
         if a.schema_alias:
             action_alias = "%s.%s" % (provider_name, action_name)
             if action_alias in definitions['actions']:
@@ -317,7 +316,8 @@ def process_resource(
                     msg = "Schema mismatch on type:{} action:{} w/ schema alias ".format(
                         type_name, action_name)
                     raise SyntaxError(msg)
-            definitions['actions'][action_alias] = a.schema
+            else:
+                definitions['actions'][action_alias] = a.schema
             action_refs.append({'$ref': '#/definitions/actions/%s' % action_alias})
         else:
             r['actions'][action_name] = a.schema
@@ -329,55 +329,41 @@ def process_resource(
     action_refs.append(
         {'enum': list(resource_type.action_registry.keys())})
 
-    nested_filter_refs = []
-    filters_seen = set()
-    for k, v in sorted(resource_type.filter_registry.items()):
-        if v in filters_seen:
-            continue
-        else:
-            filters_seen.add(v)
-        nested_filter_refs.append(
-            {'$ref': '#/definitions/resources/%s/filters/%s' % (
-                type_name, k)})
-    nested_filter_refs.append(
-        {'$ref': '#/definitions/filters/valuekv'})
-
     filter_refs = []
-    filters_seen = set()  # for aliases
-    for filter_name, f in sorted(resource_type.filter_registry.items()):
-        if f in filters_seen:
-            continue
-        else:
-            filters_seen.add(f)
-
-        if filter_name in ('or', 'and', 'not'):
-            continue
-        if f.schema_alias:
-            if filter_name in definitions['filters']:
-                assert definitions['filters'][filter_name] == f.schema, "Schema mismatch on filter w/ schema alias" # NOQA
-            definitions['filters'][filter_name] = f.schema
-            filter_refs.append({
-                '$ref': '#/definitions/filters/%s' % filter_name})
-            continue
-        elif filter_name == 'value':
-            r['filters'][filter_name] = {
-                '$ref': '#/definitions/filters/value'}
-            r['filters']['valuekv'] = {
-                '$ref': '#/definitions/filters/valuekv'}
+    for f in ElementSchema.elements(resource_type.filter_registry):
+        filter_name = f.type
+        if filter_name == 'value':
+            filter_refs.append({'$ref': '#/definitions/filters/value'})
+            filter_refs.append({'$ref': '#/definitions/filters/valuekv'})
         elif filter_name == 'event':
-            r['filters'][filter_name] = {
-                '$ref': '#/definitions/filters/event'}
+            filter_refs.append({'$ref': '#/definitions/filters/event'})
+        elif f.schema_alias:
+            filter_alias = "%s.%s" % (provider_name, filter_name)
+            if filter_alias in definitions['filters']:
+                assert definitions['filters'][filter_alias] == f.schema, "Schema mismatch on filter w/ schema alias" # NOQA
+            else:
+                definitions['filters'][filter_alias] = f.schema
+            filter_refs.append({'$ref': '#/definitions/filters/%s' % filter_alias})
+            continue
         else:
             r['filters'][filter_name] = f.schema
-        filter_refs.append(
-            {'$ref': '#/definitions/resources/%s/filters/%s' % (
-                type_name, filter_name)})
-    filter_refs.append(
-        {'$ref': '#/definitions/filters/valuekv'})
+            filter_refs.append(
+                {'$ref': '#/definitions/resources/%s/filters/%s' % (
+                    type_name, filter_name)})
 
     # one word filter shortcuts
     filter_refs.append(
         {'enum': list(resource_type.filter_registry.keys())})
+
+    block_fref = '#/definitions/resources/%s/policy/allOf/1/properties/filters' % (
+        type_name)
+    filter_refs.extend([
+        {'type': 'object', 'additionalProperties': False,
+         'properties': {'or': {'$ref': block_fref}}},
+        {'type': 'object', 'additionalProperties': False,
+         'properties': {'and': {'$ref': block_fref}}},
+        {'type': 'object', 'additionalProperties': False,
+         'properties': {'not': {'$ref': block_fref}}}])
 
     resource_policy = {
         'allOf': [

@@ -1,0 +1,74 @@
+{
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "principalEmail": "system:node:gke-standard-cluster-1-pool-1-c733eefe-xtbq"
+      },
+      "authorizationInfo": [],
+      "methodName": "io.k8s.core.v1.pods.create",
+      "request": {
+        "@type": "core.k8s.io/v1.Pod",
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "annotations": {},
+          "creationTimestamp": null,
+          "labels": {
+            "component": "kube-proxy",
+            "tier": "node"
+          },
+          "name": "kube-proxy-gke-standard-cluster-1-pool-1-c733eefe-xtbq",
+          "namespace": "kube-system",
+          "selfLink": "/api/v1/namespaces/kube-system/pods/kube-proxy-gke-standard-cluster-1-pool-1-c733eefe-xtbq",
+          "uid": "9ef8eaa0a08f35eed9a7f7676a774e8a"
+        },
+        "spec": {},
+        "status": {
+          "phase": "Pending"
+        }
+      },
+      "requestMetadata": {
+        "callerIp": "35.184.126.154"
+      },
+      "resourceName": "core/v1/namespaces/kube-system/pods/kube-proxy-gke-standard-cluster-1-pool-1-c733eefe-xtbq",
+      "response": {
+        "@type": "core.k8s.io/v1.Pod",
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "annotations": {},
+          "creationTimestamp": "2019-05-20T13:23:47Z",
+          "labels": {
+            "component": "kube-proxy",
+            "tier": "node"
+          },
+          "name": "kube-proxy-gke-standard-cluster-1-pool-1-c733eefe-xtbq",
+          "namespace": "kube-system",
+          "resourceVersion": "1694",
+          "selfLink": "/api/v1/namespaces/kube-system/pods/kube-proxy-gke-standard-cluster-1-pool-1-c733eefe-xtbq",
+          "uid": "7fe1a60c-7b02-11e9-b6b0-42010a8001b1"
+        },
+        "spec": {},
+        "status": {
+          "phase": "Pending",
+          "qosClass": "Burstable"
+        }
+      },
+      "serviceName": "k8s.io",
+      "status": {}
+    },
+    "insertId": "5d259625-1465-4202-b868-81724a325522",
+    "resource": {
+      "type": "k8s_cluster",
+      "labels": {
+        "project_id": "mythic-tribute-232915",
+        "cluster_name": "standard-cluster-1",
+        "location": "us-central1-a"
+      }
+    },
+    "timestamp": "2019-05-20T13:23:47.758997Z",
+    "labels": {},
+    "logName": "projects/mythic-tribute-232915/logs/cloudaudit.googleapis.com%2Factivity",
+    "operation": {},
+    "receiveTimestamp": "2019-05-20T13:24:15.856159145Z"
+  }

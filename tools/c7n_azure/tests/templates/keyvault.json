@@ -15,11 +15,13 @@
           }
         }
     },
-    "variables": {},
+    "variables": {
+         "kvname": "[concat('cckeyvault1', uniqueString(resourceGroup().id))]"
+    },
     "resources": [
         {
             "type": "Microsoft.KeyVault/vaults",
-            "name": "[concat('cckeyvault1', uniqueString(resourceGroup().id))]",
+            "name": "[variables('kvname')]",
             "apiVersion": "2016-10-01",
             "location": "southcentralus",
             "tags": {},
@@ -92,6 +94,18 @@
                 "enabledForTemplateDeployment": false
             },
             "dependsOn": []
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/providers/locks",
+            "apiVersion": "2016-09-01",
+            "name": "[concat(variables('kvname'), '/Microsoft.Authorization/lock')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('kvname'))]"
+            ],
+            "properties": {
+                "level": "CanNotDelete",
+                "notes": "Keyvault should not be deleted."
+            }
         }
     ]
 }

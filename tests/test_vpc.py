@@ -1400,6 +1400,23 @@ class SecurityGroupTest(BaseTest):
         ]
         self.assertEqual(group_info.get("IpPermissions", []), [])
 
+    def test_permission_cidr_kv(self):
+        factory = self.replay_flight_data('test_security_group_perm_cidr_kv')
+        p = self.load_policy({
+            'name': 'sg-ingress',
+            'resource': 'security-group',
+            'source': 'config',
+            'filters': [{
+                'type': 'egress',
+                'Cidr': '0.0.0.0/0',
+            }],
+            'query': [
+                {'clause': "resourceId ='sg-6c7fa917'"},
+            ]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['GroupId'], 'sg-6c7fa917')
+
     def test_default_vpc(self):
         # preconditions, more than one vpc, each with at least one
         # security group

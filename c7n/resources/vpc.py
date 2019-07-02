@@ -177,7 +177,7 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-sg
                 resource: vpc
                 filters:
                   - type: security-group
@@ -211,7 +211,7 @@ class VpcSubnetFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-subnet
                 resource: vpc
                 filters:
                   - type: subnet
@@ -245,7 +245,7 @@ class VpcNatGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-nat
                 resource: vpc
                 filters:
                   - type: nat-gateway
@@ -279,7 +279,7 @@ class VpcInternetGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-igw
                 resource: vpc
                 filters:
                   - type: internet-gateway
@@ -1009,13 +1009,18 @@ class SGPermission(Filter):
         return found
 
     def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
+
         found = None
         ip_perms = perm.get(range_type, [])
         if not ip_perms:
             return False
 
         match_range = self.data[cidr_key]
-        match_range['key'] = cidr_type
+
+        if isinstance(match_range, dict):
+            match_range['key'] = cidr_type
+        else:
+            match_range = {cidr_type: match_range}
 
         vf = ValueFilter(match_range, self.manager)
         vf.annotate = False

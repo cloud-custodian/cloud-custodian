@@ -64,7 +64,7 @@ class GlacierCrossAccountAccessFilter(CrossAccountAccessFilter):
         .. code-block:
 
             policies:
-              - name: glacier-cross-account
+              - name: check-glacier-cross-account
                 resource: glacier
                 filters:
                   - type: cross-account

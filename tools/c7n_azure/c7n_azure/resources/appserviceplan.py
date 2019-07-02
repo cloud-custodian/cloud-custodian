@@ -23,6 +23,22 @@ from azure.mgmt.web import models
 
 @resources.register('appserviceplan')
 class AppServicePlan(ArmResourceManager):
+    """Application Service Plan
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: basic-tier-plans
+            resource: azure.appserviceplan
+            filters:
+              - type: value
+                key: sku.tier
+                op: eq
+                value: Basic
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.web'
@@ -51,15 +67,15 @@ resources.subscribe(resources.EVENT_FINAL, AppServicePlan.register)
 class ResizePlan(AzureBaseAction):
     """Resize App Service Plans
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-          policies:
-            - name: azure-resize-plan
-              resource: azure.appserviceplan
-              actions:
-               - type: resize-plan
-                 size: F1
-                 count: 1
+        policies:
+        - name: azure-resize-plan
+          resource: azure.appserviceplan
+          actions:
+           - type: resize-plan
+             size: F1
+             count: 1
     """
 
     schema = utils.type_schema(

@@ -26,7 +26,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_azure",
-    version='0.5.4',
+    version='0.5.5',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -71,7 +71,10 @@ setup(
                       "azure-keyvault",
                       "azure-storage-blob",
                       "azure-storage-queue",
+                      "azure-storage-file",
+                      "azure-cosmosdb-table",
                       "distlib",
+                      "jsonpickle",
                       "requests",
                       "PyJWT",
                       "c7n",

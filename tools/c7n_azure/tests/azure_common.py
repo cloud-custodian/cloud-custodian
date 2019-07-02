@@ -39,6 +39,7 @@ DEFAULT_SUBSCRIPTION_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
 CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 DEFAULT_USER_OBJECT_ID = '00000000-0000-0000-0000-000000000002'
 DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000003'
+DEFAULT_INSTRUMENTATION_KEY = '00000000-0000-0000-0000-000000000004'
 DEFAULT_STORAGE_KEY = 'DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo'\
                       '/MGFHKc+t+M20PxoraNCslng9w=='
 
@@ -190,6 +191,7 @@ class AzureVCRBaseTest(VCRTestCase):
         body = AzureVCRBaseTest._replace_tenant_id(body)
         body = AzureVCRBaseTest._replace_subscription_id(body)
         body = AzureVCRBaseTest._replace_storage_keys(body)
+        body = AzureVCRBaseTest._replace_instrumentation_key(body)
 
         try:
             response['body']['data'] = json.loads(body)
@@ -264,6 +266,16 @@ class AzureVCRBaseTest(VCRTestCase):
                 r"(?P<prefix>=|\"|:)(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==)",
                 r"\g<prefix>" + DEFAULT_STORAGE_KEY, s)
         return s
+
+    @staticmethod
+    def _replace_instrumentation_key(s):
+        prefixes = ['"InstrumentationKey":\\s*"']
+
+        regex = r"(?P<prefix>(%s))" \
+                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
+                % '|'.join(['(%s)' % p for p in prefixes])
+
+        return re.sub(regex, r"\g<prefix>" + DEFAULT_INSTRUMENTATION_KEY, s)
 
     @staticmethod
     def _json_extension(path):

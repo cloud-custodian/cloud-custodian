@@ -31,23 +31,20 @@ from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExce
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
-from c7n.provider import clouds
+from c7n.provider import clouds, get_resource_class
 from c7n import utils
 from c7n.version import version
 
 log = logging.getLogger('c7n.policy')
 
 
-def load(options, path, format='yaml', validate=True, vars=None):
+def load(options, path, format=None, validate=True, vars=None):
     # should we do os.path.expanduser here?
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
     load_resources()
     data = utils.load_file(path, format=format, vars=vars)
-
-    if format == 'json':
-        validate = False
 
     if isinstance(data, list):
         log.warning('yaml in invalid format. The "policies:" line is probably missing.')
@@ -957,18 +954,7 @@ class Policy(object):
             fh.write(value)
 
     def load_resource_manager(self):
-        resource_type = self.data.get('resource')
-
-        provider = clouds.get(self.provider_name)
-        if provider is None:
-            raise ValueError(
-                "Invalid cloud provider: %s" % self.provider_name)
-
-        factory = provider.resources.get(
-            resource_type.rsplit('.', 1)[-1])
-        if not factory:
-            raise ValueError(
-                "Invalid resource type: %s" % resource_type)
+        factory = get_resource_class(self.data.get('resource'))
         return factory(self.ctx, self.data)
 
     def validate_policy_start_stop(self):

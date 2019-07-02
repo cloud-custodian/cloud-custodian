@@ -17,14 +17,14 @@
                     "content-type": [
                         "application/json"
                     ],
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:11 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 03 May 2019 14:09:19 GMT"
-                    ],
                     "content-length": [
-                        "1081"
+                        "1180"
                     ]
                 },
                 "body": {
@@ -37,9 +37,13 @@
                         "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest",
                         "name": "cloudcustodiantest",
                         "type": "Microsoft.Storage/storageAccounts",
-                        "location": "westus2",
-                        "tags": {},
+                        "location": "centralus",
+                        "tags": {
+                            "CreatorEmail": "kiril@microsoft.com"
+                        },
                         "properties": {
+                            "minimumTlsVersion": "TLS1_2",
+                            "allowBlobPublicAccess": false,
                             "networkAcls": {
                                 "bypass": "AzureServices",
                                 "virtualNetworkRules": [],
@@ -51,24 +55,24 @@
                                 "services": {
                                     "file": {
                                         "enabled": true,
-                                        "lastEnabledTime": "2019-05-01T21:51:44.9504918Z"
+                                        "lastEnabledTime": "2019-06-27T00:42:54.3609456Z"
                                     },
                                     "blob": {
                                         "enabled": true,
-                                        "lastEnabledTime": "2019-05-01T21:51:44.9504918Z"
+                                        "lastEnabledTime": "2019-06-27T00:42:54.3609456Z"
                                     }
                                 },
                                 "keySource": "Microsoft.Storage"
                             },
                             "provisioningState": "Succeeded",
-                            "creationTime": "2019-05-01T21:51:44.8567460Z",
+                            "creationTime": "2019-06-27T00:42:54.2828220Z",
                             "primaryEndpoints": {
                                 "blob": "https://cloudcustodiantest.blob.core.windows.net/",
                                 "queue": "https://cloudcustodiantest.queue.core.windows.net/",
                                 "table": "https://cloudcustodiantest.table.core.windows.net/",
                                 "file": "https://cloudcustodiantest.file.core.windows.net/"
                             },
-                            "primaryLocation": "westus2",
+                            "primaryLocation": "centralus",
                             "statusOfPrimary": "available"
                         }
                     }
@@ -91,14 +95,14 @@
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:11 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 03 May 2019 14:09:20 GMT"
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1198"
                     ],
                     "content-length": [
                         "288"
@@ -131,28 +135,28 @@
             },
             "response": {
                 "status": {
-                    "code": 201,
-                    "message": "Created"
+                    "code": 409,
+                    "message": "The specified container already exists."
                 },
                 "headers": {
-                    "etag": [
-                        "\"0x8D6CFD0F00F16B8\""
+                    "content-type": [
+                        "application/xml"
                     ],
                     "date": [
-                        "Fri, 03 May 2019 14:09:20 GMT"
+                        "Thu, 27 Jun 2019 00:53:11 GMT"
                     ],
-                    "last-modified": [
-                        "Fri, 03 May 2019 14:09:20 GMT"
+                    "x-ms-error-code": [
+                        "ContainerAlreadyExists"
                     ],
                     "x-ms-version": [
-                        "2018-03-28"
+                        "2018-11-09"
                     ],
                     "content-length": [
-                        "0"
+                        "230"
                     ]
                 },
                 "body": {
-                    "string": ""
+                    "string": "\ufeff<?xml version=\"1.0\" encoding=\"utf-8\"?><Error><Code>ContainerAlreadyExists</Code><Message>The specified container already exists.\nRequestId:6a3466ea-701e-000d-5f82-2c7ab8000000\nTime:2019-06-27T00:53:12.2044534Z</Message></Error>"
                 }
             }
         },
@@ -169,23 +173,23 @@
                     "message": "Created"
                 },
                 "headers": {
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:11 GMT"
+                    ],
                     "etag": [
-                        "\"0x8D6CFD0F014F0F0\""
+                        "\"0x8D6FA99D48F188C\""
                     ],
                     "x-ms-request-server-encrypted": [
                         "true"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 14:09:20 GMT"
-                    ],
-                    "last-modified": [
-                        "Fri, 03 May 2019 14:09:20 GMT"
                     ],
                     "content-md5": [
                         "ds2yutlYLSPB9vTYaCGNbA=="
                     ],
                     "x-ms-version": [
-                        "2018-03-28"
+                        "2018-11-09"
+                    ],
+                    "last-modified": [
+                        "Thu, 27 Jun 2019 00:53:12 GMT"
                     ],
                     "content-length": [
                         "0"
@@ -199,7 +203,7 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/appsettings/list?api-version=2018-02-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/appsettings/list?api-version=2018-11-01",
                 "body": null,
                 "headers": {}
             },
@@ -209,20 +213,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "11999"
-                    ],
                     "content-type": [
                         "application/json"
+                    ],
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:11 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 03 May 2019 14:09:20 GMT"
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
                     ],
                     "content-length": [
-                        "707"
+                        "939"
                     ]
                 },
                 "body": {
@@ -230,12 +234,13 @@
                         "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/appsettings",
                         "name": "appsettings",
                         "type": "Microsoft.Web/sites/config",
-                        "location": "West US 2",
+                        "location": "Central US",
                         "properties": {
-                            "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=RPtR9C9mP+bJBBnKYfGS8pcx1/hW/miK1Qo3qJs7LBmOjOJLt6u4UyVGzb9OGDI8C0/89EX6BftJrXVHoIq3Gg==",
-                            "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=RPtR9C9mP+bJBBnKYfGS8pcx1/hW/miK1Qo3qJs7LBmOjOJLt6u4UyVGzb9OGDI8C0/89EX6BftJrXVHoIq3Gg==",
+                            "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
+                            "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
                             "FUNCTIONS_EXTENSION_VERSION": "~2",
-                            "FUNCTIONS_WORKER_RUNTIME": "python"
+                            "FUNCTIONS_WORKER_RUNTIME": "python",
+                            "WEBSITE_RUN_FROM_PACKAGE": "https://cloudcustodiantest.blob.core.windows.net/cloud-custodian-packages/cloud-custodian-test.zip?se=2029-06-24T00%3A46%3A10Z&sp=r&sv=2018-11-09&sr=b&sig=GQgUSSKtdPRk8DM6EGvCrYwNV9xwbcpSnIGQXYkQvYY%3D"
                         }
                     }
                 }
@@ -244,7 +249,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/appsettings?api-version=2018-02-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/appsettings?api-version=2018-11-01",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -257,20 +262,20 @@
                     "content-type": [
                         "application/json"
                     ],
-                    "etag": [
-                        "\"1D501B9CE2875F5\""
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:13 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "etag": [
+                        "\"1D52C82B2C9BAF5\""
+                    ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "1199"
                     ],
-                    "date": [
-                        "Fri, 03 May 2019 14:09:21 GMT"
-                    ],
                     "content-length": [
-                        "940"
+                        "941"
                     ]
                 },
                 "body": {
@@ -278,13 +283,13 @@
                         "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/appsettings",
                         "name": "appsettings",
                         "type": "Microsoft.Web/sites/config",
-                        "location": "West US 2",
+                        "location": "Central US",
                         "properties": {
-                            "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=RPtR9C9mP+bJBBnKYfGS8pcx1/hW/miK1Qo3qJs7LBmOjOJLt6u4UyVGzb9OGDI8C0/89EX6BftJrXVHoIq3Gg==",
-                            "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=RPtR9C9mP+bJBBnKYfGS8pcx1/hW/miK1Qo3qJs7LBmOjOJLt6u4UyVGzb9OGDI8C0/89EX6BftJrXVHoIq3Gg==",
+                            "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
+                            "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
                             "FUNCTIONS_EXTENSION_VERSION": "~2",
                             "FUNCTIONS_WORKER_RUNTIME": "python",
-                            "WEBSITE_RUN_FROM_PACKAGE": "https://cloudcustodiantest.blob.core.windows.net/cloud-custodian-packages/cloud-custodian-test.zip?se=2029-04-30T14%3A09%3A18Z&sp=r&sv=2018-03-28&sr=b&sig=bew7KbBVkjrdXlYF592CEP49yOxTIrpFwkmWvd%2Bd1Zc%3D"
+                            "WEBSITE_RUN_FROM_PACKAGE": "https://cloudcustodiantest.blob.core.windows.net/cloud-custodian-packages/cloud-custodian-test.zip?se=2029-06-24T00%3A53%3A12Z&sp=r&sv=2018-11-09&sr=b&sig=8eyGm6EtX0lY99o47%2BPB7hSQoNL47WrU34XKPzOfABk%3D"
                         }
                     }
                 }
@@ -293,38 +298,52 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/syncfunctiontriggers?api-version=2018-02-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/syncfunctiontriggers?api-version=2018-11-01",
                 "body": null,
                 "headers": {}
             },
             "response": {
                 "status": {
-                    "code": 200,
-                    "message": "OK"
+                    "code": 400,
+                    "message": "Bad Request"
                 },
                 "headers": {
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "set-cookie": [
-                        "ARRAffinity=e566830fcb90564433d8116337d77fee023c24beb241ecfd5bdebeab53f12868;Path=/;HttpOnly;Domain=cloud-custodian-test.scm.azurewebsites.net"
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:19 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1198"
-                    ],
-                    "date": [
-                        "Fri, 03 May 2019 14:09:28 GMT"
-                    ],
                     "content-length": [
-                        "20"
+                        "346"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ]
                 },
                 "body": {
                     "data": {
-                        "status": "success"
+                        "Code": "BadRequest",
+                        "Message": "Encountered an error (ServiceUnavailable) from host runtime.",
+                        "Target": null,
+                        "Details": [
+                            {
+                                "Message": "Encountered an error (ServiceUnavailable) from host runtime."
+                            },
+                            {
+                                "Code": "BadRequest"
+                            },
+                            {
+                                "ErrorEntity": {
+                                    "Code": "BadRequest",
+                                    "Message": "Encountered an error (ServiceUnavailable) from host runtime."
+                                }
+                            }
+                        ],
+                        "Innererror": null
                     }
                 }
             }
@@ -332,7 +351,113 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/appsettings/list?api-version=2018-02-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/syncfunctiontriggers?api-version=2018-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 400,
+                    "message": "Bad Request"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:22 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "346"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "Code": "BadRequest",
+                        "Message": "Encountered an error (ServiceUnavailable) from host runtime.",
+                        "Target": null,
+                        "Details": [
+                            {
+                                "Message": "Encountered an error (ServiceUnavailable) from host runtime."
+                            },
+                            {
+                                "Code": "BadRequest"
+                            },
+                            {
+                                "ErrorEntity": {
+                                    "Code": "BadRequest",
+                                    "Message": "Encountered an error (ServiceUnavailable) from host runtime."
+                                }
+                            }
+                        ],
+                        "Innererror": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/syncfunctiontriggers?api-version=2018-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 400,
+                    "message": "Bad Request"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:27 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "346"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "Code": "BadRequest",
+                        "Message": "Encountered an error (ServiceUnavailable) from host runtime.",
+                        "Target": null,
+                        "Details": [
+                            {
+                                "Message": "Encountered an error (ServiceUnavailable) from host runtime."
+                            },
+                            {
+                                "Code": "BadRequest"
+                            },
+                            {
+                                "ErrorEntity": {
+                                    "Code": "BadRequest",
+                                    "Message": "Encountered an error (ServiceUnavailable) from host runtime."
+                                }
+                            }
+                        ],
+                        "Innererror": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/appsettings/list?api-version=2018-11-01",
                 "body": null,
                 "headers": {}
             },
@@ -342,20 +467,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "11999"
-                    ],
                     "content-type": [
                         "application/json"
+                    ],
+                    "date": [
+                        "Thu, 27 Jun 2019 00:53:26 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 03 May 2019 14:09:30 GMT"
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
                     ],
                     "content-length": [
-                        "940"
+                        "941"
                     ]
                 },
                 "body": {
@@ -363,13 +488,13 @@
                         "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/appsettings",
                         "name": "appsettings",
                         "type": "Microsoft.Web/sites/config",
-                        "location": "West US 2",
+                        "location": "Central US",
                         "properties": {
-                            "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=RPtR9C9mP+bJBBnKYfGS8pcx1/hW/miK1Qo3qJs7LBmOjOJLt6u4UyVGzb9OGDI8C0/89EX6BftJrXVHoIq3Gg==",
-                            "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=RPtR9C9mP+bJBBnKYfGS8pcx1/hW/miK1Qo3qJs7LBmOjOJLt6u4UyVGzb9OGDI8C0/89EX6BftJrXVHoIq3Gg==",
+                            "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
+                            "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=cloudcustodiantest;AccountKey=DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
                             "FUNCTIONS_EXTENSION_VERSION": "~2",
                             "FUNCTIONS_WORKER_RUNTIME": "python",
-                            "WEBSITE_RUN_FROM_PACKAGE": "https://cloudcustodiantest.blob.core.windows.net/cloud-custodian-packages/cloud-custodian-test.zip?se=2029-04-30T14%3A09%3A18Z&sp=r&sv=2018-03-28&sr=b&sig=bew7KbBVkjrdXlYF592CEP49yOxTIrpFwkmWvd%2Bd1Zc%3D"
+                            "WEBSITE_RUN_FROM_PACKAGE": "https://cloudcustodiantest.blob.core.windows.net/cloud-custodian-packages/cloud-custodian-test.zip?se=2029-06-24T00%3A53%3A12Z&sp=r&sv=2018-11-09&sr=b&sig=8eyGm6EtX0lY99o47%2BPB7hSQoNL47WrU34XKPzOfABk%3D"
                         }
                     }
                 }

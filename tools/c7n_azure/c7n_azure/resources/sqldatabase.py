@@ -35,7 +35,22 @@ log = logging.getLogger('custodian.azure.sqldatabase')
 
 @resources.register('sqldatabase')
 class SqlDatabase(ChildArmResourceManager):
+    """SQL Server Database Resource
 
+    The ``azure.sqldatabase`` resource is a child resource of the SQL Server resource,
+    and the SQL Server parent id is available as the ``c7n:parent-id`` property.
+
+    :example:
+
+    Finds all SQL Servers Database in the subscription.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-all-sql-databases
+              resource: azure.sqldatabase
+
+    """
     class resource_type(ChildArmResourceManager.resource_type):
         service = 'azure.mgmt.sql'
         client = 'SqlManagementClient'

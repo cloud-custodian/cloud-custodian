@@ -40,19 +40,15 @@ class StorageUtilities(object):
 
     @staticmethod
     def get_blob_client_from_storage_account(resource_group, name, session, sas_generation=False):
-        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
-        storage_account = storage_client.storage_accounts.get_properties(resource_group, name)
-
         # sas tokens can only be generated from clients created from account keys
         primary_key = token = None
         if sas_generation:
-            storage_keys = storage_client.storage_accounts.list_keys(resource_group, name)
-            primary_key = storage_keys.keys[0].value
+            primary_key = StorageUtilities.get_storage_primary_key(resource_group, name, session)
         else:
             token = StorageUtilities.get_storage_token(session)
 
         return BlockBlobService(
-            account_name=storage_account.name,
+            account_name=name,
             account_key=primary_key,
             token_credential=token
         )
@@ -104,6 +100,13 @@ class StorageUtilities(object):
         if session.resource_namespace != RESOURCE_STORAGE:
             session = session.get_session_for_resource(RESOURCE_STORAGE)
         return TokenCredential(session.get_bearer_token())
+
+    @staticmethod
+    @lru_cache()
+    def get_storage_primary_key(resource_group, name, session):
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_keys = storage_client.storage_accounts.list_keys(resource_group, name)
+        return storage_keys.keys[0].value
 
     @staticmethod
     @lru_cache()

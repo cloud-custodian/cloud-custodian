@@ -18,6 +18,24 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('containerservice')
 class ContainerService(ArmResourceManager):
+    """Container Service Resource
+
+    :example:
+    Returns all container services that did not provision successfully
+
+    .. code-block:: yaml
+
+        policies:
+        - name: broken-containerservices
+          resource: azure.containerservice
+          filters:
+            - type: value
+              key: properties.provisioningState
+              op: not-equal
+              value_type: normalize
+              value: succeeded
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.containerservice'

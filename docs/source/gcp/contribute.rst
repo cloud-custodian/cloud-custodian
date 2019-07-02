@@ -60,36 +60,44 @@ An example that uses `parent_spec` is available below.
 .. code-block:: python
 
     # the class extends ChildResourceManager
-    @resources.register('sql-database')
-    class SqlDatabase(ChildResourceManager):
+    @resources.register('bq-table')
+    class BigQueryTable(ChildResourceManager):
 
         # the class extends ChildTypeInfo
         class resource_type(ChildTypeInfo):
-            service = 'sqladmin'     # the name of the GCP service
-            version = 'v1beta4'      # the version of the GCP service
-            component = 'databases'  # the component of the GCP service
-                # the `list` method in the resource. https://cloud.google.com/sql/docs/postgres/admin-api/v1beta4/databases/list
-                # It requires 2 request params: `project` and `instance`. `Project` is set from the environment variable GOOGLE_CLOUD_PROJECT
-                # `Instance` is set from the parent GCP resource.
-            enum_spec = ('list', 'items[]', None)
-            id = 'name'
+            service = 'bigquery'  # the name of the GCP service
+            version = 'v2'        # the version of the GCP service
+            component = 'tables'  # the component of the GCP service
+                # The `list` method in the resource. https://cloud.google.com/bigquery/docs/reference/rest/v2/tables/list
+                # It requires 2 request params: `projectId` and `datasetId`. Since the resource has a parent the params will
+                # be extracted from parent's instance
+            enum_spec = ('list', 'tables[]', None)
+            scope_key = 'projectId'
+            id = 'id'
             parent_spec = {
-                # The name of Custodian parent resource.
-                'resource': 'sql-instance',
+                # the name of Custodian parent resource.
+                'resource': 'bq-dataset',
                 'child_enum_params': [
-                    # Each `name` in response from GCP that are loaded
-                    #   using `sql-instance` resource will be used as `instance` for `sql-database` resource
-                    ('name', 'instance')
+                    # Extract the `datasetReference.datasetId` field from a parent instance and use its value
+                    # as the `datasetId` argument for child's `list` method (see `resource_type.enum_spec`)
+                    ('datasetReference.datasetId', 'datasetId'),
                 ],
                 'parent_get_params': [
-                    # The `project` value of `sql-database` resource is used as
-                    # `project` for `sql-instance` resource for a `get` request
-                    ('project', 'project'),
-                    # The `instance` value of `sql-database` resource is used as
-                    # `name` for `sql-instance` resource for a `get` request
-                    ('instance', 'name')
+                    # Extract the `tableReference.projectId` field from a child instance and use its value
+                    # as the `projectId` event's field for parent's `get` method (see `resource_type.get`)
+                    ('tableReference.projectId', 'projectId'),
+                    # Similar to above
+                    ('tableReference.datasetId', 'datasetId'),
                 ]
             }
+
+            @staticmethod
+            def get(client, event):
+                return client.execute_query('get', {
+                    'projectId': event['project_id'],
+                    'datasetId': event['dataset_id'],
+                    'tableId': event['resourceName'].rsplit('/', 1)[-1]
+                })
 
 Most resources have get methods that are created based on the corresponding `get` method of the actual GCP resource.
 As a rule the Custodian `get` method has `resource_info` param. The param has fields that can be found in Stackdriver logs  in `protoPayload.resourceName` and `resource` fields. Examples of the Stackdriver logs are available in tools/c7n_gcp/tests/data/events folder.

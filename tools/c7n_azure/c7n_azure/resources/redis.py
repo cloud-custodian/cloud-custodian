@@ -18,6 +18,19 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('redis')
 class Redis(ArmResourceManager):
+    """Redis Resource
+
+    :example:
+
+    Finds all Redis resources in the subscription.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: find-all-redis
+              resource: azure.redis
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.redis'

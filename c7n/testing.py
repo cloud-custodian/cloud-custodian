@@ -120,7 +120,7 @@ class TestUtils(unittest.TestCase):
         return p
 
     def load_policy_set(self, data, config=None):
-        filename = self.write_policy_file(data)
+        filename = self.write_policy_file(data, format="json")
         if config:
             e = Config.empty(**config)
         else:

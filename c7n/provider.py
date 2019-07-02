@@ -66,3 +66,21 @@ def resources(cloud_provider=None):
         for rname, rtype in ctype.resources.items():
             results['%s.%s' % (cname, rname)] = rtype
     return results
+
+
+def get_resource_class(resource_type):
+    if '.' in resource_type:
+        provider_name, resource = resource_type.split('.', 1)
+    else:
+        provider_name, resource = 'aws', resource_type
+
+    provider = clouds.get(provider_name)
+    if provider is None:
+        raise KeyError(
+            "Invalid cloud provider: %s" % provider_name)
+
+    factory = provider.resources.get(resource)
+    if factory is None:
+        raise KeyError("Invalid resource: %s for provider: %s" % (
+            resource, provider_name))
+    return factory
