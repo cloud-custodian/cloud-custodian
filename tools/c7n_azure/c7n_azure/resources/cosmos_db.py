@@ -127,9 +127,8 @@ class CosmosDBDatabase(CosmosDBChildResource):
                 log.error("403 Forbidden. Ensure identity has `Cosmos DB Account Reader` or"
                           "`DocumentDB Accounts Contributor` and that firewall is not "
                           "blocking access.")
-            else:
-                log.error(e)
-            return None
+            raise e
+
 
         for d in databases:
             d.update({'c7n:document-endpoint':
@@ -168,9 +167,7 @@ class CosmosDBCollection(CosmosDBChildResource):
                 log.error("403 Forbidden. Ensure identity has `Cosmos DB Account Reader` or"
                           "`DocumentDB Accounts Contributor` and that firewall is not "
                           "blocking access.")
-            else:
-                log.error(e)
-            return None
+            raise e
 
         collections = []
 
