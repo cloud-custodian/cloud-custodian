@@ -17,7 +17,7 @@ import logging
 
 from azure_common import BaseTest
 from c7n_azure.filters import FirewallRulesFilter
-from netaddr import IPRange, IPNetwork
+from netaddr import IPRange, IPNetwork, IPSet
 
 
 class FirewallRulesFilterTest(BaseTest):
@@ -88,8 +88,8 @@ class FirewallRulesFilterTest(BaseTest):
 
     def test_firewall_rules_equal(self):
         required_rules = [
-            IPNetwork('0.0.0.0'),
             IPNetwork('1.0.0.20/10'),
+            IPNetwork('0.0.0.0'),
             IPRange('2.0.0.0', '2.0.0.10')]
 
         satisfying_resources = [
@@ -141,4 +141,8 @@ class FirewallRulesFilterMock(FirewallRulesFilter):
         return logging.Logger.root
 
     def _query_rules(self, resource):
-        return set(resource['rules'])
+        rules = IPSet()
+        for r in resource['rules']:
+            rules.add(r)
+
+        return rules
