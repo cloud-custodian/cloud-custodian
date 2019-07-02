@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest
 from c7n_azure.utils import IpRangeHelper
-from netaddr import IPRange
+from netaddr import IPRange, IPSet
 
 
 class IpRangeHelperTest(BaseTest):
@@ -23,7 +23,7 @@ class IpRangeHelperTest(BaseTest):
     def test_empty(self):
         data = {'whatever': []}
         actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
-        expected = set()
+        expected = IPSet()
         self.assertEqual(expected, actual)
 
     def test_absent(self):
@@ -34,28 +34,22 @@ class IpRangeHelperTest(BaseTest):
     def test_parse_range_and_net(self):
         data = {'whatever': ['0.0.0.0-10.10.10.10', '10.20.20.0/24']}
         actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
-        expected = set([IPRange('0.0.0.0', '10.10.10.10'), IPRange('10.20.20.0', '10.20.20.255')])
+        expected = IPSet(IPRange('0.0.0.0', '10.10.10.10')) | \
+            IPSet(IPRange('10.20.20.0', '10.20.20.255'))
         self.assertEqual(expected, actual)
 
     def test_parse_multi_net(self):
         data = {'whatever': ['1.2.2.127/32', '1.2.2.128/25']}
         actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
-        expected = set([IPRange('1.2.2.127', '1.2.2.127'), IPRange('1.2.2.128', '1.2.2.255')])
+        expected = IPSet(IPRange('1.2.2.127', '1.2.2.127')) | \
+            IPSet(IPRange('1.2.2.128', '1.2.2.255'))
         self.assertEqual(expected, actual)
-
-    def test_parse_multi_net_ensure_separation(self):
-        '''
-        Verify that adjacent nets are not combined into one range
-        '''
-        data = {'whatever': ['1.2.2.127/32', '1.2.2.128/25']}
-        actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
-        unexpected = set([IPRange('1.2.2.127', '1.2.2.255')])
-        self.assertNotEqual(unexpected, actual)
 
     def test_parse_spaces(self):
         data = {'whatever': ['0.0.0.0 - 10.10.10.10', '10.20.20.0 / 24']}
         actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
-        expected = set([IPRange('0.0.0.0', '10.10.10.10'), IPRange('10.20.20.0', '10.20.20.255')])
+        expected = IPSet(IPRange('0.0.0.0', '10.10.10.10')) | \
+            IPSet(IPRange('10.20.20.0', '10.20.20.255'))
         self.assertEqual(expected, actual)
 
     def test_parse_extra_dash(self):
@@ -68,5 +62,5 @@ class IpRangeHelperTest(BaseTest):
     def test_parse_single_ip(self):
         data = {'whatever': ['1.2.2.127']}
         actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
-        expected = set([IPRange('1.2.2.127', '1.2.2.127')])
+        expected = IPSet(IPRange('1.2.2.127', '1.2.2.127'))
         self.assertEqual(expected, actual)

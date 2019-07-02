@@ -19,8 +19,14 @@ from c7n.utils import type_schema
 
 
 class LogicAppAction(Webhook):
-    """Calls an Azure Logic App with optional parameters
-       and body populated from JMESPath queries.
+    """
+    Calls an Azure Logic App with optional parameters and body populated from JMESPath queries.
+    Your policy credentials are used to get the trigger endpoint URL with secrets
+    using the resource group and app name.
+
+    This action is based on the ``webhook`` action and supports the same options.
+
+    :example: This policy will call logic app with list of VM's
 
         .. code-block:: yaml
 

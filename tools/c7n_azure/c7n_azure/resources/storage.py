@@ -20,16 +20,19 @@ from azure.cosmosdb.table import TableService
 from azure.mgmt.storage.models import IPRule, \
     NetworkRuleSet, StorageAccountUpdateParameters, VirtualNetworkRule
 from azure.storage.blob import BlockBlobService
+from azure.storage.common.models import RetentionPolicy, Logging
 from azure.storage.file import FileService
 from azure.storage.queue import QueueService
 from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
 from c7n_azure.filters import FirewallRulesFilter, ValueFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ThreadHelper
-from netaddr import IPNetwork
+from netaddr import IPSet
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import type_schema
 from c7n.utils import local_session, get_annotation_prefix
 
@@ -162,7 +165,7 @@ class StorageFirewallRulesFilter(FirewallRulesFilter):
 
         ip_rules = resource['properties']['networkAcls']['ipRules']
 
-        resource_rules = set([IPNetwork(r['value']) for r in ip_rules])
+        resource_rules = IPSet([r['value'] for r in ip_rules])
 
         return resource_rules
 
@@ -200,11 +203,6 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
                       op: eq
                       value: False
     """
-
-    BLOB_TYPE = 'blob'
-    QUEUE_TYPE = 'queue'
-    TABLE_TYPE = 'table'
-    FILE_TYPE = 'file'
 
     schema = type_schema('storage-diagnostic-settings',
                          rinherit=ValueFilter.schema,
@@ -246,33 +244,91 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
         return matched
 
     def _get_settings(self, storage_account, session=None, token=None):
-        if self.storage_type == self.BLOB_TYPE:
-            blob_property = get_annotation_prefix(self.BLOB_TYPE)
-            if not (blob_property in storage_account):
-                storage_account[blob_property] = json.loads(jsonpickle.encode(
-                    StorageSettingsUtilities.get_blob_settings(storage_account, token)))
-            return storage_account[blob_property]
+        storage_prefix_property = get_annotation_prefix(self.storage_type)
 
-        elif self.storage_type == self.FILE_TYPE:
-            file_property = get_annotation_prefix(self.FILE_TYPE)
-            if not (file_property in storage_account):
-                storage_account[file_property] = json.loads(jsonpickle.encode(
-                    StorageSettingsUtilities.get_file_settings(storage_account, session)))
-            return storage_account[file_property]
+        if not (storage_prefix_property in storage_account):
+            settings = StorageSettingsUtilities.get_settings(
+                self.storage_type, storage_account, session, token)
+            storage_account[storage_prefix_property] = json.loads(jsonpickle.encode(settings))
 
-        elif self.storage_type == self.TABLE_TYPE:
-            table_property = get_annotation_prefix(self.TABLE_TYPE)
-            if not (table_property in storage_account):
-                storage_account[table_property] = json.loads(jsonpickle.encode(
-                    StorageSettingsUtilities.get_table_settings(storage_account, session)))
-            return storage_account[table_property]
+        return storage_account[storage_prefix_property]
 
-        elif self.storage_type == self.QUEUE_TYPE:
-            queue_property = get_annotation_prefix(self.QUEUE_TYPE)
-            if not (queue_property in storage_account):
-                storage_account[queue_property] = json.loads(jsonpickle.encode(
-                    StorageSettingsUtilities.get_queue_settings(storage_account, token)))
-            return storage_account[queue_property]
+
+@Storage.action_registry.register('set-log-settings')
+class SetLogSettingsAction(AzureBaseAction):
+    """Action that updates the logging settings on storage accounts. The action requires
+    specifying an array of storage types that will be impacted by the action (blob, queue, table),
+    retention (number in days; 0-365), and an array of log settings to enable (read, write, delete).
+    The action will disable any settings not listed (e.g. by providing log: [write, delete], the
+    action will disable read).
+
+     :example:
+
+        Enable write and delete logging and disable read logging on blob storage,
+        and retain logs for 5 days.
+
+     .. code-block:: yaml
+
+        policies:
+            - name: enable-blob-storage-logging
+              resource: azure.storage
+              actions:
+                - type: set-log-settings
+                  storage-types: [blob]
+                  retention: 5
+                  log: [write, delete]
+    """
+
+    READ = 'read'
+    WRITE = 'write'
+    DELETE = 'delete'
+
+    schema = type_schema('set-log-settings',
+                         required=['storage-types', 'log', 'retention'],
+                         **{
+                             'storage-types': {
+                                 'type': 'array',
+                                 'items': {
+                                     'type': 'string',
+                                     'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE]
+                                 }
+                             },
+                             'log': {
+                                 'type': 'array',
+                                 'items': {
+                                     'type': 'string',
+                                     'enum': [READ, WRITE, DELETE]
+                                 }
+                             },
+                             'retention': {'type': 'number'}
+                         }
+                         )
+
+    def __init__(self, data, manager=None):
+        super(SetLogSettingsAction, self).__init__(data, manager)
+        self.storage_types = data['storage-types']
+        self.logs_to_enable = data['log']
+        self.retention = data['retention']
+        self.log = logging.getLogger('custodian.azure.storage')
+        self.token = None
+
+    def validate(self):
+        if self.retention < 0 or self.retention > 365:
+            raise PolicyValidationError(
+                'attribute: retention can not be less than 0 or greater than 365')
+
+    def process_in_parallel(self, resources, event):
+        self.token = StorageUtilities.get_storage_token(self.session)
+        return super(SetLogSettingsAction, self).process_in_parallel(resources, event)
+
+    def _process_resource(self, resource, event=None):
+        retention = RetentionPolicy(enabled=self.retention != 0, days=self.retention)
+        log_settings = Logging(self.DELETE in self.logs_to_enable, self.READ in self.logs_to_enable,
+                               self.WRITE in self.logs_to_enable, retention_policy=retention)
+
+        for storage_type in self.storage_types:
+            StorageSettingsUtilities.update_logging(storage_type, resource,
+                                                    log_settings, self.session, self.token)
 
 
 class StorageSettingsUtilities(object):
@@ -311,25 +367,25 @@ class StorageSettingsUtilities(object):
         return QueueService(account_name=storage_account['name'], token_credential=token)
 
     @staticmethod
-    def get_blob_settings(storage_account, session):
-        client = StorageSettingsUtilities._get_blob_client_from_storage_account(
-            storage_account, session)
-        return client.get_blob_service_properties()
+    def _get_client(storage_type, storage_account, session=None, token=None):
+        if storage_type == TABLE_TYPE or storage_type == FILE_TYPE:
+            client = getattr(StorageSettingsUtilities, '_get_{}_client_from_storage_account'
+                             .format(storage_type))(storage_account, session)
+        else:
+            client = getattr(StorageSettingsUtilities, '_get_{}_client_from_storage_account'
+                             .format(storage_type))(storage_account, token)
+
+        return client
 
     @staticmethod
-    def get_file_settings(storage_account, session):
-        file_client = StorageSettingsUtilities._get_file_client_from_storage_account(
-            storage_account, session)
-        return file_client.get_file_service_properties()
+    def get_settings(storage_type, storage_account, session=None, token=None):
+        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session, token)
+
+        return getattr(client, 'get_{}_service_properties'.format(storage_type))()
 
     @staticmethod
-    def get_table_settings(storage_account, session):
-        table_client = StorageSettingsUtilities._get_table_client_from_storage_account(
-            storage_account, session)
-        return table_client.get_table_service_properties()
+    def update_logging(storage_type, storage_account, logging_settings, session=None, token=None):
+        client = StorageSettingsUtilities._get_client(storage_type, storage_account, session, token)
 
-    @staticmethod
-    def get_queue_settings(storage_account, session):
-        queue_client = StorageSettingsUtilities._get_queue_client_from_storage_account(
-            storage_account, session)
-        return queue_client.get_queue_service_properties()
+        return getattr(client, 'set_{}_service_properties'
+                       .format(storage_type))(logging=logging_settings)

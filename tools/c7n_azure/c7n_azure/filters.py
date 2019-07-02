@@ -69,6 +69,39 @@ class MetricFilter(Filter):
                     threshold: 75
                     timeframe: 2
 
+    :example: Find KeyVaults with more than 1000 API hits in the last hour
+
+    .. code-block:: yaml
+
+        policies:
+          - name: keyvault-hits
+            resource: azure.keyvault
+            filters:
+              - type: metric
+                metric: ServiceApiHit
+                aggregation: total
+                op: gt
+                threshold: 1000
+                timeframe: 1
+
+    :example:
+    Find SQL servers with less than 10% average DTU consumption
+    across all databases over last 24 hours
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dtu-consumption
+            resource: azure.sqlserver
+            filters:
+              - type: metric
+                metric: dtu_consumption_percent
+                aggregation: average
+                op: lt
+                threshold: 10
+                timeframe: 24
+                filter:  "DatabaseResourceId eq '*'"
+
     """
 
     DEFAULT_TIMEFRAME = 24
@@ -188,6 +221,7 @@ class TagActionFilter(Filter):
     Optionally, the 'tz' parameter can get used to specify the timezone
     in which to interpret the clock (default value is 'utc')
 
+    :example:
     .. code-block :: yaml
 
        policies:
@@ -201,8 +235,7 @@ class TagActionFilter(Filter):
               op: stop
               # Another optional tag is skew
               tz: utc
-          actions:
-            - type: stop
+
 
     """
     schema = type_schema(
@@ -270,6 +303,47 @@ class TagActionFilter(Filter):
 
 
 class DiagnosticSettingsFilter(ValueFilter):
+    """The diagnostic settings filter is implicitly just the ValueFilter
+    on the diagnostic settings for an azure resource.
+
+    :example:
+    Find Load Balancers that have logs for both LoadBalancerProbeHealthStatus category and
+    LoadBalancerAlertEvent category enabled.
+    The use of value_type: swap is important for these examples because it swaps the value
+    and the evaluated key so that it evaluates the value provided is in the logs.
+
+    .. code-block:: yaml
+
+        policies
+          - name: find-load-balancers-with-logs-enabled
+            resource: azure.loadbalancer
+            filters:
+              - type: diagnostic-settings
+                key: logs[?category == 'LoadBalancerProbeHealthStatus'][].enabled
+                value: True
+                op: in
+                value_type: swap
+              - type: diagnostic-settings
+                key: logs[?category == 'LoadBalancerAlertEvent'][].enabled
+                value: True
+                op: in
+                value_type: swap
+
+    :example:
+    Find KeyVaults that have logs enabled for the AuditEvent category.
+
+    .. code-block:: yaml
+
+        policies
+          - name: find-keyvaults-with-logs-enabled
+            resource: azure.keyvault
+            filters:
+              - type: diagnostic-settings
+                key: logs[?category == 'AuditEvent'][].enabled
+                value: True
+                op: in
+                value_type: swap
+    """
 
     schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
     schema_alias = True

@@ -19,6 +19,18 @@
       "properties": {}
     },
     {
+      "name": "[concat('cclgstorage', uniqueString(resourceGroup().id))]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
+      "location": "South Central US",
+      "tags": {},
+      "properties": {}
+    },
+    {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2018-07-01",
       "name": "[concat('ccipstorage', uniqueString(resourceGroup().id))]",

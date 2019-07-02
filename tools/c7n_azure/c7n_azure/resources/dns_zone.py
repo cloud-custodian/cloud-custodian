@@ -1,4 +1,4 @@
-# Copyright 2018 Capital One Services, LLC
+# 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,33 +16,24 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('cdnprofile')
-class CdnProfile(ArmResourceManager):
-    """CDN Resource
+@resources.register('dnszone')
+class DnsZone(ArmResourceManager):
+    """DNS Zone Resource
 
     :example:
-    Returns all CDNs with Standard_Verizon sku
+
+    Finds all DNS Zones in the subscription
 
     .. code-block:: yaml
 
         policies:
-          - name: standard-verizon
-            resource: azure.cdnprofile
-            filters:
-              - type: value
-                key: sku
-                op: in
-                value_type: normalize
-                value: Standard_Verizon
+            - name: find-all-dns-zones
+              resource: azure.dnszone
+
     """
 
     class resource_type(ArmResourceManager.resource_type):
-        service = 'azure.mgmt.cdn'
-        client = 'CdnManagementClient'
-        enum_spec = ('profiles', 'list', None)
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup'
-        )
-        resource_type = 'Microsoft.Cdn/profiles'
+        service = 'azure.mgmt.dns'
+        client = 'DnsManagementClient'
+        enum_spec = ('zones', 'list', {})
+        resource_type = 'Microsoft.Network/dnszones'

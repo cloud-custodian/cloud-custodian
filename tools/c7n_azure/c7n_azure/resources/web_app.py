@@ -18,6 +18,44 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('webapp')
 class WebApp(ArmResourceManager):
+    """Web Applications Resource
+
+    :example:
+    This policy will find all web apps with 10 or less requests over the last 72 hours
+
+    .. code-block:: yaml
+
+        policies:
+          - name: webapp-dropping-messages
+            resource: azure.webapp
+            filters:
+              - type: metric
+                metric: Requests
+                op: le
+                aggregation: total
+                threshold: 10
+                timeframe: 72
+             actions:
+              - type: mark-for-op
+                op: delete
+                days: 7
+
+    :example:
+    This policy will find all web apps with 1000 or more server errors over the last 72 hours
+
+    .. code-block:: yaml
+
+        policies:
+          - name: webapp-high-error-count
+            resource: azure.webapp
+            filters:
+              - type: metric
+                metric: Http5xxx
+                op: ge
+                aggregation: total
+                threshold: 1000
+                timeframe: 72
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.web'

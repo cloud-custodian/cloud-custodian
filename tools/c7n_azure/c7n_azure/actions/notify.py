@@ -6,6 +6,30 @@ from c7n.resolver import ValuesFrom
 
 
 class Notify(BaseNotify):
+    """
+    Action to queue email.
+
+    See `c7n_mailer readme.md <https://github.com/cloud-custodian/cloud-custodian/blob/
+    master/tools/c7n_mailer/README.md#using-on-azure>`_for more information.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: notify
+            resource: azure.resourcegroup
+            actions:
+              - type: notify
+                template: default
+                subject: Hello World
+                to:
+                  - someone@somewhere.com
+                transport:
+                  type: asq
+                  queue: https://storagename.queue.core.windows.net/queuename
+    """
+
     batch_size = 50
 
     schema = {

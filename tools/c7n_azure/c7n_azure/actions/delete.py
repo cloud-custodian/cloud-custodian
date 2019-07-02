@@ -3,7 +3,48 @@ from c7n_azure.actions.base import AzureBaseAction
 
 
 class DeleteAction(AzureBaseAction):
-    """Delete a resource."""
+    """
+    Perform delete operation on any ARM resource. Can be used with
+    generic resource type `armresource` or on any other more specific
+    ARM resource type supported by Cloud Custodian.
+
+    :example:
+    This policy will delete any ARM resource with 'test' in the name
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-test-resources
+                resource: azure.armresource
+                description: |
+                  Deletes any ARM resource with 'test' in the name
+                filters:
+                  - type: value
+                    key: name
+                    value: test
+                    op: contains
+                actions:
+                 - type: delete
+
+    :example:
+    This policy will delete any Network Security Group  with 'test' in the name
+
+    .. code-block:: yaml
+
+            policies:
+               - name: delete-test-nsg
+                 description: |
+                   Deletes any Network Security Group with 'test' in the name
+                 resource: azure.networksecuritygroup
+                 filters:
+                   - type: value
+                     key: name
+                     value: test
+                     op: contains
+                 actions:
+                  - type: delete
+
+    """
 
     schema = type_schema('delete')
     schema_alias = True
