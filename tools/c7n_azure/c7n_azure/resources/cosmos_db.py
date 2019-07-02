@@ -37,7 +37,6 @@ import logging
 
 
 max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
-chunk_size = constants.DEFAULT_CHUNK_SIZE
 log = logging.getLogger('azure.cosmosdb')
 
 

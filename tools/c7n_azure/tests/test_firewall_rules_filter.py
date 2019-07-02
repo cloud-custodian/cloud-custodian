@@ -92,7 +92,6 @@ class FirewallRulesFilterTest(BaseTest):
             IPNetwork('0.0.0.0'),
             IPRange('2.0.0.0', '2.0.0.10')]
 
-
         satisfying_resources = [
             {'rules': required_rules},
             {'rules': required_rules},
