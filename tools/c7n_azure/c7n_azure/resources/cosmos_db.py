@@ -129,7 +129,6 @@ class CosmosDBDatabase(CosmosDBChildResource):
                           "blocking access.")
             raise e
 
-
         for d in databases:
             d.update({'c7n:document-endpoint':
                       parent_resource.get('properties').get('documentEndpoint')})
