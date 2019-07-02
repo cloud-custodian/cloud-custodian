@@ -5,8 +5,43 @@ Examples
 
 These use cases provide examples of specific policies.
 
+General
+"""""""
+
 .. toctree::
-  :titlesonly:
   :glob:
 
-  ./*
+  ./*general*
+
+
+Compute
+"""""""
+
+.. toctree::
+  :glob:
+
+  ./*compute*
+
+Databases
+"""""""""
+
+.. toctree::
+  :glob:
+
+  ./*databases*
+
+Identity
+""""""""""
+
+.. toctree::
+  :glob:
+  ./*identity*
+
+
+Networking
+""""""""""
+
+.. toctree::
+  :glob:
+  
+  ./*networking*

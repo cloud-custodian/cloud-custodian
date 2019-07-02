@@ -1,5 +1,5 @@
-Remove Tag From Virtual Machines
-================================
+Tags - Remove tag From Virtual Machines
+=======================================
 
 .. code-block:: yaml
 

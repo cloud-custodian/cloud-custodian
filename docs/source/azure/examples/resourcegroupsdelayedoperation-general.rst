@@ -1,7 +1,7 @@
 .. _azure_example_delayedoperation:
 
-Delayed Operations
-==================
+Resource Groups - Delayed operations
+====================================
 
 You can use `mark-for-op` action and `marked-for-op` filter to implement delayed actions, such as delete a resource if
 it remains non-compliant for a few days.

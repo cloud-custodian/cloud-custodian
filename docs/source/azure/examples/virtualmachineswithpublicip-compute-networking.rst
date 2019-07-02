@@ -1,5 +1,5 @@
-Find Virtual Machines with Public IP address
-============================================
+Virtual Machines - Find Virtual Machines with public IP address
+===============================================================
 
 .. code-block:: yaml
 

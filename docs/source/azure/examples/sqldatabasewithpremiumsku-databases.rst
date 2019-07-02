@@ -1,7 +1,7 @@
 .. _azure_examples_sqldatabasewithpremiumsku:
 
-Find all SQL Databases with Premium SKU
-=======================================
+SQL - Find all SQL Databases with Premium SKU
+=============================================
 
 This policy will find all SQL databases with Premium SKU.
 

@@ -1,7 +1,7 @@
 .. _azure_examples_sqldatabaseupdateretentionpolicies:
 
-Update SQL Database Retention Policies
-======================================
+SQL - Update SQL Database retention policies
+============================================
 
 Update any SQL Database short term retentions to at least 7 days
 

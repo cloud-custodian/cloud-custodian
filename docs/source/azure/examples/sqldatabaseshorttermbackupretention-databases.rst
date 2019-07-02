@@ -1,7 +1,7 @@
 .. _azure_examples_sqldatabaseshorttermbackupretention:
 
-Find SQL Databases with a Short Term Backup Retention Less Than 14 Days
-=======================================================================
+SQL - Find SQL Databases with a short term backup retention less than 14 days
+=============================================================================
 
 .. code-block:: yaml
 

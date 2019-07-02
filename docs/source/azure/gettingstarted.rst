@@ -16,8 +16,30 @@ We recommend using Python 3.6 or higher.
 
 The Azure provider is an additional package which is installed in addition to c7n.
 
-Option 1: Install latest from the repository
-"""""""""""""""""""""""""""""""""""""""""""""
+Option 1: Install released packages to virtual Python environment
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Linux and Mac OS
++++++++++++++++++++++++++++
+
+To install Cloud Custodian, just run::
+
+  $ python3 -m venv custodian
+  $ source custodian/bin/activate
+  (custodian) $ pip install c7n_azure #Install Azure package
+
+Windows (CMD/PowerShell)
++++++++++++++++++++++++++++
+
+To install Cloud Custodian, just run::
+
+  $ python3 -m venv custodian
+  $ source custodian/Scripts/activate
+  (custodian) $ pip install c7n_azure #Install Azure package
+
+
+Option 2: Install latest from the repository to local Python environment
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. code-block:: bash
 
@@ -32,15 +54,20 @@ Option 1: Install latest from the repository
 Write your first policy
 -----------------------
 
+YAML Policies are the core concept of Cloud Custodian.  They take actions 
+on resources specified by filters. Custodian adheres to a compliance
+as code principle, so you can validate, dry-run, and code review on
+changes to your policies.
+
 A policy specifies the following items:
 
 * The type of resource to run the policy against
 * Filters to narrow down the set of resources
 * Actions to take on the filtered set of resources
 
-For this tutorial we will filter to a VM of a specific name, then add the tag ``Hello: World``.
+Our first policy filters to a VM of a specific name, then adds the tag ``Hello: World``.
 
-Create a file named ``custodian.yml`` with this content, and update ``my_vm_name`` to match an existing VM.
+First, Create a file named ``custodian.yml`` with this content, and update ``my_vm_name`` to match an existing VM.
 
 *note: Some text editors (VSCode) inject invalid whitespace characters when copy/pasting YAML from a browser*
 
@@ -65,7 +92,7 @@ Create a file named ``custodian.yml`` with this content, and update ``my_vm_name
 Run your policy
 ---------------
 
-First, **choose one of the supported authentication mechanisms** and either log in to Azure CLI or set
+Second, **choose one of the supported authentication mechanisms** and either log in to Azure CLI or set
 environment variables as documented in :ref:`azure_authentication`.
 
 .. code-block:: bash
@@ -87,8 +114,8 @@ See :ref:`filters` for more information on the features of the Value filter used
 
 .. _monitor-azure-cc:
 
-Monitor Azure
--------------
+(Optional) Run your policy with Azure Monitoring
+""""""""""""""""""""""""
 
 You can generate App Insights metrics by specifying the ``--metrics`` flag and specifying ``azure``::
 

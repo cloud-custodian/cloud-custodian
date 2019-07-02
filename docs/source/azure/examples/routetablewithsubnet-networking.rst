@@ -1,7 +1,7 @@
 .. _azure_examples_routetable_with_subnet:
 
-Find Route Tables With A Specific Subnet
-============================================
+Routes - Find route tables with a specific subnet
+=================================================
 
 Returns all route tables that route to the subnet named `subnetname` in the virtual network named `vnetname`.
 Since the relationship between route tables and subnets is one-to-many, there will only ever be 0 or 1

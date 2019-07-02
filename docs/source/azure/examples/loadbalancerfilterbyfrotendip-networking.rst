@@ -1,5 +1,5 @@
-Filter load balancer by front end public ip
-===========================================
+Load Balancer - Filter load balancer by front end public ip
+===========================================================
 
 .. code-block:: yaml
 

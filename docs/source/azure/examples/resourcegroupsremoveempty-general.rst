@@ -1,5 +1,5 @@
-Remove Empty Resource Groups
-============================
+Resource Groups - Remove empty Resource Groups
+==============================================
 
 .. code-block:: yaml
 

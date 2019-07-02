@@ -1,7 +1,7 @@
 .. _azure_examples_sqldatabaselongtermbackupretention:
 
-Find SQL Databases with a Monthly Long Term Backup Retention More Than 1 Year
-=============================================================================
+SQL - Find SQL Databases with a monthly long term backup retention more than one year
+===================================================================================
 
 .. code-block:: yaml
 

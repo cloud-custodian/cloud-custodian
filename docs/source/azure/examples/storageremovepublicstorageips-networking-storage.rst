@@ -1,5 +1,5 @@
-Remove public storage IP-s
-==========================
+Storage - Remove public storage IP-s
+====================================
 
 .. code-block:: yaml
 
