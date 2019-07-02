@@ -38,7 +38,7 @@ Windows (CMD/PowerShell)
 To install Cloud Custodian, just run::
 
   $ python3 -m venv custodian
-  $ source custodian/Scripts/activate
+  $ ./custodian/Scripts/activate
   (custodian) $ pip install c7n       #Install AWS package
   (custodian) $ pip install c7n_azure #Install Azure package
   (custodian) $ pip install c7n_gcp   #Install GCP Package

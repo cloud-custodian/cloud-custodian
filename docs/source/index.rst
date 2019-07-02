@@ -55,16 +55,14 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    aws/resources/index
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Azure
 
    azure/gettingstarted
-   azure/authentication
+   azure/configuration/index
    azure/examples/index
    azure/policy/index
-   azure/azure-modes
    azure/advanced/index
-   azure/contribute
    azure/resources/index
 
 .. toctree::
