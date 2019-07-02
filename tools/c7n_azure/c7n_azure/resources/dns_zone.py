@@ -1,4 +1,4 @@
-# Copyright 2018 Capital One Services, LLC
+# 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-
-# from azure.mgmt.dns.v2018_05_01.operations import ZonesOperations
-# from azure.mgmt.sql.sql_management_client import SqlManagementClient
 
 
 @resources.register('dnszone')
