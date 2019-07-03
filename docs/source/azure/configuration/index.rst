@@ -1,4 +1,4 @@
-.. _azure_policies:
+.. _azure_configuration:
 
 Configuring Azure Policies
 ==========================
@@ -12,5 +12,5 @@ Azure Functions and monitoring the results of policies.
   :glob:
 
   authentication
-  serverlessfunctions
+  hostingoptions
   monitoring

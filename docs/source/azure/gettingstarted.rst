@@ -111,7 +111,7 @@ See :ref:`filters` for more information on the features of the Value filter used
 .. _monitor-azure-cc:
 
 (Optional) Run your policy with Azure Monitoring
-""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""
 
 You can generate App Insights metrics by specifying the ``--metrics`` flag and specifying ``azure``::
 

@@ -44,6 +44,8 @@ specified when running Cloud Custodian:
         custodian run --metrics azure://<resource_group_name>/<app_insights_name>
 
 
+.. _azure_bloboutput:
+
 Writing Custodian Output to Azure Blob Storage
 ----------------------------------------------
 
