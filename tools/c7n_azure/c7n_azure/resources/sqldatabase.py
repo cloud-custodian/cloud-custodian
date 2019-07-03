@@ -29,6 +29,7 @@ from c7n_azure.provider import resources
 from c7n_azure.query import ChildTypeInfo
 from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper
+from azure.mgmt.resource.resources.models import GenericResource
 
 log = logging.getLogger('custodian.azure.sqldatabase')
 
@@ -465,3 +466,39 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
         new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR] = \
             retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR]
         return new_retention_policy
+
+
+@SqlDatabase.action_registry.register('resize')
+class Resize(AzureBaseAction):
+    """
+    Bla
+
+    """
+
+    schema = type_schema('resize', required=['capacity', 'tier'],
+        **{
+            'capacity': {'type': 'number'},
+            'tier': {'enum': ['Basic', 'Standard', 'Premium']},
+        }
+    )
+
+    def __init__(self, data, manager=None):
+        super(Resize, self).__init__(data, manager)
+        self.capacity = self.data['capacity']
+
+
+    def _process_resource(self, resource):
+        resource['sku']['capacity'] = self.capacity
+        resource['sku']['tier'] = self.tier
+        resource['sku']['name'] = self.tier
+
+        az_resource = GenericResource.deserialize(resource)
+
+        api_version = '2018-06-01-preview' #self.session.resource_api_version(resource['id'])
+
+        # create a GenericResource object with the required parameters
+        generic_resource = GenericResource(sku=az_resource.sku)
+
+        client = self.session.client('azure.mgmt.resource.ResourceManagementClient')
+
+        client.resources.update_by_id(resource['id'], api_version, generic_resource)
