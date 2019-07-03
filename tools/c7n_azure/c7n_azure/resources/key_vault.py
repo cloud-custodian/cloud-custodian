@@ -34,6 +34,76 @@ log = logging.getLogger('custodian.azure.keyvault')
 @resources.register('keyvault')
 class KeyVault(ArmResourceManager):
 
+    """Key Vault Resource
+
+    :example:
+
+    This policy will find all KeyVaults with 10 or less API Hits over the last 72 hours
+
+    .. code-block:: yaml
+
+        policies:
+          - name: inactive-keyvaults
+            resource: azure.keyvault
+            filters:
+              - type: metric
+                metric: ServiceApiHit
+                op: ge
+                aggregation: total
+                threshold: 10
+                timeframe: 72
+
+    :example:
+
+    This policy will find all KeyVaults with an access of Service Principals not in the white list
+    that exceed read-only access
+
+    .. code-block:: yaml
+
+        policies:
+            - name: policy
+              description:
+                Ensure only authorized people have an access
+              resource: azure.keyvault
+              filters:
+                - not:
+                  - type: whitelist
+                    key: principalName
+                    users:
+                      - account1@sample.com
+                      - account2@sample.com
+                    permissions:
+                      keys:
+                        - get
+                      secrets:
+                        - get
+                      certificates:
+                        - get
+
+    :example:
+
+    This policy will find all KeyVaults and add get and list permissions for keys.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: policy
+              description:
+                Add get and list permissions to keys access policy
+              resource: azure.keyvault
+              actions:
+                - type: update-access-policy
+                  operation: add
+                  access-policies:
+                    - tenant-id: 00000000-0000-0000-0000-000000000000
+                      object-id: 11111111-1111-1111-1111-111111111111
+                      permissions:
+                        keys:
+                          - get
+                          - list
+
+    """
+
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
@@ -182,6 +252,7 @@ class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
                           keys:
                             - Get
                             - List
+
     """
 
     schema = type_schema('update-access-policy',

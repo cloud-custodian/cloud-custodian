@@ -21,6 +21,7 @@ class ContainerService(ArmResourceManager):
     """Container Service Resource
 
     :example:
+
     Returns all container services that did not provision successfully
 
     .. code-block:: yaml

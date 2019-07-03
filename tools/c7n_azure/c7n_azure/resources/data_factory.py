@@ -21,6 +21,7 @@ class DataFactory(ArmResourceManager):
     """Data Factory Resource
 
     :example:
+
     This policy will find all Data Factories with 10 or more failures in pipeline
     runs over the last 72 hours
 

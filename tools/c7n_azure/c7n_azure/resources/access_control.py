@@ -51,6 +51,7 @@ class RoleAssignment(QueryResourceManager):
     :example:
 
     .. code-block:: yaml
+
         policies:
             - name: role-assignment-owner
               resource: azure.roleassignment

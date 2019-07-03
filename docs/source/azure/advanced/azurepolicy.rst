@@ -42,7 +42,8 @@ during resource creation.
 
 Here is what that Azure Policy might look like:
 
-.. code-block:: yaml
+.. code-block:: json
+
     {
        "properties": {
           "displayName": "Enforce tag and its value on resource groups",
@@ -84,6 +85,7 @@ events and automatically finds the identity of the creator and writes the tag wi
 required user action.
 
 .. code-block:: yaml
+
     policies:
       - name: azure-auto-tag-creator
         mode:
@@ -103,6 +105,7 @@ With Cloud Custodian a policy to find and delete unused Network Interfaces would
 like this:
 
 .. code-block:: yaml
+
     policies:
       - name: orphaned-nic
         resource: azure.networkinterface

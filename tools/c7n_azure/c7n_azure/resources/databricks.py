@@ -21,6 +21,7 @@ class Databricks(ArmResourceManager):
     """Databricks Resource
 
     :example:
+
     Returns all databricks named my-test-databricks
 
     .. code-block:: yaml
