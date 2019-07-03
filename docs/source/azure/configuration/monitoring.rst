@@ -1,7 +1,7 @@
 .. _azure_monitoring:
 
-App Insights Logging & Metrics
-==============================
+Logging, Metrics and Output
+===========================
 
 Writing Custodian Logs to Azure App Insights
 --------------------------------------------
@@ -43,8 +43,6 @@ specified when running Cloud Custodian:
 
         custodian run --metrics azure://<resource_group_name>/<app_insights_name>
 
-Blob Storage Output
-===================
 
 Writing Custodian Output to Azure Blob Storage
 ----------------------------------------------

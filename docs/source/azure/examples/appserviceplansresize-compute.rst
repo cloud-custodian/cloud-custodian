@@ -1,7 +1,8 @@
 .. _azure_examples_resize_app_service_plan:
 
-Virtual Machines - Resize an Application Service Plan
-=====================================================
+App Service - Resize an Application Service Plan
+================================================
+
 Count or Size can be provided individually or together.
 
 .. code-block:: yaml

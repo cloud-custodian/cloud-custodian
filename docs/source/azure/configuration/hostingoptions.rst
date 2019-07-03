@@ -1,7 +1,7 @@
-.. _azure_azurefunctions:
+.. _azure_hostingoptions:
 
-Serverless - Azure Functions Support
-====================================
+Hosting options
+===============
 
 Overview
 ########
@@ -12,7 +12,7 @@ them to run inexpensively in your subscription.
 Python support in Azure Functions V2 is in preview and this feature is still immature.
 
 - Linux is currently the only supported operating system.
-- Python 3.6 is the only supported version.
+- Python 3+ is the only supported version.
 - Only Service Principal authentication is currently supported.
 
 Currently periodic (CRON) and Event Grid functions are supported, however consumption pricing is not
