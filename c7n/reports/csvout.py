@@ -157,7 +157,7 @@ class Formatter(object):
 
         fields = OrderedDict(fields)
         mfields = getattr(model, 'default_report_fields', None)
-        if mfields is None:
+        if not mfields:
             mfields = [model.id]
             if model.name != model.id:
                 mfields.append(model.name)
