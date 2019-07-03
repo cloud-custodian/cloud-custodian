@@ -30,6 +30,7 @@ class NetworkInterface(ArmResourceManager):
     """Network Interface Resource
 
     :example:
+
     This policy will get Network Interfaces that have User added routes.
 
     .. code-block:: yaml

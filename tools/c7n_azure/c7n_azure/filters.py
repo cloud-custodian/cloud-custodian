@@ -54,22 +54,26 @@ class MetricFilter(Filter):
 
     Filters Azure resources based on live metrics from the Azure monitor
 
-    :example: Find all VMs with an average Percentage CPU greater than 75% over last 2 hours
+    :example:
+
+    Find all VMs with an average Percentage CPU greater than 75% over last 2 hours
 
     .. code-block:: yaml
 
-            policies:
-              - name: vm-percentage-cpu
-                resource: azure.vm
-                filters:
-                  - type: metric
-                    metric: Percentage CPU
-                    aggregation: average
-                    op: gt
-                    threshold: 75
-                    timeframe: 2
+        policies:
+          - name: vm-percentage-cpu
+            resource: azure.vm
+            filters:
+              - type: metric
+                metric: Percentage CPU
+                aggregation: average
+                op: gt
+                threshold: 75
+                timeframe: 2
 
-    :example: Find KeyVaults with more than 1000 API hits in the last hour
+    :example:
+
+    Find KeyVaults with more than 1000 API hits in the last hour
 
     .. code-block:: yaml
 
@@ -85,6 +89,7 @@ class MetricFilter(Filter):
                 timeframe: 1
 
     :example:
+
     Find SQL servers with less than 10% average DTU consumption
     across all databases over last 24 hours
 
@@ -222,6 +227,7 @@ class TagActionFilter(Filter):
     in which to interpret the clock (default value is 'utc')
 
     :example:
+
     .. code-block :: yaml
 
        policies:
@@ -307,6 +313,7 @@ class DiagnosticSettingsFilter(ValueFilter):
     on the diagnostic settings for an azure resource.
 
     :example:
+
     Find Load Balancers that have logs for both LoadBalancerProbeHealthStatus category and
     LoadBalancerAlertEvent category enabled.
     The use of value_type: swap is important for these examples because it swaps the value
@@ -330,6 +337,7 @@ class DiagnosticSettingsFilter(ValueFilter):
                 value_type: swap
 
     :example:
+
     Find KeyVaults that have logs enabled for the AuditEvent category.
 
     .. code-block:: yaml
@@ -562,7 +570,9 @@ class ResourceLockFilter(Filter):
     Lock type is optional, by default any lock will be applied to the filter.
     To get unlocked resources, use "Absent" type.
 
-    :example: Get all keyvaults with ReadOnly lock:
+    :example:
+
+    Get all keyvaults with ReadOnly lock:
 
     .. code-block :: yaml
 
@@ -573,7 +583,9 @@ class ResourceLockFilter(Filter):
             - type: resource-lock
               lock-type: ReadOnly
 
-    :example: Get all locked sqldatabases (any type of lock):
+    :example:
+
+    Get all locked sqldatabases (any type of lock):
 
     .. code-block :: yaml
 
@@ -583,7 +595,9 @@ class ResourceLockFilter(Filter):
           filters:
             - type: resource-lock
 
-    :example: Get all unlocked resource groups:
+    :example:
+
+    Get all unlocked resource groups:
 
     .. code-block :: yaml
 

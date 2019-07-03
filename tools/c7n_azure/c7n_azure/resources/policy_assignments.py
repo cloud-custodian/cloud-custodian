@@ -21,6 +21,7 @@ class PolicyAssignments(ArmResourceManager):
     """Policy Assignment Resource
 
     :example:
+
     This policy will find all policy assignments named 'test-assignment' and delete them.
 
     .. code-block:: yaml

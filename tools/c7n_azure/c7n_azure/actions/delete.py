@@ -9,24 +9,27 @@ class DeleteAction(AzureBaseAction):
     ARM resource type supported by Cloud Custodian.
 
     :example:
+
     This policy will delete any ARM resource with 'test' in the name
 
     .. code-block:: yaml
 
-            policies:
-              - name: delete-test-resources
-                resource: azure.armresource
-                description: |
-                  Deletes any ARM resource with 'test' in the name
-                filters:
-                  - type: value
-                    key: name
-                    value: test
-                    op: contains
-                actions:
-                 - type: delete
+        policies:
+          - name: delete-test-resources
+            resource: azure.armresource
+            description: |
+              Deletes any ARM resource with 'test' in the name
+            filters:
+              - type: value
+                key: name
+                value: test
+                op: contains
+            actions:
+              - type: delete
+
 
     :example:
+
     This policy will delete any Network Security Group  with 'test' in the name
 
     .. code-block:: yaml

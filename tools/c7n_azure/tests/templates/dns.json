@@ -9,6 +9,10 @@
       "wwwRecordName": {
          "type": "string",
          "defaultValue": "www"
+      },
+      "deletemeRecordName": {
+         "type": "string",
+         "defaultValue": "deleteme"
       }
    },
    "resources": [
@@ -35,6 +39,23 @@
                },
                {
                   "ipv4Address": "1.2.3.5"
+               }
+            ]
+         }
+      },
+      {
+         "type": "Microsoft.Network/dnszones/A",
+         "name": "[concat(parameters('dnsZoneName'), '/', parameters('deletemeRecordName'))]",
+         "apiVersion": "2016-04-01",
+         "location": "global",
+         "dependsOn": [
+            "[parameters('dnsZoneName')]"
+         ],
+         "properties": {
+            "TTL": 3600,
+            "ARecords": [
+               {
+                  "ipv4Address": "1.2.3.6"
                }
             ]
          }

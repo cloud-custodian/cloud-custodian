@@ -31,6 +31,7 @@ class NetworkSecurityGroup(ArmResourceManager):
     """Network Security Group Resource
 
     :example:
+
     This policy will deny access to all ports that are NOT 22, 23 or 24
     for all Network Security Groups
 
@@ -50,6 +51,7 @@ class NetworkSecurityGroup(ArmResourceManager):
                 direction: 'Inbound'
 
     :example:
+
     This policy will find all NSGs with port 80 opened and port 443 closed,
     then it will open port 443
 

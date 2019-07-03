@@ -26,7 +26,9 @@ class LogicAppAction(Webhook):
 
     This action is based on the ``webhook`` action and supports the same options.
 
-    :example: This policy will call logic app with list of VM's
+    :example:
+
+    This policy will call logic app with list of VM's
 
         .. code-block:: yaml
 

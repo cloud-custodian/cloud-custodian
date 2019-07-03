@@ -48,7 +48,9 @@ class ArmTypeInfo(TypeInfo):
 class ArmResourceManager(QueryResourceManager):
     """Azure Arm Resource
 
-    :example: This policy will find all ARM resources with the tag 'Tag1' present
+    :example:
+
+    This policy will find all ARM resources with the tag 'Tag1' present
 
     .. code-block:: yaml
 

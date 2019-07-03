@@ -24,6 +24,7 @@ class LoadBalancer(ArmResourceManager):
     """Load Balancer Resource
 
     :example:
+
     This policy will filter load balancers with an ipv6 frontend public IP
 
     .. code-block:: yaml
@@ -39,6 +40,7 @@ class LoadBalancer(ArmResourceManager):
                   value: "ipv6"
 
     :example:
+
     This policy will find all load balancers with 1000 or less transmitted packets
     over the last 72 hours
 
@@ -69,7 +71,7 @@ class LoadBalancer(ArmResourceManager):
 class FrontEndIp(RelatedResourceFilter):
     """Filters load balancers by frontend public ip.
 
-    :Example:
+    :example:
 
         .. code-block:: yaml
 

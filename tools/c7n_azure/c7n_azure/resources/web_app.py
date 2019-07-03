@@ -21,6 +21,7 @@ class WebApp(ArmResourceManager):
     """Web Applications Resource
 
     :example:
+
     This policy will find all web apps with 10 or less requests over the last 72 hours
 
     .. code-block:: yaml
@@ -41,6 +42,7 @@ class WebApp(ArmResourceManager):
                 days: 7
 
     :example:
+
     This policy will find all web apps with 1000 or more server errors over the last 72 hours
 
     .. code-block:: yaml
@@ -55,6 +57,7 @@ class WebApp(ArmResourceManager):
                 aggregation: total
                 threshold: 1000
                 timeframe: 72
+
     """
 
     class resource_type(ArmResourceManager.resource_type):

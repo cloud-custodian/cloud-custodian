@@ -37,6 +37,7 @@ class KeyVault(ArmResourceManager):
     """Key Vault Resource
 
     :example:
+
     This policy will find all KeyVaults with 10 or less API Hits over the last 72 hours
 
     .. code-block:: yaml
@@ -53,6 +54,7 @@ class KeyVault(ArmResourceManager):
                 timeframe: 72
 
     :example:
+
     This policy will find all KeyVaults with an access of Service Principals not in the white list
     that exceed read-only access
 
@@ -79,6 +81,7 @@ class KeyVault(ArmResourceManager):
                         - get
 
     :example:
+
     This policy will find all KeyVaults and add get and list permissions for keys.
 
     .. code-block:: yaml
@@ -249,6 +252,7 @@ class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
                           keys:
                             - Get
                             - List
+
     """
 
     schema = type_schema('update-access-policy',

@@ -21,6 +21,7 @@ class Disk(ArmResourceManager):
     """Disk Resource
 
     :example:
+
     This policy will disks that are not being managed by a VM
 
     .. code-block:: yaml

@@ -25,6 +25,7 @@ class VirtualMachine(ArmResourceManager):
     """Virtual Machine Resource
 
     :example:
+
     Stop all running VMs
 
     .. code-block:: yaml
@@ -42,6 +43,7 @@ class VirtualMachine(ArmResourceManager):
               - type: stop
 
     :example:
+
     Start all VMs
 
     .. code-block:: yaml
@@ -53,6 +55,7 @@ class VirtualMachine(ArmResourceManager):
               - type: start
 
     :example:
+
     Restart all VMs
 
     .. code-block:: yaml
@@ -64,6 +67,7 @@ class VirtualMachine(ArmResourceManager):
               - type: restart
 
     :example:
+
     Delete specific VM by name
 
     .. code-block:: yaml
@@ -81,6 +85,7 @@ class VirtualMachine(ArmResourceManager):
               - type: delete
 
     :example:
+
     Find all VMs with a Public IP address
 
     .. code-block:: yaml
@@ -94,6 +99,7 @@ class VirtualMachine(ArmResourceManager):
                 value: not-null
 
     :example:
+
     This policy will find all VMs that have Percentage CPU usage >= 75% over the last 72 hours
 
     .. code-block:: yaml
@@ -110,6 +116,7 @@ class VirtualMachine(ArmResourceManager):
                 timeframe: 72
 
     :example:
+
     This policy will find all VMs that have Percentage CPU usage <= 1% over the last 72 hours,
     mark for deletion in 7 days
 
@@ -129,6 +136,7 @@ class VirtualMachine(ArmResourceManager):
               - type: mark-for-op
                 op: delete
                 days: 7
+
     """
 
     class resource_type(ArmResourceManager.resource_type):
