@@ -17,7 +17,7 @@ import enum
 import logging
 
 import six
-from azure.mgmt.sql.models import BackupLongTermRetentionPolicy
+from azure.mgmt.sql.models import BackupLongTermRetentionPolicy, DatabaseUpdate, Sku
 from msrestazure.azure_exceptions import CloudError
 
 from c7n.filters import Filter
@@ -29,7 +29,6 @@ from c7n_azure.provider import resources
 from c7n_azure.query import ChildTypeInfo
 from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper
-from azure.mgmt.resource.resources.models import GenericResource
 
 log = logging.getLogger('custodian.azure.sqldatabase')
 
@@ -479,34 +478,52 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
 @SqlDatabase.action_registry.register('resize')
 class Resize(AzureBaseAction):
     """
-    Bla
+    Action to scale database.
+    Required arguments: capacity in DTUs and tier (Basic, Standard or Premium).
+    Max data size (in bytes) is optional.
+
+    :example:
+    This policy will resize database to Premium tier with 500 DTU and set max data size to 750 GB
+
+    policies:
+      - name: resize-db
+        resource: azure.sqldatabase
+        filters:
+          - type: value
+            key: name
+            value: cctestdb
+        actions:
+          - type: resize
+            tier: Premium
+            capacity: 500
+            max_size_bytes: 805306368000
 
     """
 
-    schema = type_schema('resize', required=['capacity', 'tier'],
+    schema = type_schema(
+        'resize',
+        required=['capacity', 'tier'],
         **{
             'capacity': {'type': 'number'},
             'tier': {'enum': ['Basic', 'Standard', 'Premium']},
-        }
-    )
+            'max_size_bytes': {'type': 'number'}
+        })
 
     def __init__(self, data, manager=None):
         super(Resize, self).__init__(data, manager)
         self.capacity = self.data['capacity']
+        self.tier = self.data['tier']
+        self.max_size_bytes = self.data.get('max_size_bytes', 0)
 
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
 
-    def _process_resource(self, resource):
-        resource['sku']['capacity'] = self.capacity
-        resource['sku']['tier'] = self.tier
-        resource['sku']['name'] = self.tier
-
-        az_resource = GenericResource.deserialize(resource)
-
-        api_version = '2018-06-01-preview' #self.session.resource_api_version(resource['id'])
-
-        # create a GenericResource object with the required parameters
-        generic_resource = GenericResource(sku=az_resource.sku)
-
-        client = self.session.client('azure.mgmt.resource.ResourceManagementClient')
-
-        client.resources.update_by_id(resource['id'], api_version, generic_resource)
+    def _process_resource(self, database):
+        sku = Sku(capacity=self.capacity, tier=self.tier, name=self.tier)
+        max_size_bytes = self.max_size_bytes if not 0 else database['properties']['maxSizeBytes']
+        self.client.databases.update(
+            database['resourceGroup'],
+            ResourceIdParser.get_resource_name(database['c7n:parent-id']),
+            database['name'],
+            DatabaseUpdate(sku=sku, max_size_bytes=max_size_bytes)
+        )
