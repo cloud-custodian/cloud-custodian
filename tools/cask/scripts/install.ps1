@@ -30,7 +30,7 @@ try
 }
 catch
 {
-    echo "Installation failed.  Please file a Github issue if you require support."
+    echo "Installation failed.  Please file a Github issue if you need help."
     echo $_.Exception|format-list -force
     Break
 }
