@@ -190,7 +190,9 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyBaseFilter):
     If the database has no backup retention policies, the database is treated as if
     it has a backup retention of zero days.
 
-    :example: Find all SQL Databases with a short term retention policy shorter than 2 weeks.
+    :example:
+
+    Find all SQL Databases with a short term retention policy shorter than 2 weeks.
 
     .. code-block:: yaml
 
@@ -234,7 +236,9 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyBaseFilter):
     of these backups has a retention period that can specified in units of days, weeks,
     months, or years.
 
-    :example: Find all SQL Databases with weekly backup retentions longer than 1 month.
+    :example:
+
+    Find all SQL Databases with weekly backup retentions longer than 1 month.
 
     .. code-block:: yaml
 
@@ -326,7 +330,9 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
 
     Update the short term backup retention policy for a SQL Database.
 
-    :example: Update any SQL Database short term retentions to at least 7 days.
+    :example:
+
+    Update any SQL Database short term retentions to at least 7 days.
 
     .. code-block:: yaml
 
@@ -383,7 +389,9 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
     of these backups has a retention period that can specified in units of days, weeks,
     months, or years.
 
-    :example: Enforce a 1 month maximum retention for weekly backups on all SQL Databases
+    :example:
+
+    Enforce a 1 month maximum retention for weekly backups on all SQL Databases
 
     .. code-block:: yaml
 

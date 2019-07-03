@@ -84,45 +84,27 @@ class ChildResourceQuery(ResourceQuery):
 
     def filter(self, resource_manager, **params):
         """Query a set of resources."""
-        m = self.resolve(resource_manager.resource_type)
-        client = resource_manager.get_client()
-
-        enum_op, list_op, extra_args = m.enum_spec
+        m = self.resolve(resource_manager.resource_type)  # type: ChildTypeInfo
 
         parents = self.manager.get_resource_manager(m.parent_manager_name)
 
         # Have to query separately for each parent's children.
         results = []
         for parent in parents.resources():
-            # There are 2 types of extra_args:
-            #   - static values stored in 'extra_args' dict (e.g. some type)
-            #   - dynamic values are retrieved via 'extra_args' method (e.g. parent name)
-            if extra_args:
-                params.update({key: extra_args[key](parent) for key in extra_args.keys()})
-
-            params.update(m.extra_args(parent))
-
-            # Some resources might not have enum_op piece (non-arm resources)
-            if enum_op:
-                op = getattr(getattr(client, enum_op), list_op)
-            else:
-                op = getattr(client, list_op)
-
             try:
-                subset = [r.serialize(True) for r in op(**params)]
-
-                # If required, append parent resource ID to all child resources
-                if m.annotate_parent:
-                    for r in subset:
-                        r[m.parent_key] = parent[parents.resource_type.id]
+                subset = self.manager.enumerate_resources(parent, m, **params)
 
                 if subset:
+                    # If required, append parent resource ID to all child resources
+                    if m.annotate_parent:
+                        for r in subset:
+                            r[m.parent_key] = parent[parents.resource_type.id]
+
                     results.extend(subset)
+
             except Exception as e:
-                log.warning('{0}.{1} failed for {2}. {3}'.format(m.client,
-                                                                 list_op,
-                                                                 parent[parents.resource_type.id],
-                                                                 e))
+                log.warning('Child enumeration failed for {0}. {1}'
+                            .format(parent[parents.resource_type.id], e))
                 if m.raise_on_exception:
                     raise e
 
@@ -153,7 +135,7 @@ class TypeMeta(type):
 
 @six.add_metaclass(TypeMeta)
 class TypeInfo(object):
-    # api client construction information
+    """api client construction information"""
     service = ''
     client = ''
 
@@ -162,7 +144,7 @@ class TypeInfo(object):
 
 @six.add_metaclass(TypeMeta)
 class ChildTypeInfo(TypeInfo):
-    # api client construction information for child resources
+    """api client construction information for child resources"""
     parent_manager_name = ''
     annotate_parent = True
     raise_on_exception = True
@@ -277,6 +259,27 @@ class ChildResourceManager(QueryResourceManager):
             self._session = session
 
         return self._session
+
+    def enumerate_resources(self, parent_resource, type_info, **params):
+        client = self.get_client()
+
+        enum_op, list_op, extra_args = self.resource_type.enum_spec
+
+        # There are 2 types of extra_args:
+        #   - static values stored in 'extra_args' dict (e.g. some type)
+        #   - dynamic values are retrieved via 'extra_args' method (e.g. parent name)
+        if extra_args:
+            params.update({key: extra_args[key](parent_resource) for key in extra_args.keys()})
+
+        params.update(type_info.extra_args(parent_resource))
+
+        # Some resources might not have enum_op piece (non-arm resources)
+        if enum_op:
+            op = getattr(getattr(client, enum_op), list_op)
+        else:
+            op = getattr(client, list_op)
+
+        return [r.serialize(True) for r in op(**params)]
 
 
 resources.subscribe(resources.EVENT_FINAL, QueryResourceManager.register_actions_and_filters)

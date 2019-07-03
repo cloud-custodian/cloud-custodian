@@ -1,4 +1,4 @@
-# Copyright 2018 Capital One Services, LLC
+# 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,29 +16,24 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('vnet')
-class Vnet(ArmResourceManager):
-    """Virtual Networks Resource
+@resources.register('dnszone')
+class DnsZone(ArmResourceManager):
+    """DNS Zone Resource
 
     :example:
 
-    This set of policies will find all Virtual Networks that do not have DDOS protection enabled.
+    Finds all DNS Zones in the subscription
 
     .. code-block:: yaml
 
         policies:
-          - name: find-vnets-ddos-protection-disabled
-            resource: azure.vnet
-            filters:
-              - type: value
-                key: properties.enableDdosProtection
-                op: equal
-                value: False
+            - name: find-all-dns-zones
+              resource: azure.dnszone
 
     """
 
     class resource_type(ArmResourceManager.resource_type):
-        service = 'azure.mgmt.network'
-        client = 'NetworkManagementClient'
-        enum_spec = ('virtual_networks', 'list_all', None)
-        resource_type = 'Microsoft.Network/virtualNetworks'
+        service = 'azure.mgmt.dns'
+        client = 'DnsManagementClient'
+        enum_spec = ('zones', 'list', {})
+        resource_type = 'Microsoft.Network/dnszones'

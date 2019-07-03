@@ -28,6 +28,51 @@ from msrestazure.azure_exceptions import CloudError
 
 @resources.register('networksecuritygroup')
 class NetworkSecurityGroup(ArmResourceManager):
+    """Network Security Group Resource
+
+    :example:
+
+    This policy will deny access to all ports that are NOT 22, 23 or 24
+    for all Network Security Groups
+
+    .. code-block:: yaml
+
+          policies:
+           - name: close-inbound-except-22-24
+             resource: azure.networksecuritygroup
+             filters:
+              - type: ingress
+                exceptPorts: '22-24'
+                match: 'any'
+                access: 'Allow'
+             actions:
+              - type: close
+                exceptPorts: '22-24'
+                direction: 'Inbound'
+
+    :example:
+
+    This policy will find all NSGs with port 80 opened and port 443 closed,
+    then it will open port 443
+
+    .. code-block:: yaml
+
+         policies:
+           - name: close-egress-except-TCP
+             resource: azure.networksecuritygroup
+             filters:
+              - type: ingress
+                ports: '80'
+                access: 'Allow'
+              - type: ingress
+                ports: '443'
+                access: 'Deny'
+             actions:
+              - type: open
+                ports: '443'
+
+    """
+
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'

@@ -21,6 +21,7 @@ class Image(ArmResourceManager):
     """Virtual Machine Image
 
     :example:
+
     Returns all virtual machine images named my-test-vm-image
 
     .. code-block:: yaml

@@ -32,7 +32,9 @@ class LockAction(AzureBaseAction):
     See `Who can create or delete locks <https://docs.microsoft.com/en-us/azure/
     azure-resource-manager/resource-group-lock-resources#who-can-create-or-delete-locks>`_
 
-    :example: Add ReadOnly lock to all keyvaults:
+    :example:
+
+    Add ReadOnly lock to all keyvaults:
 
     .. code-block:: yaml
 

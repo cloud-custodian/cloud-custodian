@@ -21,6 +21,44 @@ from c7n.filters.related import RelatedResourceFilter
 
 @resources.register('loadbalancer')
 class LoadBalancer(ArmResourceManager):
+    """Load Balancer Resource
+
+    :example:
+
+    This policy will filter load balancers with an ipv6 frontend public IP
+
+    .. code-block:: yaml
+
+         policies:
+           - name: loadbalancer-with-ipv6-frontend
+             resource: azure.loadbalancer
+             filters:
+                - type: frontend-public-ip
+                  key: properties.publicIPAddressVersion
+                  op: in
+                  value_type: normalize
+                  value: "ipv6"
+
+    :example:
+
+    This policy will find all load balancers with 1000 or less transmitted packets
+    over the last 72 hours
+
+    .. code-block:: yaml
+
+        policies:
+          - name: notify-inactive-loadbalancer
+            resource: azure.loadbalancer
+            filters:
+              - type: metric
+                metric: PacketCount
+                op: le
+                aggregation: total
+                threshold: 1000
+                timeframe: 72
+
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
         service = 'azure.mgmt.network'
@@ -33,7 +71,7 @@ class LoadBalancer(ArmResourceManager):
 class FrontEndIp(RelatedResourceFilter):
     """Filters load balancers by frontend public ip.
 
-    :Example:
+    :example:
 
         .. code-block:: yaml
 

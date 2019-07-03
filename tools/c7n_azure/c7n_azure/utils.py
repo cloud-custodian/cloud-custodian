@@ -27,7 +27,7 @@ from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
-from netaddr import IPNetwork, IPRange
+from netaddr import IPNetwork, IPRange, IPSet
 
 from c7n.utils import chunks, local_session
 from c7n_azure import constants
@@ -406,7 +406,7 @@ class IpRangeHelper(object):
             return None
 
         ranges = [[s.strip() for s in r.split('-')] for r in data[key]]
-        result = set()
+        result = IPSet()
         for r in ranges:
             if len(r) > 2:
                 raise Exception('Invalid range. Use x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.')
