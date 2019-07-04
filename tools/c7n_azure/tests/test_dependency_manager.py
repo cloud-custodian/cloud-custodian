@@ -74,7 +74,9 @@ class DependencyManagerTest(BaseTest):
                                                       self.test_packages))
 
     def test_get_installed_distributions(self):
-        d = DependencyManager.get_dependency_packages_list(['c7n-azure'], ['azure-cli-core'])
+        d = DependencyManager.get_dependency_packages_list(
+            ['c7n-azure', 'c7n-azure'],
+            ['azure-cli-core'])
         self.assertTrue('azure-cli-core' not in d)
         self.assertTrue('adal' in d)
         self.assertEqual(sorted(d), d)
