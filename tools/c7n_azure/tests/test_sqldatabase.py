@@ -82,7 +82,7 @@ class SqlDatabaseTest(BaseTest):
     @arm_template('sqlserver.json')
     def test_resize_action(self):
         p = self.load_policy({
-            'name': 'lock-sqldatabase',
+            'name': 'resize-sqldatabase',
             'resource': 'azure.sqldatabase',
             'filters': [
                 {
@@ -95,8 +95,8 @@ class SqlDatabaseTest(BaseTest):
                 {
                     'type': 'resize',
                     'tier': 'Standard',
-                    'capacity': '100',
-                    'max_size_bytes': '21474836480'
+                    'capacity': 100,
+                    'max_size_bytes': 21474836480
                 }
             ],
         })
