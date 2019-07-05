@@ -157,7 +157,8 @@ class CosmosDBReplaceOfferActionTest(BaseTest):
             ],
             'actions': [
                 {
-                    'type': 'replace-offer'
+                    'type': 'replace-offer',
+                    'throughput': 100
                 }
             ]
         }, validate=True)

@@ -86,11 +86,11 @@ class CosmosDBChildResource(ChildResourceManager):
 
     @staticmethod
     @lru_cache()
-    def get_cosmos_key(resource_group, resource_name, client):
-        key_result = client.database_accounts.get_read_only_keys(
+    def get_cosmos_key(resource_group, resource_name, client, readonly=True):
+        key_result = client.database_accounts.list_keys(
             resource_group,
             resource_name)
-        return key_result.primary_readonly_master_key
+        return key_result.primary_readonly_master_key if readonly else key_result.primary_master_key
 
     def get_data_client(self, parent_resource):
         key = CosmosDBChildResource.get_cosmos_key(
@@ -200,7 +200,7 @@ class OfferHelper(object):
         return account_grouped
 
     @staticmethod
-    def get_cosmos_data_client(resources, manager):
+    def get_cosmos_data_client(resources, manager, readonly=True):
         cosmos_db_key = resources[0]['c7n:parent-id']
         url_connection = resources[0]['c7n:document-endpoint']
 
@@ -208,7 +208,9 @@ class OfferHelper(object):
         key = CosmosDBChildResource.get_cosmos_key(
             ResourceIdParser.get_resource_group(cosmos_db_key),
             ResourceIdParser.get_resource_name(cosmos_db_key),
-            manager.get_client())
+            manager.get_client(),
+            readonly
+        )
 
         # Build a data client
         data_client = CosmosClient(url_connection=url_connection, auth={'masterKey': key})
@@ -316,7 +318,13 @@ class CosmosDBReplaceOfferAction(AzureBaseAction):
     """CosmosDB Replace Offer Action
     """
 
-    schema = type_schema('replace-offer')
+    schema = type_schema(
+        'replace-offer',
+        required=['throughput'],
+        **{
+            'throughput': {'type': 'number'}
+        }
+    )
 
     def _process_resources(self, resources, event):
         OfferHelper.execute_in_parallel_grouped_by_account(
@@ -328,12 +336,20 @@ class CosmosDBReplaceOfferAction(AzureBaseAction):
 
     def _process_resource_set(self, resources):
         try:
+
             # The offer data may not already be available
             manager = self.manager.get_parent_manager()
-            data_client = OfferHelper.get_cosmos_data_client(resources, manager)
+            data_client = OfferHelper.get_cosmos_data_client(resources, manager, readonly=False)
             OfferHelper.populate_offer_data(resources, manager, data_client)
 
-            # TODO: replace the offer
+            # Working under the assumption that there is 1 offer per collection...
+            offer = resources[0]['c7n:offer'][0]
+            new_offer = dict(offer)
+            new_offer.pop('c7n:MatchedFilters', None)
+            new_offer['content']['offerThroughput'] = self.data['throughput']
+            new_offer = data_client.ReplaceOffer(offer['_self'], new_offer)
+            for resource in resources:
+                resource['c7n:offer'] = [new_offer]
 
         except Exception as e:
             log.warn(e)
@@ -342,7 +358,7 @@ class CosmosDBReplaceOfferAction(AzureBaseAction):
 
     def _process_resource(self, resource):
         # Since the offer lives on the account, not the collection, this action does not
-        # apply to each individual resource.
+        # apply to resources individually
         raise NotImplementedError(
             "CosmosDBReplaceOfferAction processes resources as a group, not individually")
 
