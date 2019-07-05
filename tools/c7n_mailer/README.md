@@ -577,3 +577,26 @@ the message file to be base64-encoded, gzipped JSON, just like c7n sends to SQS.
   receive mail, and print the rendered message body template to STDOUT.
 * With the ``-d`` | ``--dry-run`` argument, it will print the actual email body (including headers)
   that would be sent, for each message that would be sent, to STDOUT.
+  
+#### Testing Templates for Azure
+
+The ``c7n-mailer-replay`` entrypoint can be used to test templates for Azure with either of the arguments:
+* ``-T`` | ``--template-print`` 
+* ``-d`` | ``--dry-run`` 
+  
+Running ``c7n-mailer-replay`` without either of these arguments will throw an error as it will attempt
+to authorize with AWS. 
+
+The following is an example for retrieving a sample message to test against templates:
+
+* Run a policy with the notify action, providing the name of the template to test, to populate the queue.
+
+* Using the azure cli, save the message locally: 
+```
+$ az storage message get --queue-name <queuename> --account-name <storageaccountname> --query '[].content' > test_message.gz
+```
+* The example message can be provided to ``c7n-mailer-replay`` by running:
+
+```
+$ c7n-mailer-replay test_message.gz -T --config mailer.yml
+```

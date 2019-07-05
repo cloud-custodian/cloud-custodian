@@ -47,6 +47,7 @@ setup(
                       "azure-mgmt-batch",
                       "azure-mgmt-cognitiveservices",
                       "azure-mgmt-cosmosdb",
+                      "azure-mgmt-costmanagement",
                       "azure-mgmt-compute",
                       "azure-mgmt-cdn",
                       "azure-mgmt-containerregistry",
@@ -72,6 +73,10 @@ setup(
                       "azure-graphrbac",
                       "azure-keyvault",
                       "azure-storage-blob",
+                      # azure-cosmosdb-table has incompatible dependency ~=1.1
+                      # Remove this when fixed:
+                      # https://github.com/Azure/azure-cosmos-table-python/issues/39
+                      "azure-storage-common~=2.0",
                       "azure-storage-queue",
                       "azure-storage-file",
                       "azure-cosmosdb-table",

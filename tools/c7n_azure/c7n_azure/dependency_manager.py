@@ -48,7 +48,7 @@ class DependencyManager(object):
         regex = "^[^<>~=]*"
         for i, val in enumerate(res):
             pname = re.match(regex, val)
-            if sum(pname.group(0).lower() in e.lower() for e in res) > 1:
+            if sum(pname.group(0).lower() == re.match(regex, e.lower()).group(0) for e in res) > 1:
                 logger.debug("removing duplicate dependency:" + val)
                 res.pop(i)
         return sorted(res)
@@ -115,6 +115,9 @@ class DependencyManager(object):
         for f in [os.path.join(wheels_folder, f) for f in files]:
             wheel = Wheel(f)
             wheel.install(paths, ScriptMaker(None, None), lib_only=True)
+
+        # Ensure there is no top level __init__.py
+        os.remove(os.path.join(install_folder, 'azure', '__init__.py'))
 
     @staticmethod
     def _get_file_hash(filepath):
