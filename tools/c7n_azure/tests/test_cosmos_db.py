@@ -148,13 +148,12 @@ class CosmosDBTest(BaseTest):
 
 class CosmosDBReplaceOfferActionTest(BaseTest):
 
-    @classmethod
-    def setUpClass(cls, *args, **kwargs):
-        super(CosmosDBReplaceOfferActionTest, cls).setUpClass(*args, **kwargs)
+    def setUp(self, *args, **kwargs):
+        super(CosmosDBReplaceOfferActionTest, self).setUp(*args, **kwargs)
         client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
         key = CosmosDBChildResource.get_cosmos_key(
             'test_cosmosdb', 'cctestcosmosdb', client, readonly=False)
-        cls.data_client = CosmosClient(
+        self.data_client = CosmosClient(
             url_connection='https://cctestcosmosdb.documents.azure.com:443/',
             auth={
                 'masterKey': key
@@ -163,7 +162,7 @@ class CosmosDBReplaceOfferActionTest(BaseTest):
 
     def tearDown(self, *args, **kwargs):
         super(CosmosDBReplaceOfferActionTest, self).tearDown(*args, **kwargs)
-        CosmosDBReplaceOfferActionTest.data_client.ReplaceOffer(
+        self.data_client.ReplaceOffer(
             self.initial_offer['_self'],
             self.initial_offer
         )
@@ -202,7 +201,7 @@ class CosmosDBReplaceOfferActionTest(BaseTest):
         self._assert_offer_throughput_equals(500, collections[0]['_self'])
 
     def _assert_offer_throughput_equals(self, throughput, resource_self):
-        offers = CosmosDBReplaceOfferActionTest.data_client.ReadOffers()
+        offers = self.data_client.ReadOffers()
         offer = next((o for o in offers if o['resource'] == resource_self), None)
         self.assertIsNotNone(offer)
         self.assertEqual(offer['content']['offerThroughput'], throughput)
