@@ -316,6 +316,27 @@ class CosmosDBOfferFilter(ValueFilter):
 @CosmosDBCollection.action_registry.register('replace-offer')
 class CosmosDBReplaceOfferAction(AzureBaseAction):
     """CosmosDB Replace Offer Action
+
+    Modify the throughput of a cosmodb collection's offer
+
+    :example:
+
+    This policy will ensure that no collections have offers with more than 400 RU/s throughput.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: limit-throughput-to-400
+            resource: azure.cosmosdb-collection
+            filters:
+              - type: offer
+                key: content.offerThroughput
+                op: gt
+                value: 400
+            actions:
+              - type: replace-offer
+                throughput: 400
+
     """
 
     schema = type_schema(
