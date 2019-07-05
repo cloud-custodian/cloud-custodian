@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 from azure_common import BaseTest, arm_template
 
@@ -138,3 +139,26 @@ class CosmosDBTest(BaseTest):
 
         self.assertEqual(1, len(resources))
         self.assertEqual('Hash', resources[0]['partitionKey']['kind'])
+
+
+class CosmosDBReplaceOfferActionTest(BaseTest):
+
+    def test_replace_offer_collection_action(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-collection',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'id',
+                    'op': 'eq',
+                    'value': 'cccontainer'
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'replace-offer'
+                }
+            ]
+        }, validate=True)
+        self.assertTrue(p)
