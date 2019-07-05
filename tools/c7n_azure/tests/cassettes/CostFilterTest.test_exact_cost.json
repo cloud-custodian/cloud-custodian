@@ -1,0 +1,328 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;137,Microsoft.Compute/HighCostGet30Min;697"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 03 Jul 2019 17:48:06 GMT"
+                    ],
+                    "content-length": [
+                        "3090"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "vmId": "60ad9263-e0e9-446e-beba-86d320b783a8",
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B1ls"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "18.04-LTS",
+                                            "version": "latest"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "anluong-vm_disk1_e99a305bab314590b811a7361625805c",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Premium_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anluong-vm/providers/Microsoft.Compute/disks/anluong-vm_disk1_e99a305bab314590b811a7361625805c"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "anluong-vm",
+                                        "adminUsername": "azureuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/azureuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCwhmcmk+6FvOsu2WIZlj3WWu4KO8Ib9A2EVvHo8x+dwHy9DXFv/8avBCkyTQAuynbdmwXpwTfRs+VwHBDsrmOuOpTgkRCKGBi3MDUP987yFmytmScRHjizrbNDRXs/Fcqyf9VlXYE7lMxjFbA9SyVpbZirYrjxfHY5V0qr8Cd4UW8VUEEACRmZfKE76WFAwQc2A0lVxDKksUk3a9UQUzcKThfwgzza3/wSeSNOi3X0V/6PEDAaBfIaX23b5ffQaF6x+WEdlTKCqjEJeqhBmC/Xj5HoCTOFi1H8YmDHWco8LOqDN72rJAzvXU+t/jJt72ZIKSl3wWax/9imMI6gS1/sSHWvpVOIm0wSp2Y1uznN1gvi6CShCu+bO9V+GpXhGkiYq43cjoGYDFj/R1WdXgParKcDtzEEklsVT3D1b82O39o9NBBLeIhQamTbz4rJgJiWTNr1gBFoH+NGU3w/oiKyBccaiPP2wv1f35nfkcUJyIcmPXn1wkM1hmh+uTH56vDUquTpsU/NzfL3n4XjMd0vbH6vsJDulCuJ3mU230CRahG6TLysuJRT3149cSsGHW5SLehjgRIVCSyAW541/lY7folqu8s8i2QsdrBKoKAMv1NjWCqbomT6mI4O+13l6RUACtfG8xCNbSvxWhjuUE2H7rMslMzRP77NUB3jbAoenQ=="
+                                                    }
+                                                ]
+                                            },
+                                            "provisionVMAgent": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anluong-vm/providers/Microsoft.Network/networkInterfaces/anluong-vm990"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://anluongvmdiag.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "eastus2",
+                                "tags": {
+                                    "CreatorEmail": "anluong@microsoft.com"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/ANLUONG-VM/providers/Microsoft.Compute/virtualMachines/anluong-vm",
+                                "name": "anluong-vm"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CostManagement/query?api-version=2019-01-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 03 Jul 2019 17:48:07 GMT"
+                    ],
+                    "access-control-allow-origin": [
+                        "*"
+                    ],
+                    "session-id": [
+                        "21d8c9a1-a2ea-491b-9f61-a5763ea3f2d4"
+                    ],
+                    "content-length": [
+                        "5525"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.CostManagement/query/2dbb357e-d619-4a20-ada4-fe9805c16160",
+                        "name": "2dbb357e-d619-4a20-ada4-fe9805c16160",
+                        "type": "Microsoft.CostManagement/query",
+                        "location": null,
+                        "sku": null,
+                        "eTag": null,
+                        "properties": {
+                            "nextLink": null,
+                            "columns": [
+                                {
+                                    "name": "PreTaxCost",
+                                    "type": "Number"
+                                },
+                                {
+                                    "name": "ResourceId",
+                                    "type": "String"
+                                },
+                                {
+                                    "name": "Currency",
+                                    "type": "String"
+                                }
+                            ],
+                            "rows": [
+                                [
+                                    0.7812,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.security/pricings/appservices",
+                                    "USD"
+                                ],
+                                [
+                                    0.4284,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.security/pricings/virtualmachines",
+                                    "USD"
+                                ],
+                                [
+                                    1.4e-05,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.sql/locations/eastus2/longtermretentionservers/cctestsqlserverj6y6cbbtaphs4/longtermretentiondatabases/cclongtermretentiondb/longtermretentionbackups",
+                                    "USD"
+                                ],
+                                [
+                                    1.5e-05,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.sql/locations/eastus2/longtermretentionservers/cctestsqlserverj6y6cbbtaphs4/longtermretentiondatabases/cctestdb/longtermretentionbackups",
+                                    "USD"
+                                ],
+                                [
+                                    0.001612,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/anluong-custodian/providers/microsoft.logic/workflows/custodian-emailer",
+                                    "USD"
+                                ],
+                                [
+                                    0.174767,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/anluong-vm/providers/microsoft.compute/disks/anluong-vm_disk1_e99a305bab314590b811a7361625805c",
+                                    "USD"
+                                ],
+                                [
+                                    0.115082,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/anluong-vm/providers/microsoft.compute/virtualmachines/anluong-vm",
+                                    "USD"
+                                ],
+                                [
+                                    0.088704,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/anluong-vm/providers/microsoft.network/publicipaddresses/anluong-vm-ip",
+                                    "USD"
+                                ],
+                                [
+                                    0.022809,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/anluong-vm/providers/microsoft.storage/storageaccounts/anluongvmdiag",
+                                    "USD"
+                                ],
+                                [
+                                    5.2e-05,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/anzoloch-cc/providers/microsoft.insights/components/cloud-custodian",
+                                    "USD"
+                                ],
+                                [
+                                    0.007808,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/anzoloch-cc/providers/microsoft.storage/storageaccounts/custodiand5e7853c",
+                                    "USD"
+                                ],
+                                [
+                                    0.0,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/anzoloch-cc/providers/microsoft.web/sites/tag-key-vault-creator-d5e7853c",
+                                    "USD"
+                                ],
+                                [
+                                    0.000681,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian/providers/microsoft.insights/components/cloud-custodian",
+                                    "USD"
+                                ],
+                                [
+                                    0.008199,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian/providers/microsoft.storage/storageaccounts/custodianc24f5696",
+                                    "USD"
+                                ],
+                                [
+                                    0.0,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian/providers/microsoft.web/sites/azure-auto-tag-creator-c24f5696",
+                                    "USD"
+                                ],
+                                [
+                                    0.000164,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-cask/providers/microsoft.storage/storageaccounts/custodiancask",
+                                    "USD"
+                                ],
+                                [
+                                    0.000468,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-vm/providers/microsoft.compute/virtualmachines/contoso-vm",
+                                    "USD"
+                                ],
+                                [
+                                    0.000504,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/custodian-vm/providers/microsoft.network/publicipaddresses/contoso-vm-ip",
+                                    "USD"
+                                ],
+                                [
+                                    0.000444,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/erwelch-test/providers/microsoft.storage/storageaccounts/erwelchtest",
+                                    "USD"
+                                ],
+                                [
+                                    0.4032,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cosmosdb/providers/microsoft.documentdb/databaseaccounts/cctestcosmosdb",
+                                    "USD"
+                                ],
+                                [
+                                    0.005056,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_dns/providers/microsoft.network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com",
+                                    "USD"
+                                ],
+                                [
+                                    0.034049,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test",
+                                    "USD"
+                                ],
+                                [
+                                    0.013486,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_functionapp-reqs/providers/microsoft.storage/storageaccounts/cloudcustodiantest",
+                                    "USD"
+                                ],
+                                [
+                                    1.9656,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_functionapp-reqs/providers/microsoft.web/serverfarms/cloud-custodian-test",
+                                    "USD"
+                                ],
+                                [
+                                    0.0,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_functionapp-reqs/providers/microsoft.web/sites/cloud-custodian-test",
+                                    "USD"
+                                ],
+                                [
+                                    0.0,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_functionapp-reqs/providers/microsoft.web/sites/custodian-test-app",
+                                    "USD"
+                                ],
+                                [
+                                    0.522612,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/microsoft.sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cclongtermretentiondb",
+                                    "USD"
+                                ],
+                                [
+                                    18.5625,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/microsoft.sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb",
+                                    "USD"
+                                ],
+                                [
+                                    1.4e-05,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_storage/providers/microsoft.storage/storageaccounts/ccipstoragey6akyqpagdt3o",
+                                    "USD"
+                                ],
+                                [
+                                    5.4e-05,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_storage/providers/microsoft.storage/storageaccounts/cclgstoragey6akyqpagdt3o",
+                                    "USD"
+                                ],
+                                [
+                                    0.0694,
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_storage/providers/microsoft.storage/storageaccounts/cctstoragey6akyqpagdt3o",
+                                    "USD"
+                                ]
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
