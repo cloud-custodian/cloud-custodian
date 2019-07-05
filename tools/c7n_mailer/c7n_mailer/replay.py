@@ -10,19 +10,19 @@ JSON data that can be loaded directly.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
-import boto3
-import os
-import logging
-import zlib
 import base64
 import json
+import logging
+import os
+import zlib
 
+import boto3
 import jsonschema
-from ruamel import yaml
-
-from c7n_mailer.utils import setup_defaults
 from c7n_mailer.cli import CONFIG_SCHEMA
-from .email_delivery import EmailDelivery
+from c7n_mailer.email_delivery import EmailDelivery
+from c7n_mailer.utils import setup_defaults
+from c7n_mailer.utils_email import get_mimetext_message
+from ruamel import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +54,12 @@ class MailerTester(object):
         addrs_to_msgs = emd.get_to_addrs_email_messages_map(self.data)
         logger.info('Would send email to: %s', addrs_to_msgs.keys())
         if print_only:
-            mime = emd.get_mimetext_message(
-                self.data, self.data['resources'], ['foo@example.com']
+            mime = get_mimetext_message(
+                self.config,
+                logger,
+                self.data,
+                self.data['resources'],
+                ['foo@example.com']
             )
             logger.info('Send mail with subject: "%s"', mime['Subject'])
             print(mime.get_payload(None, True))
