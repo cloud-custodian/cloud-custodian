@@ -41,7 +41,7 @@ class SqlDatabase(ChildArmResourceManager):
     and the SQL Server parent id is available as the ``c7n:parent-id`` property.
 
     :example:
-
+    
     Finds all SQL Servers Database in the subscription.
 
     .. code-block:: yaml
@@ -485,18 +485,20 @@ class Resize(AzureBaseAction):
     :example:
     This policy will resize database to Premium tier with 500 DTU and set max data size to 750 GB
 
-    policies:
-      - name: resize-db
-        resource: azure.sqldatabase
-        filters:
-          - type: value
-            key: name
-            value: cctestdb
-        actions:
-          - type: resize
-            tier: Premium
-            capacity: 500
-            max_size_bytes: 805306368000
+    .. code-block:: yaml
+    
+        policies:
+          - name: resize-db
+            resource: azure.sqldatabase
+            filters:
+              - type: value
+                key: name
+                value: cctestdb
+            actions:
+              - type: resize
+                tier: Premium
+                capacity: 500
+                max_size_bytes: 805306368000
 
     """
 
