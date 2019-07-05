@@ -14,7 +14,12 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+from azure.cosmos.cosmos_client import CosmosClient
+
 from azure_common import BaseTest, arm_template
+from c7n.utils import local_session
+from c7n_azure.resources.cosmos_db import CosmosDBChildResource
+from c7n_azure.session import Session
 
 
 class CosmosDBTest(BaseTest):
@@ -143,7 +148,28 @@ class CosmosDBTest(BaseTest):
 
 class CosmosDBReplaceOfferActionTest(BaseTest):
 
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super(CosmosDBReplaceOfferActionTest, cls).setUpClass(*args, **kwargs)
+        client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
+        key = CosmosDBChildResource.get_cosmos_key(
+            'test_cosmosdb', 'cctestcosmosdb', client, readonly=False)
+        cls.data_client = CosmosClient(
+            url_connection='https://cctestcosmosdb.documents.azure.com:443/',
+            auth={
+                'masterKey': key
+            }
+        )
+
+    def tearDown(self, *args, **kwargs):
+        super(CosmosDBReplaceOfferActionTest, self).tearDown(*args, **kwargs)
+        CosmosDBReplaceOfferActionTest.data_client.ReplaceOffer(
+            self.initial_offer['_self'],
+            self.initial_offer
+        )
+
     def test_replace_offer_collection_action(self):
+
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
             'resource': 'azure.cosmosdb-collection',
@@ -153,13 +179,30 @@ class CosmosDBReplaceOfferActionTest(BaseTest):
                     'key': 'id',
                     'op': 'eq',
                     'value': 'cccontainer'
+                },
+                {
+                    'type': 'offer',
+                    'key': 'content.offerThroughput',
+                    'op': 'eq',
+                    'value': 400
                 }
             ],
             'actions': [
                 {
                     'type': 'replace-offer',
-                    'throughput': 100
+                    'throughput': 500
                 }
             ]
-        }, validate=True)
-        self.assertTrue(p)
+        })
+        collections = p.run()
+        self.assertEqual(len(collections), 1)
+
+        self.initial_offer = collections[0]['c7n:offer'][0]
+        self.collection = collections[0]
+        self._assert_offer_throughput_equals(500, collections[0]['_self'])
+
+    def _assert_offer_throughput_equals(self, throughput, resource_self):
+        offers = CosmosDBReplaceOfferActionTest.data_client.ReadOffers()
+        offer = next((o for o in offers if o['resource'] == resource_self), None)
+        self.assertIsNotNone(offer)
+        self.assertEqual(offer['content']['offerThroughput'], throughput)
