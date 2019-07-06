@@ -14,17 +14,14 @@
                     "message": "Ok"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
                     "cache-control": [
                         "no-store, no-cache"
                     ],
                     "date": [
-                        "Mon, 01 Jul 2019 20:18:18 GMT"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-ms-gatewayversion": [
-                        "version=2.4.0.0"
+                        "Fri, 05 Jul 2019 20:14:29 GMT"
                     ],
                     "content-length": [
                         "1717"
@@ -105,8 +102,8 @@
         },
         {
             "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/readonlykeys?api-version=2015-04-08",
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb/listKeys?api-version=2015-04-08",
                 "body": null,
                 "headers": {}
             },
@@ -116,27 +113,26 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
-                    ],
-                    "date": [
-                        "Mon, 01 Jul 2019 20:18:19 GMT"
-                    ],
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-gatewayversion": [
-                        "version=2.4.0.0"
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "date": [
+                        "Fri, 05 Jul 2019 20:14:30 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1197"
                     ],
                     "content-length": [
-                        "239"
+                        "461"
                     ]
                 },
                 "body": {
                     "data": {
+                        "primaryMasterKey": "DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
+                        "secondaryMasterKey": "DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
                         "primaryReadonlyMasterKey": "DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w==",
                         "secondaryReadonlyMasterKey": "DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w=="
                     }
@@ -156,31 +152,28 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "x-ms-max-media-storage-usage-mb": [
-                        "2048"
+                    "x-ms-databaseaccount-provisioned-mb": [
+                        "0"
                     ],
                     "x-ms-media-storage-usage-mb": [
                         "0"
                     ],
-                    "x-ms-databaseaccount-provisioned-mb": [
-                        "0"
-                    ],
-                    "date": [
-                        "Mon, 01 Jul 2019 20:18:20 GMT"
-                    ],
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-gatewayversion": [
-                        "version=2.4.0.0"
-                    ],
-                    "x-ms-databaseaccount-reserved-mb": [
-                        "0"
+                    "cache-control": [
+                        "no-store, no-cache"
                     ],
                     "x-ms-databaseaccount-consumed-mb": [
+                        "0"
+                    ],
+                    "date": [
+                        "Fri, 05 Jul 2019 20:14:30 GMT"
+                    ],
+                    "x-ms-max-media-storage-usage-mb": [
+                        "2048"
+                    ],
+                    "x-ms-databaseaccount-reserved-mb": [
                         "0"
                     ]
                 },
@@ -239,59 +232,44 @@
                     "message": "Ok"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-ms-resource-quota": [
+                        "databases=1000;collections=5000;users=500000;permissions=2000000;"
+                    ],
+                    "x-ms-schemaversion": [
+                        "1.8"
+                    ],
+                    "lsn": [
+                        "10"
+                    ],
+                    "x-ms-transport-request-id": [
+                        "311523"
+                    ],
                     "x-ms-request-charge": [
                         "2"
                     ],
                     "cache-control": [
                         "no-store, no-cache"
                     ],
-                    "x-ms-number-of-read-regions": [
-                        "0"
-                    ],
                     "x-ms-serviceversion": [
                         "version=2.4.0.0"
                     ],
-                    "x-ms-schemaversion": [
-                        "1.8"
+                    "x-ms-session-token": [
+                        "0:-1#10"
+                    ],
+                    "date": [
+                        "Fri, 05 Jul 2019 20:14:30 GMT"
                     ],
                     "x-ms-resource-usage": [
                         "databases=1;collections=1;users=0;permissions=0;"
                     ],
-                    "x-ms-xp-role": [
-                        "1"
-                    ],
-                    "x-ms-resource-quota": [
-                        "databases=1000;collections=5000;users=500000;permissions=2000000;"
-                    ],
-                    "x-ms-gatewayversion": [
-                        "version=2.4.0.0"
-                    ],
-                    "x-ms-cosmos-llsn": [
-                        "5"
-                    ],
-                    "date": [
-                        "Mon, 01 Jul 2019 20:18:20 GMT"
-                    ],
-                    "x-ms-last-state-change-utc": [
-                        "Mon, 01 Jul 2019 19:36:20.223 GMT"
-                    ],
-                    "x-ms-transport-request-id": [
-                        "36908"
-                    ],
-                    "x-ms-global-committed-lsn": [
-                        "5"
-                    ],
                     "x-ms-activity-id": [
-                        "f77360b8-4126-4807-b19e-bc6f48ad9d1f"
+                        "703e6e9c-0e14-4d9d-a986-91f9d588ec50"
                     ],
-                    "x-ms-session-token": [
-                        "0:-1#5"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "lsn": [
-                        "5"
+                    "x-ms-number-of-read-regions": [
+                        "0"
                     ],
                     "x-ms-item-count": [
                         "1"
@@ -329,62 +307,47 @@
                     "message": "Ok"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-ms-resource-quota": [
+                        "collections=5000;"
+                    ],
+                    "x-ms-schemaversion": [
+                        "1.8"
+                    ],
+                    "lsn": [
+                        "10"
+                    ],
+                    "x-ms-transport-request-id": [
+                        "311524"
+                    ],
+                    "x-ms-alt-content-path": [
+                        "dbs/cctestcdatabase"
+                    ],
                     "x-ms-request-charge": [
                         "2"
                     ],
                     "cache-control": [
                         "no-store, no-cache"
                     ],
-                    "x-ms-alt-content-path": [
-                        "dbs/cctestcdatabase"
-                    ],
-                    "x-ms-number-of-read-regions": [
-                        "0"
-                    ],
                     "x-ms-serviceversion": [
                         "version=2.4.0.0"
                     ],
-                    "x-ms-schemaversion": [
-                        "1.8"
+                    "x-ms-session-token": [
+                        "0:-1#10"
+                    ],
+                    "date": [
+                        "Fri, 05 Jul 2019 20:14:30 GMT"
                     ],
                     "x-ms-resource-usage": [
                         "collections=1;"
                     ],
-                    "x-ms-xp-role": [
-                        "2"
-                    ],
-                    "x-ms-resource-quota": [
-                        "collections=5000;"
-                    ],
-                    "x-ms-gatewayversion": [
-                        "version=2.4.0.0"
-                    ],
-                    "x-ms-cosmos-llsn": [
-                        "5"
-                    ],
-                    "date": [
-                        "Mon, 01 Jul 2019 20:18:20 GMT"
-                    ],
-                    "x-ms-last-state-change-utc": [
-                        "Mon, 01 Jul 2019 19:36:18.326 GMT"
-                    ],
-                    "x-ms-transport-request-id": [
-                        "82706"
-                    ],
-                    "x-ms-global-committed-lsn": [
-                        "5"
-                    ],
                     "x-ms-activity-id": [
-                        "5f607bb8-7af9-43d3-85c3-8677994b1531"
+                        "374ac9c7-d602-44e6-a77d-54e60a6f695c"
                     ],
-                    "x-ms-session-token": [
-                        "0:-1#5"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "lsn": [
-                        "5"
+                    "x-ms-number-of-read-regions": [
+                        "0"
                     ],
                     "x-ms-item-count": [
                         "1"

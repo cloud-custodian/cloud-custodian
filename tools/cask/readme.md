@@ -26,13 +26,13 @@ sudo sh -c 'wget -q https://cloudcustodian.io/downloads/custodian-cask/darwin-la
 Windows (cmd.exe)
 
 ```cmd
-@"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/cloud-custodian/cloud-custodian/caskdocs/tools/cask/scripts/install.ps1'))" && SET "PATH=%PATH%;%LOCALAPPDATA%\custodian\"
+@"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/cloud-custodian/cloud-custodian/master/tools/cask/scripts/install.ps1'))" && SET "PATH=%PATH%;%LOCALAPPDATA%\custodian\"
 ```
 
 Windows (powershell.exe)
 
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/cloud-custodian/cloud-custodian/caskdocs/tools/cask/scripts/install.ps1'))
+Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/cloud-custodian/cloud-custodian/master/tools/cask/scripts/install.ps1'))
 ```
 
 

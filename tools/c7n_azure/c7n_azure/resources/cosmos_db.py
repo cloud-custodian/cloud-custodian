@@ -11,29 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 from concurrent.futures import as_completed
 from itertools import groupby
-from netaddr import IPSet
 
 import azure.mgmt.cosmosdb
 from azure.cosmos.cosmos_client import CosmosClient
-from c7n_azure import constants
-from c7n_azure.filters import FirewallRulesFilter
-from c7n_azure.provider import resources
-from c7n_azure.query import ChildTypeInfo, ChildResourceManager
-from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.utils import ResourceIdParser
 from azure.cosmos.errors import HTTPFailure
+from netaddr import IPSet
 
 from c7n.filters import ValueFilter
 from c7n.utils import type_schema
+from c7n_azure import constants
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.filters import FirewallRulesFilter
+from c7n_azure.provider import resources
+from c7n_azure.query import ChildResourceManager, ChildTypeInfo
+from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.utils import ResourceIdParser
 
 try:
     from functools import lru_cache
 except ImportError:
     from backports.functools_lru_cache import lru_cache
-
-import logging
 
 
 max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
@@ -86,11 +86,11 @@ class CosmosDBChildResource(ChildResourceManager):
 
     @staticmethod
     @lru_cache()
-    def get_cosmos_key(resource_group, resource_name, client):
-        key_result = client.database_accounts.get_read_only_keys(
+    def get_cosmos_key(resource_group, resource_name, client, readonly=True):
+        key_result = client.database_accounts.list_keys(
             resource_group,
             resource_name)
-        return key_result.primary_readonly_master_key
+        return key_result.primary_readonly_master_key if readonly else key_result.primary_master_key
 
     def get_data_client(self, parent_resource):
         key = CosmosDBChildResource.get_cosmos_key(
@@ -183,6 +183,79 @@ class CosmosDBCollection(CosmosDBChildResource):
         return collections
 
 
+class OfferHelper(object):
+
+    @staticmethod
+    def account_key(resource):
+        return resource['c7n:document-endpoint']
+
+    @staticmethod
+    def group_by_account(resources):
+        # Group all resources by account because offers are queried per account not per collection
+        account_sorted = sorted(resources, key=OfferHelper.account_key)
+        account_grouped = [list(it) for k, it in groupby(
+            account_sorted,
+            OfferHelper.account_key)]
+
+        return account_grouped
+
+    @staticmethod
+    def get_cosmos_data_client(resources, manager, readonly=True):
+        cosmos_db_key = resources[0]['c7n:parent-id']
+        url_connection = resources[0]['c7n:document-endpoint']
+
+        # Get the data client keys
+        key = CosmosDBChildResource.get_cosmos_key(
+            ResourceIdParser.get_resource_group(cosmos_db_key),
+            ResourceIdParser.get_resource_name(cosmos_db_key),
+            manager.get_client(),
+            readonly
+        )
+
+        # Build a data client
+        data_client = CosmosClient(url_connection=url_connection, auth={'masterKey': key})
+        return data_client
+
+    @staticmethod
+    def populate_offer_data(resources, manager, data_client=None):
+        # Skip if offer key is present anywhere because we already
+        # queried and joined offers in a previous filter instance
+        if not resources[0].get('c7n:offer'):
+
+            if not data_client:
+                data_client = OfferHelper.get_cosmos_data_client(resources, manager)
+
+            # Get the offers
+            offers = list(data_client.ReadOffers())
+
+            # Match up offers to collections
+            for resource in resources:
+                offer = [o for o in offers if o['resource'] == resource['_self']]
+                resource['c7n:offer'] = offer
+
+    @staticmethod
+    def execute_in_parallel_grouped_by_account(
+            resources, executor_factory, process_resource_set, log):
+        futures = []
+        results = []
+        account_grouped = OfferHelper.group_by_account(resources)
+
+        # Process database groups in parallel
+        with executor_factory(max_workers=3) as w:
+            for resource_set in account_grouped:
+                futures.append(w.submit(process_resource_set, resource_set))
+
+            for f in as_completed(futures):
+                if f.exception():
+                    log.warning(
+                        "CosmosDB offer processing error: %s" % f.exception())
+                    continue
+                else:
+                    results.extend(f.result())
+
+            return results
+
+
 @CosmosDBCollection.filter_registry.register('offer')
 @CosmosDBDatabase.filter_registry.register('offer')
 class CosmosDBOfferFilter(ValueFilter):
@@ -212,57 +285,18 @@ class CosmosDBOfferFilter(ValueFilter):
     schema_alias = True
 
     def process(self, resources, event=None):
-        futures = []
-        results = []
-
-        # Group all resources by account because offers are queried per account not per collection
-        account_sorted = sorted(resources, key=CosmosDBOfferFilter.account_key)
-        account_grouped = [list(it) for k, it in groupby(
-            account_sorted,
-            CosmosDBOfferFilter.account_key)]
-
-        # Process database groups in parallel
-        with self.executor_factory(max_workers=3) as w:
-            for resource_set in account_grouped:
-                futures.append(w.submit(self.process_resource_set, resource_set))
-
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.warning(
-                        "Offer filter error: %s" % f.exception())
-                    continue
-                else:
-                    results.extend(f.result())
-
-            return results
+        return OfferHelper.execute_in_parallel_grouped_by_account(
+            resources,
+            self.executor_factory,
+            self.process_resource_set,
+            self.log
+        )
 
     def process_resource_set(self, resources):
         matched = []
 
         try:
-            # Skip if offer key is present anywhere because we already
-            # queried and joined offers in a previous filter instance
-            if not resources[0].get('c7n:offer'):
-
-                # Get the data client keys
-                parent_key = resources[0]['c7n:parent-id']
-                key = CosmosDBChildResource.get_cosmos_key(
-                    ResourceIdParser.get_resource_group(parent_key),
-                    ResourceIdParser.get_resource_name(parent_key),
-                    self.manager.get_parent_manager().get_client())
-
-                # Build a data client
-                data_client = CosmosClient(
-                    url_connection=resources[0]['c7n:document-endpoint'],
-                    auth={'masterKey': key})
-
-                # Get the offers
-                offers = list(data_client.ReadOffers())
-
-                # Match up offers to collections
-                for resource in resources:
-                    offer = [o for o in offers if o['resource'] == resource['_self']]
-                    resource['c7n:offer'] = offer
+            OfferHelper.populate_offer_data(resources, self.manager.get_parent_manager())
 
             # Pass each resource through the base filter
             for resource in resources:
@@ -278,9 +312,76 @@ class CosmosDBOfferFilter(ValueFilter):
 
         return matched
 
-    @staticmethod
-    def account_key(resource):
-        return resource['c7n:document-endpoint']
+
+@CosmosDBCollection.action_registry.register('replace-offer')
+class CosmosDBReplaceOfferAction(AzureBaseAction):
+    """CosmosDB Replace Offer Action
+
+    Modify the throughput of a cosmodb collection's offer
+
+    :example:
+
+    This policy will ensure that no collections have offers with more than 400 RU/s throughput.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: limit-throughput-to-400
+            resource: azure.cosmosdb-collection
+            filters:
+              - type: offer
+                key: content.offerThroughput
+                op: gt
+                value: 400
+            actions:
+              - type: replace-offer
+                throughput: 400
+
+    """
+
+    schema = type_schema(
+        'replace-offer',
+        required=['throughput'],
+        **{
+            'throughput': {'type': 'number'}
+        }
+    )
+
+    def _process_resources(self, resources, event):
+        OfferHelper.execute_in_parallel_grouped_by_account(
+            resources,
+            self.executor_factory,
+            self._process_resource_set,
+            self.log
+        )
+
+    def _process_resource_set(self, resources):
+        try:
+
+            # The offer data may not already be available
+            manager = self.manager.get_parent_manager()
+            data_client = OfferHelper.get_cosmos_data_client(resources, manager, readonly=False)
+            OfferHelper.populate_offer_data(resources, manager, data_client)
+
+            # Working under the assumption that there is 1 offer per collection...
+            offer = resources[0]['c7n:offer'][0]
+            new_offer = dict(offer)
+            new_offer.pop('c7n:MatchedFilters', None)
+            new_offer['content']['offerThroughput'] = self.data['throughput']
+            new_offer = data_client.ReplaceOffer(offer['_self'], new_offer)
+            for resource in resources:
+                resource['c7n:offer'] = [new_offer]
+
+        except Exception as e:
+            log.warn(e)
+
+        return resources
+
+    def _process_resource(self, resource):
+        # Since the offer lives on the account, not the collection, this action does not
+        # apply to resources individually
+        raise NotImplementedError(
+            "CosmosDBReplaceOfferAction processes resources as a group, not individually")
 
 
 @CosmosDB.filter_registry.register('firewall-rules')
