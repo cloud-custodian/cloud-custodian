@@ -105,5 +105,5 @@ And you can output logs and resource records to Azure storage accounts::
 
 Next Steps
 ----------
-* :ref:`Notifify users of policy violations using a Logic App <azure_examples_notifications_logic_app>`
+* :ref:`Notify users of policy violations using a Logic App <azure_examples_notifications_logic_app>`
 * :ref:`More example policies <azure_examples>`
