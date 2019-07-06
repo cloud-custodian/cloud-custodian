@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from azure.mgmt.sql.models import DatabaseUpdate, Sku
 from azure_common import BaseTest, arm_template
+from c7n_azure.utils import ResourceIdParser
+
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
 from c7n_azure.resources.sqldatabase import (
@@ -21,6 +23,10 @@ from c7n_azure.session import Session
 
 
 class SqlDatabaseTest(BaseTest):
+
+    def setUp(self):
+        super(SqlDatabaseTest, self).setUp()
+        self.client = local_session(Session).client('azure.mgmt.sql.SqlManagementClient')
 
     def test_sql_database_schema_validate(self):
         with self.sign_out_patch():
@@ -72,6 +78,52 @@ class SqlDatabaseTest(BaseTest):
         db = resources[0]
 
         self.assertEqual(db.get('name'), 'cctestdb')
+
+    @arm_template('sqlserver.json')
+    def test_resize_action(self):
+        p = self.load_policy({
+            'name': 'resize-sqldatabase',
+            'resource': 'azure.sqldatabase',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'cctestdb'
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'resize',
+                    'tier': 'Standard',
+                    'capacity': 100,
+                    'max_size_bytes': 21474836480
+                }
+            ],
+        })
+
+        self.resources = p.run()
+        self.assertEqual(len(self.resources), 1)
+        self.assertEqual(self.resources[0]['name'], 'cctestdb')
+
+        updated_database = self.client.databases.get(
+            'test_sqlserver',
+            ResourceIdParser.get_resource_name(self.resources[0]['c7n:parent-id']),
+            'cctestdb')
+
+        self.assertEqual(updated_database.sku.capacity, 100)
+        self.assertEqual(updated_database.sku.tier, 'Standard')
+        # The value for max_size_bytes returned by api is stale,
+        # so we can't make an assertion until it's fixed
+        # self.assertEqual(database.max_size_bytes, 21474836480)
+
+        # Revert action
+        self.client.databases.update(
+            'test_sqlserver',
+            ResourceIdParser.get_resource_name(self.resources[0]['c7n:parent-id']),
+            'cctestdb',
+            DatabaseUpdate(sku=Sku(capacity=125, tier='Premium', name='Premium'),
+                           max_size_bytes=2147483648)
+        )
 
 
 class ShortTermBackupRetentionPolicyFilterTest(BaseTest):

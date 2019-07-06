@@ -165,7 +165,7 @@ class LockActionTest(BaseTest):
         locks = [r.serialize(True) for r in self.client.management_locks.list_at_resource_level(
             'test_sqlserver',
             'Microsoft.Sql/servers',
-            'cctestsqlserverj6y6cbbtaphs4',
+            ResourceIdParser.get_resource_name(self.resources[0]['c7n:parent-id']),
             'databases',
             'cctestdb')]
 

@@ -17,7 +17,7 @@ import enum
 import logging
 
 import six
-from azure.mgmt.sql.models import BackupLongTermRetentionPolicy
+from azure.mgmt.sql.models import BackupLongTermRetentionPolicy, DatabaseUpdate, Sku
 from msrestazure.azure_exceptions import CloudError
 
 from c7n.filters import Filter
@@ -190,7 +190,9 @@ class ShortTermBackupRetentionPolicyFilter(BackupRetentionPolicyBaseFilter):
     If the database has no backup retention policies, the database is treated as if
     it has a backup retention of zero days.
 
-    :example: Find all SQL Databases with a short term retention policy shorter than 2 weeks.
+    :example:
+
+    Find all SQL Databases with a short term retention policy shorter than 2 weeks.
 
     .. code-block:: yaml
 
@@ -234,7 +236,9 @@ class LongTermBackupRetentionPolicyFilter(BackupRetentionPolicyBaseFilter):
     of these backups has a retention period that can specified in units of days, weeks,
     months, or years.
 
-    :example: Find all SQL Databases with weekly backup retentions longer than 1 month.
+    :example:
+
+    Find all SQL Databases with weekly backup retentions longer than 1 month.
 
     .. code-block:: yaml
 
@@ -326,7 +330,9 @@ class ShortTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
 
     Update the short term backup retention policy for a SQL Database.
 
-    :example: Update any SQL Database short term retentions to at least 7 days.
+    :example:
+
+    Update any SQL Database short term retentions to at least 7 days.
 
     .. code-block:: yaml
 
@@ -383,7 +389,9 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
     of these backups has a retention period that can specified in units of days, weeks,
     months, or years.
 
-    :example: Enforce a 1 month maximum retention for weekly backups on all SQL Databases
+    :example:
+
+    Enforce a 1 month maximum retention for weekly backups on all SQL Databases
 
     .. code-block:: yaml
 
@@ -465,3 +473,59 @@ class LongTermBackupRetentionPolicyAction(BackupRetentionPolicyBaseAction):
         new_retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR] = \
             retention_policy[BackupRetentionPolicyHelper.WEEK_OF_YEAR]
         return new_retention_policy
+
+
+@SqlDatabase.action_registry.register('resize')
+class Resize(AzureBaseAction):
+    """
+    Action to scale database.
+    Required arguments: capacity in DTUs and tier (Basic, Standard or Premium).
+    Max data size (in bytes) is optional.
+
+    :example:
+    This policy will resize database to Premium tier with 500 DTU and set max data size to 750 GB
+
+    .. code-block:: yaml
+
+        policies:
+          - name: resize-db
+            resource: azure.sqldatabase
+            filters:
+              - type: value
+                key: name
+                value: cctestdb
+            actions:
+              - type: resize
+                tier: Premium
+                capacity: 500
+                max_size_bytes: 805306368000
+
+    """
+
+    schema = type_schema(
+        'resize',
+        required=['capacity', 'tier'],
+        **{
+            'capacity': {'type': 'number'},
+            'tier': {'enum': ['Basic', 'Standard', 'Premium']},
+            'max_size_bytes': {'type': 'number'}
+        })
+
+    def __init__(self, data, manager=None):
+        super(Resize, self).__init__(data, manager)
+        self.capacity = self.data['capacity']
+        self.tier = self.data['tier']
+        self.max_size_bytes = self.data.get('max_size_bytes', 0)
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, database):
+        sku = Sku(capacity=self.capacity, tier=self.tier, name=self.tier)
+        max_size_bytes = self.max_size_bytes if not 0 else database['properties']['maxSizeBytes']
+        self.client.databases.update(
+            database['resourceGroup'],
+            ResourceIdParser.get_resource_name(database['c7n:parent-id']),
+            database['name'],
+            DatabaseUpdate(sku=sku, max_size_bytes=max_size_bytes)
+        )

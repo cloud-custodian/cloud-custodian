@@ -14,20 +14,20 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json"
+                    "x-ms-gatewayversion": [
+                        "version=2.4.0.0"
                     ],
                     "date": [
-                        "Mon, 17 Jun 2019 18:55:23 GMT"
+                        "Mon, 01 Jul 2019 19:58:01 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ],
                     "cache-control": [
                         "no-store, no-cache"
                     ],
-                    "x-ms-gatewayversion": [
-                        "version=2.4.0.0"
-                    ],
                     "content-length": [
-                        "1797"
+                        "1717"
                     ]
                 },
                 "body": {
@@ -38,28 +38,25 @@
                                 "name": "cctestcosmosdb",
                                 "location": "South Central US",
                                 "type": "Microsoft.DocumentDB/databaseAccounts",
-                                "kind": "MongoDB",
-                                "tags": {
-                                    "defaultExperience": "MongoDB"
-                                },
+                                "kind": "GlobalDocumentDB",
+                                "tags": {},
                                 "properties": {
                                     "provisioningState": "Succeeded",
                                     "documentEndpoint": "https://cctestcosmosdb.documents.azure.com:443/",
-                                    "ipRangeFilter": "1.2.2.128/25,3.1.1.1,104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26",
+                                    "ipRangeFilter": "0.0.0.0/1,128.0.0.0/1",
                                     "enableAutomaticFailover": false,
                                     "enableMultipleWriteLocations": false,
+                                    "enablePartitionKeyMonitor": false,
                                     "isVirtualNetworkFilterEnabled": false,
                                     "virtualNetworkRules": [],
-                                    "EnabledApiTypes": "MongoDB",
+                                    "EnabledApiTypes": "Sql",
                                     "databaseAccountOfferType": "Standard",
                                     "consistencyPolicy": {
                                         "defaultConsistencyLevel": "Session",
                                         "maxIntervalInSeconds": 5,
                                         "maxStalenessPrefix": 100
                                     },
-                                    "configurationOverrides": {
-                                        "EnableBsonSchema": "True"
-                                    },
+                                    "configurationOverrides": {},
                                     "writeLocations": [
                                         {
                                             "id": "cctestcosmosdb-southcentralus",

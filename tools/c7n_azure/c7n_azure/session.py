@@ -219,6 +219,10 @@ class Session(object):
         resource_client = self.client('azure.mgmt.resource.ResourceManagementClient')
         provider = resource_client.providers.get(namespace)
 
+        # The api version may be directly provided
+        if not provider.resource_types and resource_client.providers.api_version:
+            return resource_client.providers.api_version
+
         rt = next((t for t in provider.resource_types
             if StringUtils.equal(t.resource_type, resource_type)), None)
 

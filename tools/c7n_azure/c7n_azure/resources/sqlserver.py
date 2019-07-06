@@ -17,7 +17,7 @@ import logging
 from c7n_azure.filters import FirewallRulesFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from netaddr import IPRange
+from netaddr import IPRange, IPSet
 
 
 @resources.register('sqlserver')
@@ -64,6 +64,9 @@ class SqlServerFirewallRulesFilter(FirewallRulesFilter):
             resource['resourceGroup'],
             resource['name'])
 
-        resource_rules = set([IPRange(r.start_ip_address, r.end_ip_address) for r in query])
+        resource_rules = IPSet()
+
+        for r in query:
+            resource_rules.add(IPRange(r.start_ip_address, r.end_ip_address))
 
         return resource_rules
