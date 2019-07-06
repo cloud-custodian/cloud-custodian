@@ -10,3 +10,10 @@ These use cases provide examples of specific policies.
   :glob:
 
   ./*
+
+Notitications
+"""""""""""""
+.. toctree::
+  :titlesonly:
+  
+  ./logicappnotifications/logicappnotification.rst

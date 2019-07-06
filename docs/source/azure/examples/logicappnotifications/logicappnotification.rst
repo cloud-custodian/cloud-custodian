@@ -1,6 +1,6 @@
-.. _azure_scenarios_logic_app_notifications:
+.. _azure_examples_notifications_logic_app:
 
-Using Azure Logic Apps to notify users of policy violations.
+Use Azure Logic Apps to notify users of policy violations.
 ============================================================
 
 Azure Logic Apps are a great option to create simple scalable workflows in Azure such as sending an email or posting to Microsoft Teams. Logic Apps can have a `Request trigger` to initiate a workflow and this can be invoked with a Custodian :ref:`logic-app <Azure.common.actions.logic-app>` action.
