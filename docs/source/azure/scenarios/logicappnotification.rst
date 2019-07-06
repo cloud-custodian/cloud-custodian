@@ -1,7 +1,7 @@
 .. _azure_scenarios_logic_app_notifications:
 
 Using Azure Logic Apps to notify users of policy violations.
-==========================================================
+============================================================
 
 Azure Logic Apps are a great option to create simple scalable workflows in Azure such as sending an email or posting to Microsoft Teams. Logic Apps can have a `Request trigger` to initiate a workflow and this can be invoked with a Custodian :ref:`logic-app <Azure.common.actions.logic-app>` action.
 
@@ -12,7 +12,11 @@ We will now walkthrough the steps to configure a Logic Apps workflow that will c
 Create a new Azure Logic App
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 1. From the main Azure menu, choose **Create a resource ─▶ Integration ─▶ Logic App.**
-2. Under **Templates**, choose **Blank Logic App**.
+2. Now, provide details about your logic app as shown here. After you're done, hit **Create**.
+
+.. image:: resources/f0.png
+
+3. Under **Templates**, choose **Blank Logic App**.
 
 Create Request trigger
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -78,7 +82,7 @@ Create the Outlook Send Email action
 
 Author Cloud Custodian policy
 -----------------------------
-Now that we have a Logic App workflow that can send an email with our Office 365 account, we need to a policy we wanted to be notified about. Let's start with the :ref:`Find Virtual Machines with Public IP address <azure_examples_vm_with_public_ips>` policy.
+Now that we have a Logic App workflow that can send an email with our Office 365 account, we need a policy we want to be notified about. Let's start with the :ref:`Find Virtual Machines with Public IP address <azure_examples_vm_with_public_ips>` policy.
 This Custodian policy will find all Azure Virtual Machines that have public IPs attached to them. 
 
 .. code-block:: yaml
@@ -155,7 +159,7 @@ Test the policy
 
 Policy violating virtual machine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Note: Virtual Machine that has the an **CreatorEmail** tag and **Public Ip Address**.
+Notice that the Virtual Machine has the an **CreatorEmail** tag; this is from executing the following :ref:`auto-tag-user policy <azure_examples_autotagusers>` against our subscription Virtual Machine resources. In addition, the Virtiual Machine has a **Public Ip Address**, which is a violation of our policy.
 
 .. image:: resources/f8.png
 
