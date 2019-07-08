@@ -17,7 +17,6 @@ from c7n import utils
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.filters import AzureOffHour, AzureOnHour
 from azure.mgmt.web import models
 
 
@@ -52,15 +51,6 @@ class AppServicePlan(ArmResourceManager):
         )
         resource_type = 'Microsoft.Web/sites'
         enable_tag_operations = False
-
-    @staticmethod
-    def register(registry, _):
-        # Additional filters/actions registered for this resource type
-        AppServicePlan.filter_registry.register("offhour", AzureOffHour)
-        AppServicePlan.filter_registry.register("onhour", AzureOnHour)
-
-
-resources.subscribe(resources.EVENT_FINAL, AppServicePlan.register)
 
 
 @AppServicePlan.action_registry.register('resize-plan')
