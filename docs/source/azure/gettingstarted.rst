@@ -124,3 +124,9 @@ You can also upload Cloud Custodian logs to App Insights logs::
 And you can output logs and resource records to Azure storage accounts::
 
   $ custodian run -s azure://<my-bucket><my-prefix> <policyfile>.yml
+
+
+Next Steps
+----------
+* :ref:`Notify users of policy violations using a Logic App <azure_examples_notifications_logic_app>`
+* :ref:`More example policies <azure_examples>`

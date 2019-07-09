@@ -13,7 +13,6 @@ General
 
   ./*general*
 
-
 Compute
 """""""
 
@@ -38,7 +37,6 @@ Identity
 
   ./*identity*
 
-
 Networking
 """"""""""
 
@@ -46,3 +44,10 @@ Networking
   :glob:
   
   ./*networking*
+
+Notifications
+"""""""""""""
+.. toctree::
+  :titlesonly:
+  
+  ./logicappnotifications/logicappnotification.rst
