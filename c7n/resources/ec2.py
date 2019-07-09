@@ -36,6 +36,7 @@ from c7n.filters import (
 )
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
+from c7n.filters.core import StateTransitionFilter
 
 from c7n.manager import resources
 from c7n import query, utils
@@ -63,6 +64,8 @@ class EC2(query.QueryResourceManager):
         date = 'LaunchTime'
         dimension = 'InstanceId'
         config_type = "AWS::EC2::Instance"
+        shape = "Instance"
+        state_key = 'State.Name'
 
         default_report_fields = (
             'CustodianDate',
@@ -243,29 +246,6 @@ class StateTransitionAge(AgeFilter):
         if dates:
             return parse(dates[0][1:-1])
         return None
-
-
-class StateTransitionFilter(object):
-    """Filter instances by state.
-
-    Try to simplify construction for policy authors by automatically
-    filtering elements (filters or actions) to the instances states
-    they are valid for.
-
-    For more details see
-     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
-
-    """
-    valid_origin_states = ()
-
-    def filter_instance_state(self, instances, states=None):
-        states = states or self.valid_origin_states
-        orig_length = len(instances)
-        results = [i for i in instances
-                   if i['State']['Name'] in states]
-        self.log.info("%s %d of %d instances" % (
-            self.__class__.__name__, len(results), orig_length))
-        return results
 
 
 @filters.register('ebs')
@@ -529,7 +509,7 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
 
     def process(self, resources, event=None):
         return super(InstanceOffHour, self).process(
-            self.filter_instance_state(resources))
+            self.filter_resource_state(resources))
 
 
 @filters.register('network-location')
@@ -539,7 +519,7 @@ class EC2NetworkLocation(net_filters.NetworkLocation, StateTransitionFilter):
                            'stopped')
 
     def process(self, resources, event=None):
-        resources = self.filter_instance_state(resources)
+        resources = self.filter_resource_state(resources)
         if not resources:
             return []
         return super(EC2NetworkLocation, self).process(resources)
@@ -599,7 +579,7 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
 
     def process(self, resources, event=None):
         return super(InstanceOnHour, self).process(
-            self.filter_instance_state(resources))
+            self.filter_resource_state(resources))
 
 
 @filters.register('ephemeral')
@@ -814,7 +794,7 @@ class SingletonFilter(Filter, StateTransitionFilter):
 
     def process(self, instances, event=None):
         return super(SingletonFilter, self).process(
-            self.filter_instance_state(instances))
+            self.filter_resource_state(instances))
 
     def __call__(self, i):
         if self.in_asg(i):
@@ -966,7 +946,7 @@ class Start(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self._filter_ec2_with_volumes(
-            self.filter_instance_state(instances))
+            self.filter_resource_state(instances))
         if not len(instances):
             return
 
@@ -1052,9 +1032,9 @@ class Resize(BaseAction, StateTransitionFilter):
         return perms
 
     def process(self, resources):
-        stopped_instances = self.filter_instance_state(
+        stopped_instances = self.filter_resource_state(
             resources, ('stopped',))
-        running_instances = self.filter_instance_state(
+        running_instances = self.filter_resource_state(
             resources, ('running',))
 
         if self.data.get('restart') and running_instances:
@@ -1139,7 +1119,7 @@ class Stop(BaseAction, StateTransitionFilter):
         return ephemeral, persistent
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resource_state(instances)
         if not len(instances):
             return
         client = utils.local_session(
@@ -1196,7 +1176,7 @@ class Reboot(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self._filter_ec2_with_volumes(
-            self.filter_instance_state(instances))
+            self.filter_resource_state(instances))
         if not len(instances):
             return
 
@@ -1265,7 +1245,7 @@ class Terminate(BaseAction, StateTransitionFilter):
         return permissions
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resource_state(instances)
         if not len(instances):
             return
         client = utils.local_session(
@@ -1453,7 +1433,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self.filter_asg_membership.process(
-            self.filter_instance_state(instances))
+            self.filter_resource_state(instances))
         if not len(instances):
             return
         client = utils.local_session(
@@ -1518,7 +1498,7 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
     valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resource_state(instances)
         if not len(instances):
             return
         client = utils.local_session(self.manager.session_factory).client('ec2')

@@ -17,11 +17,12 @@ import six
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
+from c7n.filters.core import StateTransitionFilter
+from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 
 
 @resources.register('sagemaker-notebook')
@@ -36,6 +37,7 @@ class NotebookInstance(QueryResourceManager):
         arn = id = 'NotebookInstanceArn'
         name = 'NotebookInstanceName'
         date = 'CreationTime'
+        state_key = 'NotebookInstanceStatus'
 
     permissions = ('sagemaker:ListTags',)
 
@@ -300,26 +302,6 @@ class Model(QueryResourceManager):
 Model.filter_registry.register('marked-for-op', TagActionFilter)
 
 
-class StateTransitionFilter(object):
-    """Filter instances by state.
-
-    Try to simplify construction for policy authors by automatically
-    filtering elements (filters or actions) to the instances states
-    they are valid for.
-
-    """
-    valid_origin_states = ()
-
-    def filter_instance_state(self, instances, states=None):
-        states = states or self.valid_origin_states
-        orig_length = len(instances)
-        results = [i for i in instances
-                   if i['NotebookInstanceStatus'] in states]
-        self.log.info("state filter %s %d of %d notebook instances" % (
-            self.__class__.__name__, len(results), orig_length))
-        return results
-
-
 @SagemakerEndpoint.action_registry.register('tag')
 @SagemakerEndpointConfig.action_registry.register('tag')
 @NotebookInstance.action_registry.register('tag')
@@ -497,7 +479,7 @@ class StartNotebookInstance(BaseAction, StateTransitionFilter):
     valid_origin_states = ('Stopped',)
 
     def process(self, resources):
-        resources = self.filter_instance_state(resources)
+        resources = self.filter_resource_state(resources)
         if not len(resources):
             return
 
@@ -532,7 +514,7 @@ class StopNotebookInstance(BaseAction, StateTransitionFilter):
     valid_origin_states = ('InService',)
 
     def process(self, resources):
-        resources = self.filter_instance_state(resources)
+        resources = self.filter_resource_state(resources)
         if not len(resources):
             return
 
@@ -567,7 +549,7 @@ class DeleteNotebookInstance(BaseAction, StateTransitionFilter):
     valid_origin_states = ('Stopped', 'Failed',)
 
     def process(self, resources):
-        resources = self.filter_instance_state(resources)
+        resources = self.filter_resource_state(resources)
         if not len(resources):
             return
 
@@ -594,7 +576,7 @@ class NotebookSubnetFilter(SubnetFilter):
 
 
 @Model.action_registry.register('delete')
-class DeleteModel(BaseAction, StateTransitionFilter):
+class DeleteModel(BaseAction):
     """Deletes sagemaker-model(s)
 
     :example:

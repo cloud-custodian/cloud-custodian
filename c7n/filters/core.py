@@ -767,14 +767,18 @@ class ValueRegex(object):
         return capture.group(1)
 
 
-class StateTransitionFilter(Filter):
+class StateTransitionFilter(object):
     valid_origin_states = ()
 
     def filter_resource_state(self, resources, event=None):
         state_key = self.manager.get_model().state_key
         states = self.valid_origin_states
         orig_length = len(resources)
-        results = [r for r in resources if r[state_key] in states]
+        state_resource_map = zip(jmespath.search('[].%s' % state_key, resources), resources)
+        results = []
+        for k, v in state_resource_map:
+            if k in self.valid_origin_states:
+                results.append(v)
         self.log.info("filtered %d of %d %s resources with  %s states" % (
             len(results), orig_length, self.__class__.__name__, states))
 
