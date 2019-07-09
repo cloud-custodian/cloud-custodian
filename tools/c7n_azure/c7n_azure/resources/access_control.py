@@ -79,7 +79,7 @@ class RoleAssignment(QueryResourceManager):
         )
 
     def augment(self, resources):
-        s = Session(resource='https://graph.windows.net')
+        s = self.get_session().get_session_for_resource('https://graph.windows.net')
         graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
 
         object_ids = list(set(
