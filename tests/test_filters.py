@@ -20,10 +20,12 @@ from dateutil.parser import parse as parse_date
 import unittest
 
 from c7n.exceptions import PolicyValidationError
+from c7n.executor import MainThreadExecutor
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
+from c7n.resources.elb import ELB
 from c7n.utils import annotation
-from .common import instance, event_data, Bag
+from .common import instance, event_data, Bag, BaseTest
 from c7n.filters.core import ValueRegex
 
 
@@ -919,6 +921,68 @@ class TestFilterRegistry(unittest.TestCase):
     def test_filter_registry(self):
         reg = base_filters.FilterRegistry("test.filters")
         self.assertRaises(PolicyValidationError, reg.factory, {"type": ""})
+
+
+class TestMissingMetrics(BaseTest):
+
+    def test_missing_metrics(self):
+        self.patch(ELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_missing_metrics")
+
+        p = self.load_policy(
+            {
+                "name": "elb-missing-metrics",
+                "resource": "elb",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "value": 0,
+                        "name": "RequestCount",
+                        "op": "eq",
+                        "statistics": "Sum",
+                    }
+                ],
+            },
+            config={"account_id": "644160558196"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_missing_metrics_with_fillvalue(self):
+        self.patch(ELB, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data("test_missing_metrics")
+
+        p = self.load_policy(
+            {
+                "name": "elb-missing-metrics-with-fill",
+                "resource": "elb",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "value": 0,
+                        "name": "RequestCount",
+                        "op": "eq",
+                        "statistics": "Sum",
+                        "missing-value": 0.0,
+                    }
+                ],
+            },
+            config={"account_id": "644160558196"},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(all(
+            isinstance(res["c7n.metrics"]["AWS/ELB.RequestCount.Sum"], list)
+            for res in resources
+        ), True)
+        self.assertIn(
+            "Fill value for missing data",
+            (res["c7n.metrics"]["AWS/ELB.RequestCount.Sum"][0].get("c7n:detail")
+                for res in resources)
+        )
 
 
 if __name__ == "__main__":

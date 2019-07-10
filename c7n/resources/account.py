@@ -27,8 +27,10 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
+from c7n.query import QueryResourceManager
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema, generate_arn
 
@@ -57,6 +59,7 @@ class Account(ResourceManager):
 
     filter_registry = filters
     action_registry = actions
+    retry = staticmethod(QueryResourceManager.retry)
 
     class resource_type(object):
         id = 'account_id'
@@ -1171,6 +1174,110 @@ class SetXrayEncryption(BaseAction):
         key = self.data.get('key')
         req = {'Type': 'NONE'} if key == 'default' else {'Type': 'KMS', 'KeyId': key}
         client.put_encryption_config(**req)
+
+
+@filters.register('default-ebs-encryption')
+class EbsEncryption(Filter):
+    """Filter an account by its ebs encryption status.
+
+    By default for key we match on the alias name for a key.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-default-ebs-encryption
+           resource: aws.account
+           filters:
+            - type: default-ebs-encryption
+              key: "alias/aws/ebs"
+              state: true
+
+    It is also possible to match on specific key attributes (tags, origin)
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-ebs-encryption-key-origin
+           resource: aws.account
+           filters:
+            - type: default-ebs-encryption
+              key:
+                type: value
+                key: Origin
+                value: AWS_KMS
+              state: true
+    """
+    permissions = ('ec2:GetEbsEncryptionByDefault',)
+    schema = type_schema(
+        'default-ebs-encryption',
+        state={'type': 'boolean'},
+        key={'oneOf': [
+            {'$ref': '#/definitions/filters/value'},
+            {'type': 'string'}]})
+
+    def process(self, resources, event=None):
+        state = self.data.get('state', False)
+        client = local_session(self.manager.session_factory).client('ec2')
+        account_state = client.get_ebs_encryption_by_default().get(
+            'EbsEncryptionByDefault')
+        if account_state != state:
+            return []
+        if state and 'key' in self.data:
+            vfd = (isinstance(self.data['key'], dict) and
+                   self.data['key'] or {'c7n:AliasName': self.data['key']})
+            vf = KmsRelatedFilter(vfd, self.manager)
+            vf.RelatedIdsExpression = 'KmsKeyId'
+            vf.annotate = False
+            key = client.get_ebs_default_kms_key_id().get('KmsKeyId')
+            if not vf.process([{'KmsKeyId': key}]):
+                return []
+        return resources
+
+
+@actions.register('set-ebs-encryption')
+class SetEbsEncryption(BaseAction):
+    """Set AWS EBS default encryption on an account
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: set-default-ebs-encryption
+           resource: aws.account
+           filters:
+            - type: default-ebs-encryption
+              state: false
+           actions:
+            - type: set-ebs-encryption
+              state: true
+              key: alias/aws/ebs
+    """
+    permissions = ('ec2:EnableEbsEncryptionByDefault',
+                   'ec2:DisableEbsEncryptionByDefault')
+
+    schema = type_schema(
+        'set-ebs-encryption',
+        state={'type': 'boolean'},
+        key={'type': 'string'})
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('ec2')
+        state = self.data.get('state')
+        key = self.data.get('key')
+        if state:
+            client.enable_ebs_encryption_by_default()
+        else:
+            client.disable_ebs_encryption_by_default()
+
+        if state and key:
+            client.modify_ebs_default_kms_key_id(
+                KmsKeyId=self.data['key'])
 
 
 @filters.register('s3-public-block')

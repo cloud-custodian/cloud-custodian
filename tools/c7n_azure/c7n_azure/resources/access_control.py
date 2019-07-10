@@ -21,7 +21,6 @@ from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
-from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 
 from c7n.filters import Filter
@@ -79,7 +78,7 @@ class RoleAssignment(QueryResourceManager):
         )
 
     def augment(self, resources):
-        s = Session(resource='https://graph.windows.net')
+        s = self.get_session().get_session_for_resource('https://graph.windows.net')
         graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
 
         object_ids = list(set(
