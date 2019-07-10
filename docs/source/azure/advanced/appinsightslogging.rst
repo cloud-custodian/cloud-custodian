@@ -6,39 +6,43 @@ App Insights Logging & Metrics
 Writing Custodian Logs to Azure App Insights
 --------------------------------------------
 
-Custodian can optionally upload its logs in realtime to App Insights,
-if a log group is specified.  Each policy’s log output contains policy
-name, subscription id and execution id properties.
+Cloud Custodian can upload its logs to Application Insights. Each policy’s log output contains the `policy name`,
+`subscription id` and `execution id properties`. These logs will be found under the *Trace* source in Application Insights.
+
 
 Usage example using instrumentation key:
 
     .. code-block:: sh
 
-        custodian run -l azure://<instrumentation_key_guid>
+        custodian run -s <output_directory> -l azure://<instrumentation_key_guid> policy.yml
 
 Usage example using resource name:
 
     .. code-block:: sh
 
-        custodian run -l azure://<resource_group_name>/<app_insights_name>
+        custodian run  -s <output_directory> -l azure://<resource_group_name>/<app_insights_name> policy.yml
 
 
 Writing Custodian Metrics to Azure App Insights
 -----------------------------------------------
 
-By default Cloud Custodian generates App Insights metrics on each
-policy for the number of resources that matched the set of filters,
-the time to retrieve and filter the resources, and the time to execute
-actions.
+By default, Cloud Custodian upload the following metrics:
 
-Additionally some filters and actions may generate their own metrics.
+* ResourceCount - the number of resources that matched the set of filters
+* ResourceTime - the time to query for and filter the resources
+* ActionTime - the time to execute the actions.
 
-You can specify the instrumentation key or resource group and resource
-names, similar to Logs output.
+Additionally some custom filters and actions may generate their own metrics.
+These metrics will be found under the *customMetrics* source in Application Insights.
 
-In order to enable metrics output, the metrics flag needs to be
-specified when running Cloud Custodian:
+Usage example using instrumentation key:
 
     .. code-block:: sh
 
-        custodian run --metrics azure://<resource_group_name>/<app_insights_name>
+        custodian run -s <output_directory> -m azure://<instrumentation_key_guid> policy.yml
+
+Usage example using resource name:
+
+    .. code-block:: sh
+
+        custodian run -s <output_directory> -m azure://<resource_group_name>/<app_insights_name> policy.yml

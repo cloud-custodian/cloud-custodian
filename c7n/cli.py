@@ -92,7 +92,7 @@ def _default_options(p, blacklist=""):
     if 'log-group' not in blacklist:
         p.add_argument(
             "-l", "--log-group", default=None,
-            help="Cloudwatch Log Group to send policy logs")
+            help="Location to send policy logs (Ex: AWS CloudWatch Log Group)")
     else:
         p.add_argument("--log-group", default=None, help=argparse.SUPPRESS)
 
@@ -246,7 +246,7 @@ def setup_parser():
             "https://cloudcustodian.io/docs/aws/usage.html#metrics")
 
     run.add_argument(
-        "-m", "--metrics-enabled",
+        "-m", "--metrics",
         default=None, nargs="?", const="aws",
         help=metrics_help)
     run.add_argument(
