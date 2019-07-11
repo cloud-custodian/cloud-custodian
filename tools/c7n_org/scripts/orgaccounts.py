@@ -57,7 +57,7 @@ def main(role, ou, assume, profile, output, regions, active):
         path_parts = a['Path'].strip('/').split('/')
         for idx, _ in enumerate(path_parts):
             tags.append("path:/%s" % "/".join(path_parts[:idx + 1]))
-        
+
         for tag in list_tags_for_account(client, a['Id']):
             tags.append("{}:{}".format(tag.get('Key'), tag.get('Value')))
 
@@ -137,6 +137,7 @@ def get_accounts_for_ou(client, ou, active, recursive=True):
             else:
                 results.append(a)
     return results
+
 
 def list_tags_for_account(client, id):
     results = []
