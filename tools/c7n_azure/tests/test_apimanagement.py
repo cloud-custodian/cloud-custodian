@@ -24,7 +24,6 @@ from c7n_azure.session import Session
 class ApiManagementTest(BaseTest):
     def setUp(self):
         super(ApiManagementTest, self).setUp()
-        self.client = local_session(Session).client('azure.mgmt.apimanagement.ApiManagementClient')
 
     def test_apimanagement_schema_validate(self):
         with self.sign_out_patch():
