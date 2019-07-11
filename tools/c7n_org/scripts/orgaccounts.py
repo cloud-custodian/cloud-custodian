@@ -57,6 +57,9 @@ def main(role, ou, assume, profile, output, regions, active):
         path_parts = a['Path'].strip('/').split('/')
         for idx, _ in enumerate(path_parts):
             tags.append("path:/%s" % "/".join(path_parts[:idx + 1]))
+        
+        for tag in list_tags_for_account(client, a['Id']):
+            tags.append("{}:{}".format(tag.get('Key'), tag.get('Value')))
 
         ainfo = {
             'account_id': a['Id'],
@@ -133,6 +136,16 @@ def get_accounts_for_ou(client, ou, active, recursive=True):
                     results.append(a)
             else:
                 results.append(a)
+    return results
+
+def list_tags_for_account(client, id):
+    results = []
+
+    tags_pager = client.get_paginator('list_tags_for_resource')
+    for tag in tags_pager.paginate(
+        ResourceId=id).build_full_result().get(
+            'Tags', []):
+        results.append(tag)
     return results
 
 
