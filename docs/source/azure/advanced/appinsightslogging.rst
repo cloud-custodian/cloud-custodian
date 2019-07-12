@@ -6,8 +6,8 @@ App Insights Logging & Metrics
 Writing Custodian Logs to Azure App Insights
 --------------------------------------------
 
-Cloud Custodian can upload its logs to Application Insights. Each policy’s log output contains the `policy name`,
-`subscription id` and `execution id properties`. These logs will be found under the *Trace* source in Application Insights.
+Cloud Custodian can upload its logs to Application Insights. Each policy’s log output contains the **policy name**,
+**subscription id** and **execution id properties**. These logs will be found under the **trace** source in Application Insights.
 
 
 Usage example using instrumentation key:
@@ -28,14 +28,15 @@ Writing Custodian Metrics to Azure App Insights
 
 By default, Cloud Custodian will upload the following metrics in all mode:
 
-* *ResourceCount* - the number of resources that matched the set of filters
-* *ActionTime* - the time to execute the actions.
+* **ResourceCount** - the number of resources that matched the set of filters
+* **ActionTime** - the time to execute the actions.
 
 In `poll` and `azure-periodic` mode, Cloud Custodian will also publish the following metric:
-* *ResourceTime* - the time to query for and filter the resources,
+
+* **ResourceTime** - the time to query for and filter the resources,
 
 Additionally some custom filters and actions may generate their own metrics.
-These metrics will be found under the *customMetrics* source in Application Insights.
+These metrics will be found under the **customMetrics** source in Application Insights.
 
 Usage example using instrumentation key:
 
@@ -49,8 +50,8 @@ Usage example using resource name:
 
         custodian run -s <output_directory> -m azure://<resource_group_name>/<app_insights_name> policy.yml
 
-In `azure-periodic` and `azure-event-grid` modes, you can add these configuration settings under the `execution-options`.
-Similarly, you can provide the instrumentation key or the resource name.
+In **azure-periodic** and **azure-event-grid** modes, you can configure metrics under the **execution-options**.
+Like above, you can provide the instrumentation key or the resource name.
 
 
     .. code-block:: yaml
