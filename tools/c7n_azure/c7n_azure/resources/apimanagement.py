@@ -59,17 +59,19 @@ class Resize(AzureBaseAction):
     :example:
     This policy will resize api management to Premium tier with 8 units.
 
-    policies:
-      - name: resize-api
-        resource: azure.api-management
-        filters:
-          - type: value
-            key: name
-            value: test-api
-        actions:
-          - type: resize
-            tier: Premium
-            capacity: 8
+    .. code-block:: yaml
+
+        policies:
+          - name: resize-api
+            resource: azure.api-management
+            filters:
+              - type: value
+                key: name
+                value: test-api
+            actions:
+              - type: resize
+                tier: Premium
+                capacity: 8
 
     """
 
