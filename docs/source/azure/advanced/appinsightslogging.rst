@@ -26,11 +26,13 @@ Usage example using resource name:
 Writing Custodian Metrics to Azure App Insights
 -----------------------------------------------
 
-By default, Cloud Custodian upload the following metrics:
+By default, Cloud Custodian will upload the following metrics in all mode:
 
-* ResourceCount - the number of resources that matched the set of filters
-* ResourceTime - the time to query for and filter the resources
-* ActionTime - the time to execute the actions.
+* *ResourceCount* - the number of resources that matched the set of filters
+* *ActionTime* - the time to execute the actions.
+
+In `poll` and `azure-periodic` mode, Cloud Custodian will also publish the following metric:
+* *ResourceTime* - the time to query for and filter the resources,
 
 Additionally some custom filters and actions may generate their own metrics.
 These metrics will be found under the *customMetrics* source in Application Insights.
@@ -46,3 +48,24 @@ Usage example using resource name:
     .. code-block:: sh
 
         custodian run -s <output_directory> -m azure://<resource_group_name>/<app_insights_name> policy.yml
+
+In `azure-periodic` and `azure-event-grid` modes, you can add these configuration settings under the `execution-options`.
+Similarly, you can provide the instrumentation key or the resource name.
+
+
+    .. code-block:: yaml
+
+        policies:
+          - name: periodic-mode-logging-metrics
+            resource: azure.storage
+            mode:
+              type: azure-periodic
+              schedule: '0 0 * * * *'
+              provision-options:
+                servicePlan:
+                  name: cloud-custodian
+                  location: eastus
+                  resourceGroupName: cloud-custodian
+              execution-options:
+                metrics: azure://<instrumentation_key_guid>
+

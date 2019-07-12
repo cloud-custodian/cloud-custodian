@@ -131,8 +131,9 @@ def init_config(policy_config):
     # boolean flag triggering a string value of 'aws'
     if 'metrics_enabled' in exec_options \
        and isinstance(exec_options['metrics_enabled'], bool) \
-       and exec_options['metrics_enabled']:
-        exec_options['metrics_enabled'] = 'aws'
+       and exec_options['metrics_enabled'] \
+       and not exec_options['metrics']:
+        exec_options['metrics'] = 'aws'
 
     return Config.empty(**exec_options)
 
