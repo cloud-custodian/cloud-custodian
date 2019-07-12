@@ -20,13 +20,13 @@ Usage example using resource name:
 
     .. code-block:: sh
 
-        custodian run  -s <output_directory> -l azure://<resource_group_name>/<app_insights_name> policy.yml
+        custodian run -s <output_directory> -l azure://<resource_group_name>/<app_insights_name> policy.yml
 
 
 Writing Custodian Metrics to Azure App Insights
 -----------------------------------------------
 
-By default, Cloud Custodian will upload the following metrics in all mode:
+By default, Cloud Custodian will upload the following metrics in all modes:
 
 * **ResourceCount** - the number of resources that matched the set of filters
 * **ActionTime** - the time to execute the actions.
