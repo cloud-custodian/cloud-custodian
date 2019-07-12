@@ -246,7 +246,7 @@ def setup_parser():
             "https://cloudcustodian.io/docs/aws/usage.html#metrics")
 
     run.add_argument(
-        "-m", "--metrics",
+        "-m", "--metrics-enabled",
         default=None, nargs="?", const="aws",
         help=metrics_help)
     run.add_argument(
