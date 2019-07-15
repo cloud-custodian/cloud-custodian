@@ -31,7 +31,7 @@ By default, Cloud Custodian will upload the following metrics in all modes:
 * **ResourceCount** - the number of resources that matched the set of filters
 * **ActionTime** - the time to execute the actions.
 
-In `poll` and `azure-periodic` mode, Cloud Custodian will also publish the following metric:
+In **poll** and **azure-periodic** mode, Cloud Custodian will also publish the following metric:
 
 * **ResourceTime** - the time to query for and filter the resources,
 
