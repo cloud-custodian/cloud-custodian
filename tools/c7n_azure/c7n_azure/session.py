@@ -55,6 +55,63 @@ class Session(object):
         self._is_token_auth = False
         self._is_cli_auth = False
         self.authorization_file = authorization_file
+        self._auth_params = {}
+
+    @property
+    def auth_params(self):
+        self._initialize_session()
+        return self._auth_params
+
+    def _authenticate(self):
+        client_id = self._auth_params.get('client_id')
+        client_secret = self._auth_params.get('client_secret')
+        access_token = self._auth_params.get('access_token')
+        tenant_id = self._auth_params.get('tenant_id')
+        use_msi = self._auth_params.get('use_msi')
+        subscription_id = self._auth_params.get('subscription_id')
+
+        if access_token and subscription_id:
+            self.log.info("Creating session with Token Authentication")
+            self.subscription_id = subscription_id
+            self.credentials = BasicTokenAuthentication(
+                token={
+                    'access_token': access_token
+                })
+            self._is_token_auth = True
+
+        elif client_id and client_secret and tenant_id and subscription_id:
+            self.log.info("Creating session with Service Principal Authentication")
+            self.subscription_id = subscription_id
+            self.credentials = ServicePrincipalCredentials(
+                client_id=client_id,
+                secret=client_secret,
+                tenant=tenant_id,
+                resource=self.resource_namespace)
+            self.tenant_id = tenant_id
+
+        elif use_msi and subscription_id:
+            self.log.info("Creating session with MSI Authentication")
+            self.subscription_id = subscription_id
+            if client_id:
+                self.credentials = MSIAuthentication(
+                    client_id=client_id,
+                    resource=self.resource_namespace)
+            else:
+                self.credentials = MSIAuthentication(
+                    resource=self.resource_namespace)
+
+        elif self._auth_params.get('enable_cli_auth'):
+            self.log.info("Creating session with Azure CLI Authentication")
+            self._is_cli_auth = True
+            try:
+                (self.credentials,
+                 self.subscription_id,
+                 self.tenant_id) = Profile().get_login_credentials(
+                    resource=self.resource_namespace)
+            except Exception:
+                self.log.error('Unable to authenticate with Azure')
+
+        self.log.info("Session using Subscription ID: %s" % self.subscription_id)
 
     def _initialize_session(self):
         """
@@ -71,80 +128,37 @@ class Session(object):
         if self.credentials is not None:
             return
 
-        tenant_auth_variables = [
-            constants.ENV_TENANT_ID, constants.ENV_SUB_ID,
-            constants.ENV_CLIENT_ID, constants.ENV_CLIENT_SECRET
-        ]
-
-        token_auth_variables = [
-            constants.ENV_ACCESS_TOKEN, constants.ENV_SUB_ID
-        ]
-
-        msi_auth_variables = [
-            constants.ENV_USE_MSI, constants.ENV_SUB_ID
-        ]
-
         if self.authorization_file:
-            self.credentials, self.subscription_id = self.load_auth_file(self.authorization_file)
-            self.log.info("Creating session with authorization file")
-
-        elif all(k in os.environ for k in token_auth_variables):
-            # Token authentication
-            self.credentials = BasicTokenAuthentication(
-                token={
-                    'access_token': os.environ[constants.ENV_ACCESS_TOKEN]
-                })
-            self.subscription_id = os.environ[constants.ENV_SUB_ID]
-            self.log.info("Creating session with Token Authentication")
-            self._is_token_auth = True
-
-        elif all(k in os.environ for k in tenant_auth_variables):
-            # Tenant (service principal) authentication
-            self.credentials = ServicePrincipalCredentials(
-                client_id=os.environ[constants.ENV_CLIENT_ID],
-                secret=os.environ[constants.ENV_CLIENT_SECRET],
-                tenant=os.environ[constants.ENV_TENANT_ID],
-                resource=self.resource_namespace)
-            self.subscription_id = os.environ[constants.ENV_SUB_ID]
-            self.tenant_id = os.environ[constants.ENV_TENANT_ID]
-            self.log.info("Creating session with Service Principal Authentication")
-
-        elif all(k in os.environ for k in msi_auth_variables):
-            # MSI authentication
-            if constants.ENV_CLIENT_ID in os.environ:
-                self.credentials = MSIAuthentication(
-                    client_id=os.environ[constants.ENV_CLIENT_ID],
-                    resource=self.resource_namespace)
-            else:
-                self.credentials = MSIAuthentication(
-                    resource=self.resource_namespace)
-
-            self.subscription_id = os.environ[constants.ENV_SUB_ID]
-            self.log.info("Creating session with MSI Authentication")
+            self.log.info("Using file for authentication parameters")
+            with open(self.authorization_file) as json_file:
+                self._auth_params = json.load(json_file)
         else:
-            # Azure CLI authentication
-            self._is_cli_auth = True
-            (self.credentials,
-             self.subscription_id,
-             self.tenant_id) = Profile().get_login_credentials(
-                resource=self.resource_namespace)
+            self.log.info("Using environment variables for authentication parameters")
+            self._auth_params = {
+                'client_id': os.environ.get(constants.ENV_CLIENT_ID),
+                'client_secret': os.environ.get(constants.ENV_CLIENT_SECRET),
+                'access_token': os.environ.get(constants.ENV_ACCESS_TOKEN),
+                'tenant_id': os.environ.get(constants.ENV_TENANT_ID),
+                'use_msi': bool(os.environ.get(constants.ENV_USE_MSI)),
+                'subscription_id': os.environ.get(constants.ENV_SUB_ID),
+                'enable_cli_auth': True
+            }
 
-            self.log.info("Creating session with Azure CLI Authentication")
+        # Let provided id parameter override everything else
+        if self.subscription_id_override is not None:
+            self._auth_params['subscription_id'] = self.subscription_id_override
+
+        self._authenticate()
+
+        if self.credentials is None:
+            self.log.error('Unable to authenticate with Azure.')
+            sys.exit(1)
 
         # TODO: cleanup this workaround when issue resolved.
         # https://github.com/Azure/azure-sdk-for-python/issues/5096
         if self.resource_namespace == constants.RESOURCE_VAULT:
             access_token = AccessToken(token=self.get_bearer_token())
             self.credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
-
-        # Let provided id parameter override everything else
-        if self.subscription_id_override is not None:
-            self.subscription_id = self.subscription_id_override
-
-        self.log.info("Session using Subscription ID: %s" % self.subscription_id)
-
-        if self.credentials is None:
-            self.log.error('Unable to locate credentials for Azure session.')
 
     def get_session_for_resource(self, resource):
         return Session(
@@ -275,32 +289,22 @@ class Session(object):
             constants.ENV_FUNCTION_CLIENT_SECRET
         ]
 
+        required_params = ['client_id', 'client_secret', 'tenant_id']
+
+        function_auth_params = {k: v for k, v in self._auth_params.items()
+                                if k in required_params}
+        function_auth_params['subscription_id'] = target_subscription_id
+
         # Use dedicated function env vars if available
         if all(k in os.environ for k in function_auth_variables):
-            auth = {
-                'credentials':
-                    {
-                        'client_id': os.environ[constants.ENV_FUNCTION_CLIENT_ID],
-                        'secret': os.environ[constants.ENV_FUNCTION_CLIENT_SECRET],
-                        'tenant': os.environ[constants.ENV_FUNCTION_TENANT_ID]
-                    },
-                'subscription': target_subscription_id
-            }
+            function_auth_params['client_id'] = os.environ[constants.ENV_FUNCTION_CLIENT_ID]
+            function_auth_params['client_secret'] = os.environ[constants.ENV_FUNCTION_CLIENT_SECRET]
+            function_auth_params['tenant_id'] = os.environ[constants.ENV_FUNCTION_TENANT_ID]
 
-        elif type(self.credentials) is ServicePrincipalCredentials:
-            auth = {
-                'credentials':
-                    {
-                        'client_id': os.environ[constants.ENV_CLIENT_ID],
-                        'secret': os.environ[constants.ENV_CLIENT_SECRET],
-                        'tenant': os.environ[constants.ENV_TENANT_ID]
-                    },
-                'subscription': target_subscription_id
-            }
-
-        else:
+        # Verify SP authentication parameters
+        if any(k not in function_auth_params.keys() for k in required_params):
             raise NotImplementedError(
                 "Service Principal credentials are the only "
                 "supported auth mechanism for deploying functions.")
 
-        return json.dumps(auth, indent=2)
+        return json.dumps(function_auth_params, indent=2)
