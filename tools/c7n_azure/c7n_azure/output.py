@@ -89,8 +89,13 @@ class AzureStorageOutput(DirectoryOutput):
                         blob_name,
                         os.path.join(root, f))
                 except AzureHttpError as e:
-                    self.log.error("Error writing output. Confirm output storage URL is correct "
-                                   "and that 'Storage Blob Contributor' role is assigned. \n" +
+                    if e.status_code == 403:
+                        self.log.error("Access error writing output. "
+                                       "'Storage Blob Data Contributor' role "
+                                       "is required to write to Blob Storage.")
+                    else:
+                        self.log.error("Error writing output. "
+                                       "Confirm output storage URL is correct. \n" +
                                    str(e))
 
                 self.log.debug("%s uploaded" % blob_name)
