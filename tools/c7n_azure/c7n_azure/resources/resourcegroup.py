@@ -20,6 +20,8 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.utils import type_schema
 
+from msrestazure.azure_exceptions import CloudError
+
 
 @resources.register('resourcegroup')
 class ResourceGroup(ArmResourceManager):
@@ -89,5 +91,11 @@ class DeleteResourceGroup(BaseAction):
 
     def process(self, groups):
         for group in groups:
-            self.manager.log.info('Removing resource group ' + group['name'])
-            self.manager.get_client().resource_groups.delete(group['name'])
+            try:
+                self.manager.log.info('Removing resource group ' + group['name'])
+                self.manager.get_client().resource_groups.delete(group['name'])
+            except CloudError as e:
+                if e.status_code == 409:
+                    self.log.error(e.message)
+                else:
+                    raise e

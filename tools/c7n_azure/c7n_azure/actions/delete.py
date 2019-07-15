@@ -1,3 +1,5 @@
+from msrestazure.azure_exceptions import CloudError
+
 from c7n.utils import type_schema
 from c7n_azure.actions.base import AzureBaseAction
 
@@ -56,5 +58,11 @@ class DeleteAction(AzureBaseAction):
         self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
 
     def _process_resource(self, resource):
-        self.client.resources.delete_by_id(resource['id'],
-                                      self.session.resource_api_version(resource['id']))
+        try:
+            self.client.resources.delete_by_id(resource['id'],
+                                               self.session.resource_api_version(resource['id']))
+        except CloudError as e:
+            if e.status_code == 409:
+                self.log.error(e.message)
+            else:
+                raise e
