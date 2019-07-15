@@ -47,7 +47,7 @@ class ExecutionContext(object):
         self.sys_stats = None
 
         # A few tests patch on metrics flush
-        # For backward compatibility, accept both 'metrics' and 'metrics_enabled' params
+        # For backward compatibility, accept both 'metrics' and 'metrics_enabled' params (PR #4361)
         metrics = self.options.metrics or self.options.metrics_enabled
         self.metrics = metrics_outputs.select(metrics, self)
 
