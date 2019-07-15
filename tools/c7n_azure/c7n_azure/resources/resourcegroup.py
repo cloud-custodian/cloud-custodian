@@ -11,16 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import ResourceIdParser
 
-from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.utils import type_schema
-
-from msrestazure.azure_exceptions import CloudError
 
 
 @resources.register('resourcegroup')
@@ -80,7 +77,7 @@ class EmptyGroup(Filter):
 
 
 @ResourceGroup.action_registry.register('delete')
-class DeleteResourceGroup(BaseAction):
+class DeleteResourceGroup(AzureBaseAction):
     # policies:
     #   - name: test - azure
     #   resource: azure.resourcegroup
@@ -89,13 +86,6 @@ class DeleteResourceGroup(BaseAction):
 
     schema = type_schema('delete')
 
-    def process(self, groups):
-        for group in groups:
-            try:
-                self.manager.log.info('Removing resource group ' + group['name'])
-                self.manager.get_client().resource_groups.delete(group['name'])
-            except CloudError as e:
-                if e.status_code == 409:
-                    self.log.error(e.message)
-                else:
-                    raise e
+    def _process_resource(self, group):
+        self.manager.log.info('Removing resource group ' + group['name'])
+        self.manager.get_client().resource_groups.delete(group['name'])
