@@ -546,6 +546,10 @@ def run_account(account, region, policies_config, output_path,
                 policy_counts[p.name] = resources and len(resources) or 0
                 if not resources:
                     continue
+                if not config.dryrun and p.execution_mode != 'pull':
+                    log.info("Ran account:%s region:%s policy:%s provisioned time:%0.2f",
+                             account['name'], region, p.name, time.time() - st)
+                    continue
                 log.info(
                     "Ran account:%s region:%s policy:%s matched:%d time:%0.2f",
                     account['name'], region, p.name, len(resources),
