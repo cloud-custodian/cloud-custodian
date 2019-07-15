@@ -102,5 +102,5 @@ class Notify(BaseNotify):
                                "'Storage Queue Data Contributor' "
                                "role is required to write to Queue Storage.")
             else:
-                self.log.error("Error putting message to the queue. \n" +
+                self.log.error("Error putting message to the queue.\n" +
                                str(e))
