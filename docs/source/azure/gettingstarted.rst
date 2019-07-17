@@ -113,7 +113,7 @@ See :ref:`filters` for more information on the features of the Value filter used
 """"""""""""""""""""""""""""""""""""""""""""""""
 
 Cloud Custodian policies can emit logs and metrics to Application Insights when the policy executes.
-Please refer to the :ref:`azure_appinsightslogging` section for further details.
+Please refer to the :ref:`azure_monitoring` section for further details.
 
 
 Next Steps

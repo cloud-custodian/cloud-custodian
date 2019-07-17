@@ -51,25 +51,27 @@ Create the Outlook Send Email action
 
 .. code-block:: json
 
-    "actions": {
-        "Send_an_email_(V2)": {
-            "inputs": {
-                "body": {
-                    "Body": "<p><span style=\"font-size: 16px\"><strong>Policy Name: </strong></span>@{triggerBody()['PolicyName']}<br>\n<span style=\"font-size: 16px\"><strong>Policy Description:</strong></span><strong> </strong>@{triggerBody()['PolicyDescription']}<br>\n<strong><br>\n</strong><span style=\"font-size: 16px\"><strong>Resource</strong></span><strong><br>\n--------------<br>\nName: </strong>@{triggerBody()['Resource']['Name']}<br>\n<strong>Location: </strong>@{triggerBody()['Resource']['Location']}<br>\n<strong>Owner: </strong>@{triggerBody()['Resource']['Owner']}<br>\n<strong>VmSize: </strong>@{triggerBody()['Resource']['VmSize']}<br>\n<br>\n</p>",
-                    "Subject": "Cloud Custodian Policy: @{triggerBody()['PolicyName']}",
-                    "To": "@{triggerBody()['Resource']['Owner']}"
-                },
-                "host": {
-                    "connection": {
-                        "name": "@parameters('$connections')['office365']['connectionId']"
-                    }
-                },
-                "method": "post",
-                "path": "/v2/Mail"
-            },
-            "runAfter": {},
-            "type": "ApiConnection"
-        }
+    {
+      "actions": {
+          "Send_an_email_(V2)": {
+              "inputs": {
+                  "body": {
+                      "Body": "<p><span style=\"font-size: 16px\"><strong>Policy Name: </strong></span>@{triggerBody()['PolicyName']}<br>\n<span style=\"font-size: 16px\"><strong>Policy Description:</strong></span><strong> </strong>@{triggerBody()['PolicyDescription']}<br>\n<strong><br>\n</strong><span style=\"font-size: 16px\"><strong>Resource</strong></span><strong><br>\n--------------<br>\nName: </strong>@{triggerBody()['Resource']['Name']}<br>\n<strong>Location: </strong>@{triggerBody()['Resource']['Location']}<br>\n<strong>Owner: </strong>@{triggerBody()['Resource']['Owner']}<br>\n<strong>VmSize: </strong>@{triggerBody()['Resource']['VmSize']}<br>\n<br>\n</p>",
+                      "Subject": "Cloud Custodian Policy: @{triggerBody()['PolicyName']}",
+                      "To": "@{triggerBody()['Resource']['Owner']}"
+                  },
+                  "host": {
+                      "connection": {
+                          "name": "@parameters('$connections')['office365']['connectionId']"
+                      }
+                  },
+                  "method": "post",
+                  "path": "/v2/Mail"
+              },
+              "runAfter": {},
+              "type": "ApiConnection"
+          }
+      }
     }
 
 6. Return back to the `Designer` mode, and you should see the template in the **Send an email (V2)** action.
@@ -105,22 +107,23 @@ This action leverages tags that the resource has been auto-tagged with the follo
 
 .. code-block:: yaml
 
-    - type: logic-app
-      resource-group: cloud-custodian            ─▶ This is the resource group where you created your Logic App
-      logic-app-name: custodian-notifications    ─▶ This is the name of your Logic App
-      batch: false                               ─▶ We want to invoke the logic app for each resource that violates our policy
-      body: >                                    ─▶ We will select specific properties of our resource that can be used in our Logic App
-          {
-          PolicyName: policy.name,
-          PolicyDescription: policy.description,
-          Resource: resource.
-              {
-              Name: name,
-              Location: location,
-              Owner: tags.CreatorEmail,                  ─▶ The CreatorEmail tag on the resource will be recipient of the email.
-              VmSize: properties.hardwareProfile.vmSize
-              }
-          }
+    actions:
+      - type: logic-app
+        resource-group: cloud-custodian            # ─▶ This is the resource group where you created your Logic App
+        logic-app-name: custodian-notifications    # ─▶ This is the name of your Logic App
+        batch: false                               # ─▶ We want to invoke the logic app for each resource that violates our policy
+        body: >                                    # ─▶ We will select specific properties of our resource that can be used in our Logic App
+            {
+            PolicyName: policy.name,
+            PolicyDescription: policy.description,
+            Resource: resource.
+                {
+                Name: name,
+                Location: location,
+                Owner: tags.CreatorEmail,                  # ─▶ The CreatorEmail tag on the resource will be recipient of the email.
+                VmSize: properties.hardwareProfile.vmSize
+                }
+            }
 
 Final updated policy
 ~~~~~~~~~~~~~~~~~~~~

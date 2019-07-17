@@ -1,3 +1,5 @@
+.. _azure_examples_autotagusers:
+
 Tags - Automatically tag the creator of a resource or resource group
 ====================================================================
 

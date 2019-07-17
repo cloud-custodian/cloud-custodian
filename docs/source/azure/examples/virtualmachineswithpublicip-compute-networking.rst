@@ -1,3 +1,5 @@
+.. _azure_examples_vm_with_public_ips:
+
 Virtual Machines - Find Virtual Machines with public IP address
 ===============================================================
 
