@@ -200,7 +200,7 @@ class GuardDutyEnabled(MultiAttrFilter):
                   - type: guard-duty
                     Detector.Status: ENABLED
                     Master.AccountId: "00011001"
-                    Master.RelationshipStatus: ENABLED
+                    Master.RelationshipStatus: "Enabled"
     """
 
     schema = {

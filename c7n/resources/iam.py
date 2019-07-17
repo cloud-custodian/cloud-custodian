@@ -504,7 +504,7 @@ class CheckPermissions(Filter):
 class IamRoleUsage(Filter):
 
     def get_permissions(self):
-        perms = list(itertools.chain([
+        perms = list(itertools.chain(*[
             self.manager.get_resource_manager(m).get_permissions()
             for m in ['lambda', 'launch-config', 'ec2']]))
         perms.extend(['ecs:DescribeClusters', 'ecs:DescribeServices'])

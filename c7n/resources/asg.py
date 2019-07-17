@@ -243,7 +243,7 @@ class LaunchConfigFilter(ValueFilter):
 class ConfigValidFilter(Filter):
 
     def get_permissions(self):
-        return list(itertools.chain([
+        return list(itertools.chain(*[
             self.manager.get_resource_manager(m).get_permissions()
             for m in ('subnet', 'security-group', 'key-pair', 'elb',
                       'app-elb-target-group', 'ebs-snapshot', 'ami')]))

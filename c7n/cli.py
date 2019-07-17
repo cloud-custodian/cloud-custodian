@@ -92,7 +92,7 @@ def _default_options(p, blacklist=""):
     if 'log-group' not in blacklist:
         p.add_argument(
             "-l", "--log-group", default=None,
-            help="Cloudwatch Log Group to send policy logs")
+            help="Location to send policy logs (Ex: AWS CloudWatch Log Group)")
     else:
         p.add_argument("--log-group", default=None, help=argparse.SUPPRESS)
 

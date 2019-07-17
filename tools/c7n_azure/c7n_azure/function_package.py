@@ -198,12 +198,7 @@ class FunctionPackage(object):
     def status(self, deployment_creds):
         status_url = '%s/api/deployments' % deployment_creds.scm_uri
 
-        try:
-            r = requests.get(status_url, timeout=30, verify=self.enable_ssl_cert)
-        except requests.exceptions.ReadTimeout:
-            self.log.error("Your Function app is not responding to a status request.")
-            return False
-
+        r = requests.get(status_url, verify=self.enable_ssl_cert)
         if r.status_code != 200:
             self.log.error("Application service returned an error.\n%s\n%s"
                            % (r.status_code, r.text))
