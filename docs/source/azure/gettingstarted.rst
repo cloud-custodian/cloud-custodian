@@ -50,9 +50,7 @@ To install Cloud Custodian, just run::
 Write your first policy
 -----------------------
 
-The core concept is a stateless rule engine, that filters and takes actions on resources.
-It can be bound to serverless event streams across multiple cloud providers that maps to security, operations, and governance use cases.
-Custodian adheres to a compliance as code principle, so you can validate, dry-run, and review changes to your policies.
+Cloud Custodian is a stateless rules engine that filters and takes actions on Azure resources based on policies that you define.
 
 Cloud Custodian policies are expressed in YAML and include the following:
 
