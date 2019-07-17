@@ -19,12 +19,11 @@ ensuring compliance to security policies, tag policies, garbage
 collection of unused resources, and cost management from a single
 tool. 
 
-YAML Policies are the core concept of Cloud Custodian.  They take actions 
-on resources specified by filters. Custodian adheres to a compliance
-as code principle, so you can validate, dry-run, and code review on
-changes to your policies.
+The core concept is a stateless rule engine, that filters and takes actions on resources.
+It can be bound to serverless event streams across multiple cloud providers that maps to security, operations, and governance use cases.
+Custodian adheres to a compliance as code principle, so you can validate, dry-run, and review changes to your policies.
 
-A policy specifies the following items:
+Cloud Custodian policies are expressed in YAML and include the following:
 
 * The type of resource to run the policy against
 * Filters to narrow down the set of resources
