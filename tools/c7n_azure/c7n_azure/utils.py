@@ -23,14 +23,23 @@ from concurrent.futures import as_completed
 
 import six
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
+from azure.keyvault import KeyVaultAuthentication, AccessToken
+from azure.keyvault import KeyVaultClient, KeyVaultId
 from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
+from c7n_azure import constants
+from c7n_azure.constants import RESOURCE_VAULT
+from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
 
 from c7n.utils import chunks, local_session
-from c7n_azure import constants
+
+try:
+    from functools import lru_cache
+except ImportError:
+    from backports.functools_lru_cache import lru_cache
 
 
 class ResourceIdParser(object):
@@ -500,3 +509,24 @@ class RetentionPeriod(object):
         units = next(units for units in RetentionPeriod.Units
             if units.iso8601_symbol == iso8601_symbol)
         return period, units
+
+
+@lru_cache()
+def get_keyvault_secret(user_identity_id, keyvault_secret_id):
+    secret_id = KeyVaultId.parse_secret_id(keyvault_secret_id)
+    access_token = None
+
+    # Use UAI if client_id is provided
+    if user_identity_id:
+        msi = MSIAuthentication(
+            client_id=user_identity_id,
+            resource=RESOURCE_VAULT)
+    else:
+        msi = MSIAuthentication(
+            resource=RESOURCE_VAULT)
+
+    access_token = AccessToken(token=msi.token['access_token'])
+    credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
+
+    kv_client = KeyVaultClient(credentials)
+    return kv_client.get_secret(secret_id.vault, secret_id.name, secret_id.version).value

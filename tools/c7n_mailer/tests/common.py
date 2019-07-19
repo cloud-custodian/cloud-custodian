@@ -399,6 +399,109 @@ ASQ_MESSAGE_TAG = '''{
 }'''
 
 
+ASQ_MESSAGE_SLACK = '''{
+   "account":"subscription",
+   "account_id":"ee98974b-5d2a-4d98-a78a-382f3715d07e",
+   "region":"all",
+   "action":{
+      "to":[
+         "slack://#test-channel"
+      ],
+      "template":"default",
+      "priority_header":"2",
+      "type":"notify",
+      "transport":{
+         "queue":"https://test.queue.core.windows.net/testcc",
+         "type":"asq"
+      },
+      "subject":"testing notify action"
+   },
+   "policy":{
+      "resource":"azure.keyvault",
+      "name":"test-notify-for-keyvault",
+      "actions":[
+         {
+            "to":[
+               "slack://#test-channel"
+            ],
+            "template":"default",
+            "priority_header":"2",
+            "type":"notify",
+            "transport":{
+               "queue":"https://test.queue.core.windows.net/testcc",
+               "type":"asq"
+            },
+            "subject":"testing notify action"
+         }
+      ]
+   },
+   "event":null,
+   "resources":[
+      {
+         "name":"cckeyvault1",
+         "tags":{
+
+         },
+         "resourceGroup":"test_keyvault",
+         "location":"southcentralus",
+         "type":"Microsoft.KeyVault/vaults",
+         "id":"/subscriptions/ee98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1"
+      }
+   ]
+}'''
+
+ASQ_MESSAGE_DATADOG = '''{
+   "account":"subscription",
+   "account_id":"ee98974b-5d2a-4d98-a78a-382f3715d07e",
+   "region":"all",
+   "action":{
+      "to":[
+         "datadog://?metric_name=EBS_volume.available.size"
+      ],
+      "template":"default",
+      "priority_header":"2",
+      "type":"notify",
+      "transport":{
+         "queue":"https://test.queue.core.windows.net/testcc",
+         "type":"asq"
+      },
+      "subject":"testing notify action"
+   },
+   "policy":{
+      "resource":"azure.keyvault",
+      "name":"test-notify-for-keyvault",
+      "actions":[
+         {
+            "to":[
+               "datadog://?metric_name=EBS_volume.available.size"
+            ],
+            "template":"default",
+            "priority_header":"2",
+            "type":"notify",
+            "transport":{
+               "queue":"https://test.queue.core.windows.net/testcc",
+               "type":"asq"
+            },
+            "subject":"testing notify action"
+         }
+      ]
+   },
+   "event":null,
+   "resources":[
+      {
+         "name":"cckeyvault1",
+         "tags":{
+
+         },
+         "resourceGroup":"test_keyvault",
+         "location":"southcentralus",
+         "type":"Microsoft.KeyVault/vaults",
+         "id":"/subscriptions/ee98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1"
+      }
+   ]
+}'''
+
+
 # Monkey-patch ldap3 to work around a bytes/text handling bug.
 
 _safe_rdn = mockBase.safe_rdn
