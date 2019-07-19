@@ -8,7 +8,7 @@ Cloud Custodian Documentation
 
 Cloud Custodian is a tool that unifies the dozens of tools and scripts
 most organizations use for managing their public cloud accounts into
-one open source tool. It's a stateless rules engine for policy
+one open source tool. It uses a stateless rules engine for policy
 definition and enforcement, with metrics, structured outputs and
 detailed reporting for clouds infrastructure. It integrates tightly
 with serverless runtimes to provide real time remediation/response with
@@ -17,13 +17,18 @@ low operational overhead.
 Organizations can use Custodian to manage their cloud environments by
 ensuring compliance to security policies, tag policies, garbage
 collection of unused resources, and cost management from a single
-tool. Custodian policies are written in simple YAML configuration
-files that specify given resource types and are constructed from a
-vocabulary of filters and actions. Custodian adheres to a compliance
-as code principle, so you can validate, dry-run, and code review on
-changes to your policies.
+tool. 
 
-Navigate below and get started with Cloud Custodian!
+Cloud Custodian can be bound to serverless event streams across multiple cloud providers that maps to security, operations, and governance use cases.
+Custodian adheres to a compliance as code principle, so you can validate, dry-run, and review changes to your policies.
+
+Cloud Custodian policies are expressed in YAML and include the following:
+
+* The type of resource to run the policy against
+* Filters to narrow down the set of resources
+* Actions to take on the filtered set of resources
+
+Navigate below to your cloud provider and get started with Cloud Custodian!
 
 .. toctree::
    :maxdepth: 2
@@ -48,16 +53,14 @@ Navigate below and get started with Cloud Custodian!
    aws/resources/index
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Azure
 
    azure/gettingstarted
-   azure/authentication
+   azure/configuration/index
    azure/examples/index
    azure/policy/index
-   azure/azure-modes
    azure/advanced/index
-   azure/contribute
    azure/resources/index
 
 .. toctree::

@@ -1,5 +1,10 @@
+{% if provider_name in key %}
+{{key}} resources
+{{underline(key + ' resources', '#')}}
+{% else %}
 {{provider_name}}.{{key}} resources
 {{underline(provider_name + '.' + key + ' resources', '#')}}
+{% endif %}
 
 {% if resources|length > 1 %}
 {% for r in resources %}

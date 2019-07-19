@@ -57,6 +57,7 @@ class Resize(AzureBaseAction):
     Required arguments: capacity in units and tier (Developer, Basic, Standard or Premium).
 
     :example:
+
     This policy will resize api management to Premium tier with 8 units.
 
     .. code-block:: yaml

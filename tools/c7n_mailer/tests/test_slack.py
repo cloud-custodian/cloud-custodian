@@ -40,9 +40,8 @@ class TestSlackDelivery(unittest.TestCase):
         assert self.target_channel in result
         assert json.loads(result[self.target_channel])['channel'] == self.target_channel
 
-    def test_map_sending_to_tag_channel(self):
-        self.target_channel = 'tag-channel'
-        print(self.config['templates_folders'])
+    def test_map_sending_to_tag_channel_with_hash(self):
+        self.target_channel = '#tag-channel'
         slack = SlackDelivery(self.config, self.logger, self.email_delivery)
         message_destination = ['slack://tag/SlackChannel']
 
@@ -54,6 +53,23 @@ class TestSlackDelivery(unittest.TestCase):
 
         assert self.target_channel in result
         assert json.loads(result[self.target_channel])['channel'] == self.target_channel
+        self.logger.debug.assert_called_with("Generating message for specified Slack channel.")
+
+    def test_map_sending_to_tag_channel_without_hash(self):
+        self.target_channel = 'tag-channel'
+        channel_name = "#" + self.target_channel
+
+        slack = SlackDelivery(self.config, self.logger, self.email_delivery)
+        message_destination = ['slack://tag/SlackChannel']
+
+        self.resource['Tags'].append({"Key": "SlackChannel", "Value": self.target_channel})
+        self.message['action']['to'] = message_destination
+        self.message['policy']['actions'][1]['to'] = message_destination
+
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+
+        assert channel_name in result
+        assert json.loads(result[channel_name])['channel'] == channel_name
         self.logger.debug.assert_called_with("Generating message for specified Slack channel.")
 
     def test_map_sending_to_tag_channel_no_tag(self):

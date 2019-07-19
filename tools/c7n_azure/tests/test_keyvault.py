@@ -16,10 +16,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure_common import BaseTest, arm_template
 from c7n_azure.resources.key_vault import KeyVaultUpdateAccessPolicyAction, WhiteListFilter
 from c7n_azure.session import Session
-from c7n.utils import local_session
+from c7n_azure.utils import GraphHelper
 from mock import patch, Mock
 from msrestazure.azure_exceptions import CloudError
 from requests import Response
+
+from c7n.utils import local_session
 
 
 class KeyVaultTest(BaseTest):
@@ -130,7 +132,7 @@ class KeyVaultTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     @arm_template('keyvault.json')
-    @patch('c7n_azure.utils.GraphHelper.get_principal_dictionary', )
+    @patch.object(GraphHelper, 'get_principal_dictionary')
     def test_whitelist_not_authorized(self, get_principal_dictionary):
         """Tests that an exception is thrown when both:
           The Microsoft Graph call fails.
