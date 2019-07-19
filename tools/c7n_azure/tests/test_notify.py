@@ -99,7 +99,7 @@ class NotifyTest(BaseTest):
 
         args, _ = logger_mock.call_args
 
-        self.assertTrue(re.match("Access Error*", args[0]) is not None)
+        self.assertIsNotNone(re.match("Access Error*", args[0]))
 
     @patch('c7n_azure.storage_utils.StorageUtilities.put_queue_message')
     @patch('c7n_azure.storage_utils.StorageUtilities.get_queue_client_by_uri')
@@ -109,7 +109,6 @@ class NotifyTest(BaseTest):
                                     get_queue_client_by_uri,
                                     put_queue_message):
         put_queue_message.side_effect = AzureHttpError('not found', 404)
-            
         get_queue_client_by_uri.return_value = 'service', 'name'
 
         action = Notify()
@@ -118,5 +117,5 @@ class NotifyTest(BaseTest):
 
         args, _ = logger_mock.call_args
 
-        self.assertFalse(re.match("Access Error*", args[0]) is not None)
-        self.assertTrue(re.match("Error*", args[0]) is not None)
+        self.assertIsNone(re.match("Access Error*", args[0]))
+        self.assertIsNotNone(re.match("Error*", args[0]))

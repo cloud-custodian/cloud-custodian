@@ -144,7 +144,7 @@ class OutputTest(BaseTest):
 
         args, _ = logger_mock.call_args
 
-        self.assertTrue(re.match("Access Error*", args[0]) is not None)
+        self.assertIsNotNone(re.match("Access Error*", args[0]))
 
     @patch('logging.Logger.error')
     def test_error_writing_to_blob(self, logger_mock):
@@ -165,5 +165,5 @@ class OutputTest(BaseTest):
 
         args, _ = logger_mock.call_args
 
-        self.assertFalse(re.match("Access Error*", args[0]) is not None)
-        self.assertTrue(re.match("Error*", args[0]) is not None)
+        self.assertIsNone(re.match("Access Error*", args[0]))
+        self.assertIsNotNone(re.match("Error*", args[0]))
