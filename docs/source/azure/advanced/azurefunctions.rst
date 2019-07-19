@@ -174,6 +174,7 @@ Common properties are:
 - output_dir
 - cache_period
 - dryrun
+- metrics
 
 Output directory defaults to `/tmp/<random_uuid>` but you can point it to a Azure Blob Storage container instead
 
@@ -189,6 +190,7 @@ Output directory defaults to `/tmp/<random_uuid>` but you can point it to a Azur
                 name: functionshost
             execution-options:
               output_dir: azure://yourstorageaccount.blob.core.windows.net/custodian
+              metrics: azure://<resource_group_name>/<app_insights_name>
          resource: azure.vm
          filters:
           - type: instance-view

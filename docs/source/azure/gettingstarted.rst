@@ -90,17 +90,8 @@ See :ref:`filters` for more information on the features of the Value filter used
 Monitor Azure
 -------------
 
-You can generate App Insights metrics by specifying the ``--metrics`` flag and specifying ``azure``::
-
-  $ custodian run -s <output_directory> --metrics azure <policyfile>.yml
-
-You can also upload Cloud Custodian logs to App Insights logs::
-
-  $ custodian run --log-group=azure://cloud-custodian/<dev-account>/<region> -s <output_directory> <policyfile>.yml
-
-And you can output logs and resource records to Azure storage accounts::
-
-  $ custodian run -s azure://<my-bucket><my-prefix> <policyfile>.yml
+Cloud Custodian policies can emit logs and metrics to Application Insights when the policy executes.
+Please refer to the :ref:`azure_appinsightslogging` section for further details.
 
 
 Next Steps
