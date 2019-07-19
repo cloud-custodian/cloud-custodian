@@ -109,6 +109,7 @@ class NotifyTest(BaseTest):
                                     get_queue_client_by_uri,
                                     put_queue_message):
         put_queue_message.side_effect = AzureHttpError('not found', 404)
+            
         get_queue_client_by_uri.return_value = 'service', 'name'
 
         action = Notify()
