@@ -51,6 +51,10 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
             site_config.app_settings.append(
                 azure_name_value_pair('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key))
 
+        # Don't generate pycache
+        site_config.app_settings.append(
+            azure_name_value_pair('PYTHONDONTWRITEBYTECODE', 1))
+
         # general app settings
         con_string = params['storage_account_connection_string']
         site_config.app_settings.append(azure_name_value_pair('AzureWebJobsStorage', con_string))
