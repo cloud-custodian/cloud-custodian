@@ -18,7 +18,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from c7n_azure.session import Session
 from c7n_azure.constants import RESOURCE_STORAGE
-from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
 
 
 def start_c7n_mailer(logger, config, auth_file):

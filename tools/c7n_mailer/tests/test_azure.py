@@ -18,8 +18,8 @@ import unittest
 import zlib
 
 from c7n_azure.storage_utils import StorageUtilities
-from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
-from c7n_mailer.azure.sendgrid_delivery import SendGridDelivery
+from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure_mailer.sendgrid_delivery import SendGridDelivery
 from common import MAILER_CONFIG_AZURE, ASQ_MESSAGE, ASQ_MESSAGE_TAG, logger
 
 from mock import MagicMock, patch
@@ -35,8 +35,9 @@ class AzureTest(unittest.TestCase):
 
         self.tag_message = json.loads(ASQ_MESSAGE_TAG)
 
-    @patch('c7n_mailer.azure.sendgrid_delivery.SendGridDelivery.sendgrid_handler')
-    @patch('c7n_mailer.azure.sendgrid_delivery.SendGridDelivery.get_to_addrs_sendgrid_messages_map')
+    @patch('c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery.sendgrid_handler')
+    @patch('c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery'
+           '.get_to_addrs_sendgrid_messages_map')
     def test_process_azure_queue_message_success(self, mock_get_addr, mock_handler):
         mock_handler.return_value = True
         mock_get_addr.return_value = 42
@@ -49,8 +50,9 @@ class AzureTest(unittest.TestCase):
         mock_get_addr.assert_called_with(self.loaded_message)
         mock_handler.assert_called_with(self.loaded_message, 42)
 
-    @patch('c7n_mailer.azure.sendgrid_delivery.SendGridDelivery.sendgrid_handler')
-    @patch('c7n_mailer.azure.sendgrid_delivery.SendGridDelivery.get_to_addrs_sendgrid_messages_map')
+    @patch('c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery.sendgrid_handler')
+    @patch('c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery'
+           '.get_to_addrs_sendgrid_messages_map')
     def test_process_azure_queue_message_failure(self, mock_get_addr, mock_handler):
         mock_handler.return_value = False
         mock_get_addr.return_value = 42

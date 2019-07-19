@@ -22,7 +22,7 @@ import traceback
 import zlib
 
 import six
-from c7n_mailer.azure.sendgrid_delivery import SendGridDelivery
+from c7n_mailer.azure_mailer.sendgrid_delivery import SendGridDelivery
 from c7n_mailer.smtp_delivery import SmtpDelivery
 
 try:

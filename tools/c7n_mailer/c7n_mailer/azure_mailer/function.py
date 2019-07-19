@@ -20,7 +20,7 @@ from os.path import dirname, join
 # The working path for the Azure Function doesn't include this file's folder
 sys.path.append(dirname(dirname(__file__)))
 
-from c7n_mailer.azure import handle
+from c7n_mailer.azure_mailer import handle
 
 def main(input):
     logger = logging.getLogger('custodian.mailer')
