@@ -1,3 +1,18 @@
+# Copyright 2019 Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 from azure.common import AzureHttpError
 from c7n_azure.storage_utils import StorageUtilities
 
@@ -98,9 +113,8 @@ class Notify(BaseNotify):
                 self.pack(message)).id
         except AzureHttpError as e:
             if e.status_code == 403:
-                self.log.error("Access error while putting message to the queue. "
-                               "'Storage Queue Data Contributor' "
-                               "role is required to write to Queue Storage.")
+                self.log.error("Access Error - Storage Queue Data Contributor Role is required "
+                               "to enqueue messages to the Azure Queue Storage.")
             else:
                 self.log.error("Error putting message to the queue. \n" +
                                str(e))

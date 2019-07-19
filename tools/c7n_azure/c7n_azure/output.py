@@ -90,9 +90,8 @@ class AzureStorageOutput(DirectoryOutput):
                         os.path.join(root, f))
                 except AzureHttpError as e:
                     if e.status_code == 403:
-                        self.log.error("Access error writing output. "
-                                       "'Storage Blob Data Contributor' role "
-                                       "is required to write to Blob Storage.")
+                        self.log.error("Access Error: Storage Blob Data Contributor Role "
+                                       "is required to write to Azure Blob Storage.")
                     else:
                         self.log.error("Error writing output. "
                                        "Confirm output storage URL is correct. \n" +
