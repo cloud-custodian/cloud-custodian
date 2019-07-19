@@ -53,6 +53,5 @@ Example Policies
 ----------------
 
 - :ref:`azure_examples_sqldatabasewithpremiumsku`
-- :ref:`azure_examples_sqldatabaseshorttermbackupretention`
-- :ref:`azure_examples_sqldatabaselongtermbackupretention`
+- :ref:`azure_examples_sqldatabasebackupretention`
 - :ref:`azure_examples_sqldatabaseupdateretentionpolicies`

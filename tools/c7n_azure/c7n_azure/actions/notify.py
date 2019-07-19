@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from azure.common import AzureHttpError
+
 from c7n_azure.storage_utils import StorageUtilities
 
 from c7n import utils
