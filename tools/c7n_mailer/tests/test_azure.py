@@ -171,4 +171,3 @@ class AzureTest(unittest.TestCase):
         self.assertTrue(azure_processor.process_azure_queue_message(datadog_compressed_message))
         mock_datadog.assert_has_calls(
             [call().deliver_datadog_messages('mock_datadog_message_map', datadog_loaded_message)])
-
