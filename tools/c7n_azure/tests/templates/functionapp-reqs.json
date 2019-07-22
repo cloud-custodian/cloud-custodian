@@ -1,6 +1,7 @@
 {
   "variables": {
-    "functionAppName": "cloud-custodian-test",
+    "dedicatedfunctionAppName": "cloud-custodian-test-dedicated",
+    "consumptionfunctionAppName": "cloud-custodian-test-consumption",
     "appHostingPlanName": "cloud-custodian-test",
     "storageAccountName": "cloudcustodiantest",
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
@@ -49,7 +50,7 @@
     {
       "type": "Microsoft.Web/sites",
       "kind": "functionapp,linux,container",
-      "name": "[variables('functionAppName')]",
+      "name": "[variables('dedicatedfunctionAppName')]",
       "apiVersion": "2016-08-01",
       "location": "[resourceGroup().location]",
       "dependsOn": [
@@ -74,6 +75,35 @@
             }
           ]
         }
+      }
+    },
+    {
+      "apiVersion": "2016-03-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('consumptionfunctionAppName')]",
+      "location": "eastus",
+      "kind": "functionapp,linux",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ],
+      "properties": {
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2018-07-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "python"
+            }
+          ]
+        },
+        "reserved": true
       }
     }
   ],
