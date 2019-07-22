@@ -51,7 +51,6 @@ class FunctionAppUtilsTest(BaseTest):
 
     @arm_template('functionapp-reqs.json')
     def test_deploy_function_app(self):
-
         parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights={
                 'id': '',
@@ -77,7 +76,6 @@ class FunctionAppUtilsTest(BaseTest):
 
     @arm_template('functionapp-reqs.json')
     def test_deploy_function_app_pre_existing_app_fetch_actual_sku_tier(self):
-
         parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights={
                 'id': '',
