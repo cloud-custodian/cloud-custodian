@@ -181,6 +181,9 @@ class MetricsFilter(Filter):
             # if we overload dimensions with multiple resources we get
             # the statistics/average over those resources.
             dimensions = self.get_dimensions(r)
+            if dimensions is None:
+                continue
+
             collected_metrics = r.setdefault('c7n.metrics', {})
             # Note this annotation cache is policy scoped, not across
             # policies, still the lack of full qualification on the key

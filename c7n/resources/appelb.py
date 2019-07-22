@@ -960,6 +960,47 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
             TagKeys=tag_keys)
 
 
+@AppELBTargetGroup.filter_registry.register('metrics')
+class TargetGroupMetrics(MetricsFilter):
+    """See app-elb.filters.metrics for full metrics filter docs.
+
+    Target groups can be associated to multiple load balanacers,
+    and metrics are associated to a target group, load balancer pair.
+
+    If a target group is not associated to any load balancer this
+    filter will automatically filter it out.
+
+    The metrics filter here will only return metrics for the first
+    load balancer found.
+
+    WARNING: To avoid ambiguity, its recommended to filter target groups
+    to only those associated with a single load balancer.
+    """
+
+    def get_dimensions(self, resource):
+        lbs = []
+
+        app_lb = ':loadbalancer/app/'
+        net_lb = ':loadbalancer/net/'
+        tg_lb = ':targetgroup/'
+
+        for n in resource['LoadBalancerArns']:
+            if app_lb in n:
+                lbs.append("app/%s" % n[n.index(app_lb) + len(app_lb) + 1:])
+            elif net_lb in n:
+                lbs.append("net/%s" % n[n.index(net_lb) + len(app_lb) + 1:])
+
+        if not lbs:
+            return None
+
+        return [
+            {'Name': 'LoadBalancerArn',
+             'Value': lbs[0]},
+            {'Name': 'TargetGroup',
+             'Value': 'targetgroup/%s' % (
+                 resource['TargetGroupArn'].split(tg_lb)[-1])}]
+
+
 @AppELBTargetGroup.filter_registry.register('default-vpc')
 class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
     """Filter all application elb target groups within the default vpc
