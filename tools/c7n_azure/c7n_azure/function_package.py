@@ -20,9 +20,6 @@ import shutil
 import time
 
 import requests
-
-from c7n.mu import PythonPackageArchive
-from c7n.utils import local_session
 from c7n_azure.constants import (ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,
                                  FUNCTION_EVENT_TRIGGER_MODE,
                                  FUNCTION_TIME_TRIGGER_MODE,
@@ -30,6 +27,25 @@ from c7n_azure.constants import (ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,
                                  FUNCTION_EXTENSION_BUNDLE_CONFIG)
 from c7n_azure.dependency_manager import DependencyManager
 from c7n_azure.session import Session
+
+from c7n.mu import PythonPackageArchive
+from c7n.utils import local_session
+
+
+class AzurePythonPackageArchive(PythonPackageArchive):
+    def __init__(self, modules=(), cache_file=None):
+        super(AzurePythonPackageArchive, self).__init__(modules, cache_file)
+        self.package_time = time.gmtime()
+
+    def create_zinfo(self, fname):
+        """
+        In Dedicated App Service Plans - Functions are updated via KuduSync
+        The KuduSync uses the modified time and file size to determine if a file has changed
+        """
+        info = super(AzurePythonPackageArchive, self).create_zinfo(fname)
+
+        info.date_time = self.package_time[0:6]
+        return info
 
 
 class FunctionPackage(object):
@@ -130,7 +146,7 @@ class FunctionPackage(object):
     def build(self, policy, modules, non_binary_packages, excluded_packages, queue_name=None):
         cache_zip_file = self.build_cache(modules, excluded_packages, non_binary_packages)
 
-        self.pkg = PythonPackageArchive(cache_file=cache_zip_file)
+        self.pkg = AzurePythonPackageArchive(cache_file=cache_zip_file)
 
         self.pkg.add_modules(None, [m.replace('-', '_') for m in modules])
 
@@ -145,7 +161,7 @@ class FunctionPackage(object):
         packages = DependencyManager.get_dependency_packages_list(modules, excluded_packages)
 
         if not DependencyManager.check_cache(cache_metadata_file, cache_zip_file, packages):
-            cache_pkg = PythonPackageArchive()
+            cache_pkg = AzurePythonPackageArchive()
             self.log.info("Cached packages not found or requirements were changed.")
 
             # If cache check fails, wipe all previous wheels, installations etc
@@ -186,6 +202,7 @@ class FunctionPackage(object):
             DependencyManager.create_cache_metadata(cache_metadata_file,
                                                     cache_zip_file,
                                                     packages)
+
         return cache_zip_file
 
     def wait_for_status(self, deployment_creds, retries=10, delay=15):

@@ -100,6 +100,9 @@ class PythonPackageArchive(object):
             raise ValueError("Archive not closed, size not accurate")
         return os.stat(self._temp_archive_file.name).st_size
 
+    def create_zinfo(self, fname):
+        return zinfo(fname)
+
     def add_modules(self, ignore, modules):
         """Add the named Python modules to the archive. For consistency's sake
         we only add ``*.py`` files, not ``*.pyc``. We also don't add other
@@ -203,7 +206,7 @@ class PythonPackageArchive(object):
         """
         assert not self._closed, "Archive closed"
         if not isinstance(dest, zipfile.ZipInfo):
-            dest = zinfo(dest)  # see for some caveats
+            dest = self.create_zinfo(dest)  # see for some caveats
         # Ensure we apply the compression
         dest.compress_type = self.zip_compression
         # Mark host OS as Linux for all archives
