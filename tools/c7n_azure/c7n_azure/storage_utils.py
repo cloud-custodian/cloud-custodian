@@ -65,6 +65,14 @@ class StorageUtilities(object):
         return queue_service, storage.container_name
 
     @staticmethod
+    def get_queue_client_by_storage_account(storage_account, session):
+        token = StorageUtilities.get_storage_token(session)
+        queue_service = QueueService(
+            account_name=storage_account.name,
+            token_credential=token)
+        return queue_service
+
+    @staticmethod
     def create_queue_from_storage_account(storage_account, name, session):
         token = StorageUtilities.get_storage_token(session)
         queue_service = QueueService(
