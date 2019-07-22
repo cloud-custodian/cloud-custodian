@@ -13,9 +13,14 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from azure.common import AzureHttpError
 from azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
+from mock import patch
+from c7n_azure.actions.notify import Notify
+import re
+from c7n.utils import local_session
 
 
 class NotifyTest(BaseTest):
@@ -77,3 +82,40 @@ class NotifyTest(BaseTest):
         # Pull messages, should be 1
         messages = StorageUtilities.get_queue_messages(queue, name)
         self.assertEqual(len(messages), 1)
+
+    @patch('c7n_azure.storage_utils.StorageUtilities.put_queue_message')
+    @patch('c7n_azure.storage_utils.StorageUtilities.get_queue_client_by_uri')
+    @patch('logging.Logger.error')
+    def test_access_error(self,
+                          logger_mock,
+                          get_queue_client_by_uri,
+                          put_queue_message):
+        put_queue_message.side_effect = AzureHttpError('forbidden', 403)
+        get_queue_client_by_uri.return_value = 'service', 'name'
+
+        action = Notify()
+
+        action.send_to_azure_queue("url", "message", local_session(Session))
+
+        args, _ = logger_mock.call_args
+
+        self.assertIsNotNone(re.match("Access Error*", args[0]))
+
+    @patch('c7n_azure.storage_utils.StorageUtilities.put_queue_message')
+    @patch('c7n_azure.storage_utils.StorageUtilities.get_queue_client_by_uri')
+    @patch('logging.Logger.error')
+    def test_error_putting_to_queue(self,
+                                    logger_mock,
+                                    get_queue_client_by_uri,
+                                    put_queue_message):
+        put_queue_message.side_effect = AzureHttpError('not found', 404)
+        get_queue_client_by_uri.return_value = 'service', 'name'
+
+        action = Notify()
+
+        action.send_to_azure_queue("url", "message", local_session(Session))
+
+        args, _ = logger_mock.call_args
+
+        self.assertIsNone(re.match("Access Error*", args[0]))
+        self.assertIsNotNone(re.match("Error*", args[0]))

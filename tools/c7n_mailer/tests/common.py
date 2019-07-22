@@ -47,6 +47,7 @@ MAILER_CONFIG = {
     'contact_tags': ['OwnerEmail', 'SupportEmail'],
     'queue_url': 'https://sqs.us-east-1.amazonaws.com/xxxx/cloudcustodian-mailer',
     'region': 'us-east-1',
+    'ses_region': 'us-east-1',
     'ldap_uri': 'ldap.initech.com',
     'smtp_server': 'smtp.inittech.com',
     'cache_engine': 'sqlite',
@@ -389,6 +390,109 @@ ASQ_MESSAGE_TAG = '''{
          "name":"cckeyvault1",
          "tags":{
             "owner":"user@domain.com"
+         },
+         "resourceGroup":"test_keyvault",
+         "location":"southcentralus",
+         "type":"Microsoft.KeyVault/vaults",
+         "id":"/subscriptions/ee98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1"
+      }
+   ]
+}'''
+
+
+ASQ_MESSAGE_SLACK = '''{
+   "account":"subscription",
+   "account_id":"ee98974b-5d2a-4d98-a78a-382f3715d07e",
+   "region":"all",
+   "action":{
+      "to":[
+         "slack://#test-channel"
+      ],
+      "template":"default",
+      "priority_header":"2",
+      "type":"notify",
+      "transport":{
+         "queue":"https://test.queue.core.windows.net/testcc",
+         "type":"asq"
+      },
+      "subject":"testing notify action"
+   },
+   "policy":{
+      "resource":"azure.keyvault",
+      "name":"test-notify-for-keyvault",
+      "actions":[
+         {
+            "to":[
+               "slack://#test-channel"
+            ],
+            "template":"default",
+            "priority_header":"2",
+            "type":"notify",
+            "transport":{
+               "queue":"https://test.queue.core.windows.net/testcc",
+               "type":"asq"
+            },
+            "subject":"testing notify action"
+         }
+      ]
+   },
+   "event":null,
+   "resources":[
+      {
+         "name":"cckeyvault1",
+         "tags":{
+
+         },
+         "resourceGroup":"test_keyvault",
+         "location":"southcentralus",
+         "type":"Microsoft.KeyVault/vaults",
+         "id":"/subscriptions/ee98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1"
+      }
+   ]
+}'''
+
+ASQ_MESSAGE_DATADOG = '''{
+   "account":"subscription",
+   "account_id":"ee98974b-5d2a-4d98-a78a-382f3715d07e",
+   "region":"all",
+   "action":{
+      "to":[
+         "datadog://?metric_name=EBS_volume.available.size"
+      ],
+      "template":"default",
+      "priority_header":"2",
+      "type":"notify",
+      "transport":{
+         "queue":"https://test.queue.core.windows.net/testcc",
+         "type":"asq"
+      },
+      "subject":"testing notify action"
+   },
+   "policy":{
+      "resource":"azure.keyvault",
+      "name":"test-notify-for-keyvault",
+      "actions":[
+         {
+            "to":[
+               "datadog://?metric_name=EBS_volume.available.size"
+            ],
+            "template":"default",
+            "priority_header":"2",
+            "type":"notify",
+            "transport":{
+               "queue":"https://test.queue.core.windows.net/testcc",
+               "type":"asq"
+            },
+            "subject":"testing notify action"
+         }
+      ]
+   },
+   "event":null,
+   "resources":[
+      {
+         "name":"cckeyvault1",
+         "tags":{
+
          },
          "resourceGroup":"test_keyvault",
          "location":"southcentralus",

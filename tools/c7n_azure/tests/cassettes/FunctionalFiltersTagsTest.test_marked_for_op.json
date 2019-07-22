@@ -1,0 +1,113 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 18 Jul 2019 18:51:33 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;136,Microsoft.Compute/HighCostGet30Min;696"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "2634"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "test_filters_tag": "test_value",
+                                    "custodian_status": "TTL: delete@2018-01-01"
+                                },
+                                "properties": {
+                                    "vmId": "1d19aea7-d14e-4a00-95b5-debb2d0e020e",
+                                    "hardwareProfile": {
+                                        "vmSize": "Basic_A0"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04.0-LTS",
+                                            "version": "latest"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvm_OsDisk_1_8eb04efd2d6f4514b3b9f88c4bfb1548",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_8eb04efd2d6f4514b3b9f88c4bfb1548"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "cctestvm_disk2_c1af741f44764727985cdac787e96b3d",
+                                                "createOption": "Empty",
+                                                "caching": "None",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Standard_LRS",
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_c1af741f44764727985cdac787e96b3d"
+                                                },
+                                                "diskSizeGB": 1023,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vm45mqcga7pkswi",
+                                        "adminUsername": "testuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://45mqcga7pkswisalinuxvm.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

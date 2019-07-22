@@ -18,7 +18,6 @@ Azure Queue Message Processing
 """
 import base64
 import json
-import traceback
 import zlib
 
 import six
@@ -85,30 +84,42 @@ class MailerAzureQueueProcessor(object):
 
         if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/')
                 for e in queue_message.get('action', ()).get('to')):
-            from c7n_mailer.slack_delivery import SlackDelivery
-            slack_delivery = SlackDelivery(self.config,
-                                           self.logger,
-                                           SendGridDelivery(self.config, self.logger))
-            slack_messages = slack_delivery.get_to_addrs_slack_messages_map(queue_message)
-            try:
-                slack_delivery.slack_handler(queue_message, slack_messages)
-            except Exception:
-                traceback.print_exc()
-                pass
+            self._deliver_slack_message(queue_message)
 
-        # this section gets the map of metrics to send to datadog and delivers it
         if any(e.startswith('datadog') for e in queue_message.get('action', ()).get('to')):
-            from c7n_mailer.datadog_delivery import DataDogDelivery
-            datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
-            datadog_message_packages = datadog_delivery.get_datadog_message_packages(queue_message)
+            self._deliver_datadog_message(queue_message)
 
-            try:
-                datadog_delivery.deliver_datadog_messages(datadog_message_packages, queue_message)
-            except Exception:
-                traceback.print_exc()
-                pass
+        email_result = self._deliver_email(queue_message)
 
-        # this section sends a notification to the resource owner via SendGrid
+        if email_result is not None:
+            return email_result
+        else:
+            return True
+
+    def _deliver_slack_message(self, queue_message):
+        from c7n_mailer.slack_delivery import SlackDelivery
+        slack_delivery = SlackDelivery(self.config,
+                                       self.logger,
+                                       SendGridDelivery(self.config, self.logger))
+        slack_messages = slack_delivery.get_to_addrs_slack_messages_map(queue_message)
+        try:
+            self.logger.info('Sending message to Slack.')
+            slack_delivery.slack_handler(queue_message, slack_messages)
+        except Exception as error:
+            self.logger.exception(error)
+
+    def _deliver_datadog_message(self, queue_message):
+        from c7n_mailer.datadog_delivery import DataDogDelivery
+        datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
+        datadog_message_packages = datadog_delivery.get_datadog_message_packages(queue_message)
+
+        try:
+            self.logger.info('Sending message to Datadog.')
+            datadog_delivery.deliver_datadog_messages(datadog_message_packages, queue_message)
+        except Exception as error:
+            self.logger.exception(error)
+
+    def _deliver_email(self, queue_message):
         try:
             sendgrid_delivery = SendGridDelivery(self.config, self.logger)
             email_messages = sendgrid_delivery.get_to_addrs_sendgrid_messages_map(queue_message)
@@ -118,10 +129,11 @@ class MailerAzureQueueProcessor(object):
                                              session=self.session,
                                              logger=self.logger)
                 for to_addrs, message in six.iteritems(email_messages):
+                    self.logger.info(
+                        'Sending message to SMTP server, {}.'.format(self.config['smtp_server']))
                     smtp_delivery.send_message(message=message, to_addrs=list(to_addrs))
             else:
+                self.logger.info('Sending message to Sendgrid.')
                 return sendgrid_delivery.sendgrid_handler(queue_message, email_messages)
-        except Exception:
-            traceback.print_exc()
-
-        return True
+        except Exception as error:
+            self.logger.exception(error)

@@ -23,11 +23,12 @@ import types
 import jwt
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
+from azure.keyvault import KeyVaultAuthentication, AccessToken
 from c7n_azure import constants
 from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
                              ManagedGroupHelper)
+from c7n_azure.utils import get_keyvault_secret
 from msrestazure.azure_active_directory import MSIAuthentication
-from azure.keyvault import KeyVaultAuthentication, AccessToken
 
 try:
     from azure.cli.core._profile import Profile
@@ -63,6 +64,15 @@ class Session(object):
         return self._auth_params
 
     def _authenticate(self):
+        keyvault_client_id = self._auth_params.get('keyvault_client_id')
+        keyvault_secret_id = self._auth_params.get('keyvault_secret_id')
+
+        # If user provided KeyVault secret, we will pull auth params information from it
+        if keyvault_secret_id:
+            self._auth_params.update(
+                json.loads(
+                    get_keyvault_secret(keyvault_client_id, keyvault_secret_id)))
+
         client_id = self._auth_params.get('client_id')
         client_secret = self._auth_params.get('client_secret')
         access_token = self._auth_params.get('access_token')
@@ -141,6 +151,8 @@ class Session(object):
                 'tenant_id': os.environ.get(constants.ENV_TENANT_ID),
                 'use_msi': bool(os.environ.get(constants.ENV_USE_MSI)),
                 'subscription_id': os.environ.get(constants.ENV_SUB_ID),
+                'keyvault_client_id': os.environ.get(constants.ENV_KEYVAULT_CLIENT_ID),
+                'keyvault_secret_id': os.environ.get(constants.ENV_KEYVAULT_SECRET_ID),
                 'enable_cli_auth': True
             }
 
