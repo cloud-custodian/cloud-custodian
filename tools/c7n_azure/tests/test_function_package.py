@@ -198,8 +198,10 @@ class FunctionPackageTest(BaseTest):
             mocks.append(self._create_patch(
                 'c7n_azure.dependency_manager.DependencyManager.' + f[0],
                 return_value=f[1]))
-        add_modules_mock = self._create_patch('c7n_azure.function_package.AzurePythonPackageArchive.add_modules')
-        mocks.append(self._create_patch('c7n_azure.function_package.AzurePythonPackageArchive.add_file'))
+        add_modules_mock = self._create_patch(
+            'c7n_azure.function_package.AzurePythonPackageArchive.add_modules')
+        mocks.append(self._create_patch(
+            'c7n_azure.function_package.AzurePythonPackageArchive.add_file'))
 
         cache_zip = os.path.join(test_files_folder, 'cache.zip')
         self.addCleanup(os.remove, cache_zip)
@@ -236,7 +238,8 @@ class FunctionPackageTest(BaseTest):
             mocks.append(self._create_patch(
                 'c7n_azure.dependency_manager.DependencyManager.' + f[0],
                 return_value=f[1]))
-        add_modules_mock = self._create_patch('c7n_azure.function_package.AzurePythonPackageArchive.add_modules')
+        add_modules_mock = self._create_patch(
+            'c7n_azure.function_package.AzurePythonPackageArchive.add_modules')
         self._create_patch('c7n_azure.function_package.AzurePythonPackageArchive.__init__')
 
         packer = FunctionPackage('test')
