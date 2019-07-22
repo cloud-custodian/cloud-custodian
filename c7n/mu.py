@@ -899,7 +899,7 @@ def zinfo(fname):
     Python's default zipfile.writestr does a 0600 perm which
     we modify here as a workaround.
     """
-    info = zipfile.ZipInfo(fname, date_time=time.localtime()[0:6])
+    info = zipfile.ZipInfo(fname)
     # Grant other users permissions to read
     # http://unix.stackexchange.com/questions/14705/
     info.external_attr = 0o644 << 16
