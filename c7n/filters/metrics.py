@@ -55,6 +55,27 @@ class MetricsFilter(Filter):
     period. ie. being stopped for an ec2 instance wouldn't lower the
     average cpu utilization.
 
+    The "missing-value" key allows a policy to specify a default
+    value when CloudWatch has no data to report:
+
+    .. code-block:: yaml
+
+      - name: elb-low-request-count
+        resource: elb
+        filters:
+          - type: metrics
+            name: RequestCount
+            statistics: Sum
+            days: 7
+            value: 7
+            missing-value: 0
+            op: less-than
+
+    This policy matches any ELB with fewer than 7 requests for the past week.
+    ELBs with no requests during that time will have an empty set of metrics.
+    Rather than skipping those resources, "missing-value: 0" causes the
+    policy to treat their request counts as 0.
+
     Note the default statistic for metrics is Average.
     """
 
@@ -72,6 +93,7 @@ class MetricsFilter(Filter):
            'period': {'type': 'number'},
            'attr-multiplier': {'type': 'number'},
            'percent-attr': {'type': 'string'},
+           'missing-value': {'type': 'number'},
            'required': ('value', 'name')})
     schema_alias = True
     permissions = ("cloudwatch:GetMetricStatistics",)
@@ -174,8 +196,20 @@ class MetricsFilter(Filter):
                     EndTime=self.end,
                     Period=self.period,
                     Dimensions=dimensions)['Datapoints']
+
+            # In certain cases CloudWatch reports no data for a metric.
+            # If the policy specifies a fill value for missing data, add
+            # that here before testing for matches. Otherwise, skip
+            # matching entirely.
             if len(collected_metrics[key]) == 0:
-                continue
+                if 'missing-value' not in self.data:
+                    continue
+                collected_metrics[key].append({
+                    'Timestamp': self.start,
+                    self.statistics: self.data['missing-value'],
+                    'c7n:detail': 'Fill value for missing data'
+                })
+
             if self.data.get('percent-attr'):
                 rvalue = r[self.data.get('percent-attr')]
                 if self.data.get('attr-multiplier'):

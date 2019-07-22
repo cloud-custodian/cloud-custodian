@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "EbsEncryptionByDefault": true,
+        "ResponseMetadata": {
+            "RequestId": "5e2673f2-005f-48ce-95d1-0849a84d4ddf",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "accept-encoding",
+                "date": "Wed, 10 Jul 2019 11:05:15 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

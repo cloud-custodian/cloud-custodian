@@ -1,18 +1,35 @@
+# Copyright 2019 Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import datetime
 import logging
+from abc import abstractmethod
 from email.utils import parseaddr
 
 import jmespath
 from c7n_azure import constants
+from c7n_azure.actions.base import AzureBaseAction, AzureEventAction
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import StringUtils
 from dateutil import tz as tzutils
-from c7n_azure.actions.base import AzureBaseAction, AzureEventAction
+from msrest import Deserializer
 
 from c7n import utils
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import Time
+from c7n.utils import type_schema
 
 
 class Tag(AzureBaseAction):
@@ -104,7 +121,113 @@ class RemoveTag(AzureBaseAction):
         TagHelper.remove_tags(self, resource, self.tags_to_delete)
 
 
-class AutoTagUser(AzureEventAction):
+class AutoTagBase(AzureEventAction):
+
+    default_value = "Unknown"
+    query_select = "eventTimestamp, operationName"
+    max_query_days = 90
+
+    schema = utils.type_schema(
+        'auto-tag-base',
+        required=['tag'],
+        **{'update': {'type': 'boolean'},
+           'tag': {'type': 'string'},
+           'days': {'type': 'integer'}})
+    schema_alias = True
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(AutoTagBase, self).__init__(data, manager, log_dir)
+
+    @abstractmethod
+    def _get_tag_value_from_event(self, event):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def _get_tag_value_from_resource(self, resource):
+        raise NotImplementedError()
+
+    def validate(self):
+
+        if self.manager.data.get('mode', {}).get('type') == 'azure-event-grid' \
+                and self.data.get('days') is not None:
+            raise PolicyValidationError(
+                "Auto tag actions in event mode does not use days.")
+
+        if (self.data.get('days') is not None and
+                (self.data.get('days') < 1 or self.data.get('days') > 90)):
+            raise FilterValidationError("Days must be between 1 and 90")
+
+        return self
+
+    def _prepare_processing(self):
+        self.session = self.manager.get_session()
+        self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        self.tag_key = self.data['tag']
+        self.should_update = self.data.get('update', False)
+
+    def _process_resource(self, resource, event):
+        # if the auto-tag-user policy set update to False (or it's unset) then we
+        # will skip writing their UserName tag and not overwrite pre-existing values
+        if not self.should_update and resource.get('tags', {}).get(self.tag_key, None):
+            return
+
+        tag_value = self.default_value
+        if event:
+            tag_value = self._get_tag_value_from_event(event) or tag_value
+        else:
+            tag_value = self._get_tag_value_from_resource(resource) or tag_value
+
+        TagHelper.add_tags(self, resource, {self.tag_key: tag_value})
+
+    def _get_first_event(self, resource):
+
+        if 'c7n:first_iam_event' in resource:
+            return resource['c7n:first_iam_event']
+
+        # Makes patching this easier
+        from c7n_azure.utils import utcnow
+
+        # Calculate start time
+        delta_days = self.data.get('days', self.max_query_days)
+        start_time = utcnow() - datetime.timedelta(days=delta_days)
+
+        # resource group type
+        if self.manager.type == 'resourcegroup':
+            resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
+            query_filter = " and ".join([
+                "eventTimestamp ge '%s'" % start_time,
+                "resourceGroupName eq '%s'" % resource['name'],
+                "eventChannels eq 'Operation'",
+                "resourceType eq '%s'" % resource_type
+            ])
+        # other Azure resources
+        else:
+            resource_type = resource['type']
+            query_filter = " and ".join([
+                "eventTimestamp ge '%s'" % start_time,
+                "resourceUri eq '%s'" % resource['id'],
+                "eventChannels eq 'Operation'",
+                "resourceType eq '%s'" % resource_type
+            ])
+
+        # fetch activity logs
+        logs = self.client.activity_logs.list(
+            filter=query_filter,
+            select=self.query_select
+        )
+
+        # get the user who issued the first operation
+        operation_name = "%s/write" % resource_type
+        first_event = None
+        for l in logs:
+            if l.operation_name.value and l.operation_name.value.lower() == operation_name.lower():
+                first_event = l
+
+        resource['c7n:first_iam_event'] = first_event
+        return first_event
+
+
+class AutoTagUser(AutoTagBase):
     """Attempts to tag a resource with the first user who created/modified it.
 
     :example:
@@ -128,9 +251,8 @@ class AutoTagUser(AzureEventAction):
     Note: activity logs are only held for the last 90 days.
 
     """
-    default_user = "Unknown"
-    query_select = "eventTimestamp, operationName, caller"
-    max_query_days = 90
+
+    schema = type_schema('auto-tag-user', rinherit=AutoTagBase.schema)
 
     # compiled JMES paths
     service_admin_jmes_path = jmespath.compile(constants.EVENT_GRID_SERVICE_ADMIN_JMES_PATH)
@@ -139,56 +261,11 @@ class AutoTagUser(AzureEventAction):
     principal_role_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_ROLE_JMES_PATH)
     principal_type_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH)
 
-    schema = utils.type_schema(
-        'auto-tag-user',
-        required=['tag'],
-        **{'update': {'type': 'boolean'},
-           'tag': {'type': 'string'},
-           'days': {'type': 'integer'}})
-    schema_alias = True
-
     def __init__(self, data=None, manager=None, log_dir=None):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
         self.log = logging.getLogger('custodian.azure.actions.auto-tag-user')
 
-    def validate(self):
-
-        if self.manager.action_registry.get('tag') is None:
-            raise FilterValidationError("Resource does not support tagging")
-
-        if self.manager.data.get('mode', {}).get('type') == 'azure-event-grid' \
-                and self.data.get('days') is not None:
-            raise PolicyValidationError(
-                "Auto tag user in event mode does not use days.")
-
-        if (self.data.get('days') is not None and
-                (self.data.get('days') < 1 or self.data.get('days') > 90)):
-            raise FilterValidationError("Days must be between 1 and 90")
-
-        return self
-
-    def _prepare_processing(self):
-        self.session = self.manager.get_session()
-        self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
-        self.tag_key = self.data['tag']
-        self.should_update = self.data.get('update', False)
-
-    def _process_resource(self, resource, event):
-        # if the auto-tag-user policy set update to False (or it's unset) then we
-        # will skip writing their UserName tag and not overwrite pre-existing values
-        if not self.should_update and resource.get('tags', {}).get(self.tag_key, None):
-            return
-
-        user = self.default_user
-        if event:
-            user = self._get_user_from_event(event) or user
-        else:
-            user = self._get_user_from_resource_logs(resource) or user
-
-        # issue tag action to label user
-        TagHelper.add_tags(self, resource, {self.tag_key: user})
-
-    def _get_user_from_event(self, event):
+    def _get_tag_value_from_event(self, event):
         principal_role = self.principal_role_jmes_path.search(event)
         principal_type = self.principal_type_jmes_path.search(event)
         user = None
@@ -224,50 +301,66 @@ class AutoTagUser(AzureEventAction):
         else:
             return False
 
-    def _get_user_from_resource_logs(self, resource):
-        # Makes patching this easier
-        from c7n_azure.utils import utcnow
-
-        # Calculate start time
-        delta_days = self.data.get('days', self.max_query_days)
-        start_time = utcnow() - datetime.timedelta(days=delta_days)
-
-        # resource group type
-        if self.manager.type == 'resourcegroup':
-            resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
-            query_filter = " and ".join([
-                "eventTimestamp ge '%s'" % start_time,
-                "resourceGroupName eq '%s'" % resource['name'],
-                "eventChannels eq 'Operation'"
-            ])
-        # other Azure resources
-        else:
-            resource_type = resource['type']
-            query_filter = " and ".join([
-                "eventTimestamp ge '%s'" % start_time,
-                "resourceUri eq '%s'" % resource['id'],
-                "eventChannels eq 'Operation'"
-            ])
-
-        # fetch activity logs
-        logs = self.client.activity_logs.list(
-            filter=query_filter,
-            select=self.query_select
-        )
-
-        # get the user who issued the first operation
-        operation_name = "%s/write" % resource_type
-        first_op = self.get_first_operation(logs, operation_name)
+    def _get_tag_value_from_resource(self, resource):
+        first_op = self._get_first_event(resource)
         return first_op.caller if first_op else None
 
-    @staticmethod
-    def get_first_operation(logs, operation_name):
-        first_operation = None
-        for l in logs:
-            if l.operation_name.value and l.operation_name.value.lower() == operation_name.lower():
-                first_operation = l
 
-        return first_operation
+class AutoTagDate(AutoTagBase):
+    """
+    Attempts to tag a resource with the date when resource was created.
+
+    This action searches from the earliest 'write' operation's caller
+    in the activity logs for a particular resource.
+
+    Note: activity logs are only held for the last 90 days.
+
+    :example:
+
+    This policy will tag all existing resource groups with the 'CreatedDate' tag
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-auto-tag-created-date
+            resource: azure.resourcegroup
+            description: |
+              Tag all existing resource groups with the 'CreatedDate' tag
+            actions:
+              - type: auto-tag-date
+                tag: CreatedDate
+                format: "%m-%d-%Y"
+
+    """
+
+    schema = type_schema('auto-tag-date', rinherit=AutoTagBase.schema,
+                         **{'format': {'type': 'string'}})
+
+    event_time_path = jmespath.compile(constants.EVENT_GRID_EVENT_TIME_PATH)
+
+    def __init__(self, data=None, manager=None, log_dir=None):
+        super(AutoTagDate, self).__init__(data, manager, log_dir)
+        self.log = logging.getLogger('custodian.azure.actions.auto-tag-date')
+        self.format = self.data.get('format', '%m.%d.%Y')
+
+    def validate(self):
+        super(AutoTagDate, self).validate()
+        try:
+            datetime.datetime.now().strftime(self.format)
+        except Exception:
+            raise FilterValidationError("'%s' string has invalid datetime format." % self.format)
+
+    def _get_tag_value_from_event(self, event):
+        event_time = Deserializer.deserialize_iso(self.event_time_path.search(event))
+        return event_time.strftime(self.format)
+
+    def _get_tag_value_from_resource(self, resource):
+        first_op = self._get_first_event(resource)
+
+        if not first_op:
+            return None
+
+        return first_op.event_timestamp.strftime(self.format)
 
 
 class TagTrim(AzureBaseAction):
@@ -415,14 +508,14 @@ class TagDelayedAction(AzureBaseAction):
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
-            raise PolicyValidationError(
+            raise FilterValidationError(
                 "mark-for-op specifies invalid op:%s in %s" % (
                     op, self.manager.data))
 
         self.tz = tzutils.gettz(
             Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
-            raise PolicyValidationError(
+            raise FilterValidationError(
                 "Invalid timezone specified %s in %s" % (
                     self.tz, self.manager.data))
         return self

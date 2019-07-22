@@ -83,6 +83,9 @@ class Webhook(EventAction):
         self.query_params = self.data.get('query-params', {})
         self.headers = self.data.get('headers', {})
         self.method = self.data.get('method', 'POST')
+        self.lookup_data = None
+
+    def process(self, resources, event=None):
         self.lookup_data = {
             'account_id': self.manager.config.account_id,
             'region': self.manager.config.region,
@@ -91,7 +94,6 @@ class Webhook(EventAction):
             'policy': self.manager.data
         }
 
-    def process(self, resources, event=None):
         self.http = urllib3.PoolManager(
             cert_reqs='CERT_REQUIRED',
             ca_certs=certifi and certifi.where() or None)

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import time
 
 from gcp_common import BaseTest, event_data
 
@@ -126,6 +127,31 @@ class RouterTest(BaseTest):
 
         self.assertEqual(len(routers), 1)
         self.assertEqual(routers[0]['bgp']['asn'], 65001)
+
+    def test_router_delete(self):
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('router-delete', project_id=project_id)
+
+        p = self.load_policy(
+            {'name': 'delete-router',
+             'resource': 'gcp.router',
+             'filters': [{'name': 'test-router'}],
+             'actions': ['delete']},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(5)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'region': 'us-central1',
+                     'filter': 'name = test-router'})
+
+        self.assertEqual(result.get('items', []), [])
 
 
 class RouteTest(BaseTest):

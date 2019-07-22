@@ -15,16 +15,17 @@
 import six
 from c7n_azure.actions.delete import DeleteAction
 from c7n_azure.actions.lock import LockAction
+from c7n_azure.actions.tagging import (AutoTagDate)
 from c7n_azure.actions.tagging import Tag, AutoTagUser, RemoveTag, TagTrim, TagDelayedAction
 from c7n_azure.filters import (CostFilter, MetricFilter, TagActionFilter,
-                               DiagnosticSettingsFilter, PolicyCompliantFilter, ResourceLockFilter)
+                               DiagnosticSettingsFilter, PolicyCompliantFilter, ResourceLockFilter,
+                               AzureOffHour, AzureOnHour)
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta, ChildResourceManager, TypeInfo, \
     ChildTypeInfo, TypeMeta
 from c7n_azure.utils import ResourceIdParser
 
 from c7n.utils import local_session
-
 
 arm_resource_types = {}
 
@@ -96,6 +97,7 @@ class ArmResourceManager(QueryResourceManager):
                     klass.action_registry.register('tag', Tag)
                     klass.action_registry.register('untag', RemoveTag)
                     klass.action_registry.register('auto-tag-user', AutoTagUser)
+                    klass.action_registry.register('auto-tag-date', AutoTagDate)
                     klass.action_registry.register('tag-trim', TagTrim)
                     klass.filter_registry.register('marked-for-op', TagActionFilter)
                     klass.action_registry.register('mark-for-op', TagDelayedAction)
@@ -104,8 +106,9 @@ class ArmResourceManager(QueryResourceManager):
                 klass.filter_registry.register('metric', MetricFilter)
                 klass.filter_registry.register('policy-compliant', PolicyCompliantFilter)
                 klass.filter_registry.register('resource-lock', ResourceLockFilter)
-
                 klass.action_registry.register('lock', LockAction)
+                klass.filter_registry.register('offhour', AzureOffHour)
+                klass.filter_registry.register('onhour', AzureOnHour)
 
                 if resource != 'resourcegroup':
                     klass.action_registry.register('delete', DeleteAction)

@@ -172,6 +172,3 @@ class DeploymentUnitsTest(BaseTest):
         site_config = wc.web_apps.get_configuration(self.rg_name, func_app_name)
         self.assertTrue(site_config.always_on)
         self.assertEqual(site_config.linux_fx_version, FUNCTION_DOCKER_VERSION)
-
-        app_settings = wc.web_apps.list_application_settings(self.rg_name, func_app_name)
-        self.assertIsNotNone(app_settings.properties['MACHINEKEY_DecryptionKey'])

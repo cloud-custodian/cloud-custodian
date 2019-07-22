@@ -19,7 +19,8 @@ from c7n_gcp.provider import resources
 
 @resources.register('bq-dataset')
 class DataSet(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets
+    """
     class resource_type(TypeInfo):
         service = 'bigquery'
         version = 'v2'
@@ -57,7 +58,8 @@ class DataSet(QueryResourceManager):
 
 @resources.register('bq-job')
 class BigQueryJob(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs
+    """
     class resource_type(TypeInfo):
         service = 'bigquery'
         version = 'v2'
@@ -80,7 +82,8 @@ class BigQueryJob(QueryResourceManager):
 
 @resources.register('bq-project')
 class BigQueryProject(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/projects
+    """
     class resource_type(TypeInfo):
         service = 'bigquery'
         version = 'v2'
@@ -92,6 +95,8 @@ class BigQueryProject(QueryResourceManager):
 
 @resources.register('bq-table')
 class BigQueryTable(ChildResourceManager):
+    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/tables
+    """
 
     class resource_type(ChildTypeInfo):
         service = 'bigquery'
