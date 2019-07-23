@@ -37,13 +37,12 @@ class AzurePythonPackageArchive(PythonPackageArchive):
         super(AzurePythonPackageArchive, self).__init__(modules, cache_file)
         self.package_time = time.gmtime()
 
-    def create_zinfo(self, fname):
+    def create_zinfo(self, file):
         """
         In Dedicated App Service Plans - Functions are updated via KuduSync
         The KuduSync uses the modified time and file size to determine if a file has changed
         """
-        info = super(AzurePythonPackageArchive, self).create_zinfo(fname)
-
+        info = super(AzurePythonPackageArchive, self).create_zinfo(file)
         info.date_time = self.package_time[0:6]
         return info
 

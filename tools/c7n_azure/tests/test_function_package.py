@@ -100,6 +100,27 @@ class FunctionPackageTest(BaseTest):
         self.assertEqual('test.txt', zinfo.filename)
         self.assertEqual(t[0:6], zinfo.date_time)
 
+    def test_zipped_files_with_zip_cache_unmodified_cache_timestamps(self):
+        cache_ts = time.gmtime(1577000000)
+        cache = AzurePythonPackageArchive()
+        cache.package_time = cache_ts
+        cache.add_contents('cache.txt', 'I am a cache file')
+        cache.close()
+
+        new_ts = time.gmtime(1577854800)
+        package = AzurePythonPackageArchive(cache_file=cache.path)
+        package.package_time = new_ts
+        package.add_contents('new.txt', 'I am a new file')
+        package.close()
+
+        cache_file = package._zip_file.infolist()[0]
+        self.assertEqual('cache.txt', cache_file.filename)
+        self.assertEqual(cache_ts[0:6], cache_file.date_time)
+
+        new_file = package._zip_file.infolist()[1]
+        self.assertEqual('new.txt', new_file.filename)
+        self.assertEqual(new_ts[0:6], new_file.date_time)
+
     @patch("c7n_azure.session.Session.get_functions_auth_string", return_value="")
     def test_event_package_files(self, session_mock):
         p = self.load_policy({
