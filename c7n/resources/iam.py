@@ -797,7 +797,7 @@ class SetPolicy(BaseAction):
     def validate(self):
         if self.data.get('state') == 'attached' and self.data.get('arn') == "*":
             raise PolicyValidationError(
-                'State should be detached when arn is * on %s' % (self.manager.data))
+                '* operator is not supported for state: attached on %s' % (self.manager.data))
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
@@ -808,7 +808,7 @@ class SetPolicy(BaseAction):
                 client.attach_role_policy(
                     RoleName=r['RoleName'],
                     PolicyArn=policy_arn)
-            elif state == 'detached' and not policy_arn == "*":
+            elif state == 'detached' and policy_arn != "*":
                 try:
                     client.detach_role_policy(
                         RoleName=r['RoleName'],
