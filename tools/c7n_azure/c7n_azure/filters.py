@@ -17,6 +17,7 @@ from concurrent.futures import as_completed
 from datetime import timedelta
 
 import six
+from netaddr import AddrFormatError
 from azure.mgmt.costmanagement.models import QueryDefinition, QueryDataset, \
     QueryAggregation, QueryGrouping, QueryTimePeriod, TimeframeType
 from azure.mgmt.policyinsights import PolicyInsightsClient
@@ -496,18 +497,32 @@ class FirewallRulesFilter(Filter):
                             - 10.20.20.0/24
     """
 
-    schema = type_schema(
-        'firewall-rules',
-        **{
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['firewall-rules']},
             'include': {'type': 'array', 'items': {'type': 'string'}},
+            'any': {'type': 'array', 'items': {'type': 'string'}},
+            'only': {'type': 'array', 'items': {'type': 'string'}},
             'equal': {'type': 'array', 'items': {'type': 'string'}}
-        })
+        },
+        'oneOf': [
+            {"required": ["type", "include"]},
+            {"required": ["type", "any"]},
+            {"required": ["type", "only"]},
+            {"required": ["type", "equal"]}
+        ]
+    }
+
     schema_alias = True
 
     def __init__(self, data, manager=None):
         super(FirewallRulesFilter, self).__init__(data, manager)
         self.policy_include = None
         self.policy_equal = None
+        self.policy_any = None
+        self.policy_only = None
 
     @property
     @abstractmethod
@@ -515,21 +530,21 @@ class FirewallRulesFilter(Filter):
         raise NotImplementedError()
 
     def validate(self):
-        self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
-        self.policy_equal = IpRangeHelper.parse_ip_ranges(self.data, 'equal')
-
-        has_include = self.policy_include is not None
-        has_equal = self.policy_equal is not None
-
-        if has_include and has_equal:
-            raise FilterValidationError('Cannot have both include and equal.')
-
-        if not has_include and not has_equal:
-            raise FilterValidationError('Must have either include or equal.')
-
-        return True
+        try:
+            IpRangeHelper.parse_ip_ranges(self.data, 'include')
+            IpRangeHelper.parse_ip_ranges(self.data, 'equal')
+            IpRangeHelper.parse_ip_ranges(self.data, 'any')
+            IpRangeHelper.parse_ip_ranges(self.data, 'only')
+        except AddrFormatError as e:
+            raise PolicyValidationError("Invalid IP range found. %s" % e)
+        return self
 
     def process(self, resources, event=None):
+        self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
+        self.policy_equal = IpRangeHelper.parse_ip_ranges(self.data, 'equal')
+        self.policy_any = IpRangeHelper.parse_ip_ranges(self.data, 'any')
+        self.policy_only = IpRangeHelper.parse_ip_ranges(self.data, 'only')
+
         result, _ = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
@@ -560,8 +575,15 @@ class FirewallRulesFilter(Filter):
     def _check_rules(self, resource_rules):
         if self.policy_equal is not None:
             return self.policy_equal == resource_rules
+
         elif self.policy_include is not None:
             return self.policy_include.issubset(resource_rules)
+
+        elif self.policy_any is not None:
+            return not self.policy_any.isdisjoint(resource_rules)
+
+        elif self.policy_only is not None:
+            return resource_rules.issubset(self.policy_only)
         else:  # validated earlier, can never happen
             raise FilterValidationError("Internal error.")
 

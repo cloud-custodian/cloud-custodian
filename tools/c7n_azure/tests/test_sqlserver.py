@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import datetime
 
-from azure_common import BaseTest
+from azure_common import BaseTest, cassette_name
 
 
 class SqlServerTest(BaseTest):
@@ -112,6 +112,7 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @cassette_name('firewall')
     def test_firewall_rules_include_range(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
@@ -128,6 +129,7 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    @cassette_name('firewall')
     def test_firewall_rules_not_include_all_ranges(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
@@ -144,6 +146,7 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(0, len(resources))
 
+    @cassette_name('firewall')
     def test_firewall_rules_include_cidr(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
@@ -160,6 +163,7 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    @cassette_name('firewall')
     def test_firewall_rules_not_include_cidr(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
@@ -176,6 +180,7 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(0, len(resources))
 
+    @cassette_name('firewall')
     def test_firewall_rules_equal(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
@@ -192,6 +197,7 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    @cassette_name('firewall')
     def test_firewall_rules_not_equal(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
