@@ -110,7 +110,7 @@ class FunctionAppUtilities(object):
     def validate_function_name(function_name):
         if (function_name is None or len(function_name) > 60 or len(function_name) < 1):
             raise ValueError('Function name must be between 1-60 characters. Given name: "' +
-                str(function_name) + '"')
+                             str(function_name) + '"')
 
     @staticmethod
     def get_function_name(policy_name, suffix):

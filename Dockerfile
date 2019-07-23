@@ -10,16 +10,23 @@ LABEL name="custodian" \
 # to minimize size
 ADD setup.py README.md requirements.txt /src/
 ADD c7n /src/c7n/
-ADD tools /src/tools/
+ADD tools/c7n_gcp /src/tools/c7n_gcp
+ADD tools/c7n_azure /src/tools/c7n_azure
 
 WORKDIR /src
 
 RUN adduser --disabled-login custodian
-RUN apt-get --yes update && apt-get --yes upgrade \
- && apt-get --yes install build-essential \
+RUN apt-get --yes update \
+ && apt-get --yes install build-essential --no-install-recommends \
  && pip3 install -r requirements.txt  . \
  && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
  && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
+ # Pre-cache Azure Functions package
+ && python -c "from c7n_azure.function_package import FunctionPackage; \
+      FunctionPackage('cache').build_cache( \
+      modules=['c7n', 'c7n-azure', 'applicationinsights'], \
+      non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'pyrsistent'], \
+      excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])" \
  && apt-get --yes remove build-essential \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
  && rm -Rf /var/cache/apt/ \
@@ -28,7 +35,6 @@ RUN apt-get --yes update && apt-get --yes upgrade \
  && rm -Rf /root/.cache/ \
  && mkdir /output \
  && chown custodian: /output
-
 
 USER custodian
 WORKDIR /home/custodian

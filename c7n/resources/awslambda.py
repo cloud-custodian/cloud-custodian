@@ -21,7 +21,7 @@ from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
 from concurrent.futures import as_completed
 
-from c7n.actions import BaseAction, RemovePolicyBase
+from c7n.actions import BaseAction, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -392,6 +392,26 @@ class Delete(BaseAction):
                     continue
                 raise
         self.log.debug("Deleted %d functions", len(functions))
+
+
+@AWSLambda.action_registry.register('modify-security-groups')
+class LambdaModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+
+    permissions = ("lambda:UpdateFunctionConfiguration",)
+
+    def process(self, functions):
+        client = local_session(self.manager.session_factory).client('lambda')
+        groups = super(LambdaModifyVpcSecurityGroups, self).get_groups(
+            functions)
+
+        for idx, i in enumerate(functions):
+            if 'VpcConfig' not in i:  # only continue if Lambda func is VPC-enabled
+                continue
+            try:
+                client.update_function_configuration(FunctionName=i['FunctionName'],
+                                            VpcConfig={'SecurityGroupIds': groups[idx]})
+            except client.exceptions.ResourceNotFoundException:
+                continue
 
 
 @resources.register('lambda-layer')

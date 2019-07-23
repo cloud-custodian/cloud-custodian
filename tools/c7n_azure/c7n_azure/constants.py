@@ -1,8 +1,22 @@
+# Copyright 2019 Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """
 Azure Functions
 """
 # Docker version from https://hub.docker.com/r/microsoft/azure-functions/
-FUNCTION_DOCKER_VERSION = 'DOCKER|mcr.microsoft.com/azure-functions/python:latest'
+FUNCTION_DOCKER_VERSION = 'DOCKER|mcr.microsoft.com/azure-functions/python:2.0-python3.6-appservice'
 FUNCTION_EXT_VERSION = '~2'
 FUNCTION_EVENT_TRIGGER_MODE = 'azure-event-grid'
 FUNCTION_TIME_TRIGGER_MODE = 'azure-periodic'
@@ -21,6 +35,7 @@ EVENT_GRID_SERVICE_ADMIN_JMES_PATH = \
     'data.claims."http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"'
 EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH = 'data.authorization.evidence.principalType'
 EVENT_GRID_PRINCIPAL_ROLE_JMES_PATH = 'data.authorization.evidence.role'
+EVENT_GRID_EVENT_TIME_PATH = 'eventTime'
 
 """
 Environment Variables
@@ -29,6 +44,9 @@ ENV_TENANT_ID = 'AZURE_TENANT_ID'
 ENV_CLIENT_ID = 'AZURE_CLIENT_ID'
 ENV_SUB_ID = 'AZURE_SUBSCRIPTION_ID'
 ENV_CLIENT_SECRET = 'AZURE_CLIENT_SECRET'
+
+ENV_KEYVAULT_CLIENT_ID = 'AZURE_KEYVAULT_CLIENT_ID'
+ENV_KEYVAULT_SECRET_ID = 'AZURE_KEYVAULT_SECRET'
 
 ENV_ACCESS_TOKEN = 'AZURE_ACCESS_TOKEN'
 

@@ -666,7 +666,7 @@ class SGUsage(Filter):
 
     def get_permissions(self):
         return list(itertools.chain(
-            [self.manager.get_resource_manager(m).get_permissions()
+            *[self.manager.get_resource_manager(m).get_permissions()
              for m in
              ['lambda', 'eni', 'launch-config', 'security-group']]))
 

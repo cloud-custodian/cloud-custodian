@@ -176,10 +176,7 @@ class FunctionPackageTest(BaseTest):
 
     @patch('c7n_azure.function_package.FunctionPackage._add_functions_required_files')
     @patch('shutil.rmtree')
-    @patch('c7n_azure.function_package.FunctionPackage.cache_folder',
-           new_callable=PropertyMock,
-           return_value=test_files_folder)
-    def test_package_build_no_cache(self, _1, rmtree_mock, add_files_mock):
+    def test_package_build_no_cache(self, rmtree_mock, add_files_mock):
         functions = [('check_cache', False),
                      ('prepare_non_binary_wheels', None),
                      ('download_wheels', None),
@@ -196,7 +193,7 @@ class FunctionPackageTest(BaseTest):
         cache_zip = os.path.join(test_files_folder, 'cache.zip')
         self.addCleanup(os.remove, cache_zip)
 
-        packer = FunctionPackage('test')
+        packer = FunctionPackage('test', cache_override_path=test_files_folder)
         packer.build({}, [], [], [], 'queue')
 
         for m in mocks:

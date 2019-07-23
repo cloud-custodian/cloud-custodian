@@ -100,6 +100,10 @@ class SlackDelivery(object):
                     continue
 
                 resolved_addrs = result['Value']
+
+                if not resolved_addrs.startswith("#"):
+                    resolved_addrs = "#" + resolved_addrs
+
                 slack_messages[resolved_addrs] = get_rendered_jinja(
                     resolved_addrs, sqs_message,
                     resource_list,
