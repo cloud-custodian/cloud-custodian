@@ -245,7 +245,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
     @staticmethod
     def _replace_subscription_id(s):
-        prefixes = ['(/|%2F)subscriptions(/|%2F)',
+        prefixes = ['(/|%2F)?subscriptions(/|%2F)',
                     '"subscription":\\s*"']
         regex = r"(?P<prefix>(%s))" \
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
@@ -329,6 +329,11 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                                            return_value=DEFAULT_TENANT_ID)
                 self._tenant_patch.start()
                 self.addCleanup(self._tenant_patch.stop)
+
+            self._subscription_patch = patch('c7n_azure.session.Session.get_subscription_id',
+                                             return_value=DEFAULT_SUBSCRIPTION_ID)
+            self._subscription_patch.start()
+            self.addCleanup(self._subscription_patch.stop)
 
     def get_test_date(self, tz=None):
         header_date = self.cassette.responses[0]['headers'].get('date') \
