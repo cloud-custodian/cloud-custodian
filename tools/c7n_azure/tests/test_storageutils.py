@@ -13,11 +13,13 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from azure.common import AzureHttpError
+from azure.mgmt.storage.models import StorageAccountListKeysResult, StorageAccountKey
+from azure.storage.common import TokenCredential
 from azure_common import BaseTest, arm_template, requires_arm_polling
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser
-from azure.mgmt.storage.models import StorageAccountListKeysResult, StorageAccountKey
 from mock import patch
 
 from c7n.utils import local_session
@@ -58,6 +60,32 @@ class StorageUtilsTest(BaseTest):
         queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(url, self.session)
         self.assertIsNotNone(queue_service)
         self.assertEqual(queue_name, "testcc")
+
+    def test_get_queue_client_expired_token(self):
+        """
+        Exception handler should deal with a bad token by clearing
+        cache and retrying.  So if we provide a bad token followed
+        by a real one in our mock, we expect it to end up getting
+        the real token.
+        """
+        real_token = StorageUtilities.get_storage_token(self.session)
+
+        with patch('c7n_azure.storage_utils.QueueService.create_queue') as create_mock:
+            with patch('c7n_azure.storage_utils.StorageUtilities.get_storage_token') as token_mock:
+                error = AzureHttpError('', 403)
+                error.error_code = 'AuthenticationFailed'
+
+                # Two side effects: one with a bad token and an error,
+                # and one with a good token and no error
+                create_mock.side_effect = [error, None]
+                token_mock.side_effect = [TokenCredential('fake'), real_token]
+
+                url = "https://fake.queue.core.windows.net/testcc"
+                queue_service, queue_name = \
+                    StorageUtilities.get_queue_client_by_uri(url, self.session)
+
+                # We end up with the real token (after a retry)
+                self.assertEqual(real_token, queue_service.authentication)
 
     @arm_template('storage.json')
     def test_create_delete_queue_from_storage_account(self):

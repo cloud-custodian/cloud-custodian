@@ -1,4 +1,4 @@
-# Copyright 2015-2018 Capital One Services, LLC
+# Copyright 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@ from mock import patch, Mock
 
 
 class ContainerHostTest(BaseTest):
-    def setUp(self):
-        super(ContainerHostTest, self).setUp()
-
     def test_build_options(self):
         with patch.dict(os.environ, {
             constants.ENV_CONTAINER_OPTION_OUTPUT_DIR: '/test/dir',
@@ -48,11 +45,12 @@ class ContainerHostTest(BaseTest):
         self.assertEqual('test_path', result['output_dir'])
         self.assertEqual(None, result['metrics'])
 
+    @patch('c7n_azure.container_host.host.Host.has_required_params', return_value=True)
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('tempfile.mkdtemp', return_value='test_path')
-    def test_init(self, _1, _2, _3, _4):
+    def test_init(self, _1, _2, _3, _4, _5):
         host = Host()
         jobs = host.scheduler.get_jobs()
         update_policy_job = [j for j in jobs if j.id == 'update_policies']
@@ -63,11 +61,12 @@ class ContainerHostTest(BaseTest):
         self.assertIsNotNone(update_policy_job)
         self.assertIsNotNone(poll_queue_job)
 
+    @patch('c7n_azure.container_host.host.Host.has_required_params', return_value=True)
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
-    def test_update_policies(self, get_blob_client_mock, _1, _2, _3):
+    def test_update_policies(self, get_blob_client_mock, _1, _2, _3, _4):
         # mock blob list call
         client_mock = Mock()
         client_mock.list_blobs.return_value = [
@@ -82,6 +81,9 @@ class ContainerHostTest(BaseTest):
         # init
         host = Host()
 
+        # cleanup
+        self.addCleanup(lambda: shutil.rmtree(host.policy_cache))
+
         self.assertEqual({}, host.policies)
 
         # run
@@ -95,14 +97,12 @@ class ContainerHostTest(BaseTest):
         self.assertEqual(1, len([j for j in jobs if j.id == 'blob1.yml']))
         self.assertEqual(1, len([j for j in jobs if j.id == 'blob2.YML']))
 
-        # cleanup
-        shutil.rmtree(host.policy_cache)
-
+    @patch('c7n_azure.container_host.host.Host.has_required_params', return_value=True)
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
-    def test_update_policies_add_remove(self, get_blob_client_mock, _1, _2, _3):
+    def test_update_policies_add_remove(self, get_blob_client_mock, _1, _2, _3, _4):
         """
         Run a series of add/update/removal of policy blobs
         and verify jobs and caches are updated correctly
@@ -185,13 +185,14 @@ class ContainerHostTest(BaseTest):
         # cleanup
         shutil.rmtree(host.policy_cache)
 
+    @patch('c7n_azure.container_host.host.Host.has_required_params', return_value=True)
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('c7n_azure.container_host.host.Host.update_policies')
     @patch('c7n_azure.container_host.host.AzureEventSubscription')
     @patch('c7n_azure.container_host.host.StringInAdvancedFilter')
-    def test_update_event_subscriptions(self, event_filter_mock, _0, _1, _2, _3, _4):
+    def test_update_event_subscriptions(self, event_filter_mock, _0, _1, _2, _3, _4, _5):
         host = Host()
 
         host.event_queue_name = 'testq'
@@ -236,14 +237,12 @@ class ContainerHostTest(BaseTest):
             'Microsoft.Network/virtualNetworks/write',
             'Microsoft.Resources/subscriptions/resourceGroups/write'})
 
+    @patch('c7n_azure.container_host.host.Host.has_required_params', return_value=True)
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage')
     @patch('c7n_azure.container_host.host.Host.run_policies_for_event')
-    def test_poll_queue(self, run_policy_mock, storage_mock, _1, _2):
-        client_mock = Mock()
-        storage_mock.get_queue_client_by_storage_account.return_value = client_mock
-
+    def test_poll_queue(self, run_policy_mock, storage_mock, _1, _2, _3):
         host = Host()
 
         host.policies = {
@@ -279,22 +278,36 @@ class ContainerHostTest(BaseTest):
         q2.content = q1.content
 
         # Return 2 messages on first call, then none
-        client_mock.get_messages.side_effect = [[q1, q2], []]
+        storage_mock.get_queue_messages.side_effect = [[q1, q2], []]
         host.poll_queue()
         self.assertEqual(2, run_policy_mock.call_count)
         run_policy_mock.reset_mock()
 
         # Return 5 messages on first call, then 2, then 0
-        client_mock.get_messages.side_effect = [[q1, q1, q1, q1, q1], [q1, q2], []]
+        storage_mock.get_queue_messages.side_effect = [[q1, q1, q1, q1, q1], [q1, q2], []]
         host.poll_queue()
         self.assertEqual(7, run_policy_mock.call_count)
         run_policy_mock.reset_mock()
 
         # High dequeue count
         q1.dequeue_count = 100
-        client_mock.get_messages.side_effect = [[q1, q2], []]
+        storage_mock.get_queue_messages.side_effect = [[q1, q2], []]
         host.poll_queue()
         self.assertEqual(1, run_policy_mock.call_count)
+
+    def test_has_required_params(self):
+        with patch.dict(os.environ, {
+            constants.ENV_CONTAINER_POLICY_STORAGE: 'foo',
+            constants.ENV_CONTAINER_EVENT_QUEUE_NAME: 'foo',
+            constants.ENV_CONTAINER_EVENT_QUEUE_ID: 'foo'
+        }, clear=False):
+            self.assertTrue(Host.has_required_params())
+
+        with patch.dict(os.environ, {
+            constants.ENV_CONTAINER_POLICY_STORAGE: 'foo',
+            constants.ENV_CONTAINER_EVENT_QUEUE_ID: 'foo'
+        }, clear=False):
+            self.assertFalse(Host.has_required_params())
 
     @staticmethod
     def download_policy_blob(_, name, path):

@@ -15,7 +15,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure.mgmt.storage.models import StorageAccount
 from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
-from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE
+from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
+    CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
 from mock import mock
 
@@ -67,6 +68,28 @@ class AzurePolicyModeTest(BaseTest):
                              'name': 'testschemaname'
                          }
                      }}
+            })
+            self.assertTrue(p)
+
+    def test_container_event_mode_schema_validation(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-event-mode',
+                'resource': 'azure.vm',
+                'mode':
+                    {'type': CONTAINER_EVENT_TRIGGER_MODE,
+                     'events': ['VmWrite']}
+            })
+            self.assertTrue(p)
+
+    def test_container_periodic_mode_schema_validation(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-event-mode',
+                'resource': 'azure.vm',
+                'mode':
+                    {'type': CONTAINER_TIME_TRIGGER_MODE,
+                     'schedule': '* /5 * * * *'}
             })
             self.assertTrue(p)
 

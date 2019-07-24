@@ -22,6 +22,7 @@ from datetime import datetime
 import yaml
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
+from azure.common import AzureHttpError
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
 from c7n_azure import entry, constants
@@ -50,6 +51,9 @@ class Host:
     def __init__(self):
         logging.basicConfig(level=logging.INFO, format='%(message)s')
         log.info("Running Azure Cloud Custodian Self-Host")
+
+        if not Host.has_required_params():
+            return
 
         load_resources()
         self.session = local_session(Session)
@@ -111,8 +115,14 @@ class Host:
                                                                      self.session)
         (client, container, prefix) = self.policy_blob_client
 
-        # All blobs with YAML extension
-        blobs = [b for b in client.list_blobs(container) if b.name.lower().endswith('.yml')]
+        try:
+            # All blobs with YAML extension
+            blobs = [b for b in client.list_blobs(container) if Host.has_yaml_ext(b.name)]
+        except AzureHttpError as e:
+            # If blob methods are failing don't keep
+            # a cached client
+            self.policy_blob_client = None
+            raise e
 
         # Filter to hashes we have not seen before
         new_blobs = [b for b in blobs
@@ -120,7 +130,7 @@ class Host:
 
         # Get all YAML files on disk that are no longer in blob storage
         cached_policy_files = [f for f in os.listdir(self.policy_cache)
-                               if f.lower().endswith('.yml')]
+                               if Host.has_yaml_ext(f)]
 
         removed_files = [f for f in cached_policy_files if f not in [b.name for b in blobs]]
 
@@ -160,12 +170,13 @@ class Host:
         with open(path, "r") as stream:
             try:
                 policy_config = yaml.safe_load(stream)
-
                 new_policies = PolicyCollection.from_data(policy_config, self.options)
 
                 if new_policies:
                     for p in new_policies:
                         log.info("Loading Policy %s from %s" % (p.name, path))
+
+                        p.validate()
                         policies.update({p.name: {'policy': p}})
 
                         # Update periodic and set event update flag
@@ -187,6 +198,7 @@ class Host:
                 policy_config = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
                 log.warning('Failure loading cached policy for cleanup %s %s' % (path, exc))
+                os.unlink(path)
                 return
 
         removed = [policies.pop(p['name']) for p in policy_config.get('policies', [])]
@@ -273,7 +285,8 @@ class Host:
             return
 
         while True:
-            messages = client.get_messages(
+            messages = Storage.get_queue_messages(
+                client,
                 self.event_queue_name,
                 num_messages=queue_message_count,
                 visibility_timeout=queue_timeout_seconds)
@@ -325,7 +338,6 @@ class Host:
 
     def run_policy(self, policy, event, context):
         try:
-            policy.validate()
             policy.push(event, context)
         except Exception as e:
             log.error(
@@ -349,6 +361,22 @@ class Host:
         return account
 
     @staticmethod
+    def has_required_params():
+        required = [
+            constants.ENV_CONTAINER_POLICY_STORAGE,
+            constants.ENV_CONTAINER_EVENT_QUEUE_NAME,
+            constants.ENV_CONTAINER_EVENT_QUEUE_ID
+        ]
+
+        missing = [r for r in required if os.getenv(r) is None]
+
+        if missing:
+            log.error('Missing REQUIRED environment variable(s): %s' % ', '.join(missing))
+            return False
+
+        return True
+
+    @staticmethod
     def build_options():
         """
         Accept some CLI/Execution options as environment
@@ -370,6 +398,10 @@ class Host:
         )
 
         return Azure().initialize(config)
+
+    @staticmethod
+    def has_yaml_ext(filename):
+        return filename.lower().endswith(('.yml', '.yaml'))
 
 
 if __name__ == "__main__":
