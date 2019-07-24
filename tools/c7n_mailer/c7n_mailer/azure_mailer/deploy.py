@@ -47,7 +47,7 @@ def build_function_package(config, function_name):
         cache_override_path=cache_override_path)
 
     package.build(None,
-                  modules=['c7n', 'c7n-azure', 'c7n-mailer', 'applicationinsights'],
+                  modules=['c7n', 'c7n-azure', 'c7n-mailer'],
                   non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'jmespath',
                                        'datadog', 'MarkupSafe', 'simplejson', 'pyrsistent'],
                   excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])
