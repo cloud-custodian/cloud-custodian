@@ -44,7 +44,9 @@ class DependencyManager(object):
         regex = "^[^<>~=]*"
 
         # remove the excluded packages
-        res = [t for t in res if not any(re.match(regex, t).group(0).lower() == e.lower() for e in excluded_packages + packages)]
+        res = [t for t in res if
+               not any(re.match(regex, t).group(0).lower() == e.lower()
+                       for e in excluded_packages + packages)]
 
         # boto3 is a dependency for both c7n and c7n_mailer.. Remove the duplicate from the list
         # because not all versions of pip can handle this.
