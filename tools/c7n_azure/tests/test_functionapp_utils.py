@@ -14,14 +14,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template
-from c7n_azure.function_package import FunctionPackage
+from c7n_azure.function_package import FunctionPackage, AzurePythonPackageArchive
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 
 from c7n_azure.provisioning.app_insights import AppInsightsUnit
 from mock import patch
 
 from c7n.utils import local_session
-from c7n.mu import PythonPackageArchive
 from c7n_azure.session import Session
 
 CONST_GROUP_NAME = 'test_functionapp-reqs'
@@ -159,7 +158,7 @@ class FunctionAppUtilsTest(BaseTest):
             function_app_name='cloud-custodian-test-consumption')
 
         package = FunctionPackage("TestPolicy")
-        package.pkg = PythonPackageArchive()
+        package.pkg = AzurePythonPackageArchive()
         package.close()
 
         FunctionAppUtilities.publish_functions_package(
