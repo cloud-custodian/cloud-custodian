@@ -68,12 +68,20 @@ class AzureContainerPeriodicMode(AzureContainerHostMode, PullMode):
 @execution.register(CONTAINER_EVENT_TRIGGER_MODE)
 class AzureContainerEventMode(AzureContainerHostMode):
     """A policy that runs at specified time intervals."""
-    schema = utils.type_schema(CONTAINER_TIME_TRIGGER_MODE,
-                               schedule={'type': 'string'},
+    schema = utils.type_schema(CONTAINER_EVENT_TRIGGER_MODE,
+                               events={'type': 'array', 'items': {
+                                   'oneOf': [
+                                       {'type': 'string'},
+                                       {'type': 'object',
+                                        'required': ['resourceProvider', 'event'],
+                                        'properties': {
+                                            'resourceProvider': {'type': 'string'},
+                                            'event': {'type': 'string'}}}]
+                               }},
                                rinherit=AzureContainerHostMode.schema)
 
     def provision(self):
-        super(AzureContainerPeriodicMode, self).provision()
+        super(AzureContainerEventMode, self).provision()
 
     def run(self, event=None, lambda_context=None):
         resources = self.policy.resource_manager.get_resources([event['subject']])
