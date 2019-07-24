@@ -483,6 +483,17 @@ class AzureOnHour(OnHour):
 class FirewallRulesFilter(Filter):
     """Filters resources by the firewall rules
 
+    Rules can be specified as x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.
+
+    With the exception of **equal** all modes reference total IP space and ignore
+    specific notation.
+
+    **include**: True if all IP space listed is included in firewall.
+    **any**: True if any overlap in IP space exists.
+    **only**: True if firewall IP space only includes IPs from provided space
+    (firewall is subset of provided space).
+    **equal**: the list of IP ranges or CIDR that firewall rules must match exactly.
+
     :example:
 
     .. code-block:: yaml
