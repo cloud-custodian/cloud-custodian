@@ -24,7 +24,7 @@ RUN apt-get --yes update \
  # Pre-cache Azure Functions package
  && python -c "from c7n_azure.function_package import FunctionPackage; \
       FunctionPackage('cache').build_cache( \
-      modules=['c7n', 'c7n-azure', 'applicationinsights'], \
+      modules=['c7n', 'c7n-azure'], \
       non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'pyrsistent'], \
       excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])" \
  && apt-get --yes remove build-essential \
