@@ -18,7 +18,6 @@ from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
-from c7n_azure.container_host.policy import AzureContainerEventMode, AzureContainerPeriodicMode
 from mock import mock
 
 

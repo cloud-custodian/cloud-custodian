@@ -30,6 +30,7 @@ except ImportError:
 class StorageUtilities(object):
 
     class Decorators:
+        @staticmethod
         def handle_token_failure(func):
             @wraps(func)
             def wrapper(*a, **kw):
