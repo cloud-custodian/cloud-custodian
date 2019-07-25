@@ -1,0 +1,359 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "4073"
+                    ],
+                    "date": [
+                        "Tue, 23 Jul 2019 17:36:19 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzolochteststrage",
+                                "name": "anzolochteststrage",
+                                "location": "westus2",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian",
+                                "name": "cloud-custodian",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/containerhost",
+                                "name": "containerhost",
+                                "location": "westus2",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-cask",
+                                "name": "custodian-cask",
+                                "location": "westus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-mailer",
+                                "name": "custodian-mailer",
+                                "location": "westus2",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-sendgrid",
+                                "name": "custodian-sendgrid",
+                                "location": "centralus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/erwelch-test",
+                                "name": "erwelch-test",
+                                "location": "westus2",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/FindMeAnOwner",
+                                "name": "FindMeAnOwner",
+                                "location": "centralus",
+                                "tags": {
+                                    "ActuallyWorksNow": "update-1",
+                                    "Stable": "update-6"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/functionshost-eastus-alwaysupdate",
+                                "name": "functionshost-eastus-alwaysupdate",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/functionshost-westus-stable",
+                                "name": "functionshost-westus-stable",
+                                "location": "westus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/kiril-nsg",
+                                "name": "kiril-nsg",
+                                "location": "centralus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/NetworkWatcherRG",
+                                "name": "NetworkWatcherRG",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test-ded-westus",
+                                "name": "test-ded-westus",
+                                "location": "westus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test-site-lock",
+                                "name": "test-site-lock",
+                                "location": "centralus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_container_mode",
+                                "name": "test_container_mode",
+                                "location": "centralus",
+                                "tags": {
+                                    "ActuallyWorksNow": "update-1",
+                                    "Stable": "update-6"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked",
+                                "name": "test_locked",
+                                "location": "centralus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_rg-1",
+                                "name": "test_rg-1",
+                                "location": "centralus",
+                                "tags": {
+                                    "ActuallyWorksNow": "update-1",
+                                    "Stable": "update-6"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_rg-2",
+                                "name": "test_rg-2",
+                                "location": "eastus",
+                                "tags": {
+                                    "ActuallyWorksNow": "update-1",
+                                    "Stable": "update-6"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm",
+                                "name": "test_vm",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/vm-images",
+                                "name": "vm-images",
+                                "location": "westus2",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CostManagement/query?api-version=2019-01-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "session-id": [
+                        "20a62916-1fd1-4d24-8a5c-94864fa47651"
+                    ],
+                    "access-control-allow-origin": [
+                        "*"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 23 Jul 2019 17:36:19 GMT"
+                    ],
+                    "content-length": [
+                        "923"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CostManagement/query/97761364-48f0-4ca0-97e6-1865443c149b",
+                        "name": "97761364-48f0-4ca0-97e6-1865443c149b",
+                        "type": "Microsoft.CostManagement/query",
+                        "location": null,
+                        "sku": null,
+                        "eTag": null,
+                        "properties": {
+                            "nextLink": null,
+                            "columns": [
+                                {
+                                    "name": "PreTaxCost",
+                                    "type": "Number"
+                                },
+                                {
+                                    "name": "ResourceGroupName",
+                                    "type": "String"
+                                },
+                                {
+                                    "name": "Currency",
+                                    "type": "String"
+                                }
+                            ],
+                            "rows": [
+                                [
+                                    1.852214,
+                                    "",
+                                    "USD"
+                                ],
+                                [
+                                    6e-05,
+                                    "anzolochteststrage",
+                                    "USD"
+                                ],
+                                [
+                                    0.025794,
+                                    "cloud-custodian",
+                                    "USD"
+                                ],
+                                [
+                                    1.155881,
+                                    "containerhost",
+                                    "USD"
+                                ],
+                                [
+                                    1.034025,
+                                    "custodian-cask",
+                                    "USD"
+                                ],
+                                [
+                                    3.6e-05,
+                                    "erwelch-test",
+                                    "USD"
+                                ],
+                                [
+                                    4.006719,
+                                    "functionshost-eastus-alwaysupdate",
+                                    "USD"
+                                ],
+                                [
+                                    0.459829,
+                                    "functionshost-westus-pkg",
+                                    "USD"
+                                ],
+                                [
+                                    4.341013,
+                                    "functionshost-westus-stable",
+                                    "USD"
+                                ],
+                                [
+                                    0.044361,
+                                    "test_functionapp-reqs",
+                                    "USD"
+                                ],
+                                [
+                                    0.740463,
+                                    "test_vm",
+                                    "USD"
+                                ],
+                                [
+                                    4.1561,
+                                    "test-ded-westus",
+                                    "USD"
+                                ],
+                                [
+                                    0.0,
+                                    "test-site-lock",
+                                    "USD"
+                                ],
+                                [
+                                    0.00333,
+                                    "vm-images",
+                                    "USD"
+                                ]
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

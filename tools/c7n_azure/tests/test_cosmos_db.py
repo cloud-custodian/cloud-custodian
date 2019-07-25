@@ -16,7 +16,7 @@ from __future__ import (absolute_import, division, print_function,
 
 from azure.cosmos.cosmos_client import CosmosClient
 
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest, arm_template, cassette_name
 from c7n.utils import local_session
 from c7n_azure.resources.cosmos_db import CosmosDBChildResource
 from c7n_azure.session import Session
@@ -93,6 +93,7 @@ class CosmosDBTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('cosmosdb.json')
+    @cassette_name('firewall')
     def test_firewall_rules_include(self):
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
@@ -100,12 +101,13 @@ class CosmosDBTest(BaseTest):
             'filters': [
                 {'type': 'firewall-rules',
                  'include': ['3.1.1.1']}],
-        })
+        }, validate=True)
         resources = p.run()
         print(resources)
         self.assertEqual(1, len(resources))
 
     @arm_template('cosmosdb.json')
+    @cassette_name('firewall')
     def test_firewall_rules_include_cidr(self):
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
@@ -118,6 +120,7 @@ class CosmosDBTest(BaseTest):
         self.assertEqual(1, len(resources))
 
     @arm_template('cosmosdb.json')
+    @cassette_name('firewall')
     def test_firewall_rules_not_equal(self):
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',

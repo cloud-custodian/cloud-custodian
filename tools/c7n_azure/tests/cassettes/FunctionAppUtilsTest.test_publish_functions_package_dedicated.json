@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/config/publishingcredentials/list?api-version=2018-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicated/config/publishingcredentials/list?api-version=2018-11-01",
                 "body": null,
                 "headers": {}
             },
@@ -17,34 +17,34 @@
                     "content-type": [
                         "application/json"
                     ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
+                    ],
                     "date": [
-                        "Thu, 27 Jun 2019 00:53:27 GMT"
+                        "Mon, 22 Jul 2019 15:17:53 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "11999"
-                    ],
                     "content-length": [
-                        "696"
+                        "762"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test/publishingcredentials/$cloud-custodian-test",
-                        "name": "cloud-custodian-test",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicated/publishingcredentials/$cloud-custodian-test-dedicated",
+                        "name": "cloud-custodian-test-dedicated",
                         "type": "Microsoft.Web/sites/publishingcredentials",
-                        "location": "Central US",
+                        "location": "South Central US",
                         "properties": {
                             "name": null,
-                            "publishingUserName": "$cloud-custodian-test",
-                            "publishingPassword": "CDjFhFmrq7l6Wq0hAd1c3ocrGufWuMEmX7GYXBfjANf5jcfLResHaHsHX1xy",
+                            "publishingUserName": "$cloud-custodian-test-dedicated",
+                            "publishingPassword": "zhsZP0jmr4Ry0TPhdn079a8B6YRPjnHEgg3fewKdNAYadPPjbyyoaoZlBok5",
                             "publishingPasswordHash": null,
                             "publishingPasswordHashSalt": null,
                             "metadata": null,
                             "isDeleted": false,
-                            "scmUri": "https://$cloud-custodian-test:CDjFhFmrq7l6Wq0hAd1c3ocrGufWuMEmX7GYXBfjANf5jcfLResHaHsHX1xy@cloud-custodian-test.scm.azurewebsites.net"
+                            "scmUri": "https://$cloud-custodian-test-dedicated:zhsZP0jmr4Ry0TPhdn079a8B6YRPjnHEgg3fewKdNAYadPPjbyyoaoZlBok5@cloud-custodian-test-dedicated.scm.azurewebsites.net"
                         }
                     }
                 }
@@ -53,7 +53,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://cloud-custodian-test.scm.azurewebsites.net/api/deployments",
+                "uri": "https://cloud-custodian-test-dedicated.scm.azurewebsites.net/api/deployments",
                 "body": null,
                 "headers": {}
             },
@@ -67,13 +67,13 @@
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Thu, 27 Jun 2019 00:53:29 GMT"
-                    ],
-                    "etag": [
-                        "\"fffffffffc0bdf9b\""
+                        "Mon, 22 Jul 2019 15:17:54 GMT"
                     ],
                     "set-cookie": [
-                        "ARRAffinity=07f9cf5840a21c88ad9faf3878ff016f7bcbae6c77a45c73e38dd7fa16d576c6;Path=/;HttpOnly;Domain=cloud-custodian-test.scm.azurewebsites.net"
+                        "ARRAffinity=05b861ebe79164f1c3419b2df70ed06db5899d9a39895e36c9e927e50da322ed;Path=/;HttpOnly;Domain=cloud-custodian-test-dedicated.scm.azurewebsites.net"
+                    ],
+                    "etag": [
+                        "\"ffffffffc4021e9a\""
                     ],
                     "content-length": [
                         "2"

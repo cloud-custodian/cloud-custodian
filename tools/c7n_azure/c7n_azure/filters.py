@@ -17,8 +17,10 @@ from concurrent.futures import as_completed
 from datetime import timedelta
 
 import six
+from netaddr import AddrFormatError
 from azure.mgmt.costmanagement.models import QueryDefinition, QueryDataset, \
-    QueryAggregation, QueryGrouping, QueryTimePeriod, TimeframeType
+    QueryAggregation, QueryGrouping, QueryTimePeriod, TimeframeType, QueryFilter, \
+    QueryComparisonExpression
 from azure.mgmt.policyinsights import PolicyInsightsClient
 
 from c7n_azure.tags import TagHelper
@@ -35,6 +37,7 @@ from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time, OffHour, OnHour
 from c7n.utils import chunks
 from c7n.utils import type_schema
+from c7n.utils import get_annotation_prefix
 
 scalar_ops = {
     'eq': operator.eq,
@@ -482,6 +485,17 @@ class AzureOnHour(OnHour):
 class FirewallRulesFilter(Filter):
     """Filters resources by the firewall rules
 
+    Rules can be specified as x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.
+
+    With the exception of **equal** all modes reference total IP space and ignore
+    specific notation.
+
+    **include**: True if all IP space listed is included in firewall.
+    **any**: True if any overlap in IP space exists.
+    **only**: True if firewall IP space only includes IPs from provided space
+    (firewall is subset of provided space).
+    **equal**: the list of IP ranges or CIDR that firewall rules must match exactly.
+
     :example:
 
     .. code-block:: yaml
@@ -496,18 +510,32 @@ class FirewallRulesFilter(Filter):
                             - 10.20.20.0/24
     """
 
-    schema = type_schema(
-        'firewall-rules',
-        **{
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['firewall-rules']},
             'include': {'type': 'array', 'items': {'type': 'string'}},
+            'any': {'type': 'array', 'items': {'type': 'string'}},
+            'only': {'type': 'array', 'items': {'type': 'string'}},
             'equal': {'type': 'array', 'items': {'type': 'string'}}
-        })
+        },
+        'oneOf': [
+            {"required": ["type", "include"]},
+            {"required": ["type", "any"]},
+            {"required": ["type", "only"]},
+            {"required": ["type", "equal"]}
+        ]
+    }
+
     schema_alias = True
 
     def __init__(self, data, manager=None):
         super(FirewallRulesFilter, self).__init__(data, manager)
         self.policy_include = None
         self.policy_equal = None
+        self.policy_any = None
+        self.policy_only = None
 
     @property
     @abstractmethod
@@ -515,21 +543,21 @@ class FirewallRulesFilter(Filter):
         raise NotImplementedError()
 
     def validate(self):
-        self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
-        self.policy_equal = IpRangeHelper.parse_ip_ranges(self.data, 'equal')
-
-        has_include = self.policy_include is not None
-        has_equal = self.policy_equal is not None
-
-        if has_include and has_equal:
-            raise FilterValidationError('Cannot have both include and equal.')
-
-        if not has_include and not has_equal:
-            raise FilterValidationError('Must have either include or equal.')
-
-        return True
+        try:
+            IpRangeHelper.parse_ip_ranges(self.data, 'include')
+            IpRangeHelper.parse_ip_ranges(self.data, 'equal')
+            IpRangeHelper.parse_ip_ranges(self.data, 'any')
+            IpRangeHelper.parse_ip_ranges(self.data, 'only')
+        except AddrFormatError as e:
+            raise PolicyValidationError("Invalid IP range found. %s" % e)
+        return self
 
     def process(self, resources, event=None):
+        self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
+        self.policy_equal = IpRangeHelper.parse_ip_ranges(self.data, 'equal')
+        self.policy_any = IpRangeHelper.parse_ip_ranges(self.data, 'any')
+        self.policy_only = IpRangeHelper.parse_ip_ranges(self.data, 'only')
+
         result, _ = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
@@ -560,8 +588,15 @@ class FirewallRulesFilter(Filter):
     def _check_rules(self, resource_rules):
         if self.policy_equal is not None:
             return self.policy_equal == resource_rules
+
         elif self.policy_include is not None:
             return self.policy_include.issubset(resource_rules)
+
+        elif self.policy_any is not None:
+            return not self.policy_any.isdisjoint(resource_rules)
+
+        elif self.policy_only is not None:
+            return resource_rules.issubset(self.policy_only)
         else:  # validated earlier, can never happen
             raise FilterValidationError("Internal error.")
 
@@ -668,6 +703,11 @@ class ResourceLockFilter(Filter):
 class CostFilter(ValueFilter):
     """
     Filter resources by the cost consumed over a timeframe.
+
+    Total cost for the resource includes costs for all of it child resources if billed
+    separately (e.g. SQL Server and SQL Server Databases). Warning message is logged if we detect
+    different currencies.
+
     Timeframe can be either number of days before today or one of:
 
     WeekToDate,
@@ -730,25 +770,36 @@ class CostFilter(ValueFilter):
         self.cached_costs = None
 
     def __call__(self, i):
-        if self.cached_costs is None:
+        if not self.cached_costs:
             self.cached_costs = self._query_costs()
-        id = i['id'].lower()
-        if id not in self.cached_costs:
+
+        id = i['id'].lower() + "/"
+
+        costs = [k.copy() for k in self.cached_costs if (k['ResourceId'] + '/').startswith(id)]
+
+        if not costs:
             return False
 
-        cost = self.cached_costs[id]
-        i['c7n:cost'] = cost
-        result = super(CostFilter, self).__call__(cost)
+        if any(c['Currency'] != costs[0]['Currency'] for c in costs):
+            self.log.warning('Detected different currencies for the resource {0}. Costs array: {1}'
+                             .format(i['id'], costs))
+
+        total_cost = {
+            'PreTaxCost': sum(c['PreTaxCost'] for c in costs),
+            'Currency': costs[0]['Currency']
+        }
+        i[get_annotation_prefix('cost')] = total_cost
+        result = super(CostFilter, self).__call__(total_cost)
         return result
 
     def fix_wrap_rest_response(self, data):
-        '''
+        """
         Azure REST API doesn't match the documentation and the python SDK fails to deserialize
         the response.
         This is a temporal workaround that converts the response into the correct form.
         :param data: partially deserialized response that doesn't match the the spec.
         :return: partially deserialized response that does match the the spec.
-        '''
+        """
         type = data.get('type', None)
         if type != 'Microsoft.CostManagement/query':
             return data
@@ -757,13 +808,26 @@ class CostFilter(ValueFilter):
         return data
 
     def _query_costs(self):
-        client = self.manager.get_client('azure.mgmt.costmanagement.CostManagementClient')
+        manager = self.manager
+        is_resource_group = manager.type == 'resourcegroup'
+
+        client = manager.get_client('azure.mgmt.costmanagement.CostManagementClient')
 
         aggregation = {'totalCost': QueryAggregation(name='PreTaxCost')}
 
-        grouping = [QueryGrouping(type='Dimension', name='ResourceId')]
+        grouping = [QueryGrouping(type='Dimension',
+                                  name='ResourceGroupName' if is_resource_group else 'ResourceId')]
 
-        dataset = QueryDataset(grouping=grouping, aggregation=aggregation)
+        query_filter = None
+        if not is_resource_group:
+            query_filter = QueryFilter(
+                dimension=QueryComparisonExpression(name='ResourceType',
+                                                    operator='In',
+                                                    values=[manager.resource_type.resource_type]))
+            if 'dimension' in query_filter._attribute_map:
+                query_filter._attribute_map['dimension']['key'] = 'dimensions'
+
+        dataset = QueryDataset(grouping=grouping, aggregation=aggregation, filter=query_filter)
 
         timeframe = self.data['timeframe']
         time_period = None
@@ -776,7 +840,7 @@ class CostFilter(ValueFilter):
 
         definition = QueryDefinition(timeframe=timeframe, time_period=time_period, dataset=dataset)
 
-        subscription_id = self.manager.get_session().subscription_id
+        subscription_id = manager.get_session().get_subscription_id()
 
         scope = '/subscriptions/' + subscription_id
 
@@ -787,7 +851,13 @@ class CostFilter(ValueFilter):
             query._derserializer._deserialize = lambda target, data: \
                 original(target, self.fix_wrap_rest_response(data))
 
-        result = list(query)[0]
-        result = [{result.columns[i].name: v for i, v in enumerate(row)} for row in result.rows]
-        result = {r['ResourceId'].lower(): r for r in result}
-        return result
+        result_list = list(query)[0]
+        result_list = [{result_list.columns[i].name: v for i, v in enumerate(row)}
+                       for row in result_list.rows]
+
+        for r in result_list:
+            if 'ResourceGroupName' in r:
+                r['ResourceId'] = scope + '/resourcegroups/' + r.pop('ResourceGroupName')
+            r['ResourceId'] = r['ResourceId'].lower()
+
+        return result_list

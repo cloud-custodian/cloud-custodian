@@ -48,7 +48,7 @@ setup(
     },
     install_requires=["azure-mgmt-authorization",
                       "azure-mgmt-apimanagement",
-                      "azure-mgmt-applicationinsights==0.1.1",
+                      "azure-mgmt-applicationinsights",
                       "azure-mgmt-batch",
                       "azure-mgmt-cognitiveservices",
                       "azure-mgmt-cosmosdb",

@@ -71,9 +71,7 @@ class Host:
             self.event_queue_id,
             self.event_queue_name)
 
-        self.queue_service = Storage.get_queue_client_by_storage_account(
-            self.queue_storage_account,
-            self.session)
+        self.queue_service = None
 
         # Track required event subscription updates
         self.require_event_update = False
@@ -277,19 +275,25 @@ class Host:
         Poll the Azure queue and loop until
         there are no visible messages remaining.
         """
-        client = self.queue_service
-
-        # If we don't have any policies
-        # don't bother pulling events
+        # Exit if we don't have any policies
         if not self.policies:
             return
 
+        if not self.queue_service:
+            self.queue_service = Storage.get_queue_client_by_storage_account(
+                self.queue_storage_account,
+                self.session)
+
         while True:
-            messages = Storage.get_queue_messages(
-                client,
-                self.event_queue_name,
-                num_messages=queue_message_count,
-                visibility_timeout=queue_timeout_seconds)
+            try:
+                messages = Storage.get_queue_messages(
+                    self.queue_service,
+                    self.event_queue_name,
+                    num_messages=queue_message_count,
+                    visibility_timeout=queue_timeout_seconds)
+            except AzureHttpError:
+                self.queue_service = None
+                raise
 
             if len(messages) == 0:
                 break
@@ -298,17 +302,17 @@ class Host:
 
             for message in messages:
                 if message.dequeue_count > max_dequeue_count:
-                    Storage.delete_queue_message(client, self.event_queue_name, message=message)
+                    Storage.delete_queue_message(self.queue_service,
+                                                 self.event_queue_name,
+                                                 message=message)
                     log.warning("Event deleted due to reaching maximum retry count.")
                 else:
                     # Run matching policies
                     self.run_policies_for_event(message)
 
-                    # We always dequeue the message.  We have
-                    # alternate options for retry if the behavior
-                    # is required
+                    # We delete events regardless of policy result
                     Storage.delete_queue_message(
-                        client,
+                        self.queue_service,
                         self.event_queue_name,
                         message=message)
 

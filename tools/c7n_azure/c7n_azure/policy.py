@@ -219,9 +219,9 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def build_functions_package(self, queue_name=None, target_subscription_ids=None):
         self.log.info("Building function package for %s" % self.function_params.function_app_name)
 
-        package = FunctionPackage(self.policy_name, target_subscription_ids=target_subscription_ids)
+        package = FunctionPackage(self.policy_name, target_sub_ids=target_subscription_ids)
         package.build(self.policy.data,
-                      modules=['c7n', 'c7n-azure', 'applicationinsights'],
+                      modules=['c7n', 'c7n-azure'],
                       non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'pyrsistent'],
                       excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'],
                       queue_name=queue_name)

@@ -20,9 +20,6 @@ import shutil
 import time
 
 import requests
-
-from c7n.mu import PythonPackageArchive
-from c7n.utils import local_session
 from c7n_azure.constants import (ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,
                                  FUNCTION_EVENT_TRIGGER_MODE,
                                  FUNCTION_TIME_TRIGGER_MODE,
@@ -31,22 +28,41 @@ from c7n_azure.constants import (ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,
 from c7n_azure.dependency_manager import DependencyManager
 from c7n_azure.session import Session
 
+from c7n.mu import PythonPackageArchive
+from c7n.utils import local_session
+
+
+class AzurePythonPackageArchive(PythonPackageArchive):
+    def __init__(self, modules=(), cache_file=None):
+        super(AzurePythonPackageArchive, self).__init__(modules, cache_file)
+        self.package_time = time.gmtime()
+
+    def create_zinfo(self, file):
+        """
+        In Dedicated App Service Plans - Functions are updated via KuduSync
+        KuduSync uses the modified time and file size to determine if a file has changed
+        """
+        info = super(AzurePythonPackageArchive, self).create_zinfo(file)
+        info.date_time = self.package_time[0:6]
+        return info
+
 
 class FunctionPackage(object):
 
-    def __init__(self, name, function_path=None, target_subscription_ids=None):
+    def __init__(self, name, function_path=None, target_sub_ids=None, cache_override_path=None):
         self.log = logging.getLogger('custodian.azure.function_package')
         self.pkg = None
         self.name = name
         self.function_path = function_path or os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'function.py')
+        self.cache_override_path = cache_override_path
         self.enable_ssl_cert = not distutils.util.strtobool(
             os.environ.get(ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, 'no'))
 
-        if target_subscription_ids is not None:
-            self.target_subscription_ids = target_subscription_ids
+        if target_sub_ids is not None:
+            self.target_sub_ids = target_sub_ids
         else:
-            self.target_subscription_ids = [None]
+            self.target_sub_ids = [None]
 
         if not self.enable_ssl_cert:
             self.log.warning('SSL Certificate Validation is disabled')
@@ -54,11 +70,11 @@ class FunctionPackage(object):
     def _add_functions_required_files(self, policy, queue_name=None):
         s = local_session(Session)
 
-        for target_subscription_id in self.target_subscription_ids:
-            name = self.name + ("_" + target_subscription_id if target_subscription_id else "")
+        for target_sub_id in self.target_sub_ids:
+            name = self.name + ("_" + target_sub_id if target_sub_id else "")
             # generate and add auth
             self.pkg.add_contents(dest=name + '/auth.json',
-                                  contents=s.get_functions_auth_string(target_subscription_id))
+                                  contents=s.get_functions_auth_string(target_sub_id))
 
             self.pkg.add_file(self.function_path,
                               dest=name + '/function.py')
@@ -120,23 +136,35 @@ class FunctionPackage(object):
 
     @property
     def cache_folder(self):
+        if self.cache_override_path:
+            return self.cache_override_path
+
         c7n_azure_root = os.path.dirname(__file__)
         return os.path.join(c7n_azure_root, 'cache')
 
-    def build(self, policy, modules, non_binary_packages, excluded_packages, queue_name=None,):
+    def build(self, policy, modules, non_binary_packages, excluded_packages, queue_name=None):
+        cache_zip_file = self.build_cache(modules, excluded_packages, non_binary_packages)
 
+        self.pkg = AzurePythonPackageArchive(cache_file=cache_zip_file)
+
+        exclude = os.path.normpath('/cache/') + os.path.sep
+        self.pkg.add_modules(lambda f: (exclude in f),
+                             [m.replace('-', '_') for m in modules])
+
+        # add config and policy
+        self._add_functions_required_files(policy, queue_name)
+
+    def build_cache(self, modules, excluded_packages, non_binary_packages):
         wheels_folder = os.path.join(self.cache_folder, 'wheels')
         wheels_install_folder = os.path.join(self.cache_folder, 'dependencies')
-
         cache_zip_file = os.path.join(self.cache_folder, 'cache.zip')
         cache_metadata_file = os.path.join(self.cache_folder, 'metadata.json')
-
-        packages = \
-            DependencyManager.get_dependency_packages_list(modules, excluded_packages)
+        packages = DependencyManager.get_dependency_packages_list(modules, excluded_packages)
 
         if not DependencyManager.check_cache(cache_metadata_file, cache_zip_file, packages):
-            cache_pkg = PythonPackageArchive()
+            cache_pkg = AzurePythonPackageArchive()
             self.log.info("Cached packages not found or requirements were changed.")
+
             # If cache check fails, wipe all previous wheels, installations etc
             if os.path.exists(self.cache_folder):
                 self.log.info("Removing cache folder...")
@@ -176,14 +204,7 @@ class FunctionPackage(object):
                                                     cache_zip_file,
                                                     packages)
 
-        self.pkg = PythonPackageArchive(cache_file=cache_zip_file)
-
-        exclude = os.path.normpath('/cache/') + os.path.sep
-        self.pkg.add_modules(lambda f: (exclude in f),
-                             [m.replace('-', '_') for m in modules])
-
-        # add config and policy
-        self._add_functions_required_files(policy, queue_name)
+        return cache_zip_file
 
     def wait_for_status(self, deployment_creds, retries=10, delay=15):
         for r in range(retries):
