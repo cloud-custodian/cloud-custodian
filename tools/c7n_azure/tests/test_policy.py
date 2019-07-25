@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure.mgmt.storage.models import StorageAccount
-from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
+from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, cassette_name
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
@@ -296,3 +296,69 @@ class AzurePolicyModeTest(BaseTest):
             'v',
             {'t1': None, 'nested_value': {'test_camel': None}, 't2': 'v2'})
         self.assertEqual(r, {'t1': 'v1', 't2': 'v2', 'nested_value': {'test_camel': 'valueCamel'}})
+
+    @arm_template('emptyrg.json')
+    @cassette_name('firewall')
+    def test_empty_group_function_event(self):
+        p = self.load_policy({
+            'name': 'test-azure-resource-group',
+            'mode':
+                {'type': FUNCTION_EVENT_TRIGGER_MODE,
+                 'events': ['ResourceGroupWrite'],
+                 'provision-options': {
+                     'servicePlan': {
+                         'name': 'test-cloud-custodian'
+                     }
+                 }},
+            'resource': 'azure.resourcegroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value': 'test_emptyrg'},
+                {'type': 'empty-group'}]})
+
+        event = AzurePolicyModeTest.get_sample_event()
+
+        resources = p.push(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test_emptyrg')
+
+    @arm_template('emptyrg.json')
+    @cassette_name('firewall')
+    def test_empty_group_container_event(self):
+        p = self.load_policy({
+            'name': 'test-azure-resource-group',
+            'mode':
+                {'type': CONTAINER_EVENT_TRIGGER_MODE,
+                 'events': ['ResourceGroupWrite']},
+            'resource': 'azure.resourcegroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value': 'test_emptyrg'},
+                {'type': 'empty-group'}]})
+
+        event = AzurePolicyModeTest.get_sample_event()
+
+        resources = p.push(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test_emptyrg')
+
+    @staticmethod
+    def get_sample_event():
+        return {"subject": "/subscriptions/ea98974b-5d2a-4d98-a78a-382f3715d07e/"
+                           "resourceGroups/test_emptyrg",
+                "eventType": "Microsoft.Resources.ResourceWriteSuccess",
+                "eventTime": "2019-07-16T18:30:43.3595255Z",
+                "id": "619d2674-b396-4356-9619-6c5a52fe4e88",
+                "data": {
+                    "correlationId": "7dd5a476-e052-40e2-99e4-bb9852dc1f86",
+                    "resourceProvider": "Microsoft.Resources",
+                    "resourceUri": "/subscriptions/ea98974b-5d2a-4d98-a78a-382f3715d07e/"
+                                   "resourceGroups/test_emptyrg",
+                    "operationName": "Microsoft.Resources/subscriptions/resourceGroups/write",
+                    "status": "Succeeded"
+                },
+                "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e"}

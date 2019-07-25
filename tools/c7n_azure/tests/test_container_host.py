@@ -20,7 +20,7 @@ from azure.storage.queue.models import QueueMessage
 from azure_common import BaseTest
 from c7n_azure import constants
 from c7n_azure.container_host.host import Host
-from mock import patch, Mock
+from mock import patch, Mock, ANY
 
 
 class ContainerHostTest(BaseTest):
@@ -294,6 +294,58 @@ class ContainerHostTest(BaseTest):
         storage_mock.get_queue_messages.side_effect = [[q1, q2], []]
         host.poll_queue()
         self.assertEqual(1, run_policy_mock.call_count)
+
+    @patch('c7n_azure.container_host.host.Host.has_required_params', return_value=True)
+    @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
+    @patch('c7n_azure.container_host.host.Storage')
+    @patch('c7n_azure.container_host.host.BlockingScheduler.start')
+    @patch('c7n_azure.container_host.host.BlockingScheduler.add_job')
+    def test_run_policy_for_event(self, add_job_mock, _0, _1, _2, _3):
+        host = Host()
+
+        host.policies = {
+            'one': {
+                'policy': ContainerHostTest.get_mock_policy({
+                    'name': 'one',
+                    'mode': {
+                        'type': 'container-event',
+                        'events': ['ResourceGroupWrite', 'VnetWrite']
+                    }
+                })
+            }
+        }
+
+        message = QueueMessage()
+        message.id = 1
+        message.dequeue_count = 0
+        message.content = \
+            """eyAgCiAgICJzdWJqZWN0IjoiL3N1YnNjcmlwdGlvbnMvZWE5ODk3NGItNWQyYS00ZDk4LWE3OGEt
+            MzgyZjM3MTVkMDdlL3Jlc291cmNlR3JvdXBzL3Rlc3RfY29udGFpbmVyX21vZGUiLAogICAiZXZl
+            bnRUeXBlIjoiTWljcm9zb2Z0LlJlc291cmNlcy5SZXNvdXJjZVdyaXRlU3VjY2VzcyIsCiAgICJl
+            dmVudFRpbWUiOiIyMDE5LTA3LTE2VDE4OjMwOjQzLjM1OTUyNTVaIiwKICAgImlkIjoiNjE5ZDI2
+            NzQtYjM5Ni00MzU2LTk2MTktNmM1YTUyZmU0ZTg4IiwKICAgImRhdGEiOnsgICAgICAgIAogICAg
+            ICAiY29ycmVsYXRpb25JZCI6IjdkZDVhNDc2LWUwNTItNDBlMi05OWU0LWJiOTg1MmRjMWY4NiIs
+            CiAgICAgICJyZXNvdXJjZVByb3ZpZGVyIjoiTWljcm9zb2Z0LlJlc291cmNlcyIsCiAgICAgICJy
+            ZXNvdXJjZVVyaSI6Ii9zdWJzY3JpcHRpb25zL2VhOTg5NzRiLTVkMmEtNGQ5OC1hNzhhLTM4MmYz
+            NzE1ZDA3ZS9yZXNvdXJjZUdyb3Vwcy90ZXN0X2NvbnRhaW5lcl9tb2RlIiwKICAgICAgIm9wZXJh
+            dGlvbk5hbWUiOiJNaWNyb3NvZnQuUmVzb3VyY2VzL3N1YnNjcmlwdGlvbnMvcmVzb3VyY2VHcm91
+            cHMvd3JpdGUiLAogICAgICAic3RhdHVzIjoiU3VjY2VlZGVkIgogICB9LAogICAidG9waWMiOiIv
+            c3Vic2NyaXB0aW9ucy9hYTk4OTc0Yi01ZDJhLTRkOTgtYTc4YS0zODJmMzcxNWQwN2UiCn0="""
+
+        # run with real match
+        host.run_policies_for_event(message)
+        add_job_mock.assert_called_with(ANY,
+                                        id='one619d2674-b396-4356-9619-6c5a52fe4e88',
+                                        name='one',
+                                        args=ANY,
+                                        misfire_grace_time=ANY)
+
+        add_job_mock.reset_mock()
+
+        # run with no match
+        host.policies = {}
+        host.run_policies_for_event(message)
+        self.assertFalse(add_job_mock.called)
 
     def test_has_required_params(self):
         with patch.dict(os.environ, {
