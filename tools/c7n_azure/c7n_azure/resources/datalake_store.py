@@ -40,6 +40,8 @@ class DataLakeStore(ArmResourceManager):
 
     """
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Storage']
+
         service = 'azure.mgmt.datalake.store'
         client = 'DataLakeStoreAccountManagementClient'
         enum_spec = ('accounts', 'list', None)

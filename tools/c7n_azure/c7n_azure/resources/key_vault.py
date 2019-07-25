@@ -105,6 +105,8 @@ class KeyVault(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Security']
+
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
         enum_spec = ('vaults', 'list', None)

@@ -39,6 +39,8 @@ class CdnProfile(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Media']
+
         service = 'azure.mgmt.cdn'
         client = 'CdnManagementClient'
         enum_spec = ('profiles', 'list', None)

@@ -37,6 +37,8 @@ class Disk(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Storage']
+
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
         enum_spec = ('disks', 'list', None)

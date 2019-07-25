@@ -139,6 +139,8 @@ class VirtualMachine(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Compute']
+
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
         enum_spec = ('virtual_machines', 'list_all', None)

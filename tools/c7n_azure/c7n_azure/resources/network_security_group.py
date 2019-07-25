@@ -74,6 +74,8 @@ class NetworkSecurityGroup(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Networking']
+
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('network_security_groups', 'list_all', None)

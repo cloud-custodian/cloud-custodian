@@ -64,6 +64,8 @@ class CosmosDB(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Databases']
+
         service = 'azure.mgmt.cosmosdb'
         client = 'CosmosDB'  # type: azure.mgmt.cosmosdb.CosmosDB
         enum_spec = ('database_accounts', 'list', None)
@@ -79,6 +81,8 @@ class CosmosDB(ArmResourceManager):
 class CosmosDBChildResource(ChildResourceManager):
 
     class resource_type(ChildTypeInfo):
+        doc_groups = ['Databases']
+
         parent_spec = ('cosmosdb', True)
         parent_manager_name = 'cosmosdb'
         raise_on_exception = False

@@ -36,10 +36,11 @@ class AppServicePlan(ArmResourceManager):
                 key: sku.tier
                 op: eq
                 value: Basic
-
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Compute', 'Web']
+
         service = 'azure.mgmt.web'
         client = 'WebSiteManagementClient'
         enum_spec = ('app_service_plans', 'list', None)

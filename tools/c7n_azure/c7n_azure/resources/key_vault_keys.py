@@ -88,6 +88,8 @@ class KeyVaultKeys(ChildResourceManager):
     """
 
     class resource_type(ChildTypeInfo):
+        doc_groups = ['Security']
+
         resource = constants.RESOURCE_VAULT
         service = 'azure.keyvault'
         client = 'KeyVaultClient'

@@ -26,7 +26,7 @@ from c7n.manager import ResourceManager
 from c7n.utils import local_session, type_schema
 
 from c7n_azure.provider import resources
-from c7n_azure.query import QueryMeta
+from c7n_azure.query import QueryMeta, TypeInfo
 
 
 @resources.register('subscription')
@@ -61,7 +61,9 @@ class Subscription(ResourceManager):
 
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
+        doc_groups = ['Subscription']
+
         id = 'subscriptionId'
         name = 'displayName'
         filter_name = None
