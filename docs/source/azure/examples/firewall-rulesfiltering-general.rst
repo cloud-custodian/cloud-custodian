@@ -34,14 +34,9 @@ to remediate the non-compliant resources.
               key: properties.networkAcls.defaultAction
               value: 'Allow'
 
-            - and :
-              - type: value
-                key: properties.networkAcls.defaultAction
-                value: 'Deny'
-
-              - not:
-                - type: firewall-rules
-                  only:
-                    - '8.8.8.8'
-                    - '10.0.0.0/16'
-                    - '20.0.0.0 - 20.10.0.0'
+            - not:
+              - type: firewall-rules
+                only:
+                  - '8.8.8.8'
+                  - '10.0.0.0/16'
+                  - '20.0.0.0 - 20.10.0.0'
