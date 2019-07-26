@@ -18,7 +18,7 @@ from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, casset
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
-from mock import mock
+from mock import mock, patch
 
 
 class AzurePolicyModeTest(BaseTest):
@@ -298,8 +298,9 @@ class AzurePolicyModeTest(BaseTest):
         self.assertEqual(r, {'t1': 'v1', 't2': 'v2', 'nested_value': {'test_camel': 'valueCamel'}})
 
     @arm_template('emptyrg.json')
-    @cassette_name('firewall')
-    def test_empty_group_function_event(self):
+    @cassette_name('resourcegroup')
+    @patch('c7n_azure.resources.resourcegroup.DeleteResourceGroup._process_resource')
+    def test_empty_group_function_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
             'mode':
@@ -316,17 +317,21 @@ class AzurePolicyModeTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value': 'test_emptyrg'},
-                {'type': 'empty-group'}]})
+                {'type': 'empty-group'}],
+            'actions': [
+                {'type': 'delete'}]})
 
         event = AzurePolicyModeTest.get_sample_event()
 
         resources = p.push(event, None)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test_emptyrg')
+        self.assertTrue(mock_delete.called)
 
     @arm_template('emptyrg.json')
-    @cassette_name('firewall')
-    def test_empty_group_container_event(self):
+    @cassette_name('resourcegroup')
+    @patch('c7n_azure.resources.resourcegroup.DeleteResourceGroup._process_resource')
+    def test_empty_group_container_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
             'mode':
@@ -338,11 +343,33 @@ class AzurePolicyModeTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value': 'test_emptyrg'},
-                {'type': 'empty-group'}]})
+                {'type': 'empty-group'}],
+            'actions': [
+                {'type': 'delete'}]})
 
         event = AzurePolicyModeTest.get_sample_event()
 
         resources = p.push(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'test_emptyrg')
+        self.assertTrue(mock_delete.called)
+
+    @arm_template('emptyrg.json')
+    def test_empty_group_container_scheduled(self):
+        p = self.load_policy({
+            'name': 'test-azure-resource-group',
+            'mode':
+                {'type': CONTAINER_TIME_TRIGGER_MODE,
+                 'schedule': '* * * * *'},
+            'resource': 'azure.resourcegroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value': 'test_emptyrg'},
+                {'type': 'empty-group'}]})
+
+        resources = p.push(None, None)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test_emptyrg')
 
