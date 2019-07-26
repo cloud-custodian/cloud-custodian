@@ -21,7 +21,9 @@ from c7n.filters.core import type_schema
 @resources.register('eventsubscription')
 class EventSubscription(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(QueryResourceManager.resource_type):
+        doc_groups = ['Events']
+
         service = 'azure.mgmt.eventgrid'
         client = 'EventGridManagementClient'
         enum_spec = ('event_subscriptions', 'list_global_by_subscription', None)

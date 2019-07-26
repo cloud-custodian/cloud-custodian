@@ -54,6 +54,8 @@ class Storage(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Storage']
+
         service = 'azure.mgmt.storage'
         client = 'StorageManagementClient'
         enum_spec = ('storage_accounts', 'list', None)

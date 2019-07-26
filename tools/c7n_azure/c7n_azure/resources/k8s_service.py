@@ -39,6 +39,8 @@ class KubernetesService(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Compute', 'Containers']
+
         service = 'azure.mgmt.containerservice'
         client = 'ContainerServiceClient'
         enum_spec = ('managed_clusters', 'list', None)

@@ -41,6 +41,8 @@ class PolicyAssignments(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Subscription', 'Generic']
+
         service = 'azure.mgmt.resource.policy'
         client = 'PolicyClient'
         enum_spec = ('policy_assignments', 'list', None)
