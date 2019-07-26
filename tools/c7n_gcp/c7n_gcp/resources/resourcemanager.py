@@ -59,6 +59,7 @@ class Project(QueryResourceManager):
         enum_spec = ('list', 'projects', None)
         id = "projectId"
 
+
 @resources.register('project-iam-policy')
 class ProjectIamRole(QueryResourceManager):
     """GCP resource: https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy
