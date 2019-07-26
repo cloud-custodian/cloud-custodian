@@ -58,3 +58,17 @@ class Project(QueryResourceManager):
         scope = 'global'
         enum_spec = ('list', 'projects', None)
         id = "projectId"
+
+@resources.register('project-iam-policy')
+class ProjectIamRole(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy
+    """
+    class resource_type(TypeInfo):
+        service = 'cloudresourcemanager'
+        version = 'v1'
+        component = 'projects'
+
+        scope = 'project'
+        scope_key = 'resource'
+        enum_spec = ('getIamPolicy', 'bindings[]', {'body': {}})
+        id = 'role'
