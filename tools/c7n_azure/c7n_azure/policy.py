@@ -15,7 +15,6 @@
 import logging
 import re
 import sys
-import time
 
 import six
 from azure.mgmt.eventgrid.models import \
