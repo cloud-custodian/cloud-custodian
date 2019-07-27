@@ -16,9 +16,9 @@ import logging
 
 from c7n_azure.constants import (CONTAINER_EVENT_TRIGGER_MODE,
                                  CONTAINER_TIME_TRIGGER_MODE)
+from c7n_azure.policy import AzureModeCommon
 
 from c7n import utils
-from c7n.actions import EventAction
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
 
 
@@ -84,40 +84,7 @@ class AzureContainerEventMode(AzureContainerHostMode):
         super(AzureContainerEventMode, self).provision()
 
     def run(self, event=None, lambda_context=None):
-        resources = self.policy.resource_manager.get_resources([event['subject']])
-
-        resources = self.policy.resource_manager.filter_resources(
-            resources, event)
-
-        if not resources:
-            self.policy.log.info(
-                "policy: %s resources: %s no resources found" % (
-                    self.policy.name, self.policy.resource_type))
-            return
-
-        resources = self.policy.resource_manager.filter_resources(
-            resources, event)
-
-        with self.policy.ctx:
-            self.policy.ctx.metrics.put_metric(
-                'ResourceCount', len(resources), 'Count', Scope="Policy",
-                buffer=False)
-
-            self.policy._write_file(
-                'resources.json', utils.dumps(resources, indent=2))
-
-            for action in self.policy.resource_manager.actions:
-                self.policy.log.info(
-                    "policy: %s invoking action: %s resources: %d",
-                    self.policy.name, action.name, len(resources))
-                if isinstance(action, EventAction):
-                    results = action.process(resources, event)
-                else:
-                    results = action.process(resources)
-                self.policy._write_file(
-                    "action-%s" % action.name, utils.dumps(results))
-
-        return resources
+        return AzureModeCommon.run_for_event(self.policy, event)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""

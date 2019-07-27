@@ -119,6 +119,9 @@ class ContainerHostTest(BaseTest):
         # init
         host = Host()
 
+        # cleanup
+        self.addCleanup(lambda: shutil.rmtree(host.policy_cache))
+
         self.assertEqual({}, host.policies)
 
         # Initial load
@@ -145,7 +148,7 @@ class ContainerHostTest(BaseTest):
         self.assertEqual(3, len([j for j in jobs if j.func == host.run_policy]))
         self.assertEqual(1, len([j for j in jobs if j.id == 'blob1.yml']))
         self.assertEqual(1, len([j for j in jobs if j.id == 'blob2.yml']))
-        self.assertEqual(1, len([j for j in jobs if j.id == 'blob2.yml']))
+        self.assertEqual(1, len([j for j in jobs if j.id == 'blob3.yml']))
 
         ##############################################
         # Add one, remove one, update one
@@ -161,6 +164,7 @@ class ContainerHostTest(BaseTest):
         self.assertIsNotNone(host.policies['blob1.yml'])
         self.assertIsNotNone(host.policies['blob4.yml'])
         self.assertIsNotNone(host.policies['blob3.yml'])
+        self.assertEqual('hash3_new', host.blob_cache['blob3.yml'])
 
         # jobs were updated
         jobs = host.scheduler.get_jobs()
@@ -181,9 +185,6 @@ class ContainerHostTest(BaseTest):
         # jobs were updated
         jobs = host.scheduler.get_jobs()
         self.assertEqual(0, len([j for j in jobs if j.func == host.run_policy]))
-
-        # cleanup
-        shutil.rmtree(host.policy_cache)
 
     @patch('c7n_azure.container_host.host.Host.has_required_params', return_value=True)
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
