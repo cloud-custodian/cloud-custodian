@@ -388,4 +388,4 @@ class AzurePolicyModeTest(BaseTest):
                     "operationName": "Microsoft.Resources/subscriptions/resourceGroups/write",
                     "status": "Succeeded"
                 },
-                "topic": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e"}
+                "topic": "/subscriptions/ea98974b-5d2a-4d98-a78a-382f3715d07e"}

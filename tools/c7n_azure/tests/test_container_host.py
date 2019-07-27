@@ -71,7 +71,7 @@ class ContainerHostTest(BaseTest):
         client_mock = Mock()
         client_mock.list_blobs.return_value = [
             ContainerHostTest.get_mock_blob("blob1.yml", "hash1"),
-            ContainerHostTest.get_mock_blob("blob2.YML", "hash2"),
+            ContainerHostTest.get_mock_blob("blob2.YAML", "hash2"),
             ContainerHostTest.get_mock_blob("blob3.md", "hash3")
         ]
 
@@ -95,7 +95,7 @@ class ContainerHostTest(BaseTest):
         # jobs were created
         jobs = host.scheduler.get_jobs()
         self.assertEqual(1, len([j for j in jobs if j.id == 'blob1.yml']))
-        self.assertEqual(1, len([j for j in jobs if j.id == 'blob2.YML']))
+        self.assertEqual(1, len([j for j in jobs if j.id == 'blob2.YAML']))
 
     @patch('c7n_azure.container_host.host.Host.has_required_params', return_value=True)
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
