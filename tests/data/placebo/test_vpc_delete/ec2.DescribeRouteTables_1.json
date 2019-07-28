@@ -1,0 +1,74 @@
+{
+    "status_code": 200, 
+    "data": {
+        "RouteTables": [
+            {
+                "Associations": [
+                    {
+                        "Main": false,
+                        "RouteTableAssociationId": "rtbassoc-0b77cc2053764d6cd",
+                        "RouteTableId": "rtb-06e710fd1810bfc8c",
+                        "SubnetId": "subnet-0a10d515d917d1b17"
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-06e710fd1810bfc8c",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/16",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "GatewayId": "igw-01862a679bf95e81b",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-0cc1f28fcc3977440"
+            },
+            {
+                "Associations": [
+                    {
+                        "Main": true,
+                        "RouteTableAssociationId": "rtbassoc-0adf8938c6ee7bc99",
+                        "RouteTableId": "rtb-0ec45fbe582f00674"
+                    }
+                ],
+                "PropagatingVgws": [],
+                "RouteTableId": "rtb-0ec45fbe582f00674",
+                "Routes": [
+                    {
+                        "DestinationCidrBlock": "10.0.0.0/16",
+                        "GatewayId": "local",
+                        "Origin": "CreateRouteTable",
+                        "State": "active"
+                    },
+                    {
+                        "DestinationCidrBlock": "0.0.0.0/0",
+                        "NatGatewayId": "nat-0db15032e3c152411",
+                        "Origin": "CreateRoute",
+                        "State": "active"
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-0cc1f28fcc3977440"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "395b36a4-b70e-429a-a314-8dfd466f6131", 
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:48 GMT", 
+                "transfer-encoding": "chunked", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "server": "AmazonEC2", 
+                "vary": "accept-encoding"
+            }
+        }
+    }
+}

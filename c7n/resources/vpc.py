@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import itertools
 import operator
+import time
 import zlib
 import jmespath
 
@@ -28,7 +29,7 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
+from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr, backoff_delays
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -45,6 +46,146 @@ class Vpc(query.QueryResourceManager):
         filter_type = 'list'
         config_type = 'AWS::EC2::VPC'
         id_prefix = "vpc-"
+
+
+@Vpc.action_registry.register('delete')
+class VpcDelete(BaseAction):
+    """Action to delete VPC(s)
+
+    It is recommended to apply a filter to the delete policy to avoid the
+    deletion of all VPCs returned.
+
+    If you want to delete any dependencies of the VPC(s), you must specify those as 'dependencies'.
+
+    VPCs can have multiple other dependencies (EC2, RDS) that may not be covered by this action.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: vpc-delete-test
+                resource: vpc
+                filters:
+                  - type: value
+                    key: "tag:Name"
+                    op: eq
+                    value: "c7n-vpc-delete-test"
+                actions:
+                  - type: delete
+                    dependencies:
+                      - nat-gateway
+                      - subnet
+                      - internet-gateway
+                      - route-table
+                      - security-group
+    """
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'type': {'enum': ['delete']},
+            'dependencies': {
+                'oneOf': [
+                    {
+                        'type': 'string',
+                        'enum': ['all']
+                    },
+                    {
+                        'type': 'array',
+                        'items': {
+                            'type': 'string',
+                            'enum': ['internet-gateway', 'nat-gateway', 'route-table',
+                                     'security-group', 'subnet']
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    permissions = ('ec2:DeleteSubnet', 'ec2:DetachInternetGateway', 'ec2:DeleteInternetGateway',
+                   'ec2:DeleteNatGateway', 'ec2:DeleteRouteTable', 'ec2:DeleteSecurityGroup',
+                   'ec2:DeleteVpc',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        # Delete NAT-gateway associated with VPC
+        if self.data.get('dependencies', {}) == 'all' or \
+                'nat-gateway' in self.data.get('dependencies', {}):
+            self._take_action_on_dependency(resources, 'delete', 'nat-gateway', VpcNatGatewayFilter,
+                                            confirm=True,
+                                            confirmed=lambda x:
+                                                len(x) == 0 or x[0]['State'] == 'deleted')
+
+        # Delete Subnets associated with VPC
+        if self.data.get('dependencies', {}) == 'all' or \
+                'subnet' in self.data.get('dependencies', {}):
+            self._take_action_on_dependency(resources, 'delete', 'subnet', VpcSubnetFilter)
+
+        # Delete Internet Gateways associated with VPC
+        # Detaching the Internet Gateway requires the VpcId
+        # The Internet Gateway could be connected to other VPCs too?
+        # We probably want to only detach from this one, so we won't force the delete action
+        if self.data.get('dependencies', {}) == 'all' or \
+                'internet-gateway' in self.data.get('dependencies', {}):
+            for r in resources:
+                dep_data = {'vpc_ids': [r['VpcId']]}
+                self._take_action_on_dependency([r], 'detach', 'internet-gateway',
+                                                VpcInternetGatewayFilter, dep_data)
+                self._take_action_on_dependency([r], 'delete', 'internet-gateway',
+                                                VpcInternetGatewayFilter)
+
+        # Delete Route Tables associated with VPC
+        if self.data.get('dependencies', {}) == 'all' or \
+                'route-table' in self.data.get('dependencies', {}):
+            self._take_action_on_dependency(resources, 'delete', 'route-table', VpcRouteTableFilter)
+
+        # Delete Security Groups associated with VPC
+        if self.data.get('dependencies', {}) == 'all' or \
+                'security-group' in self.data.get('dependencies', {}):
+            self._take_action_on_dependency(resources, 'delete', 'security-group',
+                                            VpcSecurityGroupFilter)
+
+        # Delete the VPCs
+        for r in resources:
+            client.delete_vpc(VpcId=r['VpcId'])
+            self.log.debug(
+                "Deleted VPC ID %s",
+                r['VpcId']
+            )
+
+    def _take_action_on_dependency(self, resources, action, dependency, dependency_filter,
+                                   dep_data=None, confirm=False, confirmed=lambda x: True):
+        max_attempts = 8
+        min_delay = 2
+        max_delay = max(min_delay, 2) ** max_attempts
+        if dep_data is None:
+            dep_data = {}
+
+        vpc_dep_filter = dependency_filter(data=self.data, manager=self.manager)
+        vpc_dep_ids = vpc_dep_filter.get_related_ids(resources=resources)
+        dep_manager = self.manager.get_resource_manager(dependency)
+        for id in vpc_dep_ids:
+            try:
+                deps = dep_manager.get_resources([id])
+                dep_manager.action_registry.get(action)(dep_data, dep_manager).process(deps)
+                self.log.debug("%s action on associated %s ID %s", action, dependency, id)
+
+                if confirm:
+                    for idx, delay in enumerate(backoff_delays(min_delay, max_delay, jitter=True)):
+                        time.sleep(delay)
+                        deps = dep_manager.get_resources([id], cache=False)
+                        if confirmed(deps):
+                            self.log.debug("%s action on %s confirmed: %s", action, dependency, id)
+                            break
+                        if idx == max_attempts - 1:
+                            self.log.debug("Giving up waiting for %s action on %s: %s",
+                                           action, dependency, id)
+                            break
+                        self.log.debug("Waiting for %s action on %s: %s", action, dependency, id)
+            except ClientError as e:
+                self.log.warning("Could not %s %s ID %s, error: %s", action, dependency, id, e)
 
 
 @Vpc.filter_registry.register('flow-logs')
@@ -304,6 +445,40 @@ class VpcInternetGatewayFilter(RelatedResourceFilter):
         return vpc_igw_ids
 
 
+@Vpc.filter_registry.register('route-table')
+class VpcRouteTableFilter(RelatedResourceFilter):
+    """Filter VPCs based on Route Table attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: gray-vpcs
+                resource: vpc
+                filters:
+                  - type: route-table
+                    key: tag:Color
+                    value: Gray
+    """
+    schema = type_schema(
+        'route-table', rinherit=ValueFilter.schema,
+        **{'match-resource': {'type': 'boolean'},
+           'operator': {'enum': ['and', 'or']}})
+    RelatedResource = "c7n.resources.vpc.RouteTable"
+    RelatedIdsExpression = '[RouteTables][].RouteTableId'
+    AnnotationKey = "MatchedVpcsRtbs"
+
+    def get_related_ids(self, resources):
+        vpc_ids = [vpc['VpcId'] for vpc in resources]
+        vpc_rtb_ids = {
+            g['RouteTableId'] for g in
+            self.manager.get_resource_manager('route-table').resources()
+            if g.get('VpcId', '') in vpc_ids
+        }
+        return vpc_rtb_ids
+
+
 @Vpc.filter_registry.register('vpc-attributes')
 class AttributesFilter(Filter):
     """Filters VPCs based on their DNS attributes
@@ -442,6 +617,35 @@ class Subnet(query.QueryResourceManager):
 
 
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
+
+
+@Subnet.action_registry.register('delete')
+class SubnetDelete(BaseAction):
+    """Action to delete subnet(s)
+
+    It is recommended to apply a filter to the delete policy to avoid the
+    deletion of all subnets returned.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: subnets-unused-delete
+                resource: subnet
+                filters:
+                  - flow-logs
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteSubnet',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_subnet(SubnetId=r['SubnetId'])
 
 
 @resources.register('security-group')
@@ -1175,7 +1379,7 @@ class IPPermissionEgress(SGPermission):
 
 
 @SecurityGroup.action_registry.register('delete')
-class Delete(BaseAction):
+class SecurityGroupDelete(BaseAction):
     """Action to delete security group(s)
 
     It is recommended to apply a filter to the delete policy to avoid the
@@ -1501,6 +1705,33 @@ class Route(ValueFilter):
         return results
 
 
+@RouteTable.action_registry.register('delete')
+class DeleteRouteTable(BaseAction):
+    """Delete a Route Table
+
+        :example:
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: delete-route-table
+                    resource: route-table
+                    filters:
+                      - type: value
+                        key: "tag:Name"
+                        value: "c7n-delete-test"
+                    actions:
+                      - delete
+        """
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteRouteTable',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_route_table(RouteTableId=r['RouteTableId'])
+
+
 @resources.register('transit-gateway')
 class TransitGateway(query.QueryResourceManager):
 
@@ -1817,6 +2048,82 @@ class InternetGateway(query.QueryResourceManager):
         filter_type = 'list'
         config_type = "AWS::EC2::InternetGateway"
         id_prefix = "igw-"
+
+
+@InternetGateway.action_registry.register('detach')
+class DetachInternetGateway(BaseAction):
+    """Detach an Internet Gateway
+
+        :example:
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: detach-internet-gateway
+                    resource: internet-gateway
+                    filters:
+                      - type: value
+                        key: "tag:Name"
+                        value: "c7n-delete-test"
+                    actions:
+                      - type: detach
+                        vpc_ids: "all"
+        """
+    schema = type_schema('detach',
+                         vpc_ids={
+                             'oneOf': [
+                                 {'type': 'string', 'enum': ['all']},
+                                 {'type': 'array', 'items': {'type': 'string'}}
+                             ]
+                         },
+                         required=['type', 'vpc_ids'])
+    permissions = ('ec2:DetachInternetGateway',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            for a in r['Attachments']:
+                if self.data.get('vpc_ids') == 'all' or a['VpcId'] in self.data.get('vpc_ids', []):
+                    client.detach_internet_gateway(
+                        InternetGatewayId=r['InternetGatewayId'],
+                        VpcId=a['VpcId'])
+
+
+@InternetGateway.action_registry.register('delete')
+class DeleteInternetGateway(BaseAction):
+    """Delete an Internet Gateway
+
+        If the force boolean is true, we will detach the Internet Gateway from all attached VPCs,
+        and then delete.
+
+        :example:
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: delete-internet-gateway
+                    resource: internet-gateway
+                    filters:
+                      - type: value
+                        key: "tag:Name"
+                        value: "c7n-delete-test"
+                    actions:
+                      - delete
+        """
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('ec2:DeleteInternetGateway', 'ec2:DetachInternetGateway')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            if self.data.get('force') and len(r['Attachments']):
+                # This could be attached to more than one VPC?
+                # I guess we had better detach all of them
+                for a in r['Attachments']:
+                    client.detach_internet_gateway(
+                        InternetGatewayId=r['InternetGatewayId'],
+                        VpcId=a['VpcId'])
+            client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
 
 
 @resources.register('nat-gateway')

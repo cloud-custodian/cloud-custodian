@@ -1,0 +1,29 @@
+{
+    "status_code": 200, 
+    "data": {
+        "InternetGateways": [
+            {
+                "Attachments": [
+                    {
+                        "State": "available",
+                        "VpcId": "vpc-0cc1f28fcc3977440"
+                    }
+                ],
+                "InternetGatewayId": "igw-01862a679bf95e81b",
+                "Tags": [{"Key": "Name", "Value": "c7n_test"}]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "9482b1ce-be42-441d-a200-f5a3023502b0", 
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:48 GMT", 
+                "content-length": "3537", 
+                "vary": "accept-encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8"
+            }
+        }
+    }
+}

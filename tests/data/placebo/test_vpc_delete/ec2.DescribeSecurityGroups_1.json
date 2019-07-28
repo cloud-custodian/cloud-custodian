@@ -1,0 +1,53 @@
+{
+    "status_code": 200, 
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "default VPC security group",
+                "GroupName": "default",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-09e78919ff4ea20a9",
+                                "UserId": "123456789012"
+                            }
+                        ]
+                    }
+                ],
+                "OwnerId": "123456789012",
+                "GroupId": "sg-09e78919ff4ea20a9",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "VpcId": "vpc-0cc1f28fcc3977440"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "63b421c4-d1aa-4849-93c7-a68ac1f22a3a", 
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:49 GMT", 
+                "transfer-encoding": "chunked", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "server": "AmazonEC2", 
+                "vary": "accept-encoding"
+            }
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "status_code": 400, 
+    "data": {
+        "Error": {
+            "Message": "The routeTable 'rtb-010af5ef3ea01f217' has dependencies and cannot be deleted.", 
+            "Code": "DependencyViolation"
+        }, 
+        "ResponseMetadata": {
+            "RequestId": "3ac2182f-b6b8-4a69-aa2e-f9701b51b9c8", 
+            "HTTPStatusCode": 400, 
+            "RetryAttempts": 0, 
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:49 GMT", 
+                "transfer-encoding": "chunked", 
+                "connection": "close", 
+                "server": "AmazonEC2"
+            }
+        }
+    }
+}

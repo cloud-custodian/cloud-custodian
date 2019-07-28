@@ -1,0 +1,35 @@
+{
+    "status_code": 200, 
+    "data": {
+        "NatGateways": [
+            {
+                "CreateTime": "2019-05-17T17:39:55.000Z",
+                "NatGatewayAddresses": [
+                    {
+                        "AllocationId": "eipalloc-0ae30108ef67fc47a",
+                        "NetworkInterfaceId": "eni-0142d2127131f00f1",
+                        "PrivateIp": "10.0.0.209",
+                        "PublicIp": "55.88.222.111"
+                    }
+                ],
+                "NatGatewayId": "nat-0db15032e3c152411",
+                "State": "available",
+                "SubnetId": "subnet-0a10d515d917d1b17",
+                "VpcId": "vpc-0cc1f28fcc3977440",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "9482b1ce-be42-441d-a200-f5a3023502b0", 
+            "HTTPStatusCode": 200, 
+            "RetryAttempts": 0, 
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:48 GMT", 
+                "content-length": "3537", 
+                "vary": "accept-encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8"
+            }
+        }
+    }
+}

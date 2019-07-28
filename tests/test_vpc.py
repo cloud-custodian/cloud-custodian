@@ -213,6 +213,43 @@ class VpcTest(BaseTest):
         self.assertEqual([len(resources), resources[0]["VpcId"]], [1, "vpc-7af45101"])
         self.assertTrue("c7n:DhcpConfiguration" in resources[0])
 
+    def test_vpc_delete(self):
+        session_factory = self.replay_flight_data('test_vpc_delete')
+        p = self.load_policy(
+            {
+                'name': 'test-vpc-delete',
+                'resource': 'vpc',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'tag:Name',
+                        'op': 'eq',
+                        'value': 'c7n-vpc-delete-test'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'dependencies': [
+                            'nat-gateway',
+                            'subnet',
+                            'route-table',
+                            'internet-gateway',
+                            'security-group'
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcId"], 'vpc-0cc1f28fcc3977440')
+        # client.describe_vpcs(VpcIds=['vpc-0cc1f28fcc3977440'])
+        # calling that again just hits the placebo data? Not really testing much
+
 
 class NetworkLocationTest(BaseTest):
 
@@ -2407,6 +2444,24 @@ class EndpointTest(BaseTest):
         self.assertEqual(violations[0]['Action'], '*')
         self.assertEqual(violations[0]['Resource'], '*')
         self.assertEqual(violations[0]['Effect'], 'Allow')
+
+
+class InternetGatewayTest(BaseTest):
+
+    def test_delete_internet_gateways(self):
+        factory = self.replay_flight_data("test_internet_gateway_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-internet-gateways",
+                "resource": "internet-gateway",
+                "filters": [{"tag:Name": "c7n_test"}],
+                "actions": [{"type": "delete", "force": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["InternetGatewayId"], 'igw-01862a679bf95e81b')
 
 
 class NATGatewayTest(BaseTest):

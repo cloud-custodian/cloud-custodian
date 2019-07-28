@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subnets": [
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailableIpAddressCount": 250,
+                "CidrBlock": "10.0.0.0/24",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-0a10d515d917d1b17",
+                "VpcId": "vpc-0cc1f28fcc3977440",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Public subnet"
+                    }
+                ]
+            },
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailableIpAddressCount": 251,
+                "CidrBlock": "10.0.1.0/24",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-0d7d0e375c7297d53",
+                "VpcId": "vpc-0cc1f28fcc3977440",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Private subnet"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "ead60365-a0ce-46cf-a320-5e68131dc59d",
+            "HTTPStatusCode": 200,
+            "RetryAttempts": 0,
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2019 15:30:47 GMT",
+                "content-type": "text/xml;charset=UTF-8",
+                "server": "AmazonEC2",
+                "content-length": "1197"
+            }
+        }
+    }
+}
