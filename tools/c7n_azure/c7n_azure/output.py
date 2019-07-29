@@ -176,8 +176,7 @@ class AppInsightsLogHandler(LoggingHandler):
             self.client.track_exception(*record.exc_info, properties=properties)
             return
 
-        formatted_message = self.format(record)
-        self.client.track_trace(formatted_message, properties=properties, severity=record.levelname)
+        self.client.track_trace(record.msg, properties=properties, severity=record.levelname)
 
 
 @log_outputs.register('azure')

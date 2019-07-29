@@ -15,7 +15,6 @@
 import logging
 import re
 import sys
-import time
 
 import six
 from azure.mgmt.eventgrid.models import \
@@ -231,6 +230,43 @@ class AzureFunctionMode(ServerlessExecutionMode):
         return package
 
 
+class AzureModeCommon:
+    """ Utility methods shared across a variety of modes """
+    @staticmethod
+    def run_for_event(policy, event=None):
+        resources = policy.resource_manager.get_resources([event['subject']])
+
+        resources = policy.resource_manager.filter_resources(
+            resources, event)
+
+        if not resources:
+            policy.log.info(
+                "policy: %s resources: %s no resources found" % (
+                    policy.name, policy.resource_type))
+            return
+
+        with policy.ctx:
+            policy.ctx.metrics.put_metric(
+                'ResourceCount', len(resources), 'Count', Scope="Policy",
+                buffer=False)
+
+            policy._write_file(
+                'resources.json', utils.dumps(resources, indent=2))
+
+            for action in policy.resource_manager.actions:
+                policy.log.info(
+                    "policy: %s invoking action: %s resources: %d",
+                    policy.name, action.name, len(resources))
+                if isinstance(action, EventAction):
+                    results = action.process(resources, event)
+                else:
+                    results = action.process(resources)
+                policy._write_file(
+                    "action-%s" % action.name, utils.dumps(results))
+
+        return resources
+
+
 @execution.register(FUNCTION_TIME_TRIGGER_MODE)
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
     """A policy that runs/execute s in azure functions at specified
@@ -284,43 +320,7 @@ class AzureEventGridMode(AzureFunctionMode):
 
     def run(self, event=None, lambda_context=None):
         """Run the actual policy."""
-        resources = self.policy.resource_manager.get_resources([event['subject']])
-
-        resources = self.policy.resource_manager.filter_resources(
-            resources, event)
-
-        if not resources:
-            self.policy.log.info(
-                "policy: %s resources: %s no resources found" % (
-                    self.policy.name, self.policy.resource_type))
-            return
-
-        resources = self.policy.resource_manager.filter_resources(
-            resources, event)
-
-        with self.policy.ctx:
-            self.policy.ctx.metrics.put_metric(
-                'ResourceCount', len(resources), 'Count', Scope="Policy",
-                buffer=False)
-
-            self.policy._write_file(
-                'resources.json', utils.dumps(resources, indent=2))
-
-            at = time.time()
-            for action in self.policy.resource_manager.actions:
-                self.policy.log.info(
-                    "policy: %s invoking action: %s resources: %d",
-                    self.policy.name, action.name, len(resources))
-                if isinstance(action, EventAction):
-                    results = action.process(resources, event)
-                else:
-                    results = action.process(resources)
-                self.policy._write_file(
-                    "action-%s" % action.name, utils.dumps(results))
-            self.policy.ctx.metrics.put_metric(
-                "ActionTime", time.time() - at, "Seconds", Scope="Policy")
-
-        return resources
+        return AzureModeCommon.run_for_event(self.policy, event)
 
     def get_logs(self, start, end):
         """Retrieve logs for the policy"""

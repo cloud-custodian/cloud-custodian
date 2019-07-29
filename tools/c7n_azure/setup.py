@@ -86,6 +86,7 @@ setup(
                       "azure-storage-file",
                       "azure-cosmosdb-table",
                       "applicationinsights",
+                      "apscheduler",
                       "distlib",
                       "jsonpickle",
                       "requests",
