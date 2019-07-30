@@ -28,12 +28,12 @@ Cloud Custodian has deep support for integrating with SSM Ops Center. With
 custodian you can.
 
   - Filter resources by extant ops items associated to them.
-    See :ref:`ops-item filter <aws.common.filters.post-item>`
+    See :ref:`ops-item filter <aws.common.filters.ops-item>`
 
   - Post new ops items for a resource from any custodian policy.
     See :ref:`post-item action <aws.common.actions.post-item>`
 
-  - Manage ops items as a resource, , close or update ops items.
+  - Manage ops items as a resource, to resolve or update ops items.
     See :ref:`ops-item resource <aws.ops-item>`
 
 
