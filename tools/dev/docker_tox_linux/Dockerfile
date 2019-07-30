@@ -8,8 +8,13 @@
 #
 # For example, a useful one-liner to build image and then run doc build to `docs/build`:
 #
+# Linux:
 # docker build -t tox_linux --build-arg TOX_ENV=docs . -f tools/dev/docker_tox_linux/Dockerfile &&
 # docker run -v 'pwd'/docs/build:/src/docs/build -it tox_linux
+#
+# Windows:
+# docker build -t tox_linux --build-arg TOX_ENV=docs . -f tools/dev/docker_tox_linux/Dockerfile &&
+# docker run -v %cd%/docs/build:/src/docs/build -it tox_linux
 
 
 

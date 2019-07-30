@@ -152,7 +152,7 @@ class RemoveLaunchPermissions(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: ami-remove-launch-permissions
+              - name: ami-stop-share-old
                 resource: ami
                 filters:
                   - type: image-age
@@ -276,7 +276,7 @@ class ImageUnusedFilter(Filter):
     schema = type_schema('unused', value={'type': 'boolean'})
 
     def get_permissions(self):
-        return list(itertools.chain([
+        return list(itertools.chain(*[
             self.manager.get_resource_manager(m).get_permissions()
             for m in ('asg', 'launch-config', 'ec2')]))
 

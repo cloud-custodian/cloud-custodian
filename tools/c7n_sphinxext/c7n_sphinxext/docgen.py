@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-import itertools
 import logging
 import operator
 import os
@@ -162,6 +161,10 @@ def main(provider, output_dir, group_by):
         pdb.post_mortem(sys.exc_info()[-1])
 
 
+def resource_file_name(output_dir, r):
+    return os.path.join(output_dir, "%s.rst" % r.type).replace(' ', '-').lower()
+
+
 def _main(provider, output_dir, group_by):
     """Generate RST docs for a given cloud provider's resources
     """
@@ -176,16 +179,35 @@ def _main(provider, output_dir, group_by):
 
     files = []
 
-    # Write out resources by grouped page
-    for key, group in itertools.groupby(
-            sorted(provider_class.resources.values(), key=group_by), key=group_by):
-        rpath = os.path.join(output_dir, "%s.rst" % key)
+    groups = {}
+
+    for r in provider_class.resources.values():
+        group = group_by(r)
+        if not isinstance(group, list):
+            group = [group]
+        for g in group:
+            groups.setdefault(g, []).append(r)
+
+    # Create individual resources pages
+    for r in provider_class.resources.values():
+        rpath = resource_file_name(output_dir, r)
         with open(rpath, 'w') as fh:
             t = env.get_template('provider-resource.rst')
             fh.write(t.render(
                 provider_name=provider,
+                resource=r))
+
+    # Create files for all groups
+    for key, group in sorted(groups.items()):
+        group = sorted(group, key=operator.attrgetter('type'))
+        rpath = os.path.join(output_dir, "group-%s.rst" % key).replace(' ', '-').lower()
+        with open(rpath, 'w') as fh:
+            t = env.get_template('provider-group.rst')
+            fh.write(t.render(
+                provider_name=provider,
                 key=key,
-                resources=sorted(group, key=operator.attrgetter('type'))))
+                resource_files=[os.path.basename(resource_file_name(output_dir, r)) for r in group],
+                resources=group))
         files.append(os.path.basename(rpath))
 
     # Write out common provider filters & actions

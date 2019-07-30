@@ -1,0 +1,6 @@
+queue_url: asq://${storage_name}.queue.core.windows.net/${queue_name}
+from_address: cloud@custodian.com
+sendgrid_api_key: ${SENDGRID_API_KEY}
+function_properties:
+  servicePlan:
+    resourceGroupName: ${rg_name}

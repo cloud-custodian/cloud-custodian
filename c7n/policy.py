@@ -31,23 +31,20 @@ from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExce
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
-from c7n.provider import clouds
+from c7n.provider import clouds, get_resource_class
 from c7n import utils
 from c7n.version import version
 
 log = logging.getLogger('c7n.policy')
 
 
-def load(options, path, format='yaml', validate=True, vars=None):
+def load(options, path, format=None, validate=True, vars=None):
     # should we do os.path.expanduser here?
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
     load_resources()
     data = utils.load_file(path, format=format, vars=vars)
-
-    if format == 'json':
-        validate = False
 
     if isinstance(data, list):
         log.warning('yaml in invalid format. The "policies:" line is probably missing.')
@@ -365,11 +362,20 @@ class LambdaMode(ServerlessExecutionMode):
 
     def validate(self):
         super(LambdaMode, self).validate()
-        prefix = self.policy.data.get('function-prefix', 'custodian-')
+        prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
         if len(prefix + self.policy.name) > 64:
             raise PolicyValidationError(
                 "Custodian Lambda policies have a max length with prefix of 64"
                 " policy:%s prefix:%s" % (prefix, self.policy.name))
+        tags = self.policy.data['mode'].get('tags')
+        if not tags:
+            return
+        reserved_overlap = [t for t in tags if t.startswith('custodian-')]
+        if reserved_overlap:
+            log.warning((
+                'Custodian reserves policy lambda '
+                'tags starting with custodian - policy specifies %s' % (
+                    ', '.join(reserved_overlap))))
 
     def get_metrics(self, start, end, period):
         from c7n.mu import LambdaManager, PolicyLambda
@@ -481,6 +487,12 @@ class LambdaMode(ServerlessExecutionMode):
         return resources
 
     def provision(self):
+        # auto tag lambda policies with mode and version, we use the
+        # version in mugc to effect cleanups.
+        tags = self.policy.data['mode'].setdefault('tags', {})
+        tags['custodian-info'] = "mode=%s:version=%s" % (
+            self.policy.data['mode']['type'], version)
+
         from c7n import mu
         with self.policy.ctx:
             self.policy.log.info(
@@ -622,6 +634,144 @@ class EC2InstanceState(LambdaMode):
                      'stopped', 'stopping', 'terminated']}})
 
 
+@execution.register('hub-action')
+@execution.register('hub-finding')
+class SecurityHub(LambdaMode):
+    """
+    Execute a policy lambda in response to security hub finding event or action.
+
+    .. example:
+
+    This policy will provision a lambda and security hub custom action.
+    The action can be invoked on a finding or insight result (collection
+    of findings). The action name will have the resource type prefixed as
+    custodian actions are resource specific.
+
+    .. code-block: yaml
+
+       policy:
+         - name: remediate
+           resource: aws.ec2
+           mode:
+             type: hub-action
+             role: MyRole
+           actions:
+            - snapshot
+            - type: set-instance-profile
+              name: null
+            - stop
+
+    .. example:
+
+    This policy will provision a lambda that will process high alert findings from
+    guard duty (note custodian also has support for guard duty events directly).
+
+    .. code-block: yaml
+
+       policy:
+         - name: remediate
+           resource: aws.iam
+           filters:
+             - type: event
+               key: detail.findings[].ProductFields.aws/securityhub/ProductName
+               value: GuardDuty
+             - type: event
+               key: detail.findings[].ProductFields.aws/securityhub/ProductName
+               value: GuardDuty
+           actions:
+             - remove-keys
+
+    Note, for custodian we support additional resources in the finding via the Other resource,
+    so these modes work for resources that security hub doesn't natively support.
+
+    https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cloudwatch-events.html
+    """
+
+    schema = utils.type_schema(
+        'hub-finding', aliases=('hub-action',),
+        rinherit=LambdaMode.schema)
+
+    ActionFinding = 'Security Hub Findings - Custom Action'
+    ActionInsight = 'Security Hub Insight Results'
+    ImportFinding = 'Security Hub Findings - Imported'
+
+    handlers = {
+        ActionFinding: 'resolve_action_finding',
+        ActionInsight: 'resolve_action_insight',
+        ImportFinding: 'resolve_import_finding'
+    }
+
+    def resolve_findings(self, findings):
+        rids = set()
+        for f in findings:
+            for r in f['Resources']:
+                # Security hub invented some new arn format for a few resources...
+                # detect that and normalize to something sane.
+                if r['Id'].startswith('AWS') and r['Type'] == 'AwsIamAccessKey':
+                    rids.add('arn:aws:iam::%s:user/%s' % (
+                        f['AwsAccountId'],
+                        r['Details']['AwsIamAccessKey']['UserName']))
+                elif not r['Id'].startswith('arn'):
+                    log.warning("security hub unknown id:%s rtype:%s",
+                                r['Id'], r['Type'])
+                else:
+                    rids.add(r['Id'])
+        return rids
+
+    def resolve_action_insight(self, event):
+        rtype = event['detail']['resultType']
+        rids = [list(i.keys())[0] for i in event['detail']['insightResults']]
+        client = utils.local_session(
+            self.policy.session_factory).client('securityhub')
+        insights = client.get_insights(
+            InsightArns=[event['detail']['insightArn']]).get(
+                'Insights', ())
+        if not insights or len(insights) > 1:
+            return []
+        insight = insights.pop()
+        params = {}
+        params['Filters'] = insight['Filters']
+        params['Filters'][rtype] = [
+            {'Comparison': 'EQUALS', 'Value': r} for r in rids]
+        findings = client.get_findings(**params).get('Findings', ())
+        return self.resolve_findings(findings)
+
+    def resolve_action_finding(self, event):
+        return self.resolve_findings(event['detail']['findings'])
+
+    def resolve_import_finding(self, event):
+        return self.resolve_findings(event['detail']['findings'])
+
+    def resolve_resources(self, event):
+        # For centralized setups in a hub aggregator account
+        self.assume_member(event)
+
+        event_type = event['detail-type']
+        arn_resolver = getattr(self, self.handlers[event_type])
+        arns = arn_resolver(event)
+
+        # Lazy import to avoid aws sdk runtime dep in core
+        from c7n.resources.aws import Arn
+        resource_map = {Arn.parse(r) for r in arns}
+
+        # sanity check on finding resources matching policy resource
+        # type's service.
+        if self.policy.resource_manager.type != 'account':
+            log.info(
+                "mode:security-hub resolve resources %s", list(resource_map))
+            if not resource_map:
+                return []
+            resource_arns = [
+                r for r in resource_map
+                if r.service == self.policy.resource_manager.resource_type.service]
+            resources = self.policy.resource_manager.get_resources(
+                [r.resource for r in resource_arns])
+        else:
+            resources = self.policy.resource_manager.get_resources([])
+            resources[0]['resource-arns'] = resource_arns
+        return resources
+
+
 @execution.register('asg-instance-state')
 class ASGInstanceState(LambdaMode):
     """a lambda policy that executes on an asg's ec2 instance state changes."""
@@ -635,7 +785,10 @@ class ASGInstanceState(LambdaMode):
 
 @execution.register('guard-duty')
 class GuardDutyMode(LambdaMode):
-    """Incident Response for AWS Guard Duty"""
+    """Incident Response for AWS Guard Duty.
+
+    This policy fires on guard duty events for the given resource type.
+    """
 
     schema = utils.type_schema('guard-duty', rinherit=LambdaMode.schema)
 
@@ -957,18 +1110,7 @@ class Policy(object):
             fh.write(value)
 
     def load_resource_manager(self):
-        resource_type = self.data.get('resource')
-
-        provider = clouds.get(self.provider_name)
-        if provider is None:
-            raise ValueError(
-                "Invalid cloud provider: %s" % self.provider_name)
-
-        factory = provider.resources.get(
-            resource_type.rsplit('.', 1)[-1])
-        if not factory:
-            raise ValueError(
-                "Invalid resource type: %s" % resource_type)
+        factory = get_resource_class(self.data.get('resource'))
         return factory(self.ctx, self.data)
 
     def validate_policy_start_stop(self):

@@ -21,6 +21,7 @@ import c7n_azure.actions.logic_app
 import c7n_azure.filters
 import c7n_azure.output
 import c7n_azure.policy
+import c7n_azure.container_host.modes
 import c7n_azure.resources.generic_arm_resource
 import c7n_azure.resources.cosmos_db
 import c7n_azure.resources.key_vault
@@ -56,7 +57,9 @@ import c7n_azure.resources.image
 import c7n_azure.resources.event_subscription
 import c7n_azure.resources.k8s_service
 import c7n_azure.resources.apimanagement
-import c7n_azure.resources.appserviceplan  # noqa: F401
+import c7n_azure.resources.appserviceplan
+import c7n_azure.resources.dns_zone
+import c7n_azure.resources.record_set  # noqa: F401
 
 
 def initialize_azure():

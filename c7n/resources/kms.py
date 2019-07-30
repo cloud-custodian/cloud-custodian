@@ -127,7 +127,7 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
     .. code-block:: yaml
 
             policies:
-              - name: kms-key-cross-account
+              - name: check-kms-key-cross-account
                 resource: kms-key
                 filters:
                   - type: cross-account

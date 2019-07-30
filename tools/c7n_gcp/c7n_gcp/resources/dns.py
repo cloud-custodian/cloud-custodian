@@ -17,7 +17,8 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('dns-managed-zone')
 class DnsManagedZone(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/dns/docs/reference/v1beta2/managedZones
+    """
     class resource_type(TypeInfo):
         service = 'dns'
         version = 'v1beta2'
@@ -35,7 +36,8 @@ class DnsManagedZone(QueryResourceManager):
 
 @resources.register('dns-policy')
 class DnsPolicy(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/dns/docs/reference/v1beta2/policies
+    """
     class resource_type(TypeInfo):
         service = 'dns'
         version = 'v1beta2'

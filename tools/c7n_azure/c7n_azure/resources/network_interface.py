@@ -27,7 +27,29 @@ log = logging.getLogger('custodian.azure.networkinterface')
 
 @resources.register('networkinterface')
 class NetworkInterface(ArmResourceManager):
+    """Network Interface Resource
+
+    :example:
+
+    This policy will get Network Interfaces that have User added routes.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: get-nic-with-user-routes
+            resource: azure.networkinterface
+            filters:
+              - type: effective-route-table
+                key: routes.value[].source
+                op: in
+                value_type: swap
+                value: User
+
+    """
+
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Networking']
+
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('network_interfaces', 'list_all', None)

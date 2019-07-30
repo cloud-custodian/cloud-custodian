@@ -1,0 +1,62 @@
+{
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "principalEmail": "c7n.test@gmail.com"
+      },
+      "requestMetadata": {
+        "callerIp": "188.163.232.130",
+        "callerSuppliedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:67.0) Gecko/20100101 Firefox/67.0,gzip(gfe)",
+        "requestAttributes": {
+          "time": "2019-06-27T10:44:56.181Z",
+          "auth": {}
+        },
+        "destinationAttributes": {}
+      },
+      "serviceName": "ml.googleapis.com",
+      "methodName": "google.cloud.ml.v1.ModelService.CreateModel",
+      "authorizationInfo": [
+        {
+          "resource": "projects/second-impact-244209",
+          "permission": "ml.models.create",
+          "granted": true,
+          "resourceAttributes": {}
+        }
+      ],
+      "resourceName": "projects/second-impact-244209",
+      "request": {
+        "model": {
+          "onlinePredictionConsoleLogging": false,
+          "regions": [
+            "us-central1"
+          ],
+          "name": "test_model",
+          "description": "",
+          "onlinePredictionLogging": false
+        },
+        "parent": "projects/second-impact-244209",
+        "@type": "type.googleapis.com/google.cloud.ml.v1.CreateModelRequest"
+      },
+      "response": {
+        "@type": "type.googleapis.com/google.cloud.ml.v1.Model",
+        "regions": [
+          "us-central1"
+        ],
+        "name": "projects/second-impact-244209/models/test_model",
+        "etag": "aBqikbr66gg="
+      }
+    },
+    "insertId": "1km3japd39r8",
+    "resource": {
+      "type": "audited_resource",
+      "labels": {
+        "method": "google.cloud.ml.v1.ModelService.CreateModel",
+        "project_id": "second-impact-244209",
+        "service": "ml.googleapis.com"
+      }
+    },
+    "timestamp": "2019-06-27T10:44:56.162Z",
+    "severity": "NOTICE",
+    "logName": "projects/second-impact-244209/logs/cloudaudit.googleapis.com%2Factivity",
+    "receiveTimestamp": "2019-06-27T10:44:58.165207111Z"
+  }

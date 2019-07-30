@@ -28,9 +28,6 @@ get deleted so you always have a rolling 7 days worth of snapshots.
            - type: age
              days: 7
              op: ge
-           - type: value
-             key: Description
-             op: regex
-             value: ^(Automated,Backup,-?)\w+
+           - "tag:custodian_snapshot": present
        actions:
            - delete

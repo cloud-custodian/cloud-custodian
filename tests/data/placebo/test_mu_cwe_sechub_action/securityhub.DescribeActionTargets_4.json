@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "80048b1a-b0a3-11e9-80cd-d12c6412ea6b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sat, 27 Jul 2019 19:19:48 GMT",
+                "content-type": "application/json",
+                "content-length": "152",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "80048b1a-b0a3-11e9-80cd-d12c6412ea6b",
+                "x-amz-apigw-id": "df6JNEMWoAMFnnQ=",
+                "x-amzn-trace-id": "Root=1-5d3ca3d4-9ee94a309cfa4000aa54c602;Sampled=0"
+            },
+            "RetryAttempts": 0
+        },
+        "ActionTargets": [
+            {
+                "ActionTargetArn": "arn:aws:securityhub:us-east-1:644160558196:action/custom/sechub",
+                "Name": "Account sechub",
+                "Description": "sechub"
+            }
+        ]
+    }
+}

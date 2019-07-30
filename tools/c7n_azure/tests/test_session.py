@@ -36,6 +36,11 @@ CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 class SessionTest(BaseTest):
 
     authorization_file = os.path.join(os.path.dirname(__file__), 'data', 'test_auth_file.json')
+    authorization_file_kv = os.path.join(os.path.dirname(__file__), 'data',
+                                         'test_auth_file_kv.json')
+    authorization_file_full = os.path.join(os.path.dirname(__file__),
+                                           'data',
+                                           'test_auth_file_full.json')
 
     def setUp(self):
         super(SessionTest, self).setUp()
@@ -139,11 +144,10 @@ class SessionTest(BaseTest):
 
                 auth = s.get_functions_auth_string(CUSTOM_SUBSCRIPTION_ID)
 
-                expected = {"credentials":
-                            {"client_id": "client",
-                             "secret": "secret",
-                             "tenant": "tenant"},
-                            "subscription": CUSTOM_SUBSCRIPTION_ID}
+                expected = {"client_id": "client",
+                            "client_secret": "secret",
+                            "tenant_id": "tenant",
+                            "subscription_id": CUSTOM_SUBSCRIPTION_ID}
 
                 self.assertEqual(json.loads(auth), expected)
 
@@ -165,13 +169,10 @@ class SessionTest(BaseTest):
 
                 auth = s.get_functions_auth_string('000000-5106-4743-99b0-c129bfa71a47')
 
-                expected = """{
-                               "credentials": {
-                                 "client_id": "functionclient",
-                                 "secret": "functionsecret",
-                                 "tenant": "functiontenant"
-                               },
-                               "subscription": "000000-5106-4743-99b0-c129bfa71a47"
+                expected = """{"client_id": "functionclient",
+                               "client_secret": "functionsecret",
+                               "tenant_id": "functiontenant",
+                               "subscription_id": "000000-5106-4743-99b0-c129bfa71a47"
                              }"""
 
                 self.assertEqual(json.loads(auth), json.loads(expected))
@@ -243,3 +244,46 @@ class SessionTest(BaseTest):
         self.assertIsNotNone(client._client.orig_send)
         client._client.send()
         self.assertTrue(mock.called)
+
+    @patch('c7n_azure.utils.get_keyvault_secret', return_value='{}')
+    def test_compare_auth_params(self, _1):
+        reload(sys.modules['c7n_azure.session'])
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_TENANT_ID: 'tenant',
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                            constants.ENV_CLIENT_ID: 'client',
+                            constants.ENV_CLIENT_SECRET: 'secret',
+                            constants.ENV_USE_MSI: 'true',
+                            constants.ENV_ACCESS_TOKEN: 'access_token',
+                            constants.ENV_KEYVAULT_CLIENT_ID: 'kv_client',
+                            constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret'
+                        }, clear=True):
+            env_params = Session().auth_params
+
+        file_params = Session(authorization_file=self.authorization_file_full).auth_params
+
+        self.assertTrue(env_params.pop('enable_cli_auth'))
+        self.assertFalse(file_params.pop('enable_cli_auth', None))
+        self.assertEqual(env_params, file_params)
+
+    @patch('c7n_azure.utils.get_keyvault_secret',
+           return_value='{"client_id": "client", "client_secret": "secret"}')
+    def test_kv_patch(self, _1):
+        reload(sys.modules['c7n_azure.session'])
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_TENANT_ID: 'tenant',
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                            constants.ENV_KEYVAULT_CLIENT_ID: 'kv_client',
+                            constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret'
+                        }, clear=True):
+            with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
+                       autospec=True, return_value=None):
+                auth_params = Session().auth_params
+            self.assertEqual(auth_params.get('tenant_id'), 'tenant')
+            self.assertEqual(auth_params.get('subscription_id'), DEFAULT_SUBSCRIPTION_ID)
+            self.assertEqual(auth_params.get('keyvault_client_id'), 'kv_client')
+            self.assertEqual(auth_params.get('keyvault_secret_id'), 'kv_secret')
+            self.assertEqual(auth_params.get('client_id'), 'client')
+            self.assertEqual(auth_params.get('client_secret'), 'secret')

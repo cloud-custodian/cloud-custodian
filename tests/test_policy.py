@@ -27,6 +27,7 @@ from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
+from c7n.version import version
 
 from .common import BaseTest, event_data, Bag, TestConfig as Config
 
@@ -919,6 +920,51 @@ class PolicyExecutionModeTest(BaseTest):
         self.assertRaises(
             NotImplementedError, policy.PolicyExecutionMode({}).get_logs, 1, 2
         )
+
+
+class LambdaModeTest(BaseTest):
+
+    def test_tags_validation(self):
+        log_file = self.capture_logging('c7n.policy', level=logging.INFO)
+        self.load_policy({
+            'name': 'foobar',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'config-rule',
+                'tags': {
+                    'custodian-mode': 'xyz',
+                    'xyz': 'bar'}
+            }},
+            validate=True)
+        lines = log_file.getvalue().strip().split('\n')
+        self.assertEqual(
+            lines[0],
+            ('Custodian reserves policy lambda tags starting with '
+             'custodian - policy specifies custodian-mode'))
+
+    def test_tags_injection(self):
+        p = self.load_policy({
+            'name': 'foobar',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'config-rule',
+                'tags': {
+                    'xyz': 'bar'}
+            }},
+            validate=True)
+
+        from c7n import mu
+        policy_lambda = []
+
+        def publish(self, func, alias=None, role=None, s3_uri=None):
+            policy_lambda.append(func)
+
+        self.patch(mu.LambdaManager, 'publish', publish)
+
+        p.provision()
+        self.assertEqual(
+            policy_lambda[0].tags['custodian-info'],
+            'mode=config-rule:version=%s' % version)
 
 
 class PullModeTest(BaseTest):

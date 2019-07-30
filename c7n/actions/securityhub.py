@@ -20,7 +20,8 @@ import jmespath
 import json
 
 from .core import BaseAction
-from c7n.utils import type_schema, local_session, chunks, dumps, filter_empty
+from c7n.utils import (
+    type_schema, local_session, chunks, dumps, filter_empty, get_partition)
 from c7n.exceptions import PolicyValidationError
 
 from c7n.manager import resources as aws_resources
@@ -327,6 +328,7 @@ class OtherResourcePostFinding(PostFinding):
             'Type': 'Other',
             'Id': self.manager.get_arns([r])[0],
             'Region': self.manager.config.region,
+            'Partition': get_partition(self.manager.config.region),
             'Details': {'Other': filter_empty(details)}
         }
         tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}

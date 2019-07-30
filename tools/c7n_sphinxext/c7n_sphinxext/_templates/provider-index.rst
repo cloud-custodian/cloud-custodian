@@ -8,7 +8,7 @@ See the :ref:`Generic Filters reference <filters>` for filters that can
 be applies for all resources.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :titlesonly:
 
 {% for f in files %}

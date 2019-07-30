@@ -17,14 +17,30 @@ from c7n import utils
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.filters import AzureOffHour, AzureOnHour
 from azure.mgmt.web import models
 
 
 @resources.register('appserviceplan')
 class AppServicePlan(ArmResourceManager):
+    """Application Service Plan
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: basic-tier-plans
+            resource: azure.appserviceplan
+            filters:
+              - type: value
+                key: sku.tier
+                op: eq
+                value: Basic
+    """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Compute', 'Web']
+
         service = 'azure.mgmt.web'
         client = 'WebSiteManagementClient'
         enum_spec = ('app_service_plans', 'list', None)
@@ -37,29 +53,20 @@ class AppServicePlan(ArmResourceManager):
         resource_type = 'Microsoft.Web/sites'
         enable_tag_operations = False
 
-    @staticmethod
-    def register(registry, _):
-        # Additional filters/actions registered for this resource type
-        AppServicePlan.filter_registry.register("offhour", AzureOffHour)
-        AppServicePlan.filter_registry.register("onhour", AzureOnHour)
-
-
-resources.subscribe(resources.EVENT_FINAL, AppServicePlan.register)
-
 
 @AppServicePlan.action_registry.register('resize-plan')
 class ResizePlan(AzureBaseAction):
     """Resize App Service Plans
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-          policies:
-            - name: azure-resize-plan
-              resource: azure.appserviceplan
-              actions:
-               - type: resize-plan
-                 size: F1
-                 count: 1
+        policies:
+        - name: azure-resize-plan
+          resource: azure.appserviceplan
+          actions:
+           - type: resize-plan
+             size: F1
+             count: 1
     """
 
     schema = utils.type_schema(

@@ -22,6 +22,8 @@ from c7n.filters.core import Filter, type_schema
 class GenericArmResource(ArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Generic']
+
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
         enum_spec = ('resources', 'list', None)

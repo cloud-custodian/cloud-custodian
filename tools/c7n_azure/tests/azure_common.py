@@ -16,6 +16,7 @@ import email.utils as eut
 import json
 import os
 import re
+from functools import wraps
 
 import msrest.polling
 from azure_serializer import AzureSerializer
@@ -39,6 +40,7 @@ DEFAULT_SUBSCRIPTION_ID = 'ea42f556-5106-4743-99b0-c129bfa71a47'
 CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 DEFAULT_USER_OBJECT_ID = '00000000-0000-0000-0000-000000000002'
 DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000003'
+DEFAULT_INSTRUMENTATION_KEY = '00000000-0000-0000-0000-000000000004'
 DEFAULT_STORAGE_KEY = 'DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo'\
                       '/MGFHKc+t+M20PxoraNCslng9w=='
 
@@ -98,6 +100,11 @@ class AzureVCRBaseTest(VCRTestCase):
                         'x-ms-gateway-service-instanceid',
                         'x-ms-ratelimit-remaining-tenant-reads',
                         'x-ms-served-by',
+                        'x-ms-cosmos-llsn',
+                        'x-ms-last-state-change-utc',
+                        'x-ms-xp-role',
+                        'x-ms-gatewayversion',
+                        'x-ms-global-committed-lsn',
                         'x-aspnet-version',
                         'x-content-type-options',
                         'x-powered-by',
@@ -114,6 +121,13 @@ class AzureVCRBaseTest(VCRTestCase):
         # setup (via our callbacks), but it is also not possible to do until the base class setup
         # has completed initializing the cassette instance.
         return not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path)
+
+    def _get_cassette_name(self):
+        test_method = getattr(self, self._testMethodName)
+        name_override = getattr(test_method, 'cassette_name', None)
+        method_name = name_override or self._testMethodName
+        return '{0}.{1}.yaml'.format(self.__class__.__name__,
+                                     method_name)
 
     def _get_vcr_kwargs(self):
         return super(VCRTestCase, self)._get_vcr_kwargs(
@@ -190,6 +204,7 @@ class AzureVCRBaseTest(VCRTestCase):
         body = AzureVCRBaseTest._replace_tenant_id(body)
         body = AzureVCRBaseTest._replace_subscription_id(body)
         body = AzureVCRBaseTest._replace_storage_keys(body)
+        body = AzureVCRBaseTest._replace_instrumentation_key(body)
 
         try:
             response['body']['data'] = json.loads(body)
@@ -238,7 +253,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
     @staticmethod
     def _replace_subscription_id(s):
-        prefixes = ['(/|%2F)subscriptions(/|%2F)',
+        prefixes = ['(/|%2F)?subscriptions(/|%2F)',
                     '"subscription":\\s*"']
         regex = r"(?P<prefix>(%s))" \
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
@@ -264,6 +279,16 @@ class AzureVCRBaseTest(VCRTestCase):
                 r"(?P<prefix>=|\"|:)(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==)",
                 r"\g<prefix>" + DEFAULT_STORAGE_KEY, s)
         return s
+
+    @staticmethod
+    def _replace_instrumentation_key(s):
+        prefixes = ['"InstrumentationKey":\\s*"']
+
+        regex = r"(?P<prefix>(%s))" \
+                r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
+                % '|'.join(['(%s)' % p for p in prefixes])
+
+        return re.sub(regex, r"\g<prefix>" + DEFAULT_INSTRUMENTATION_KEY, s)
 
     @staticmethod
     def _json_extension(path):
@@ -312,6 +337,11 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                                            return_value=DEFAULT_TENANT_ID)
                 self._tenant_patch.start()
                 self.addCleanup(self._tenant_patch.stop)
+
+            self._subscription_patch = patch('c7n_azure.session.Session.get_subscription_id',
+                                             return_value=DEFAULT_SUBSCRIPTION_ID)
+            self._subscription_patch.start()
+            self.addCleanup(self._subscription_patch.stop)
 
     def get_test_date(self, tz=None):
         header_date = self.cassette.responses[0]['headers'].get('date') \
@@ -375,12 +405,20 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
 
 def arm_template(template):
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             template_file_path = os.path.dirname(__file__) + "/templates/" + template
             if not os.path.isfile(template_file_path):
                 return args[0].fail("ARM template {} is not found".format(template_file_path))
             return func(*args, **kwargs)
         return wrapper
+    return decorator
+
+
+def cassette_name(name):
+    def decorator(func):
+        func.cassette_name = name
+        return func
     return decorator
 
 

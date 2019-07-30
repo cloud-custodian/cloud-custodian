@@ -1,3 +1,19 @@
+# Copyright 2019 Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from azure.common import AzureHttpError
+
 from c7n_azure.storage_utils import StorageUtilities
 
 from c7n import utils
@@ -6,6 +22,30 @@ from c7n.resolver import ValuesFrom
 
 
 class Notify(BaseNotify):
+    """
+    Action to queue email.
+
+    See `c7n_mailer readme.md <https://github.com/cloud-custodian/cloud-custodian/blob/
+    master/tools/c7n_mailer/README.md#using-on-azure>`_ for more information.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: notify
+            resource: azure.resourcegroup
+            actions:
+              - type: notify
+                template: default
+                subject: Hello World
+                to:
+                  - someone@somewhere.com
+                transport:
+                  type: asq
+                  queue: https://storagename.queue.core.windows.net/queuename
+    """
+
     batch_size = 50
 
     schema = {
@@ -65,5 +105,16 @@ class Notify(BaseNotify):
             return self.send_to_azure_queue(queue_uri, message, session)
 
     def send_to_azure_queue(self, queue_uri, message, session):
-        queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri, session)
-        return StorageUtilities.put_queue_message(queue_service, queue_name, self.pack(message)).id
+        try:
+            queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri, session)
+            return StorageUtilities.put_queue_message(
+                queue_service,
+                queue_name,
+                self.pack(message)).id
+        except AzureHttpError as e:
+            if e.status_code == 403:
+                self.log.error("Access Error - Storage Queue Data Contributor Role is required "
+                               "to enqueue messages to the Azure Queue Storage.")
+            else:
+                self.log.error("Error putting message to the queue.\n" +
+                               str(e))

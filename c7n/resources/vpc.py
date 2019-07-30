@@ -19,6 +19,7 @@ import zlib
 import jmespath
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
@@ -28,7 +29,8 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
+from c7n.utils import (
+    chunks, local_session, type_schema, get_retry, parse_cidr)
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -177,7 +179,7 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-sg
                 resource: vpc
                 filters:
                   - type: security-group
@@ -211,7 +213,7 @@ class VpcSubnetFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-subnet
                 resource: vpc
                 filters:
                   - type: subnet
@@ -245,7 +247,7 @@ class VpcNatGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-nat
                 resource: vpc
                 filters:
                   - type: nat-gateway
@@ -279,7 +281,7 @@ class VpcInternetGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-igw
                 resource: vpc
                 filters:
                   - type: internet-gateway
@@ -425,6 +427,15 @@ class DhcpOptionsFilter(Filter):
         if not self.data.get('present', True):
             found = not found
         return found
+
+
+@Vpc.action_registry.register('post-finding')
+class VpcPostFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        fr = super(VpcPostFinding, self).format_resource(r)
+        fr['Type'] = 'AwsEc2Vpc'
+        return fr
 
 
 @resources.register('subnet')
@@ -666,7 +677,7 @@ class SGUsage(Filter):
 
     def get_permissions(self):
         return list(itertools.chain(
-            [self.manager.get_resource_manager(m).get_permissions()
+            *[self.manager.get_resource_manager(m).get_permissions()
              for m in
              ['lambda', 'eni', 'launch-config', 'security-group']]))
 
@@ -1009,13 +1020,18 @@ class SGPermission(Filter):
         return found
 
     def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
+
         found = None
         ip_perms = perm.get(range_type, [])
         if not ip_perms:
             return False
 
         match_range = self.data[cidr_key]
-        match_range['key'] = cidr_type
+
+        if isinstance(match_range, dict):
+            match_range['key'] = cidr_type
+        else:
+            match_range = {cidr_type: match_range}
 
         vf = ValueFilter(match_range, self.manager)
         vf.annotate = False
@@ -1249,6 +1265,15 @@ class RemovePermissions(BaseAction):
                     continue
                 method = getattr(client, 'revoke_security_group_%s' % label)
                 method(GroupId=r['GroupId'], IpPermissions=groups)
+
+
+@SecurityGroup.action_registry.register('post-finding')
+class SecurityGroupPostFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        fr = super(SecurityGroupPostFinding, self).format_resource(r)
+        fr['Type'] = 'AwsEc2SecurityGroup'
+        return fr
 
 
 @resources.register('eni')

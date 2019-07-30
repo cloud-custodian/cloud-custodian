@@ -49,7 +49,7 @@ if path.exists(readme):
 
 setup(
     name="c7n_mailer",
-    version='0.5.2',
+    version='0.5.3',
     description="Cloud Custodian - Reference Mailer",
     long_description=long_description,
     long_description_content_type='text/markdown',

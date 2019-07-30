@@ -504,7 +504,7 @@ class CheckPermissions(Filter):
 class IamRoleUsage(Filter):
 
     def get_permissions(self):
-        perms = list(itertools.chain([
+        perms = list(itertools.chain(*[
             self.manager.get_resource_manager(m).get_permissions()
             for m in ['lambda', 'launch-config', 'ec2']]))
         perms.extend(['ecs:DescribeClusters', 'ecs:DescribeServices'])
@@ -779,6 +779,9 @@ class SetPolicy(BaseAction):
               value: my-iam-policy
           actions:
             - type: set-policy
+              state: detached
+              arn: *
+            - type: set-policy
               state: attached
               arn: arn:aws:iam::123456789012:policy/my-iam-policy
 
@@ -791,23 +794,38 @@ class SetPolicy(BaseAction):
 
     permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
 
+    def validate(self):
+        if self.data.get('state') == 'attached' and self.data.get('arn') == "*":
+            raise PolicyValidationError(
+                '* operator is not supported for state: attached on %s' % (self.manager.data))
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         policy_arn = self.data['arn']
         state = self.data['state']
-
         for r in resources:
             if state == 'attached':
                 client.attach_role_policy(
                     RoleName=r['RoleName'],
                     PolicyArn=policy_arn)
-            elif state == 'detached':
+            elif state == 'detached' and policy_arn != "*":
                 try:
                     client.detach_role_policy(
                         RoleName=r['RoleName'],
                         PolicyArn=policy_arn)
                 except client.exceptions.NoSuchEntityException:
-                    pass
+                    continue
+            elif state == 'detached' and policy_arn == "*":
+                try:
+                    self.detach_all_policies(client, r)
+                except client.exceptions.NoSuchEntityException:
+                    continue
+
+    def detach_all_policies(self, client, resource):
+        attached_policy = client.list_attached_role_policies(RoleName=resource['RoleName'])
+        policy_arns = [p.get('PolicyArn') for p in attached_policy['AttachedPolicies']]
+        for parn in policy_arns:
+            client.detach_role_policy(RoleName=resource['RoleName'], PolicyArn=parn)
 
 
 @Role.action_registry.register('delete')
@@ -827,21 +845,28 @@ class RoleDelete(BaseAction):
               match-operator: all
               LastAuthenticated: null
           actions:
-            - delete
+            - type: delete
+              force: True
 
     """
-    schema = type_schema('delete')
+    schema = type_schema('delete',
+        force={'type': 'boolean', 'default': False})
+
     permissions = ('iam:DeleteRole',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         error = None
+        if self.data.get('force', False):
+            policy_setter = self.manager.action_registry['set-policy'](
+                {'state': 'detached', 'arn': '*'}, self.manager)
+            policy_setter.process(resources)
         for r in resources:
             try:
                 client.delete_role(RoleName=r['RoleName'])
             except client.exceptions.DeleteConflictException as e:
                 self.log.warning(
-                    "Role:%s cannot be deleted, must remove role from instance profile first"
+                    "Role:%s cannot be deleted, set force to detach policy and delete"
                     % r['Arn'])
                 error = e
             except client.exceptions.NoSuchEntityException:

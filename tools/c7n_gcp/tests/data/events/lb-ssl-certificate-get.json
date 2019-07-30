@@ -1,0 +1,52 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "yauhen_shaliou@comelfo.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.21.63.2",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-03T15:36:18.845Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "v1.compute.sslCertificates.get",
+    "authorizationInfo": [
+      {
+        "permission": "compute.sslCertificates.get",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/custodian-test-project-0/global/sslCertificates/comelfo-com-google-certificate",
+          "type": "compute.sslCertificates"
+        }
+      }
+    ],
+    "resourceName": "projects/custodian-test-project-0/global/sslCertificates/comelfo-com-google-certificate",
+    "request": {
+      "@type": "type.googleapis.com/compute.sslCertificates.get"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "global"
+      ]
+    }
+  },
+  "insertId": "-eywr5ld1arm",
+  "resource": {
+    "type": "gce_ssl_certificate",
+    "labels": {
+      "ssl_certificate_name": "comelfo-com-google-certificate",
+      "ssl_certificate_id": "",
+      "project_id": "custodian-test-project-0"
+    }
+  },
+  "timestamp": "2019-05-03T15:36:18.767Z",
+  "severity": "INFO",
+  "logName": "projects/custodian-test-project-0/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2019-05-03T15:36:19.855531833Z"
+}

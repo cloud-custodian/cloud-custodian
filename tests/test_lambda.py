@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
+from mock import patch
 
 from botocore.exceptions import ClientError
 from .common import BaseTest, functional
@@ -374,3 +375,138 @@ class LambdaTagTest(BaseTest):
             after_tags,
             {'custodian_next': 'Resource does not meet policy: delete@2019/02/09',
              'xyz': 'abcdef'})
+
+
+class TestModifyVpcSecurityGroupsAction(BaseTest):
+
+    def test_lambda_remove_matched_security_groups(self):
+
+        # Test conditions:
+        #   - list with two functions, matching only one "resource-fixer"
+        #    - this function is in a VPC and has 3 SGs attached
+        #    - removing a third SG, "sg_controllers" (sg-c573e6b3)
+        #    - start with 3 SGs, end with 2, match function by regex
+
+        session_factory = self.replay_flight_data(
+            "test_lambda_remove_matched_security_groups"
+        )
+
+        p = self.load_policy(
+            {
+                "name": "lambda-remove-matched-security-groups",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "FunctionName",
+                        "value": "resource-fixer",
+                        "op": "eq",
+                    },
+                    {
+                        "type": "security-group",
+                        "key": "GroupName",
+                        "value": ".*controllers",
+                        "op": "regex",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "modify-security-groups",
+                        "remove": "matched",
+                        "isolation-group": "sg-01a19f602ecaf25f4",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        client = session_factory().client('lambda')
+        response = client.list_functions()
+        clean_resources = response['Functions']
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn("fixer", resources[0]["FunctionName"])
+        self.assertEqual(len(resources[0]["VpcConfig"]["SecurityGroupIds"]), 3)
+        # check result is expected
+        self.assertEqual(len(clean_resources[0]["VpcConfig"]["SecurityGroupIds"]), 2)
+        self.assertNotIn("sg-c573e6b3", clean_resources[0]["VpcConfig"]["SecurityGroupIds"])
+        # verify by name that the removed SG is not there
+
+    def test_lambda_add_security_group(self):
+
+        # Test conditions:
+        #   - list with two functions, matching only one "resource-fixer"
+        #    - this function is in a VPC and has 2 SGs attached
+        #    - adding a third SG, "sg_controllers" (sg-c573e6b3)
+        #    - start with 2 SGs, end with 3, match functuin by exact name
+
+        session_factory = self.replay_flight_data("test_lambda_add_security_group")
+
+        p = self.load_policy(
+            {
+                "name": "add-sg-to-lambda",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "FunctionName",
+                        "value": ".*",
+                        "op": "regex",
+                    },
+                ],
+                "actions": [{"type": "modify-security-groups", "add": "sg-c573e6b3"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        client = session_factory().client('lambda')
+        response = client.list_functions()
+        clean_resources = response['Functions']
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual("resource-fixer", resources[0]["FunctionName"])
+        self.assertEqual(len(resources[0]["VpcConfig"]["SecurityGroupIds"]), 2)
+        self.assertNotIn("sg-c573e6b3", resources[0]["VpcConfig"]["SecurityGroupIds"])
+        # check SG was added
+        self.assertEqual(len(clean_resources[0]["VpcConfig"]["SecurityGroupIds"]), 3)
+        self.assertIn("sg-c573e6b3", clean_resources[0]["VpcConfig"]["SecurityGroupIds"])
+
+    def test_nonvpc_function(self):
+
+        session_factory = self.replay_flight_data("test_lambda_add_security_group")
+
+        p = self.load_policy(
+            {
+                "name": "test-with-nonvpc-lambda",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "FunctionName",
+                        "value": "test-func.*",
+                        "op": "regex",
+                    },
+                ],
+                "actions": [{"type": "modify-security-groups", "add": "sg-c573e6b3"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual("test-func-2", resources[0]["FunctionName"])
+
+    def test_lambda_notfound_exception(self):
+        error_response = {'Error': {'Code': 'ResourceNotFoundException'}}
+        operation_name = 'UpdateFunctionConfiguration'
+        with patch("c7n.resources.awslambda.local_session") as mock_local_session:
+            updatefunc = mock_local_session.client.update_function_configuration
+            updatefunc.side_effect = ClientError(error_response, operation_name)
+            with self.assertRaises(ClientError):
+                groups = ['sg-12121212', 'sg-34343434']
+                updatefunc(FunctionName='badname', VpcConfig={'SecurityGroupIds': groups})
+                updatefunc.assert_called_once()

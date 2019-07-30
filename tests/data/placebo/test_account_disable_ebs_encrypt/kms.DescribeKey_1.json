@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2016,
+                "month": 6,
+                "day": 27,
+                "hour": 7,
+                "minute": 15,
+                "second": 48,
+                "microsecond": 139000
+            },
+            "Enabled": true,
+            "Description": "Default master key that protects my EBS volumes when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS"
+        },
+        "ResponseMetadata": {
+            "RequestId": "5b40f658-a8ad-48fc-abce-33cf4ddc7293",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5b40f658-a8ad-48fc-abce-33cf4ddc7293",
+                "cache-control": "no-cache, no-store, must-revalidate, private",
+                "expires": "0",
+                "pragma": "no-cache",
+                "date": "Wed, 10 Jul 2019 11:05:17 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "436"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "AttachedPolicies": [
+            {
+                "PolicyName": "AlexaForBusinessFullAccess",
+                "PolicyArn": "arn:aws:iam::aws:policy/AlexaForBusinessFullAccess"
+            },
+            {
+                "PolicyName": "AdministratorAccess",
+                "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "b768be81-9cfb-11e9-82f6-8f5e7da59408",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b768be81-9cfb-11e9-82f6-8f5e7da59408",
+                "content-type": "text/xml",
+                "content-length": "715",
+                "date": "Tue, 02 Jul 2019 19:00:53 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -574,5 +574,8 @@ def version_cmd(options):
     except Exception:  # pragma: no cover
         print("Platform:  ", sys.platform)
     print("Using venv: ", hasattr(sys, 'real_prefix'))
+
+    in_container = os.path.exists('/.dockerenv')
+    print("Docker: %s" % str(bool(in_container)))
     print("PYTHONPATH: ")
     pp.pprint(sys.path)

@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test?api-version=2018-02-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicated?api-version=2018-11-01",
                 "body": null,
                 "headers": {}
             },
@@ -18,41 +18,41 @@
                         "application/json"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:31:41 GMT"
-                    ],
-                    "etag": [
-                        "\"1D50068236AD3A0\""
+                        "Mon, 22 Jul 2019 15:17:42 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "etag": [
+                        "\"1D540A073E91DA0\""
+                    ],
                     "content-length": [
-                        "3043"
+                        "3189"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test",
-                        "name": "cloud-custodian-test",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicated",
+                        "name": "cloud-custodian-test-dedicated",
                         "type": "Microsoft.Web/sites",
                         "kind": "functionapp,linux",
-                        "location": "West US 2",
+                        "location": "South Central US",
                         "properties": {
-                            "name": "cloud-custodian-test",
+                            "name": "cloud-custodian-test-dedicated",
                             "state": "Running",
                             "hostNames": [
-                                "cloud-custodian-test.azurewebsites.net"
+                                "cloud-custodian-test-dedicated.azurewebsites.net"
                             ],
-                            "webSpace": "test_functionapp-reqs-WestUS2webspace",
-                            "selfLink": "https://waws-prod-mwh-007.api.azurewebsites.windows.net:454/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/webspaces/test_functionapp-reqs-WestUS2webspace/sites/cloud-custodian-test",
-                            "repositorySiteName": "cloud-custodian-test",
+                            "webSpace": "test_functionapp-reqs-SouthCentralUSwebspace",
+                            "selfLink": "https://waws-prod-sn1-161.api.azurewebsites.windows.net:454/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/webspaces/test_functionapp-reqs-SouthCentralUSwebspace/sites/cloud-custodian-test-dedicated",
+                            "repositorySiteName": "cloud-custodian-test-dedicated",
                             "owner": null,
                             "usageState": "Normal",
                             "enabled": true,
                             "adminEnabled": true,
                             "enabledHostNames": [
-                                "cloud-custodian-test.azurewebsites.net",
-                                "cloud-custodian-test.scm.azurewebsites.net"
+                                "cloud-custodian-test-dedicated.azurewebsites.net",
+                                "cloud-custodian-test-dedicated.scm.azurewebsites.net"
                             ],
                             "siteProperties": {
                                 "metadata": null,
@@ -75,7 +75,7 @@
                             "siteMode": null,
                             "hostNameSslStates": [
                                 {
-                                    "name": "cloud-custodian-test.azurewebsites.net",
+                                    "name": "cloud-custodian-test-dedicated.azurewebsites.net",
                                     "sslState": "Disabled",
                                     "ipBasedSslResult": null,
                                     "virtualIP": null,
@@ -86,7 +86,7 @@
                                     "hostType": "Standard"
                                 },
                                 {
-                                    "name": "cloud-custodian-test.scm.azurewebsites.net",
+                                    "name": "cloud-custodian-test-dedicated.scm.azurewebsites.net",
                                     "sslState": "Disabled",
                                     "ipBasedSslResult": null,
                                     "virtualIP": null,
@@ -103,12 +103,12 @@
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "lastModifiedTimeUtc": "2019-05-01T21:52:14.81",
+                            "lastModifiedTimeUtc": "2019-07-22T15:16:36.09",
                             "storageRecoveryDefaultState": "Running",
                             "contentAvailabilityState": "Normal",
                             "runtimeAvailabilityState": "Normal",
                             "siteConfig": null,
-                            "deploymentId": "cloud-custodian-test",
+                            "deploymentId": "cloud-custodian-test-dedicated",
                             "trafficManagerHostNames": null,
                             "sku": "Basic",
                             "scmSiteAlsoStopped": false,
@@ -121,20 +121,20 @@
                             "hostNamesDisabled": false,
                             "domainVerificationIdentifiers": null,
                             "kind": "functionapp,linux",
-                            "outboundIpAddresses": "52.175.254.10,52.183.85.212,52.183.86.156,52.183.100.42,52.183.85.188",
-                            "possibleOutboundIpAddresses": "52.175.254.10,52.183.85.212,52.183.86.156,52.183.100.42,52.183.85.188,52.151.29.83,52.151.33.248",
+                            "outboundIpAddresses": "13.84.227.164,52.171.221.149,52.171.217.1,52.171.217.147,52.171.219.120",
+                            "possibleOutboundIpAddresses": "13.84.227.164,52.171.221.149,52.171.217.1,52.171.217.147,52.171.219.120,52.171.52.137,13.84.201.190",
                             "containerSize": 1536,
                             "dailyMemoryTimeQuota": 0,
                             "suspendedTill": null,
                             "siteDisabledReason": 0,
                             "functionExecutionUnitsCache": null,
                             "maxNumberOfWorkers": null,
-                            "homeStamp": "waws-prod-mwh-007",
+                            "homeStamp": "waws-prod-sn1-161",
                             "cloningInfo": null,
                             "hostingEnvironmentId": null,
                             "tags": null,
                             "resourceGroup": "test_functionapp-reqs",
-                            "defaultHostName": "cloud-custodian-test.azurewebsites.net",
+                            "defaultHostName": "cloud-custodian-test-dedicated.azurewebsites.net",
                             "slotSwapStatus": null,
                             "httpsOnly": false,
                             "redundancyMode": "None",
@@ -162,13 +162,13 @@
                         "application/json"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:31:42 GMT"
+                        "Mon, 22 Jul 2019 15:17:43 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "content-length": [
-                        "1352"
+                        "1350"
                     ]
                 },
                 "body": {
@@ -177,9 +177,9 @@
                         "name": "cloud-custodian-test",
                         "type": "Microsoft.Web/serverfarms",
                         "kind": "linux",
-                        "location": "West US 2",
+                        "location": "South Central US",
                         "properties": {
-                            "serverFarmId": 8180,
+                            "serverFarmId": 12065,
                             "name": "cloud-custodian-test",
                             "workerSize": "Default",
                             "workerSizeId": 0,
@@ -189,7 +189,7 @@
                             "currentWorkerSizeId": 0,
                             "currentNumberOfWorkers": 1,
                             "status": "Ready",
-                            "webSpace": "test_functionapp-reqs-WestUS2webspace",
+                            "webSpace": "test_functionapp-reqs-SouthCentralUSwebspace",
                             "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
                             "adminSiteName": null,
                             "hostingEnvironment": null,
@@ -199,21 +199,21 @@
                             "adminRuntimeSiteName": null,
                             "computeMode": "Dedicated",
                             "siteMode": null,
-                            "geoRegion": "West US 2",
+                            "geoRegion": "South Central US",
                             "perSiteScaling": false,
                             "maximumElasticWorkerCount": 1,
                             "numberOfSites": 1,
                             "hostingEnvironmentId": null,
                             "isSpot": false,
                             "spotExpirationTime": null,
-                            "freeOfferExpirationTime": "2019-05-31T21:51:46.6233333",
+                            "freeOfferExpirationTime": null,
                             "tags": null,
                             "kind": "linux",
                             "resourceGroup": "test_functionapp-reqs",
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "mdmId": "waws-prod-mwh-007_8180",
+                            "mdmId": "waws-prod-sn1-161_12065",
                             "targetWorkerCount": 0,
                             "targetWorkerSizeId": 0,
                             "provisioningState": "Succeeded",

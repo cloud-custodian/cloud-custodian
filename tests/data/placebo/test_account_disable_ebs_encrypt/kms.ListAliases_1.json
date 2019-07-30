@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/ebs",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/ebs",
+                "TargetKeyId": "798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "cdfe0c77-302e-4682-b07a-f4c3398b02f0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cdfe0c77-302e-4682-b07a-f4c3398b02f0",
+                "cache-control": "no-cache, no-store, must-revalidate, private",
+                "expires": "0",
+                "pragma": "no-cache",
+                "date": "Wed, 10 Jul 2019 11:05:17 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "192"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
