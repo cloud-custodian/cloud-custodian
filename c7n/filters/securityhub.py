@@ -20,6 +20,17 @@ from c7n.manager import resources
 
 class SecurityHubFindingFilter(Filter):
     """Check if there are Security Hub Findings related to the resources
+
+    .. code-block:: yaml
+
+       name: ec2-findings-filter
+       resource: ec2
+       filters:
+         - type: finding
+           query:
+             Type:
+              - Value: "Software and Configuration Checks/AWS Security Best Practices"
+                Comparison: EQUALS
     """
     schema = type_schema(
         'finding',
