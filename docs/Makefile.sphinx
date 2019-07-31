@@ -66,7 +66,7 @@ html:
 #
 # Copy readme files that are in the tree to avoid duplicating
 #	cp README.md $(SRCDIR)/overview.md
-	mkdir $(SRCDIR)/tools/assets
+	mkdir -p $(SRCDIR)/tools/assets
 	cp tools/c7n_org/README.md $(SRCDIR)/tools/c7n-org.md
 	cp tools/cask/readme.md $(SRCDIR)/tools/cask.md
 	cp tools/c7n_policystream/README.md $(SRCDIR)/tools/c7n-policystream.md
@@ -84,7 +84,7 @@ html:
 	c7n-sphinxext --provider gcp --output-dir $(SRCDIR)/gcp/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/azure/resources
 	c7n-sphinxext --provider azure --output-dir $(SRCDIR)/azure/resources --group-by=resource_type.doc_groups
-	$(SPHINXBUILD) -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -W -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 #
 # Remove the copies so folks dont accidentally edit the copy
