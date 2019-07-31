@@ -168,10 +168,11 @@ func run(ctx context.Context, id string, dockerClient *client.Client) {
 func generateBinds(args []string) []string {
 	var binds []string
 
+	// Loop through all args looking for paths
+	// so we can create bind mounts and rewrite the arg
 	for i, arg := range args {
 		if isPath(arg) {
 			containerPath := containerHome + filepath.Base(arg)
-
 			absPath, err := filepath.Abs(arg)
 			if err == nil {
 				binds = append(binds, absPath+":"+containerHome+filepath.Base(absPath)+":rw")
@@ -284,6 +285,8 @@ func getAwsConfigPath() string {
 	return ""
 }
 
+// getFolderFromHome helps us get a
+// folder in the users home directory
 func getFolderFromHome(subdir string) string {
 	var configPath string
 
