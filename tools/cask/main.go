@@ -208,9 +208,9 @@ func processOutputArgs(argsp *[]string) {
 	var outputPath string
 	args := *argsp
 
-	// Normalize argument separator
 	for i, arg := range args {
 		if strings.HasPrefix(arg, "-s") || strings.HasPrefix(arg, "--output-dir") {
+			// normalize argument separator
 			if strings.HasPrefix(arg, "-s=") || strings.HasPrefix(arg, "--output-dir=") {
 				outputPath = strings.Split(arg, "=")[1]
 
@@ -220,6 +220,7 @@ func processOutputArgs(argsp *[]string) {
 				args[i+1] = outputPath
 			}
 
+			// make absolute path and ensure exists
 			outputPath, err := filepath.Abs(args[i+1])
 			if err != nil {
 				log.Fatal(err)
