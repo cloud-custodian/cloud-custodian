@@ -287,7 +287,7 @@ class OpsItemFilter(Filter):
 
     Find ec2 instances with open ops items.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
        policies:
          - name: ec2-instances-ops-items

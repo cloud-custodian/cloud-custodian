@@ -28,13 +28,13 @@ supports. This also supports doing arbitrary sql selects (via config's
 select resources api) on the resources in addition to the standard
 custodian filters.
 
-.. code-block: yaml
+.. code-block:: yaml
 
   policies:
     - name: dynamdb-checker
       resource: aws.dynamodb
       source: config
-      queries:
+      query:
         - clause: "resourceId = 'MyTable'"
       filters:
         - SSEDescription: absent
@@ -48,7 +48,7 @@ rules. For any config supported resource, you can just add a mode with
 type:config-rule to have the policy deployed as a custom config rule
 lambda.
 
-.. code-block: yaml
+.. code-block:: yaml
 
   policies:
     - name: ec2-checker
@@ -68,7 +68,7 @@ Filter
 Custodian also supports filtering resources based on their compliance
 with other config-rules.
 
-.. code-block: yaml
+.. code-block:: yaml
 
    policies:
      - name: ec2-remediate-non-compliant

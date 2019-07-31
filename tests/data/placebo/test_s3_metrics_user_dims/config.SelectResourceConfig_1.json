@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"awsRegion\":\"us-east-2\",\"configuration\":{\"owner\":{\"id\":\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\"},\"name\":\"c7n-ssm-build\",\"creationDate\":\"2018-04-20T13:47:24.000Z\"},\"supplementaryConfiguration\":{\"AccessControlList\":\"{\\\"grantSet\\\":null,\\\"grantList\\\":[{\\\"grantee\\\":{\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\",\\\"displayName\\\":null},\\\"permission\\\":\\\"FullControl\\\"}],\\\"owner\\\":{\\\"displayName\\\":null,\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\"},\\\"isRequesterCharged\\\":false}\",\"BucketLifecycleConfiguration\":{\"rules\":[{\"filter\":{\"predicate\":{\"prefix\":\"custodian-build/\",\"type\":\"LifecyclePrefixPredicate\"}},\"expirationInDays\":60.0,\"id\":\"CodeBuild cache lifecycle\",\"noncurrentVersionExpirationInDays\":-1.0,\"status\":\"Enabled\",\"expiredObjectDeleteMarker\":false}]},\"BucketLoggingConfiguration\":{},\"BucketPolicy\":{\"policyText\":\"{\\\"Version\\\":\\\"2008-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"AWS\\\":\\\"arn:aws:iam::644160558196:role/service-role/codebuild-test-service-role\\\"},\\\"Action\\\":\\\"s3:*\\\",\\\"Resource\\\":[\\\"arn:aws:s3:::c7n-ssm-build\\\",\\\"arn:aws:s3:::c7n-ssm-build/*\\\"]}]}\"},\"BucketAccelerateConfiguration\":{},\"IsRequesterPaysEnabled\":false,\"BucketVersioningConfiguration\":{\"status\":\"Off\"},\"BucketNotificationConfiguration\":{\"configurations\":{}}}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "awsRegion"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "2f23b1a8-d9e7-4d40-9505-90b0bb174584",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2f23b1a8-d9e7-4d40-9505-90b0bb174584",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1659",
+                "date": "Tue, 30 Jul 2019 20:14:09 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -19,5 +19,58 @@ Custodian supports deep integration with security hub to support the following u
    security hub actions work against both findings and insights.
    `mode: hub-action`
 
-Additional details from the initial integration of security hub.
-https://aws.amazon.com/blogs/opensource/announcing-cloud-custodian-integration-aws-security-hub/
+
+Modes
++++++
+
+Execute a policy lambda in response to security hub finding event or action.
+
+
+This policy will provision a lambda and security hub custom action.
+The action can be invoked on a finding or insight result (collection
+of findings). The action name will have the resource type prefixed as
+custodian actions are resource specific.
+
+.. code-block:: yaml
+
+   policy:
+     - name: remediate
+       resource: aws.ec2
+       mode:
+         type: hub-action
+         role: MyRole
+       actions:
+        - snapshot
+        - type: set-instance-profile
+          name: null
+        - stop
+
+
+This policy will provision a lambda that will process high alert findings from
+guard duty (note custodian also has support for guard duty events directly).
+
+.. code-block:: yaml
+
+   policy:
+     - name: remediate
+       resource: aws.iam
+       mode:
+         type: hub-finding
+	 role: MyRole
+       filters:
+         - type: event
+           key: detail.findings[].ProductFields.aws/securityhub/ProductName
+           value: GuardDuty
+         - type: event
+           key: detail.findings[].ProductFields.aws/securityhub/ProductName
+           value: GuardDuty
+       actions:
+         - remove-keys
+
+Note, for custodian we support additional resources in the finding via the Other resource,
+so these modes work for resources that security hub doesn't natively support.
+
+https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cloudwatch-events.html
+
+
+

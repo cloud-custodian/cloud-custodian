@@ -9,10 +9,10 @@ variables:
   value: /home/vsts/.cache/pip
 
 jobs:
+
 - job: 'Lint'
   pool:
     vmImage: 'Ubuntu-16.04'
-
   steps:
     - checkout: self
       fetchDepth: 1
@@ -27,6 +27,37 @@ jobs:
 
     - script: make lint
       displayName: "Flake8 Lint"
+
+
+- job: 'Docs'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  steps:
+  - task: CacheBeta@0
+    inputs:
+      key: |
+        c7n-tox
+        3.7
+        $(Agent.OS)
+      path: $(LINUX_CACHE_DIR)
+
+  - checkout: self
+    fetchDepth: 1
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.7'
+      architecture: 'x64'
+
+  - script: python -m pip install --upgrade pip && pip install tox
+    displayName: 'Install Test Runner'
+
+  - script: TOXENV=docs tox --notest
+    displayName: 'Install Dependencies'
+
+  - script: TOXENV=docs tox
+    displayName: "Docs Build"
+
 
 - job: 'Test'
   pool:
@@ -80,10 +111,6 @@ jobs:
     condition: "eq(variables['python.version'], '3.6')"
     env:
       CODECOV_TOKEN: $(CODECOV_TOKEN)
-
-  - script: TOXENV=docs tox
-    displayName: "Docs Build"
-    condition: "eq(variables['python.version'], '3.7')"
 
   - task: PublishTestResults@2
     displayName: "Publish Test Results Azure"
