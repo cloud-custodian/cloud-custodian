@@ -105,9 +105,8 @@ func Update(ctx context.Context, image string, dockerClient *client.Client) {
 func Create(ctx context.Context, image string, dockerClient *client.Client) string {
 	// Prepare configuration
 	args := os.Args[1:]
-	originalOutput := SubstituteOutput(args)
-	originalPolicy := SubstitutePolicy(args)
-	binds := GenerateBinds(originalOutput, originalPolicy)
+	args = PrepareOutput(args)
+	binds := GenerateBinds(args)
 	envs := GenerateEnvs()
 
 	// Create container
@@ -159,26 +158,21 @@ func Run(ctx context.Context, id string, dockerClient *client.Client) {
 }
 
 // GenerateBinds Create the bind mounts for input/output
-func GenerateBinds(outputPath string, policyPath string) []string {
-	// Policy
-	policy, err := filepath.Abs(policyPath)
-	if err != nil {
-		log.Fatalf("Unable to load policy. %v", err)
-	}
+func GenerateBinds(args []string) []string {
+	var binds []string
 
-	containerPolicy := containerHome + filepath.Base(policy)
-	binds := []string{
-		policy + ":" + containerPolicy + ":ro",
-	}
+	for i, arg := range args {
+		if isPath(arg) {
+			containerPath := containerHome+filepath.Base(arg)
 
-	// Output Path
-	if outputPath != "" {
-		outputPath, err = filepath.Abs(outputPath)
-		if err != nil {
-			log.Fatalf("Unable to parse output path. %v", err)
+			absPath, err := filepath.Abs(arg)
+			if err == nil {
+				binds = append(binds, absPath+":"+containerHome+filepath.Base(absPath)+":rw")
+			}
+
+			args[i] = containerPath
 		}
 
-		binds = append(binds, outputPath+":"+containerHome+"output:rw")
 	}
 
 	// Azure CLI support
@@ -197,45 +191,36 @@ func GenerateBinds(outputPath string, policyPath string) []string {
 	return binds
 }
 
-// SubstitutePolicy Fix the policy arguments
-func SubstitutePolicy(args []string) string {
-	if len(args) == 0 ||
-		strings.EqualFold(args[0], "schema") ||
-		strings.EqualFold(args[0], "version") {
-		return ""
-	}
-
-	originalPolicy := args[len(args)-1]
-	args[len(args)-1] = containerHome + filepath.Base(originalPolicy)
-
-	return originalPolicy
-}
-
-// SubstituteOutput Fix the output arguments
-func SubstituteOutput(args []string) string {
+func PrepareOutput(args []string) []string {
 	var outputPath string
 
-	for i := range args {
-		arg := args[i]
-		if arg == "-s" || arg == "--output-dir" {
-			outputPath = args[i+1]
-			if isLocalStorage(outputPath) {
-				args[i+1] = containerHome + "output"
-				return outputPath
+	// Normalize argument separator
+	for i, arg := range args {
+		if strings.HasPrefix(arg, "-s") || strings.HasPrefix(arg, "--output-dir") {
+			if strings.HasPrefix(arg, "-s=") || strings.HasPrefix(arg, "--output-dir=") {
+				outputPath = strings.Split(arg, "=")[1]
 
+				args[i] = "-s"
+				args = append(args, "")
+				copy(args[i+1:], args[i:])
+				args[i+1] = outputPath
 			}
-		}
 
-		if strings.HasPrefix(arg, "-s=") || strings.HasPrefix(arg, "--output-dir=") {
-			outputPath = strings.Split(arg, "=")[1]
-			if isLocalStorage(outputPath) {
-				args[i] = "-s=" + containerHome + "output"
-				return outputPath
+			outputPath, err := filepath.Abs(args[i+1])
+			if err != nil {
+				log.Fatal(err)
 			}
+
+			err = os.MkdirAll(outputPath, 0700)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			args[i+1] = outputPath
 		}
 	}
 
-	return ""
+	return args
 }
 
 // GenerateEnvs Get list of environment variables
@@ -300,6 +285,16 @@ func isLocalStorage(output string) bool {
 	return !(strings.HasPrefix(output, "s3://") ||
 		strings.HasPrefix(output, "azure://") ||
 		strings.HasPrefix(output, "gs://"))
+}
+
+// isPath attempts to confirm if an argument
+// is a path, and thus needs a bind
+func isPath(arg string) bool {
+	_, err := os.Stat(arg)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
 
 func getDockerImageName() string {
