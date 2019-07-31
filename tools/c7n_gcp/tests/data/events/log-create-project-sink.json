@@ -1,0 +1,50 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "dkhanas@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.20.186.33",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-21T14:47:36.991845577Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "logging.googleapis.com",
+    "methodName": "google.logging.v2.ConfigServiceV2.CreateSink",
+    "authorizationInfo": [
+      {
+        "resource": "projects/test-project-232910/sinks/testqqqqqqqqqqqqqqqqq",
+        "permission": "logging.sinks.create",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "resourceName": "projects/test-project-232910/sinks/testqqqqqqqqqqqqqqqqq",
+    "request": {
+      "parent": "projects/test-project-232910",
+      "sink": {
+        "destination": "bigquery.googleapis.com/projects/test-project-232910/datasets/qwerty1234",
+        "name": "testqqqqqqqqqqqqqqqqq"
+      },
+      "@type": "type.googleapis.com/google.logging.v2.CreateSinkRequest"
+    }
+  },
+  "insertId": "dbqgimd358e",
+  "resource": {
+    "type": "logging_sink",
+    "labels": {
+      "name": "testqqqqqqqqqqqqqqqqq",
+      "project_id": "test-project-232910",
+      "destination": ""
+    }
+  },
+  "timestamp": "2019-05-21T14:47:36.982248308Z",
+  "severity": "NOTICE",
+  "logName": "projects/test-project-232910/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-05-21T14:47:38.927752331Z"
+}

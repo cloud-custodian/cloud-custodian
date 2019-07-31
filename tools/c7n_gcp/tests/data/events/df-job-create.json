@@ -1,0 +1,51 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "dkhanas@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "188.163.232.130",
+      "requestAttributes": {
+        "time": "2019-05-16T11:24:18.685953982Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "dataflow.googleapis.com",
+    "methodName": "dataflow.jobs.create",
+    "authorizationInfo": [
+      {
+        "resource": "projects/cloud-custodian",
+        "permission": "dataflow.jobs.create",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "request": {
+      "job_name": "test1",
+      "job_id": "2019-05-16_04_24_18-6110555549864901093"
+    },
+    "response": {},
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1"
+      ]
+    }
+  },
+  "insertId": "1ie3v65c54g",
+  "resource": {
+    "type": "dataflow_step",
+    "labels": {
+      "job_id": "",
+      "project_id": "cloud-custodian",
+      "region": "us-central1",
+      "job_name": "",
+      "step_id": ""
+    }
+  },
+  "timestamp": "2019-05-16T11:24:18.674167008Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-05-16T11:24:19.408701177Z"
+}

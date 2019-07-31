@@ -18,5 +18,3 @@
 {{eschema(e)}}
 
 {% endfor %}
-
-

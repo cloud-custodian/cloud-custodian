@@ -780,7 +780,7 @@ class SetPolicy(BaseAction):
           actions:
             - type: set-policy
               state: detached
-              arn: *
+              arn: "*"
             - type: set-policy
               state: attached
               arn: arn:aws:iam::123456789012:policy/my-iam-policy
@@ -846,12 +846,10 @@ class RoleDelete(BaseAction):
               LastAuthenticated: null
           actions:
             - type: delete
-              force: True
+              force: true
 
     """
-    schema = type_schema('delete',
-        force={'type': 'boolean', 'default': False})
-
+    schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('iam:DeleteRole',)
 
     def process(self, resources):
