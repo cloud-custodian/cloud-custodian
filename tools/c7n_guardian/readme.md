@@ -1,5 +1,5 @@
 
-# Automated Setup for AWS Guard Duty
+# c7n-guardian: Automated multi-account Guard Duty setup
 
 Amazon Guard Duty provides for machine learning based threat
 intelligence and detection on resources in your aws accounts. This

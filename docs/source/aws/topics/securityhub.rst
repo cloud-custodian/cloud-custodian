@@ -21,7 +21,7 @@ Custodian supports deep integration with security hub to support the following u
 
 
 Modes
------
++++++
 
 Execute a policy lambda in response to security hub finding event or action.
 

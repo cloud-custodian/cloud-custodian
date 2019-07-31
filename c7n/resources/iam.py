@@ -849,9 +849,7 @@ class RoleDelete(BaseAction):
               force: True
 
     """
-    schema = type_schema('delete',
-        force={'type': 'boolean', 'default': False})
-
+    schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('iam:DeleteRole',)
 
     def process(self, resources):

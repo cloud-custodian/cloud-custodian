@@ -1,4 +1,4 @@
-# Cloud watch log exporter
+# c7n-log-exporter: Cloud watch log exporter automation
 
 A small serverless app to archive cloud logs across accounts to an archive bucket. It utilizes
 cloud log export to s3 feature for historical exports.
