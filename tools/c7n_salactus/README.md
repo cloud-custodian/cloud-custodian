@@ -1,9 +1,12 @@
-# c7n-salactus: Distributed Scale out bucket processing
+# c7n-salactus: Distributed Scale out S3 processing
 
 
 Salactus, inspired by the planet eaters.
 
 Distributed, scale out s3 scanning
+
+**Note** this was built a few years before AWS S3 Batch Operations
+which maybe a simpler solution for the problem domain.
 
 ## Use Cases
 
