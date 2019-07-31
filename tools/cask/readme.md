@@ -55,3 +55,11 @@ Build
 cd cloud-custodian\tools\custodian-cask
 go build -o custodian-cask
 ```
+
+Alternatively 
+
+```
+make darwin
+make linux
+make windows
+```

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import jmespath
 
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
@@ -28,11 +29,13 @@ class DataflowJob(QueryResourceManager):
         enum_spec = ('aggregated', 'jobs[]', None)
         scope_key = 'projectId'
         id = 'name'
+        get_requires_event = True
 
         @staticmethod
-        def get(client, resource_info):
+        def get(client, event):
             return client.execute_command(
                 'get', {
-                    'projectId': resource_info['project_id'],
-                    'jobId': resource_info['job_id']
-                })
+                    'projectId': jmespath.search('resource.labels.project_id', event),
+                    'jobId': jmespath.search('protoPayload.request.job_id', event)
+                }
+            )

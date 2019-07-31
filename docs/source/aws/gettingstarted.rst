@@ -75,9 +75,10 @@ overwriting it). Lastly, you should find the instance stopping or stopped in
 your AWS console. Congratulations, and welcome to Custodian!
 
 
-See our extended example of a policy's structure :ref:`tag compliance
-policy <policyStructure>`, or browse all of our :ref:`use case recipes
-<usecases>`.
+See our extended example of a policy's structure
+:ref:`tag compliance policy <policyStructure>`, or browse all of our
+:ref:`use case recipes <usecases>`.
+
 
 A 2nd Example Policy
 --------------------

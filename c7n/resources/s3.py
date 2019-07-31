@@ -139,10 +139,17 @@ class DescribeS3(query.DescribeSource):
 
 class ConfigS3(query.ConfigSource):
 
+    def get_query_params(self, query):
+        q = super(ConfigS3, self).get_query_params(query)
+        if 'expr' in q:
+            q['expr'] = q['expr'].replace('select ', 'select awsRegion, ')
+        return q
+
     def load_resource(self, item):
         resource = super(ConfigS3, self).load_resource(item)
         cfg = item['supplementaryConfiguration']
-        if item['awsRegion'] != 'us-east-1':  # aka standard
+        # aka standard
+        if 'awsRegion' in item and item['awsRegion'] != 'us-east-1':
             resource['Location'] = {'LocationConstraint': item['awsRegion']}
 
         # owner is under acl per describe
@@ -210,7 +217,8 @@ class ConfigS3(query.ConfigSource):
         return
 
     def handle_BucketLoggingConfiguration(self, resource, item_value):
-        if item_value['destinationBucketName'] is None:
+        if ('destinationBucketName' not in item_value or
+                item_value['destinationBucketName'] is None):
             return {}
         resource[u'Logging'] = {
             'TargetBucket': item_value['destinationBucketName'],
@@ -226,7 +234,7 @@ class ConfigS3(query.ConfigSource):
                     ('Date', 'expirationDate'),
                     ('ExpiredObjectDeleteMarker', 'expiredObjectDeleteMarker'),
                     ('Days', 'expirationInDays')):
-                if r[ck] and r[ck] != -1:
+                if ck in r and r[ck] and r[ck] != -1:
                     expiry[ek] = r[ck]
             if expiry:
                 rr['Expiration'] = expiry
@@ -558,11 +566,12 @@ class S3Metrics(MetricsFilter):
     """
 
     def get_dimensions(self, resource):
-        return [
-            {'Name': 'BucketName',
-             'Value': resource['Name']},
-            {'Name': 'StorageType',
-             'Value': 'AllStorageTypes'}]
+        dims = [{'Name': 'BucketName', 'Value': resource['Name']}]
+        if (self.data['name'] == 'NumberOfObjects' and
+                'dimensions' not in self.data):
+            dims.append(
+                {'Name': 'StorageType', 'Value': 'AllStorageTypes'})
+        return dims
 
 
 @filters.register('cross-account')

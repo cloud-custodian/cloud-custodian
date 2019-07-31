@@ -1,0 +1,46 @@
+{
+  "body": {
+    "metrics": [
+      {
+        "updateTime": "2019-03-11T15:11:26.726129870Z", 
+        "name": "test", 
+        "metricDescriptor": {
+          "name": "projects/test-project-232910/metricDescriptors/logging.googleapis.com/user/test", 
+          "metricKind": "DELTA", 
+          "valueType": "INT64", 
+          "labels": [
+            {
+              "description": "sinks", 
+              "key": "sinks"
+            }
+          ], 
+          "type": "logging.googleapis.com/user/test", 
+          "unit": "1", 
+          "description": "sinks"
+        }, 
+        "labelExtractors": {
+          "sinks": "EXTRACT(logName)"
+        }, 
+        "filter": "resource.type=\"gae_app\"\n", 
+        "createTime": "2019-03-11T15:11:26.726129870Z", 
+        "description": "sinks"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "732", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://logging.googleapis.com/v2/projects/test-project-232910/metrics?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Wed, 27 Mar 2019 09:40:33 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
