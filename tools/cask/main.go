@@ -34,6 +34,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/thoas/go-funk"
 )
 
 const containerHome string = "/home/custodian/"
@@ -80,6 +81,7 @@ func Update(ctx context.Context, image string, dockerClient *client.Client) {
 
 	// Check if there is a marker indicating last pull for this image
 	info, err := os.Stat(updateMarker)
+
 	if err == nil && info.ModTime().Add(updateInterval).After(now) {
 		fmt.Printf("Skipped image pull - Last checked %d minutes ago.\n\n", uint(now.Sub(info.ModTime()).Minutes()))
 		return
@@ -93,10 +95,15 @@ func Update(ctx context.Context, image string, dockerClient *client.Client) {
 		_ = jsonmessage.DisplayJSONMessagesStream(out, os.Stdout, 1, true, nil)
 	}
 
-	// Update the marker file
-	_, err = os.OpenFile(updateMarker, os.O_RDONLY|os.O_CREATE, 0666)
-	if err != nil {
-		log.Printf("Unable to write to temporary directory. %v", err)
+	// Touch the marker file
+	if _, err := os.Stat(updateMarker); err == nil {
+		if err := os.Chtimes(updateMarker, now, now); err != nil {
+			log.Printf("Unable to update cache marker file. %v", err)
+		}
+	} else {
+		if _, err = os.OpenFile(updateMarker, os.O_RDWR|os.O_CREATE, 0666); err != nil {
+			log.Printf("Unable to write to temporary directory. %v", err)
+		}
 	}
 }
 
@@ -105,7 +112,7 @@ func Update(ctx context.Context, image string, dockerClient *client.Client) {
 func Create(ctx context.Context, image string, dockerClient *client.Client) string {
 	// Prepare configuration
 	args := os.Args[1:]
-	args = PrepareOutput(args)
+	ProcessOutputArgs(&args)
 	binds := GenerateBinds(args)
 	envs := GenerateEnvs()
 
@@ -163,7 +170,7 @@ func GenerateBinds(args []string) []string {
 
 	for i, arg := range args {
 		if isPath(arg) {
-			containerPath := containerHome+filepath.Base(arg)
+			containerPath := containerHome + filepath.Base(arg)
 
 			absPath, err := filepath.Abs(arg)
 			if err == nil {
@@ -188,11 +195,18 @@ func GenerateBinds(args []string) []string {
 		binds = append(binds, awsConfig+":"+containerHome+".aws:ro")
 	}
 
+	// Default cache location
+	if !funk.Any(funk.Intersect(args, []string{"-f", "--cache"})) {
+		cacheDefault := GetFolderFromHome(".cache")
+		binds = append(binds, cacheDefault+":"+containerHome+".cache:rw")
+	}
+
 	return binds
 }
 
-func PrepareOutput(args []string) []string {
+func ProcessOutputArgs(argsp *[]string) {
 	var outputPath string
+	args := *argsp
 
 	// Normalize argument separator
 	for i, arg := range args {
@@ -220,7 +234,7 @@ func PrepareOutput(args []string) []string {
 		}
 	}
 
-	return args
+	*argsp = args
 }
 
 // GenerateEnvs Get list of environment variables
@@ -248,13 +262,7 @@ func GetAzureCliConfigPath() string {
 	}
 
 	// Check for default location
-	var configPath string
-
-	if runtime.GOOS == "windows" {
-		configPath = filepath.Join(os.Getenv("USERPROFILE"), ".azure")
-	} else {
-		configPath = filepath.Join(os.Getenv("HOME"), ".azure")
-	}
+	configPath := GetFolderFromHome(".azure")
 
 	if _, err := os.Stat(configPath); err == nil {
 		return configPath
@@ -266,19 +274,25 @@ func GetAzureCliConfigPath() string {
 // GetAwsConfigPath Find AWS Config if available so
 // we can mount it on the container.
 func GetAwsConfigPath() string {
-	var configPath string
-
-	if runtime.GOOS == "windows" {
-		configPath = filepath.Join(os.Getenv("USERPROFILE"), ".aws")
-	} else {
-		configPath = filepath.Join(os.Getenv("HOME"), ".aws")
-	}
+	configPath := GetFolderFromHome(".aws")
 
 	if _, err := os.Stat(configPath); err == nil {
 		return configPath
 	}
 
 	return ""
+}
+
+func GetFolderFromHome(subdir string) string {
+	var configPath string
+
+	if runtime.GOOS == "windows" {
+		configPath = os.Getenv("USERPROFILE")
+	} else {
+		configPath = os.Getenv("HOME")
+	}
+
+	return filepath.Join(configPath, subdir)
 }
 
 func isLocalStorage(output string) bool {

@@ -11,9 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-// The package provides a transparent pass-through
-// for the Custodian CLI to a Custodian Docker Image
+
 package main
 
 import (
@@ -24,16 +22,16 @@ import (
 
 func TestGenerateBinds(t *testing.T) {
 	tests := []struct {
-		name string
-		args []string
+		name     string
+		args     []string
 		wantArgs []string
 	}{
-		{ name: "one",
+		{name: "one",
 			args:     []string{"run", "-s", ".", "main.go"},
 			wantArgs: []string{"run", "-s", "/home/custodian/.", "/home/custodian/main.go"},
 		},
-		{ name: "two",
-			args:     []string{"run", "-s", ".", "main.go", "main.go"},
+		{name: "two",
+			args: []string{"run", "-s", ".", "main.go", "main.go"},
 			wantArgs: []string{"run", "-s", "/home/custodian/.",
 				"/home/custodian/main.go", "/home/custodian/main.go"},
 		},
@@ -48,7 +46,7 @@ func TestGenerateBinds(t *testing.T) {
 	}
 }
 
-func TestPrepareOutput(t *testing.T) {
+func TestProcessOutputArgs(t *testing.T) {
 	pwd, _ := filepath.Abs(".")
 
 	tests := []struct {
@@ -56,26 +54,27 @@ func TestPrepareOutput(t *testing.T) {
 		args []string
 		want []string
 	}{
-		{ name: "short_space",
+		{name: "short_space",
 			args: []string{"run", "-s", ".", "foo.yaml"},
 			want: []string{"run", "-s", pwd, "foo.yaml"}},
 
-		{ name: "short_equal",
+		{name: "short_equal",
 			args: []string{"run", "-s=.", "foo.yaml"},
 			want: []string{"run", "-s", pwd, "foo.yaml"}},
 
-		{ name: "long_space",
+		{name: "long_space",
 			args: []string{"run", "--output-dir", ".", "foo.yaml"},
 			want: []string{"run", "--output-dir", pwd, "foo.yaml"}},
 
-		{ name: "long_equal",
+		{name: "long_equal",
 			args: []string{"run", "--output-dir=.", "foo.yaml"},
 			want: []string{"run", "-s", pwd, "foo.yaml"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := PrepareOutput(tt.args); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PrepareOutput() = %v, want %v", got, tt.want)
+			ProcessOutputArgs(&tt.args)
+			if !reflect.DeepEqual(tt.args, tt.want) {
+				t.Errorf("ProcessOutputArgs() = %v, want %v", tt.args, tt.want)
 			}
 		})
 	}
@@ -84,15 +83,15 @@ func TestPrepareOutput(t *testing.T) {
 func Test_isPath(t *testing.T) {
 	tests := []struct {
 		name string
-		arg string
+		arg  string
 		want bool
 	}{
-		{ name: "flag", arg: "-s", want: false},
-		{ name: "not exist", arg: "not_real_file.yaml", want: false},
-		{ name: "schema", arg: "schema", want: false},
-		{ name: "cd", arg: ".", want: true},
-		{ name: "parent", arg: "../", want: true},
-		{ name: "file", arg: "main.go", want: true},
+		{name: "flag", arg: "-s", want: false},
+		{name: "not exist", arg: "not_real_file.yaml", want: false},
+		{name: "schema", arg: "schema", want: false},
+		{name: "cd", arg: ".", want: true},
+		{name: "parent", arg: "../", want: true},
+		{name: "file", arg: "main.go", want: true},
 	}
 
 	for _, tt := range tests {
@@ -103,4 +102,3 @@ func Test_isPath(t *testing.T) {
 		})
 	}
 }
-
