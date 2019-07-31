@@ -38,7 +38,7 @@ func TestGenerateBinds(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			GenerateBinds(tt.args)
+			generateBinds(tt.args)
 			if !reflect.DeepEqual(tt.args, tt.wantArgs) {
 				t.Errorf("GenerateBinds() = %v, want %v", tt.args, tt.wantArgs)
 			}
@@ -72,7 +72,7 @@ func TestProcessOutputArgs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ProcessOutputArgs(&tt.args)
+			processOutputArgs(&tt.args)
 			if !reflect.DeepEqual(tt.args, tt.want) {
 				t.Errorf("ProcessOutputArgs() = %v, want %v", tt.args, tt.want)
 			}

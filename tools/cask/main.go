@@ -51,20 +51,20 @@ func main() {
 	ctx := context.Background()
 
 	// Create a docker client
-	dockerClient := GetClient()
+	dockerClient := getClient()
 
 	// Update docker image if needed
-	Update(ctx, "docker.io/"+activeImage, dockerClient)
+	update(ctx, "docker.io/"+activeImage, dockerClient)
 
 	// Create container
-	id := Create(ctx, activeImage, dockerClient)
+	id := create(ctx, activeImage, dockerClient)
 
 	// Run
-	Run(ctx, id, dockerClient)
+	run(ctx, id, dockerClient)
 }
 
-// GetClient Creates a docker client using the host environment variables
-func GetClient() *client.Client {
+// getClient Creates a docker client using the host environment variables
+func getClient() *client.Client {
 	dockerClient, err := client.NewEnvClient()
 	if err != nil {
 		log.Fatalf("Unable to create docker client. %v", err)
@@ -72,10 +72,10 @@ func GetClient() *client.Client {
 	return dockerClient
 }
 
-// Update Pulls the latest docker image and creates
+// update Pulls the latest docker image and creates
 // a marker file so it is not pulled again until
 // the specified time elapses or the file is deleted.
-func Update(ctx context.Context, image string, dockerClient *client.Client) {
+func update(ctx context.Context, image string, dockerClient *client.Client) {
 	updateMarker := updateMarkerFilename(image)
 	now := time.Now()
 
@@ -107,14 +107,14 @@ func Update(ctx context.Context, image string, dockerClient *client.Client) {
 	}
 }
 
-// Create a container with appropriate arguments.
+// create a container with appropriate arguments.
 // Includes creating mounts and updating paths.
-func Create(ctx context.Context, image string, dockerClient *client.Client) string {
+func create(ctx context.Context, image string, dockerClient *client.Client) string {
 	// Prepare configuration
 	args := os.Args[1:]
-	ProcessOutputArgs(&args)
-	binds := GenerateBinds(args)
-	envs := GenerateEnvs()
+	processOutputArgs(&args)
+	binds := generateBinds(args)
+	envs := generateEnvs()
 
 	// Create container
 	cont, err := dockerClient.ContainerCreate(
@@ -137,9 +137,9 @@ func Create(ctx context.Context, image string, dockerClient *client.Client) stri
 	return cont.ID
 }
 
-// Run container and wait for it to complete.
+// run container and wait for it to complete.
 // Copy log output to stdout and stderr.
-func Run(ctx context.Context, id string, dockerClient *client.Client) {
+func run(ctx context.Context, id string, dockerClient *client.Client) {
 	// Docker Run
 	err := dockerClient.ContainerStart(ctx, id, types.ContainerStartOptions{})
 	if err != nil {
@@ -164,8 +164,8 @@ func Run(ctx context.Context, id string, dockerClient *client.Client) {
 	}
 }
 
-// GenerateBinds Create the bind mounts for input/output
-func GenerateBinds(args []string) []string {
+// generateBinds Create the bind mounts for input/output
+func generateBinds(args []string) []string {
 	var binds []string
 
 	for i, arg := range args {
@@ -183,28 +183,28 @@ func GenerateBinds(args []string) []string {
 	}
 
 	// Azure CLI support
-	azureCliConfig := GetAzureCliConfigPath()
+	azureCliConfig := getAzureCliConfigPath()
 	if azureCliConfig != "" {
 		// Bind as RW for token refreshes
 		binds = append(binds, azureCliConfig+":"+containerHome+".azure:rw")
 	}
 
 	// AWS config
-	awsConfig := GetAwsConfigPath()
+	awsConfig := getAwsConfigPath()
 	if awsConfig != "" {
 		binds = append(binds, awsConfig+":"+containerHome+".aws:ro")
 	}
 
 	// Default cache location
 	if !funk.Any(funk.Intersect(args, []string{"-f", "--cache"})) {
-		cacheDefault := GetFolderFromHome(".cache")
+		cacheDefault := getFolderFromHome(".cache")
 		binds = append(binds, cacheDefault+":"+containerHome+".cache:rw")
 	}
 
 	return binds
 }
 
-func ProcessOutputArgs(argsp *[]string) {
+func processOutputArgs(argsp *[]string) {
 	var outputPath string
 	args := *argsp
 
@@ -237,8 +237,8 @@ func ProcessOutputArgs(argsp *[]string) {
 	*argsp = args
 }
 
-// GenerateEnvs Get list of environment variables
-func GenerateEnvs() []string {
+// generateEnvs Get list of environment variables
+func generateEnvs() []string {
 	var envs []string
 
 	// Bulk include matching variables
@@ -252,9 +252,9 @@ func GenerateEnvs() []string {
 	return envs
 }
 
-// GetAzureCliConfigPath Find Azure CLI Config if available so
+// getAzureCliConfigPath Find Azure CLI Config if available so
 // we can mount it on the container.
-func GetAzureCliConfigPath() string {
+func getAzureCliConfigPath() string {
 	// Check for override location
 	azureCliConfig := os.Getenv("AZURE_CONFIG_DIR")
 	if azureCliConfig != "" {
@@ -262,7 +262,7 @@ func GetAzureCliConfigPath() string {
 	}
 
 	// Check for default location
-	configPath := GetFolderFromHome(".azure")
+	configPath := getFolderFromHome(".azure")
 
 	if _, err := os.Stat(configPath); err == nil {
 		return configPath
@@ -271,10 +271,10 @@ func GetAzureCliConfigPath() string {
 	return ""
 }
 
-// GetAwsConfigPath Find AWS Config if available so
+// getAwsConfigPath Find AWS Config if available so
 // we can mount it on the container.
-func GetAwsConfigPath() string {
-	configPath := GetFolderFromHome(".aws")
+func getAwsConfigPath() string {
+	configPath := getFolderFromHome(".aws")
 
 	if _, err := os.Stat(configPath); err == nil {
 		return configPath
@@ -283,7 +283,7 @@ func GetAwsConfigPath() string {
 	return ""
 }
 
-func GetFolderFromHome(subdir string) string {
+func getFolderFromHome(subdir string) string {
 	var configPath string
 
 	if runtime.GOOS == "windows" {
