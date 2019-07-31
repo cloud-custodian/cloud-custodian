@@ -36,6 +36,7 @@ custodian you can.
   - Manage ops items as a resource, to resolve or update ops items.
     See :ref:`ops-item resource <aws.ops-item>`
 
+.. image:: opscenter.png
 
 OmniSSM
 +++++++
@@ -45,7 +46,7 @@ cloud provider systems manager setups using the data center/hybrid mode support
 of SSM. It provides for secure introduction (using signed metadata documents),
 automated discovery and garbage collection using a set of golang lambda functions.
 
-https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/omnissm
+See tools section of the docs for more info.
 
 
 
