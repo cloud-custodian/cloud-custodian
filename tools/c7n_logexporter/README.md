@@ -28,7 +28,7 @@ as the periodic historical exports.
  - Catch up archiving is not run in lambda (do a cli run first)
 
 
-# Cli usage
+## Cli usage
 
 ```
 make install
@@ -66,7 +66,7 @@ accounts and log groups.
 c7n-log-exporter run --config config.yml
 ```
 
-# Serverless Usage
+## Serverless Usage
 
 Edit config.yml to specify the accounts, archive bucket, and log groups you want to
 use.
