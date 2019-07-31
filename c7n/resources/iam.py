@@ -360,10 +360,13 @@ class ServiceUsage(Filter):
 
         job_resource_map = {}
         for arn, r in zip(self.manager.get_arns(resources), resources):
-            jid = self.manager.retry(
-                client.generate_service_last_accessed_details,
-                Arn=arn)['JobId']
-            job_resource_map[jid] = r
+            try:
+                jid = self.manager.retry(
+                    client.generate_service_last_accessed_details,
+                    Arn=arn)['JobId']
+                job_resource_map[jid] = r
+            except client.exceptions.NoSuchEntityException:
+                continue
 
         conf = dict(self.data)
         conf.pop('match-operator')
