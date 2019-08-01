@@ -212,7 +212,7 @@ class SetLogging(Action):
 class DeleteTrail(BaseAction):
     """ Delete a cloud trail
 
-    :Example:
+    :example:
 
     .. code-block:: yaml
 
