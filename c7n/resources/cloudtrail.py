@@ -233,7 +233,7 @@ class DeleteTrail(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('cloudtrail')
-        shadow_check = IsShadow({'state': False}, self.manager)
+        shadow_check = IsShadow({'state': True}, self.manager)
         shadow_check.embedded = True
         resources = shadow_check.process(resources)
         for r in resources:
