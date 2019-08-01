@@ -17,8 +17,8 @@ from azure.mgmt.storage.models import StorageAccount
 from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, cassette_name
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
-from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode
-from mock import mock, patch
+from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode, AzureModeCommon
+from mock import mock, patch, Mock
 
 
 class AzurePolicyModeTest(BaseTest):
@@ -372,6 +372,34 @@ class AzurePolicyModeTest(BaseTest):
         resources = p.push(None, None)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'test_emptyrg')
+
+    def test_extract_resource_id(self):
+        rg_id = "/subscriptions/ea98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_emptyrg"
+        nsg_id = rg_id + '/providers/Microsoft.Network/networkSecurityGroups/test-nsg'
+        sr_id = nsg_id + '/securityRules/test-rule'
+        resource_type = ''
+        policy = Mock()
+        policy.resource_manager.resource_type.resource_type = resource_type
+
+        event = {'subject': rg_id}
+        policy.resource_manager.resource_type.resource_type =\
+            'Microsoft.Resources/subscriptions/resourceGroups'
+        self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), rg_id)
+
+        event = {'subject': nsg_id}
+        policy.resource_manager.resource_type.resource_type =\
+            'Microsoft.Resources/subscriptions/resourceGroups'
+        self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), rg_id)
+
+        event = {'subject': nsg_id}
+        policy.resource_manager.resource_type.resource_type =\
+            'Microsoft.Network/networksecuritygroups'
+        self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), nsg_id)
+
+        event = {'subject': sr_id}
+        policy.resource_manager.resource_type.resource_type =\
+            'Microsoft.Network/networksecuritygroups'
+        self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), nsg_id)
 
     @staticmethod
     def get_sample_event():

@@ -232,9 +232,31 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
 class AzureModeCommon:
     """ Utility methods shared across a variety of modes """
+
+    @staticmethod
+    def extract_resource_id(policy, event):
+        """
+        Searches for a resource id in the events resource id
+        that will match the policy resource type.
+        """
+        expected_type = policy.resource_manager.resource_type.resource_type
+
+        if expected_type == 'Microsoft.Resources/subscriptions/resourceGroups':
+            extract_regex = '/subscriptions/[^/]+/resourceGroups/[^/]+'
+        else:
+            types = expected_type.split('/')
+
+            types_regex = '/'.join([t + '/[^/]+' for t in types[1:]])
+            extract_regex = '/subscriptions/[^/]+/resourceGroups/[^/]+/providers/{0}/{1}'\
+                .format(types[0], types_regex)
+
+        return re.search(extract_regex, event['subject'], re.IGNORECASE).group()
+
     @staticmethod
     def run_for_event(policy, event=None):
-        resources = policy.resource_manager.get_resources([event['subject']])
+
+        resources = policy.resource_manager.get_resources(
+            [AzureModeCommon.extract_resource_id(policy, event)])
 
         resources = policy.resource_manager.filter_resources(
             resources, event)

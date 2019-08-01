@@ -3,10 +3,6 @@ trigger:
 
 variables:
 - group: CustodianCoreCI
-- name: WINDOWS_CACHE_DIR
-  value: $(LOCALAPPDATA)\pip\cache
-- name: LINUX_CACHE_DIR
-  value: /home/vsts/.cache/pip
 
 jobs:
 
@@ -33,14 +29,6 @@ jobs:
   pool:
     vmImage: 'Ubuntu-16.04'
   steps:
-  - task: CacheBeta@0
-    inputs:
-      key: |
-        c7n-tox
-        3.7
-        $(Agent.OS)
-      path: $(LINUX_CACHE_DIR)
-
   - checkout: self
     fetchDepth: 1
 
@@ -76,14 +64,6 @@ jobs:
     maxParallel: 3
 
   steps:
-  - task: CacheBeta@0
-    inputs:
-      key: |
-        c7n-tox
-        $(python.version)
-        $(Agent.OS)
-      path: $(LINUX_CACHE_DIR)
-
   - checkout: self
     fetchDepth: 2
 
@@ -134,14 +114,6 @@ jobs:
     maxParallel: 3
 
   steps:
-  - task: CacheBeta@0
-    inputs:
-      key: |
-        c7n-tox
-        $(python.version)
-        $(Agent.OS)
-      path: $(WINDOWS_CACHE_DIR)
-
   - checkout: self
     fetchDepth: 2
 
