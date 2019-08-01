@@ -237,7 +237,7 @@ class DeleteTrail(BaseAction):
         shadow_check.embedded = True
         resources = shadow_check.process(resources)
         for r in resources:
-            if r.get('IsOrganizationTrail', False):
+            if not r.get('IsOrganizationTrail', False):
                 try:
                     client.delete_trail(Name=r['Name'])
                 except client.exceptions.TrailNotFoundException:
