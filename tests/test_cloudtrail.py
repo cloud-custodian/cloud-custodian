@@ -151,3 +151,26 @@ class CloudTrail(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_cloudtrail_delete(self):
+        factory = self.replay_flight_data("test_cloudtrail_delete")
+        p = self.load_policy(
+            {
+                "name": "cloudtrail-resource",
+                "resource": "cloudtrail",
+                "filters": [{'type': 'value', 'key': 'Name', 'value': 'delete-me'}],
+                'actions': [{'type': 'delete'}],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'delete-me')
+
+        if self.recording:
+            time.sleep(3)
+
+        client = factory().client('cloudtrail')
+        self.assertRaises(
+            client.exceptions.TrailNotFoundException,
+            client.delete_trail,
+            Name=resources[0]['Name'])
