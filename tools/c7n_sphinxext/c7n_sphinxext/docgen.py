@@ -162,7 +162,8 @@ def main(provider, output_dir, group_by):
 
 
 def resource_file_name(output_dir, r):
-    return os.path.join(output_dir, "%s.rst" % r.type).replace(' ', '-').lower()
+    return os.path.join(
+        output_dir, ("%s.rst" % r.type).replace(' ', '-').lower())
 
 
 def _main(provider, output_dir, group_by):
@@ -200,13 +201,15 @@ def _main(provider, output_dir, group_by):
     # Create files for all groups
     for key, group in sorted(groups.items()):
         group = sorted(group, key=operator.attrgetter('type'))
-        rpath = os.path.join(output_dir, "group-%s.rst" % key).replace(' ', '-').lower()
+        rpath = os.path.join(
+            output_dir, ("group-%s.rst" % key).replace(' ', '-').lower())
         with open(rpath, 'w') as fh:
             t = env.get_template('provider-group.rst')
             fh.write(t.render(
                 provider_name=provider,
                 key=key,
-                resource_files=[os.path.basename(resource_file_name(output_dir, r)) for r in group],
+                resource_files=[os.path.basename(
+                    resource_file_name(output_dir, r)) for r in group],
                 resources=group))
         files.append(os.path.basename(rpath))
 
@@ -225,7 +228,8 @@ def _main(provider, output_dir, group_by):
             common_actions[ElementSchema.name(a)] = (a, r)
 
     fpath = os.path.join(
-        output_dir, "%s-common-filters.rst" % provider_class.type.lower())
+        output_dir,
+        ("%s-common-filters.rst" % provider_class.type.lower()))
     with open(fpath, 'w') as fh:
         t = env.get_template('provider-common-elements.rst')
         fh.write(t.render(
@@ -235,7 +239,8 @@ def _main(provider, output_dir, group_by):
         files.insert(0, os.path.basename(fpath))
 
     fpath = os.path.join(
-        output_dir, "%s-common-actions.rst" % provider_class.type.lower())
+        output_dir,
+        ("%s-common-actions.rst" % provider_class.type.lower()))
     with open(fpath, 'w') as fh:
         t = env.get_template('provider-common-elements.rst')
         fh.write(t.render(
