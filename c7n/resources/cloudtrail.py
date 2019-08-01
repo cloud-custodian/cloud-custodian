@@ -16,7 +16,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 
 from c7n.actions import Action, BaseAction
-from botocore.exceptions import ClientError
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
