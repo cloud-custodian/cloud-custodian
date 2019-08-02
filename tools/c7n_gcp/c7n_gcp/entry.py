@@ -28,6 +28,7 @@ import c7n_gcp.resources.dns
 import c7n_gcp.resources.function
 import c7n_gcp.resources.gke
 import c7n_gcp.resources.iam
+import c7n_gcp.resources.kms
 import c7n_gcp.resources.loadbalancer
 import c7n_gcp.resources.logging
 import c7n_gcp.resources.mlengine

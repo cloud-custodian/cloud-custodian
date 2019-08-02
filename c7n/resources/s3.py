@@ -663,17 +663,23 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
 class GlobalGrantsFilter(Filter):
     """Filters for all S3 buckets that have global-grants
 
+    *Note* by default this filter allows for read access
+    if the bucket has been configured as a website. This
+    can be disabled per the example below.
+
     :example:
 
     .. code-block:: yaml
 
-            policies:
-              - name: remove-global-grants
-                resource: s3
-                filters:
-                  - type: global-grants
-                actions:
-                  - delete-global-grants
+       policies:
+         - name: remove-global-grants
+           resource: s3
+           filters:
+            - type: global-grants
+              allow_website: false
+           actions:
+            - delete-global-grants
+
     """
 
     schema = type_schema(

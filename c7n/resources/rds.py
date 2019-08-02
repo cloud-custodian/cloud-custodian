@@ -285,7 +285,7 @@ class SubnetFilter(net_filters.SubnetFilter):
 @filters.register('vpc')
 class VpcFilter(net_filters.VpcFilter):
 
-    RelatedIdsExpression = "DBSubnetGroup.Subnets[].VpcId"
+    RelatedIdsExpression = "DBSubnetGroup.VpcId"
 
 
 filters.register('network-location', net_filters.NetworkLocation)
