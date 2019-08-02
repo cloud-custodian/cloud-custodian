@@ -356,7 +356,6 @@ class ServiceUsage(Filter):
                    'iam:GetServiceLastAccessedDetails')
 
     def process(self, resources, event=None):
-        import pdb; pdb.set_trace()
         client = local_session(self.manager.session_factory).client('iam')
 
         job_resource_map = {}
