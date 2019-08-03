@@ -38,6 +38,7 @@ from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session
+from c7n.policy import SecurityHub
 
 log = logging.getLogger('custodian.serverless')
 
@@ -1038,12 +1039,12 @@ class CloudWatchEventSource(object):
                 payload['detail']['eventTypeCategory'] = self.data['categories']
         elif event_type == 'hub-finding':
             payload['source'] = ['aws.securityhub']
-            payload['detail-type'] = ['Security Hub Findings']
+            payload['detail-type'] = [SecurityHub.ImportFinding]
         elif event_type == 'hub-action':
             payload['source'] = ['aws.securityhub']
             payload['detail-type'] = [
-                'Security Hub Findings - Custom Action',
-                'Security Hub Insight Results']
+                SecurityHub.ActionFinding,
+                SecurityHub.ActionInsight]
         elif event_type == 'periodic':
             pass
         else:
