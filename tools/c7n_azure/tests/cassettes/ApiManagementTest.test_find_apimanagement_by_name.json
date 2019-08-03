@@ -1,0 +1,96 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ApiManagement/service?api-version=2019-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 06 Jun 2019 23:47:45 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "2244"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_apimanagement/providers/Microsoft.ApiManagement/service/cctestapimanagementoburasvn7hj52",
+                                "name": "cctestapimanagementoburasvn7hj52",
+                                "type": "Microsoft.ApiManagement/service",
+                                "tags": {},
+                                "location": "Central US",
+                                "etag": "AAAAAAGLUP4=",
+                                "properties": {
+                                    "publisherEmail": "cloud@custodian.com",
+                                    "publisherName": "cloudcustodian",
+                                    "notificationSenderEmail": "apimgmt-noreply@mail.windowsazure.com",
+                                    "provisioningState": "Succeeded",
+                                    "targetProvisioningState": "",
+                                    "createdAtUtc": "2019-06-06T23:10:52.4619755Z",
+                                    "gatewayUrl": "https://cctestapimanagementoburasvn7hj52.azure-api.net",
+                                    "gatewayRegionalUrl": "https://cctestapimanagementoburasvn7hj52-centralus-01.regional.azure-api.net",
+                                    "portalUrl": "https://cctestapimanagementoburasvn7hj52.portal.azure-api.net",
+                                    "developerPortalUrl": "https://cctestapimanagementoburasvn7hj52.developer.azure-api.net",
+                                    "managementApiUrl": "https://cctestapimanagementoburasvn7hj52.management.azure-api.net",
+                                    "scmUrl": "https://cctestapimanagementoburasvn7hj52.scm.azure-api.net",
+                                    "hostnameConfigurations": [
+                                        {
+                                            "type": "Proxy",
+                                            "hostName": "cctestapimanagementoburasvn7hj52.azure-api.net",
+                                            "encodedCertificate": null,
+                                            "keyVaultId": null,
+                                            "certificatePassword": null,
+                                            "negotiateClientCertificate": false,
+                                            "certificate": null,
+                                            "defaultSslBinding": true
+                                        }
+                                    ],
+                                    "publicIPAddresses": [
+                                        "40.122.130.170"
+                                    ],
+                                    "privateIPAddresses": null,
+                                    "additionalLocations": null,
+                                    "virtualNetworkConfiguration": null,
+                                    "customProperties": {
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10": "False",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11": "False",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Ssl30": "False",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168": "False",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls10": "False",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls11": "False",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Ssl30": "False",
+                                        "Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2": "False"
+                                    },
+                                    "virtualNetworkType": "None",
+                                    "certificates": null
+                                },
+                                "sku": {
+                                    "name": "Developer",
+                                    "capacity": 1
+                                },
+                                "identity": null
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

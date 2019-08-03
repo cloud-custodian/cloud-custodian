@@ -77,6 +77,37 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_vpc_post_finding(self):
+        # reusing extant test data
+        factory = self.replay_flight_data('test_vpc_flow_log_s3_dest')
+        p = self.load_policy({
+            'name': 'post-vpc-finding',
+            'resource': 'vpc',
+            'actions': [{
+                'type': 'post-finding',
+                'types': ['Effects/Custodian']}]},
+            session_factory=factory)
+        resources = p.resource_manager.resources()
+        post_finding = p.resource_manager.actions[0]
+        formatted = post_finding.format_resource(resources[0])
+        formatted['Details']['Other'].pop('Tags')
+        formatted['Details']['Other'].pop('CidrBlockAssociationSet')
+        self.assertEqual(
+            formatted,
+            {'Details': {'Other': {'CidrBlock': '10.0.42.0/24',
+                                   'DhcpOptionsId': 'dopt-24ff1940',
+                                   'InstanceTenancy': 'default',
+                                   'IsDefault': 'False',
+                                   'OwnerId': '644160558196',
+                                   'State': 'available',
+                                   'VpcId': 'vpc-f1516b97',
+                                   'c7n:resource-type': 'vpc'}},
+             'Id': 'arn:aws:ec2:us-east-1::vpc/vpc-f1516b97',
+             'Partition': 'aws',
+             'Region': 'us-east-1',
+             'Tags': {'Name': 'FancyTestVPC', 'tagfancykey': 'tagfanncyvalue'},
+             'Type': 'AwsEc2Vpc'})
+
     def test_flow_logs_s3_destination(self):
         factory = self.replay_flight_data('test_vpc_flow_log_s3_dest')
         p = self.load_policy({
@@ -162,6 +193,20 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["VpcId"], vpc_id1)
+
+    def test_eni_vpc_filter(self):
+        self.session_factory = self.replay_flight_data("test_eni_vpc_filter")
+        p = self.load_policy({
+            "name": "ec2-eni-vpc-filter",
+            "resource": "eni",
+            "filters": [{
+                'type': 'vpc',
+                'key': 'tag:Name',
+                'value': 'FlowLogTest'}]},
+            session_factory=self.session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["VpcId"], "vpc-d2d616b5")
 
     def test_attributes_filter_all(self):
         self.session_factory = self.replay_flight_data("test_vpc_attributes")
@@ -644,6 +689,41 @@ class NetworkInterfaceTest(BaseTest):
         self.assertEqual(
             [k for k in resources[0] if k.startswith("c7n")], ["c7n:MatchedFilters"]
         )
+
+    def test_interface_delete(self):
+        factory = self.replay_flight_data("test_network_interface_delete")
+        client = factory().client("ec2")
+        eni = "eni-d834cdcf"
+
+        p = self.load_policy(
+            {
+                "name": "eni-delete",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "NetworkInterfaceId",
+                        "value": eni,
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                    },
+                    {
+                        # ensure graceful handling of multiple delete attempts
+                        "type": "delete",
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(client.exceptions.ClientError) as e:
+            client.describe_network_interfaces(NetworkInterfaceIds=[eni])
+        self.assertEqual(e.exception.response['Error']['Code'],
+            'InvalidNetworkInterfaceID.NotFound')
 
     @functional
     def test_interface_subnet(self):
@@ -1365,6 +1445,57 @@ class SecurityGroupTest(BaseTest):
         ]
         self.assertEqual(group_info.get("IpPermissions", []), [])
 
+    def test_security_group_post_finding(self):
+        # reuse replay
+        factory = self.replay_flight_data('test_security_group_perm_cidr_kv')
+        p = self.load_policy({
+            'name': 'sg-ingress',
+            'resource': 'security-group',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId ='sg-6c7fa917'"}],
+            'actions': [{
+                'type': 'post-finding',
+                'types': ['Effects/Custodian']}]},
+            session_factory=factory)
+        resources = p.resource_manager.resources()
+        post_finding = p.resource_manager.actions[0]
+        formatted = post_finding.format_resource(resources[0])
+        for k in ('IpPermissions', 'IpPermissionsEgress', 'Tags'):
+            formatted['Details']['Other'].pop(k)
+        self.assertEqual(
+            formatted,
+            {'Details': {
+                'Other': {
+                    'Description': 'default VPC security group',
+                    'GroupId': 'sg-6c7fa917',
+                    'GroupName': 'default',
+                    'OwnerId': '644160558196',
+                    'VpcId': 'vpc-d2d616b5',
+                    'c7n:resource-type': 'security-group'}},
+             'Id': 'arn:aws:ec2:us-east-1::security-group/sg-6c7fa917',
+             'Partition': 'aws',
+             'Region': 'us-east-1',
+             'Tags': {'NetworkLocation': 'Private'},
+             'Type': 'AwsEc2SecurityGroup'})
+
+    def test_permission_cidr_kv(self):
+        factory = self.replay_flight_data('test_security_group_perm_cidr_kv')
+        p = self.load_policy({
+            'name': 'sg-ingress',
+            'resource': 'security-group',
+            'source': 'config',
+            'filters': [{
+                'type': 'egress',
+                'Cidr': '0.0.0.0/0',
+            }],
+            'query': [
+                {'clause': "resourceId ='sg-6c7fa917'"},
+            ]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['GroupId'], 'sg-6c7fa917')
+
     def test_default_vpc(self):
         # preconditions, more than one vpc, each with at least one
         # security group
@@ -1388,40 +1519,24 @@ class SecurityGroupTest(BaseTest):
                 "resource": "security-group",
                 "filters": [{"GroupId": "sg-6c7fa917"}],
             },
-            session_factory=factory,
-        )
+            session_factory=factory)
+
         d_resources = p.run()
         self.assertEqual(len(d_resources), 1)
-
-        p = self.load_policy(
-            {
-                "name": "sg-test",
-                "source": "config",
-                "resource": "security-group",
-                "filters": [{"type": "default-vpc"}, {"GroupId": "sg-6c7fa917"}],
-            },
-            session_factory=factory,
-        )
+        p = self.load_policy({
+            "name": "sg-test",
+            "source": "config",
+            "resource": "security-group",
+            # to match on filter annotation
+            "filters": [{"GroupId": "sg-6c7fa917"}],
+            "query": [{"clause": "resourceId = 'sg-6c7fa917'"}]},
+            session_factory=factory)
         c_resources = p.run()
 
         self.assertEqual(len(c_resources), 1)
         self.assertEqual(c_resources[0]["GroupId"], "sg-6c7fa917")
         self.maxDiff = None
-        self.assertEqual(c_resources, d_resources)
-
-        p = self.load_policy(
-            {
-                "name": "sg-test",
-                "resource": "security-group",
-                "filters": [
-                    {"type": "ingress", "Cidr": {"value": "108.56.181.242/32"}}
-                ],
-            },
-            session_factory=factory,
-        )
-        c_resources = p.run()
-        self.assertEqual(len(c_resources), 1)
-        self.assertEqual(c_resources[0]["GroupId"], "sg-6c7fa917")
+        self.assertEqual(c_resources[0], d_resources[0])
 
     def test_config_rule(self):
         factory = self.replay_flight_data("test_security_group_config_rule")
@@ -2187,7 +2302,7 @@ class SecurityGroupTest(BaseTest):
 
     def test_egress_validation_error(self):
         self.assertRaises(
-            PolicyValidationError,
+            Exception,
             self.load_policy,
             {
                 "name": "sg-find2",
@@ -2217,6 +2332,98 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Tags"][0]["Value"], "FancyTestVPC")
+
+    def test_vpc_scenario_2(self):
+        factory = self.replay_flight_data("test_vpc_scenario_2")
+        p = self.load_policy(
+            {
+                "name": "vpc-scenario-2",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "value_type": "resource_count",
+                        "value": 2,
+                        "op": "lt"
+                    },
+                    {
+                        "type": "internet-gateway",
+                        "value_type": "resource_count",
+                        "value": 1,
+                        "op": "gte"
+                    },
+                    {
+                        "type": "nat-gateway",
+                        "value_type": "resource_count",
+                        "value": 1,
+                        "op": "gte"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_vpc_by_subnet(self):
+        factory = self.replay_flight_data("test_vpc_scenario_2")
+        p = self.load_policy(
+            {
+                "name": "vpc-subnet",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "tag:Name",
+                        "value": "Public subnet",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Tags"][0]["Value"], "scenario-2-test")
+
+    def test_vpc_by_internet_gateway(self):
+        factory = self.replay_flight_data("test_vpc_scenario_2")
+        p = self.load_policy(
+            {
+                "name": "vpc-internet-gateway",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "internet-gateway",
+                        "key": "tag:Name",
+                        "value": "Fancy Internet Gateway",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Tags"][0]["Value"], "scenario-2-test")
+
+    def test_vpc_by_nat_gateway(self):
+        factory = self.replay_flight_data("test_vpc_scenario_2")
+        p = self.load_policy(
+            {
+                "name": "vpc-nat-gateway",
+                "resource": "vpc",
+                "filters": [
+                    {
+                        "type": "nat-gateway",
+                        "key": "tag:Name",
+                        "value": "Fancy NAT Gateway",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Tags"][0]["Value"], "scenario-2-test")
 
 
 class EndpointTest(BaseTest):

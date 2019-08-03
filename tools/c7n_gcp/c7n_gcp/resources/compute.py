@@ -32,6 +32,7 @@ class Instance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('aggregatedList', 'items.*.instances[]', None)
         scope = 'project'
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
@@ -102,12 +103,26 @@ class Image(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'images'
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'resourceId': resource_info['image_id']})
+
+
+@Image.action_registry.register('delete')
+class DeleteImage(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    attr_filter = ('status', ('READY'))
+    path_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*)')
+
+    def get_resource_params(self, m, r):
+        project, image_id = self.path_param_re.match(r['selfLink']).groups()
+        return {'project': project, 'image': image_id}
 
 
 @resources.register('disk')
@@ -119,6 +134,7 @@ class Disk(QueryResourceManager):
         component = 'disks'
         scope = 'zone'
         enum_spec = ('aggregatedList', 'items.*.disks[]', None)
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):
@@ -146,6 +162,7 @@ class Snapshot(QueryResourceManager):
         version = 'v1'
         component = 'snapshots'
         enum_spec = ('list', 'items[]', None)
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):

@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/redshift",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/redshift",
+                "TargetKeyId": "8785aeb9-a616-4e2b-bbd3-df3cde76bcc5"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "2b040f89-0785-4c31-9fba-2252958cc371",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2b040f89-0785-4c31-9fba-2252958cc371",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "202"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

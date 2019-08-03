@@ -1,0 +1,140 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "Isolation SG",
+                "GroupName": "test-isolation-group",
+                "IpPermissions": [
+                    {
+                        "FromPort": 80,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "192.168.0.1/31",
+                                "Description": "testcidr"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [
+                            {
+                                "PrefixListId": "pl-63a5400b"
+                            }
+                        ],
+                        "ToPort": 80,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "OwnerId": "123412341234",
+                "GroupId": "sg-01a19f602ecaf25f4",
+                "IpPermissionsEgress": [
+                    {
+                        "FromPort": 80,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "20.0.0.0/8"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 80,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-3d05f145"
+            },
+            {
+                "Description": "test-sg-2",
+                "GroupName": "test-sg-2",
+                "IpPermissions": [
+                    {
+                        "FromPort": 443,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "127.0.0.1/32"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 443,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "OwnerId": "123412341234",
+                "GroupId": "sg-0b650189861ce4f6c",
+                "IpPermissionsEgress": [
+                    {
+                        "FromPort": 80,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "10.0.0.0/8"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 80,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [],
+                "VpcId": "vpc-3d05f145"
+            },
+            {
+                "Description": "sample controller SG",
+                "GroupName": "sg_controllers",
+                "IpPermissions": [
+                    {
+                        "FromPort": 443,
+                        "IpProtocol": "udp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "10.0.0.0/8"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 443,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "OwnerId": "123412341234",
+                "GroupId": "sg-c573e6b3",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "10.0.0.0/8"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-c573e6b3",
+                                "UserId": "123412341234"
+                            }
+                        ]
+                    }
+                ],
+                "VpcId": "vpc-3d05f145"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "414d164f-7241-4721-be33-42585bb438d7",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "accept-encoding",
+                "date": "Fri, 12 Jul 2019 17:53:43 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -13,13 +13,12 @@ Filters
 
 - ``onhour``
 
-  .. c7n-schema:: AzureOnHour
-       :module: c7n_azure.filters
+  .. c7n-schema:: azure.appserviceplan.filters.onhour
 
 - ``offhour``
 
-  .. c7n-schema:: AzureOffHour
-       :module: c7n_azure.filters
+  .. c7n-schema:: azure.appserviceplan.filters.offhour
+
 
 Actions
 -------
@@ -28,34 +27,9 @@ Actions
 - ``resize-plan``
   Resize an app service plan by changing either the SKU or the number of instances.
 
-  .. c7n-schema:: ResizePlan
-       :module: c7n_azure.resources.appserviceplan
+  .. c7n-schema:: azure.appserviceplan.actions.resize-plan
+
 
 Example Policies
 ----------------
-
-This set of policies will mark all app services for deletion in 7 days that have 'test' in name (ignore case),
-and then perform the delete operation on those ready for deletion.
-
-.. code-block:: yaml
-
-    policies:
-      - name: mark-test-appservice-for-deletion
-        resource: azure.appserviceplan
-        filters:
-          - type: value
-            key: name
-            op: in
-            value_type: normalize
-            value: test
-         actions:
-          - type: mark-for-op
-            op: delete
-            days: 7
-      - name: delete-test-appservice
-        resource: azure.appserviceplan
-        filters:
-          - type: marked-for-op
-            op: delete
-        actions:
-          - type: delete
+- :ref:`azure_examples_resize_app_service_plan`

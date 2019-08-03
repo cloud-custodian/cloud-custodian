@@ -1,16 +1,16 @@
 .. _azure_policies:
 
-Policies
-========
+Supported Resources
+===================
 
-Here are some more specific example policies for these resources:
+All supported Azure resource types and their associated filters and actions are
+listed below:
 
 .. toctree::
   :maxdepth: 2
   :titlesonly:
   :glob:
 
-  delayedoperation
   genericarmaction
   genericarmfilter
   resources/*

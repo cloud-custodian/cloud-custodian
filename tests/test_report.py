@@ -17,7 +17,7 @@ import unittest
 
 from c7n.policy import Policy
 from c7n.reports.csvout import Formatter
-from .common import Config, load_data
+from .common import BaseTest, Config, load_data
 
 
 EC2_POLICY = Policy({"name": "report-test-ec2", "resource": "ec2"}, Config.empty())
@@ -25,13 +25,21 @@ ASG_POLICY = Policy({"name": "report-test-asg", "resource": "asg"}, Config.empty
 ELB_POLICY = Policy({"name": "report-test-elb", "resource": "elb"}, Config.empty())
 
 
-class TestEC2Report(unittest.TestCase):
+class TestEC2Report(BaseTest):
 
     def setUp(self):
         data = load_data("report.json")
         self.records = data["ec2"]["records"]
         self.headers = data["ec2"]["headers"]
         self.rows = data["ec2"]["rows"]
+
+    def test_default_csv(self):
+        self.patch(EC2_POLICY.resource_manager.resource_type,
+                   'default_report_fields', ())
+        formatter = Formatter(EC2_POLICY.resource_manager.resource_type)
+        self.assertEqual(
+            formatter.to_csv([self.records['full']]),
+            [['InstanceId-1', '', 'LaunchTime-1']])
 
     def test_csv(self):
         formatter = Formatter(EC2_POLICY.resource_manager.resource_type)

@@ -8,7 +8,6 @@ Topics for advanced usage of the Azure provider
   :titlesonly:
   :glob:
 
-  azurefunctions
   multiplesubs
-  bloboutput
-  appinsightslogging
+  azurepolicy
+  contribute

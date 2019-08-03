@@ -1,0 +1,82 @@
+{
+    "status_code": 200,
+    "data": {
+        "OpsItem": {
+            "CreatedBy": "arn:aws:iam::644160558196:user/kapil",
+            "CreatedTime": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 7,
+                "day": 13,
+                "hour": 10,
+                "minute": 5,
+                "second": 5,
+                "microsecond": 762000
+            },
+            "Description": "something good",
+            "LastModifiedBy": "arn:aws:iam::644160558196:user/kapil",
+            "LastModifiedTime": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 7,
+                "day": 29,
+                "hour": 16,
+                "minute": 55,
+                "second": 56,
+                "microsecond": 272000
+            },
+            "Notifications": [],
+            "Priority": 3,
+            "RelatedOpsItems": [],
+            "Status": "Open",
+            "OpsItemId": "oi-9be57440dcb3",
+            "Title": "checking-lambdas",
+            "Source": "Cloud Custodian",
+            "OperationalData": {
+                "/aws/dedup": {
+                    "Value": "{\"dedupString\": \"d82644a050a2df919ce4d7abedce0134\"}",
+                    "Type": "SearchableString"
+                },
+                "/aws/resources": {
+                    "Value": "[{\"arn\": \"arn:aws:lambda:us-east-1::function:custodian-aws\"}, {\"arn\": \"arn:aws:lambda:us-east-1::function:custodian-nuke-emr\"}]",
+                    "Type": "SearchableString"
+                },
+                "/custodian/dedup": {
+                    "Value": "d82644a050a2df919ce4d7abedce0134",
+                    "Type": "SearchableString"
+                },
+                "/custodian/execution-id": {
+                    "Value": "56100b1f-1993-4c7a-9262-d25fdaaaee72",
+                    "Type": "String"
+                },
+                "/custodian/policy": {
+                    "Value": "{\"name\": \"checking-lambdas\", \"description\": \"something good\", \"resource\": \"aws.lambda\", \"source\": \"config\", \"query\": [{\"clause\": \"resourceId = 'custodian-aws'\"}], \"actions\": [{\"type\": \"post-item\"}]}",
+                    "Type": "String"
+                },
+                "/custodian/policy-name": {
+                    "Value": "checking-lambdas",
+                    "Type": "SearchableString"
+                },
+                "/custodian/resource": {
+                    "Value": "lambda",
+                    "Type": "SearchableString"
+                },
+                "/custodian/version": {
+                    "Value": "0.8.44.0",
+                    "Type": "String"
+                }
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "7fbcdb32-c74b-414a-b77b-00a4645a94f4",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7fbcdb32-c74b-414a-b77b-00a4645a94f4",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1350",
+                "date": "Mon, 29 Jul 2019 20:55:58 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

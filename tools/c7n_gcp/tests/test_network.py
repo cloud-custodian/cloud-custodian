@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import time
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 
 
 class FirewallTest(BaseTest):
@@ -89,3 +90,102 @@ class SubnetTest(BaseTest):
                     'region': 'us-central1',
                     'subnetwork': subnet['name']})
         self.assertEqual(result['privateIpGoogleAccess'], True)
+
+
+class RouterTest(BaseTest):
+    def test_router_query(self):
+        project_id = 'atomic-shine-231410'
+        session_factory = self.replay_flight_data('router-query', project_id=project_id)
+
+        policy = {
+            'name': 'all-routers',
+            'resource': 'gcp.router'
+        }
+
+        policy = self.load_policy(
+            policy,
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], 'test-router')
+
+    def test_router_get(self):
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('router-get', project_id=project_id)
+
+        p = self.load_policy({
+            'name': 'router-created',
+            'resource': 'gcp.router',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['beta.compute.routers.insert']}},
+            session_factory=factory)
+
+        exec_mode = p.get_execution_mode()
+        event = event_data('router-create.json')
+        routers = exec_mode.run(event, None)
+
+        self.assertEqual(len(routers), 1)
+        self.assertEqual(routers[0]['bgp']['asn'], 65001)
+
+    def test_router_delete(self):
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('router-delete', project_id=project_id)
+
+        p = self.load_policy(
+            {'name': 'delete-router',
+             'resource': 'gcp.router',
+             'filters': [{'name': 'test-router'}],
+             'actions': ['delete']},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(5)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'region': 'us-central1',
+                     'filter': 'name = test-router'})
+
+        self.assertEqual(result.get('items', []), [])
+
+
+class RouteTest(BaseTest):
+    def test_route_query(self):
+        project_id = 'atomic-shine-231410'
+        session_factory = self.replay_flight_data('route-query', project_id=project_id)
+
+        policy = {
+            'name': 'all-routes',
+            'resource': 'gcp.route'
+        }
+
+        policy = self.load_policy(
+            policy,
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['destRange'], '10.160.0.0/20')
+
+    def test_route_get(self):
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('route-get', project_id=project_id)
+
+        p = self.load_policy({
+            'name': 'route-created',
+            'resource': 'gcp.route',
+            'mode': {
+                'type': 'gcp-audit',
+                'methods': ['v1.compute.routes.insert']}},
+            session_factory=factory)
+
+        exec_mode = p.get_execution_mode()
+        event = event_data('route-create.json')
+        routes = exec_mode.run(event, None)
+
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(routes[0]['destRange'], '10.0.0.0/24')

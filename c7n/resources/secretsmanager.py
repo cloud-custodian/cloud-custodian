@@ -13,7 +13,7 @@
 # limitations under the License.
 from c7n.manager import resources
 from c7n.filters import iamaccess
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session
 
@@ -23,14 +23,12 @@ class SecretsManager(QueryResourceManager):
 
     permissions = ('secretsmanager:ListSecretVersionIds',)
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'secretsmanager'
         enum_spec = ('list_secrets', 'SecretList', None)
         detail_spec = ('describe_secret', 'SecretId', 'ARN', None)
-        id = 'ARN'
+        arn = id = 'ARN'
         name = 'Name'
-        dimension = None
-        filter_name = None
 
 
 SecretsManager.filter_registry.register('marked-for-op', TagActionFilter)
@@ -116,6 +114,6 @@ class MarkSecretForOp(TagDelayedAction):
               resource: secrets-manager
               actions:
                 - type: mark-for-op
-                  op: delete
+                  op: tag
                   days: 1
     """

@@ -92,7 +92,7 @@ def _default_options(p, blacklist=""):
     if 'log-group' not in blacklist:
         p.add_argument(
             "-l", "--log-group", default=None,
-            help="Cloudwatch Log Group to send policy logs")
+            help="Location to send policy logs (Ex: AWS CloudWatch Log Group)")
     else:
         p.add_argument("--log-group", default=None, help=argparse.SUPPRESS)
 
@@ -130,9 +130,9 @@ def _report_options(p):
         '--no-default-fields', action="store_true",
         help='Exclude default fields for report.')
     p.add_argument(
-        '--format', default='csv', choices=['csv', 'grid', 'simple'],
+        '--format', default='csv', choices=['csv', 'grid', 'simple', 'json'],
         help="Format to output data in (default: %(default)s). "
-        "Options include simple, grid, csv")
+        "Options include simple, grid, csv, json")
 
 
 def _metrics_options(p):
@@ -240,17 +240,22 @@ def setup_parser():
         "--skip-validation",
         action="store_true",
         help="Skips validation of policies (assumes you've run the validate command seperately).")
+
+    metrics_help = ("Emit metrics to provider metrics. Specify 'aws', 'gcp', or 'azure'. "
+            "For more details on aws metrics options, see: "
+            "https://cloudcustodian.io/docs/aws/usage.html#metrics")
+
     run.add_argument(
         "-m", "--metrics-enabled",
         default=None, nargs="?", const="aws",
-        help="Emit metrics to provider metrics")
+        help=metrics_help)
     run.add_argument(
         "--trace",
         dest="tracer",
         help=argparse.SUPPRESS,
         default=None, nargs="?", const="default")
 
-    schema_desc = ("Browse the available vocabularies (resources, filters, and "
+    schema_desc = ("Browse the available vocabularies (resources, filters, modes, and "
                    "actions) for policy construction. The selector "
                    "is specified with RESOURCE[.CATEGORY[.ITEM]] "
                    "examples: s3, ebs.actions, or ec2.filters.instance-age")

@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.utils import local_session, type_schema
 
@@ -24,12 +24,13 @@ from c7n.utils import local_session, type_schema
 @resources.register('batch-compute')
 class ComputeEnvironment(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'batch'
         filter_name = 'computeEnvironments'
         filter_type = 'list'
-        dimension = None
         id = name = "computeEnvironmentName"
+        arn = "computeEnvironmentArn"
+        arn_type = "compute-environment"
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
 
@@ -49,11 +50,12 @@ class ComputeSubnetFilter(SubnetFilter):
 @resources.register('batch-definition')
 class JobDefinition(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'batch'
         filter_name = 'jobDefinitions'
         filter_type = 'list'
-        dimension = None
+        arn = "jobDefinitionArn"
+        arn_type = 'job-definition'
         id = name = "jobDefinitionName"
         enum_spec = (
             'describe_job_definitions', 'jobDefinitions', None)
@@ -88,7 +90,7 @@ class UpdateComputeEnvironment(BaseAction, StateTransitionFilter):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: update-environments
@@ -139,14 +141,14 @@ class DeleteComputeEnvironment(BaseAction, StateTransitionFilter):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: delete-environments
             resource: batch-compute
             filters:
               - computeResources.desiredvCpus: 0
-            action:
+            actions:
               - type: delete
     """
     schema = type_schema('delete')
@@ -174,7 +176,7 @@ class DefinitionDeregister(BaseAction, StateTransitionFilter):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: deregister-definition

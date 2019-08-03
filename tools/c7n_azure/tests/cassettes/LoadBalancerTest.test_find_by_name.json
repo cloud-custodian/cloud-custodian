@@ -1,0 +1,345 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/loadBalancers?api-version=2018-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:32:52 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "16279"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "k8s-master-internal-lb-C02B7042",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042",
+                                "etag": "W/\"9b30e653-8cfc-4e18-abff-2a7448d0ce32\"",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "f62dd440-2673-4f36-8e59-fcbdeb4a5959",
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "k8s-master-internal-lbFrontEnd-C02B7042",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042/frontendIPConfigurations/k8s-master-internal-lbFrontEnd-C02B7042",
+                                            "etag": "W/\"9b30e653-8cfc-4e18-abff-2a7448d0ce32\"",
+                                            "type": "Microsoft.Network/loadBalancers/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAddress": "10.240.255.15",
+                                                "privateIPAllocationMethod": "Static",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/virtualNetworks/k8s-vnet-C02B7042/subnets/k8s-subnet"
+                                                },
+                                                "loadBalancingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042/loadBalancingRules/InternalLBRuleHTTPS"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "k8s-master-pool-C02B7042",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042/backendAddressPools/k8s-master-pool-C02B7042",
+                                            "etag": "W/\"9b30e653-8cfc-4e18-abff-2a7448d0ce32\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendIPConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-C02B7042-nic-0/ipConfigurations/ipconfig1"
+                                                    }
+                                                ],
+                                                "loadBalancingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042/loadBalancingRules/InternalLBRuleHTTPS"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/loadBalancers/backendAddressPools"
+                                        }
+                                    ],
+                                    "loadBalancingRules": [
+                                        {
+                                            "name": "InternalLBRuleHTTPS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042/loadBalancingRules/InternalLBRuleHTTPS",
+                                            "etag": "W/\"9b30e653-8cfc-4e18-abff-2a7448d0ce32\"",
+                                            "type": "Microsoft.Network/loadBalancers/loadBalancingRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042/frontendIPConfigurations/k8s-master-internal-lbFrontEnd-C02B7042"
+                                                },
+                                                "frontendPort": 443,
+                                                "backendPort": 4443,
+                                                "enableFloatingIP": false,
+                                                "idleTimeoutInMinutes": 5,
+                                                "protocol": "Tcp",
+                                                "enableDestinationServiceEndpoint": false,
+                                                "enableTcpReset": false,
+                                                "allowBackendPortConflict": false,
+                                                "loadDistribution": "Default",
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042/backendAddressPools/k8s-master-pool-C02B7042"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "probes": [
+                                        {
+                                            "name": "tcpHTTPSProbe",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042/probes/tcpHTTPSProbe",
+                                            "etag": "W/\"9b30e653-8cfc-4e18-abff-2a7448d0ce32\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "protocol": "Tcp",
+                                                "port": 4443,
+                                                "intervalInSeconds": 5,
+                                                "numberOfProbes": 2
+                                            },
+                                            "type": "Microsoft.Network/loadBalancers/probes"
+                                        }
+                                    ],
+                                    "inboundNatRules": [],
+                                    "inboundNatPools": []
+                                },
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                }
+                            },
+                            {
+                                "name": "k8s-master-lb-C02B7042",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042",
+                                "etag": "W/\"74d3dd59-860a-401e-8a18-40ee0ad837e2\"",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "95537201-183b-42a5-acb3-9e2458c44399",
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "k8s-master-lbFrontEnd-C02B7042",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/frontendIPConfigurations/k8s-master-lbFrontEnd-C02B7042",
+                                            "etag": "W/\"74d3dd59-860a-401e-8a18-40ee0ad837e2\"",
+                                            "type": "Microsoft.Network/loadBalancers/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/publicIPAddresses/k8s-master-ip-cctestacsdnsmgmt-C02B7042"
+                                                },
+                                                "loadBalancingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/loadBalancingRules/LBRuleHTTPS"
+                                                    }
+                                                ],
+                                                "inboundNatRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/inboundNatRules/SSH-k8s-master-C02B7042-0"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "k8s-master-pool-C02B7042",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/backendAddressPools/k8s-master-pool-C02B7042",
+                                            "etag": "W/\"74d3dd59-860a-401e-8a18-40ee0ad837e2\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendIPConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-C02B7042-nic-0/ipConfigurations/ipconfig1"
+                                                    }
+                                                ],
+                                                "loadBalancingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/loadBalancingRules/LBRuleHTTPS"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/loadBalancers/backendAddressPools"
+                                        }
+                                    ],
+                                    "loadBalancingRules": [
+                                        {
+                                            "name": "LBRuleHTTPS",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/loadBalancingRules/LBRuleHTTPS",
+                                            "etag": "W/\"74d3dd59-860a-401e-8a18-40ee0ad837e2\"",
+                                            "type": "Microsoft.Network/loadBalancers/loadBalancingRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/frontendIPConfigurations/k8s-master-lbFrontEnd-C02B7042"
+                                                },
+                                                "frontendPort": 443,
+                                                "backendPort": 443,
+                                                "enableFloatingIP": false,
+                                                "idleTimeoutInMinutes": 5,
+                                                "protocol": "Tcp",
+                                                "enableDestinationServiceEndpoint": false,
+                                                "enableTcpReset": false,
+                                                "allowBackendPortConflict": false,
+                                                "loadDistribution": "Default",
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/backendAddressPools/k8s-master-pool-C02B7042"
+                                                },
+                                                "probe": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/probes/tcpHTTPSProbe"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "probes": [
+                                        {
+                                            "name": "tcpHTTPSProbe",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/probes/tcpHTTPSProbe",
+                                            "etag": "W/\"74d3dd59-860a-401e-8a18-40ee0ad837e2\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "protocol": "Tcp",
+                                                "port": 443,
+                                                "intervalInSeconds": 5,
+                                                "numberOfProbes": 2,
+                                                "loadBalancingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/loadBalancingRules/LBRuleHTTPS"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/loadBalancers/probes"
+                                        }
+                                    ],
+                                    "inboundNatRules": [
+                                        {
+                                            "name": "SSH-k8s-master-C02B7042-0",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/inboundNatRules/SSH-k8s-master-C02B7042-0",
+                                            "etag": "W/\"74d3dd59-860a-401e-8a18-40ee0ad837e2\"",
+                                            "type": "Microsoft.Network/loadBalancers/inboundNatRules",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/frontendIPConfigurations/k8s-master-lbFrontEnd-C02B7042"
+                                                },
+                                                "frontendPort": 22,
+                                                "backendPort": 22,
+                                                "enableFloatingIP": false,
+                                                "idleTimeoutInMinutes": 4,
+                                                "protocol": "Tcp",
+                                                "enableDestinationServiceEndpoint": false,
+                                                "enableTcpReset": false,
+                                                "allowBackendPortConflict": false,
+                                                "backendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-C02B7042-nic-0/ipConfigurations/ipconfig1"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "inboundNatPools": []
+                                },
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                }
+                            },
+                            {
+                                "name": "cctestdiagnostic_loadbalancer",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer",
+                                "etag": "W/\"31bac99b-fbcf-46fa-923e-da432f3b5d49\"",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "31bed4d2-1b61-4539-bdad-ccb18de946d3",
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "LoadBalancerFrontEnd",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer/frontendIPConfigurations/LoadBalancerFrontEnd",
+                                            "etag": "W/\"31bac99b-fbcf-46fa-923e-da432f3b5d49\"",
+                                            "type": "Microsoft.Network/loadBalancers/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/publicIPAddresses/cctestdiagnostic_loadbalancer_public_ip"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "backendAddressPools": [],
+                                    "loadBalancingRules": [],
+                                    "probes": [],
+                                    "inboundNatRules": [],
+                                    "inboundNatPools": []
+                                },
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                }
+                            },
+                            {
+                                "name": "cctestloadbalancer",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_load-balancer/providers/Microsoft.Network/loadBalancers/cctestloadbalancer",
+                                "etag": "W/\"fd677de9-846d-43a4-bc60-4bc97fa93492\"",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "491c82a7-7f6c-4c6d-9dd3-3faf7b617c64",
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "LoadBalancerFrontEnd",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_load-balancer/providers/Microsoft.Network/loadBalancers/cctestloadbalancer/frontendIPConfigurations/LoadBalancerFrontEnd",
+                                            "etag": "W/\"fd677de9-846d-43a4-bc60-4bc97fa93492\"",
+                                            "type": "Microsoft.Network/loadBalancers/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_load-balancer/providers/Microsoft.Network/publicIPAddresses/cctestloadbalancer_public_ip"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "backendAddressPools": [],
+                                    "loadBalancingRules": [],
+                                    "probes": [],
+                                    "inboundNatRules": [],
+                                    "inboundNatPools": []
+                                },
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Regional"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

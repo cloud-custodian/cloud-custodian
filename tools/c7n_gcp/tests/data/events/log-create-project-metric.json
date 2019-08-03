@@ -1,0 +1,50 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "dkhanas@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "188.163.232.130",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-21T14:55:11.471693730Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "logging.googleapis.com",
+    "methodName": "google.logging.v2.MetricsServiceV2.CreateLogMetric",
+    "authorizationInfo": [
+      {
+        "resource": "projects/test-project-232910/metrics",
+        "permission": "logging.logMetrics.create",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "resourceName": "projects/test-project-232910/metrics",
+    "request": {
+      "@type": "type.googleapis.com/google.logging.v2.CreateLogMetricRequest",
+      "metric": {
+        "filter": "resource.type=\"gae_app\"\n",
+        "name": "test_name",
+        "description": "sinks"
+      },
+      "parent": "projects/test-project-232910"
+    }
+  },
+  "insertId": "eford39lu",
+  "resource": {
+    "type": "metric",
+    "labels": {
+      "project_id": "test-project-232910",
+      "name": "logging.googleapis.com/user/test_name"
+    }
+  },
+  "timestamp": "2019-05-21T14:55:11.464176100Z",
+  "severity": "NOTICE",
+  "logName": "projects/test-project-232910/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-05-21T14:55:14.142648203Z"
+}

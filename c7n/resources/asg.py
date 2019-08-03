@@ -18,36 +18,33 @@ from botocore.client import ClientError
 from collections import Counter
 from concurrent.futures import as_completed
 
-from datetime import datetime, timedelta
-from dateutil import tz as tzutil
 from dateutil.parser import parse
 
-import logging
 import itertools
 import time
 
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import ValueFilter, AgeFilter, Filter, OPERATORS
-from c7n.filters.offhours import OffHour, OnHour, Time
+from c7n.filters import ValueFilter, AgeFilter, Filter
+from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query
-from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim
+from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
 from c7n.utils import local_session, type_schema, chunks, get_retry
 
 from .ec2 import deserialize_user_data
-
-log = logging.getLogger('custodian.asg')
 
 
 @resources.register('asg')
 class ASG(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'autoscaling'
-        type = 'autoScalingGroup'
+        arn = 'AutoScalingGroupARN'
+        arn_type = 'autoScalingGroup'
+        arn_separator = ":"
         id = name = 'AutoScalingGroupName'
         date = 'CreatedTime'
         dimension = 'AutoScalingGroupName'
@@ -97,7 +94,7 @@ class LaunchInfo(object):
             return {}
         return {
             (t['LaunchTemplateId'],
-             t.get('c7n:VersionAlias', t['VersionNumber'])): t['LaunchTemplateData']
+             str(t.get('c7n:VersionAlias', t['VersionNumber']))): t['LaunchTemplateData']
             for t in tmpl_mgr.get_resources(template_ids)}
 
     def get_launch_configs(self, asgs):
@@ -165,9 +162,14 @@ class LaunchInfo(object):
         # amis, it doesn't seem to have any upper bound on number of
         # ImageIds to pass (Tested with 1k+ ImageIds)
         #
+        # Explicitly use a describe source. Can't use a config source
+        # since it won't have state for third party ami, we auto
+        # propagate source normally. Can't use a cache either as their
+        # not in the account.
         return {i['ImageId']: i for i in
-                self.manager.get_resource_manager('ami').get_resources(
-                    list(self.get_image_ids()), cache=False)}
+                self.manager.get_resource_manager(
+                    'ami').get_source('describe').get_resources(
+                        list(self.get_image_ids()), cache=False)}
 
     def get_security_group_ids(self):
         # return set of security group ids for given asg
@@ -227,6 +229,7 @@ class LaunchConfigFilter(ValueFilter):
     """
     schema = type_schema(
         'launch-config', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ("autoscaling:DescribeLaunchConfigurations",)
 
     def process(self, asgs, event=None):
@@ -240,7 +243,7 @@ class LaunchConfigFilter(ValueFilter):
 class ConfigValidFilter(Filter):
 
     def get_permissions(self):
-        return list(itertools.chain([
+        return list(itertools.chain(*[
             self.manager.get_resource_manager(m).get_permissions()
             for m in ('subnet', 'security-group', 'key-pair', 'elb',
                       'app-elb-target-group', 'ebs-snapshot', 'ami')]))
@@ -375,13 +378,13 @@ class ValidConfigFilter(ConfigValidFilter):
 
     :example:
 
-        .. code-base: yaml
+      .. code-block:: yaml
 
-            policies:
-              - name: asg-valid-config
-                resource: asg
-                filters:
-                  - valid
+          policies:
+            - name: asg-valid-config
+              resource: asg
+              filters:
+               - valid
     """
 
     schema = type_schema('valid')
@@ -410,7 +413,7 @@ class InvalidConfigFilter(ConfigValidFilter):
 
     :example:
 
-        .. code-base: yaml
+        .. code-block:: yaml
 
             policies:
               - name: asg-invalid-config
@@ -558,7 +561,7 @@ class ImageAgeFilter(AgeFilter):
     date_attribute = "CreationDate"
     schema = type_schema(
         'image-age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
     def process(self, asgs, event=None):
@@ -595,6 +598,7 @@ class ImageFilter(ValueFilter):
         "autoscaling:DescribeLaunchConfigurations")
 
     schema = type_schema('image', rinherit=ValueFilter.schema)
+    schema_alias = True
 
     def process(self, asgs, event=None):
         self.launch_info = LaunchInfo(self.manager).initialize(asgs)
@@ -635,6 +639,7 @@ class VpcIdFilter(ValueFilter):
     schema = type_schema(
         'vpc-id', rinherit=ValueFilter.schema)
     schema['properties'].pop('key')
+    schema_alias = False
     permissions = ('ec2:DescribeSubnets',)
 
     # TODO: annotation
@@ -678,7 +683,7 @@ class PropagatedTagFilter(Filter):
 
     :example:
 
-        .. code-block: yaml
+       .. code-block:: yaml
 
             policies:
               - name: asg-non-propagated-tags
@@ -785,9 +790,9 @@ class UserDataFilter(ValueFilter):
     Note: It is highly recommended to use regexes with the ?sm flags, since Custodian
     uses re.match() and userdata spans multiple lines.
 
-        :example:
+    :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: lc_userdata
@@ -801,6 +806,7 @@ class UserDataFilter(ValueFilter):
     """
 
     schema = type_schema('user-data', rinherit=ValueFilter.schema)
+    schema_alias = False
     batch_size = 50
     annotation = 'c7n:user-data'
 
@@ -932,7 +938,8 @@ class Resize(Action):
 
             if 'restore-options-tag' in self.data:
                 # we want to restore all ASG size params from saved data
-                log.debug('Want to restore ASG %s size from tag %s' %
+                self.log.debug(
+                    'Want to restore ASG %s size from tag %s' %
                     (a['AutoScalingGroupName'], self.data['restore-options-tag']))
                 if self.data['restore-options-tag'] in tag_map:
                     for field in tag_map[self.data['restore-options-tag']].split(';'):
@@ -959,13 +966,13 @@ class Resize(Action):
                         update['DesiredCapacity'] = self.data['desired-size']
 
             if update:
-                log.debug('ASG %s size: current=%d, min=%d, max=%d, desired=%d'
+                self.log.debug('ASG %s size: current=%d, min=%d, max=%d, desired=%d'
                     % (a['AutoScalingGroupName'], current_size, a['MinSize'],
                     a['MaxSize'], a['DesiredCapacity']))
 
                 if 'save-options-tag' in self.data:
                     # save existing ASG params to a tag before changing them
-                    log.debug('Saving ASG %s size to tag %s' %
+                    self.log.debug('Saving ASG %s size to tag %s' %
                         (a['AutoScalingGroupName'], self.data['save-options-tag']))
                     tags = [dict(
                         Key=self.data['save-options-tag'],
@@ -976,14 +983,14 @@ class Resize(Action):
                     )]
                     self.manager.retry(client.create_or_update_tags, Tags=tags)
 
-                log.debug('Resizing ASG %s with %s' % (a['AutoScalingGroupName'],
+                self.log.debug('Resizing ASG %s with %s' % (a['AutoScalingGroupName'],
                     str(update)))
                 self.manager.retry(
                     client.update_auto_scaling_group,
                     AutoScalingGroupName=a['AutoScalingGroupName'],
                     **update)
             else:
-                log.debug('nothing to resize')
+                self.log.debug('nothing to resize')
 
 
 @ASG.action_registry.register('remove-tag')
@@ -1026,7 +1033,7 @@ class RemoveTag(Action):
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
-                    self.process_asg_set, client, asg_set, tags)] = asg_set
+                    self.process_resource_set, client, asg_set, tags)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
                 if f.exception():
@@ -1040,7 +1047,7 @@ class RemoveTag(Action):
         if error:
             raise error
 
-    def process_asg_set(self, client, asgs, tags):
+    def process_resource_set(self, client, asgs, tags):
         tag_set = []
         for a in asgs:
             for t in tags:
@@ -1079,6 +1086,7 @@ class Tag(Action):
         'tag',
         key={'type': 'string'},
         value={'type': 'string'},
+        tags={'type': 'object'},
         # Backwards compatibility
         tag={'type': 'string'},
         msg={'type': 'string'},
@@ -1088,42 +1096,58 @@ class Tag(Action):
     permissions = ('autoscaling:CreateOrUpdateTags',)
     batch_size = 1
 
-    def process(self, asgs):
+    def get_tag_set(self):
+        tags = []
         key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
         value = self.data.get(
             'value', self.data.get(
                 'msg', 'AutoScaleGroup does not meet policy guidelines'))
-        return self.tag(asgs, key, value)
+        if key and value:
+            tags.append({'Key': key, 'Value': value})
 
-    def tag(self, asgs, key, value):
+        for k, v in self.data.get('tags', {}).items():
+            tags.append({'Key': k, 'Value': v})
+
+        return tags
+
+    def process(self, asgs):
+        tags = self.get_tag_set()
         error = None
 
-        client = local_session(self.manager.session_factory).client('autoscaling')
-
+        client = self.get_client()
         with self.executor_factory(max_workers=3) as w:
             futures = {}
             for asg_set in chunks(asgs, self.batch_size):
                 futures[w.submit(
-                    self.process_asg_set, client, asg_set, key, value)] = asg_set
+                    self.process_resource_set, client, asg_set, tags)] = asg_set
             for f in as_completed(futures):
                 asg_set = futures[f]
                 if f.exception():
                     self.log.exception(
-                        "Exception untagging tag:%s error:%s asg:%s" % (
-                            self.data.get('key', DEFAULT_TAG),
+                        "Exception tagging tag:%s error:%s asg:%s" % (
+                            tags,
                             f.exception(),
                             ", ".join([a['AutoScalingGroupName']
                                        for a in asg_set])))
         if error:
             raise error
 
-    def process_asg_set(self, client, asgs, key, value):
-        propagate = self.data.get('propagate_launch', True)
-        tags = [
-            dict(Key=key, ResourceType='auto-scaling-group', Value=value,
-                 PropagateAtLaunch=propagate,
-                 ResourceId=a['AutoScalingGroupName']) for a in asgs]
-        self.manager.retry(client.create_or_update_tags, Tags=tags)
+    def process_resource_set(self, client, asgs, tags):
+        tag_params = []
+        propagate = self.data.get('propagate', False)
+        for t in tags:
+            if 'PropagateAtLaunch' not in t:
+                t['PropagateAtLaunch'] = propagate
+        for t in tags:
+            for a in asgs:
+                atags = dict(t)
+                atags['ResourceType'] = 'auto-scaling-group'
+                atags['ResourceId'] = a['AutoScalingGroupName']
+                tag_params.append(atags)
+        self.manager.retry(client.create_or_update_tags, Tags=tag_params)
+
+    def get_client(self):
+        return local_session(self.manager.session_factory).client('autoscaling')
 
 
 @ASG.action_registry.register('propagate-tags')
@@ -1214,10 +1238,10 @@ class PropagateTags(Action):
                 remove_tags.append(k)
 
         if remove_tags:
-            log.debug("Pruning asg:%s instances:%d of old tags: %s" % (
+            self.log.debug("Pruning asg:%s instances:%d of old tags: %s" % (
                 asg['AutoScalingGroupName'], instance_count, remove_tags))
         if extra_tags:
-            log.debug("Asg: %s has uneven tags population: %s" % (
+            self.log.debug("Asg: %s has uneven tags population: %s" % (
                 asg['AutoScalingGroupName'], instance_tags))
         # Remove orphan tags
         remove_tags.extend(extra_tags)
@@ -1338,7 +1362,7 @@ class RenameTag(Action):
 
 
 @ASG.action_registry.register('mark-for-op')
-class MarkForOp(Tag):
+class MarkForOp(TagDelayedAction):
     """Action to create a delayed action for a later date
 
     :example:
@@ -1365,60 +1389,25 @@ class MarkForOp(Tag):
         op={'type': 'string'},
         key={'type': 'string'},
         tag={'type': 'string'},
+        tz={'type': 'string'},
         message={'type': 'string'},
         days={'type': 'number', 'minimum': 0},
         hours={'type': 'number', 'minimum': 0})
-
+    schema_alias = False
     default_template = (
         'AutoScaleGroup does not meet org policy: {op}@{action_date}')
 
-    def validate(self):
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
-        if not self.tz:
-            raise PolicyValidationError(
-                "Invalid timezone specified %s on %s" % (self.tz, self.manager.data))
-        op = self.data.get('op')
-        if op not in self.manager.action_registry:
-            raise PolicyValidationError(
-                "Invalid op %s for asg on policy %s" % (op, self.manager.data))
-        return self
-
-    def process(self, asgs):
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
-
-        msg_tmpl = self.data.get('message', self.default_template)
-        key = self.data.get('key', self.data.get('tag', DEFAULT_TAG))
-        op = self.data.get('op', 'suspend')
-        days = self.data.get('days', 0)
-        hours = self.data.get('hours', 0)
-
-        action_date = self._generate_timestamp(days, hours)
-        try:
-            msg = msg_tmpl.format(
-                op=op, action_date=action_date)
-        except Exception:
-            self.log.warning("invalid template %s" % msg_tmpl)
-            msg = self.default_template.format(
-                op=op, action_date=action_date)
-
-        self.log.info("Tagging %d asgs for %s on %s" % (
-            len(asgs), op, action_date))
-        self.tag(asgs, key, msg)
-
-    def _generate_timestamp(self, days, hours):
-        n = datetime.now(tz=self.tz)
-        if days == hours == 0:
-            # maintains default value of days being 4 if nothing is provided
-            days = 4
-        action_date = (n + timedelta(days=days, hours=hours))
-        if hours > 0:
-            action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
-        else:
-            action_date_string = action_date.strftime('%Y/%m/%d')
-
-        return action_date_string
+    def get_config_values(self):
+        d = {
+            'op': self.data.get('op', 'stop'),
+            'tag': self.data.get('key', self.data.get('tag', DEFAULT_TAG)),
+            'msg': self.data.get('message', self.default_template),
+            'tz': self.data.get('tz', 'utc'),
+            'days': self.data.get('days', 0),
+            'hours': self.data.get('hours', 0)}
+        d['action_date'] = self.generate_timestamp(
+            d['days'], d['hours'])
+        return d
 
 
 @ASG.action_registry.register('suspend')
@@ -1497,7 +1486,7 @@ class Suspend(Action):
             if e.response['Error']['Code'] in (
                     'InvalidInstanceID.NotFound',
                     'IncorrectInstanceState'):
-                log.warning("Erroring stopping asg instances %s %s" % (
+                self.log.warning("Erroring stopping asg instances %s %s" % (
                     asg['AutoScalingGroupName'], e))
                 return
             raise
@@ -1546,12 +1535,12 @@ class Resume(Action):
                 futures[w.submit(self.resume_asg_instances, ec2_client, a)] = a
             for f in as_completed(futures):
                 if f.exception():
-                    log.error("Traceback resume asg:%s instances error:%s" % (
+                    self.log.error("Traceback resume asg:%s instances error:%s" % (
                         futures[f]['AutoScalingGroupName'],
                         f.exception()))
                     continue
 
-        log.debug("Sleeping for asg health check grace")
+        self.log.debug("Sleeping for asg health check grace")
         time.sleep(self.delay)
 
         with self.executor_factory(max_workers=3) as w:
@@ -1560,7 +1549,7 @@ class Resume(Action):
                 futures[w.submit(self.resume_asg, asg_client, a)] = a
             for f in as_completed(futures):
                 if f.exception():
-                    log.error("Traceback resume asg:%s error:%s" % (
+                    self.log.error("Traceback resume asg:%s error:%s" % (
                         futures[f]['AutoScalingGroupName'],
                         f.exception()))
 
@@ -1594,7 +1583,7 @@ class Delete(Action):
     .. code-block:: yaml
 
             policies:
-              - name: asg-unencrypted
+              - name: asg-delete-bad-encryption
                 resource: asg
                 filters:
                   - type: not-encrypted
@@ -1629,12 +1618,11 @@ class Delete(Action):
 @resources.register('launch-config')
 class LaunchConfig(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'autoscaling'
-        type = 'launchConfiguration'
+        arn_type = 'launchConfiguration'
         id = name = 'LaunchConfigurationName'
         date = 'CreatedTime'
-        dimension = None
         enum_spec = (
             'describe_launch_configurations', 'LaunchConfigurations', None)
         filter_name = 'LaunchConfigurationNames'
@@ -1662,7 +1650,7 @@ class LaunchConfigAge(AgeFilter):
     date_attribute = "CreatedTime"
     schema = type_schema(
         'age',
-        op={'type': 'string', 'enum': list(OPERATORS.keys())},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'})
 
 

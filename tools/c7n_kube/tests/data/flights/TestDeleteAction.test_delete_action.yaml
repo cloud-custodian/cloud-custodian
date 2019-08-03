@@ -1,0 +1,80 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/9.0.0/python
+    method: GET
+    uri: https://ghost/api/v1/namespaces
+  response:
+    body:
+      string: '{"kind":"NamespaceList","apiVersion":"v1","metadata":{"selfLink":"/api/v1/namespaces","resourceVersion":"62065"},"items":[{"metadata":{"name":"default","selfLink":"/api/v1/namespaces/default","uid":"d1617dee-4b25-11e9-86a8-080027415632","resourceVersion":"11","creationTimestamp":"2019-03-20T15:35:41Z"},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"kube-public","selfLink":"/api/v1/namespaces/kube-public","uid":"d3ce981d-4b25-11e9-86a8-080027415632","resourceVersion":"45","creationTimestamp":"2019-03-20T15:35:45Z"},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"kube-system","selfLink":"/api/v1/namespaces/kube-system","uid":"d168e4ee-4b25-11e9-86a8-080027415632","resourceVersion":"12","creationTimestamp":"2019-03-20T15:35:41Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"kind\":\"Namespace\",\"metadata\":{\"annotations\":{},\"name\":\"kube-system\",\"namespace\":\"\"}}\n"}},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"test","selfLink":"/api/v1/namespaces/test","uid":"b0f5c265-4f27-11e9-86a8-080027415632","resourceVersion":"62057","creationTimestamp":"2019-03-25T17:59:10Z"},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}}]}
+
+        '
+    headers:
+      Content-Length:
+      - '1325'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 25 Mar 2019 17:59:14 GMT
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"gracePeriodSeconds": 30}'
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/9.0.0/python
+    method: DELETE
+    uri: https://ghost/api/v1/namespaces/test
+  response:
+    body:
+      string: '{"kind":"Namespace","apiVersion":"v1","metadata":{"name":"test","selfLink":"/api/v1/namespaces/test","uid":"b0f5c265-4f27-11e9-86a8-080027415632","resourceVersion":"62066","creationTimestamp":"2019-03-25T17:59:10Z","deletionTimestamp":"2019-03-25T17:59:14Z"},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Terminating"}}
+
+        '
+    headers:
+      Content-Length:
+      - '330'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 25 Mar 2019 17:59:14 GMT
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Swagger-Codegen/9.0.0/python
+    method: GET
+    uri: https://ghost/api/v1/namespaces
+  response:
+    body:
+      string: '{"kind":"NamespaceList","apiVersion":"v1","metadata":{"selfLink":"/api/v1/namespaces","resourceVersion":"62066"},"items":[{"metadata":{"name":"default","selfLink":"/api/v1/namespaces/default","uid":"d1617dee-4b25-11e9-86a8-080027415632","resourceVersion":"11","creationTimestamp":"2019-03-20T15:35:41Z"},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"kube-public","selfLink":"/api/v1/namespaces/kube-public","uid":"d3ce981d-4b25-11e9-86a8-080027415632","resourceVersion":"45","creationTimestamp":"2019-03-20T15:35:45Z"},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"kube-system","selfLink":"/api/v1/namespaces/kube-system","uid":"d168e4ee-4b25-11e9-86a8-080027415632","resourceVersion":"12","creationTimestamp":"2019-03-20T15:35:41Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"kind\":\"Namespace\",\"metadata\":{\"annotations\":{},\"name\":\"kube-system\",\"namespace\":\"\"}}\n"}},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Active"}},{"metadata":{"name":"test","selfLink":"/api/v1/namespaces/test","uid":"b0f5c265-4f27-11e9-86a8-080027415632","resourceVersion":"62066","creationTimestamp":"2019-03-25T17:59:10Z","deletionTimestamp":"2019-03-25T17:59:14Z"},"spec":{"finalizers":["kubernetes"]},"status":{"phase":"Terminating"}}]}
+
+        '
+    headers:
+      Content-Length:
+      - '1373'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 25 Mar 2019 17:59:14 GMT
+    status:
+      code: 200
+      message: OK
+version: 1

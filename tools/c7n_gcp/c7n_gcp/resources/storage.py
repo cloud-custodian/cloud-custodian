@@ -24,6 +24,7 @@ class Bucket(QueryResourceManager):
         component = 'buckets'
         scope = 'project'
         enum_spec = ('list', 'items[]', {'projection': 'full'})
+        id = 'name'
 
         @staticmethod
         def get(client, resource_info):

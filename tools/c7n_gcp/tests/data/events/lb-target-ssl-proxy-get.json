@@ -1,0 +1,51 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "yauhen_shaliou@comelfo.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.21.63.2",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-03T15:25:00.765Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "v1.compute.targetSslProxies.get",
+    "authorizationInfo": [
+      {
+        "permission": "compute.targetSslProxies.get",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/custodian-test-project-0/global/targetSslProxies/target-ssl-proxy",
+          "type": "compute.targetSslProxies"
+        }
+      }
+    ],
+    "resourceName": "projects/custodian-test-project-0/global/targetSslProxies/target-ssl-proxy",
+    "request": {
+      "@type": "type.googleapis.com/compute.targetSslProxies.get"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "global"
+      ]
+    }
+  },
+  "insertId": "-mqiqkbdq0jy",
+  "resource": {
+    "type": "gce_target_ssl_proxy",
+    "labels": {
+      "project_id": "custodian-test-project-0",
+      "target_ssl_proxy_id": ""
+    }
+  },
+  "timestamp": "2019-05-03T15:25:00.706Z",
+  "severity": "INFO",
+  "logName": "projects/custodian-test-project-0/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2019-05-03T15:25:01.782332033Z"
+}

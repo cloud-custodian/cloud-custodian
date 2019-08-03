@@ -16,11 +16,21 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.utils import local_session, type_schema
 from .core import Filter
 from c7n.manager import resources
-from c7n.resources import aws
 
 
 class SecurityHubFindingFilter(Filter):
     """Check if there are Security Hub Findings related to the resources
+
+    .. code-block:: yaml
+
+       name: ec2-findings-filter
+       resource: ec2
+       filters:
+         - type: finding
+           query:
+             Type:
+              - Value: "Software and Configuration Checks/AWS Security Best Practices"
+                Comparison: EQUALS
     """
     schema = type_schema(
         'finding',
@@ -28,7 +38,7 @@ class SecurityHubFindingFilter(Filter):
         # for filtering.
         region={'type': 'string'},
         query={'type': 'object'})
-
+    schema_alias = True
     permissions = ('securityhub:GetFindings',)
     annotation_key = 'c7n:finding-filter'
     query_shape = 'AwsSecurityFindingFilters'
@@ -36,6 +46,7 @@ class SecurityHubFindingFilter(Filter):
     def validate(self):
         query = self.data.get('query')
         if query:
+            from c7n.resources import aws
             aws.shape_validate(query, self.query_shape, 'securityhub')
 
     def process(self, resources, event=None):
@@ -60,6 +71,8 @@ class SecurityHubFindingFilter(Filter):
         SecurityHub Findings Filter
         """
         for rtype, resource_manager in registry.items():
+            if not resource_manager.has_arn():
+                continue
             if 'post-finding' in resource_manager.action_registry:
                 continue
             resource_class.filter_registry.register('finding', klass)

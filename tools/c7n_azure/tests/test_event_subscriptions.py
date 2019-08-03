@@ -31,7 +31,9 @@ class AzureEventSubscriptionsTest(BaseTest):
         StorageUtilities.create_queue_from_storage_account(account, queue_name, self.session)
         event_sub_destination = StorageQueueEventSubscriptionDestination(
             resource_id=account.id, queue_name=queue_name)
-        AzureEventSubscription.create(event_sub_destination, self.event_sub_name)
+        AzureEventSubscription.create(event_sub_destination,
+                                      self.event_sub_name,
+                                      self.session.get_subscription_id())
 
     def test_event_subscription_schema_validate(self):
         with self.sign_out_patch():
@@ -75,11 +77,6 @@ class AzureEventSubscriptionsTest(BaseTest):
         p_delete = self.load_policy({
             'name': 'test-azure-event-subscriptions',
             'resource': 'azure.eventsubscription',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value': self.event_sub_name}],
             'actions': [
                 {'type': 'delete'}
             ]

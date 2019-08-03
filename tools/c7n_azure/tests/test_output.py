@@ -19,7 +19,9 @@ import shutil
 from datetime import date
 
 import mock
+from azure.common import AzureHttpError
 from azure_common import BaseTest
+import re
 from c7n_azure.output import AzureStorageOutput
 
 from c7n.config import Bag, Config
@@ -28,6 +30,7 @@ from c7n_azure.session import Session
 
 from c7n_azure.output import MetricsOutput, AppInsightsLogOutput
 from c7n.output import log_outputs, metrics_outputs
+from mock import patch
 
 
 class OutputTest(BaseTest):
@@ -120,3 +123,47 @@ class OutputTest(BaseTest):
         self.assertTrue(isinstance(sink, MetricsOutput))
         sink.put_metric('ResourceCount', 101, 'Count')
         sink.flush()
+
+    @patch('logging.Logger.error')
+    def test_access_error(self, logger_mock):
+
+        AzureStorageOutput.get_blob_client_wrapper = gm = mock.MagicMock()
+        gm.return_value = None, "logs", 'xyz'
+
+        output = self.get_azure_output()
+
+        output.blob_service = mock.MagicMock()
+        output.blob_service.create_blob_from_path = mock.MagicMock()
+        output.blob_service.create_blob_from_path.side_effect = AzureHttpError('forbidden', 403)
+
+        # Generate fake output file
+        with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
+            fh.write("abc")
+
+        output.upload()
+
+        args, _ = logger_mock.call_args
+
+        self.assertIsNotNone(re.match("Access Error*", args[0]))
+
+    @patch('logging.Logger.error')
+    def test_error_writing_to_blob(self, logger_mock):
+        AzureStorageOutput.get_blob_client_wrapper = gm = mock.MagicMock()
+        gm.return_value = None, "logs", 'xyz'
+
+        output = self.get_azure_output()
+
+        output.blob_service = mock.MagicMock()
+        output.blob_service.create_blob_from_path = mock.MagicMock()
+        output.blob_service.create_blob_from_path.side_effect = AzureHttpError('not found', 404)
+
+        # Generate fake output file
+        with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
+            fh.write("abc")
+
+        output.upload()
+
+        args, _ = logger_mock.call_args
+
+        self.assertIsNone(re.match("Access Error*", args[0]))
+        self.assertIsNotNone(re.match("Error*", args[0]))

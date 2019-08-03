@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "CacheClusters": [
+            {
+                "CacheClusterId": "test",
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:",
+                "CacheNodeType": "cache.t2.micro",
+                "Engine": "redis",
+                "EngineVersion": "5.0.3",
+                "CacheClusterStatus": "available",
+                "NumCacheNodes": 1,
+                "PreferredAvailabilityZone": "us-east-1a",
+                "CacheClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 4,
+                    "hour": 22,
+                    "minute": 16,
+                    "second": 30,
+                    "microsecond": 0
+                },
+                "PreferredMaintenanceWindow": "thu:10:00-thu:11:00",
+                "PendingModifiedValues": {},
+                "CacheSecurityGroups": [],
+                "CacheParameterGroup": {
+                    "CacheParameterGroupName": "default.redis5.0",
+                    "ParameterApplyStatus": "in-sync",
+                    "CacheNodeIdsToReboot": []
+                },
+                "CacheSubnetGroupName": "test",
+                "AutoMinorVersionUpgrade": true,
+                "SecurityGroups": [
+                    {
+                        "SecurityGroupId": "sg-0fd0c04f0c434d68d",
+                        "Status": "active"
+                    }
+                ],
+                "SnapshotRetentionLimit": 0,
+                "SnapshotWindow": "04:30-05:30",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": false,
+                "AtRestEncryptionEnabled": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "bf2fc4d2-3ecc-11e9-8ee5-178dc921cc46",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bf2fc4d2-3ecc-11e9-8ee5-178dc921cc46",
+                "content-type": "text/xml",
+                "content-length": "1930",
+                "date": "Mon, 04 Mar 2019 22:27:50 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

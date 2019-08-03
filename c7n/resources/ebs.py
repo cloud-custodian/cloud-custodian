@@ -28,12 +28,13 @@ from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
-    ANNOTATION_KEY, OPERATORS)
+    ANNOTATION_KEY)
 from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
+from c7n.tags import Tag
 from c7n.utils import (
     camelResource,
     chunks,
@@ -51,18 +52,16 @@ log = logging.getLogger('custodian.ebs')
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'ec2'
-        type = 'snapshot'
+        arn_type = 'snapshot'
         enum_spec = (
             'describe_snapshots', 'Snapshots', None)
-        detail_spec = None
         id = 'SnapshotId'
         filter_name = 'SnapshotIds'
         filter_type = 'list'
         name = 'SnapshotId'
         date = 'StartTime'
-        dimension = None
 
         default_report_fields = (
             'SnapshotId',
@@ -102,6 +101,16 @@ class Snapshot(QueryResourceManager):
 class ErrorHandler(object):
 
     @staticmethod
+    def remove_snapshot(rid, resource_set):
+        found = None
+        for r in resource_set:
+            if r['SnapshotId'] == rid:
+                found = r
+                break
+        if found:
+            resource_set.remove(found)
+
+    @staticmethod
     def extract_bad_snapshot(e):
         """Handle various client side errors when describing snapshots"""
         msg = e.response['Error']['Message']
@@ -135,6 +144,24 @@ class SnapshotQueryParser(QueryParser):
     type_name = 'EBS'
 
 
+@Snapshot.action_registry.register('tag')
+class SnapshotTag(Tag):
+
+    permissions = ('ec2:CreateTags',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        while resource_set:
+            try:
+                return super(SnapshotTag, self).process_resource_set(
+                    client, resource_set, tags)
+            except ClientError as e:
+                bad_snap = ErrorHandler.extract_bad_snapshot(e)
+                if bad_snap:
+                    ErrorHandler.remove_snapshot(bad_snap, resource_set)
+                    continue
+                raise
+
+
 @Snapshot.filter_registry.register('age')
 class SnapshotAge(AgeFilter):
     """EBS Snapshot Age Filter
@@ -157,7 +184,7 @@ class SnapshotAge(AgeFilter):
     schema = type_schema(
         'age',
         days={'type': 'number'},
-        op={'type': 'string', 'enum': list(OPERATORS.keys())})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
     date_attribute = 'StartTime'
 
 
@@ -218,6 +245,69 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
         return results
 
 
+@Snapshot.filter_registry.register('unused')
+class SnapshotUnusedFilter(Filter):
+    """Filters snapshots based on usage
+
+    true: snapshot is not used by launch-template, launch-config, or ami.
+
+    false: snapshot is being used by launch-template, launch-config, or ami.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: snapshot-unused
+                resource: ebs-snapshot
+                filters:
+                  - type: unused
+                    value: true
+    """
+
+    schema = type_schema('unused', value={'type': 'boolean'})
+
+    def get_permissions(self):
+        return list(itertools.chain(*[
+            self.manager.get_resource_manager(m).get_permissions()
+            for m in ('asg', 'launch-config', 'ami')]))
+
+    def _pull_asg_snapshots(self):
+        asgs = self.manager.get_resource_manager('asg').resources()
+        snap_ids = set()
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs if 'LaunchConfigurationName' in a)
+        lcfg_mgr = self.manager.get_resource_manager('launch-config')
+
+        if lcfgs:
+            for lc in lcfg_mgr.resources():
+                for b in lc.get('BlockDeviceMappings'):
+                    if 'Ebs' in b and 'SnapshotId' in b['Ebs']:
+                        snap_ids.add(b['Ebs']['SnapshotId'])
+
+        tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
+        for tversion in tmpl_mgr.get_resources(
+                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+            for bd in tversion['LaunchTemplateData'].get('BlockDeviceMappings', ()):
+                if 'Ebs' in bd and 'SnapshotId' in bd['Ebs']:
+                    snap_ids.add(bd['Ebs']['SnapshotId'])
+        return snap_ids
+
+    def _pull_ami_snapshots(self):
+        amis = self.manager.get_resource_manager('ami').resources()
+        ami_snaps = set()
+        for i in amis:
+            for dev in i.get('BlockDeviceMappings'):
+                if 'Ebs' in dev and 'SnapshotId' in dev['Ebs']:
+                    ami_snaps.add(dev['Ebs']['SnapshotId'])
+        return ami_snaps
+
+    def process(self, resources, event=None):
+        snaps = self._pull_asg_snapshots().union(self._pull_ami_snapshots())
+        if self.data.get('value', True):
+            return [r for r in resources if r['SnapshotId'] not in snaps]
+        return [r for r in resources if r['SnapshotId'] in snaps]
+
+
 @Snapshot.filter_registry.register('skip-ami-snapshots')
 class SnapshotSkipAmiSnapshots(Filter):
     """
@@ -232,7 +322,7 @@ class SnapshotSkipAmiSnapshots(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: delete-stale-snapshots
+              - name: delete-ebs-stale-snapshots
                 resource: ebs-snapshot
                 filters:
                   - type: age
@@ -424,9 +514,9 @@ class CopySnapshot(BaseAction):
 @resources.register('ebs')
 class EBS(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'ec2'
-        type = 'volume'
+        arn_type = 'volume'
         enum_spec = ('describe_volumes', 'Volumes', None)
         name = id = 'VolumeId'
         filter_name = 'VolumeIds'
@@ -446,7 +536,6 @@ class EBS(QueryResourceManager):
 
 @EBS.action_registry.register('detach')
 class VolumeDetach(BaseAction):
-
     """
     Detach an EBS volume from an Instance.
 
@@ -458,10 +547,10 @@ class VolumeDetach(BaseAction):
      .. code-block:: yaml
 
              policies:
-               - name: instance-ebs-volumes
+               - name: detach-ebs-volumes
                  resource: ebs
                  filters:
-                   VolumeId :  volumeid
+                   - VolumeId :  volumeid
                  actions:
                    - detach
 
@@ -493,10 +582,13 @@ class AttachedInstanceFilter(ValueFilter):
               - name: instance-ebs-volumes
                 resource: ebs
                 filters:
-                  - instance
+                  - type: instance
+                    key: tag:Name
+                    value: OldManBySea
     """
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
+    schema_alias = False
 
     def get_permissions(self):
         return self.manager.get_resource_manager('ec2').get_permissions()
@@ -540,11 +632,14 @@ class FaultTolerantSnapshots(Filter):
     means that, in the event of a failure, the volume can be restored
     from a snapshot with (reasonable) data loss
 
-    - name: ebs-volume-tolerance
-    - resource: ebs
-    - filters: [{
-        'type': 'fault-tolerant',
-        'tolerant': True}]
+    .. code-block:: yaml
+
+      policies:
+       - name: ebs-volume-tolerance
+         resource: ebs
+         filters:
+           - type: fault-tolerant
+             tolerant: True
     """
     schema = type_schema('fault-tolerant', tolerant={'type': 'boolean'})
     check_id = 'H7IgTzjTYb'
@@ -571,6 +666,7 @@ class FaultTolerantSnapshots(Filter):
 @EBS.filter_registry.register('health-event')
 class HealthFilter(HealthEventFilter):
 
+    schema_alias = False
     schema = type_schema(
         'health-event',
         types={'type': 'array', 'items': {
@@ -1145,7 +1241,7 @@ class ModifyableVolume(Filter):
       - must wait at least 6hrs between modifications to the same volume.
       - volumes must have been attached after nov 1st, 2016.
 
-    See `custodian schema ebs.actions.modify` for examples.
+    See :ref:`modify action <aws.ebs.actions.modify>` for examples.
     """
 
     schema = type_schema('modifyable')
@@ -1207,7 +1303,10 @@ class ModifyableVolume(Filter):
         # Filter volumes that are currently under modification
         client = local_session(self.manager.session_factory).client('ec2')
         modifying = set()
-        for vol_set in chunks(list(results), 200):
+
+        # Re 197 - Max number of filters is 200, and we have to use
+        # three additional attribute filters.
+        for vol_set in chunks(list(results), 197):
             vol_ids = [v['VolumeId'] for v in vol_set]
             mutating = client.describe_volumes_modifications(
                 Filters=[
@@ -1266,7 +1365,7 @@ class ModifyVolume(BaseAction):
                - modifyable
               actions:
                - type: modify
-                 volume-type: gp1
+                 volume-type: gp2
 
     `iops-percent` and `size-percent` can be used to modify
     respectively iops on io1 volumes and volume size.
@@ -1282,7 +1381,7 @@ class ModifyVolume(BaseAction):
     .. code-block:: yaml
 
            policies:
-            - name: ebs-remove-piops
+            - name: ebs-upsize-piops
               resource: ebs
               filters:
                 - VolumeType: io1
@@ -1313,7 +1412,7 @@ class ModifyVolume(BaseAction):
         if 'modifyable' not in self.manager.data.get('filters', ()):
             raise PolicyValidationError(
                 "modify action requires modifyable filter in policy")
-        if self.data.get('size-percent') < 100 and not self.data.get('shrink', False):
+        if self.data.get('size-percent', 100) < 100 and not self.data.get('shrink', False):
             raise PolicyValidationError((
                 "shrinking volumes requires os/fs support "
                 "or data-loss may ensue, use `shrink: true` to override"))

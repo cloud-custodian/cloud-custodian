@@ -1,0 +1,46 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "dkhanas@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.20.186.33",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36,gzip(gfe)"
+    },
+    "serviceName": "bigquery.googleapis.com",
+    "methodName": "google.cloud.bigquery.v2.JobService.InsertJob",
+    "authorizationInfo": [
+      {
+        "resource": "projects/cloud-custodian/datasets/test",
+        "permission": "bigquery.tables.create",
+        "granted": true
+      }
+    ],
+    "resourceName": "projects/cloud-custodian/datasets/test/tables/test",
+    "metadata": {
+      "tableCreation": {
+        "table": {
+          "tableName": "projects/cloud-custodian/datasets/test/tables/test",
+          "schemaJson": "{\n}"
+        },
+        "reason": "JOB",
+        "jobName": "projects/cloud-custodian/jobs/bquxjob_4c28c9a7_16958c2791d"
+      },
+      "@type": "type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata"
+    }
+  },
+  "insertId": "-bx7i7xe4omj7",
+  "resource": {
+    "type": "bigquery_dataset",
+    "labels": {
+      "project_id": "cloud-custodian",
+      "dataset_id": "test"
+    }
+  },
+  "timestamp": "2019-03-07T15:25:34.958Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-03-07T15:25:35.347085345Z"
+}

@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import datetime
 import os
+import mock
 import tempfile
 import time
 
@@ -28,6 +29,7 @@ from dateutil import parser
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
+from botocore.exceptions import ClientError
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (
     UserMfaDevice,
@@ -309,7 +311,87 @@ class IamRoleFilterUsage(BaseTest):
         self.assertEqual(resources[0]['RoleId'], "AROAIGK7B2VUDZL4I73HK")
 
 
+class IamRoleTag(BaseTest):
+
+    def test_iam_role_actions(self):
+        factory = self.replay_flight_data('test_iam_role_tags')
+        p = self.load_policy({
+            'name': 'iam-role-tag',
+            'resource': 'iam-role',
+            'filters': [{
+                'tag:Role': 'Dev'}],
+            'actions': [
+                {'type': 'tag',
+                 'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag',
+                 'tags': ['Application']}
+            ]
+        },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory().client('iam')
+        if self.recording:
+            time.sleep(1)
+        role = client.get_role(RoleName=resources[0]['RoleName']).get('Role')
+        self.assertEqual(
+            {'Role': 'Dev'},
+            {t['Key']: t['Value'] for t in resources[0]['Tags'] if t['Key'] == 'Role'})
+        self.assertEqual(
+            {'Dev'},
+            {t['Value'] for t in role['Tags'] if t['Key'] == 'Env'})
+        self.assertNotIn(
+            {'Application'},
+            {t['Key'] for t in role['Tags']})
+
+
 class IamUserTest(BaseTest):
+
+    def test_iam_user_usage_no_such_entity(self):
+        p = self.load_policy({
+            'name': 'usage-check',
+            'resource': 'iam-user',
+            'filters': [
+                {'type': 'usage',
+                 'ServiceNamespace': 'dynamodb',
+                 'TotalAuthenticatedEntities': 1,
+                 'poll-delay': 0.1,
+                 'match-operator': 'any'}]})
+
+        # A lot of mock to get to an error on a specific api call.
+        p.resource_manager.session_factory = sf = mock.MagicMock()
+        sf.region = 'us-east-1'
+        sf.return_value = f = mock.MagicMock()
+        f.client.return_value = c = mock.MagicMock()
+        c.generate_service_last_accessed_details.side_effect = ClientError(
+            {'Error': {'Code': 'ResourceNotFoundException',
+                       'Message': 'MonkeyWrench'}},
+            'generate_service_last_accessed_details')
+        c.exceptions.NoSuchEntityException = ClientError
+
+        resources = p.resource_manager.filter_resources(
+            [{'UserName': 'Kapil', 'Arn': 'arn:x'}])
+        self.assertEqual(resources, [])
+
+    def test_iam_user_usage(self):
+        factory = self.replay_flight_data('test_iam_user_usage')
+        p = self.load_policy({
+            'name': 'usage-check',
+            'resource': 'iam-user',
+            'mode': {
+                'type': 'cloudtrail',
+                'events': [{'event': '', 'source': '', 'ids': 'ids'}]},
+            'filters': [
+                {'UserName': 'kapil'},
+                {'type': 'usage',
+                 'ServiceNamespace': 'dynamodb',
+                 'TotalAuthenticatedEntities': 1,
+                 'poll-delay': 0.1,
+                 'match-operator': 'any'}]}, session_factory=factory)
+        resources = p.push({'detail': {
+            'eventName': '', 'eventSource': '', 'ids': ['kapil']}}, None)
+        self.assertEqual(len(resources), 1)
 
     def test_iam_user_check_permissions(self):
         factory = self.replay_flight_data('test_iam_user_check_permissions')
@@ -1372,3 +1454,106 @@ class SetRolePolicyAction(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertIn('test-role-us-east-1', resources[0]['RoleName'])
+
+
+class DeleteRoleAction(BaseTest):
+
+    @functional
+    def test_delete_role(self):
+        factory = self.replay_flight_data("test_delete_role")
+        policy_doc = json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "ec2.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+            }]
+        })
+        client = factory().client("iam")
+        client.create_role(
+            RoleName="c7n-test-delete", AssumeRolePolicyDocument=policy_doc, Path='/pratyush/',
+            Tags=[{'Key': 'Name', 'Value': 'pratyush'}])
+        p = self.load_policy(
+            {
+                'name': 'iam-attach-role-policy',
+                'resource': 'iam-role',
+                'filters': [{'tag:Name': 'pratyush'}],
+                "actions": ["delete"],
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(ClientError, client.get_role, RoleName=resources[0]['RoleName'])
+
+    def test_set_policy_wildcard(self):
+        factory = self.replay_flight_data("test_set_policy_wildcard")
+        policy = self.load_policy(
+            {
+                'name': 'iam-force-delete-role',
+                'resource': 'iam-role',
+                'filters': [{'tag:Name': 'Pratyush'}],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*",
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("iam")
+        self.assertEqual(
+            len((client.list_attached_role_policies(RoleName=resources[0]['RoleName']))
+            ['AttachedPolicies']), 0)
+
+    def test_set_policy_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "iam-policy-error",
+                "resource": "iam-role",
+                'filters': [{'tag:Name': 'Pratyush'}],
+                "actions": [{"type": "set-policy", "state": "attached", "arn": "*"}],
+            }
+        )
+
+    def test_force_delete_role(self):
+        factory = self.replay_flight_data("test_force_delete_role")
+        policy = self.load_policy(
+            {
+                'name': 'iam-force-delete-role',
+                'resource': 'iam-role',
+                'filters': [{'tag:Name': 'Pratyush'}],
+                "actions": [{"type": "delete", "force": True}],
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("iam")
+        self.assertRaises(ClientError, client.get_role, RoleName=resources[0]['RoleName'])
+
+    def test_delete_role_error(self):
+        factory = self.replay_flight_data("test_delete_role_error")
+        p = self.load_policy(
+            {
+                'name': 'iam-delete-profile-roles',
+                'resource': 'iam-role',
+                'filters': [{'tag:Name': 'CannotDelete'}],
+                "actions": ["delete"],
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("iam")
+        self.assertTrue(
+            client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')

@@ -17,10 +17,12 @@ import importlib
 
 import jmespath
 
-from .core import ValueFilter
+from .core import ValueFilter, OPERATORS
 
 
 class RelatedResourceFilter(ValueFilter):
+
+    schema_alias = False
 
     RelatedResource = None
     RelatedIdsExpression = None
@@ -70,15 +72,23 @@ class RelatedResourceFilter(ValueFilter):
         model = self.manager.get_model()
         op = self.data.get('operator', 'or')
         found = []
+
         if self.data.get('match-resource') is True:
             self.data['value'] = self.get_resource_value(
                 self.data['key'], resource)
+
+        if self.data.get('value_type') == 'resource_count':
+            count_matches = OPERATORS[self.data.get('op')](len(related_ids), self.data.get('value'))
+            if count_matches:
+                self._add_annotations(related_ids, resource)
+            return count_matches
+
         for rid in related_ids:
             robj = related.get(rid, None)
             if robj is None:
                 self.log.warning(
                     "Resource %s:%s references non existant %s: %s",
-                    model.type,
+                    self.manager.type,
                     resource[model.id],
                     self.RelatedResource.rsplit('.', 1)[-1],
                     rid)
@@ -86,15 +96,19 @@ class RelatedResourceFilter(ValueFilter):
             if self.match(robj):
                 found.append(rid)
 
-        if self.AnnotationKey is not None and found:
-            akey = 'c7n:%s' % self.AnnotationKey
-            resource[akey] = list(set(found).union(resource.get(akey, [])))
+        if found:
+            self._add_annotations(found, resource)
 
         if op == 'or' and found:
             return True
         elif op == 'and' and len(found) == len(related_ids):
             return True
         return False
+
+    def _add_annotations(self, related_ids, resource):
+        if self.AnnotationKey is not None:
+            akey = 'c7n:%s' % self.AnnotationKey
+            resource[akey] = list(set(related_ids).union(resource.get(akey, [])))
 
     def process(self, resources, event=None):
         related = self.get_related(resources)

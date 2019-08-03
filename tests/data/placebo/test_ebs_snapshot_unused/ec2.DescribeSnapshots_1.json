@@ -1,0 +1,79 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "Description": "test",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-0bf9e1af959fbdddf",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 6,
+                    "hour": 0,
+                    "minute": 44,
+                    "second": 22,
+                    "microsecond": 972000
+                },
+                "State": "completed",
+                "VolumeId": "vol-0bf78c2aa3a923550",
+                "VolumeSize": 1
+            },
+            {
+                "Description": "Copied for DestinationAmi ami-008c67c239389d171 from SourceAmi ami-97785bed for SourceSnapshot snap-0fae6f7252388fc12. Task created on 1,552,061,232,790.",
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0",
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-0b80955e4f7052f72",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 8,
+                    "hour": 16,
+                    "minute": 12,
+                    "second": 36,
+                    "microsecond": 913000
+                },
+                "State": "completed",
+                "VolumeId": "vol-ffffffff",
+                "VolumeSize": 8
+            },
+            {
+                "Description": "c7n-test",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-0b818bbec5eebac4c",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 8,
+                    "hour": 16,
+                    "minute": 9,
+                    "second": 25,
+                    "microsecond": 523000
+                },
+                "State": "completed",
+                "VolumeId": "vol-090f204348522c306",
+                "VolumeSize": 8
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "98a222b5-e785-48c7-9a59-8f8416284dbc",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "1850",
+                "date": "Fri, 08 Mar 2019 18:02:29 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

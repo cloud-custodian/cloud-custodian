@@ -13,15 +13,14 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest
-
 import datetime
-from mock import patch
+
+from azure_common import BaseTest, cassette_name
 
 
 class SqlServerTest(BaseTest):
 
-    TEST_DATE = datetime.datetime(2018, 12, 26, 14, 10, 00)
+    TEST_DATE = datetime.datetime(2019, 4, 21, 14, 10, 00)
 
     def test_sql_server_schema_validate(self):
         with self.sign_out_patch():
@@ -39,19 +38,23 @@ class SqlServerTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestsqlserver12262018'}],
+                 'value': 'cctestsqlserver*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_metric_elastic_exclude(self, utcnow):
+    def test_metric_elastic_exclude(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
             'resource': 'azure.sqlserver',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
                 {'type': 'metric',
                  'metric': 'dtu_consumption_percent',
                  'op': 'lt',
@@ -64,12 +67,16 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_metric_elastic_include(self, utcnow):
+    def test_metric_elastic_include(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
             'resource': 'azure.sqlserver',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
                 {'type': 'metric',
                  'metric': 'dtu_consumption_percent',
                  'op': 'lt',
@@ -83,12 +90,16 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @patch('c7n_azure.actions.utcnow', return_value=TEST_DATE)
-    def test_metric_database(self, utcnow):
+    def test_metric_database(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',
             'resource': 'azure.sqlserver',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
                 {'type': 'metric',
                  'metric': 'dtu_consumption_percent',
                  'op': 'lt',
@@ -100,3 +111,105 @@ class SqlServerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @cassette_name('firewall')
+    def test_firewall_rules_include_range(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'firewall-rules',
+                 'include': ['0.0.0.0-0.0.0.0']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    @cassette_name('firewall')
+    def test_firewall_rules_not_include_all_ranges(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'firewall-rules',
+                 'include': ['0.0.0.0-0.0.0.0', '0.0.0.0-0.0.0.1']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(0, len(resources))
+
+    @cassette_name('firewall')
+    def test_firewall_rules_include_cidr(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'firewall-rules',
+                 'include': ['1.2.2.128/25']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    @cassette_name('firewall')
+    def test_firewall_rules_not_include_cidr(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'firewall-rules',
+                 'include': ['2.2.2.128/25']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(0, len(resources))
+
+    @cassette_name('firewall')
+    def test_firewall_rules_equal(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'firewall-rules',
+                 'equal': ['0.0.0.0-0.0.0.0', '1.2.2.128/25']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+    @cassette_name('firewall')
+    def test_firewall_rules_not_equal(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'firewall-rules',
+                 'equal': ['0.0.0.0-0.0.0.1', '0.0.0.0-0.0.0.0', '1.2.2.128/25']}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(0, len(resources))

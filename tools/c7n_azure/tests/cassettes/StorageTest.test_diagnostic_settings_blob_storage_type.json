@@ -1,0 +1,120 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2019-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Tue, 25 Jun 2019 21:55:23 GMT"
+                    ],
+                    "content-length": [
+                        "11569"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "e5358832-3b8b-4b5b-8ba7-81e9cb007576",
+                        "486ac63c-bdba-475e-a668-e2bbf86dcb1e",
+                        "b89311a6-18c5-48a6-bff6-8a24628d60c6",
+                        "60b7e709-d048-41b0-a5c1-89c39881bf2b",
+                        "043af272-5e4e-4b4a-9371-9f505071ee76"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
+                                "name": "cctstoragey6akyqpagdt3o",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": false,
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": false,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "enabled": true,
+                                                "lastEnabledTime": "2019-06-21T18:49:57.4063401Z"
+                                            },
+                                            "blob": {
+                                                "enabled": true,
+                                                "lastEnabledTime": "2019-06-21T18:49:57.4063401Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2019-06-21T18:49:57.2813373Z",
+                                    "primaryEndpoints": {
+                                        "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                                        "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+                                        "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                                        "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "southcentralus",
+                                    "statusOfPrimary": "available"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/?restype=service&comp=properties",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/xml"
+                    ],
+                    "date": [
+                        "Tue, 25 Jun 2019 21:55:24 GMT"
+                    ],
+                    "x-ms-version": [
+                        "2018-03-28"
+                    ]
+                },
+                "body": {
+                    "string": "\ufeff<?xml version=\"1.0\" encoding=\"utf-8\"?><StorageServiceProperties><Logging><Version>1.0</Version><Read>false</Read><Write>false</Write><Delete>false</Delete><RetentionPolicy><Enabled>false</Enabled></RetentionPolicy></Logging><HourMetrics><Version>1.0</Version><Enabled>true</Enabled><IncludeAPIs>true</IncludeAPIs><RetentionPolicy><Enabled>true</Enabled><Days>7</Days></RetentionPolicy></HourMetrics><MinuteMetrics><Version>1.0</Version><Enabled>false</Enabled><RetentionPolicy><Enabled>false</Enabled></RetentionPolicy></MinuteMetrics><Cors /><DeleteRetentionPolicy><Enabled>false</Enabled></DeleteRetentionPolicy></StorageServiceProperties>"
+                }
+            }
+        }
+    ]
+}

@@ -23,12 +23,14 @@ from .session import Session
 @clouds.register('azure')
 class Azure(Provider):
 
+    display_name = 'Azure'
     resource_prefix = 'azure'
     resources = PluginRegistry('%s.resources' % resource_prefix)
 
     def initialize(self, options):
-        session = local_session(self.get_session_factory(options))
-        options['account_id'] = session.get_subscription_id()
+        if options['account_id'] is None:
+            session = local_session(self.get_session_factory(options))
+            options['account_id'] = session.get_subscription_id()
         return options
 
     def initialize_policies(self, policy_collection, options):

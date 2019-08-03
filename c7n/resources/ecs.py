@@ -52,15 +52,13 @@ def ecs_taggable(model, r):
 @resources.register('ecs')
 class ECSCluster(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         enum_spec = ('list_clusters', 'clusterArns', None)
         batch_detail_spec = (
             'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
         name = "clusterName"
-        id = "clusterArn"
-        dimension = None
-        filter_name = None
+        arn = id = "clusterArn"
 
     def augment(self, resources):
         resources = super(ECSCluster, self).augment(resources)
@@ -160,15 +158,13 @@ class Service(query.ChildResourceManager):
 
     chunk_size = 10
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         name = 'serviceName'
-        id = 'serviceArn'
+        arn = id = 'serviceArn'
         enum_spec = ('list_services', 'serviceArns', None)
         parent_spec = ('ecs', 'cluster', None)
-        dimension = None
         supports_trailevents = True
-        filter_name = None
 
     @property
     def source_type(self):
@@ -193,6 +189,7 @@ class ServiceMetrics(MetricsFilter):
 class RelatedTaskDefinitionFilter(ValueFilter):
 
     schema = type_schema('task-definition', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('ecs:DescribeTaskDefinition',
                    'ecs:ListTaskDefinitions')
     related_key = 'taskDefinition'
@@ -229,23 +226,22 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     :Example:
 
      Find any fargate services that are running with a particular
-     image in the task and delete them.
+     image in the task and stop them.
 
     .. code-block:: yaml
 
        policies:
-         - name: fargate-readonly-tasks
+         - name: fargate-find-stop-image
            resource: ecs-task
            filters:
-            - launchType: FARGATE
-            - type: task-definition
-              key: "containerDefinitions[].image"
-              value: "elasticsearch/elasticsearch:6.4.3
-              value_type: swap
-              op: contains
+             - launchType: FARGATE
+             - type: task-definition
+               key: "containerDefinitions[].image"
+               value: "elasticsearch/elasticsearch:6.4.3"
+               value_type: swap
+               op: contains
            actions:
-            - delete
-
+             - type: stop
     """
 
 
@@ -391,14 +387,13 @@ class Task(query.ChildResourceManager):
 
     chunk_size = 100
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
-        id = name = 'taskArn'
+        arn = id = name = 'taskArn'
+        arn_type = 'task'
         enum_spec = ('list_tasks', 'taskArns', None)
         parent_spec = ('ecs', 'cluster', None)
-        dimension = None
         supports_trailevents = True
-        filter_name = None
 
     @property
     def source_type(self):
@@ -426,14 +421,14 @@ class TaskTaskDefinitionFilter(RelatedTaskDefinitionFilter):
          - name: fargate-readonly-tasks
            resource: ecs-task
            filters:
-            - launchType: FARGATE
-            - type: task-definition
-              key: "containerDefinitions[].readonlyRootFilesystem"
-              value: None
-              value_type: swap
-              op: contains
+             - launchType: FARGATE
+             - type: task-definition
+               key: "containerDefinitions[].readonlyRootFilesystem"
+               value: None
+               value_type: swap
+               op: contains
            actions:
-            - stop
+             - type: stop
 
     """
     related_key = 'taskDefinitionArn'
@@ -466,13 +461,10 @@ class StopTask(BaseAction):
 @resources.register('ecs-task-definition')
 class TaskDefinition(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
-        id = name = 'taskDefinitionArn'
+        arn = id = name = 'taskDefinitionArn'
         enum_spec = ('list_task_definitions', 'taskDefinitionArns', None)
-        dimension = None
-        filter_name = None
-        filter_type = None
 
     def get_resources(self, ids, cache=True):
         if cache:
@@ -532,12 +524,12 @@ class ContainerInstance(query.ChildResourceManager):
 
     chunk_size = 100
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ecs'
         id = name = 'containerInstance'
         enum_spec = ('list_container_instances', 'containerInstanceArns', None)
         parent_spec = ('ecs', 'cluster', None)
-        dimension = None
+        arn = "containerInstanceArn"
 
     @property
     def source_type(self):
@@ -693,12 +685,11 @@ class RemoveTagEcsResource(RemoveTag):
     .. code-block:: yaml
 
             policies:
-              - name: ecs-cluster-remove-tag
-                resource: ecs
+              - name: ecs-service-remove-tag
+                resource: ecs-service
                 filters:
-                  - "tag:BadTag": present
                   - type: taggable
-                    value: true
+                    state: true
                 actions:
                   - type: remove-tag
                     tags: ["BadTag"]
@@ -759,11 +750,11 @@ class ECSTaggable(Filter):
         .. code-block:: yaml
 
             policies:
-                - name:
+                - name: taggable
                   resource: ecs-service
                   filters:
                     - type: taggable
-                      state: true
+                      state: True
     """
 
     schema = type_schema('taggable', state={'type': 'boolean'})

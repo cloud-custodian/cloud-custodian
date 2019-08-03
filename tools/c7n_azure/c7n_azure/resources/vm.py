@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from c7n_azure.actions import AzureBaseAction
-from c7n_azure.filters import AzureOffHour, AzureOnHour
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
@@ -22,8 +21,126 @@ from c7n.filters.related import RelatedResourceFilter
 
 @resources.register('vm')
 class VirtualMachine(ArmResourceManager):
+    """Virtual Machine Resource
+
+    :example:
+
+    Stop all running VMs
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-running-vms
+            resource: azure.vm
+            filters:
+              - type: instance-view
+                key: statuses[].code
+                op: in
+                value_type: swap
+                value: PowerState/running
+            actions:
+              - type: stop
+
+    :example:
+
+    Start all VMs
+
+    .. code-block:: yaml
+
+        policies:
+          - name: start-vms
+            resource: azure.vm
+            actions:
+              - type: start
+
+    :example:
+
+    Restart all VMs
+
+    .. code-block:: yaml
+
+        policies:
+          - name: start-vms
+            resource: azure.vm
+            actions:
+              - type: restart
+
+    :example:
+
+    Delete specific VM by name
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-running-vms
+            resource: azure.vm
+            filters:
+              - type: value
+                key: name
+                op: eq
+                value_type: normalize
+                value: fake_vm_name
+            actions:
+              - type: delete
+
+    :example:
+
+    Find all VMs with a Public IP address
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vms-with-public-ip
+            resource: azure.vm
+            filters:
+              - type: network-interface
+                key: 'properties.ipConfigurations[].properties.publicIPAddress.id'
+                value: not-null
+
+    :example:
+
+    This policy will find all VMs that have Percentage CPU usage >= 75% over the last 72 hours
+
+    .. code-block:: yaml
+
+        policies:
+          - name: busy-vms
+            resource: azure.vm
+            filters:
+              - type: metric
+                metric: Percentage CPU
+                op: ge
+                aggregation: average
+                threshold: 75
+                timeframe: 72
+
+    :example:
+
+    This policy will find all VMs that have Percentage CPU usage <= 1% over the last 72 hours,
+    mark for deletion in 7 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-unused-vms
+            resource: azure.vm
+            filters:
+              - type: metric
+                metric: Percentage CPU
+                op: le
+                aggregation: average
+                threshold: 1
+                timeframe: 72
+             actions:
+              - type: mark-for-op
+                op: delete
+                days: 7
+
+    """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Compute']
+
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
         enum_spec = ('virtual_machines', 'list_all', None)
@@ -34,20 +151,13 @@ class VirtualMachine(ArmResourceManager):
             'resourceGroup',
             'properties.hardwareProfile.vmSize',
         )
-
-    @staticmethod
-    def register(registry, _):
-        # Additional filters/actions registered for this resource type
-        VirtualMachine.filter_registry.register("offhour", AzureOffHour)
-        VirtualMachine.filter_registry.register("onhour", AzureOnHour)
-
-
-resources.subscribe(resources.EVENT_FINAL, VirtualMachine.register)
+        resource_type = 'Microsoft.Compute/virtualMachines'
 
 
 @VirtualMachine.filter_registry.register('instance-view')
 class InstanceViewFilter(ValueFilter):
     schema = type_schema('instance-view', rinherit=ValueFilter.schema)
+    schema_alias = True
 
     def __call__(self, i):
         if 'instanceView' not in i:

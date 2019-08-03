@@ -97,12 +97,9 @@ def universal_augment(self, resources):
     from c7n.query import RetryPageIterator
     paginator = client.get_paginator('get_resources')
     paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-    resource_type = getattr(self.get_model(), 'resource_type', None)
 
-    if not resource_type:
-        resource_type = self.get_model().service
-        if self.get_model().type:
-            resource_type += ":" + self.get_model().type
+    m = self.get_model()
+    resource_type = "%s:%s" % (m.arn_service or m.service, m.arn_type)
 
     resource_tag_map_list = list(itertools.chain(
         *[p['ResourceTagMappingList'] for p in paginator.paginate(
@@ -111,8 +108,10 @@ def universal_augment(self, resources):
         r['ResourceARN']: r['Tags'] for r in resource_tag_map_list}
 
     for arn, r in zip(self.get_arns(resources), resources):
-        if arn in resource_tag_map:
-            r['Tags'] = resource_tag_map[arn]
+        if 'Tags' in r:
+            continue
+        r['Tags'] = resource_tag_map.get(arn, [])
+
     return resources
 
 
@@ -147,7 +146,7 @@ class TagTrim(Action):
 
     .. code-block :: yaml
 
-      - policies:
+       policies:
          - name: ec2-tag-trim
            comment: |
              Any instances with 48 or more tags get tags removed until
@@ -155,22 +154,22 @@ class TagTrim(Action):
              that we free up a tag slot for another usage.
            resource: ec2
            filters:
-               # Filter down to resources which already have 8 tags
-               # as we need space for 3 more, this also ensures that
-               # metrics reporting is correct for the policy.
-               type: value
-               key: "[length(Tags)][0]"
-               op: ge
-               value: 48
+                 # Filter down to resources which already have 8 tags
+                 # as we need space for 3 more, this also ensures that
+                 # metrics reporting is correct for the policy.
+               - type: value
+                 key: "length(Tags)"
+                 op: ge
+                 value: 48
            actions:
-             - type: tag-trim
-               space: 3
-               preserve:
-                - OwnerContact
-                - ASV
-                - CMDBEnvironment
-                - downtime
-                - custodian_status
+              - type: tag-trim
+                space: 3
+                preserve:
+                  - OwnerContact
+                  - ASV
+                  - CMDBEnvironment
+                  - downtime
+                  - custodian_status
     """
     max_tag_count = 50
 
@@ -263,7 +262,7 @@ class TagActionFilter(Filter):
 
     .. code-block :: yaml
 
-      - policies:
+      policies:
         - name: ec2-stop-marked
           resource: ec2
           filters:
@@ -275,7 +274,7 @@ class TagActionFilter(Filter):
               # Another optional tag is skew
               tz: utc
           actions:
-            - stop
+            - type: stop
 
     """
     schema = utils.type_schema(
@@ -353,13 +352,12 @@ class TagCountFilter(Filter):
 
        - filters:
            - type: value
-             key: "[length(Tags)][0]"
              op: gte
-             value: 8
+             count: 8
 
        - filters:
            - type: tag-count
-             value: 8
+             count: 8
     """
     schema = utils.type_schema(
         'tag-count',
@@ -459,9 +457,9 @@ class RemoveTag(Action):
     concurrency = 2
 
     schema = utils.type_schema(
-        'untag', aliases=('unmark', 'remove-tag'),
+        'remove-tag', aliases=('unmark', 'untag', 'remove-tag'),
         tags={'type': 'array', 'items': {'type': 'string'}})
-
+    schema_alias = True
     permissions = ('ec2:DeleteTags',)
 
     def process(self, resources):
@@ -653,30 +651,30 @@ class TagDelayedAction(Action):
 
         return action_date_string
 
+    def get_config_values(self):
+        d = {
+            'op': self.data.get('op', 'stop'),
+            'tag': self.data.get('tag', DEFAULT_TAG),
+            'msg': self.data.get('msg', self.default_template),
+            'tz': self.data.get('tz', 'utc'),
+            'days': self.data.get('days', 0),
+            'hours': self.data.get('hours', 0)}
+        d['action_date'] = self.generate_timestamp(
+            d['days'], d['hours'])
+        return d
+
     def process(self, resources):
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        cfg = self.get_config_values()
+        self.tz = tzutil.gettz(Time.TZ_ALIASES.get(cfg['tz']))
         self.id_key = self.manager.get_model().id
 
-        # Move this to policy? / no resources bypasses actions?
-        if not len(resources):
-            return
-
-        msg_tmpl = self.data.get('msg', self.default_template)
-
-        op = self.data.get('op', 'stop')
-        tag = self.data.get('tag', DEFAULT_TAG)
-        days = self.data.get('days', 0)
-        hours = self.data.get('hours', 0)
-        action_date = self.generate_timestamp(days, hours)
-
-        msg = msg_tmpl.format(
-            op=op, action_date=action_date)
+        msg = cfg['msg'].format(
+            op=cfg['op'], action_date=cfg['action_date'])
 
         self.log.info("Tagging %d resources for %s on %s" % (
-            len(resources), op, action_date))
+            len(resources), cfg['op'], cfg['action_date']))
 
-        tags = [{'Key': tag, 'Value': msg}]
+        tags = [{'Key': cfg['tag'], 'Value': msg}]
 
         # if the tag implementation has a specified batch size, it's typically
         # due to some restraint on the api so we defer to that.
@@ -1019,9 +1017,11 @@ class CopyRelatedResourceTag(Tag):
         return self
 
     def process(self, resources):
-        related_resources = dict(
-            zip(jmespath.search('[].%s' % self.data['key'], resources), resources))
-        related_ids = set(related_resources)
+        related_resources = list(
+            zip(jmespath.search('[].[%s || "c7n:NotFound"]|[]' % self.data['key'], resources),
+                resources))
+        related_ids = set([r[0] for r in related_resources])
+        related_ids.discard('c7n:NotFound')
         related_tag_map = self.get_resource_tag_map(self.data['resource'], related_ids)
 
         missing_related_tags = related_ids.difference(related_tag_map.keys())
@@ -1037,7 +1037,7 @@ class CopyRelatedResourceTag(Tag):
 
         stats = Counter()
 
-        for related, r in related_resources.items():
+        for related, r in related_resources:
             if related in missing_related_tags or not related_tag_map[related]:
                 stats['missing'] += 1
             elif self.process_resource(
@@ -1052,7 +1052,9 @@ class CopyRelatedResourceTag(Tag):
 
     def process_resource(self, client, r, related_tags, tag_keys, tag_action):
         tags = {}
-        resource_tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
+        resource_tags = {
+            t['Key']: t['Value'] for t in r.get('Tags', []) if not t['Key'].startswith('aws:')}
+
         if tag_keys == '*':
             tags = {k: v for k, v in related_tags.items()
                     if resource_tags.get(k) != v}

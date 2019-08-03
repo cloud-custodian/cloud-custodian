@@ -21,13 +21,13 @@ if os.path.exists('README.md'):
 
 setup(
     name="c7n_policystream",
-    version='0.3.1',
+    version='0.3.2',
     description="Cloud Custodian - Git Commits as Logical Policy Changes",
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     long_description=description,
     long_description_content_type='text/markdown',
     author="Kapil Thangavelu",

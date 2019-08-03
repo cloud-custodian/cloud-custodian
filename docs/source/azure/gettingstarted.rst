@@ -11,48 +11,70 @@ Getting Started
 Install Cloud Custodian and Azure Plugin
 ----------------------------------------
 
-The Azure provider must be installed as a separate package in addition to c7n.
+Cloud Custodian is a Python application and supports Python 2 and 3 on Linux and Windows.
+We recommend using Python 3.6 or higher.
 
-.. code-block:: bash
+The Azure provider is an additional package which is installed in addition to c7n.
 
-  $ virtualenv custodian
+Install latest from the repository to virtual Python environment
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Linux and Mac OS
++++++++++++++++++++++++++++
+
+To install Cloud Custodian, just run::
+
+  $ python3 -m venv custodian
   $ source custodian/bin/activate
-  (custodian) $ pip install c7n
-  (custodian) $ pip install c7n_azure
+  $ git clone https://github.com/cloud-custodian/cloud-custodian.git
+  $ cd cloud-custodian
+  $ pip install -e .
+  $ pip install -e tools/c7n_azure
 
 
-If you prefer to install the latest from source control you can do so as follows:
+Windows (CMD/PowerShell)
++++++++++++++++++++++++++++
 
-.. code-block:: bash
+To install Cloud Custodian, just run::
 
-  $ git clone https://github.com/capitalone/cloud-custodian.git
-  $ virtualenv custodian
-  $ source custodian/bin/activate
-  (custodian) $ pip install ./cloud-custodian
-  (custodian) $ pip install ./cloud-custodian/tools/c7n_azure
+  $ python3 -m venv custodian
+  $ ./custodian/Scripts/activate
+  $ git clone https://github.com/cloud-custodian/cloud-custodian.git
+  $ cd cloud-custodian
+  $ pip install -e .
+  $ pip install -e tools/c7n_azure
+
 
 .. _azure_write-policy:
 
 Write your first policy
 -----------------------
 
-A policy specifies the following items:
+Cloud Custodian is a stateless rules engine that filters and takes actions on Azure resources based on policies that you define.
+
+Cloud Custodian policies are expressed in YAML and include the following:
 
 * The type of resource to run the policy against
 * Filters to narrow down the set of resources
 * Actions to take on the filtered set of resources
 
-For this tutorial we will add a tag to all virtual machines with the name "Hello" and the value "World".
+Our first policy filters to a VM of a specific name, then adds the tag ``Hello: World``.
 
-Create a file named ``custodian.yml`` with this content:
+First, Create a file named ``custodian.yml`` with this content, and update ``my_vm_name`` to match an existing VM.
+
+*note: Some text editors (VSCode) inject invalid whitespace characters when copy/pasting YAML from a browser*
 
 .. code-block:: yaml
 
     policies:
         - name: my-first-policy
           description: |
-            Adds a tag to all virtual machines
+            Adds a tag to a virtual machines
           resource: azure.vm
+          filters:
+            - type: value
+              key: name
+              value: my_vm_name
           actions:
            - type: tag
              tag: Hello
@@ -63,7 +85,7 @@ Create a file named ``custodian.yml`` with this content:
 Run your policy
 ---------------
 
-First, choose one of the supported authentication mechanisms and either log in to Azure CLI or set
+Second, **choose one of the supported authentication mechanisms** and either log in to Azure CLI or set
 environment variables as documented in :ref:`azure_authentication`.
 
 .. code-block:: bash
@@ -77,7 +99,22 @@ If successful, you should see output similar to the following on the command lin
     2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: tag: 1 execution_time: 0.67
 
 
-You should also find a new ``my-first-policy`` directory with a log and other
-files (subsequent runs will append to the log by default rather than
-overwriting it).
+You should also find a new ``my-first-policy`` directory with a log and a ``resources.json``.  The ``resources.json``
+file shows you the raw data that results from your policy after filtering is applied.  This file can help you understand the
+fields available for your resources while developing your policy.
 
+See :ref:`filters` for more information on the features of the Value filter used in this sample.
+
+.. _monitor-azure-cc:
+
+(Optional) Run your policy with Azure Monitoring
+""""""""""""""""""""""""""""""""""""""""""""""""
+
+Cloud Custodian policies can emit logs and metrics to Application Insights when the policy executes.
+Please refer to the :ref:`azure_monitoring` section for further details.
+
+
+Next Steps
+----------
+* :ref:`Notify users of policy violations using a Logic App <azure_examples_notifications_logic_app>`
+* :ref:`More example policies <azure_examples>`

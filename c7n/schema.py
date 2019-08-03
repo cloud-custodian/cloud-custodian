@@ -29,6 +29,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import Counter
 import json
+import inspect
 import logging
 
 from jsonschema import Draft4Validator as Validator
@@ -37,7 +38,8 @@ from jsonschema.exceptions import best_match
 from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_resources
-from c7n.filters import ValueFilter, EventFilter, AgeFilter
+from c7n.resolver import ValuesFrom
+from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
 
 
 def validate(data, schema=None):
@@ -46,22 +48,11 @@ def validate(data, schema=None):
         Validator.check_schema(schema)
 
     validator = Validator(schema)
-
     errors = list(validator.iter_errors(data))
-
     if not errors:
-        counter = Counter([p['name'] for p in data.get('policies')])
-        dupes = []
-        for k, v in counter.items():
-            if v > 1:
-                dupes.append(k)
-        if dupes:
-            return [ValueError(
-                "Only one policy with a given name allowed, duplicates: %s" % (
-                    ", ".join(dupes))), dupes[0]]
-        return []
+        return check_unique(data) or []
     try:
-        resp = specific_error(errors[0])
+        resp = policy_error_scope(specific_error(errors[0]), data)
         name = isinstance(
             errors[0].instance,
             dict) and errors[0].instance.get(
@@ -76,6 +67,29 @@ def validate(data, schema=None):
         errors[0],
         best_match(validator.iter_errors(data)),
     ]))
+
+
+def check_unique(data):
+    counter = Counter([p['name'] for p in data.get('policies', [])])
+    for k, v in list(counter.items()):
+        if v == 1:
+            counter.pop(k)
+    if counter:
+        return [ValueError(
+            "Only one policy with a given name allowed, duplicates: {}".format(counter)),
+            list(counter.keys())[0]]
+
+
+def policy_error_scope(error, data):
+    """Scope a schema error to its policy name and resource."""
+    err_path = list(error.absolute_path)
+    if err_path[0] != 'policies':
+        return error
+    pdata = data['policies'][err_path[1]]
+    pdata.get('name', 'unknown')
+    error.message = "Error on policy:{} resource:{}\n".format(
+        pdata.get('name', 'unknown'), pdata.get('resource', 'unknown')) + error.message
+    return error
 
 
 def specific_error(error):
@@ -116,7 +130,8 @@ def specific_error(error):
     if t is not None:
         found = None
         for idx, v in enumerate(error.validator_value):
-            if '$ref' in v and v['$ref'].rsplit('/', 2)[-1] == t:
+            if ('$ref' in v and
+                    v['$ref'].rsplit('/', 2)[-1].rsplit('.', 1)[-1] == t):
                 found = idx
                 break
             elif 'type' in v and t in v['properties']['type']['enum']:
@@ -173,10 +188,23 @@ def generate(resource_types=()):
             # Shortcut form of value filter as k=v
             'valuekv': {
                 'type': 'object',
+                'additionalProperties': {'oneOf': [{'type': 'number'}, {'type': 'null'},
+                    {'type': 'array', 'maxItems': 0}, {'type': 'string'}, {'type': 'boolean'}]},
                 'minProperties': 1,
                 'maxProperties': 1},
         },
-
+        'filters_common': {
+            'comparison_operators': {
+                'enum': list(OPERATORS.keys())},
+            'value_types': {'enum': VALUE_TYPES},
+            'value_from': ValuesFrom.schema,
+            'value': {'oneOf': [
+                {'type': 'array'},
+                {'type': 'string'},
+                {'type': 'boolean'},
+                {'type': 'number'},
+                {'type': 'null'}]},
+        },
         'policy': {
             'type': 'object',
             'required': ['name', 'resource'],
@@ -190,7 +218,10 @@ def generate(resource_types=()):
                 'start': {'format': 'date-time'},
                 'end': {'format': 'date-time'},
                 'resource': {'type': 'string'},
-                'max-resources': {'type': 'integer', 'minimum': 1},
+                'max-resources': {'anyOf': [
+                    {'type': 'integer', 'minimum': 1},
+                    {'$ref': '#/definitions/max-resources-properties'}
+                ]},
                 'max-resources-percent': {'type': 'number', 'minimum': 0, 'maximum': 100},
                 'comment': {'type': 'string'},
                 'comments': {'type': 'string'},
@@ -205,13 +236,12 @@ def generate(resource_types=()):
                     'type': 'array'
                 },
                 #
-                # unclear if this should be allowed, it kills resource
-                # cache coherency between policies, and we need to
-                # generalize server side query mechanisms, currently
-                # this only for ec2 instance queries. limitations
-                # in json schema inheritance prevent us from doing this
-                # on a type specific basis
-                # https://stackoverflow.com/questions/22689900/json-schema-allof-with-additionalproperties
+                # TODO: source queries should really move under
+                # source. This was initially used for describe sources
+                # to expose server side query mechanisms, however its
+                # important to note it also prevents resource cache
+                # utilization between policies that have different
+                # queries.
                 'query': {
                     'type': 'array', 'items': {'type': 'object'}}
 
@@ -219,6 +249,15 @@ def generate(resource_types=()):
         },
         'policy-mode': {
             'anyOf': [e.schema for _, e in execution.items()],
+        },
+        'max-resources-properties': {
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'amount': {"type": 'integer', 'minimum': 1},
+                'op': {'enum': ['or', 'and']},
+                'percent': {'type': 'number', 'minimum': 0, 'maximum': 100}
+            }
         }
     }
 
@@ -237,11 +276,12 @@ def generate(resource_types=()):
                     resource_type,
                     resource_defs,
                     alias_name,
-                    definitions
+                    definitions,
+                    cloud_name
                 ))
 
     schema = {
-        '$schema': 'http://json-schema.org/schema#',
+        "$schema": "http://json-schema.org/draft-07/schema#",
         'id': 'http://schema.cloudcustodian.io/v0/custodian.json',
         'definitions': definitions,
         'type': 'object',
@@ -260,21 +300,26 @@ def generate(resource_types=()):
     return schema
 
 
-def process_resource(type_name, resource_type, resource_defs, alias_name=None, definitions=None):
+def process_resource(
+        type_name, resource_type, resource_defs, alias_name=None,
+        definitions=None, provider_name=None):
+
     r = resource_defs.setdefault(type_name, {'actions': {}, 'filters': {}})
 
-    seen_actions = set()  # Aliases get processed once
     action_refs = []
-    for action_name, a in resource_type.action_registry.items():
-        if a in seen_actions:
-            continue
-        else:
-            seen_actions.add(a)
+    for a in ElementSchema.elements(resource_type.action_registry):
+        action_name = a.type
         if a.schema_alias:
-            if action_name in definitions['actions']:
-                assert definitions['actions'][action_name] == a.schema, "Schema mismatch on action w/ schema alias"  # NOQA
-            definitions['actions'][action_name] = a.schema
-            action_refs.append({'$ref': '#/definitions/actions/%s' % action_name})
+            action_alias = "%s.%s" % (provider_name, action_name)
+            if action_alias in definitions['actions']:
+
+                if definitions['actions'][action_alias] != a.schema: # NOQA
+                    msg = "Schema mismatch on type:{} action:{} w/ schema alias ".format(
+                        type_name, action_name)
+                    raise SyntaxError(msg)
+            else:
+                definitions['actions'][action_alias] = a.schema
+            action_refs.append({'$ref': '#/definitions/actions/%s' % action_alias})
         else:
             r['actions'][action_name] = a.schema
             action_refs.append(
@@ -285,55 +330,41 @@ def process_resource(type_name, resource_type, resource_defs, alias_name=None, d
     action_refs.append(
         {'enum': list(resource_type.action_registry.keys())})
 
-    nested_filter_refs = []
-    filters_seen = set()
-    for k, v in sorted(resource_type.filter_registry.items()):
-        if v in filters_seen:
-            continue
-        else:
-            filters_seen.add(v)
-        nested_filter_refs.append(
-            {'$ref': '#/definitions/resources/%s/filters/%s' % (
-                type_name, k)})
-    nested_filter_refs.append(
-        {'$ref': '#/definitions/filters/valuekv'})
-
     filter_refs = []
-    filters_seen = set()  # for aliases
-    for filter_name, f in sorted(resource_type.filter_registry.items()):
-        if f in filters_seen:
-            continue
-        else:
-            filters_seen.add(f)
-
-        if filter_name in ('or', 'and', 'not'):
-            continue
-        if f.schema_alias:
-            if filter_name in definitions['filters']:
-                assert definitions['filters'][filter_name] == f.schema, "Schema mismatch on filter w/ schema alias" # NOQA
-            definitions['filters'][filter_name] = f.schema
-            filter_refs.append({
-                '$ref': '#/definitions/filters/%s' % filter_name})
-            continue
-        elif filter_name == 'value':
-            r['filters'][filter_name] = {
-                '$ref': '#/definitions/filters/value'}
-            r['filters']['valuekv'] = {
-                '$ref': '#/definitions/filters/valuekv'}
+    for f in ElementSchema.elements(resource_type.filter_registry):
+        filter_name = f.type
+        if filter_name == 'value':
+            filter_refs.append({'$ref': '#/definitions/filters/value'})
+            filter_refs.append({'$ref': '#/definitions/filters/valuekv'})
         elif filter_name == 'event':
-            r['filters'][filter_name] = {
-                '$ref': '#/definitions/filters/event'}
+            filter_refs.append({'$ref': '#/definitions/filters/event'})
+        elif f.schema_alias:
+            filter_alias = "%s.%s" % (provider_name, filter_name)
+            if filter_alias in definitions['filters']:
+                assert definitions['filters'][filter_alias] == f.schema, "Schema mismatch on filter w/ schema alias" # NOQA
+            else:
+                definitions['filters'][filter_alias] = f.schema
+            filter_refs.append({'$ref': '#/definitions/filters/%s' % filter_alias})
+            continue
         else:
             r['filters'][filter_name] = f.schema
-        filter_refs.append(
-            {'$ref': '#/definitions/resources/%s/filters/%s' % (
-                type_name, filter_name)})
-    filter_refs.append(
-        {'$ref': '#/definitions/filters/valuekv'})
+            filter_refs.append(
+                {'$ref': '#/definitions/resources/%s/filters/%s' % (
+                    type_name, filter_name)})
 
     # one word filter shortcuts
     filter_refs.append(
         {'enum': list(resource_type.filter_registry.keys())})
+
+    block_fref = '#/definitions/resources/%s/policy/allOf/1/properties/filters' % (
+        type_name)
+    filter_refs.extend([
+        {'type': 'object', 'additionalProperties': False,
+         'properties': {'or': {'$ref': block_fref}}},
+        {'type': 'object', 'additionalProperties': False,
+         'properties': {'and': {'$ref': block_fref}}},
+        {'type': 'object', 'additionalProperties': False,
+         'properties': {'not': {'$ref': block_fref}}}])
 
     resource_policy = {
         'allOf': [
@@ -374,14 +405,16 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
                 resources[rname] = rtype
 
     for type_name, resource_type in resources.items():
-        classes = {'actions': {}, 'filters': {}}
+        classes = {'actions': {}, 'filters': {}, 'resource': resource_type}
         actions = []
-        for action_name, cls in resource_type.action_registry.items():
+        for cls in ElementSchema.elements(resource_type.action_registry):
+            action_name = ElementSchema.name(cls)
             actions.append(action_name)
             classes['actions'][action_name] = cls
 
         filters = []
-        for filter_name, cls in resource_type.filter_registry.items():
+        for cls in ElementSchema.elements(resource_type.filter_registry):
+            filter_name = ElementSchema.name(cls)
             filters.append(filter_name)
             classes['filters'][filter_name] = cls
 
@@ -390,25 +423,137 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
             'actions': sorted(actions),
             'classes': classes,
         }
+
+    vocabulary["mode"] = {}
+    for mode_name, cls in execution.items():
+        vocabulary["mode"][mode_name] = cls
+
     return vocabulary
 
 
-def summary(vocabulary):
-    print("resource count: %d" % len(vocabulary))
-    action_count = filter_count = 0
+class ElementSchema(object):
+    """Utility functions for working with resource's filters and actions.
+    """
 
-    common_actions = set(['notify', 'invoke-lambda'])
-    common_filters = set(['value', 'and', 'or', 'event'])
+    @staticmethod
+    def elements(registry):
+        """Given a resource registry return sorted de-aliased values.
+        """
+        seen = {}
+        for k, v in registry.items():
+            if k in ('and', 'or', 'not'):
+                continue
+            if v in seen:
+                continue
+            else:
+                seen[ElementSchema.name(v)] = v
+        return [seen[k] for k in sorted(seen)]
 
-    for rv in vocabulary.values():
-        action_count += len(
-            set(rv.get('actions', ())).difference(common_actions))
-        filter_count += len(
-            set(rv.get('filters', ())).difference(common_filters))
-    print("unique actions: %d" % action_count)
-    print("common actions: %d" % len(common_actions))
-    print("unique filters: %d" % filter_count)
-    print("common filters: %s" % len(common_filters))
+    @staticmethod
+    def resolve(vocabulary, schema_path):
+        """Given a resource vocabulary and a dotted path, resolve an element.
+        """
+        current = vocabulary
+        frag = None
+        if schema_path.startswith('.'):
+            # The preprended '.' is an odd artifact
+            schema_path = schema_path[1:]
+        parts = schema_path.split('.')
+        while parts:
+            k = parts.pop(0)
+            if frag:
+                k = "%s.%s" % (frag, k)
+                frag = None
+                parts.insert(0, 'classes')
+            elif k in clouds:
+                frag = k
+                if len(parts) == 1:
+                    parts.append('resource')
+                continue
+            if k not in current:
+                raise ValueError("Invalid schema path %s" % schema_path)
+            current = current[k]
+        return current
+
+    @staticmethod
+    def name(cls):
+        """For a filter or action return its name."""
+        return cls.schema['properties']['type']['enum'][0]
+
+    @staticmethod
+    def doc(cls):
+        """Return 'best' formatted doc string for a given class.
+
+        Walks up class hierarchy, skipping known bad. Returns
+        empty string if no suitable doc string found.
+        """
+        # walk up class hierarchy for nearest
+        # good doc string, skip known
+        if cls.__doc__ is not None:
+            return inspect.cleandoc(cls.__doc__)
+        doc = None
+        for b in cls.__bases__:
+            if b in (ValueFilter, object):
+                continue
+            doc = b.__doc__ or ElementSchema.doc(b)
+        if doc is not None:
+            return inspect.cleandoc(doc)
+        return ""
+
+    @staticmethod
+    def schema(definitions, cls):
+        """Return a pretty'ified version of an element schema."""
+        schema = isinstance(cls, type) and dict(cls.schema) or dict(cls)
+        schema.pop('type', None)
+        schema.pop('additionalProperties', None)
+        return ElementSchema._expand_schema(schema, definitions)
+
+    @staticmethod
+    def _expand_schema(schema, definitions):
+        """Expand references in schema to their full schema"""
+        for k, v in list(schema.items()):
+            if k == '$ref':
+                # the value here is in the form of: '#/definitions/path/to/key'
+                parts = v.split('/')
+                if ['#', 'definitions'] != parts[0:2]:
+                    raise ValueError("Invalid Ref %s" % v)
+                current = definitions
+                for p in parts[2:]:
+                    if p not in current:
+                        return None
+                    current = current[p]
+                return ElementSchema._expand_schema(current, definitions)
+            elif isinstance(v, dict):
+                schema[k] = ElementSchema._expand_schema(v, definitions)
+        return schema
+
+
+def pprint_schema_summary(vocabulary):
+    providers = {}
+    non_providers = {}
+
+    for type_name, rv in vocabulary.items():
+        if '.' not in type_name:
+            non_providers[type_name] = len(rv)
+        else:
+            provider, name = type_name.split('.', 1)
+            stats = providers.setdefault(provider, {
+                'resources': 0, 'actions': Counter(), 'filters': Counter()})
+            stats['resources'] += 1
+            for a in rv.get('actions'):
+                stats['actions'][a] += 1
+            for f in rv.get('filters'):
+                stats['filters'][f] += 1
+
+    for provider, stats in providers.items():
+        print("%s:" % provider)
+        print(" resource count: %d" % stats['resources'])
+        print(" actions: %d" % len(stats['actions']))
+        print(" filters: %d" % len(stats['filters']))
+
+    for non_providers_type, length in non_providers.items():
+        print("%s:" % non_providers_type)
+        print(" count: %d" % length)
 
 
 def json_dump(resource=None):

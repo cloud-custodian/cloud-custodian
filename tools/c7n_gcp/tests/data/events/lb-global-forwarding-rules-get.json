@@ -1,0 +1,52 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "yauhen_shaliou@comelfo.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.21.63.2",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-03T16:24:03.136Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "v1.compute.globalForwardingRules.get",
+    "authorizationInfo": [
+      {
+        "permission": "compute.globalForwardingRules.get",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/custodian-test-project-0/global/forwardingRules/custodian-frontend-0",
+          "type": "compute.globalForwardingRules"
+        }
+      }
+    ],
+    "resourceName": "projects/custodian-test-project-0/global/forwardingRules/custodian-frontend-0",
+    "request": {
+      "@type": "type.googleapis.com/compute.globalForwardingRules.get"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "global"
+      ]
+    }
+  },
+  "insertId": "jftkn4d4i92",
+  "resource": {
+    "type": "gce_forwarding_rule",
+    "labels": {
+      "forwarding_rule_id": "",
+      "project_id": "custodian-test-project-0",
+      "region": "global"
+    }
+  },
+  "timestamp": "2019-05-03T16:24:03.082Z",
+  "severity": "INFO",
+  "logName": "projects/custodian-test-project-0/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2019-05-03T16:24:04.139011270Z"
+}

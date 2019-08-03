@@ -20,28 +20,31 @@ from c7n_gcp.provider import resources as gcp_resources
 
 class Notify(BaseNotify):
     """
-    Example::
+    :example:
 
-      policies:
-        - name: bad-instance-get
-          resource: gcp.compute
-          filters:
-           - Name: bad-instance
-          actions:
-           - type: notify
-             to:
-              - email@address
-             # which template for the email should we use
-             template: policy-template
-             transport:
-               type: pubsub
-               topic: projects/yourproject/topics/yourtopic
+    .. code-block:: yaml
+
+          policies:
+            - name: bad-instance-get
+              resource: gcp.instance
+              filters:
+               - Name: bad-instance
+              actions:
+               - type: notify
+                 to:
+                  - email@address
+                 # which template for the email should we use
+                 template: policy-template
+                 transport:
+                   type: pubsub
+                   topic: projects/yourproject/topics/yourtopic
     """
 
     batch_size = 1000
 
     schema = {
         'type': 'object',
+        'addtionalProperties': False,
         'anyOf': [
             {'required': ['type', 'transport', 'to']},
             {'required': ['type', 'transport', 'to_from']}],
@@ -67,6 +70,7 @@ class Notify(BaseNotify):
             },
         }
     }
+    schema_alias = True
 
     @staticmethod
     def register_notify_action(registry, _):

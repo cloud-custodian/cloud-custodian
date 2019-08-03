@@ -1,0 +1,53 @@
+{
+  "body": {
+    "errorMessage": "The replica master 0 exited with a non-zero status of 1. To find out more about why your job exited please check the logs: https://console.cloud.google.com/logs/viewer?project=487463184276&resource=ml_job%2Fjob_id%2Ftest_job&advancedFilter=resource.type%3D%22ml_job%22%0Aresource.labels.job_id%3D%22test_job%22", 
+    "trainingInput": {
+      "jobDir": "gs://cloud-custodian.appspot.com/test/",
+      "region": "us-central1", 
+      "args": [
+        "--preprocess", 
+        "--training_data_path=gs://cloud-custodian.appspot.com/test/test.csv",
+        "--validation_split=0.2", 
+        "--model_type=regression", 
+        "--learning_rate=0.001", 
+        "--batch_size=100", 
+        "--eval_frequency_secs=100", 
+        "--optimizer_type=ftrl"
+      ], 
+      "masterConfig": {
+        "imageUri": "gcr.io/cloud-ml-algos/linear_learner_cpu:latest"
+      }
+    }, 
+    "jobId": "test_job", 
+    "state": "FAILED", 
+    "trainingOutput": {
+      "isBuiltInAlgorithmJob": true, 
+      "consumedMLUnits": 0.06, 
+      "builtInAlgorithmOutput": {
+        "framework": "TENSORFLOW", 
+        "runtimeVersion": "1.12", 
+        "pythonVersion": "2.7"
+      }
+    }, 
+    "etag": "OV+7GvFpbq0=", 
+    "startTime": "2019-04-12T13:58:39Z", 
+    "endTime": "2019-04-12T14:03:51Z", 
+    "createTime": "2019-04-12T13:56:28Z"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1270", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://ml.googleapis.com/v1/projects/cloud-custodian/jobs/test_job?alt=json",
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Mon, 15 Apr 2019 09:05:41 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

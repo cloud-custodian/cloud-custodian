@@ -16,6 +16,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
+import time
 from botocore.exceptions import ClientError
 from datetime import datetime, timedelta
 
@@ -26,8 +27,10 @@ from c7n.actions import ActionRegistry, BaseAction
 from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
+from c7n.query import QueryResourceManager
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema, generate_arn
 
@@ -56,15 +59,23 @@ class Account(ResourceManager):
 
     filter_registry = filters
     action_registry = actions
+    retry = staticmethod(QueryResourceManager.retry)
 
     class resource_type(object):
         id = 'account_id'
         name = 'account_name'
         filter_name = None
+        global_resource = True
+        # fake this for doc gen
+        service = "account"
 
     @classmethod
     def get_permissions(cls):
         return ('iam:ListAccountAliases',)
+
+    @classmethod
+    def has_arn(cls):
+        return True
 
     def get_arns(self, resources):
         return ["arn:::{account_id}".format(**r) for r in resources]
@@ -189,7 +200,7 @@ class GuardDutyEnabled(MultiAttrFilter):
                   - type: guard-duty
                     Detector.Status: ENABLED
                     Master.AccountId: "00011001"
-                    Master.RelationshipStatus: ENABLED
+                    Master.RelationshipStatus: "Enabled"
     """
 
     schema = {
@@ -232,7 +243,7 @@ class GuardDutyEnabled(MultiAttrFilter):
 
         detector = client.get_detector(DetectorId=detector_id)
         detector.pop('ResponseMetadata', None)
-        master = client.get_master_account(DetectorId=detector_id).get('master')
+        master = client.get_master_account(DetectorId=detector_id).get('Master')
         resource[self.annotation] = r = {'Detector': detector, 'Master': master}
         return r
 
@@ -353,7 +364,7 @@ class IAMSummary(ValueFilter):
               value_type: swap
     """
     schema = type_schema('iam-summary', rinherit=ValueFilter.schema)
-
+    schema_alias = False
     permissions = ('iam:GetAccountSummary',)
 
     def process(self, resources, event=None):
@@ -393,6 +404,7 @@ class AccountPasswordPolicy(ValueFilter):
                     value: true
     """
     schema = type_schema('password-policy', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('iam:GetAccountPasswordPolicy',)
 
     def process(self, resources, event=None):
@@ -433,7 +445,7 @@ class ServiceLimit(Filter):
 
       # Note this is extant for each active instance type in the account
       # however the total value is against sum of all instance types.
-      # see issue https://github.com/capitalone/cloud-custodian/issues/516
+      # see issue https://github.com/cloud-custodian/cloud-custodian/issues/516
 
       - service: EC2 limit: On-Demand instances - m3.medium
 
@@ -459,7 +471,7 @@ class ServiceLimit(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: account-service-limits
+              - name: increase-account-service-limits
                 resource: account
                 filters:
                   - type: service-limit
@@ -480,7 +492,8 @@ class ServiceLimit(Filter):
     schema = type_schema(
         'service-limit',
         threshold={'type': 'number'},
-        refresh_period={'type': 'integer'},
+        refresh_period={'type': 'integer',
+                        'title': 'how long should a check result be considered fresh'},
         limits={'type': 'array', 'items': {'type': 'string'}},
         services={'type': 'array', 'items': {
             'enum': ['EC2', 'ELB', 'VPC', 'AutoScaling',
@@ -489,6 +502,11 @@ class ServiceLimit(Filter):
     permissions = ('support:DescribeTrustedAdvisorCheckResult',)
     check_id = 'eW7HH0l7J9'
     check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
+
+    # When doing a refresh, how long to wait for the check to become ready.
+    # Max wait here is 5 * 10 ~ 50 seconds.
+    poll_interval = 5
+    poll_max_intervals = 10
     global_services = set(['IAM'])
 
     def validate(self):
@@ -500,11 +518,28 @@ class ServiceLimit(Filter):
                     % ', '.join(self.global_services))
         return self
 
+    @classmethod
+    def get_check_result(cls, client, check_id):
+        checks = client.describe_trusted_advisor_check_result(
+            checkId=check_id, language='en')['result']
+
+        # Check status and if necessary refresh checks
+        if checks['status'] == 'not_available':
+            client.refresh_trusted_advisor_check(checkId=check_id)
+            for _ in range(cls.poll_max_intervals):
+                time.sleep(cls.poll_interval)
+                refresh_response = client.describe_trusted_advisor_check_refresh_statuses(
+                    checkIds=[check_id])
+                if refresh_response['statuses'][0]['status'] == 'success':
+                    checks = client.describe_trusted_advisor_check_result(
+                        checkId=check_id, language='en')['result']
+                    break
+        return checks
+
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'support', region_name='us-east-1')
-        checks = client.describe_trusted_advisor_check_result(
-            checkId=self.check_id, language='en')['result']
+        checks = self.get_check_result(client, self.check_id)
 
         region = self.manager.config.region
         checks['flaggedResources'] = [r for r in checks['flaggedResources']
@@ -550,7 +585,7 @@ class RequestLimitIncrease(BaseAction):
     .. code-block:: yaml
 
         policies:
-          - name: account-service-limits
+          - name: raise-account-service-limits
             resource: account
             filters:
               - type: service-limit
@@ -569,7 +604,7 @@ class RequestLimitIncrease(BaseAction):
 
     schema = {
         'type': 'object',
-        'notify': {'type': 'array'},
+        'additionalProperties': False,
         'properties': {
             'type': {'enum': ['request-limit-increase']},
             'percent-increase': {'type': 'number', 'minimum': 1},
@@ -577,6 +612,7 @@ class RequestLimitIncrease(BaseAction):
             'minimum-increase': {'type': 'number', 'minimum': 1},
             'subject': {'type': 'string'},
             'message': {'type': 'string'},
+            'notify': {'type': 'array', 'items': {'type': 'string'}},
             'severity': {'type': 'string', 'enum': ['urgent', 'high', 'normal', 'low']}
         },
         'oneOf': [
@@ -1068,14 +1104,18 @@ class XrayEncrypted(Filter):
               - name: xray-encrypt-with-default
                 resource: aws.account
                 filters:
-                  - type: xray-encrypt-key
-                    key: default
+                   - type: xray-encrypt-key
+                     key: default
               - name: xray-encrypt-with-kms
-                  - type: xray-encrypt-key
-                    key: kms
+                resource: aws.account
+                filters:
+                   - type: xray-encrypt-key
+                     key: kms
               - name: xray-encrypt-with-specific-key
-                  -type: xray-encrypt-key
-                   key: alias/my-alias or arn or keyid
+                resource: aws.account
+                filters:
+                   - type: xray-encrypt-key
+                     key: alias/my-alias or arn or keyid
     """
 
     permissions = ('xray:GetEncryptionConfig',)
@@ -1116,8 +1156,10 @@ class SetXrayEncryption(BaseAction):
                   - type: set-xray-encrypt
                     key: default
               - name: xray-kms-encrypt
+                resource: aws.account
+                actions:
                   - type: set-xray-encrypt
-                    key: alias/some/alias/ke
+                    key: alias/some/alias/key
     """
 
     permissions = ('xray:PutEncryptionConfig',)
@@ -1134,6 +1176,110 @@ class SetXrayEncryption(BaseAction):
         client.put_encryption_config(**req)
 
 
+@filters.register('default-ebs-encryption')
+class EbsEncryption(Filter):
+    """Filter an account by its ebs encryption status.
+
+    By default for key we match on the alias name for a key.
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-default-ebs-encryption
+           resource: aws.account
+           filters:
+            - type: default-ebs-encryption
+              key: "alias/aws/ebs"
+              state: true
+
+    It is also possible to match on specific key attributes (tags, origin)
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: check-ebs-encryption-key-origin
+           resource: aws.account
+           filters:
+            - type: default-ebs-encryption
+              key:
+                type: value
+                key: Origin
+                value: AWS_KMS
+              state: true
+    """
+    permissions = ('ec2:GetEbsEncryptionByDefault',)
+    schema = type_schema(
+        'default-ebs-encryption',
+        state={'type': 'boolean'},
+        key={'oneOf': [
+            {'$ref': '#/definitions/filters/value'},
+            {'type': 'string'}]})
+
+    def process(self, resources, event=None):
+        state = self.data.get('state', False)
+        client = local_session(self.manager.session_factory).client('ec2')
+        account_state = client.get_ebs_encryption_by_default().get(
+            'EbsEncryptionByDefault')
+        if account_state != state:
+            return []
+        if state and 'key' in self.data:
+            vfd = (isinstance(self.data['key'], dict) and
+                   self.data['key'] or {'c7n:AliasName': self.data['key']})
+            vf = KmsRelatedFilter(vfd, self.manager)
+            vf.RelatedIdsExpression = 'KmsKeyId'
+            vf.annotate = False
+            key = client.get_ebs_default_kms_key_id().get('KmsKeyId')
+            if not vf.process([{'KmsKeyId': key}]):
+                return []
+        return resources
+
+
+@actions.register('set-ebs-encryption')
+class SetEbsEncryption(BaseAction):
+    """Set AWS EBS default encryption on an account
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: set-default-ebs-encryption
+           resource: aws.account
+           filters:
+            - type: default-ebs-encryption
+              state: false
+           actions:
+            - type: set-ebs-encryption
+              state: true
+              key: alias/aws/ebs
+    """
+    permissions = ('ec2:EnableEbsEncryptionByDefault',
+                   'ec2:DisableEbsEncryptionByDefault')
+
+    schema = type_schema(
+        'set-ebs-encryption',
+        state={'type': 'boolean'},
+        key={'type': 'string'})
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('ec2')
+        state = self.data.get('state')
+        key = self.data.get('key')
+        if state:
+            client.enable_ebs_encryption_by_default()
+        else:
+            client.disable_ebs_encryption_by_default()
+
+        if state and key:
+            client.modify_ebs_default_kms_key_id(
+                KmsKeyId=self.data['key'])
+
+
 @filters.register('s3-public-block')
 class S3PublicBlock(ValueFilter):
     """Check for s3 public blocks on an account.
@@ -1144,6 +1290,7 @@ class S3PublicBlock(ValueFilter):
     annotation_key = 'c7n:s3-public-block'
     annotate = False  # no annotation from value filter
     schema = type_schema('s3-public-block', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('s3:GetAccountPublicAccessBlock',)
 
     def process(self, resources, event=None):

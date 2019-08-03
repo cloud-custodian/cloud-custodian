@@ -1,0 +1,111 @@
+{
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "principalEmail": "system:node:gke-standard-cluster-1-pool-1-c733eefe-xtbq"
+      },
+      "authorizationInfo": [],
+      "methodName": "io.k8s.core.v1.nodes.create",
+      "request": {
+        "@type": "core.k8s.io/v1.Node",
+        "apiVersion": "v1",
+        "kind": "Node",
+        "metadata": {
+          "annotations": {
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": null,
+          "labels": {},
+          "name": "gke-standard-cluster-1-pool-1-c733eefe-xtbq"
+        },
+        "spec": {},
+        "status": {}
+      },
+      "requestMetadata": {
+        "callerIp": "35.184.126.154"
+      },
+      "resourceName": "core/v1/nodes/gke-standard-cluster-1-pool-1-c733eefe-xtbq",
+      "response": {
+        "@type": "core.k8s.io/v1.Node",
+        "apiVersion": "v1",
+        "kind": "Node",
+        "metadata": {
+          "annotations": {
+            "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+          },
+          "creationTimestamp": "2019-05-20T13:23:47Z",
+          "labels": {},
+          "name": "gke-standard-cluster-1-pool-1-c733eefe-xtbq",
+          "resourceVersion": "1691",
+          "selfLink": "/api/v1/nodes/gke-standard-cluster-1-pool-1-c733eefe-xtbq",
+          "uid": "7fc820d8-7b02-11e9-b6b0-42010a8001b1"
+        },
+        "spec": {
+          "providerID": "gce://mythic-tribute-232915/us-central1-a/gke-standard-cluster-1-pool-1-c733eefe-xtbq"
+        },
+        "status": {
+          "addresses": [],
+          "allocatable": {
+            "attachable-volumes-gce-pd": "32",
+            "cpu": "940m",
+            "ephemeral-storage": "0",
+            "hugepages-2Mi": "0",
+            "memory": "2702212Ki",
+            "pods": "110"
+          },
+          "capacity": {
+            "attachable-volumes-gce-pd": "32",
+            "cpu": "1",
+            "ephemeral-storage": "0",
+            "hugepages-2Mi": "0",
+            "memory": "3787652Ki",
+            "pods": "110"
+          },
+          "conditions": [
+            {
+              "lastHeartbeatTime": null,
+              "lastTransitionTime": "2019-05-20T13:23:47Z",
+              "message": "Node created without a route",
+              "reason": "NoRouteCreated",
+              "status": "True",
+              "type": "NetworkUnavailable"
+            }
+          ],
+          "daemonEndpoints": {
+            "kubeletEndpoint": {
+              "Port": 10250
+            }
+          },
+          "images": [],
+          "nodeInfo": {
+            "architecture": "amd64",
+            "bootID": "090188ec-6dff-4f37-b266-a8b041950ad5",
+            "containerRuntimeVersion": "docker://17.3.2",
+            "kernelVersion": "4.14.106+",
+            "kubeProxyVersion": "v1.12.7-gke.10",
+            "kubeletVersion": "v1.12.7-gke.10",
+            "machineID": "688f6e365be69f422691a973faf2275b",
+            "operatingSystem": "linux",
+            "osImage": "Container-Optimized OS from Google",
+            "systemUUID": "688F6E36-5BE6-9F42-2691-A973FAF2275B"
+          }
+        }
+      },
+      "serviceName": "k8s.io",
+      "status": {}
+    },
+    "insertId": "5716ca55-7a0a-4c31-b800-08d62d812e2d",
+    "resource": {
+      "type": "k8s_cluster",
+      "labels": {
+        "cluster_name": "standard-cluster-1",
+        "location": "us-central1-a",
+        "project_id": "mythic-tribute-232915"
+      }
+    },
+    "timestamp": "2019-05-20T13:23:47.561319Z",
+    "labels": {},
+    "logName": "projects/mythic-tribute-232915/logs/cloudaudit.googleapis.com%2Factivity",
+    "operation": {},
+    "receiveTimestamp": "2019-05-20T13:24:16.073550218Z"
+  }

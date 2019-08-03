@@ -1,0 +1,112 @@
+{
+    "status_code": 200,
+    "data": {
+        "NetworkInterfaces": [
+            {
+                "Association": {
+                    "AllocationId": "eipalloc-01783b9ef31930d3e",
+                    "AssociationId": "eipassoc-05e06e3b4749e6cfa",
+                    "IpOwnerId": "644160558196",
+                    "PublicDnsName": "ec2-34-231-118-159.compute-1.amazonaws.com",
+                    "PublicIp": "34.231.118.159"
+                },
+                "Attachment": {
+                    "AttachTime": {
+                        "__class__": "datetime",
+                        "year": 2019,
+                        "month": 6,
+                        "day": 21,
+                        "hour": 13,
+                        "minute": 40,
+                        "second": 19,
+                        "microsecond": 0
+                    },
+                    "AttachmentId": "eni-attach-085d0d695460607ca",
+                    "DeleteOnTermination": true,
+                    "DeviceIndex": 0,
+                    "InstanceId": "i-0f94b4d7343149de3",
+                    "InstanceOwnerId": "644160558196",
+                    "Status": "attached"
+                },
+                "AvailabilityZone": "us-east-1d",
+                "Description": "",
+                "Groups": [
+                    {
+                        "GroupName": "launch-wizard-1",
+                        "GroupId": "sg-007e9ef58b28a8050"
+                    }
+                ],
+                "InterfaceType": "interface",
+                "Ipv6Addresses": [],
+                "MacAddress": "12:a4:94:5c:6c:a4",
+                "NetworkInterfaceId": "eni-0e1324ba169ed7b2f",
+                "OwnerId": "644160558196",
+                "PrivateDnsName": "ip-172-31-50-32.ec2.internal",
+                "PrivateIpAddress": "172.31.50.32",
+                "PrivateIpAddresses": [
+                    {
+                        "Association": {
+                            "AllocationId": "eipalloc-01783b9ef31930d3e",
+                            "AssociationId": "eipassoc-05e06e3b4749e6cfa",
+                            "IpOwnerId": "644160558196",
+                            "PublicDnsName": "ec2-34-231-118-159.compute-1.amazonaws.com",
+                            "PublicIp": "34.231.118.159"
+                        },
+                        "Primary": true,
+                        "PrivateDnsName": "ip-172-31-50-32.ec2.internal",
+                        "PrivateIpAddress": "172.31.50.32"
+                    }
+                ],
+                "RequesterManaged": false,
+                "SourceDestCheck": true,
+                "Status": "in-use",
+                "SubnetId": "subnet-3a334610",
+                "TagSet": [],
+                "VpcId": "vpc-d2d616b5"
+            },
+            {
+                "AvailabilityZone": "us-east-1d",
+                "Description": "test",
+                "Groups": [
+                    {
+                        "GroupName": "launch-wizard-1",
+                        "GroupId": "sg-007e9ef58b28a8050"
+                    }
+                ],
+                "InterfaceType": "interface",
+                "Ipv6Addresses": [],
+                "MacAddress": "12:94:60:b9:73:0e",
+                "NetworkInterfaceId": "eni-0e78f79b7b27d86ec",
+                "OwnerId": "644160558196",
+                "PrivateDnsName": "ip-172-31-61-29.ec2.internal",
+                "PrivateIpAddress": "172.31.61.29",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateDnsName": "ip-172-31-61-29.ec2.internal",
+                        "PrivateIpAddress": "172.31.61.29"
+                    }
+                ],
+                "RequesterId": "AIDAJATQ7WOI63EQTGBT6",
+                "RequesterManaged": false,
+                "SourceDestCheck": true,
+                "Status": "available",
+                "SubnetId": "subnet-3a334610",
+                "TagSet": [],
+                "VpcId": "vpc-d2d616b5"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "36e904fb-5b2f-4c9d-9fc6-871dcda1b5c1",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "4359",
+                "vary": "accept-encoding",
+                "date": "Thu, 01 Aug 2019 18:41:04 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

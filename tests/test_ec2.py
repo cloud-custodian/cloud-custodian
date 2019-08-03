@@ -31,6 +31,34 @@ from c7n import tags, utils
 from .common import BaseTest
 
 
+class TestEc2NetworkLocation(BaseTest):
+    def test_ec2_network_location_terminated(self):
+        factory = self.replay_flight_data("test_ec2_network_location")
+        client = factory().client('ec2')
+        resp = client.describe_instances()
+
+        self.assertTrue(len(resp['Reservations'][0]['Instances']), 1)
+        self.assertTrue(
+            len(resp['Reservations'][0]['Instances'][0]['State']['Name']),
+            'terminated'
+        )
+
+        policy = self.load_policy(
+            {
+                'name': 'ec2-network-location',
+                'resource': 'ec2',
+                'filters': [
+                    {'State.Name': 'terminated'},
+                    {'type': 'network-location',
+                     "key": "tag:some-value"}
+                ]
+            },
+            session_factory=factory
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
+
 class TestTagAugmentation(BaseTest):
 
     def test_tag_augment_empty(self):
@@ -193,6 +221,23 @@ class TestDisableApiTermination(BaseTest):
                 )
             ),
         )
+
+
+class TestEc2Permissions(BaseTest):
+
+    def test_ec2_permissions(self):
+        factory = self.replay_flight_data('test_ec2_permissions')
+        policy = self.load_policy({
+            'name': 'ec2-perm',
+            'resource': 'aws.ec2',
+            'filters': [{
+                'type': 'check-permissions',
+                'match': 'allowed',
+                'actions': ['lambda:CreateFunction']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('c7n:perm-matches' in resources[0])
 
 
 class TestSsm(BaseTest):
@@ -949,33 +994,97 @@ class TestOr(BaseTest):
 
 class TestSnapshot(BaseTest):
 
-    def test_ec2_snapshot_no_copy_tags(self):
+    def test_ec2_snapshot_error_process_set(self):
+        p = self.load_policy({
+            'name': 'ec2-test-snapshot', "resource": "ec2",
+            "actions": [{"type": "snapshot"}]})
+        snapshotter = p.resource_manager.actions[0]
+
+        def process_volume_set(client, resource):
+            raise ValueError('something bad happened')
+
+        snapshotter.process_volume_set = process_volume_set
+        log = self.capture_logging('custodian.actions')
+        self.assertRaises(
+            ValueError, snapshotter.process, [{'InstanceId': 'xyz'}])
+        self.assertTrue('something' in log.getvalue())
+
+    def test_ec2_snapshot_error_process_once(self):
+        p = self.load_policy({
+            'name': 'ec2-test-snapshot', "resource": "ec2",
+            "actions": [{"type": "snapshot"}]})
+
+        log = self.capture_logging('custodian.actions')
+        snapshotter = p.resource_manager.actions[0]
+        client = mock.Mock(['create_snapshots'])
+        err_response = {'Error': {'Code': 'InvalidInstanceId.NotFound'}}
+        err = ClientError(err_response, 'create_snapshots')
+        client.create_snapshots.side_effect = err
+        snapshotter.process_volume_set(client, {'InstanceId': 'i-foo'})
+        client.create_snapshots.assert_called_once()
+
+        self.assertTrue('i-foo' in log.getvalue())
+        err_response['Error']['Code'] = 'InvalidRequest'
+        self.assertRaises(
+            ClientError,
+            snapshotter.process_volume_set,
+            client, {'InstanceId': 'i-foo'})
+
+    def test_ec2_snapshot_validate(self):
+        templ = {
+            "name": "ec2-test-snapshot",
+            "resource": "ec2",
+            "filters": [{"tag:Name": "CompileLambda"}],
+            "actions": [{"type": "snapshot"}]}
+
+        self.load_policy(templ)
+        templ['actions'][0]['copy-volume-tags'] = False
+        self.load_policy(templ)
+        templ['actions'][0]['copy-tags'] = ['Name']
+        self.assertRaises(PolicyValidationError, self.load_policy, templ)
+
+    def test_ec2_snapshot_copy_instance_tags_default(self):
         session_factory = self.replay_flight_data("test_ec2_snapshot")
         policy = self.load_policy(
             {
                 "name": "ec2-test-snapshot",
                 "resource": "ec2",
-                "filters": [{"tag:Name": "CompileLambda"}],
-                "actions": [{"type": "snapshot"}],
+                "filters": [{"tag:Name": "Foo"}],
+                "actions": [{"type": "snapshot"}]
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ec2')
+        snaps = client.describe_snapshots(
+            SnapshotIds=resources[0]['c7n:snapshots']).get('Snapshots')
+        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        for s in snaps:
+            self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
+
+    def test_ec2_snapshot_copy_tags(self):
+        session_factory = self.replay_flight_data("test_ec2_snapshot_copy_tags")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-snapshot",
+                "resource": "ec2",
+                "filters": [{"tag:Name": "Foo"}],
+                "actions": [{"type": "snapshot", "copy-tags": ['Name', 'Stage']}]
             },
             session_factory=session_factory,
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
-    def test_ec2_snapshot_copy_tags(self):
-        session_factory = self.replay_flight_data("test_ec2_snapshot")
-        policy = self.load_policy(
-            {
-                "name": "ec2-test-snapshot",
-                "resource": "ec2",
-                "filters": [{"tag:Name": "CompileLambda"}],
-                "actions": [{"type": "snapshot", "copy-tags": ["ASV" "Testing123"]}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ec2')
+        snaps = client.describe_snapshots(
+            SnapshotIds=resources[0]['c7n:snapshots']).get('Snapshots')
+        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        rtags.pop('App')
+        rtags['custodian_snapshot'] = ''
+        for s in snaps:
+            self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
 
 
 class TestSetInstanceProfile(BaseTest):
@@ -1517,6 +1626,29 @@ class TestUserData(BaseTest):
         )
         resources = policy.run()
         self.assertGreater(len(resources), 0)
+
+
+class TestLaunchTemplate(BaseTest):
+
+    def test_template_get_resources(self):
+        factory = self.replay_flight_data(
+            'test_launch_template_get')
+        p = self.load_policy({
+            'name': 'ec2-reserved',
+            'resource': 'aws.launch-template-version'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources([
+            'lt-00b3b2755218e3fdd'])
+        self.assertEqual(len(resources), 4)
+
+    def test_launch_template_versions(self):
+        factory = self.replay_flight_data('test_launch_template_query')
+        p = self.load_policy({
+            'name': 'ec2-reserved',
+            'resource': 'aws.launch-template-version'}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 8)
+        self.assertTrue(all(['LaunchTemplateData' in r for r in resources]))
 
 
 class TestReservedInstance(BaseTest):

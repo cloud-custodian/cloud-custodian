@@ -20,73 +20,24 @@ import jmespath
 import json
 
 from .core import BaseAction
-from c7n.utils import type_schema, local_session, chunks, dumps, filter_empty
+from c7n.utils import (
+    type_schema, local_session, chunks, dumps, filter_empty, get_partition)
+from c7n.exceptions import PolicyValidationError
 
 from c7n.manager import resources as aws_resources
 from c7n.version import version
 
 
 FindingTypes = {
-    "Software and Configuration Checks": [
-        "Vulnerabilities",
-        "Vulnerabilities/CVE",
-        "AWS Security Best Practices",
-        "AWS Security Best Practices/Network Reachability",
-        "Industry and Regulatory Standards",
-        "Industry and Regulatory Standards/CIS Host Hardening Benchmarks",
-        "Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
-        "Industry and Regulatory Standards/PCI-DSS Controls",
-        "Industry and Regulatory Standards/Cloud Security Alliance Controls",
-        "Industry and Regulatory Standards/ISO 90001 Controls",
-        "Industry and Regulatory Standards/ISO 27001 Controls",
-        "Industry and Regulatory Standards/ISO 27017 Controls",
-        "Industry and Regulatory Standards/ISO 27018 Controls",
-        "Industry and Regulatory Standards/SOC 1",
-        "Industry and Regulatory Standards/SOC 2",
-        "Industry and Regulatory Standards/HIPAA Controls (USA)",
-        "Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
-        "Industry and Regulatory Standards/NIST CSF Controls (USA)",
-        "Industry and Regulatory Standards/IRAP Controls (Australia)",
-        "Industry and Regulatory Standards/K-ISMS Controls (Korea)",
-        "Industry and Regulatory Standards/MTCS Controls (Singapore)",
-        "Industry and Regulatory Standards/FISC Controls (Japan)",
-        "Industry and Regulatory Standards/My Number Act Controls (Japan)",
-        "Industry and Regulatory Standards/ENS Controls (Spain)",
-        "Industry and Regulatory Standards/Cyber Essentials Plus Controls (UK)",
-        "Industry and Regulatory Standards/G-Cloud Controls (UK)",
-        "Industry and Regulatory Standards/C5 Controls (Germany)",
-        "Industry and Regulatory Standards/IT-Grundschutz Controls (Germany)",
-        "Industry and Regulatory Standards/GDPR Controls (Europe)",
-        "Industry and Regulatory Standards/TISAX Controls (Europe)",
-    ],
-    "TTPs": [
-        "Initial Access",
-        "Execution",
-        "Persistence",
-        "Privilege Escalation",
-        "Defense Evasion",
-        "Credential Access",
-        "Discovery",
-        "Lateral Movement",
-        "Collection",
-        "Command and Control",
-    ],
-    "Effects": [
-        "Data Exposure",
-        "Data Exfiltration",
-        "Data Destruction",
-        "Denial of Service",
-        "Resource Consumption",
-    ],
+    "Software and Configuration Checks",
+    "TTPs",
+    "Effects",
+    "Unusual Behaviors",
+    "Sensitive Data Identifications"
 }
 
-
-def build_vocabulary():
-    vocab = []
-    for ns, quals in FindingTypes.items():
-        for q in quals:
-            vocab.append("{}/{}".format(ns, q))
-    return vocab
+# Mostly undocumented value size limit
+SECHUB_VALUE_SIZE_LIMIT = 1024
 
 
 class PostFinding(BaseAction):
@@ -112,6 +63,8 @@ class PostFinding(BaseAction):
            - shield-enabled
          actions:
            - type: post-finding
+             description: |
+                Shield should be enabled on account to allow for DDOS protection (1 time 3k USD Charge).
              severity_normalized: 6
              types:
                - "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
@@ -131,6 +84,8 @@ class PostFinding(BaseAction):
     schema = type_schema(
         "post-finding",
         required=["types"],
+        title={"type": "string"},
+        description={'type': 'string'},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         confidence={"type": "number", "min": 0, "max": 100},
@@ -143,7 +98,8 @@ class PostFinding(BaseAction):
         batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10},
         types={
             "type": "array",
-            "items": {"type": "string", "enum": build_vocabulary()},
+            "minItems": 1,
+            "items": {"type": "string"},
         },
         compliance_status={
             "type": "string",
@@ -152,6 +108,14 @@ class PostFinding(BaseAction):
     )
 
     NEW_FINDING = 'New'
+
+    def validate(self):
+        for finding_type in self.data["types"]:
+            if finding_type.count('/') > 2 or finding_type.split('/')[0] not in FindingTypes:
+                raise PolicyValidationError(
+                    "Finding types must be in the format 'namespace/category/classifier'."
+                    " Found {}. Valid namespace values are: {}.".format(
+                        finding_type, " | ".join([ns for ns in FindingTypes])))
 
     def get_finding_tag(self, resource):
         finding_tag = None
@@ -186,7 +150,9 @@ class PostFinding(BaseAction):
                 "securityhub", region_name=region_name)
 
         now = datetime.utcnow().replace(tzinfo=tzutc()).isoformat()
-        batch_size = self.data.get('batch_size', 10)
+        # default batch size to one to work around security hub console issue
+        # which only shows a single resource in a finding.
+        batch_size = self.data.get('batch_size', 1)
         stats = Counter()
         for key, grouped_resources in self.group_resources(resources).items():
             for resource_set in chunks(grouped_resources, batch_size):
@@ -236,6 +202,7 @@ class PostFinding(BaseAction):
     def get_finding(self, resources, existing_finding_id, created_at, updated_at):
         policy = self.manager.ctx.policy
         model = self.manager.resource_type
+        region = self.data.get('region', self.manager.config.region)
 
         if existing_finding_id:
             finding_id = existing_finding_id
@@ -251,15 +218,20 @@ class PostFinding(BaseAction):
         finding = {
             "SchemaVersion": self.FindingVersion,
             "ProductArn": "arn:aws:securityhub:{}:{}:product/{}/{}".format(
-                self.manager.config.region,
+                region,
                 self.manager.config.account_id,
                 self.manager.config.account_id,
                 self.ProductName,
             ),
             "AwsAccountId": self.manager.config.account_id,
+            # Long search chain for description values, as this was
+            # made required long after users had policies deployed, so
+            # use explicit description, or policy description, or
+            # explicit title, or policy name, in that order.
             "Description": self.data.get(
-                "description", policy.data.get("description", "")
-            ).strip(),
+                "description", policy.data.get(
+                    "description",
+                    self.data.get('title', policy.name))).strip(),
             "Title": self.data.get("title", policy.name),
             'Id': finding_id,
             "GeneratorId": policy.name,
@@ -349,13 +321,14 @@ class OtherResourcePostFinding(PostFinding):
                 v = str(v)
             else:
                 continue
-            details[k] = v
+            details[k] = v[:SECHUB_VALUE_SIZE_LIMIT]
 
         details['c7n:resource-type'] = self.manager.type
         other = {
             'Type': 'Other',
             'Id': self.manager.get_arns([r])[0],
             'Region': self.manager.config.region,
+            'Partition': get_partition(self.manager.config.region),
             'Details': {'Other': filter_empty(details)}
         }
         tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
@@ -366,6 +339,8 @@ class OtherResourcePostFinding(PostFinding):
     @classmethod
     def register_resource(klass, registry, event):
         for rtype, resource_manager in registry.items():
+            if not resource_manager.has_arn():
+                continue
             if 'post-finding' in resource_manager.action_registry:
                 continue
             resource_manager.action_registry.register('post-finding', klass)

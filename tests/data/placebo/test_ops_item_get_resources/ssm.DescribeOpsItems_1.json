@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "OpsItemSummaries": [
+            {
+                "CreatedBy": "arn:aws:iam::644160558196:user/kapil",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 18,
+                    "hour": 15,
+                    "minute": 30,
+                    "second": 44,
+                    "microsecond": 580000
+                },
+                "LastModifiedBy": "arn:aws:iam::644160558196:user/kapil",
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 7,
+                    "day": 29,
+                    "hour": 17,
+                    "minute": 37,
+                    "second": 29,
+                    "microsecond": 675000
+                },
+                "Priority": 5,
+                "Source": "custodian",
+                "Status": "Resolved",
+                "OpsItemId": "oi-5aa4c36439ed",
+                "Title": "test",
+                "OperationalData": {
+                    "/aws/dedup": {
+                        "Value": "{\"dedupString\":\"devx\"}",
+                        "Type": "SearchableString"
+                    },
+                    "/aws/resources": {
+                        "Value": "[{\"arn\":\"arn:aws:ec2:us-east-1:644160558196:security-group/sg-0fd0c04f0c434d68d\"},{\"arn\":\"arn:aws:lambda:us-east-1:644160558196:function:custodian-good-vol\"}]",
+                        "Type": "SearchableString"
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "b1add718-02e6-483a-8c23-9d9517df98f9",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b1add718-02e6-483a-8c23-9d9517df98f9",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "616",
+                "date": "Tue, 30 Jul 2019 00:11:54 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

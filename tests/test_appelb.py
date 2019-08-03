@@ -649,3 +649,100 @@ class TestHealthEventsFilter(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestModifyVpcSecurityGroupsAction(BaseTest):
+
+    def test_appelb_remove_matched_security_groups(self):
+
+        # Test conditions:
+        #   - list contains only one ALB, 'test-abc'
+        #   - has two SGs attached before, 1 SG after
+        #   - test checks name of ALB is correct and
+        #   - that SGs change and are expected values
+
+        session_factory = self.replay_flight_data(
+            "test_appelb_remove_matched_security_groups"
+        )
+
+        p = self.load_policy(
+            {
+                "name": "appelb-remove-matched-security-groups",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "LoadBalancerName",
+                        "value": "test-abc",
+                        "op": "eq",
+                    },
+                    {
+                        "type": "security-group",
+                        "key": "GroupName",
+                        "value": ".*controllers",
+                        "op": "regex",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "modify-security-groups",
+                        "remove": "matched",
+                        "isolation-group": "sg-01a19f602ecaf25f4",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        client = session_factory().client('elbv2')
+        response = client.describe_load_balancers()
+        clean_resources = response['LoadBalancers']
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn("test", resources[0]["LoadBalancerName"])
+        self.assertEqual(len(resources[0]["SecurityGroups"]), 2)
+        self.assertIn("sg-c573e6b3", resources[0]["SecurityGroups"])
+        # check result is expected
+        self.assertEqual(len(clean_resources[0]["SecurityGroups"]), 1)
+        self.assertNotIn("sg-c573e6b3", clean_resources[0]["SecurityGroups"])
+
+    def test_appelb_add_security_group(self):
+
+        # Test conditions:
+        #   - list contains only one ALB, 'test-abc'
+        #   - has one SG attached before, 2 SGs after
+        #   - test checks name of ALB is correct and
+        #   - that SGs change and are expected values
+
+        session_factory = self.replay_flight_data("test_appelb_add_security_group")
+
+        p = self.load_policy(
+            {
+                "name": "add-sg-to-appelb",
+                "resource": "app-elb",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "LoadBalancerName",
+                        "value": "test-abc",
+                        "op": "eq",
+                    },
+                ],
+                "actions": [{"type": "modify-security-groups", "add": "sg-c573e6b3"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        client = session_factory().client('elbv2')
+        response = client.describe_load_balancers()
+        clean_resources = response['LoadBalancers']
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual("test-abc", resources[0]["LoadBalancerName"])
+        self.assertEqual(len(resources[0]["SecurityGroups"]), 1)
+        self.assertNotIn("sg-c573e6b3", resources[0]["SecurityGroups"])
+        # check SG was added
+        self.assertEqual(len(clean_resources[0]["SecurityGroups"]), 2)
+        self.assertIn("sg-c573e6b3", clean_resources[0]["SecurityGroups"])

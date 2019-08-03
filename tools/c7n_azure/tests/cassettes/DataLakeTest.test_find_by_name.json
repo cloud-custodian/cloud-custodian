@@ -1,0 +1,53 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DataLakeStore/accounts?api-version=2016-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Thu, 02 May 2019 19:11:21 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "508"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "state": "Active",
+                                    "endpoint": "cctestdatalake.azuredatalakestore.net",
+                                    "accountId": "a04942d1-50ed-4131-a2cb-43f8fd32aee7",
+                                    "creationTime": "2019-05-01T21:48:02.4267106Z",
+                                    "lastModifiedTime": "2019-05-01T21:48:02.4267106Z"
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_datalake/providers/Microsoft.DataLakeStore/accounts/cctestdatalake",
+                                "name": "cctestdatalake",
+                                "type": "Microsoft.DataLakeStore/accounts"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -22,22 +22,26 @@ from c7n.utils import type_schema
 
 @resources.register('vpc')
 class Network(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/networks
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
         component = 'networks'
         scope_template = "projects/{}/global/networks"
+        id = "name"
 
 
 @resources.register('subnet')
 class Subnet(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/subnetworks
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
         component = 'subnetworks'
         enum_spec = ('aggregatedList', 'items.*.subnetworks[]', None)
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):
@@ -106,11 +110,13 @@ class SetGcpPrivateAccess(SubnetAction):
 
 @resources.register('firewall')
 class Firewall(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/firewalls
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
         component = 'firewalls'
+        id = "name"
 
         @staticmethod
         def get(client, resource_info):
@@ -121,20 +127,106 @@ class Firewall(QueryResourceManager):
 
 @resources.register('router')
 class Router(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/routers
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
         component = 'routers'
         enum_spec = ('aggregatedList', 'items.*.routers[]', None)
-        scope_template = "projects/{}/aggregated/routers"
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'region': resource_info['region'],
+                        'router': resource_info['resourceName'].rsplit('/', 1)[-1]})
+
+
+@Router.action_registry.register('delete')
+class DeleteRouter(MethodAction):
+    """`Deletes <https://cloud.google.com/compute/docs/reference/rest/v1/routers/delete>`_ a router
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-network-unattached-routers
+            description: Deletes unattached Cloud Routers
+            resource: gcp.router
+            filters:
+               - type: value
+                 key: interfaces
+                 value: absent
+            actions:
+               - delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    path_param_re = re.compile('.*?/projects/(.*?)/regions/(.*?)/routers/(.*)')
+
+    def get_resource_params(self, m, r):
+        project, region, router = self.path_param_re.match(r['selfLink']).groups()
+        return {'project': project, 'region': region, 'router': router}
 
 
 @resources.register('route')
 class Route(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/routes
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
         component = 'routes'
-        scope_template = "projects/{}/global/routes"
+        enum_spec = ('list', 'items[]', None)
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'route': resource_info['resourceName'].rsplit('/', 1)[-1]})
+
+
+@resources.register('interconnect')
+class Interconnect(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/interconnects
+    """
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'interconnects'
+        enum_spec = ('list', 'items[]', None)
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id'],
+                        'interconnect': resource_info['resourceName'].rsplit('/', 1)[-1]})
+
+
+@resources.register('interconnect-attachment')
+class InterconnectAttachment(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/interconnectAttachments
+    """
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'interconnectAttachments'
+        enum_spec = ('aggregatedList', 'items.*.interconnectAttachments[]', None)
+        id = 'name'
+
+        @staticmethod
+        def get(client, resource_info):
+            project, region, name = re.match(
+                'projects/(.*?)/regions/(.*?)/interconnectAttachments/(.*?)',
+                resource_info['resourceName']).groups()
+
+            return client.execute_command(
+                'get', {'project': project,
+                        'interconnectAttachment': name,
+                        'region': region})

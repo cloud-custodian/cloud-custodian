@@ -15,7 +15,7 @@
             "sku": {
                 "name": "F0"
             },
-            "kind": "Bing.Speech",
+            "kind": "TextTranslation",
             "name": "[parameters('accounts_cctest_cog_serv_name')]",
             "apiVersion": "2016-02-01-preview",
             "location": "global",

@@ -1,12 +1,27 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
-    "variables": {},
+    "parameters": {
+        "tenantId": {
+          "type": "string",
+          "metadata": {
+            "description": "The id of the azure ad tenant."
+          }
+        },
+        "userObjectId": {
+          "type": "string",
+          "metadata": {
+            "description": "The id of the user in the specified azure ad tenant."
+          }
+        }
+    },
+    "variables": {
+         "kvname": "[concat('cckeyvault1', uniqueString(resourceGroup().id))]"
+    },
     "resources": [
         {
             "type": "Microsoft.KeyVault/vaults",
-            "name": "cckeyvault1",
+            "name": "[variables('kvname')]",
             "apiVersion": "2016-10-01",
             "location": "southcentralus",
             "tags": {},
@@ -16,11 +31,25 @@
                     "family": "A",
                     "name": "Standard"
                 },
-                "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "defaultAction": "Deny",
+                    "ipRules": [
+                        {
+                            "value": "3.1.1.1",
+                            "action": "Allow"
+                        },
+                        {
+                            "value": "1.2.2.128/25",
+                            "action": "Allow"
+                          }
+                    ]
+                },
+                "tenantId": "[parameters('tenantId')]",
                 "accessPolicies": [
                     {
-                        "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
-                        "objectId": "de4152e3-335e-41b5-9b56-f8f2e043e3ee",
+                        "tenantId": "[parameters('tenantId')]",
+                        "objectId": "[parameters('userObjectId')]",
                         "permissions": {
                             "keys": [
                                 "Get",
@@ -65,6 +94,18 @@
                 "enabledForTemplateDeployment": false
             },
             "dependsOn": []
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/providers/locks",
+            "apiVersion": "2016-09-01",
+            "name": "[concat(variables('kvname'), '/Microsoft.Authorization/lock')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('kvname'))]"
+            ],
+            "properties": {
+                "level": "CanNotDelete",
+                "notes": "Keyvault should not be deleted."
+            }
         }
     ]
 }

@@ -14,9 +14,9 @@
 
 from __future__ import print_function
 
-import yaml
 import click
 from c7n_azure.session import Session
+from c7n.utils import yaml_dump
 from azure.mgmt.resource.subscriptions import SubscriptionClient
 
 
@@ -39,11 +39,7 @@ def main(output):
         }
         results.append(sub_info)
 
-    print(
-        yaml.safe_dump(
-            {'subscriptions': results},
-            default_flow_style=False),
-        file=output)
+    print(yaml_dump({'subscriptions': results}), file=output)
 
 
 if __name__ == '__main__':

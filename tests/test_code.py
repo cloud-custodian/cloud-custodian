@@ -30,6 +30,17 @@ class CodeCommit(BaseTest):
             "ssh://git-codecommit.us-east-2.amazonaws.com/v1/repos/custodian-config-repo",
         )
 
+    def test_get_repo_resources(self):
+        factory = self.replay_flight_data('test_codecommit_get')
+        p = self.load_policy({
+            'name': 'get-repos', 'resource': 'codecommit'},
+            session_factory=factory)
+        m = p.resource_manager
+        resources = m.get_resources(['fizzbuzz'])
+        self.assertEqual(len(resources), 1)
+        r = resources.pop()
+        self.assertEqual(r['repositoryName'], 'fizzbuzz')
+
     def test_delete_repos(self):
         factory = self.replay_flight_data("test_codecommit_delete")
         p = self.load_policy(
@@ -99,8 +110,12 @@ class CodePipeline(BaseTest):
     def test_query_pipeline(self):
         factory = self.replay_flight_data("test_codepipeline")
         p = self.load_policy(
-            {"name": "get-pipes", "resource": "codepipeline"}, session_factory=factory
+            {"name": "get-pipes", "resource": "codepipeline"},
+            session_factory=factory, config={'account_id': '001100'},
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources),
+            ['arn:aws:codepipeline:us-east-1:001100:custodian-deploy'])
         self.assertEqual(len(resources[0]["stages"]), 2)

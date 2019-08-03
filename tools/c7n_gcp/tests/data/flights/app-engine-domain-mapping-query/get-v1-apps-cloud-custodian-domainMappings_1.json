@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 25 Apr 2019 11:31:38 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "408",
+    "-content-encoding": "gzip",
+    "content-location": "https://appengine.googleapis.com/v1/apps/cloud-custodian/domainMappings?alt=json"
+  },
+  "body": {
+    "domainMappings": [
+      {
+        "name": "apps/cloud-custodian/domainMappings/alex.gcp-li.ga",
+        "id": "alex.gcp-li.ga",
+        "sslSettings": {
+          "certificateId": "12277184",
+          "sslManagementType": "AUTOMATIC"
+        },
+        "resourceRecords": [
+          {
+            "name": "alex",
+            "rrdata": "ghs.googlehosted.com",
+            "type": "CNAME"
+          }
+        ]
+      }
+    ]
+  }
+}

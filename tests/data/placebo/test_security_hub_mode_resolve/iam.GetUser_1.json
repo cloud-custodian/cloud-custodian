@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "User": {
+            "Path": "/",
+            "UserName": "kapil",
+            "UserId": "AIDAJEZOTH6YPO3DY45QW",
+            "Arn": "arn:aws:iam::644160558196:user/kapil",
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2016,
+                "month": 5,
+                "day": 16,
+                "hour": 19,
+                "minute": 3,
+                "second": 36,
+                "microsecond": 0
+            },
+            "PasswordLastUsed": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 7,
+                "day": 11,
+                "hour": 15,
+                "minute": 11,
+                "second": 18,
+                "microsecond": 0
+            },
+            "Tags": [
+                {
+                    "Key": "c7n:FindingId:bad-monkey",
+                    "Value": "us-east-1/644160558196/2244688b9ca49ee094582b030e0b43f7/617144686f6f9148aa6d0d174ad18d0e:2019-05-08T12:07:34.028469+00:00"
+                },
+                {
+                    "Key": "Role",
+                    "Value": "Contributor"
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "f0611169-a49b-11e9-bb35-63372bf834a5",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f0611169-a49b-11e9-bb35-63372bf834a5",
+                "content-type": "text/xml",
+                "content-length": "876",
+                "date": "Fri, 12 Jul 2019 11:55:27 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

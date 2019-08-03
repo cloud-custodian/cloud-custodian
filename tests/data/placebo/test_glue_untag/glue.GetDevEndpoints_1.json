@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "DevEndpoints": [
+            {
+                "EndpointName": "test",
+                "RoleArn": "arn:aws:iam::644160558196:role/c7n-glue-test",
+                "SecurityGroupIds": [],
+                "ZeppelinRemoteSparkInterpreterPort": 9007,
+                "PublicAddress": "ec2-3-94-148-93.compute-1.amazonaws.com",
+                "Status": "READY",
+                "NumberOfNodes": 5,
+                "AvailabilityZone": "us-east-1b",
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 29,
+                    "hour": 14,
+                    "minute": 45,
+                    "second": 38,
+                    "microsecond": 448000
+                },
+                "LastModifiedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 29,
+                    "hour": 16,
+                    "minute": 24,
+                    "second": 45,
+                    "microsecond": 377000
+                }
+            }
+        ],
+        "NextToken": "",
+        "ResponseMetadata": {
+            "RequestId": "7025f0d1-8250-11e9-8ae4-db7eb8d48493",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Wed, 29 May 2019 20:29:20 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "380",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "7025f0d1-8250-11e9-8ae4-db7eb8d48493"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

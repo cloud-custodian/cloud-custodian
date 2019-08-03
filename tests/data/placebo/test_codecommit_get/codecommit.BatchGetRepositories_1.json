@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [
+            {
+                "accountId": "644160558196",
+                "repositoryId": "a7170b9d-7876-4962-a900-ee899f52051b",
+                "repositoryName": "fizzbuzz",
+                "lastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 25,
+                    "hour": 16,
+                    "minute": 16,
+                    "second": 58,
+                    "microsecond": 8000
+                },
+                "creationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 25,
+                    "hour": 16,
+                    "minute": 16,
+                    "second": 58,
+                    "microsecond": 8000
+                },
+                "cloneUrlHttp": "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/fizzbuzz",
+                "cloneUrlSsh": "ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/fizzbuzz",
+                "Arn": "arn:aws:codecommit:us-east-1:644160558196:fizzbuzz"
+            }
+        ],
+        "repositoriesNotFound": [],
+        "ResponseMetadata": {
+            "RequestId": "5f94de02-e9b0-40c1-b9e0-11d9a49c4a95",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5f94de02-e9b0-40c1-b9e0-11d9a49c4a95",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "443",
+                "date": "Tue, 25 Jun 2019 20:27:27 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
