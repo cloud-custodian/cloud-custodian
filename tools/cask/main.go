@@ -23,10 +23,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -58,6 +60,9 @@ func main() {
 
 	// Create container
 	id := create(ctx, activeImage, dockerClient)
+
+	// Create signal channel and register notify
+	handleSignals(ctx, id, dockerClient)
 
 	// Run
 	run(ctx, id, dockerClient)
@@ -328,4 +333,19 @@ func updateMarkerFilename(image string) string {
 	sha.Write([]byte(image))
 	hash := hex.EncodeToString(sha.Sum(nil))
 	return filepath.Join(os.TempDir(), "custodian-cask-update-"+hash[0:5])
+}
+
+func handleSignals(ctx context.Context, id string, dockerClient *client.Client) {
+	gracefulExit := make(chan os.Signal, 1)
+	signal.Notify(gracefulExit, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		sig := <-gracefulExit
+		fmt.Printf("Received %v, stopping container\n", sig)
+		timeout := 0 * time.Second
+		err := dockerClient.ContainerStop(ctx, id, &timeout)
+		if err != nil {
+			fmt.Printf("Error stopping container: %v\n", err)
+		}
+	}()
 }
