@@ -81,7 +81,7 @@ class ArmResourceManager(QueryResourceManager):
             resource_client.resources.get_by_id(rid, session.resource_api_version(rid))
             for rid in resource_ids
         ]
-        return [r.serialize(True) for r in data]
+        return self.augment([r.serialize(True) for r in data])
 
     def tag_operation_enabled(self, resource_type):
         return self.resource_type.enable_tag_operations

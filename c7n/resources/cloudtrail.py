@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 
-from c7n.actions import Action
+from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
@@ -206,3 +206,35 @@ class SetLogging(Action):
                 client.start_logging(Name=r['Name'])
             else:
                 client.stop_logging(Name=r['Name'])
+
+
+@CloudTrail.action_registry.register('delete')
+class DeleteTrail(BaseAction):
+    """ Delete a cloud trail
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: delete-cloudtrail
+          resource: aws.cloudtrail
+          filters:
+           - type: value
+             key: Name
+             value: delete-me
+             op: eq
+          actions:
+           - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudtrail:DeleteTrail',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('cloudtrail')
+        for r in resources:
+            try:
+                client.delete_trail(Name=r['Name'])
+            except client.exceptions.TrailNotFoundException:
+                continue

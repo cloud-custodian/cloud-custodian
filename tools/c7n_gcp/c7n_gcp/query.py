@@ -192,8 +192,10 @@ class ChildResourceManager(QueryResourceManager):
 
         resources = []
         annotation_key = self.resource_type.get_parent_annotation_key()
+        parent_query = self.get_parent_resource_query()
         parent_resource_manager = self.get_resource_manager(
-            self.resource_type.parent_spec['resource']
+            resource_type=self.resource_type.parent_spec['resource'],
+            data=({'query': parent_query} if parent_query else {})
         )
 
         for parent_instance in parent_resource_manager.resources():
@@ -214,6 +216,12 @@ class ChildResourceManager(QueryResourceManager):
     def _get_child_enum_args(self, parent_instance):
         mappings = self.resource_type.parent_spec['child_enum_params']
         return self._extract_fields(parent_instance, mappings)
+
+    def get_parent_resource_query(self):
+        parent_spec = self.resource_type.parent_spec
+        enabled = parent_spec['use_child_query'] if 'use_child_query' in parent_spec else False
+        if enabled and 'query' in self.data:
+            return self.data.get('query')
 
     @staticmethod
     def _extract_fields(source, mappings):
@@ -278,3 +286,51 @@ def extract_error(e):
     except Exception:
         return None
     return ERROR_REASON.search(edata)
+
+
+class GcpLocation(object):
+    """
+    The `_locations` dict is formed by the string keys representing locations taken from
+    `KMS <https://cloud.google.com/kms/docs/reference/rest/v1/projects.locations/list>`_ and
+    `App Engine <https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1
+    /apps.locations/list>`_ and list values containing the string names of the services
+    the locations are available for.
+    """
+    _locations = {'eur4': ['kms'],
+                  'global': ['kms'],
+                  'europe-west4': ['kms'],
+                  'asia-east2': ['appengine', 'kms'],
+                  'asia-east1': ['kms'],
+                  'asia': ['kms'],
+                  'europe-north1': ['kms'],
+                  'us-central1': ['kms'],
+                  'nam4': ['kms'],
+                  'asia-southeast1': ['kms'],
+                  'europe': ['kms'],
+                  'australia-southeast1': ['appengine', 'kms'],
+                  'us-central': ['appengine'],
+                  'asia-south1': ['appengine', 'kms'],
+                  'us-west1': ['kms'],
+                  'us-west2': ['appengine', 'kms'],
+                  'asia-northeast2': ['appengine', 'kms'],
+                  'asia-northeast1': ['appengine', 'kms'],
+                  'europe-west2': ['appengine', 'kms'],
+                  'europe-west3': ['appengine', 'kms'],
+                  'us-east4': ['appengine', 'kms'],
+                  'europe-west1': ['kms'],
+                  'europe-west6': ['appengine', 'kms'],
+                  'us': ['kms'],
+                  'us-east1': ['appengine', 'kms'],
+                  'northamerica-northeast1': ['appengine', 'kms'],
+                  'europe-west': ['appengine'],
+                  'southamerica-east1': ['appengine', 'kms']}
+
+    @classmethod
+    def get_service_locations(cls, service):
+        """
+        Returns a list of the locations that have a given service in associated value lists.
+
+        :param service: a string representing the name of a service locations are queried for
+        """
+        return [location for location in GcpLocation._locations
+                if service in GcpLocation._locations[location]]

@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 23 Apr 2019 12:52:29 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "868",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings/cloud-custodian/cryptoKeys/cloud-custodian/cryptoKeyVersions?alt=json"
+  },
+  "body": {
+    "cryptoKeyVersions": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/cloud-custodian/cryptoKeys/cloud-custodian/cryptoKeyVersions/1",
+        "state": "ENABLED",
+        "createTime": "2019-04-22T14:38:20.559717266Z",
+        "protectionLevel": "SOFTWARE",
+        "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+        "generateTime": "2019-04-22T14:38:20.559717266Z"
+      }
+    ],
+    "totalSize": 2
+  }
+}

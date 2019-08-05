@@ -35,15 +35,18 @@ def cache_path():
     return os.path.join(os.path.dirname(__file__), 'cache')
 
 
-def build_function_package(config, function_name):
+def build_function_package(config, function_name, sub_id):
     schedule = config.get('function_schedule', '0 */10 * * * *')
 
     cache_override_path = cache_path()
+
+    function_path = function_name + "_" + sub_id
 
     # Build package
     package = FunctionPackage(
         function_name,
         os.path.join(os.path.dirname(__file__), 'function.py'),
+        target_sub_ids=[sub_id],
         cache_override_path=cache_override_path)
 
     package.build(None,
@@ -53,7 +56,7 @@ def build_function_package(config, function_name):
                   excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])
 
     package.pkg.add_contents(
-        function_name + '/function.json',
+        function_path + '/function.json',
         contents=package.get_function_config({'mode':
                                               {'type': 'azure-periodic',
                                                'schedule': schedule}}))
@@ -64,12 +67,12 @@ def build_function_package(config, function_name):
             continue
         for t in [f for f in os.listdir(d) if os.path.splitext(f)[1] == '.j2']:
             with open(os.path.join(d, t)) as fh:
-                package.pkg.add_contents(function_name + '/msg-templates/%s' % t, fh.read())
+                package.pkg.add_contents(function_path + '/msg-templates/%s' % t, fh.read())
 
     function_config = copy.deepcopy(config)
-    function_config['templates_folders'] = [function_name + '/msg-templates/']
+    function_config['templates_folders'] = [function_path + '/msg-templates/']
     package.pkg.add_contents(
-        function_name + '/config.json',
+        function_path + '/config.json',
         contents=json.dumps(function_config))
 
     package.close()
@@ -125,7 +128,7 @@ def provision(config):
     FunctionAppUtilities.deploy_function_app(params)
 
     log.info("Building function package for %s" % function_app_name)
-    package = build_function_package(config, function_name)
+    package = build_function_package(config, function_name, sub_id)
 
     log.info("Function package built, size is %dMB" % (package.pkg.size / (1024 * 1024)))
 

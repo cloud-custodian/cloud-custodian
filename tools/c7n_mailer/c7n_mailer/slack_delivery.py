@@ -187,7 +187,6 @@ class SlackDelivery(object):
                 headers={'Content-Type': 'application/json;charset=utf-8',
                          'Authorization': 'Bearer %s' % self.config.get('slack_token')})
 
-        response_json = response.json()
         if response.status_code == 429 and "Retry-After" in response.headers:
             self.logger.info(
                 "Slack API rate limiting. Waiting %d seconds",
@@ -201,7 +200,8 @@ class SlackDelivery(object):
                 response.status_code, response.text)
             return
 
-        elif not response_json['ok']:
+        response_json = response.json()
+        if not response_json['ok']:
             self.logger.info("Error in sending Slack message. Status:%s, response:%s",
                              response.status_code, response_json['error'])
             return

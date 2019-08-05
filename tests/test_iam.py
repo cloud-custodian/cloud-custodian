@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import datetime
 import os
+import mock
 import tempfile
 import time
 
@@ -346,6 +347,32 @@ class IamRoleTag(BaseTest):
 
 
 class IamUserTest(BaseTest):
+
+    def test_iam_user_usage_no_such_entity(self):
+        p = self.load_policy({
+            'name': 'usage-check',
+            'resource': 'iam-user',
+            'filters': [
+                {'type': 'usage',
+                 'ServiceNamespace': 'dynamodb',
+                 'TotalAuthenticatedEntities': 1,
+                 'poll-delay': 0.1,
+                 'match-operator': 'any'}]})
+
+        # A lot of mock to get to an error on a specific api call.
+        p.resource_manager.session_factory = sf = mock.MagicMock()
+        sf.region = 'us-east-1'
+        sf.return_value = f = mock.MagicMock()
+        f.client.return_value = c = mock.MagicMock()
+        c.generate_service_last_accessed_details.side_effect = ClientError(
+            {'Error': {'Code': 'ResourceNotFoundException',
+                       'Message': 'MonkeyWrench'}},
+            'generate_service_last_accessed_details')
+        c.exceptions.NoSuchEntityException = ClientError
+
+        resources = p.resource_manager.filter_resources(
+            [{'UserName': 'Kapil', 'Arn': 'arn:x'}])
+        self.assertEqual(resources, [])
 
     def test_iam_user_usage(self):
         factory = self.replay_flight_data('test_iam_user_usage')
