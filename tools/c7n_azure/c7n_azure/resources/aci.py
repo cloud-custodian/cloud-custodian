@@ -34,7 +34,7 @@ class ContainerGroup(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
-        doc_groups = ['Integration']
+        doc_groups = ['Containers']
 
         service = 'azure.mgmt.containerinstance'
         client = 'ContainerInstanceManagementClient'
