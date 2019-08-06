@@ -153,21 +153,6 @@ class DescribeSource(DescribeSource):
         return [r.serialize(True) for r in resources]
 
 
-def is_scope(scope, scope_type):
-    if not isinstance(scope, six.string_types):
-        return False
-
-    regex = ""
-    if scope_type == "subscription":
-        regex = r"^\/subscriptions\/[^\/]+$"
-    elif scope_type == "resource-group":
-        regex = r"^\/subscriptions\/([^\/]+)\/resourceGroups\/.*$"
-    else:
-        return False
-
-    return bool(re.match(regex, scope, flags=re.IGNORECASE))
-
-
 @RoleAssignment.filter_registry.register('role')
 class RoleFilter(RelatedResourceFilter):
     """Filters role assignments based on role definitions
@@ -284,13 +269,35 @@ class ScopeFilter(Filter):
 
     """
 
+    SUBSCRIPTION_SCOPE = 'subscription'
+    RG_SCOPE = 'resource-group'
+    MG_SCOPE = 'management-group'
+
     schema = type_schema(
         'scope',
-        value={'type': 'string', 'enum': ['subscription', 'resource-group']})
+        value={'type': 'string', 'enum': [SUBSCRIPTION_SCOPE, RG_SCOPE, MG_SCOPE]})
 
     def process(self, data, event=None):
         scope_value = self.data.get('value', '')
-        return [d for d in data if is_scope(d["properties"]["scope"], scope_value)]
+        return [d for d in data if self.is_scope(d["properties"]["scope"], scope_value)]
+
+    def is_scope(self, scope, scope_type):
+        if not isinstance(scope, six.string_types):
+            return False
+
+        regex = ""
+        if scope_type == self.SUBSCRIPTION_SCOPE:
+            regex = r"^\/subscriptions\/[^\/]+$"
+        elif scope_type == self.RG_SCOPE:
+            regex = r"^\/subscriptions\/([^\/]+)\/resourceGroups\/[^\/]+$"
+        elif scope_type == self.MG_SCOPE:
+            regex = r"^\/providers\/Microsoft\.Management\/managementGroups/[^\/]+$"
+        else:
+            return False
+
+        match = re.match(regex, scope, flags=re.IGNORECASE)
+
+        return bool(match)
 
 
 @RoleAssignment.action_registry.register('delete')

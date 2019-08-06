@@ -14,8 +14,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template
-from c7n_azure.resources.access_control import is_scope
-from mock import patch
+from c7n_azure.resources.access_control import ScopeFilter
+from mock import patch, MagicMock
 
 
 class AccessControlTest(BaseTest):
@@ -101,22 +101,49 @@ class AccessControlTest(BaseTest):
         definitions = p.run()
         self.assertEqual(len(definitions), 1)
 
-    def test_is_scope(self):
+    def test_scope_filter_subscription(self):
         sub_scope = "/subscriptions/111-111-1111"
         resource_group_scope = sub_scope + "/resourceGroups/foo"
+        management_group_scope = "/providers/Microsoft.Management/managementGroups/foo"
 
-        # Subscription scope tests
-        self.assertTrue(is_scope(sub_scope, "subscription"))
-        self.assertFalse(is_scope(resource_group_scope, "subscription"))
-        self.assertFalse(is_scope("subscriptions", "subscription"))
-        self.assertFalse(is_scope("/subscription", "subscription"))
-        self.assertFalse(is_scope("/foo/bar", "subscription"))
+        scope_filter = ScopeFilter(MagicMock())
 
-        # Resource group scope test
-        self.assertTrue(is_scope(resource_group_scope, "resource-group"))
-        self.assertFalse(is_scope(sub_scope, "resource-group"))
-        self.assertFalse(is_scope("/subscriptions/resourceGroups", "resource-group"))
-        self.assertFalse(is_scope("/subscriptions/resourceGroups/", "resource-group"))
-        self.assertFalse(is_scope("/subscriptions/resourceGroup/", "resource-group"))
-        self.assertFalse(is_scope("/subscription/resourceGroups/foo", "resource-group"))
-        self.assertFalse(is_scope("/foo/bar/xyz", "resource-group"))
+        sub_type = 'subscription'
+        self.assertTrue(scope_filter.is_scope(sub_scope, sub_type))
+        self.assertFalse(scope_filter.is_scope(resource_group_scope, sub_type))
+        self.assertFalse(scope_filter.is_scope(management_group_scope, sub_type))
+        self.assertFalse(scope_filter.is_scope("subscriptions", sub_type))
+        self.assertFalse(scope_filter.is_scope("/subscription", sub_type))
+        self.assertFalse(scope_filter.is_scope("/foo/bar", sub_type))
+
+    def test_scope_filter_resource_group(self):
+        sub_scope = "/subscriptions/111-111-1111"
+        resource_group_scope = sub_scope + "/resourceGroups/foo"
+        management_group_scope = "/providers/Microsoft.Management/managementGroups/foo"
+
+        scope_filter = ScopeFilter(MagicMock())
+
+        rg_type = 'resource-group'
+
+        self.assertTrue(scope_filter.is_scope(resource_group_scope, rg_type))
+        self.assertFalse(scope_filter.is_scope(sub_scope, rg_type))
+        self.assertFalse(scope_filter.is_scope(management_group_scope, rg_type))
+        self.assertFalse(scope_filter.is_scope("/subscriptions/resourceGroups", rg_type))
+        self.assertFalse(scope_filter.is_scope("/subscriptions/resourceGroups/", rg_type))
+        self.assertFalse(scope_filter.is_scope("/subscriptions/resourceGroup/", rg_type))
+        self.assertFalse(scope_filter.is_scope("/subscription/resourceGroups/foo", rg_type))
+        self.assertFalse(scope_filter.is_scope("/foo/bar/xyz", rg_type))
+        self.assertFalse(scope_filter.is_scope(resource_group_scope + "/vm/bar", rg_type))
+
+    def test_scope_filter_management_group(self):
+        sub_scope = "/subscriptions/111-111-1111"
+        resource_group_scope = sub_scope + "/resourceGroups/foo"
+        management_group_scope = "/providers/Microsoft.Management/managementGroups/foo"
+
+        scope_filter = ScopeFilter(MagicMock())
+
+        mg_type = 'management-group'
+
+        self.assertTrue(scope_filter.is_scope(management_group_scope, mg_type))
+        self.assertFalse(scope_filter.is_scope(resource_group_scope, mg_type))
+        self.assertFalse(scope_filter.is_scope(sub_scope, mg_type))
