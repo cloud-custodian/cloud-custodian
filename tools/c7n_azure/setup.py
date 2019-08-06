@@ -53,6 +53,7 @@ setup(
                       "azure-mgmt-cognitiveservices",
                       "azure-mgmt-cosmosdb",
                       "azure-mgmt-costmanagement",
+                      "azure-mgmt-containerinstance",
                       "azure-mgmt-compute",
                       "azure-mgmt-cdn",
                       "azure-mgmt-containerregistry",

@@ -12,62 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-from c7n_azure.resources.apimanagement import Resize
 from mock import MagicMock
 
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest, arm_template, cassette_name
 
 from c7n.utils import local_session
 from c7n_azure.session import Session
 
 
-class ApiManagementTest(BaseTest):
-    def setUp(self):
-        super(ApiManagementTest, self).setUp()
-
-    def test_apimanagement_schema_validate(self):
+class ContainerGroupTest(BaseTest):
+    def test_containergroup_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
-                'name': 'test-azure-apimanagement',
-                'resource': 'azure.api-management'
+                'name': 'test',
+                'resource': 'azure.container-group'
             }, validate=True)
             self.assertTrue(p)
 
-    @arm_template('apimanagement.json')
-    def test_find_apimanagement_by_name(self):
+    @arm_template('aci.json')
+    @cassette_name('list')
+    def test_find_container_by_name(self):
         p = self.load_policy({
-            'name': 'test-azure-apimanagement',
-            'resource': 'azure.api-management',
+            'name': 'test',
+            'resource': 'azure.container-group',
             'filters': [
                 {'type': 'value',
-                 'key': 'name',
-                 'op': 'glob',
-                 'value_type': 'normalize',
-                 'value': 'cctestapimanagement*'}],
+                 'key': 'properties.containers[].name',
+                 'op': 'in',
+                 'value_type': 'swap',
+                 'value': 'cctest-container'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
-    def test_resize_action(self):
-        action = Resize(data={'capacity': 8, 'tier': 'Premium'})
-        action.client = MagicMock()
-        action.manager = MagicMock()
-        action.session = local_session(Session)
-
-        resource = {
-            'id': '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/'
-                  'providers/Microsoft.ApiManagement/service/test-apimanagement',
-            'name': 'test-apimanagement',
-            'type': 'Microsoft.ApiManagement/service',
-            'sku': {'name': 'Developer', 'capacity': 1, 'tier': 'Developer'},
-            'resourceGroup': 'test-rg'
-        }
-
-        action.process([resource])
-
-        update_by_id = action.client.resources.update_by_id
-
-        self.assertEqual(len(update_by_id.call_args_list), 1)
-        self.assertEqual(len(update_by_id.call_args_list[0][0]), 3)
-        self.assertEqual(update_by_id.call_args_list[0][0][2].serialize()['sku']['capacity'], 8)
-        self.assertEqual(update_by_id.call_args_list[0][0][2].serialize()['sku']['tier'], 'Premium')
