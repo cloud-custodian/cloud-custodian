@@ -60,8 +60,8 @@ class CertificateTest(BaseTest):
         arn = "arn:aws:acm:us-west-2:644160558196:certificate/b867707e-33c3-4024-b45d-b6133c3b4c05"
         self.assertTrue(client.get_certificate(CertificateArn=arn))
 
-    def test_certificate_tag_untage_mark(self):
-        factory = self.replay_flight_data("test_certificate_tag_untage_mark")
+    def test_certificate_tag_untag_mark(self):
+        factory = self.replay_flight_data("test_certificate_tag_untag_mark")
         p = self.load_policy(
             {
                 "name": "acm-tag",
