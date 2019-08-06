@@ -16,17 +16,26 @@
 
 # Variables
 $url = "https://cloudcustodian.io/downloads/custodian-cask/windows-latest/custodian-cask.exe"
+$base = "$env:LOCALAPPDATA\custodian"
 
 try
 {
     # Download
-    Invoke-WebRequest -OutFile "$env:LOCALAPPDATA\custodian\custodian-cask.exe" "$url"
+    Invoke-WebRequest -OutFile "$base\custodian-cask.exe" "$url"
 
     # Add to path
-    [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) + ";$env:LOCALAPPDATA\custodian\", [EnvironmentVariableTarget]::User)
+    if($env:Path -like "*$base*") {
+        Write-Host "Not modifying path because it appears to already contain Cask."
+    }
+    else {
+        [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) + ";$base\", [EnvironmentVariableTarget]::User)
+        Write-Host "Path updated to contain: $base"
+    }
 
     # Refresh path in current session
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+    Write-Host "Cask installed to $base and environment refreshed.`nTry running 'custodian-cask schema'."
 }
 catch
 {
