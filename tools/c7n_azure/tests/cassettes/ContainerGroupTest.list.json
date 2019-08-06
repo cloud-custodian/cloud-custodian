@@ -1,0 +1,70 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ContainerInstance/containerGroups?api-version=2018-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "westus2:439c1101-b957-404b-8ff2-ae03eade7723",
+                        "southcentralus:5611569a-295e-49b2-8d98-10232071c324"
+                    ],
+                    "content-length": [
+                        "2263"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 06 Aug 2019 18:48:03 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "containers": [
+                                        {
+                                            "name": "cctest-container",
+                                            "properties": {
+                                                "image": "microsoft/aci-helloworld",
+                                                "ports": [],
+                                                "environmentVariables": [],
+                                                "resources": {
+                                                    "requests": {
+                                                        "memoryInGB": 1.5,
+                                                        "cpu": 1.0
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "restartPolicy": "Always",
+                                    "osType": "Linux"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_aci/providers/Microsoft.ContainerInstance/containerGroups/cctest-containergroup",
+                                "name": "cctest-containergroup",
+                                "type": "Microsoft.ContainerInstance/containerGroups",
+                                "location": "southcentralus"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
