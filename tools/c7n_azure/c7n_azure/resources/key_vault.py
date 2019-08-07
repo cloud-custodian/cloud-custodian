@@ -55,8 +55,8 @@ class KeyVault(ArmResourceManager):
 
     :example:
 
-    This policy will find all KeyVaults with an access of Service Principals not in the white list
-    that exceed read-only access
+    This policy will find all KeyVaults where Service Principals that
+    have access permissions that exceed `read-only`.
 
     .. code-block:: yaml
 

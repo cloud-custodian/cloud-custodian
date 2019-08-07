@@ -204,6 +204,47 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
                       key: logging.delete
                       op: eq
                       value: False
+
+    :example:
+
+    Find Load Balancers that have logs for both LoadBalancerProbeHealthStatus
+    category and LoadBalancerAlertEvent category enabled.
+    The use of value_type: swap is important for these examples because it swaps
+    the value and the evaluated key so that it evaluates the value provided is in the logs.
+
+    .. code-block:: yaml
+
+        policies
+          - name: find-load-balancers-with-logs-enabled
+            resource: azure.loadbalancer
+            filters:
+              - type: diagnostic-settings
+                key: logs[?category == 'LoadBalancerProbeHealthStatus'][].enabled
+                value: True
+                op: in
+                value_type: swap
+              - type: diagnostic-settings
+                key: logs[?category == 'LoadBalancerAlertEvent'][].enabled
+                value: True
+                op: in
+                value_type: swap
+
+    :example:
+
+    Find KeyVaults that have logs enabled for the AuditEvent category.
+
+    .. code-block:: yaml
+
+        policies
+          - name: find-keyvaults-with-logs-enabled
+            resource: azure.keyvault
+            filters:
+              - type: diagnostic-settings
+                key: logs[?category == 'AuditEvent'][].enabled
+                value: True
+                op: in
+                value_type: swap
+
     """
 
     schema = type_schema('storage-diagnostic-settings',

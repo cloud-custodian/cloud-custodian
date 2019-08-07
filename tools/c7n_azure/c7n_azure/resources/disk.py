@@ -22,7 +22,7 @@ class Disk(ArmResourceManager):
 
     :example:
 
-    This policy will disks that are not being managed by a VM
+    This policy will find all data disks that are not being managed by a VM.
 
     .. code-block:: yaml
 

@@ -20,7 +20,21 @@ from c7n.filters.core import Filter, type_schema
 
 @resources.register('armresource')
 class GenericArmResource(ArmResourceManager):
+    """Azure Arm Resource
 
+    :example:
+
+    This policy will find all ARM resources with the tag 'Tag1' present
+
+    .. code-block:: yaml
+
+        policies
+          - name: find-resources-with-Tag1
+            resource: azure.armresource
+            filters:
+              - tag:Tag1: present
+
+    """
     class resource_type(ArmResourceManager.resource_type):
         doc_groups = ['Generic']
 

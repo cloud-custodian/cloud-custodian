@@ -49,6 +49,8 @@ class RoleAssignment(QueryResourceManager):
 
     :example:
 
+    Return role assignments with the `Owner role`.
+
     .. code-block:: yaml
 
         policies:
@@ -59,6 +61,43 @@ class RoleAssignment(QueryResourceManager):
                   key: properties.roleName
                   op: eq
                   value: Owner
+
+    :example:
+
+    Return assignments with the principal name custodian@example.com
+
+    .. code-block:: yaml
+
+         policies:
+           - name: assignment-by-principal-name
+             resource: azure.roleassignment
+             filters:
+                - type: value
+                  key: principalName
+                  op: eq
+                  value: custodian@example.com
+
+    :example:
+
+    Delete the assignment with principal name custodian@example.com.
+
+    **Note: The permissions required to run the
+    delete action requires delete permissions to Microsoft.Authorization.
+    The built-in role with the necessary permissions is Owner.**
+
+    .. code-block:: yaml
+
+         policies:
+           - name: delete-assignment-by-principal-name
+             resource: azure.roleassignment
+             filters:
+                - type: value
+                  key: principalName
+                  op: eq
+                  value: custodian@example.com
+             actions:
+                - type: delete
+
     """
 
     class resource_type(QueryResourceManager.resource_type):
@@ -107,6 +146,10 @@ class RoleDefinition(QueryResourceManager):
 
     :example:
 
+    Return role definitions that explicitly have the permission to read authorization objects (role
+    assignments, role definitions, etc). If a role definition inherits permissions
+    (e.g. by having * permissions) they are not returned in this filter.
+
     .. code-block:: yaml
 
         policies:
@@ -114,7 +157,7 @@ class RoleDefinition(QueryResourceManager):
               resource: azure.roledefinition
               filters:
                 - type: value
-                  key: properties.permissions[].actions[]
+                  key: properties.permissions[0].actions
                   value: Microsoft.Authorization/*/read
                   op: contains
     """
@@ -159,6 +202,8 @@ class RoleFilter(RelatedResourceFilter):
 
     :example:
 
+    Return role assignments with the `Owner role`.
+
     .. code-block:: yaml
 
         policies:
@@ -169,6 +214,45 @@ class RoleFilter(RelatedResourceFilter):
                   key: properties.roleName
                   op: in
                   value: Owner
+
+    :example:
+
+    Return all assignments with the `Owner role` that have access to virtual machines. For the
+    resource-access filter, the related resource can be any custodian supported azure
+    resource other than `azure.roleassignments` or `azure.roledefinitions`.
+
+    .. code-block:: yaml
+
+        policies:
+           - name: assignment-by-role-and-resource
+             resource: azure.roleassignment
+             filters:
+                - type: role
+                  key: properties.roleName
+                  op: eq
+                  value: Owner
+                - type: resource-access
+                  relatedResource: azure.vm
+
+    :example:
+
+    Return all assignments with the `Owner role` that have access to virtual machines in `westus2`:
+
+    .. code-block:: yaml
+
+        policies:
+           - name: assignment-by-role-and-resource-access
+             resource: azure.roleassignment
+             filters:
+                - type: role
+                  key: properties.roleName
+                  op: eq
+                  value: Owner
+                - type: resource-access
+                  relatedResource: azure.vm
+                  key: location
+                  op: eq
+                  value: westus2
     """
 
     schema = type_schema('role', rinherit=ValueFilter.schema)
@@ -192,6 +276,7 @@ class ResourceAccessFilter(RelatedResourceFilter):
              filters:
                 - type: resource-access
                   relatedResource: azure.vm
+
     """
 
     schema = type_schema(
@@ -238,21 +323,22 @@ class ScopeFilter(Filter):
     """
     Filter role assignments by assignment scope.
 
-    :examples:
+    :example:
 
-    Role assignments that have subscription level scope access
+    Return all role assignments with the `Subscription` level scope access.
 
     .. code-block:: yaml
 
         policies:
-          - name: assignments-with-subscription-scope
-            resource: azure.roleassignment
-            filters:
-              - type: scope
-                value: subscription
+           - name: assignments-subscription-scope
+             resource: azure.roleassignment
+             filters:
+                - type: scope
+                  value: subscription
 
+    :example:
 
-    Role assignments with scope other than Subscription or Resource Group.
+    Role assignments with scope other than `Subscription` or `Resource Group`.
 
     .. code-block:: yaml
 
@@ -266,6 +352,23 @@ class ScopeFilter(Filter):
                 - not:
                   - type: scope
                     value: resource-group
+
+    :example:
+
+    Return all service principal role assignments with the `Subscription` level scope access.
+
+    .. code-block:: yaml
+
+        policies:
+           - name: service-principal-assignments-subscription-scope
+             resource: azure.roleassignment
+             filters:
+                - type: value
+                  key: aadType
+                  op: eq
+                  value: ServicePrincipal
+                - type: scope
+                  value: subscription
 
     """
 

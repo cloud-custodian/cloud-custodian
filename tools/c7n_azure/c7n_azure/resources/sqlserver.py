@@ -26,14 +26,49 @@ class SqlServer(ArmResourceManager):
 
     :example:
 
-    Finds all SQL Servers in the subscription.
+    This policy will find all SQL servers with average DTU consumption under
+    10 percent over the last 72 hours
 
     .. code-block:: yaml
 
         policies:
-            - name: find-all-sql-servers
-              resource: azure.sqlserver
+          - name: sqlserver-under-utilized
+            resource: azure.sqlserver
+            filters:
+              - type: metric
+                metric: dtu_consumption_percent
+                op: lt
+                aggregation: average
+                threshold: 10
+                timeframe: 72
+                filter: "ElasticPoolResourceId eq '*'"
+                no_data_action: include
 
+    :example:
+
+    This policy will find all SQL servers without any firewall rules defined.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-sqlserver-without-firewall-rules
+            resource: azure.sqlserver
+            filters:
+              - type: firewall-rules
+                equal: []
+
+    :example:
+
+    This policy will find all SQL servers allowing traffic from 1.2.2.128/25 CIDR.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: find-sqlserver-allowing-subnet
+            resource: azure.sqlserver
+            filters:
+              - type: firewall-rules
+                include: ['1.2.2.128/25']
     """
 
     class resource_type(ArmResourceManager.resource_type):

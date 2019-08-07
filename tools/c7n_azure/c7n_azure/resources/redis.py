@@ -22,13 +22,20 @@ class Redis(ArmResourceManager):
 
     :example:
 
-    Finds all Redis resources in the subscription.
+    This policy will find all Redis caches with more than 1000 cache misses in the last 72 hours
 
     .. code-block:: yaml
 
         policies:
-            - name: find-all-redis
-              resource: azure.redis
+          - name: redis-cache-misses
+            resource: azure.redis
+            filters:
+              - type: metric
+                metric: cachemisses
+                op: ge
+                aggregation: count
+                threshold: 1000
+                timeframe: 72
 
     """
 

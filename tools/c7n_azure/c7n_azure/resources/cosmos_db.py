@@ -46,7 +46,7 @@ class CosmosDB(ArmResourceManager):
 
     :example:
 
-    This policy will find all CosmosDB with 1000 or less total requests over the last 72 hou
+    This policy will find all CosmosDB with 1000 or less total requests over the last 72 hours
 
     .. code-block:: yaml
 

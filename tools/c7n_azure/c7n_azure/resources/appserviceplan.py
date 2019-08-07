@@ -26,6 +26,8 @@ class AppServicePlan(ArmResourceManager):
 
     :example:
 
+    Find all App Service Plans that are of the Basic sku tier.
+
     .. code-block:: yaml
 
         policies:
@@ -57,6 +59,10 @@ class AppServicePlan(ArmResourceManager):
 @AppServicePlan.action_registry.register('resize-plan')
 class ResizePlan(AzureBaseAction):
     """Resize App Service Plans
+
+    :example:
+
+    Resize App Service Plan to F1 plan with 1 instance.
 
     .. code-block:: yaml
 

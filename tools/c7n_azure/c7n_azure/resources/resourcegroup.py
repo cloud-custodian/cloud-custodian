@@ -34,6 +34,34 @@ class ResourceGroup(ArmResourceManager):
             - name: find-all-resource-groups
               resource: azure.resourcegroup
 
+    :example:
+
+    Find all Resource Groups that have no resources in the subscription.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: test - azure
+            resource: azure.resourcegroup
+            filters:
+              - type: empty-group
+
+    :example:
+
+    Delete all Resource Groups in the subscription tagged with 'ShouldBeDeleted'.
+
+    **Warning: Deleting a resource group will delete all resources inside the resource group.**
+
+    .. code-block:: yaml
+
+        policies:
+          - name: test - azure
+            resource: azure.resourcegroup
+            filters:
+                - tag:ShouldBeDeleted: present
+            actions:
+                - type: delete
+
     """
 
     class resource_type(ArmResourceManager.resource_type):
@@ -60,12 +88,6 @@ class ResourceGroup(ArmResourceManager):
 
 @ResourceGroup.filter_registry.register('empty-group')
 class EmptyGroup(Filter):
-    # policies:
-    #   - name: test - azure
-    #   resource: azure.resourcegroup
-    #   filters:
-    #       - type: empty-group
-
     schema = type_schema('empty-group')
 
     def __call__(self, group):
@@ -80,12 +102,6 @@ class EmptyGroup(Filter):
 
 @ResourceGroup.action_registry.register('delete')
 class DeleteResourceGroup(AzureBaseAction):
-    # policies:
-    #   - name: test - azure
-    #   resource: azure.resourcegroup
-    #   actions:
-    #       - type: delete
-
     schema = type_schema('delete')
 
     def _process_resource(self, group):

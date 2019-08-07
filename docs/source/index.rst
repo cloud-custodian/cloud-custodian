@@ -60,7 +60,6 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    azure/gettingstarted
    azure/configuration/index
    azure/examples/index
-   azure/policy/index
    azure/advanced/index
    azure/resources/index
 
