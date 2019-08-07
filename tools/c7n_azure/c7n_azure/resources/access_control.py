@@ -241,7 +241,7 @@ class RoleFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
         policies:
-           - name: assignment-by-role-and-resource
+           - name: assignment-by-role-and-resource-access
              resource: azure.roleassignment
              filters:
                 - type: role
