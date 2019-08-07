@@ -17,27 +17,23 @@ from concurrent.futures import as_completed
 from datetime import timedelta
 
 import six
-from netaddr import AddrFormatError
-from azure.mgmt.costmanagement.models import QueryDefinition, QueryDataset, \
-    QueryAggregation, QueryGrouping, QueryTimePeriod, TimeframeType, QueryFilter, \
-    QueryComparisonExpression
+from azure.mgmt.costmanagement.models import (QueryAggregation,
+                                              QueryComparisonExpression,
+                                              QueryDataset, QueryDefinition,
+                                              QueryFilter, QueryGrouping,
+                                              QueryTimePeriod, TimeframeType)
 from azure.mgmt.policyinsights import PolicyInsightsClient
-
-from c7n_azure.tags import TagHelper
-from c7n_azure.utils import IpRangeHelper, ResourceIdParser, StringUtils
-from c7n_azure.utils import Math
-from c7n_azure.utils import ThreadHelper
-from c7n_azure.utils import now
-from c7n_azure.utils import utcnow
 from dateutil import tz as tzutils
 from dateutil.parser import parse
+from netaddr import AddrFormatError
 
-from c7n.filters import Filter, ValueFilter, FilterValidationError
+from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
-from c7n.filters.offhours import Time, OffHour, OnHour
-from c7n.utils import chunks
-from c7n.utils import type_schema
-from c7n.utils import get_annotation_prefix
+from c7n.filters.offhours import OffHour, OnHour, Time
+from c7n.utils import chunks, get_annotation_prefix, type_schema
+from c7n_azure.tags import TagHelper
+from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
+                             StringUtils, ThreadHelper, now, utcnow)
 
 scalar_ops = {
     'eq': operator.eq,
@@ -199,7 +195,20 @@ class MetricFilter(Filter):
                  for item in metrics_data.value[0].timeseries[0].data]
         else:
             m = None
+        self._write_metric_to_resource(resource, metrics_data, m)
         return m
+
+    def _write_metric_to_resource(self, resource, metrics_data, m):
+        metrics_prefix = get_annotation_prefix('metrics')
+        resource_metrics = resource.get(metrics_prefix)
+        if not resource_metrics:
+            resource[metrics_prefix] = resource_metrics = []
+
+        resource_metrics.append({
+            'filter': self.data,
+            'measurement': m,
+            'data': metrics_data.as_dict()
+        })
 
     def passes_op_filter(self, resource):
         m_data = self.get_metric_data(resource)
