@@ -2,7 +2,7 @@ Network Security Groups - Deny access to Network Security Group
 ===============================================================
 
 This policy will deny access to all ports that are NOT 22, 23 or 24 for all Network Security Groups
-For more examples see :ref:`azure_nsg`
+For more examples see :ref:`azure.networksecuritygroup`
 
 .. code-block:: yaml
 

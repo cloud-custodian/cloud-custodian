@@ -31,7 +31,7 @@ class NetworkInterface(ArmResourceManager):
 
     :example:
 
-    This policy will get Network Interfaces that have User added routes.
+    This policy will get Network Interfaces that have `User` added routes.
 
     .. code-block:: yaml
 
@@ -63,6 +63,26 @@ class NetworkInterface(ArmResourceManager):
 
 @NetworkInterface.filter_registry.register('effective-route-table')
 class EffectiveRouteTableFilter(ValueFilter):
+    """Filters network interfaces by the Effective Route Table
+
+    :example:
+
+    This policy will get Network Interfaces that have VirtualNetworkGateway and VNet hops.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: virtual-network-gateway-hop
+            resource: azure.networkinterface
+            filters:
+              - type: effective-route-table
+                key: routes.value[?source == 'User'].nextHopType
+                op: difference
+                value:
+                  - Internet
+                  - None
+                  - VirtualAppliance
+    """
     schema = type_schema('effective-route-table', rinherit=ValueFilter.schema)
     schema_alias = False
     def process(self, resources, event=None):
