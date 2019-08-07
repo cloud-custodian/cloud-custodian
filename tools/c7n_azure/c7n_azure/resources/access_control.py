@@ -147,8 +147,8 @@ class RoleDefinition(QueryResourceManager):
     :example:
 
     Return role definitions that explicitly have the permission to read authorization objects (role
-    assignments, role definitions, etc). If a role definition inherits permissions (e.g. by having * permissions)
-    they are not returned in this filter.
+    assignments, role definitions, etc). If a role definition inherits permissions
+    (e.g. by having * permissions) they are not returned in this filter.
 
     .. code-block:: yaml
 
@@ -218,8 +218,8 @@ class RoleFilter(RelatedResourceFilter):
     :example:
 
     Return all assignments with the `Owner role` that have access to virtual machines. For the
-    resource-access filter, the related resource can be any custodian supported azure resource other than
-    `azure.roleassignments` or `azure.roledefinitions`.
+    resource-access filter, the related resource can be any custodian supported azure
+    resource other than `azure.roleassignments` or `azure.roledefinitions`.
 
     .. code-block:: yaml
 

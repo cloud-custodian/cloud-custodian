@@ -26,7 +26,8 @@ class SqlServer(ArmResourceManager):
 
     :example:
 
-    This policy will find all SQL servers with average DTU consumption under 10 percent over the last 72 hours
+    This policy will find all SQL servers with average DTU consumption under
+    10 percent over the last 72 hours
 
     .. code-block:: yaml
 
