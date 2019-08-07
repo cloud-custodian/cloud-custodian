@@ -43,15 +43,10 @@ class TagHelper:
                                           .format(az_resource.type))
             api_version = tag_action.session.resource_api_version(resource['id'])
 
-            # create a GenericResource object with the required parameters
-            generic_resource = GenericResource(location=az_resource.location,
-                                               tags=tags,
-                                               properties=az_resource.properties,
-                                               kind=az_resource.kind,
-                                               managed_by=az_resource.managed_by,
-                                               identity=az_resource.identity)
+            # create a PATCH object with only updates to tags
+            tags_patch = GenericResource(tags=tags)
 
-            client.resources.update_by_id(resource['id'], api_version, generic_resource)
+            client.resources.update_by_id(resource['id'], api_version, tags_patch)
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):
