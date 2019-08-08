@@ -92,7 +92,7 @@ class ResizePlan(AzureBaseAction):
 
         if resource['kind'] == 'functionapp':
             self.log.info(f"Skipping {resource['name']}, "
-                          f"because App Service Plan is for Consumption Azure Functions.")
+                          f"because this App Service Plan is for Consumption Azure Functions.")
             return
 
         if resource['kind'] == 'linux':
