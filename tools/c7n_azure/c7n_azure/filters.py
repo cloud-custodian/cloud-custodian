@@ -182,6 +182,10 @@ class MetricFilter(Filter):
             return [item for item in processed if item is not None]
 
     def get_metric_data(self, resource):
+        cached_metric_data = self._get_cached_metric_data(resource)
+        if cached_metric_data:
+            return cached_metric_data['measurement']
+
         metrics_data = self.client.metrics.list(
             resource['id'],
             timespan=self.timespan,
@@ -190,25 +194,38 @@ class MetricFilter(Filter):
             aggregation=self.aggregation,
             filter=self.filter
         )
+
         if len(metrics_data.value) > 0 and len(metrics_data.value[0].timeseries) > 0:
             m = [getattr(item, self.aggregation)
-                 for item in metrics_data.value[0].timeseries[0].data]
+                for item in metrics_data.value[0].timeseries[0].data]
         else:
             m = None
+
         self._write_metric_to_resource(resource, metrics_data, m)
+
         return m
 
     def _write_metric_to_resource(self, resource, metrics_data, m):
-        metrics_prefix = get_annotation_prefix('metrics')
-        resource_metrics = resource.get(metrics_prefix)
-        if not resource_metrics:
-            resource[metrics_prefix] = resource_metrics = []
-
-        resource_metrics.append({
-            'filter': self.data,
+        resource_metrics = resource.setdefault(get_annotation_prefix('metrics'), {})
+        resource_metrics[self._get_metrics_cache_key()] = {
+            'metrics_data': metrics_data.as_dict(),
             'measurement': m,
-            'data': metrics_data.as_dict()
-        })
+        }
+
+    def _get_metrics_cache_key(self):
+        return "{}, {}, {}, {}, {}".format(
+            self.metric,
+            self.aggregation,
+            self.timeframe,
+            self.interval,
+            self.filter,
+        )
+
+    def _get_cached_metric_data(self, resource):
+        metrics = resource.get(get_annotation_prefix('metrics'))
+        if not metrics:
+            return None
+        return metrics.get(self._get_metrics_cache_key())
 
     def passes_op_filter(self, resource):
         m_data = self.get_metric_data(resource)
