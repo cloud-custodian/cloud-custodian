@@ -4,7 +4,8 @@
     "parameters": {},
     "variables": {
         "eventHubNamespaceName": "[concat(uniquestring(resourceGroup().id), '-cctesteventhubns')]",
-        "eventHubName": "cctesteventhub"
+        "eventHubName": "cctesteventhub",
+        "namespaceNetworkRuleSetName": "[concat(variables('eventhubNamespaceName'), concat('/', 'default'))]"
     },
     "resources": [
         {
@@ -13,8 +14,8 @@
             "name": "[variables('eventHubNamespaceName')]",
             "location": "westus2",
             "sku": {
-                "name": "Basic",
-                "tier": "Basic",
+                "name": "Standard",
+                "tier": "Standard",
                 "capacity": 1
             },
             "properties": {
@@ -34,6 +35,29 @@
                 "messageRetentionInDays": 1,
                 "partitionCount": 1
             }
+        },
+        {
+            "apiVersion": "2018-01-01-preview",
+            "name": "[variables('namespaceNetworkRuleSetName')]",
+            "type": "Microsoft.EventHub/namespaces/networkruleset",
+            "dependsOn": [
+                "[concat('Microsoft.EventHub/namespaces/', variables('eventhubNamespaceName'))]"
+            ],
+            "properties": {
+              "virtualNetworkRules": [],
+              "ipRules":
+              [
+                {
+                    "ipMask":"10.1.1.1",
+                    "action":"Allow"
+                },
+                {
+                    "ipMask":"11.0.0.0/24",
+                    "action":"Allow"
+                }
+              ],
+              "defaultAction": "Deny"
         }
+      }
     ]
 }

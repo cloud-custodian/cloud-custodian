@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
+from c7n_azure.filters import FirewallRulesFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from netaddr import IPSet
 
 
 @resources.register('eventhub')
@@ -22,13 +26,17 @@ class EventHub(ArmResourceManager):
 
     :example:
 
-    Finds all Event Hub resources in the subscription.
+    This policy will find all Event Hubs allowing traffic from 1.2.2.128/25 CIDR.
 
     .. code-block:: yaml
 
         policies:
-            - name: find-all-eventhubs
-              resource: azure.eventhub
+          - name: find-event-hub-allowing-subnet
+            resource: azure.eventhub
+            filters:
+              - type: firewall-rules
+                include:
+                    - '1.2.2.128/25'
 
     """
 
@@ -46,3 +54,29 @@ class EventHub(ArmResourceManager):
             'properties.isAutoInflateEnabled'
         )
         resource_type = 'Microsoft.EventHub/namespaces'
+
+
+@EventHub.filter_registry.register('firewall-rules')
+class EventHubFirewallRulesFilter(FirewallRulesFilter):
+
+    def __init__(self, data, manager=None):
+        super(EventHubFirewallRulesFilter, self).__init__(data, manager)
+        self._log = logging.getLogger('custodian.azure.eventhub')
+        self.client = None
+
+    @property
+    def log(self):
+        return self._log
+
+    def process(self, resources, event=None):
+        self.client = self.manager.get_client()
+        return super(EventHubFirewallRulesFilter, self).process(resources, event)
+
+    def _query_rules(self, resource):
+        query = self.client.namespaces.get_network_rule_set(
+            resource['resourceGroup'],
+            resource['name'])
+
+        resource_rules = IPSet([r.ip_mask for r in query.ip_rules])
+
+        return resource_rules
