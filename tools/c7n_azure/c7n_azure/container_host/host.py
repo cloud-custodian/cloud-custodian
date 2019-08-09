@@ -19,23 +19,25 @@ import os
 import tempfile
 from datetime import datetime
 
+import click
 import yaml
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from azure.common import AzureHttpError
-from azure.mgmt.eventgrid.models import \
-    StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
-from c7n_azure import entry, constants
-from c7n_azure.azure_events import AzureEventSubscription, AzureEvents
-from c7n_azure.provider import Azure
-from c7n_azure.session import Session
-from c7n_azure.storage_utils import StorageUtilities as Storage
-from c7n_azure.utils import ResourceIdParser
+from azure.mgmt.eventgrid.models import (
+    EventSubscriptionFilter, StorageQueueEventSubscriptionDestination,
+    StringInAdvancedFilter)
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources
 from c7n.utils import local_session
+from c7n_azure import entry
+from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
+from c7n_azure.provider import Azure
+from c7n_azure.session import Session
+from c7n_azure.storage_utils import StorageUtilities as Storage
+from c7n_azure.utils import ResourceIdParser
 
 log = logging.getLogger("c7n_azure.container-host")
 max_dequeue_count = 2
@@ -48,21 +50,19 @@ queue_message_count = 5
 
 class Host:
 
-    def __init__(self):
+    def __init__(self, event_queue_id, event_queue_name, policy_storage,
+                 log_group=None, metrics=None, output_dir=None):
         logging.basicConfig(level=logging.INFO, format='%(message)s')
         log.info("Running Azure Cloud Custodian Self-Host")
-
-        if not Host.has_required_params():
-            return
 
         load_resources()
         self.session = local_session(Session)
 
         # Load configuration
-        self.options = Host.build_options()
-        self.policy_storage_uri = os.getenv(constants.ENV_CONTAINER_POLICY_STORAGE)
-        self.event_queue_name = os.getenv(constants.ENV_CONTAINER_EVENT_QUEUE_NAME)
-        self.event_queue_id = os.getenv(constants.ENV_CONTAINER_EVENT_QUEUE_ID)
+        self.options = Host.build_options(output_dir, log_group, metrics)
+        self.policy_storage_uri = policy_storage
+        self.event_queue_name = event_queue_name
+        self.event_queue_id = event_queue_id
 
         # Prepare storage bits
         self.policy_blob_client = None
@@ -365,38 +365,18 @@ class Host:
         return account
 
     @staticmethod
-    def has_required_params():
-        required = [
-            constants.ENV_CONTAINER_POLICY_STORAGE,
-            constants.ENV_CONTAINER_EVENT_QUEUE_NAME,
-            constants.ENV_CONTAINER_EVENT_QUEUE_ID
-        ]
-
-        missing = [r for r in required if os.getenv(r) is None]
-
-        if missing:
-            log.error('Missing REQUIRED environment variable(s): %s' % ', '.join(missing))
-            return False
-
-        return True
-
-    @staticmethod
-    def build_options():
+    def build_options(output_dir=None, log_group=None, metrics=None):
         """
-        Accept some CLI/Execution options as environment
-        variables to apply global config across all policy
-        executions.
+        Initialize the Azure provider to apply global config across all policy executions.
         """
-        output_dir = os.environ.get(constants.ENV_CONTAINER_OPTION_OUTPUT_DIR)
-
         if not output_dir:
             output_dir = tempfile.mkdtemp()
             log.warning('Output directory not specified.  Using directory: %s' % output_dir)
 
         config = Config.empty(
             **{
-                'log_group': os.environ.get(constants.ENV_CONTAINER_OPTION_LOG_GROUP),
-                'metrics': os.environ.get(constants.ENV_CONTAINER_OPTION_METRICS),
+                'log_group': log_group,
+                'metrics': metrics,
                 'output_dir': output_dir
             }
         )
@@ -408,8 +388,19 @@ class Host:
         return filename.lower().endswith(('.yml', '.yaml'))
 
 
+@click.command()
+@click.option("--event-queue-id", "-q", required=True)
+@click.option("--event-queue-name", "-n", required=True)
+@click.option("--policy-storage", "-s", required=True)
+@click.option("--log-group", "-l")
+@click.option("--metrics", "-m")
+@click.option("--output-dir", "-d")
+class HostCommand(Host):
+    pass
+
+
 if __name__ == "__main__":
-    Host()
+    HostCommand()
 
 # Need to manually initialize c7n_azure
 entry.initialize_azure()
