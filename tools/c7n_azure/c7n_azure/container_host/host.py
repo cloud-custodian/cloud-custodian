@@ -394,19 +394,21 @@ class Host:
         return filename.lower().endswith(('.yml', '.yaml'))
 
 
-@click.command()
+@click.command(help="Periodically run a set of policies from an Azure storage container against "
+    "a single subscription. The host will update itself with new policies and event subscriptions "
+    "as they are added.")
 @click.option("--event-queue-id", "-q", envvar=ENV_CONTAINER_EVENT_QUEUE_ID, required=True,
-              help="???")
+              help="The resource id of the storage account to create the event queue in")
 @click.option("--event-queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME, required=True,
-              help="???")
+              help="The name of the event queue to create")
 @click.option("--policy-storage", "-s", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
-              help="???")
+              help="The URI to the Azure storage container that holds the policies")
 @click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
-              help="???")
+              help="Location to send policy logs")
 @click.option("--metrics", "-m", envvar=ENV_CONTAINER_OPTION_METRICS,
-              help="???")
+              help="The resource name or instrumentation key for uploading metrics")
 @click.option("--output-dir", "-d", envvar=ENV_CONTAINER_OPTION_OUTPUT_DIR,
-              help="???")
+              help="The directory for policy output")
 class HostCommand(Host):
     pass
 
