@@ -145,7 +145,7 @@ There are several ways to get a list of possible keys for each resource.
          - type: value
            key: FunctionName                ─▶ The value from the describe call
            op: regex                        ─▶ Special operator
-           value: ^(custodian?)\w+          ─▶ Regex string
+           value: (custodian|c7n)_\w+       ─▶ Regex string
 
 
 - Transformations:
