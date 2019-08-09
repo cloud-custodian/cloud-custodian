@@ -34,6 +34,12 @@ from c7n.resources import load_resources
 from c7n.utils import local_session
 from c7n_azure import entry
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
+from c7n_azure.constants import (ENV_CONTAINER_EVENT_QUEUE_ID,
+                                 ENV_CONTAINER_EVENT_QUEUE_NAME,
+                                 ENV_CONTAINER_OPTION_LOG_GROUP,
+                                 ENV_CONTAINER_OPTION_METRICS,
+                                 ENV_CONTAINER_OPTION_OUTPUT_DIR,
+                                 ENV_CONTAINER_POLICY_STORAGE)
 from c7n_azure.provider import Azure
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities as Storage
@@ -389,12 +395,18 @@ class Host:
 
 
 @click.command()
-@click.option("--event-queue-id", "-q", required=True)
-@click.option("--event-queue-name", "-n", required=True)
-@click.option("--policy-storage", "-s", required=True)
-@click.option("--log-group", "-l")
-@click.option("--metrics", "-m")
-@click.option("--output-dir", "-d")
+@click.option("--event-queue-id", "-q", envvar=ENV_CONTAINER_EVENT_QUEUE_ID, required=True,
+              help="???")
+@click.option("--event-queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME, required=True,
+              help="???")
+@click.option("--policy-storage", "-s", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
+              help="???")
+@click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
+              help="???")
+@click.option("--metrics", "-m", envvar=ENV_CONTAINER_OPTION_METRICS,
+              help="???")
+@click.option("--output-dir", "-d", envvar=ENV_CONTAINER_OPTION_OUTPUT_DIR,
+              help="???")
 class HostCommand(Host):
     pass
 
