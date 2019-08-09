@@ -35,9 +35,9 @@ for file in "$templateDirectory"/*.json; do
         az keyvault key create --vault-name $vault_name --name cctestrsa --kty RSA
         az keyvault key create --vault-name $vault_name --name cctestec --kty EC
       elif [[ "$filenameNoExtension" =~ "aks" ]]; then
-        az group deployment create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET
+        az group deployment create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --no-wait
       else
-        az group deployment create --resource-group $rgName --template-file $file
+        az group deployment create --resource-group $rgName --template-file $file --no-wait
       fi
   else
     echo "Skipping $rgName"

@@ -53,7 +53,6 @@ class AppServicePlan(ArmResourceManager):
             'kind'
         )
         resource_type = 'Microsoft.Web/sites'
-        enable_tag_operations = False
 
 
 @AppServicePlan.action_registry.register('resize-plan')
