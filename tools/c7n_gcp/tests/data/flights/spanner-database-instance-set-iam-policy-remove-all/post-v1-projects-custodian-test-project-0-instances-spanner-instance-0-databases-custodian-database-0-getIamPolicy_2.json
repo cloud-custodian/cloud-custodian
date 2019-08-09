@@ -1,0 +1,34 @@
+{
+  "body": {
+    "bindings": [
+      {
+        "role": "roles/owner", 
+        "members": [
+          "user:yauhen_shaliou@comelfo.com"
+        ]
+      }, 
+      {
+        "role": "roles/viewer", 
+        "members": [
+          "user:dkhanas@gmail.com"
+        ]
+      }
+    ], 
+    "version": 1, 
+    "etag": "BwWPDzF1omk="
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "279", 
+    "x-xss-protection": "0", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Thu, 01 Aug 2019 14:44:32 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}
