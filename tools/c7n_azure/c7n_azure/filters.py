@@ -17,15 +17,13 @@ from concurrent.futures import as_completed
 from datetime import timedelta
 
 import six
-from netaddr import AddrFormatError, IPSet
 from azure.mgmt.costmanagement.models import QueryDefinition, QueryDataset, \
     QueryAggregation, QueryGrouping, QueryTimePeriod, TimeframeType, QueryFilter, \
     QueryComparisonExpression
 from azure.mgmt.policyinsights import PolicyInsightsClient
-
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (IpRangeHelper, ResourceIdParser, StringUtils, Math,
-                             ThreadHelper, now, utcnow, get_service_tag_ip_space)
+                             ThreadHelper, now, utcnow)
 from dateutil import tz as tzutils
 from dateutil.parser import parse
 
@@ -33,8 +31,8 @@ from c7n.filters import Filter, ValueFilter, FilterValidationError
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import Time, OffHour, OnHour
 from c7n.utils import chunks
-from c7n.utils import type_schema
 from c7n.utils import get_annotation_prefix
+from c7n.utils import type_schema
 
 scalar_ops = {
     'eq': operator.eq,

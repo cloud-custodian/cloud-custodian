@@ -20,8 +20,6 @@ from c7n_azure.filters import FirewallRulesFilter
 from jsonschema import ValidationError
 from netaddr import IPRange, IPNetwork, IPSet
 
-from c7n.exceptions import PolicyValidationError
-
 
 class FirewallRulesFilterTest(BaseTest):
 

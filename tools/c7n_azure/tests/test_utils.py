@@ -13,8 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template, cassette_name
-
+from azure_common import BaseTest
 from c7n_azure.utils import get_service_tag_ip_space
 
 
@@ -36,4 +35,3 @@ class UtilsTest(BaseTest):
         # Total IP space, will be around 2500
         result = get_service_tag_ip_space()
         self.assertTrue(len(result) > 2000)
-

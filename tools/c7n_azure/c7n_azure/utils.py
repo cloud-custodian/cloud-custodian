@@ -572,5 +572,3 @@ def resolve_service_tag_alias(rule):
         resource_name = p[1] if 1 < len(p) else None
         resource_region = p[2] if 2 < len(p) else None
         return IPSet(get_service_tag_ip_space(resource_name, resource_region))
-
-

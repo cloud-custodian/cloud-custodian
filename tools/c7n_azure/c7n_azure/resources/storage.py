@@ -127,7 +127,8 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
         **{
             'default-action': {'enum': ['Allow', 'Deny'], "default": 'Deny'},
             'append': {'type': 'boolean', "default": False},
-            'bypass-rules': {'type': 'array', 'items': {'enum': ['AzureServices', 'Logging', 'Metrics']}},
+            'bypass-rules': {'type': 'array', 'items': {
+                'enum': ['AzureServices', 'Logging', 'Metrics']}},
             'ip-rules': {'type': 'array', 'items': {'type': 'string'}},
             'virtual-network-rules': {'type': 'array', 'items': {'type': 'string'}}
         }
@@ -203,7 +204,7 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
 
         if self.append:
             existing_rules = resource['properties']['networkAcls'].get('ipRules', [])
-            without_duplicates = [r for r in existing_rules if r['value'] not in rules]
+            without_duplicates = [r['value'] for r in existing_rules if r['value'] not in rules]
             rules.extend(without_duplicates)
         return rules
 
