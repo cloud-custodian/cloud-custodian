@@ -183,11 +183,6 @@ class FirewallRulesFilterTest(BaseTest):
         with self.assertRaises(ValidationError):
             self.load_policy(data=p, validate=True)
 
-    def test_firewall_invalid_range(self):
-        with self.assertRaises(PolicyValidationError):
-            mock = FirewallRulesFilterMock({'include': ['0.0.0.1-0.0.0.0']})
-            mock.validate()
-
 
 class FirewallRulesFilterMock(FirewallRulesFilter):
 

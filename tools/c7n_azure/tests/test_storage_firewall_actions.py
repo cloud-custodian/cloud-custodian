@@ -54,13 +54,11 @@ class StorageTestFirewallActions(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'}],
             'actions': [
-                {'type': 'set-network-rules',
+                {'type': 'set-firewall-rules',
                  'default-action': 'Deny',
-                 'bypass': ['Logging', 'Metrics'],
-                 'ip-rules': [
-                     {'ip-address-or-range': '11.12.13.14'},
-                     {'ip-address-or-range': '21.22.23.24'}
-                 ]}
+                 'bypass-rules': ['Logging', 'Metrics'],
+                 'ip-rules': ['11.12.13.14', '21.22.23.24']
+                 }
             ]
         })
 
@@ -96,13 +94,11 @@ class StorageTestFirewallActions(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'}],
             'actions': [
-                {'type': 'set-network-rules',
+                {'type': 'set-firewall-rules',
                  'default-action': 'Deny',
-                 'bypass': ['Logging', 'Metrics'],
-                 'virtual-network-rules': [
-                     {'virtual-network-resource-id': id1},
-                     {'virtual-network-resource-id': id2}
-                 ]}
+                 'bypass-rules': ['Logging', 'Metrics'],
+                 'virtual-network-rules': [id1, id2]
+                 }
             ]
         })
 
@@ -129,9 +125,9 @@ class StorageTestFirewallActions(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'}],
             'actions': [
-                {'type': 'set-network-rules',
+                {'type': 'set-firewall-rules',
                  'default-action': 'Deny',
-                 'bypass': []}
+                 'bypass-rules': []}
             ]
         })
 
@@ -153,7 +149,7 @@ class StorageTestFirewallActions(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'}],
             'actions': [
-                {'type': 'set-network-rules',
+                {'type': 'set-firewall-rules',
                  'default-action': 'Deny'}
             ]
         })
@@ -176,7 +172,7 @@ class StorageTestFirewallActions(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'}],
             'actions': [
-                {'type': 'set-network-rules',
+                {'type': 'set-firewall-rules',
                  'default-action': 'Deny'}
             ]
         })
@@ -199,9 +195,9 @@ class StorageTestFirewallActions(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctstorage*'}],
             'actions': [
-                {'type': 'set-network-rules',
+                {'type': 'set-firewall-rules',
                  'default-action': 'Deny',
-                 'bypass': ['Metrics']}
+                 'bypass-rules': ['Metrics']}
             ]
         })
 

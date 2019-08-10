@@ -17,18 +17,15 @@ from concurrent.futures import as_completed
 from datetime import timedelta
 
 import six
-from netaddr import AddrFormatError
+from netaddr import AddrFormatError, IPSet
 from azure.mgmt.costmanagement.models import QueryDefinition, QueryDataset, \
     QueryAggregation, QueryGrouping, QueryTimePeriod, TimeframeType, QueryFilter, \
     QueryComparisonExpression
 from azure.mgmt.policyinsights import PolicyInsightsClient
 
 from c7n_azure.tags import TagHelper
-from c7n_azure.utils import IpRangeHelper, ResourceIdParser, StringUtils
-from c7n_azure.utils import Math
-from c7n_azure.utils import ThreadHelper
-from c7n_azure.utils import now
-from c7n_azure.utils import utcnow
+from c7n_azure.utils import (IpRangeHelper, ResourceIdParser, StringUtils, Math,
+                             ThreadHelper, now, utcnow, get_service_tag_ip_space)
 from dateutil import tz as tzutils
 from dateutil.parser import parse
 
@@ -546,16 +543,6 @@ class FirewallRulesFilter(Filter):
     def log(self):
         raise NotImplementedError()
 
-    def validate(self):
-        try:
-            IpRangeHelper.parse_ip_ranges(self.data, 'include')
-            IpRangeHelper.parse_ip_ranges(self.data, 'equal')
-            IpRangeHelper.parse_ip_ranges(self.data, 'any')
-            IpRangeHelper.parse_ip_ranges(self.data, 'only')
-        except AddrFormatError as e:
-            raise PolicyValidationError("Invalid IP range found. %s" % e)
-        return self
-
     def process(self, resources, event=None):
         self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
         self.policy_equal = IpRangeHelper.parse_ip_ranges(self.data, 'equal')
@@ -580,7 +567,7 @@ class FirewallRulesFilter(Filter):
         """
         Queries firewall rules for a resource. Override in concrete classes.
         :param resource:
-        :return: A set of netaddr.IPRange or netaddr.IPSet with rules defined for the resource.
+        :return: A set of netaddr.IPSet with rules defined for the resource.
         """
         raise NotImplementedError()
 
