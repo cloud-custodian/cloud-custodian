@@ -17,22 +17,22 @@ from concurrent.futures import as_completed
 from datetime import timedelta
 
 import six
-from azure.mgmt.costmanagement.models import QueryDefinition, QueryDataset, \
-    QueryAggregation, QueryGrouping, QueryTimePeriod, TimeframeType, QueryFilter, \
-    QueryComparisonExpression
+from azure.mgmt.costmanagement.models import (QueryAggregation,
+                                              QueryComparisonExpression,
+                                              QueryDataset, QueryDefinition,
+                                              QueryFilter, QueryGrouping,
+                                              QueryTimePeriod, TimeframeType)
 from azure.mgmt.policyinsights import PolicyInsightsClient
-from c7n_azure.tags import TagHelper
-from c7n_azure.utils import (IpRangeHelper, ResourceIdParser, StringUtils, Math,
-                             ThreadHelper, now, utcnow)
 from dateutil import tz as tzutils
 from dateutil.parser import parse
 
-from c7n.filters import Filter, ValueFilter, FilterValidationError
+from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
-from c7n.filters.offhours import Time, OffHour, OnHour
-from c7n.utils import chunks
-from c7n.utils import get_annotation_prefix
-from c7n.utils import type_schema
+from c7n.filters.offhours import OffHour, OnHour, Time
+from c7n.utils import chunks, get_annotation_prefix, type_schema
+from c7n_azure.tags import TagHelper
+from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
+                             StringUtils, ThreadHelper, now, utcnow)
 
 scalar_ops = {
     'eq': operator.eq,
@@ -181,6 +181,10 @@ class MetricFilter(Filter):
             return [item for item in processed if item is not None]
 
     def get_metric_data(self, resource):
+        cached_metric_data = self._get_cached_metric_data(resource)
+        if cached_metric_data:
+            return cached_metric_data['measurement']
+
         metrics_data = self.client.metrics.list(
             resource['id'],
             timespan=self.timespan,
@@ -189,12 +193,38 @@ class MetricFilter(Filter):
             aggregation=self.aggregation,
             filter=self.filter
         )
+
         if len(metrics_data.value) > 0 and len(metrics_data.value[0].timeseries) > 0:
             m = [getattr(item, self.aggregation)
-                 for item in metrics_data.value[0].timeseries[0].data]
+                for item in metrics_data.value[0].timeseries[0].data]
         else:
             m = None
+
+        self._write_metric_to_resource(resource, metrics_data, m)
+
         return m
+
+    def _write_metric_to_resource(self, resource, metrics_data, m):
+        resource_metrics = resource.setdefault(get_annotation_prefix('metrics'), {})
+        resource_metrics[self._get_metrics_cache_key()] = {
+            'metrics_data': metrics_data.as_dict(),
+            'measurement': m,
+        }
+
+    def _get_metrics_cache_key(self):
+        return "{}, {}, {}, {}, {}".format(
+            self.metric,
+            self.aggregation,
+            self.timeframe,
+            self.interval,
+            self.filter,
+        )
+
+    def _get_cached_metric_data(self, resource):
+        metrics = resource.get(get_annotation_prefix('metrics'))
+        if not metrics:
+            return None
+        return metrics.get(self._get_metrics_cache_key())
 
     def passes_op_filter(self, resource):
         m_data = self.get_metric_data(resource)

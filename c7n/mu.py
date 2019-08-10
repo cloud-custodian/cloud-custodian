@@ -1038,7 +1038,7 @@ class CloudWatchEventSource(object):
                 payload['detail']['eventTypeCategory'] = self.data['categories']
         elif event_type == 'hub-finding':
             payload['source'] = ['aws.securityhub']
-            payload['detail-type'] = ['Security Hub Findings']
+            payload['detail-type'] = ['Security Hub Findings - Imported']
         elif event_type == 'hub-action':
             payload['source'] = ['aws.securityhub']
             payload['detail-type'] = [

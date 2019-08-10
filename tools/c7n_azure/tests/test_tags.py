@@ -72,6 +72,8 @@ class TagsTest(BaseTest):
         args = client_mock.resource_groups.update.call_args[0]
         self.assertEqual(args[0], resource_group['name'])
         self.assertEqual(args[1].tags, self.existing_tags)
+        # Only PATCH tags
+        self.assertListEqual(['tags'], [x for x in args[1].as_dict() if x is not None])
 
         action.manager.type = 'vm'
         TagHelper.update_resource_tags(action, resource, self.existing_tags)
@@ -79,3 +81,5 @@ class TagsTest(BaseTest):
         args = client_mock.resources.update_by_id.call_args[0]
         self.assertEqual(args[0], resource['id'])
         self.assertEqual(args[2].tags, self.existing_tags)
+        # Only PATCH tags
+        self.assertListEqual(['tags'], [x for x in args[2].as_dict() if x is not None])

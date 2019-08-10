@@ -1,0 +1,84 @@
+{
+  "body": {
+    "kind": "compute#instanceTemplate", 
+    "description": "", 
+    "properties": {
+      "canIpForward": false, 
+      "disks": [
+        {
+          "deviceName": "custodian-instance-template", 
+          "kind": "compute#attachedDisk", 
+          "initializeParams": {
+            "diskSizeGb": "10", 
+            "sourceImage": "projects/debian-cloud/global/images/debian-9-stretch-v20190514", 
+            "diskType": "pd-standard"
+          }, 
+          "autoDelete": true, 
+          "index": 0, 
+          "boot": true, 
+          "mode": "READ_WRITE", 
+          "type": "PERSISTENT"
+        }
+      ], 
+      "scheduling": {
+        "automaticRestart": true, 
+        "preemptible": false, 
+        "onHostMaintenance": "MIGRATE"
+      }, 
+      "machineType": "f1-micro", 
+      "serviceAccounts": [
+        {
+          "scopes": [
+            "https://www.googleapis.com/auth/devstorage.read_only", 
+            "https://www.googleapis.com/auth/logging.write", 
+            "https://www.googleapis.com/auth/monitoring.write", 
+            "https://www.googleapis.com/auth/servicecontrol", 
+            "https://www.googleapis.com/auth/service.management.readonly", 
+            "https://www.googleapis.com/auth/trace.append"
+          ], 
+          "email": "62100636004-compute@developer.gserviceaccount.com"
+        }
+      ], 
+      "networkInterfaces": [
+        {
+          "kind": "compute#networkInterface", 
+          "accessConfigs": [
+            {
+              "networkTier": "PREMIUM", 
+              "kind": "compute#accessConfig", 
+              "type": "ONE_TO_ONE_NAT", 
+              "name": "External NAT"
+            }
+          ], 
+          "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default"
+        }
+      ], 
+      "metadata": {
+        "kind": "compute#metadata", 
+        "fingerprint": "cc9idZffRtk="
+      }
+    }, 
+    "creationTimestamp": "2019-06-06T00:20:10.885-07:00", 
+    "id": "4545077653447966789", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/instanceTemplates/custodian-instance-template", 
+    "name": "custodian-instance-template"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1818", 
+    "transfer-encoding": "chunked", 
+    "expires": "Thu, 13 Jun 2019 14:24:25 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Thu, 13 Jun 2019 14:24:25 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/instanceTemplates/custodian-instance-template?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"CHgXYN9oFn3ZCee-MFlST0-7WAQ=/jWK_PEyd-cJLIumZaeRoTUq6GzU=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

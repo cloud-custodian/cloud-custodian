@@ -14,7 +14,7 @@ for file in "$templateDirectory"/*.json; do
 
   if [ $# -eq 0 ] || [[ "$@" =~ "$filenameNoExtension" ]]; then
     echo "Deleting $rgName"
-    az group delete --name $rgName --yes
+    az group delete --name $rgName --yes --no-wait
   else
     echo "Skipping $rgName"
   fi
@@ -24,14 +24,14 @@ done
 # Destroy ACS resource
 rgName=test_containerservice
 if [ $# -eq 0 ] || [[ "$@" =~ "containerservice" ]]; then
-  az group delete --name $rgName --yes
+  az group delete --name $rgName --yes --no-wait
 else
   echo "Skipping $rgName"
 fi
 
 # Destroy Azure Policy Assignment
 if [ $# -eq 0 ] || [[ "$@" =~ "policyassignment" ]]; then
-  az policy assignment delete --name cctestpolicy
+  az policy assignment delete --name cctestpolicy --no-wait
 else
   echo "Skipping policyassignment"
 fi

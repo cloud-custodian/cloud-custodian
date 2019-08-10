@@ -60,6 +60,7 @@ import c7n_azure.resources.k8s_service
 import c7n_azure.resources.apimanagement
 import c7n_azure.resources.appserviceplan
 import c7n_azure.resources.dns_zone
+import c7n_azure.resources.event_hub
 import c7n_azure.resources.record_set  # noqa: F401
 
 
