@@ -15,23 +15,55 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest
 from c7n_azure.utils import get_service_tag_ip_space
+from unittest import mock
+import json
 
 
 class UtilsTest(BaseTest):
 
-    def test_get_service_tag_ip_space(self):
-        # Intentionally vague assertions as it will change next time we record cassettes.
-        # I want to use a real cassette since it is a preview API and the
-        # schema may change which we'll want to catch in functionals.
+    @mock.patch('azure.mgmt.network._network_management_client.NetworkManagementClient')
+    def test_get_service_tag_ip_space(self, client_mock):
+        client_mock.service_tags = mock.MagicMock()
+        client_mock.service_tags.list.return_value = UtilsTest.get_ip_space()
 
-        # Should only be a few of these
-        result = get_service_tag_ip_space('ApiManagement', 'eastus2')
-        self.assertTrue(len(result) < 20)
+        result = get_service_tag_ip_space('ApiManagement', 'WestUS')
+        self.assertEqual(10, len(result))
 
         # This is in all regions, so it must be larger than previous
-        larger_result = get_service_tag_ip_space('ApiManagement')
-        self.assertTrue(len(larger_result) > len(result))
+        result = get_service_tag_ip_space('ApiManagement')
+        self.assertEqual(10, len(result))
 
-        # Total IP space, will be around 2500
-        result = get_service_tag_ip_space()
-        self.assertTrue(len(result) > 2000)
+
+    @staticmethod
+    def get_ip_space():
+        data = """
+           { "values": [
+                {
+                    "name": "ApiManagement",
+                    "id": "ApiManagement",
+                    "properties": {
+                        "address_prefixes": [
+                            "13.69.64.76/31",
+                            "13.69.66.144/28",
+                            "23.101.67.140/32",
+                            "51.145.179.78/32",
+                            "137.117.160.56/32"
+                        ]
+                    }
+                },
+                {
+                    "name": "ApiManagement.WestUS",
+                    "id": "ApiManagement.WestUS",
+                    "properties": {
+                        "address_prefixes": [
+                            "13.64.39.16/32",
+                            "40.112.242.148/31",
+                            "40.112.243.240/28"
+                        ]
+                    }
+                }
+            ]
+         }"""
+
+        return json.loads(data)
+
