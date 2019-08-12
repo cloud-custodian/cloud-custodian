@@ -36,11 +36,11 @@ class TestFirewallActions(BaseTest):
         action = StorageSetNetworkRulesAction(data)
         action.append = False
         rules = action._build_bypass_rules(resource, data['bypass-rules'])
-        self.assertCountEqual(sorted(['Logging', 'Metrics']), sorted(rules))
+        self.assertEqual(sorted(['Logging', 'Metrics']), sorted(rules))
 
         action.append = True
         rules = action._build_bypass_rules(resource, data['bypass-rules'])
-        self.assertCountEqual(sorted(['Logging', 'Metrics', 'Hello', 'World']), sorted(rules))
+        self.assertEqual(sorted(['Logging', 'Metrics', 'Hello', 'World']), sorted(rules))
 
     def test_build_vnet_rules(self):
         data = {
@@ -60,11 +60,11 @@ class TestFirewallActions(BaseTest):
         action = StorageSetNetworkRulesAction(data)
         action.append = False
         rules = action._build_vnet_rules(resource, data['virtual-network-rules'])
-        self.assertCountEqual(sorted(['id1', 'id2']), sorted(rules))
+        self.assertEqual(sorted(['id1', 'id2']), sorted(rules))
 
         action.append = True
         rules = action._build_vnet_rules(resource, data['virtual-network-rules'])
-        self.assertCountEqual(sorted(['id1', 'id2', 'Hello', 'World']), sorted(rules))
+        self.assertEqual(sorted(['id1', 'id2', 'Hello', 'World']), sorted(rules))
 
     def test_build_ip_rules(self):
         data = {
@@ -83,11 +83,11 @@ class TestFirewallActions(BaseTest):
         action = StorageSetNetworkRulesAction(data)
         action.append = False
         rules = action._build_ip_rules(resource, data['ip-rules'])
-        self.assertCountEqual(sorted(['1.1.1.1', '6.0.0.0/16']), sorted(rules))
+        self.assertEqual(sorted(['1.1.1.1', '6.0.0.0/16']), sorted(rules))
 
         action.append = True
         rules = action._build_ip_rules(resource, data['ip-rules'])
-        self.assertCountEqual(sorted(['1.1.1.1', '6.0.0.0/16', '8.0.0.0/12']), sorted(rules))
+        self.assertEqual(sorted(['1.1.1.1', '6.0.0.0/16', '8.0.0.0/12']), sorted(rules))
 
     def test_build_ip_rules_alias(self):
         data = {
