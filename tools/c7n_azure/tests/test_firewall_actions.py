@@ -91,7 +91,7 @@ class TestFirewallActions(BaseTest):
 
     def test_build_ip_rules_alias(self):
         data = {
-            'ip-rules': ['ServiceTags.AppService.WestUS', '6.0.0.0/16']
+            'ip-rules': ['ServiceTags.ApiManagement.WestUS', '6.0.0.0/16']
         }
 
         resource = {
@@ -107,10 +107,10 @@ class TestFirewallActions(BaseTest):
         action.append = False
         rules = action._build_ip_rules(resource, data['ip-rules'])
         self.assertIn('6.0.0.0/16', rules)
-        self.assertTrue(len(rules) > 20)
+        self.assertEqual(4, len(rules))
 
-        # With append we expect all our specified values + a bunch of others from the service tag.
+        # With append we expect all our specified values + others from the service tag.
         action.append = True
         rules = action._build_ip_rules(resource, data['ip-rules'])
         self.assertTrue({'6.0.0.0/16', '1.1.1.1', '8.0.0.0/12'} <= set(rules))
-        self.assertTrue(len(rules) > 20)
+        self.assertEqual(6, len(rules))

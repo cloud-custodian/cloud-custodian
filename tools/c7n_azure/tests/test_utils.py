@@ -15,55 +15,23 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest
 from c7n_azure.utils import get_service_tag_ip_space
-from unittest import mock
-import json
 
 
 class UtilsTest(BaseTest):
 
-    @mock.patch('azure.mgmt.network._network_management_client.NetworkManagementClient')
-    def test_get_service_tag_ip_space(self, client_mock):
-        client_mock.service_tags = mock.MagicMock()
-        client_mock.service_tags.list.return_value = UtilsTest.get_ip_space()
-
+    def test_get_service_tag_ip_space(self):
+        # Get with region
         result = get_service_tag_ip_space('ApiManagement', 'WestUS')
-        self.assertEqual(10, len(result))
+        self.assertEqual(3, len(result))
+        self.assertEqual({"13.64.39.16/32",
+                          "40.112.242.148/31",
+                          "40.112.243.240/28"}, set(result))
 
-        # This is in all regions, so it must be larger than previous
+        # Get without region
         result = get_service_tag_ip_space('ApiManagement')
-        self.assertEqual(10, len(result))
-
-
-    @staticmethod
-    def get_ip_space():
-        data = """
-           { "values": [
-                {
-                    "name": "ApiManagement",
-                    "id": "ApiManagement",
-                    "properties": {
-                        "address_prefixes": [
-                            "13.69.64.76/31",
-                            "13.69.66.144/28",
-                            "23.101.67.140/32",
-                            "51.145.179.78/32",
-                            "137.117.160.56/32"
-                        ]
-                    }
-                },
-                {
-                    "name": "ApiManagement.WestUS",
-                    "id": "ApiManagement.WestUS",
-                    "properties": {
-                        "address_prefixes": [
-                            "13.64.39.16/32",
-                            "40.112.242.148/31",
-                            "40.112.243.240/28"
-                        ]
-                    }
-                }
-            ]
-         }"""
-
-        return json.loads(data)
-
+        self.assertEqual(5, len(result))
+        self.assertEqual({"13.69.64.76/31",
+                          "13.69.66.144/28",
+                          "23.101.67.140/32",
+                          "51.145.179.78/32",
+                          "137.117.160.56/32"}, set(result))
