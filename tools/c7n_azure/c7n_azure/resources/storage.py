@@ -78,9 +78,10 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
 
     .. code-block:: yaml
 
-        - type: set-network-rules
-              default-action: Deny
-              bypass: [Logging, Metrics]
+        - type: set-firewall-rules
+              bypass-rules:
+                  - Logging
+                  - Metrics
               ip-rules:
                   - 11.12.13.0/16
                   - ServiceTags.AppService.CentralUS
