@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 import time
-from gcp_common import BaseTest
+
+from gcp_common import BaseTest, event_data
+from googleapiclient.errors import HttpError
 
 
 class InstanceTest(BaseTest):
@@ -164,3 +167,73 @@ class ImageTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class InstanceTemplateTest(BaseTest):
+
+    def test_instance_template_query(self):
+        project_id = 'cloud-custodian'
+        resource_name = 'custodian-instance-template'
+        session_factory = self.replay_flight_data(
+            'instance-template-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-instance-template-dryrun',
+             'resource': 'gcp.instance-template'},
+            session_factory=session_factory)
+        resources = policy.run()
+
+        self.assertEqual(resources[0]['name'], resource_name)
+
+    def test_instance_template_get(self):
+        resource_name = 'custodian-instance-template'
+        session_factory = self.replay_flight_data(
+            'instance-template-get')
+
+        policy = self.load_policy(
+            {'name': 'gcp-instance-template-audit',
+             'resource': 'gcp.instance-template',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['beta.compute.instanceTemplates.insert']
+             }},
+            session_factory=session_factory)
+
+        exec_mode = policy.get_execution_mode()
+        event = event_data('instance-template-create.json')
+        resources = exec_mode.run(event, None)
+        self.assertEqual(resources[0]['name'], resource_name)
+
+    def test_instance_template_delete(self):
+        project_id = 'cloud-custodian'
+        resource_name = 'instance-template-to-delete'
+        resource_full_name = 'projects/%s/global/instanceTemplates/%s' % (project_id, resource_name)
+        session_factory = self.replay_flight_data(
+            'instance-template-delete', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-instance-template-delete',
+             'resource': 'gcp.instance-template',
+             'filters': [{
+                 'type': 'value',
+                 'key': 'name',
+                 'value': resource_name
+             }],
+             'actions': [{'type': 'delete'}]},
+            session_factory=session_factory)
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], resource_name)
+
+        if self.recording:
+            time.sleep(1)
+
+        client = policy.resource_manager.get_client()
+        try:
+            result = client.execute_query(
+                'get', {'project': project_id,
+                        'instanceTemplate': resource_name})
+            self.fail('found deleted resource: %s' % result)
+        except HttpError as e:
+            self.assertTrue(re.match(".*The resource '%s' was not found.*" %
+                                     resource_full_name, str(e)))

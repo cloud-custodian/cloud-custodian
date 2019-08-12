@@ -1,0 +1,126 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.91",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-06-06T07:20:09.552Z",
+        "reason": "8uSywAY4GjZGb3IgYmFja2dyb3VuZCBvcGVyYXRpb25zIGluIEdvb2dsZSBEZXZlbG9wZXJzIENvbnNvbGU",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "beta.compute.instanceTemplates.insert",
+    "authorizationInfo": [
+      {
+        "permission": "compute.instanceTemplates.create",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/cloud-custodian/global/instanceTemplates/custodian-instance-template",
+          "type": "compute.instanceTemplates"
+        }
+      }
+    ],
+    "resourceName": "projects/cloud-custodian/global/instanceTemplates/custodian-instance-template",
+    "request": {
+      "@type": "type.googleapis.com/compute.instanceTemplates.insert",
+      "name": "custodian-instance-template",
+      "description": "",
+      "properties": {
+        "displayDevice": {
+          "enableDisplay": false
+        },
+        "serviceAccounts": [
+          {
+            "scopes": [
+              "https://www.googleapis.com/auth/devstorage.read_only",
+              "https://www.googleapis.com/auth/logging.write",
+              "https://www.googleapis.com/auth/monitoring.write",
+              "https://www.googleapis.com/auth/servicecontrol",
+              "https://www.googleapis.com/auth/service.management.readonly",
+              "https://www.googleapis.com/auth/trace.append"
+            ],
+            "email": "62100636004-compute@developer.gserviceaccount.com"
+          }
+        ],
+        "disks": [
+          {
+            "type": "PERSISTENT",
+            "mode": "READ_WRITE",
+            "autoDelete": true,
+            "initializeParams": {
+              "diskSizeGb": "10",
+              "sourceImage": "projects/debian-cloud/global/images/debian-9-stretch-v20190514",
+              "diskType": "pd-standard"
+            },
+            "deviceName": "custodian-instance-template",
+            "boot": true
+          }
+        ],
+        "machineType": "f1-micro",
+        "canIpForward": false,
+        "scheduling": {
+          "preemptible": false,
+          "automaticRestart": true,
+          "onHostMaintenance": "MIGRATE"
+        },
+        "networkInterfaces": [
+          {
+            "network": "projects/cloud-custodian/global/networks/default",
+            "accessConfigs": [
+              {
+                "networkTier": "PREMIUM",
+                "name": "External NAT",
+                "type": "ONE_TO_ONE_NAT"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "response": {
+      "name": "operation-1559805609371-58aa28b43e664-666d712a-0c5139b4",
+      "targetId": "4545077653447966789",
+      "id": "7414302861591642181",
+      "@type": "type.googleapis.com/operation",
+      "startTime": "2019-06-06T00:20:11.102-07:00",
+      "progress": "0",
+      "insertTime": "2019-06-06T00:20:11.088-07:00",
+      "user": "alex.karpitski@gmail.com",
+      "selfLink": "https://www.googleapis.com/compute/beta/projects/cloud-custodian/global/operations/operation-1559805609371-58aa28b43e664-666d712a-0c5139b4",
+      "targetLink": "https://www.googleapis.com/compute/beta/projects/cloud-custodian/global/instanceTemplates/custodian-instance-template",
+      "operationType": "compute.instanceTemplates.insert",
+      "selfLinkWithId": "https://www.googleapis.com/compute/beta/projects/cloud-custodian/global/operations/7414302861591642181",
+      "status": "RUNNING"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "global"
+      ]
+    }
+  },
+  "insertId": "op199ld921s",
+  "resource": {
+    "type": "gce_instance_template",
+    "labels": {
+      "instance_template_name": "custodian-instance-template",
+      "instance_template_id": "4545077653447966789",
+      "project_id": "cloud-custodian"
+    }
+  },
+  "timestamp": "2019-06-06T07:20:09.450Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "operation": {
+    "id": "operation-1559805609371-58aa28b43e664-666d712a-0c5139b4",
+    "producer": "type.googleapis.com",
+    "first": true
+  },
+  "receiveTimestamp": "2019-06-06T07:20:12.240429644Z"
+}

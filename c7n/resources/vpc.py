@@ -1139,10 +1139,17 @@ class SGPermission(Filter):
 
 
 SGPermissionSchema = {
-    'IpProtocol': {'enum': [-1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+    'match-operator': {'type': 'string', 'enum': ['or', 'and']},
+    'Ports': {'type': 'array', 'items': {'type': 'integer'}},
+    'SelfReference': {'type': 'boolean'},
     'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
-    'FromPort': {'type': 'integer'},
-    'ToPort': {'type': 'integer'},
+    'IpProtocol': {'enum': ["-1", -1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+    'FromPort': {'oneOf': [
+        {'$ref': '#/definitions/filters/value'},
+        {'type': 'integer'}]},
+    'ToPort': {'oneOf': [
+        {'$ref': '#/definitions/filters/value'},
+        {'type': 'integer'}]},
     'UserIdGroupPairs': {},
     'IpRanges': {},
     'PrefixListIds': {},
@@ -1159,12 +1166,7 @@ class IPPermission(SGPermission):
     schema = {
         'type': 'object',
         'additionalProperties': False,
-        'properties': {
-            'type': {'enum': ['ingress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
-            'SelfReference': {'type': 'boolean'}
-        },
+        'properties': {'type': {'enum': ['ingress']}},
         'required': ['type']}
     schema['properties'].update(SGPermissionSchema)
 
@@ -1176,11 +1178,7 @@ class IPPermissionEgress(SGPermission):
     schema = {
         'type': 'object',
         'additionalProperties': False,
-        'properties': {
-            'type': {'enum': ['egress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'SelfReference': {'type': 'boolean'}
-        },
+        'properties': {'type': {'enum': ['egress']}},
         'required': ['type']}
     schema['properties'].update(SGPermissionSchema)
 
