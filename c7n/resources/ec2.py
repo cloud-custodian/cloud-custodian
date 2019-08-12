@@ -1873,6 +1873,7 @@ class LaunchTemplate(query.QueryResourceManager):
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidLaunchTemplateId.NotFound":
                     continue
+                raise
             if not tversions:
                 tversions = [str(t['VersionNumber']) for t in ltv]
             for tversion, t in zip(tversions, ltv):
