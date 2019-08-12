@@ -77,6 +77,7 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
     use a regional block to fit within the limit.
 
     .. code-block:: yaml
+
         - type: set-network-rules
               default-action: Deny
               bypass: [Logging, Metrics]
