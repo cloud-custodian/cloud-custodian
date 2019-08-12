@@ -1,0 +1,57 @@
+{
+  "body": {
+    "billingAccounts": [
+      {
+        "displayName": "Temp test 1", 
+        "open": true, 
+        "name": "billingAccounts/01B5F9-B54DAC-025BC7"
+      }, 
+      {
+        "displayName": "My Billing Account 4", 
+        "name": "billingAccounts/01EDB6-A0CEBD-C6B8BD"
+      }, 
+      {
+        "displayName": "mybillingaccount", 
+        "open": true, 
+        "name": "billingAccounts/016591-0C32EA-F3D1B3"
+      }, 
+      {
+        "displayName": "Temp test", 
+        "name": "billingAccounts/01D55B-949D3D-5F8A7E"
+      }, 
+      {
+        "displayName": "hu", 
+        "open": true, 
+        "name": "billingAccounts/0123C1-3FCB51-A8F8F5"
+      }, 
+      {
+        "displayName": "My Billing Account 2", 
+        "name": "billingAccounts/01F8A0-BA806C-2D02C6"
+      }, 
+      {
+        "displayName": "My Billing Account 3 Updated", 
+        "name": "billingAccounts/0115DA-ACF055-244322"
+      }, 
+      {
+        "displayName": "My Billing Account 1", 
+        "name": "billingAccounts/013D10-EF85F7-55954D"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "944", 
+    "x-xss-protection": "0", 
+    "content-location": "https://cloudbilling.googleapis.com/v1/billingAccounts?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Mon, 12 Aug 2019 09:44:25 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

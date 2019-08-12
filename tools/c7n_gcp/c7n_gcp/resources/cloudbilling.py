@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import jmespath
+from c7n_gcp.actions import SetIamPolicy
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
-
-import jmespath
 
 
 @resources.register('cloudbilling-account')
@@ -34,3 +34,6 @@ class CloudBillingAccount(QueryResourceManager):
             return client.execute_query(
                 'get', {'name': jmespath.search(
                     'protoPayload.response.billingAccountInfo.billingAccountName', event)})
+
+
+CloudBillingAccount.action_registry.register('set-iam-policy', SetIamPolicy)

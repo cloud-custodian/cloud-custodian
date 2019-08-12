@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+
 from gcp_common import BaseTest, event_data
 
 
@@ -49,3 +51,45 @@ class CloudBillingAccountTest(BaseTest):
 
         resources = exec_mode.run(event, None)
         self.assertEqual(resources[0]['name'], billingaccount_resource_name)
+
+    def test_billingaccount_set_iam_policy(self):
+        resource_full_name = 'billingAccounts/0123C1-3FCB51-A8F8F5'
+        session_factory = self.replay_flight_data(
+            'cloudbilling-account-set-iam-policy')
+
+        policy = self.load_policy(
+            {'name': 'gcp-cloudbilling-account-set-iam-policy',
+             'resource': 'gcp.cloudbilling-account',
+             'filters': [{'type': 'value',
+                          'key': 'name',
+                          'value': resource_full_name}],
+             'actions': [{'type': 'set-iam-policy',
+                          'add-bindings':
+                              [{'members': ['user:alex.karpitski@gmail.com'],
+                                'role': 'roles/billing.user'}],
+                          'remove-bindings':
+                              [{'members': ['user:alex.karpitski@gmail.com'],
+                                'role': 'roles/billing.admin'}]}]},
+            session_factory=session_factory)
+
+        client = policy.resource_manager.get_client()
+        actual_bindings = client.execute_query('getIamPolicy', {'resource': resource_full_name})
+        self.assertEqual(actual_bindings['bindings'],
+                         [{'members': ['serviceAccount:acc@cloud-custodian.iam.gserviceaccount.com',
+                                       'user:alex.karpitski@gmail.com'],
+                           'role': 'roles/billing.admin'}])
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], resource_full_name)
+
+        if self.recording:
+            time.sleep(1)
+
+        actual_bindings = client.execute_query('getIamPolicy', {'resource': resource_full_name})
+        self.assertEqual(actual_bindings['bindings'],
+                         [{'members': [
+                             'serviceAccount:acc@cloud-custodian.iam.gserviceaccount.com'],
+                           'role': 'roles/billing.admin'},
+                          {'members': ['user:alex.karpitski@gmail.com'],
+                           'role': 'roles/billing.user'}])
