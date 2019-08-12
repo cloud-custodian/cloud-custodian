@@ -69,6 +69,10 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
 
     Updates Azure Storage Firewalls and Virtual Networks settings.
 
+    By default the firewall rules are replaced with the new values.  The ``append``
+    flag can be used to force merging the new rules with the existing ones on
+    the resource.
+
     You may also reference azure public cloud Service Tags by name in place of
     an IP address.  Use ``ServiceTags.`` followed by the ``name`` of any group
     from https://www.microsoft.com/en-us/download/details.aspx?id=56519.
