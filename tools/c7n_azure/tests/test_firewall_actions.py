@@ -1,4 +1,4 @@
-# Copyright 2015-2018 Capital One Services, LLC
+# Copyright 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,11 +36,11 @@ class TestFirewallActions(BaseTest):
         action = StorageSetNetworkRulesAction(data)
         action.append = False
         rules = action._build_bypass_rules(resource, data['bypass-rules'])
-        self.assertEqual(sorted(['Logging', 'Metrics']), sorted(rules))
+        self.assertEqual('Logging,Metrics', rules)
 
         action.append = True
         rules = action._build_bypass_rules(resource, data['bypass-rules'])
-        self.assertEqual(sorted(['Logging', 'Metrics', 'Hello', 'World']), sorted(rules))
+        self.assertEqual('Logging,Metrics,Hello,World', rules)
 
     def test_build_vnet_rules(self):
         data = {

@@ -419,7 +419,7 @@ class IpRangeHelper(object):
         result = IPSet()
         for r in ranges:
             resolved_set = resolve_service_tag_alias(r[0])
-            if resolved_set:
+            if resolved_set is not None:
                 result.update(resolved_set)
             else:
                 if len(r) > 2:

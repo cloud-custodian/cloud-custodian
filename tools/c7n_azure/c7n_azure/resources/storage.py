@@ -78,7 +78,8 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
     from https://www.microsoft.com/en-us/download/details.aspx?id=56519.
 
     Note that there are firewall rule number limits and that you will likely need to
-    use a regional block to fit within the limit.
+    use a regional block to fit within the limit.  The limit for storage accounts is
+    200 rules.
 
     .. code-block:: yaml
 
@@ -171,8 +172,7 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
             VirtualNetworkRule(virtual_network_resource_id=r) for r in vnet_rules]
 
         # Configure BYPASS
-        bypass_rules = self._build_bypass_rules(resource, self.data.get('bypass', []))
-        rule_set.bypass = ','.join(bypass_rules or ['None'])
+        rule_set.bypass = self._build_bypass_rules(resource, self.data.get('bypass', []))
 
         # Update resource
         self.client.storage_accounts.update(
@@ -185,7 +185,7 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
             existing_bypass = resource['properties']['networkAcls'].get('bypass', '').split(',')
             without_duplicates = [r for r in existing_bypass if r not in new_rules]
             new_rules.extend(without_duplicates)
-        return new_rules
+        return ','.join(new_rules or ['None'])
 
     def _build_vnet_rules(self, resource, new_rules):
         if self.append:
