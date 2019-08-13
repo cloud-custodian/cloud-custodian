@@ -1,7 +1,10 @@
 
+# Image information for the Pod, default to the latest cloud custodian image
 image:
   repository:  cloudcustodian/c7n
   tag: latest
   pullPolicy: Always
 
+# All configuration for the Azure Container Host 
+# can be provided through environement variables.
 environment: {}
