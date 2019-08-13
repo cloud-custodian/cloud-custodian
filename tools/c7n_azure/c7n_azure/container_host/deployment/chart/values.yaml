@@ -1,0 +1,7 @@
+
+image:
+  repository:  cloudcustodian/c7n
+  tag: latest
+  pullPolicy: Always
+
+environment: {}
