@@ -401,7 +401,7 @@ class Host:
               help="The resource id of the storage account to create the event queue in")
 @click.option("--event-queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME, required=True,
               help="The name of the event queue to create")
-@click.option("--policy-storage", "-s", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
+@click.option("--policy-storage", "-p", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
               help="The URI to the Azure storage container that holds the policies")
 @click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
               help="Location to send policy logs")
