@@ -91,8 +91,8 @@ class ResizePlan(AzureBaseAction):
         model = models.AppServicePlan(location=resource['location'])
 
         if resource['kind'] == 'functionapp':
-            self.log.info(f"Skipping {resource['name']}, "
-                          f"because this App Service Plan is for Consumption Azure Functions.")
+            self.log.info("Skipping %s, because this App Service Plan "
+                          "is for Consumption Azure Functions." % resource['name'])
             return
 
         if resource['kind'] == 'linux':
