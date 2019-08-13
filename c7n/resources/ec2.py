@@ -1873,13 +1873,16 @@ class LaunchTemplate(query.QueryResourceManager):
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidLaunchTemplateId.NotFound":
                     continue
+                if e.response['Error']['Code'] == "InvalidLaunchTemplateId.VersionNotFound":
+                    continue
                 raise
             if not tversions:
                 tversions = [str(t['VersionNumber']) for t in ltv]
-            for tversion, t in zip(tversions, ltv):
-                if not tversion.isdigit():
-                    t['c7n:VersionAlias'] = tversion
-                results.append(t)
+            if ltv:
+                for tversion, t in zip(tversions, ltv):
+                    if not tversion.isdigit():
+                        t['c7n:VersionAlias'] = tversion
+                    results.append(t)
         return results
 
     def get_asg_templates(self, asgs):
