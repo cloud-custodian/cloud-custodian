@@ -1,5 +1,5 @@
-Storage - Block public access when IP range is defined
-====================================
+Storage - Block public access
+=============================
 
 .. code-block:: yaml
 
