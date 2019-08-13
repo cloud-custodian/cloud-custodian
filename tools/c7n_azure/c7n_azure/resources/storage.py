@@ -29,8 +29,8 @@ from c7n_azure.filters import FirewallRulesFilter, ValueFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
-from c7n_azure.utils import ThreadHelper
-from netaddr import IPSet
+from c7n_azure.utils import ThreadHelper, resolve_service_tag_alias
+from netaddr import IPSet, IPAddress
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import type_schema
@@ -63,11 +63,34 @@ class Storage(ArmResourceManager):
         resource_type = 'Microsoft.Storage/storageAccounts'
 
 
-@Storage.action_registry.register('set-network-rules')
+@Storage.action_registry.register('set-firewall-rules')
 class StorageSetNetworkRulesAction(AzureBaseAction):
     """ Set Network Rules Action
 
     Updates Azure Storage Firewalls and Virtual Networks settings.
+
+    By default the firewall rules are replaced with the new values.  The ``append``
+    flag can be used to force merging the new rules with the existing ones on
+    the resource.
+
+    You may also reference azure public cloud Service Tags by name in place of
+    an IP address.  Use ``ServiceTags.`` followed by the ``name`` of any group
+    from https://www.microsoft.com/en-us/download/details.aspx?id=56519.
+
+    Note that there are firewall rule number limits and that you will likely need to
+    use a regional block to fit within the limit.  The limit for storage accounts is
+    200 rules.
+
+    .. code-block:: yaml
+
+        - type: set-firewall-rules
+              bypass-rules:
+                  - Logging
+                  - Metrics
+              ip-rules:
+                  - 11.12.13.0/16
+                  - ServiceTags.AppService.CentralUS
+
 
     :example:
 
@@ -92,64 +115,104 @@ class StorageSetNetworkRulesAction(AzureBaseAction):
                   value: 0
 
             actions:
-                - type: set-network-rules
-                  default-action: Deny
-                  bypass: [Logging, Metrics]
+                - type: set-firewall-rules
+                  bypass-rules:
+                      - Logging
+                      - Metrics
                   ip-rules:
-                      - ip-address-or-range: 11.12.13.14
-                      - ip-address-or-range: 21.22.23.24
+                      - 11.12.13.0/16
+                      - 21.22.23.24
                   virtual-network-rules:
-                      - virtual-network-resource-id: <subnet_resource_id>
-                      - virtual-network-resource-id: <subnet_resource_id>
+                      - <subnet_resource_id>
+                      - <subnet_resource_id>
 
     """
 
     schema = type_schema(
-        'set-network-rules',
-        required=['default-action'],
+        'set-firewall-rules',
+        required=[],
         **{
-            'default-action': {'enum': ['Allow', 'Deny']},
-            'bypass': {'type': 'array', 'items': {'enum': ['AzureServices', 'Logging', 'Metrics']}},
-            'ip-rules': {
-                'type': 'array',
-                'items': {'ip-address-or-range': {'type': 'string'}}
-            },
-            'virtual-network-rules': {
-                'type': 'array',
-                'items': {'virtual-network-resource-id': {'type': 'string'}}
-            }
+            'default-action': {'enum': ['Allow', 'Deny'], "default": 'Deny'},
+            'append': {'type': 'boolean', "default": False},
+            'bypass-rules': {'type': 'array', 'items': {
+                'enum': ['AzureServices', 'Logging', 'Metrics']}},
+            'ip-rules': {'type': 'array', 'items': {'type': 'string'}},
+            'virtual-network-rules': {'type': 'array', 'items': {'type': 'string'}}
         }
     )
 
-    def _prepare_processing(self,):
+    def __init__(self, data, manager=None):
+        super(StorageSetNetworkRulesAction, self).__init__(data, manager)
+        self._log = logging.getLogger('custodian.azure.storage')
+        self.rule_limit = 200
+
+    def _prepare_processing(self):
         self.client = self.manager.get_client()
+        self.append = self.data.get('append', False)
 
     def _process_resource(self, resource):
-        rule_set = NetworkRuleSet(default_action=self.data['default-action'])
+        rules = self._build_ip_rules(resource, self.data.get('ip-rules', []))
 
-        if 'ip-rules' in self.data:
-            rule_set.ip_rules = [
-                IPRule(
-                    ip_address_or_range=r['ip-address-or-range'],
-                    action='Allow')  # 'Allow' is the only allowed action
-                for r in self.data['ip-rules']]
+        # Build out the ruleset model to update the resource
+        rule_set = NetworkRuleSet(default_action=self.data.get('default-action', 'Deny'))
 
-        if 'virtual-network-rules' in self.data:
-            rule_set.virtual_network_rules = [
-                VirtualNetworkRule(
-                    virtual_network_resource_id=r['virtual-network-resource-id'],
-                    action='Allow')  # 'Allow' is the only allowed action
-                for r in self.data['virtual-network-rules']]
+        # If the user has too many rules log and skip
+        if len(rules) > self.rule_limit:
+            self._log.error("Skipped updating firewall for %s. "
+                            "%s exceeds maximum rule count of %s." %
+                            (resource['name'], len(rules), self.rule_limit))
+            return
 
-        if len(self.data.get('bypass', [])) > 0:
-            rule_set.bypass = ','.join(self.data['bypass'])
-        else:
-            rule_set.bypass = 'None'
+        # Add IP rules
+        rule_set.ip_rules = [IPRule(ip_address_or_range=r) for r in rules]
 
+        # Add VNET rules
+        vnet_rules = self._build_vnet_rules(resource, self.data.get('virtual-network-rules', []))
+        rule_set.virtual_network_rules = [
+            VirtualNetworkRule(virtual_network_resource_id=r) for r in vnet_rules]
+
+        # Configure BYPASS
+        rule_set.bypass = self._build_bypass_rules(resource, self.data.get('bypass', []))
+
+        # Update resource
         self.client.storage_accounts.update(
             resource['resourceGroup'],
             resource['name'],
             StorageAccountUpdateParameters(network_rule_set=rule_set))
+
+    def _build_bypass_rules(self, resource, new_rules):
+        if self.append:
+            existing_bypass = resource['properties']['networkAcls'].get('bypass', '').split(',')
+            without_duplicates = [r for r in existing_bypass if r not in new_rules]
+            new_rules.extend(without_duplicates)
+        return ','.join(new_rules or ['None'])
+
+    def _build_vnet_rules(self, resource, new_rules):
+        if self.append:
+            existing_rules = [r['id'] for r in
+                              resource['properties']['networkAcls'].get('virtualNetworkRules', [])]
+            without_duplicates = [r for r in existing_rules if r not in new_rules]
+            new_rules.extend(without_duplicates)
+        return new_rules
+
+    def _build_ip_rules(self, resource, new_rules):
+        rules = []
+        for rule in new_rules:
+            resolved_set = resolve_service_tag_alias(rule)
+            if resolved_set:
+                ranges = list(resolved_set.iter_cidrs())
+                for r in range(len(ranges)):
+                    if len(ranges[r]) == 1:
+                        ranges[r] = IPAddress(ranges[r].first)
+                rules.extend(map(str, ranges))
+            else:
+                rules.append(rule)
+
+        if self.append:
+            existing_rules = resource['properties']['networkAcls'].get('ipRules', [])
+            without_duplicates = [r['value'] for r in existing_rules if r['value'] not in rules]
+            rules.extend(without_duplicates)
+        return rules
 
 
 @Storage.filter_registry.register('firewall-rules')

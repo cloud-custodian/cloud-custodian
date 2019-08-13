@@ -26,8 +26,7 @@ from azure.common.credentials import (BasicTokenAuthentication,
 from azure.keyvault import KeyVaultAuthentication, AccessToken
 from c7n_azure import constants
 from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
-                             ManagedGroupHelper)
-from c7n_azure.utils import get_keyvault_secret
+                             ManagedGroupHelper, get_keyvault_secret)
 from msrestazure.azure_active_directory import MSIAuthentication
 
 try:

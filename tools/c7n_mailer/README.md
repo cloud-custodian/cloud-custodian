@@ -31,7 +31,7 @@ and run a policy that triggers an email to your inbox.
 4. In AWS, locate or create a role that has read access to the queue. Grab the
    role ARN and set it as `role` in `mailer.yml`.
 
-there is different notification endpoints options, you can combine both.
+There are different notification endpoints options, you can combine both.
 
 ### Email:
 Make sure your email address is verified in SES, and set it as
@@ -49,7 +49,13 @@ role: arn:aws:iam::123456790:role/c7n-mailer-test
 from_address: you@example.com
 ```
 
-(Also set `region` if you are in a region other than `us-east-1`.)
+You can also set `region` if you are in a region other than `us-east-1` as well as `lambda_tags` to give the mailer tags.
+
+```yaml
+region: us-east-2
+lambda_tags:
+  owner: ops
+```
 
 Now let's make a Custodian policy to populate your mailer queue. Create a
 `test-policy.yml` file with this content (update `to` and `queue` to match your
@@ -531,7 +537,7 @@ The following extra global functions are available:
 | `resource_tag(resource, key)`                                                | retrieve a tag value from a resource or return an empty string, aliased as get_resource_tag_value |
 | `format_resource(resource, resource_type)`                                   | renders a one line summary of a resource                                                          |
 | `date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z')` | customize rendering of an utc datetime string                                                     |
-| `seach(expression, value)`                                                   | jmespath search value using expression                                                            |
+| `search(expression, value)`                                                  | jmespath search value using expression                                                            |
 | `yaml_safe(value)`                                                           | yaml dumper                                                                                       |
 
 The following extra jinja filters are available:
