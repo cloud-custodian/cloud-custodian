@@ -1,4 +1,3 @@
-
 # Image information for the Pod, default to the latest cloud custodian image
 image:
   repository:  cloudcustodian/c7n

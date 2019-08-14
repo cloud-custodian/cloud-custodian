@@ -3,17 +3,21 @@ kind: Deployment
 metadata:
   name: "{{ .Release.Name }}"
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    cloudcustodian.io/azure-container-host: "cloud-custodian"
     cloudcustodian.io/azure-name: "{{ .Release.Name }}"
+    {{ template "azureTargetSubscriptionLabel" . }}
 spec:
   replicas: 1
   selector: 
     matchLabels:
+      cloudcustodian.io/azure-container-host: "cloud-custodian"
       cloudcustodian.io/azure-name: "{{ .Release.Name }}"
   template:
     metadata:
       labels:
+        cloudcustodian.io/azure-container-host: "cloud-custodian"
         cloudcustodian.io/azure-name: "{{ .Release.Name }}"
+        {{ template "azureTargetSubscriptionLabel" . }}
     spec:
       containers:
       - name: "{{ .Release.Name }}"
