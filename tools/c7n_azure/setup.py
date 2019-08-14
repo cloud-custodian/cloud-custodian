@@ -67,7 +67,7 @@ setup(
                       "azure-mgmt-iothub",
                       "azure-mgmt-keyvault",
                       "azure-mgmt-managementgroups",
-                      "azure-mgmt-network",
+                      "azure-mgmt-network>=4.0.0",
                       "azure-mgmt-redis",
                       "azure-mgmt-resource==2.1.0",
                       "azure-mgmt-sql",
