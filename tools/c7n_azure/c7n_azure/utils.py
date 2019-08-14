@@ -29,7 +29,7 @@ from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
 from c7n_azure import constants
 from c7n_azure.constants import RESOURCE_VAULT
-from future.moves import itertools
+import itertools
 from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id

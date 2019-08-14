@@ -303,7 +303,7 @@ class Session(object):
         required_params = ['client_id', 'client_secret', 'tenant_id']
 
         function_auth_params = {k: v for k, v in self._auth_params.items()
-                                if k in required_params}
+                                if k in required_params and v is not None}
         function_auth_params['subscription_id'] = target_subscription_id
 
         # Use dedicated function env vars if available
