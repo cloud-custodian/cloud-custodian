@@ -1878,11 +1878,10 @@ class LaunchTemplate(query.QueryResourceManager):
                 raise
             if not tversions:
                 tversions = [str(t['VersionNumber']) for t in ltv]
-            if ltv:
-                for tversion, t in zip(tversions, ltv):
-                    if not tversion.isdigit():
-                        t['c7n:VersionAlias'] = tversion
-                    results.append(t)
+            for tversion, t in zip(tversions, ltv):
+                if not tversion.isdigit():
+                    t['c7n:VersionAlias'] = tversion
+                results.append(t)
         return results
 
     def get_asg_templates(self, asgs):
