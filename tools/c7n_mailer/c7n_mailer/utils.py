@@ -155,7 +155,7 @@ def get_resource_tag_value(resource, k):
 
 
 def resource_format(resource, resource_type):
-    if resource_type == 'ec2':
+    if resource_type == 'aws.ec2':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         return "%s %s %s %s %s %s" % (
             resource['InstanceId'],
@@ -164,33 +164,33 @@ def resource_format(resource, resource_type):
             resource.get('LaunchTime'),
             tag_map.get('Name', ''),
             resource.get('PrivateIpAddress'))
-    elif resource_type == 'ami':
+    elif resource_type == 'aws.ami':
         return "%s %s %s" % (
             resource.get('Name'), resource['ImageId'], resource['CreationDate'])
-    elif resource_type == 'sagemaker-notebook':
+    elif resource_type == 'aws.sagemaker-notebook':
         return "%s" % (resource['NotebookInstanceName'])
-    elif resource_type == 's3':
+    elif resource_type == 'aws.s3':
         return "%s" % (resource['Name'])
-    elif resource_type == 'ebs':
+    elif resource_type == 'aws.ebs':
         return "%s %s %s %s" % (
             resource['VolumeId'],
             resource['Size'],
             resource['State'],
             resource['CreateTime'])
-    elif resource_type == 'rds':
+    elif resource_type == 'aws.rds':
         return "%s %s %s %s" % (
             resource['DBInstanceIdentifier'],
             "%s-%s" % (
                 resource['Engine'], resource['EngineVersion']),
             resource['DBInstanceClass'],
             resource['AllocatedStorage'])
-    elif resource_type == 'asg':
+    elif resource_type == 'aws.asg':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         return "%s %s %s" % (
             resource['AutoScalingGroupName'],
             tag_map.get('Name', ''),
             "instances: %d" % (len(resource.get('Instances', []))))
-    elif resource_type == 'elb':
+    elif resource_type == 'aws.elb':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         if 'ProhibitedPolicies' in resource:
             return "%s %s %s %s" % (
@@ -203,22 +203,22 @@ def resource_format(resource, resource_type):
             resource['LoadBalancerName'],
             "instances: %d" % len(resource['Instances']),
             "zones: %d" % len(resource['AvailabilityZones']))
-    elif resource_type == 'redshift':
+    elif resource_type == 'aws.redshift':
         return "%s %s %s" % (
             resource['ClusterIdentifier'],
             'nodes:%d' % len(resource['ClusterNodes']),
             'encrypted:%s' % resource['Encrypted'])
-    elif resource_type == 'emr':
+    elif resource_type == 'aws.emr':
         return "%s status:%s" % (
             resource['Id'],
             resource['Status']['State'])
-    elif resource_type == 'cfn':
+    elif resource_type == 'aws.cfn':
         return "%s" % (
             resource['StackName'])
-    elif resource_type == 'launch-config':
+    elif resource_type == 'aws.launch-config':
         return "%s" % (
             resource['LaunchConfigurationName'])
-    elif resource_type == 'security-group':
+    elif resource_type == 'aws.security-group':
         name = resource.get('GroupName', '')
         for t in resource.get('Tags', ()):
             if t['Key'] == 'Name':
@@ -229,18 +229,18 @@ def resource_format(resource, resource_type):
             resource.get('VpcId', 'na'),
             len(resource.get('IpPermissions', ())),
             len(resource.get('IpPermissionsEgress', ())))
-    elif resource_type == 'log-group':
+    elif resource_type == 'aws.log-group':
         if 'lastWrite' in resource:
             return "name: %s last_write: %s" % (
                 resource['logGroupName'],
                 resource['lastWrite'])
         return "name: %s" % (resource['logGroupName'])
-    elif resource_type == 'cache-cluster':
+    elif resource_type == 'aws.cache-cluster':
         return "name: %s created: %s status: %s" % (
             resource['CacheClusterId'],
             resource['CacheClusterCreateTime'],
             resource['CacheClusterStatus'])
-    elif resource_type == 'cache-snapshot':
+    elif resource_type == 'aws.cache-snapshot':
         cid = resource.get('CacheClusterId')
         if cid is None:
             cid = ', '.join([
@@ -249,15 +249,15 @@ def resource_format(resource, resource_type):
             resource['SnapshotName'],
             cid,
             resource['SnapshotSource'])
-    elif resource_type == 'redshift-snapshot':
+    elif resource_type == 'aws.redshift-snapshot':
         return "name: %s db: %s" % (
             resource['SnapshotIdentifier'],
             resource['DBName'])
-    elif resource_type == 'ebs-snapshot':
+    elif resource_type == 'aws.ebs-snapshot':
         return "name: %s date: %s" % (
             resource['SnapshotId'],
             resource['StartTime'])
-    elif resource_type == 'subnet':
+    elif resource_type == 'aws.subnet':
         return "%s %s %s %s %s %s" % (
             resource['SubnetId'],
             resource['VpcId'],
@@ -265,81 +265,81 @@ def resource_format(resource, resource_type):
             resource['State'],
             resource['CidrBlock'],
             resource['AvailableIpAddressCount'])
-    elif resource_type == 'account':
+    elif resource_type == 'aws.account':
         return " %s %s" % (
             resource['account_id'],
             resource['account_name'])
-    elif resource_type == 'cloudtrail':
+    elif resource_type == 'aws.cloudtrail':
         return " %s %s" % (
             resource['account_id'],
             resource['account_name'])
-    elif resource_type == 'vpc':
+    elif resource_type == 'aws.vpc':
         return "%s " % (
             resource['VpcId'])
-    elif resource_type == 'iam-group':
+    elif resource_type == 'aws.iam-group':
         return " %s %s %s" % (
             resource['GroupName'],
             resource['Arn'],
             resource['CreateDate'])
-    elif resource_type == 'rds-snapshot':
+    elif resource_type == 'aws.rds-snapshot':
         return " %s %s %s" % (
             resource['DBSnapshotIdentifier'],
             resource['DBInstanceIdentifier'],
             resource['SnapshotCreateTime'])
-    elif resource_type == 'iam-user':
+    elif resource_type == 'aws.iam-user':
         return " %s " % (
             resource['UserName'])
-    elif resource_type == 'iam-role':
+    elif resource_type == 'aws.iam-role':
         return " %s %s " % (
             resource['RoleName'],
             resource['CreateDate'])
-    elif resource_type == 'iam-policy':
+    elif resource_type == 'aws.iam-policy':
         return " %s " % (
             resource['PolicyName'])
-    elif resource_type == 'iam-profile':
+    elif resource_type == 'aws.iam-profile':
         return " %s " % (
             resource['InstanceProfileId'])
-    elif resource_type == 'dynamodb-table':
+    elif resource_type == 'aws.dynamodb-table':
         return "name: %s created: %s status: %s" % (
             resource['TableName'],
             resource['CreationDateTime'],
             resource['TableStatus'])
-    elif resource_type == "sqs":
+    elif resource_type == "aws.sqs":
         return "QueueURL: %s QueueArn: %s " % (
             resource['QueueUrl'],
             resource['QueueArn'])
-    elif resource_type == "efs":
+    elif resource_type == "aws.efs":
         return "name: %s  id: %s  state: %s" % (
             resource['Name'],
             resource['FileSystemId'],
             resource['LifeCycleState']
         )
-    elif resource_type == "network-addr":
+    elif resource_type == "aws.network-addr":
         return "ip: %s  id: %s  scope: %s" % (
             resource['PublicIp'],
             resource['AllocationId'],
             resource['Domain']
         )
-    elif resource_type == "route-table":
+    elif resource_type == "aws.route-table":
         return "id: %s  vpc: %s" % (
             resource['RouteTableId'],
             resource['VpcId']
         )
-    elif resource_type == "app-elb":
+    elif resource_type == "aws.app-elb":
         return "arn: %s  zones: %s  scheme: %s" % (
             resource['LoadBalancerArn'],
             len(resource['AvailabilityZones']),
             resource['Scheme'])
-    elif resource_type == "nat-gateway":
+    elif resource_type == "aws.nat-gateway":
         return "id: %s  state: %s  vpc: %s" % (
             resource['NatGatewayId'],
             resource['State'],
             resource['VpcId'])
-    elif resource_type == "internet-gateway":
+    elif resource_type == "aws.internet-gateway":
         return "id: %s  attachments: %s" % (
             resource['InternetGatewayId'],
             len(resource['Attachments']))
-    elif resource_type == 'lambda':
+    elif resource_type == 'aws.lambda':
         return "Name: %s  RunTime: %s  \n" % (
             resource['FunctionName'],
             resource['Runtime'])
