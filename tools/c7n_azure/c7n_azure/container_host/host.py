@@ -131,7 +131,7 @@ class Host:
             raise e
 
         # Filter to hashes we have not seen before
-        new_blobs = self.get_new_blobs(blobs)
+        new_blobs = self._get_new_blobs(blobs)
 
         # Get all YAML files on disk that are no longer in blob storage
         cached_policy_files = [f for f in os.listdir(self.policy_cache)
@@ -166,17 +166,17 @@ class Host:
         if self.require_event_update:
             self.update_event_subscriptions()
 
-    def get_new_blobs(self, blobs):
+    def _get_new_blobs(self, blobs):
         new_blobs = []
         for blob in blobs:
             md5_hash = blob.properties.content_settings.content_md5
             if not md5_hash:
-                blob, md5_hash = self.try_create_md5_content_hash(blob)
+                blob, md5_hash = self._try_create_md5_content_hash(blob)
             if blob and md5_hash and md5_hash != self.blob_cache.get(blob.name):
                 new_blobs.append(blob)
         return new_blobs
 
-    def try_create_md5_content_hash(self, blob):
+    def _try_create_md5_content_hash(self, blob):
         # Not all storage clients provide the md5 hash when uploading a file
         # so, we need to make sure that hash exists.
         (client, container, _) = self.policy_blob_client
