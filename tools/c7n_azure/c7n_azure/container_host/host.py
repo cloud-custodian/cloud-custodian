@@ -23,19 +23,22 @@ import yaml
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from azure.common import AzureHttpError
-from azure.mgmt.eventgrid.models import \
-    StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
-from c7n_azure import entry, constants
-from c7n_azure.azure_events import AzureEventSubscription, AzureEvents
-from c7n_azure.provider import Azure
-from c7n_azure.session import Session
-from c7n_azure.storage_utils import StorageUtilities as Storage
-from c7n_azure.utils import ResourceIdParser
+from azure.mgmt.eventgrid.models import (
+    EventSubscriptionFilter, StorageQueueEventSubscriptionDestination,
+    StringInAdvancedFilter)
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources
 from c7n.utils import local_session
+from c7n_azure import constants, entry
+from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
+from c7n_azure.constants import (CONTAINER_EVENT_TRIGGER_MODE,
+                                 CONTAINER_TIME_TRIGGER_MODE)
+from c7n_azure.provider import Azure
+from c7n_azure.session import Session
+from c7n_azure.storage_utils import StorageUtilities as Storage
+from c7n_azure.utils import ResourceIdParser
 
 log = logging.getLogger("c7n_azure.container-host")
 max_dequeue_count = 2
@@ -178,9 +181,23 @@ class Host:
                         policies.update({p.name: {'policy': p}})
 
                         # Update periodic and set event update flag
-                        self.update_periodic(p)
-                        if p.data.get('mode', {}).get('events'):
+                        policy_mode = p.data.get('mode', {}).get('type')
+                        if policy_mode == CONTAINER_TIME_TRIGGER_MODE:
+                            self.update_periodic(p)
+                        elif policy_mode == CONTAINER_EVENT_TRIGGER_MODE:
                             self.require_event_update = True
+                        else:
+                            log.warning(
+                                "Unsupported policy mode for Azure Container Host: {}. "
+                                "{} will not be run. "
+                                "Supported policy modes include \"{}\" and \"{}\"."
+                                .format(
+                                    policy_mode,
+                                    p.data['name'],
+                                    CONTAINER_EVENT_TRIGGER_MODE,
+                                    CONTAINER_TIME_TRIGGER_MODE
+                                )
+                            )
 
             except Exception as exc:
                 log.error('Invalid policy file %s %s' % (path, exc))
@@ -227,18 +244,17 @@ class Host:
         Update scheduled policies using cron type
         periodic scheduling.
         """
-        if policy.data.get('mode', {}).get('schedule'):
-            trigger = CronTrigger.from_crontab(policy.data['mode']['schedule'])
-            trigger.jitter = jitter_seconds
-            self.scheduler.add_job(self.run_policy,
-                                   trigger,
-                                   id=policy.name,
-                                   name=policy.name,
-                                   args=[policy, None, None],
-                                   coalesce=True,
-                                   max_instances=1,
-                                   replace_existing=True,
-                                   misfire_grace_time=20)
+        trigger = CronTrigger.from_crontab(policy.data['mode']['schedule'])
+        trigger.jitter = jitter_seconds
+        self.scheduler.add_job(self.run_policy,
+                               trigger,
+                               id=policy.name,
+                               name=policy.name,
+                               args=[policy, None, None],
+                               coalesce=True,
+                               max_instances=1,
+                               replace_existing=True,
+                               misfire_grace_time=20)
 
     def update_event_subscriptions(self):
         """
