@@ -27,14 +27,21 @@ from azure.mgmt.eventgrid.models import (
     EventSubscriptionFilter, StorageQueueEventSubscriptionDestination,
     StringInAdvancedFilter)
 
+import click
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources
 from c7n.utils import local_session
-from c7n_azure import constants, entry
+from c7n_azure import entry
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
 from c7n_azure.constants import (CONTAINER_EVENT_TRIGGER_MODE,
-                                 CONTAINER_TIME_TRIGGER_MODE)
+                                 CONTAINER_TIME_TRIGGER_MODE,
+                                 ENV_CONTAINER_EVENT_QUEUE_ID,
+                                 ENV_CONTAINER_EVENT_QUEUE_NAME,
+                                 ENV_CONTAINER_OPTION_LOG_GROUP,
+                                 ENV_CONTAINER_OPTION_METRICS,
+                                 ENV_CONTAINER_OPTION_OUTPUT_DIR,
+                                 ENV_CONTAINER_POLICY_STORAGE)
 from c7n_azure.provider import Azure
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities as Storage
@@ -51,21 +58,19 @@ queue_message_count = 5
 
 class Host:
 
-    def __init__(self):
+    def __init__(self, event_queue_id, event_queue_name, policy_storage,
+                 log_group=None, metrics=None, output_dir=None):
         logging.basicConfig(level=logging.INFO, format='%(message)s')
         log.info("Running Azure Cloud Custodian Self-Host")
-
-        if not Host.has_required_params():
-            return
 
         load_resources()
         self.session = local_session(Session)
 
         # Load configuration
-        self.options = Host.build_options()
-        self.policy_storage_uri = os.getenv(constants.ENV_CONTAINER_POLICY_STORAGE)
-        self.event_queue_name = os.getenv(constants.ENV_CONTAINER_EVENT_QUEUE_NAME)
-        self.event_queue_id = os.getenv(constants.ENV_CONTAINER_EVENT_QUEUE_ID)
+        self.options = Host.build_options(output_dir, log_group, metrics)
+        self.policy_storage_uri = policy_storage
+        self.event_queue_name = event_queue_name
+        self.event_queue_id = event_queue_id
 
         # Prepare storage bits
         self.policy_blob_client = None
@@ -381,38 +386,18 @@ class Host:
         return account
 
     @staticmethod
-    def has_required_params():
-        required = [
-            constants.ENV_CONTAINER_POLICY_STORAGE,
-            constants.ENV_CONTAINER_EVENT_QUEUE_NAME,
-            constants.ENV_CONTAINER_EVENT_QUEUE_ID
-        ]
-
-        missing = [r for r in required if os.getenv(r) is None]
-
-        if missing:
-            log.error('Missing REQUIRED environment variable(s): %s' % ', '.join(missing))
-            return False
-
-        return True
-
-    @staticmethod
-    def build_options():
+    def build_options(output_dir=None, log_group=None, metrics=None):
         """
-        Accept some CLI/Execution options as environment
-        variables to apply global config across all policy
-        executions.
+        Initialize the Azure provider to apply global config across all policy executions.
         """
-        output_dir = os.environ.get(constants.ENV_CONTAINER_OPTION_OUTPUT_DIR)
-
         if not output_dir:
             output_dir = tempfile.mkdtemp()
             log.warning('Output directory not specified.  Using directory: %s' % output_dir)
 
         config = Config.empty(
             **{
-                'log_group': os.environ.get(constants.ENV_CONTAINER_OPTION_LOG_GROUP),
-                'metrics': os.environ.get(constants.ENV_CONTAINER_OPTION_METRICS),
+                'log_group': log_group,
+                'metrics': metrics,
                 'output_dir': output_dir
             }
         )
@@ -424,8 +409,27 @@ class Host:
         return filename.lower().endswith(('.yml', '.yaml'))
 
 
+@click.command(help="Periodically run a set of policies from an Azure storage container against "
+    "a single subscription. The host will update itself with new policies and event subscriptions "
+    "as they are added.")
+@click.option("--event-queue-id", "-q", envvar=ENV_CONTAINER_EVENT_QUEUE_ID, required=True,
+              help="The resource id of the storage account to create the event queue in")
+@click.option("--event-queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME, required=True,
+              help="The name of the event queue to create")
+@click.option("--policy-storage", "-p", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
+              help="The URI to the Azure storage container that holds the policies")
+@click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
+              help="Location to send policy logs")
+@click.option("--metrics", "-m", envvar=ENV_CONTAINER_OPTION_METRICS,
+              help="The resource name or instrumentation key for uploading metrics")
+@click.option("--output-dir", "-d", envvar=ENV_CONTAINER_OPTION_OUTPUT_DIR,
+              help="The directory for policy output")
+class HostCommand(Host):
+    pass
+
+
 if __name__ == "__main__":
-    Host()
+    HostCommand()
 
 # Need to manually initialize c7n_azure
 entry.initialize_azure()

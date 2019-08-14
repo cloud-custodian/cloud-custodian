@@ -1,12 +1,12 @@
-Storage - Remove public storage IP-s
-====================================
+Storage - Block public access
+=============================
 
 .. code-block:: yaml
 
     policies:
-        - name: storage-no-public-ip
+      - name: storage-block-public-access
         description: |
-            Find publicly available storage ip-s and remove them while keeping the virtual network access intact.
+            Blocks public access to storage accounts with defined IP access rules.
         resource: azure.storage
         
         filters:
@@ -17,6 +17,6 @@ Storage - Remove public storage IP-s
           value: 0
 
         actions:
-        - type: set-network-rules
+        - type: set-firewall-rules
           default-action: Deny
           ip-rules: []

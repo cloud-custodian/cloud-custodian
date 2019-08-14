@@ -25,7 +25,6 @@ from azure.mgmt.costmanagement.models import (QueryAggregation,
 from azure.mgmt.policyinsights import PolicyInsightsClient
 from dateutil import tz as tzutils
 from dateutil.parser import parse
-from netaddr import AddrFormatError
 
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
@@ -572,16 +571,6 @@ class FirewallRulesFilter(Filter):
     def log(self):
         raise NotImplementedError()
 
-    def validate(self):
-        try:
-            IpRangeHelper.parse_ip_ranges(self.data, 'include')
-            IpRangeHelper.parse_ip_ranges(self.data, 'equal')
-            IpRangeHelper.parse_ip_ranges(self.data, 'any')
-            IpRangeHelper.parse_ip_ranges(self.data, 'only')
-        except AddrFormatError as e:
-            raise PolicyValidationError("Invalid IP range found. %s" % e)
-        return self
-
     def process(self, resources, event=None):
         self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
         self.policy_equal = IpRangeHelper.parse_ip_ranges(self.data, 'equal')
@@ -606,7 +595,7 @@ class FirewallRulesFilter(Filter):
         """
         Queries firewall rules for a resource. Override in concrete classes.
         :param resource:
-        :return: A set of netaddr.IPRange or netaddr.IPSet with rules defined for the resource.
+        :return: A set of netaddr.IPSet with rules defined for the resource.
         """
         raise NotImplementedError()
 

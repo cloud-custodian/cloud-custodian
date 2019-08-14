@@ -13,18 +13,20 @@
         "family": "S",
         "capacity": 1
       },
-      "kind": "app",
-      "name": "cctest-appserviceplan-win",
+      "kind": "linux",
+      "name": "cctest-appserviceplan-linux",
       "apiVersion": "2016-09-01",
       "location": "East US",
       "scale": null,
-      "properties": {},
+      "properties": {
+        "reserved": true
+      },
       "dependsOn": []
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2015-04-01",
-      "name": "cctest-consumption-win",
+      "apiVersion": "2016-09-01",
+      "name": "cctest-consumption-linux",
       "location": "East US",
       "sku": {
         "name": "Y1",
@@ -33,8 +35,10 @@
         "family": "Y",
         "capacity": 0
       },
+      "kind": "functionapp",
       "properties": {
-        "name": "cctest-consumption-win"
+        "name": "cctest-consumption-linux",
+        "reserved": true
       }
     }
   ]

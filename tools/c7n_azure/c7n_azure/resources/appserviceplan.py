@@ -90,6 +90,14 @@ class ResizePlan(AzureBaseAction):
     def _process_resource(self, resource):
         model = models.AppServicePlan(location=resource['location'])
 
+        if resource['kind'] == 'functionapp':
+            self.log.info("Skipping %s, because this App Service Plan "
+                          "is for Consumption Azure Functions." % resource['name'])
+            return
+
+        if resource['kind'] == 'linux':
+            model.reserved = True
+
         if 'size' in self.data:
             size = self.data.get('size')
             model.sku = models.SkuDescription()

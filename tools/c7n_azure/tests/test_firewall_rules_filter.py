@@ -20,8 +20,6 @@ from c7n_azure.filters import FirewallRulesFilter
 from jsonschema import ValidationError
 from netaddr import IPRange, IPNetwork, IPSet
 
-from c7n.exceptions import PolicyValidationError
-
 
 class FirewallRulesFilterTest(BaseTest):
 
@@ -182,11 +180,6 @@ class FirewallRulesFilterTest(BaseTest):
         })
         with self.assertRaises(ValidationError):
             self.load_policy(data=p, validate=True)
-
-    def test_firewall_invalid_range(self):
-        with self.assertRaises(PolicyValidationError):
-            mock = FirewallRulesFilterMock({'include': ['0.0.0.1-0.0.0.0']})
-            mock.validate()
 
 
 class FirewallRulesFilterMock(FirewallRulesFilter):
