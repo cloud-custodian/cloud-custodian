@@ -110,7 +110,7 @@ is missing, it will return an error.
 
 The following example shows how to deploy a policy to a timer triggered Function that runs every hour. 
 The defaults are accepted for Storage and Application Insights and custom values are provided for the 
-Service Plan. This policy deploys a dedicated Standard S2 App Service Plan with the default auto scaling 
+Service Plan. This policy deploys a dedicated Basic B1 App Service Plan with the default auto scaling 
 turned on. Based on the RAM consumption in the underlying VMs, the App Service Plan will be backed by 1-3 VMs.
 
 .. code-block:: yaml
@@ -123,8 +123,8 @@ turned on. Based on the RAM consumption in the underlying VMs, the App Service P
             provision-options:
               servicePlan: 
                 name: functionshost
-                skuTier: Standard
-                skuName: S2
+                skuTier: Basic
+                skuName: B1
                 autoScale:
                   enabled: true
                   minCapacity: 1
