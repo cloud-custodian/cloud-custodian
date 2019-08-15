@@ -240,7 +240,10 @@ Custodian only executes the policy if the event was caused by the resource provi
 by the policy.
 
 In order to subscribe to an event, you need to provide the resource provider and the action, or provide the string
-of one of the `shortcuts <https://github.com/cloud-custodian/cloud-custodian/blob/master/tools/c7n_azure/c7n_azure/azure_events.py>`_. The following example shows an Event Grid Function that runs when a value is written to Key Vault.
+of one of the `shortcuts <https://github.com/cloud-custodian/cloud-custodian/blob/master/tools/c7n_azure/c7n_azure/azure_events.py>`_. 
+For a list of all of the resource providers and their actions please see `Azure Resource Manager resource provider options <https://docs.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations>`_.
+
+The following example shows an Event Grid Function that runs when a value is written to Key Vault.
 
 .. code-block:: yaml
 
