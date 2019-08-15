@@ -24,8 +24,7 @@ spec:
         image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
         imagePullPolicy: "{{ $.Values.image.pullPolicy }}"
         env: 
-        {{- $defaultEnvironment := merge dict $.Values.defaultEnvironment | default dict }}
-        {{- $env := merge $defaultEnvironment $host.environment }}
+        {{- $env := merge $host.environment $.Values.defaultEnvironment }}
         {{- range $name, $value := $env }}
         - name: {{ $name }}
           value: {{ $value }}
