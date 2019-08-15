@@ -1,7 +1,7 @@
-Email notify
-============
+Email - Send Users an Email
+===========================
 
-Action to queue email.  See `c7n_mailer readme.md <https://github.com/cloud-custodian/cloud-custodian/blob/master/tools/c7n_mailer/README.md#using-on-azure>`_ for more information.
+Action to queue email after the mailer is configured.  See `c7n_mailer readme.md <https://github.com/cloud-custodian/cloud-custodian/blob/master/tools/c7n_mailer/README.md#using-on-azure>`_ for more information.
 
 
 .. code-block:: yaml

@@ -3,6 +3,8 @@
 Virtual Machines - Find Virtual Machines with public IP address
 ===============================================================
 
+Filter to select all virtual machines with a public ip address
+
 .. code-block:: yaml
 
      policies:
