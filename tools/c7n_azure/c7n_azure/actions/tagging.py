@@ -30,6 +30,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import Time
 from c7n.utils import type_schema
+from c7n_azure.lookup import Lookup
 
 
 class Tag(AzureBaseAction):
@@ -55,8 +56,8 @@ class Tag(AzureBaseAction):
     schema = utils.type_schema(
         'tag',
         **{
+            'value': Lookup.lookup_type({'type': 'string'}),
             'tag': {'type': 'string'},
-            'value': {'type': 'string'},
             'tags': {'type': 'object'}
         }
     )
