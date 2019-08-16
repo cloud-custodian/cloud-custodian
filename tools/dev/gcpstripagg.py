@@ -1,5 +1,4 @@
 import json
-import jmespath
 import fnmatch
 import click
 import os
@@ -34,11 +33,4 @@ def main(path):
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except SystemExit:
-        raise
-    except Exception:
-        import pdb, sys, traceback
-        traceback.print_exc()
-        pdb.post_mortem(sys.exc_info()[-1])
+    main()
