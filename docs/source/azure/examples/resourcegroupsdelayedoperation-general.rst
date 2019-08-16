@@ -3,13 +3,14 @@
 Resource Groups - Delayed operations
 ====================================
 
-You can use `mark-for-op` action and `marked-for-op` filter to implement delayed actions, such as delete a resource if
-it remains non-compliant for a few days.
+You can use the ``mark-for-op`` action and the ``marked-for-op`` filter to implement 
+delayed actions, such as delete a resource if it remains non-compliant for a few days.
 
-This set of policies tags all empty resource groups with a special tag. If tagged group remains empty, it will be remove after 7 days.
+This set of policies tags all empty resource groups with a special tag. If tagged 
+group remains empty, it will be remove after 7 days. If the ``days`` field is omitted
+the empty resource groups will be deleted immediately.
 
 If resource group is no longer empty, tag is removed.
-
 
 .. code-block:: yaml
 

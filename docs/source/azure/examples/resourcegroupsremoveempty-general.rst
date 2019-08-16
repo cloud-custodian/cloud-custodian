@@ -1,6 +1,8 @@
 Resource Groups - Remove empty Resource Groups
 ==============================================
 
+Removes all empty resource groups from the subscription:
+
 .. code-block:: yaml
 
     policies:

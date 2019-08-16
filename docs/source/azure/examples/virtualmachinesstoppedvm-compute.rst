@@ -1,6 +1,8 @@
 Virtual Machines - Find Stopped Virtual Machines
 ================================================
 
+Filter to select all virtual machines that are not running:
+
 .. code-block:: yaml
 
      policies:

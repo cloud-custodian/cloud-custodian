@@ -14,7 +14,6 @@
 import logging
 
 from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
-from c7n_azure.lookup import Lookup
 
 
 class TagHelper:
@@ -75,7 +74,6 @@ class TagHelper:
 
         # add or update tags
         for key in tags_to_add:
-            tags_to_add[key] = Lookup.extract(tags_to_add[key], resource)
             # nothing to do if the tag and value already exists on the resource
             if key in tags:
                 if tags[key] != tags_to_add[key]:

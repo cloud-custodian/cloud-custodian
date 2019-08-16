@@ -1,6 +1,8 @@
 Tags - Remove tag From Virtual Machines
 =======================================
 
+Remove the tags `TagName` and `TagName2` from all VMs in the subscription
+
 .. code-block:: yaml
 
     policies:

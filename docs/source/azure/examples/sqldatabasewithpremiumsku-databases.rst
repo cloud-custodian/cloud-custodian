@@ -3,7 +3,7 @@
 SQL - Find all SQL Databases with Premium SKU
 =============================================
 
-This policy will find all SQL databases with Premium SKU.
+Find all SQL databases with Premium SKU.
 
 .. code-block:: yaml
 
