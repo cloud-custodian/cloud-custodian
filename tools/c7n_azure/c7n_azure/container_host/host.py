@@ -407,7 +407,15 @@ class Host:
         Create a storage client using unusual ID/group reference
         as this is what we require for event subscriptions
         """
-        storage_client = self.session.client('azure.mgmt.storage.StorageManagementClient')
+
+        # Use a different session object if the queue is in a different subscription
+        queue_subscription_id = ResourceIdParser.get_subscription_id(queue_resource_id)
+        if queue_subscription_id != self.session.subscription_id:
+            session = Session(queue_subscription_id)
+        else:
+            session = self.session
+
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
 
         account = storage_client.storage_accounts.get_properties(
             ResourceIdParser.get_resource_group(queue_resource_id),
