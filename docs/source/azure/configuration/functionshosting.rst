@@ -1,7 +1,7 @@
-.. _azure_hostingoptions:
+.. _azure_functionshosting:
 
-Hosting options
-===============
+Azure Functions Hosting
+=======================
 
 Overview
 ########
