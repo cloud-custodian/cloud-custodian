@@ -107,7 +107,7 @@ class Deployment(object):
         if namespace:
             command += ' --namespace {}'.format(namespace)
         command += ' --values {}'.format(values_file_path)
-        chart_path = os.path.join(os.path.dirname(__file__), 'chart')
+        chart_path = os.path.dirname(__file__)
         command += ' {} {}'.format(deployment_name, chart_path)
         return command
 
