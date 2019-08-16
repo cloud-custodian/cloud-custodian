@@ -30,6 +30,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import Time
 from c7n.utils import type_schema
+from c7n_azure.lookup import Lookup
 
 
 class Tag(AzureBaseAction):
@@ -55,8 +56,8 @@ class Tag(AzureBaseAction):
     schema = utils.type_schema(
         'tag',
         **{
-            'tag': {'type': 'string'},
-            'value': {'type': 'string'},
+            'value': Lookup.lookup_type({'type': 'string'}),
+            'tag': Lookup.lookup_type({'type': 'string'}),
             'tags': {'type': 'object'}
         }
     )
@@ -76,11 +77,13 @@ class Tag(AzureBaseAction):
 
         return self
 
-    def _prepare_processing(self,):
-        self.new_tags = self.data.get('tags') or {self.data.get('tag'): self.data.get('value')}
-
     def _process_resource(self, resource):
-        TagHelper.add_tags(self, resource, self.new_tags)
+        new_tags = self._get_tags(resource)
+        TagHelper.add_tags(self, resource, new_tags)
+
+    def _get_tags(self, resource):
+        return self.data.get('tags') or {Lookup.extract(
+            self.data.get('tag'), resource): Lookup.extract(self.data.get('value'), resource)}
 
 
 class RemoveTag(AzureBaseAction):

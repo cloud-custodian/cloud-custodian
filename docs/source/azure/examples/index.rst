@@ -64,3 +64,4 @@ Notifications
   :glob:
   
   ./logicappnotifications/logicappnotification.rst
+  ./*notifications*

@@ -1,6 +1,9 @@
 Storage - Block public access
 =============================
 
+Restricts access to storage accounts with specified ip rules to only the
+ips specified:
+
 .. code-block:: yaml
 
     policies:

@@ -15,7 +15,7 @@ Find SQL Databases with a short term backup retention less than 14 days.
              op: lt
              retention-period-days: 14
 
-Find SQL Databases with a monthly long term backup retention more than one year
+Find SQL Databases with a monthly long term backup retention period more than one year
 
 .. code-block:: yaml
 

@@ -17,6 +17,7 @@ from azure.mgmt.web import WebSiteManagementClient
 from azure.mgmt.web.models import AppServicePlan
 from azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
+from azure.mgmt.resource.resources.models import GenericResource
 from mock import patch
 
 from c7n.utils import local_session
@@ -100,13 +101,43 @@ class AppServicePlanTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
-        client = self.session.client(
-            'azure.mgmt.web.WebSiteManagementClient')  # type: WebSiteManagementClient
-        app_plan = client.app_service_plans.get(
-            'test_appserviceplan-linux',
-            'cctest-appserviceplan-linux')  # type: AppServicePlan
+    @arm_template('appserviceplan.json')
+    def test_resize_plan_from_resource_tag(self):
+        web_management_client = self.session.client(
+            'azure.mgmt.web.WebSiteManagementClient')
+        app_plan = web_management_client.app_service_plans.get('test_appserviceplan',
+                                                               'cctest-appserviceplan-win')
 
-        self.assertEqual(app_plan.sku.name, 'F1')
+        self.assertNotEqual(app_plan.sku.name, 'B1')
+
+        resource_client = self.session.client(
+            'azure.mgmt.resource.ResourceManagementClient')
+
+        tags_patch = GenericResource(tags={'sku': 'B1'})
+        resource_client.resources.update_by_id(app_plan.id, "2016-09-01", tags_patch)
+
+        p = self.load_policy({
+            'name': 'test-azure-appserviceplan',
+            'resource': 'azure.appserviceplan',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctest-appserviceplan-win'}],
+            'actions': [
+                {'type': 'resize-plan',
+                 'size': {
+                     'resource': 'tags.sku'
+                 }}],
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        app_plan = web_management_client.app_service_plans.get('test_appserviceplan',
+                                                               'cctest-appserviceplan-win')
+        self.assertEqual(app_plan.sku.name, 'B1')
 
     @arm_template('appserviceplan.json')
     @patch('c7n_azure.resources.appserviceplan.ResizePlan.log.info')

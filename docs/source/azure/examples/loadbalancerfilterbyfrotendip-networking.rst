@@ -1,6 +1,8 @@
 Load Balancer - Filter load balancer by front end public ip
 ===========================================================
 
+Filter to select load balancers with an ipv6 frontend public IP.
+
 .. code-block:: yaml
 
     policies:

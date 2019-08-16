@@ -18,6 +18,7 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.actions.base import AzureBaseAction
 from azure.mgmt.web import models
+from c7n_azure.lookup import Lookup
 
 
 @resources.register('appserviceplan')
@@ -38,6 +39,7 @@ class AppServicePlan(ArmResourceManager):
                 key: sku.tier
                 op: eq
                 value: Basic
+
     """
 
     class resource_type(ArmResourceManager.resource_type):
@@ -72,15 +74,56 @@ class ResizePlan(AzureBaseAction):
            - type: resize-plan
              size: F1
              count: 1
+
+
+    :example:
+
+    Resize app service plans with on/off hours and resource tagging
+
+    .. code-block:: yaml
+
+        policies:
+          - name: on-hours
+            resource: azure.appserviceplan
+            filters:
+              - type: onhour
+                default_tz: pt
+                onhour: 8
+                tag: onoffhour_schedule
+            actions:
+              - type: resize-plan
+                size:
+                    resource: tags.on_hour_sku
+                    default-value: P1
+
+          - name: off-hours
+            resource: azure.appserviceplan
+            filters:
+              - type: offhour
+                default_tz: pt
+                offhour: 19
+                tag: onoffhour_schedule
+            actions:
+              - type: tag
+                tag: on_hour_sku
+                value:
+                    resource: sku.name
+              - type: resize-plan
+                size:
+                    size: S1
+
     """
 
     schema = utils.type_schema(
         'resize-plan',
         **{
-            'size': {'type': 'string', 'enum':
-                    ['F1', 'B1', 'B2', 'B3', 'D1', 'S1', 'S2', 'S3', 'P1', 'P2',
-                     'P3', 'P1V2', 'P2V2', 'P3v2', 'PC2', 'PC3', 'PC4']},
-            'count': {'type': 'integer'}
+            'size': Lookup.lookup_type({'type': 'string',
+                                        'enum': ['F1', 'B1', 'B2', 'B3', 'D1',
+                                                 'S1', 'S2', 'S3', 'P1', 'P2',
+                                                 'P3', 'P1V2', 'P2V2', 'P3v2',
+                                                 'PC2', 'PC3', 'PC4']
+                                        }),
+            'count': Lookup.lookup_type({'type': 'integer'})
         }
     )
 
@@ -99,13 +142,13 @@ class ResizePlan(AzureBaseAction):
             model.reserved = True
 
         if 'size' in self.data:
-            size = self.data.get('size')
+            size = Lookup.extract(self.data.get('size'), resource)
             model.sku = models.SkuDescription()
             model.sku.tier = ResizePlan.get_sku_name(size)
             model.sku.name = size
 
         if 'count' in self.data:
-            model.target_worker_count = self.data.get('count')
+            model.target_worker_count = Lookup.extract(self.data.get('count'), resource)
 
         try:
             self.client.app_service_plans.update(resource['resourceGroup'], resource['name'], model)
