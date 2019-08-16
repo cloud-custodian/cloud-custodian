@@ -40,9 +40,10 @@ Find SQL servers with less than 10% average DTU consumption over last 24 hours
       - name: dtu-consumption
         resource: azure.sqlserver
         filters:
-        - type: metric
-          metric: dtu_consumption_percent
-          aggregation: average
-          op: lt
-          threshold: 10
-          timeframe: 24
+          - type: metric
+            metric: dtu_consumption_percent
+            aggregation: average
+            op: lt
+            threshold: 10
+            timeframe: 24
+            filter:  "DatabaseResourceId eq '*'"
