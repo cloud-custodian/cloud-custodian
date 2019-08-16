@@ -6,17 +6,22 @@ Hosting options
 Overview
 ########
 
-The Azure provider supports deploying policies into Azure Functions to allow
-them to run inexpensively in your subscription. Currently you can deploy timer 
+The Azure provider supports deploying policies into Azure Functions to run them 
+inexpensively in your subscription. Currently you can deploy timer 
 triggered functions (azure-periodic) or Event Grid triggered functions 
 (azure-event-grid) depending on your needs.
 
-The created Azure Functions use the V2 runtime for Python to run Custodian.
-This feature is still in preview and puts the following requirements on the deployment:
+The first deployment to an Azure Function will create the following resources 
+in your Azure subscription:
 
-- Linux is currently the only supported operating system.
-- Python 3.6.X is the only supported version.
-- Only Service Principal authentication is currently supported.
+- Resource Group: Holds all of the resources
+- Azure Storage: Serves as the backend data store for the Functions
+- Application Insights: Provides logging and metric track ing for the Functions
+- App Service Plan: A Linux based consumption plan using the V2 runtime to support Python Functions
+- Function App: The Function that executes the given policy
+
+Successive policy deployments will only create a new Function App for the policy, 
+because the rest of the infrastructure can be shared.
 
 Azure Modes
 ###########
@@ -57,9 +62,8 @@ Functions can be deployed in either a dedicated Application Service Plan (Basic,
 More details on the different hosting models offered by Azure Functions can be found in the `Azure Functions documentation <https://docs.microsoft.com/en-us/azure/azure-functions/functions-scale>`_.
 By default, Custodian policies are run using the Consumption hosting model. (i.e. skuTier=dynamic)
 
-Linux Consumption plans are not available in all regions. The supported regions are:
-Australia East, East Asia, East US, East US 2, North Europe, South Central US,
-Southeast Asia, UK South, West Europe, West US and West US 2.
+Note: Linux Consumption plans are not available in all regions. You will recieve an error when applying the 
+policy if use an unsupported location. 
 
 You can enable auto scaling for your dedicated App Service Plan. The default auto scaling allows you
 to specify the minimum and maximum number of VMs underlying the Functions. The App Service Plan will 
@@ -72,7 +76,7 @@ When deploying a new policy using existing infrastructure, only the new Function
 
 The default set of parameters for Azure Storage, Application Insights and Application
 Service Plan will deploy the function successfully. To customize the deployment, the defaults 
-can be overwritten by setting the 'provision-options' object on 'mode'. The following keys are 
+can be overwritten by setting the ``provision-options`` object on ``mode``. The following keys are 
 supported, with their default values shown:
 
 * servicePlan
@@ -203,8 +207,9 @@ Common properties are:
 - dryrun
 - metrics
 
-The output directory defaults to `/tmp/<random_uuid>` but you can point it to a Azure Blob 
-Storage container instead, as seen in the following example:
+The default output directory for an Azure Function is ``/tmp/<random_uuid>``. The following 
+example shows how to save the output of the policy to an Azure Storage Account instead of in 
+the default Function location.
 
 .. code-block:: yaml
 
