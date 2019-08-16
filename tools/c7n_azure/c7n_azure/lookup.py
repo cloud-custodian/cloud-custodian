@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import jmespath
+import copy
 
 
 class Lookup(object):
@@ -20,28 +21,26 @@ class Lookup(object):
 
     schema = {
         'type': 'object',
-        'properties': {
-            'oneOf': [
-                {RESOURCE_SOURCE: {'type': 'string'}}
-            ],
-            'default-value': {'oneOf': [
-                {'type': 'string'},
-                {'type': 'number'},
-                {'type': 'boolean'}
-            ]}
-        },
         'oneOf': [
             {
-                'required': [RESOURCE_SOURCE]
+                'properties': {
+                    RESOURCE_SOURCE: {'type': 'string'},
+                },
+                'required': [RESOURCE_SOURCE],
+                'additionalProperties': False
             }
         ]
     }
 
     @staticmethod
     def lookup_type(schema):
+        lookup_schema = copy.deepcopy(Lookup.schema)
+        for lookup in lookup_schema['oneOf']:
+            lookup['properties']['default-value'] = schema
+
         return {
             'oneOf': [
-                Lookup.schema,
+                lookup_schema,
                 schema
             ]
         }

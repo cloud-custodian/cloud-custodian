@@ -46,6 +46,20 @@ class ActionsTagTest(BaseTest):
                 ]),
                 validate=True))
 
+        self.assertTrue(self.load_policy({
+            'name': 'test-tag-schema-validate',
+            'resource': 'azure.vm',
+            'actions': [
+                {'type': 'tag',
+                 'tag': {
+                     'resource': 'name'
+                 },
+                 'value': {
+                     'resource': 'name'
+                 }},
+            ]
+        }, validate=True))
+
         with self.assertRaises(FilterValidationError):
             # Can't have both tags and tag/value
             self.load_policy(tools.get_policy([
@@ -97,6 +111,61 @@ class ActionsTagTest(BaseTest):
 
         expected_tags = self.existing_tags.copy()
         expected_tags.update({'tag1': 'value1'})
+
+        self.assertEqual(tags, expected_tags)
+
+    @patch('c7n_azure.tags.TagHelper.update_resource_tags')
+    def test_add_or_update_single_tag_from_resource(self, update_resource_tags):
+        """Verifies we can add a new tag to a VM from values on the VM
+        """
+
+        action = self._get_action(
+            {
+                'tag': {
+                    'resource': 'name'
+                },
+                'value': {
+                    'resource': 'type'
+                }
+            })
+
+        resource = tools.get_resource(self.existing_tags)
+
+        action.process([resource])
+
+        tags = tools.get_tags_parameter(update_resource_tags)
+
+        expected_tags = self.existing_tags.copy()
+        expected_tags.update({resource['name']: resource['type']})
+
+        self.assertEqual(tags, expected_tags)
+
+    @patch('c7n_azure.tags.TagHelper.update_resource_tags')
+    def test_add_or_update_single_tag_from_resource_default(self, update_resource_tags):
+        """Verifies we can add a new tag to a VM from values on the VM
+        when values do not exist with default-value
+        """
+
+        action = self._get_action(
+            {
+                'tag': {
+                    'resource': 'doesnotexist',
+                    'default-value': 'default_tag'
+                },
+                'value': {
+                    'resource': 'doesnotexist',
+                    'default-value': 'default_value'
+                }
+            })
+
+        resource = tools.get_resource(self.existing_tags)
+
+        action.process([resource])
+
+        tags = tools.get_tags_parameter(update_resource_tags)
+
+        expected_tags = self.existing_tags.copy()
+        expected_tags.update({'default_tag': 'default_value'})
 
         self.assertEqual(tags, expected_tags)
 

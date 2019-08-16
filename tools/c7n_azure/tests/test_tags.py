@@ -44,27 +44,6 @@ class TagsTest(BaseTest):
         self.assertEqual(tools.get_tags_parameter(update_resource_tags), expected_tags)
 
     @patch('c7n_azure.tags.TagHelper.update_resource_tags')
-    def test_add_tags_from_resource(self, update_resource_tags):
-        resource = tools.get_resource(self.existing_tags)
-
-        TagHelper.add_tags(None, resource,
-                           {'tag_from_resource': {'resource': 'name'}})
-        expected_tags = self.existing_tags.copy()
-        expected_tags.update({'tag_from_resource': resource['name']})
-        self.assertEqual(tools.get_tags_parameter(update_resource_tags), expected_tags)
-
-    @patch('c7n_azure.tags.TagHelper.update_resource_tags')
-    def test_add_tags_from_resource_default_value(self, update_resource_tags):
-        resource = tools.get_resource(self.existing_tags)
-
-        TagHelper.add_tags(None, resource, {'tag_from_resource_default':
-                                            {'resource': 'does_not_exist',
-                                             'default-value': 'value4'}})
-        expected_tags = self.existing_tags.copy()
-        expected_tags.update({'tag_from_resource_default': 'value4'})
-        self.assertEqual(tools.get_tags_parameter(update_resource_tags), expected_tags)
-
-    @patch('c7n_azure.tags.TagHelper.update_resource_tags')
     def test_remove_tags(self, update_resource_tags):
         resource = tools.get_resource(self.existing_tags)
 
