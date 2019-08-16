@@ -15,12 +15,21 @@
 
 import logging
 import os
+import re
 import tempfile
 
 import click
 import yaml
 
+from c7n.resources import load_resources
+from c7n.utils import local_session
+from c7n_azure.constants import ENV_CONTAINER_EVENT_QUEUE_NAME, ENV_SUB_ID
+from c7n_azure.session import Session
+
 logger = logging.getLogger("c7n_azure.container-host.deploy")
+
+MANAGEMENT_GROUP_TYPE = '/providers/Microsoft.Management/managementGroups'
+SUBSCRIPTION_TYPE = '/subscriptions'
 
 
 class Deployment(object):
@@ -48,11 +57,12 @@ class Deployment(object):
         values_yaml = yaml.dump(values)
         logger.info(values_yaml)
 
+        # Currently deploy the helm chart through a system command, this assumes helm is installed
+        # and configured with the target cluster.
+        logger.info("Deploying with helm")
         helm_command = Deployment.build_helm_command(
             self.deployment_name, values_file_path, namespace=self.deployment_namespace,
             dry_run=self.dry_run)
-
-        logger.info("Deploying with helm")
         logger.info(helm_command)
         os.system(helm_command)
 
@@ -118,9 +128,44 @@ class SubscriptionDeployment(Deployment):
 
 class ManagementGroupDeployment(Deployment):
 
-    def __init__(self, ctx):
-        super(ManagementGroupDeployment, self).__init__()
-        raise NotImplementedError()
+    def __init__(self, ctx, management_group_id, env=[]):
+        super(ManagementGroupDeployment, self).__init__(ctx,
+            default_environment={e[0]: e[1] for e in env})
+        self.management_group_id = management_group_id
+        load_resources()
+        self.session = local_session(Session)
+
+        self.run()
+
+    def build_values_dict(self):
+        self._add_subscription_hosts()
+        return super(ManagementGroupDeployment, self).build_values_dict()
+
+    def _add_subscription_hosts(self):
+        client = self.session.client('azure.mgmt.managementgroups.ManagementGroupsAPI')
+        info = client.management_groups.get(
+            self.management_group_id, expand='children', recurse=True)
+        self._add_subscription_hosts_from_info(info)
+
+    def _add_subscription_hosts_from_info(self, info):
+        if info.type == SUBSCRIPTION_TYPE:
+            sub_id = info.name  # The 'name' field of child info is the subscription id
+            self.add_subscription_host(
+                ManagementGroupDeployment.sub_name_to_deployment_name(info.display_name),
+                {
+                    ENV_SUB_ID: sub_id,
+                    ENV_CONTAINER_EVENT_QUEUE_NAME: 'c7n-{}'.format(info.name[-4:])
+                },
+            )
+        elif info.type == MANAGEMENT_GROUP_TYPE and info.children:
+            for child in info.children:
+                self._add_subscription_hosts_from_info(child)
+
+    @staticmethod
+    def sub_name_to_deployment_name(sub_name):
+        # Deployment names must use only lower case alpha numeric characters, -, _, and .
+        # They must also start/end with an alpha numeric character
+        return re.sub(r'[^A-Za-z0-9-\._]+', '-', sub_name).strip('-_.').lower()
 
 
 @click.group()
@@ -145,6 +190,8 @@ class SubscriptionDeploymentCommand(SubscriptionDeployment):
 
 @cli.command('management_group')
 @click.pass_context
+@click.option('--management-group-id', '-m', required=True)
+@click.option('--env', '-e', type=click.Tuple([str, str]), multiple=True)
 class ManagementGroupDeploymentCommand(ManagementGroupDeployment):
     pass
 
