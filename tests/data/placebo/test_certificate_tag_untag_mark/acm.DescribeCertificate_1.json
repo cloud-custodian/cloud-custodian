@@ -1,0 +1,62 @@
+{
+    "status_code": 200,
+    "data": {
+        "Certificate": {
+            "CertificateArn": "arn:aws:acm:us-east-1:644160558196:certificate/70e45883-48b0-4024-88a3-2c145f4fe5c0",
+            "DomainName": "*.pratyush.com",
+            "SubjectAlternativeNames": [
+                "*.pratyush.com"
+            ],
+            "DomainValidationOptions": [
+                {
+                    "DomainName": "*.pratyush.com",
+                    "ValidationEmails": [
+                        "webmaster@pratyush.com",
+                        "postmaster@pratyush.com",
+                        "privacy@1and1.com",
+                        "hostmaster@pratyush.com",
+                        "admin@pratyush.com",
+                        "administrator@pratyush.com"
+                    ],
+                    "ValidationDomain": "pratyush.com",
+                    "ValidationStatus": "PENDING_VALIDATION",
+                    "ValidationMethod": "EMAIL"
+                }
+            ],
+            "Subject": "CN=*.pratyush.com",
+            "Issuer": "Amazon",
+            "CreatedAt": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 8,
+                "day": 6,
+                "hour": 11,
+                "minute": 53,
+                "second": 30,
+                "microsecond": 0
+            },
+            "Status": "PENDING_VALIDATION",
+            "KeyAlgorithm": "RSA-2048",
+            "SignatureAlgorithm": "SHA256WITHRSA",
+            "InUseBy": [],
+            "Type": "AMAZON_ISSUED",
+            "KeyUsages": [],
+            "ExtendedKeyUsages": [],
+            "RenewalEligibility": "INELIGIBLE",
+            "Options": {
+                "CertificateTransparencyLoggingPreference": "ENABLED"
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "3657835c-1f65-48c4-8b2b-3394e9b397c3",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3657835c-1f65-48c4-8b2b-3394e9b397c3",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "863",
+                "date": "Tue, 06 Aug 2019 18:24:12 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
