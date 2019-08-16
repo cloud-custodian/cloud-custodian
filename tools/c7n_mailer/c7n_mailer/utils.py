@@ -155,7 +155,7 @@ def get_resource_tag_value(resource, k):
 
 
 def resource_format(resource, resource_type):
-    resource = resource.lstrip('aws.')
+    resource_type = resource_type.lstrip('aws.')
     if resource_type == 'ec2':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         return "%s %s %s %s %s %s" % (
