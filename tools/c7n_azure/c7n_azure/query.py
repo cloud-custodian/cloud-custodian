@@ -18,6 +18,7 @@ from c7n_azure.actions.notify import Notify
 from c7n_azure.actions.logic_app import LogicAppAction
 from c7n_azure import constants
 from c7n_azure.provider import resources
+from c7n_azure.filters import ParentFilter
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
@@ -86,7 +87,7 @@ class ChildResourceQuery(ResourceQuery):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)  # type: ChildTypeInfo
 
-        parents = self.manager.get_resource_manager(m.parent_manager_name)
+        parents = self.manager.get_parent_manager()
 
         # Have to query separately for each parent's children.
         results = []
@@ -213,9 +214,21 @@ class QueryResourceManager(ResourceManager):
         return self.data.get('source', 'describe-azure')
 
     def resources(self, query=None):
-        key = self.get_cache_key(query)
-        resources = self.augment(self.source.get_resources(query))
-        self._cache.save(key, resources)
+        cache_key = self.get_cache_key(query)
+
+        resources = None
+        if self._cache.load():
+            resources = self._cache.get(cache_key)
+            if resources is not None:
+                self.log.debug("Using cached %s: %d" % (
+                    "%s.%s" % (self.__class__.__module__,
+                               self.__class__.__name__),
+                    len(resources)))
+
+        if resources is None:
+            resources = self.augment(self.source.get_resources(query))
+            self._cache.save(cache_key, resources)
+
         return self.filter_resources(resources)
 
     def get_resources(self, resource_ids, **params):
@@ -245,6 +258,7 @@ class QueryResourceManager(ResourceManager):
 class ChildResourceManager(QueryResourceManager):
 
     child_source = 'describe-child-azure'
+    parent_manager = None
 
     @property
     def source_type(self):
@@ -254,7 +268,10 @@ class ChildResourceManager(QueryResourceManager):
         return source
 
     def get_parent_manager(self):
-        return self.get_resource_manager(self.resource_type.parent_manager_name)
+        if not self.parent_manager:
+            self.parent_manager = self.get_resource_manager(self.resource_type.parent_manager_name)
+
+        return self.parent_manager
 
     def get_session(self):
         if self._session is None:
@@ -286,5 +303,17 @@ class ChildResourceManager(QueryResourceManager):
 
         return [r.serialize(True) for r in op(**params)]
 
+    @staticmethod
+    def register_child_specific(registry, _):
+        for resource in registry.keys():
+            klass = registry.get(resource)
+            if issubclass(klass, ChildResourceManager):
+
+                # If Child Resource doesn't annotate parent, there is no way to filter based on
+                # parent properties.
+                if klass.resource_type.annotate_parent:
+                    klass.filter_registry.register('parent', ParentFilter)
+
 
 resources.subscribe(resources.EVENT_FINAL, QueryResourceManager.register_actions_and_filters)
+resources.subscribe(resources.EVENT_FINAL, ChildResourceManager.register_child_specific)
