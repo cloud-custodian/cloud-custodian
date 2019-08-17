@@ -16,6 +16,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import shutil
 
+from azure.common import AzureHttpError
 from azure.storage.queue.models import QueueMessage
 from mock import ANY, Mock, patch
 
@@ -184,6 +185,75 @@ class ContainerHostTest(BaseTest):
         # jobs were updated
         jobs = host.scheduler.get_jobs()
         self.assertEqual(0, len([j for j in jobs if j.func == host.run_policy]))
+
+    @patch('c7n_azure.container_host.host.BlockingScheduler.start')
+    @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
+    @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
+    @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
+    def test_update_policies_create_content_hash(self, get_blob_client_mock, _1, _2, _3):
+        client_mock = Mock()
+        client_mock.list_blobs.return_value = [
+            ContainerHostTest.get_mock_blob("blob1.yml", None),  # no hash
+        ]
+
+        client_mock.get_blob_to_path = self.download_policy_blob
+        get_blob_client_mock.return_value = (client_mock, None, None)
+
+        def get_blob_properties(_, blob_name):
+            return ContainerHostTest.get_mock_blob(blob_name, 'hash')  # now with hash
+        client_mock.get_blob_properties = get_blob_properties
+
+        host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
+
+        # cleanup
+        self.addCleanup(lambda: shutil.rmtree(host.policy_cache))
+
+        self.assertEqual({}, host.policies)
+
+        # run
+        host.update_policies()
+
+        # both policies were loaded
+        self.assertEqual(1, len(host.policies.items()))
+
+        # jobs were created
+        jobs = host.scheduler.get_jobs()
+        self.assertEqual(1, len([j for j in jobs if j.id == 'blob1.yml']))
+
+    @patch('c7n_azure.container_host.host.BlockingScheduler.start')
+    @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
+    @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
+    @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
+    def test_update_policies_ignore_policy_if_failed_to_create_content_hash(self,
+            get_blob_client_mock, _1, _2, _3):
+        client_mock = Mock()
+        client_mock.list_blobs.return_value = [
+            ContainerHostTest.get_mock_blob("blob1.yml", None),  # no hash
+        ]
+
+        client_mock.get_blob_to_path = self.download_policy_blob
+        get_blob_client_mock.return_value = (client_mock, None, None)
+
+        def create_blob_from_bytes(_1, _2, _3, **kwargs):
+            raise AzureHttpError("Failed to create blob", 403)
+        client_mock.create_blob_from_bytes = create_blob_from_bytes
+
+        host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
+
+        # cleanup
+        self.addCleanup(lambda: shutil.rmtree(host.policy_cache))
+
+        self.assertEqual({}, host.policies)
+
+        # run
+        host.update_policies()
+
+        # both policies were loaded
+        self.assertEqual(0, len(host.policies.items()))
+
+        # jobs were created
+        jobs = host.scheduler.get_jobs()
+        self.assertEqual(0, len([j for j in jobs if j.id == 'blob1.yml']))
 
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
