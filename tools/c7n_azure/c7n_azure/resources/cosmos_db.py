@@ -18,6 +18,8 @@ from itertools import groupby
 import azure.mgmt.cosmosdb
 from azure.cosmos.cosmos_client import CosmosClient
 from azure.cosmos.errors import HTTPFailure
+from azure.mgmt.cosmosdb.models import DatabaseAccountPatchParameters
+from c7n_azure.actions.firewall import SetNetworkRulesAction
 from netaddr import IPSet
 
 from c7n.filters import ValueFilter
@@ -406,3 +408,46 @@ class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
         resource_rules = IPSet(ip_range_string.split(','))
 
         return resource_rules
+
+
+@CosmosDB.action_registry.register('set-firewall-rules')
+class StorageSetNetworkRulesAction(SetNetworkRulesAction):
+    def __init__(self, data, manager=None):
+        super(StorageSetNetworkRulesAction, self).__init__(data, manager)
+        self._log = logging.getLogger('custodian.azure.cosmosdb')
+        self.rule_limit = 200
+
+    def _process_resource(self, resource):
+
+        rules = self._build_ip_rules(resource, self.data.get('ip-rules', []))
+        # Build out the ruleset model to update the resource
+        rule_set = NetworkRuleSet(default_action=self.data.get('default-action', 'Deny'))
+
+        # If the user has too many rules log and skip
+        if len(rules) > self.rule_limit:
+            self._log.error("Skipped updating firewall for %s. "
+                            "%s exceeds maximum rule count of %s." %
+                            (resource['name'], len(rules), self.rule_limit))
+            return
+
+        # Add IP rules
+        rule_set.ip_rules = [IPRule(ip_address_or_range=r) for r in rules]
+
+        # Add VNET rules
+        vnet_rules = self._build_vnet_rules(resource, self.data.get('virtual-network-rules', []))
+        rule_set.virtual_network_rules = [
+            VirtualNetworkRule(virtual_network_resource_id=r) for r in vnet_rules]
+
+        # Configure BYPASS
+        rule_set.bypass = self._build_bypass_rules(resource, self.data.get('bypass', []))
+
+        # Update resource
+        client = self.client # type: azure.mgmt.cosmosdb.CosmosDB
+        client.database_accounts.patch(
+            resource['resourceGroup'],
+            resource['name'],
+            network_rule_set=
+        )
+        self.client..update(
+
+            DatabaseAccountPatchParameters(network_rule_set=rule_set))
