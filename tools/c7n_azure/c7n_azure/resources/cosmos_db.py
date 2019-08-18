@@ -18,7 +18,8 @@ from itertools import groupby
 import azure.mgmt.cosmosdb
 from azure.cosmos.cosmos_client import CosmosClient
 from azure.cosmos.errors import HTTPFailure
-from azure.mgmt.cosmosdb.models import DatabaseAccountPatchParameters
+from azure.mgmt.cosmosdb.models import DatabaseAccountPatchParameters, VirtualNetworkRule, \
+    DatabaseAccountCreateUpdateParameters
 from c7n_azure.actions.firewall import SetNetworkRulesAction
 from netaddr import IPSet
 
@@ -411,17 +412,42 @@ class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
 
 
 @CosmosDB.action_registry.register('set-firewall-rules')
-class StorageSetNetworkRulesAction(SetNetworkRulesAction):
+class CosmosSetNetworkRulesAction(SetNetworkRulesAction):
+
+    schema = type_schema(
+        'set-firewall-rules',
+        required=[],
+        **{
+            'default-action': {'enum': ['Allow', 'Deny'], "default": 'Deny'},
+            'append': {'type': 'boolean', "default": False},
+            'bypass-rules': {'type': 'array', 'items': {
+                'enum': ['Portal', 'AzureCloud']}},
+            'ip-rules': {'type': 'array', 'items': {'type': 'string'}},
+            'virtual-network-rules': {'type': 'array', 'items': {'type': 'string'}}
+        }
+    )
+
     def __init__(self, data, manager=None):
-        super(StorageSetNetworkRulesAction, self).__init__(data, manager)
+        super(CosmosSetNetworkRulesAction, self).__init__(data, manager)
         self._log = logging.getLogger('custodian.azure.cosmosdb')
         self.rule_limit = 200
 
     def _process_resource(self, resource):
+        existing_ip = resource['properties'].get('ipRangeFilter', [])
+        rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
 
-        rules = self._build_ip_rules(resource, self.data.get('ip-rules', []))
-        # Build out the ruleset model to update the resource
-        rule_set = NetworkRuleSet(default_action=self.data.get('default-action', 'Deny'))
+        # Cosmos DB does not have real bypass
+        # instead the portal UI adds these values to your
+        # rules filter when you check the box.
+        bypass = self.data.get('bypass-rules', [])
+        if 'Portal' in bypass:
+            rules.extend(['104.42.195.92',
+                          '40.76.54.131',
+                          '52.176.6.30',
+                          '52.169.50.45',
+                          '52.187.184.26'])
+        if 'AzureCloud' in bypass:
+            rules.add(['0.0.0.0'])
 
         # If the user has too many rules log and skip
         if len(rules) > self.rule_limit:
@@ -430,24 +456,26 @@ class StorageSetNetworkRulesAction(SetNetworkRulesAction):
                             (resource['name'], len(rules), self.rule_limit))
             return
 
-        # Add IP rules
-        rule_set.ip_rules = [IPRule(ip_address_or_range=r) for r in rules]
-
         # Add VNET rules
-        vnet_rules = self._build_vnet_rules(resource, self.data.get('virtual-network-rules', []))
-        rule_set.virtual_network_rules = [
-            VirtualNetworkRule(virtual_network_resource_id=r) for r in vnet_rules]
+        existing_vnet = \
+            [r['id'] for r in resource['properties'].get('virtualNetworkRules', [])]
+        vnet_rules = self._build_vnet_rules(existing_vnet, self.data.get('virtual-network-rules', []))
 
-        # Configure BYPASS
-        rule_set.bypass = self._build_bypass_rules(resource, self.data.get('bypass', []))
+        # Workaround for bug https://git.io/fjFLY
+        resource['properties']['locations'] = []
+        for loc in resource['properties'].get('readLocations'):
+            resource['properties']['locations'].append(
+                        {'location_name': loc['locationName'],
+                         'failover_priority': loc['failoverPriority'],
+                         'is_zone_redundant': loc.get('isZoneRedundant', False)})
+
+        resource['properties']['ipRangeFilter']=','.join(rules)
+        resource['properties']['virtualNetworkRules']=[VirtualNetworkRule(id=r) for r in vnet_rules]
 
         # Update resource
         client = self.client # type: azure.mgmt.cosmosdb.CosmosDB
-        client.database_accounts.patch(
+        client.database_accounts.create_or_update(
             resource['resourceGroup'],
             resource['name'],
-            network_rule_set=
+            create_update_parameters=resource
         )
-        self.client..update(
-
-            DatabaseAccountPatchParameters(network_rule_set=rule_set))

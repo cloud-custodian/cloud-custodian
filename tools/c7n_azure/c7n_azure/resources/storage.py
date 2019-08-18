@@ -72,10 +72,12 @@ class StorageSetNetworkRulesAction(SetNetworkRulesAction):
         self.rule_limit = 200
 
     def _process_resource(self, resource):
-        rules = self._build_ip_rules(resource, self.data.get('ip-rules', []))
-
         # Build out the ruleset model to update the resource
         rule_set = NetworkRuleSet(default_action=self.data.get('default-action', 'Deny'))
+
+        # Add IP rules
+        existing_ip = resource['properties']['networkAcls'].get('ipRules', [])
+        rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
 
         # If the user has too many rules log and skip
         if len(rules) > self.rule_limit:
@@ -84,16 +86,19 @@ class StorageSetNetworkRulesAction(SetNetworkRulesAction):
                             (resource['name'], len(rules), self.rule_limit))
             return
 
-        # Add IP rules
         rule_set.ip_rules = [IPRule(ip_address_or_range=r) for r in rules]
 
         # Add VNET rules
-        vnet_rules = self._build_vnet_rules(resource, self.data.get('virtual-network-rules', []))
-        rule_set.virtual_network_rules = [
-            VirtualNetworkRule(virtual_network_resource_id=r) for r in vnet_rules]
+        existing_vnet = \
+            [r['id'] for r in resource['properties']['networkAcls'].get('virtualNetworkRules', [])]
+        vnet_rules = \
+            self._build_vnet_rules(existing_vnet, self.data.get('virtual-network-rules', []))
+        rule_set.virtual_network_rules = \
+            [VirtualNetworkRule(virtual_network_resource_id=r) for r in vnet_rules]
 
         # Configure BYPASS
-        rule_set.bypass = self._build_bypass_rules(resource, self.data.get('bypass', []))
+        existing_bypass = resource['properties']['networkAcls'].get('bypass', '').split(',')
+        rule_set.bypass = self._build_bypass_rules(existing_bypass, self.data.get('bypass', []))
 
         # Update resource
         self.client.storage_accounts.update(

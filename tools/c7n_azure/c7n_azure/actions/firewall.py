@@ -113,22 +113,19 @@ class SetNetworkRulesAction(AzureBaseAction):
     def _process_resource(self, resource):
         pass
 
-    def _build_bypass_rules(self, resource, new_rules):
+    def _build_bypass_rules(self, existing_bypass, new_rules):
         if self.append:
-            existing_bypass = resource['properties']['networkAcls'].get('bypass', '').split(',')
             without_duplicates = [r for r in existing_bypass if r not in new_rules]
             new_rules.extend(without_duplicates)
         return ','.join(new_rules or ['None'])
 
-    def _build_vnet_rules(self, resource, new_rules):
+    def _build_vnet_rules(self, existing_vnet, new_rules):
         if self.append:
-            existing_rules = [r['id'] for r in
-                              resource['properties']['networkAcls'].get('virtualNetworkRules', [])]
-            without_duplicates = [r for r in existing_rules if r not in new_rules]
+            without_duplicates = [r for r in existing_vnet if r not in new_rules]
             new_rules.extend(without_duplicates)
         return new_rules
 
-    def _build_ip_rules(self, resource, new_rules):
+    def _build_ip_rules(self, existing_ip, new_rules):
         rules = []
         for rule in new_rules:
             resolved_set = resolve_service_tag_alias(rule)
@@ -142,7 +139,6 @@ class SetNetworkRulesAction(AzureBaseAction):
                 rules.append(rule)
 
         if self.append:
-            existing_rules = resource['properties']['networkAcls'].get('ipRules', [])
-            without_duplicates = [r['value'] for r in existing_rules if r['value'] not in rules]
+            without_duplicates = [r for r in existing_ip if r not in rules]
             rules.extend(without_duplicates)
         return rules

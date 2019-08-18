@@ -148,6 +148,36 @@ class CosmosDBTest(BaseTest):
         self.assertEqual(1, len(resources))
         self.assertEqual('Hash', resources[0]['partitionKey']['kind'])
 
+    @arm_template('cosmosdb.json')
+    def test_set_ip_range_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestcosmosdb'}],
+            'actions': [
+                {'type': 'set-firewall-rules',
+                 'append': True,
+                 'bypass': ['Portal'],
+                 'ip-rules': ['0.0.0.0/1', '11.12.13.14', '21.22.23.24']
+                 }
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        self.client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
+        resources = self.client.database_accounts.list()
+        resources = [r for r in resources if r['name'] is 'cctestcosmosdb']
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(set('0.0.0.0/1', '128.0.0.0/1', '11.12.13.14', '21.22.23.24'),
+                         set(','.split(resources[0]['properties']['ipRangeFilter'])))
+
 
 class CosmosDBReplaceOfferActionTest(BaseTest):
 
