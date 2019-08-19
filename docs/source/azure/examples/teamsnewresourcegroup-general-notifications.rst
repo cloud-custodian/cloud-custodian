@@ -37,12 +37,12 @@ For more information on how the event grid function works please see :ref:`azure
             url: <your_webhook_here>
             batch: false
             body: >
-              resource.{
+              {
                 "@context": `https://schema.org/extensions`,
                 "@type": `MessageCard`,
                 "themeColor": `0072C6`,
                 "title": `New Resource Group Created`,
-                "text": join('', [`A new resource group has been created.\n\nResource Group Name: `, name, `\n\nResource Group Location: `, location])
+                "text": join('', [`A new resource group has been created in subscription `, account_id, `.\n\nResource Group Name: `, resource.name, `\n\nResource Group Location: `, resource.location])
                 "potentialAction": [
                   {
                     "@type": `OpenUri`,
@@ -50,7 +50,7 @@ For more information on how the event grid function works please see :ref:`azure
                     "targets": [
                     {
                       "os": `default`,
-                      "uri": join('',[`https://ms.portal.azure.com/#@microsoft.onmicrosoft.com/resource`, id, `/overview`])
+                      "uri": join('',[`https://ms.portal.azure.com/#@microsoft.onmicrosoft.com/resource`, resource.id, `/overview`])
                     }
                     ]
                   }
