@@ -22,13 +22,34 @@
                 "Never"
             ],
             "defaultValue": "Always"
+        },
+        "azure_tenant_id": {
+            "type": "string"
+        },
+        "azure_client_id": {
+            "type": "string"
+        },
+        "azure_event_queue_name": {
+            "type": "string"
+        },
+        "azure_subscription_id": {
+            "type": "string"
+        },
+        "azure_container_storage": {
+            "type": "string"
+        },
+        "azure_event_queue_resource_id": {
+            "type": "string"
+        },
+        "azure_client_secret": {
+            "type": "string"
         }
     },
     "variables": {},
     "resources": [
         {
             "type": "Microsoft.ContainerInstance/containerGroups",
-            "apiVersion": "2018-04-01",
+            "apiVersion": "2018-06-01",
             "name": "[parameters('containerGroups_custodian_aci_name')]",
             "location": "westus2",
             "properties": {
@@ -43,7 +64,36 @@
                                 "c7n_azure.container_host.host"
                             ],
                             "ports": [],
-                            "environmentVariables": [],
+                            "environmentVariables": [
+                                {
+                                    "name": "AZURE_TENANT_ID",
+                                    "value": "[parameters('azure_tenant_id')]"
+                                },
+                                {
+                                    "name": "AZURE_CLIENT_ID",
+                                    "value": "[parameters('azure_client_id')]"
+                                },
+                                {
+                                    "name": "AZURE_EVENT_QUEUE_NAME",
+                                    "value": "[parameters('azure_event_queue_name')]"
+                                },
+                                {
+                                    "name": "AZURE_SUBSCRIPTION_ID",
+                                    "value": "[parameters('azure_subscription_id')]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_STORAGE",
+                                    "value": "[parameters('azure_container_storage')]"
+                                },
+                                {
+                                    "name": "AZURE_EVENT_QUEUE_RESOURCE_ID",
+                                    "value": "[parameters('azure_event_queue_resource_id')]"
+                                },
+                                {
+                                    "name": "AZURE_CLIENT_SECRET",
+                                    "secureValue": "[parameters('azure_client_secret')]"
+                                }
+                            ],
                             "resources": {
                                 "requests": {
                                     "memoryInGB": 1.5,

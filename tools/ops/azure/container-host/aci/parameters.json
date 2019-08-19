@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "containerGroups_custodian_aci_name": {
-            "value": null
+            "value": "custodian-aci"
         }
     }
 }
