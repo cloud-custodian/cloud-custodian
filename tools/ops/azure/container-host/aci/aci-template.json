@@ -2,7 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "containerGroups_custodian_aci_name": {
+        "aci_name": {
             "defaultValue": "custodian-aci",
             "type": "string"
         },
@@ -50,12 +50,12 @@
         {
             "type": "Microsoft.ContainerInstance/containerGroups",
             "apiVersion": "2018-06-01",
-            "name": "[parameters('containerGroups_custodian_aci_name')]",
+            "name": "[parameters('aci_name')]",
             "location": "westus2",
             "properties": {
                 "containers": [
                     {
-                        "name": "[parameters('containerGroups_custodian_aci_name')]",
+                        "name": "[parameters('aci_name')]",
                         "properties": {
                             "image": "[concat(parameters('image_repository'), ':', parameters('image_tag'))]",
                             "command": [

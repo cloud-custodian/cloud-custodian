@@ -54,17 +54,17 @@ Here is an example deployment of the ARM template using the azure cli:
 .. code-block:: bash
 
     az group deployment create \
-    --resource-group my-resource-group \
-    --template-file tools/ops/azure/container-host/aci/aci-template.json \
-    --parameters @tools/ops/azure/container-host/aci/parameters.json \
-    --parameters \
-        azure_tenant_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
-        azure_client_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
-        azure_event_queue_name=custodian-aci-queue \
-        azure_subscription_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
-        azure_container_storage=https://myStorageAccount.blob.core.windows.net/aci-policies \
-        azure_event_queue_resource_id=/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/my-resource-group/providers/Microsoft.Storage/storageAccounts/myStorageAccount \
-        azure_client_secret=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        --resource-group my-resource-group \
+        --template-file tools/ops/azure/container-host/aci/aci-template.json \
+        --parameters \
+            aci_name=cloud-custodian \
+            azure_tenant_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
+            azure_client_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
+            azure_event_queue_name=custodian-aci-queue \
+            azure_subscription_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
+            azure_container_storage=https://myStorageAccount.blob.core.windows.net/aci-policies \
+            azure_event_queue_resource_id=/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/my-resource-group/providers/Microsoft.Storage/storageAccounts/myStorageAccount \
+            azure_client_secret=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 Kubernetes (Helm Chart)
 -----------------------
