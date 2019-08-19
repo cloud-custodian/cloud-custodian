@@ -17,7 +17,7 @@ Azure is not supported by all web browsers.
 
 To run the policy, you must replace ``<your_webhook_here>`` with the correct url.
 
-For more information on how the event grid function works please see :ref:`azure_hostingoptions`
+For more information on how the event grid function works please see :ref:`azure_functionshosting`
 
 .. code-block:: yaml
 
