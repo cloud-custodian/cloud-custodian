@@ -14,17 +14,17 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
+                    "date": [
+                        "Mon, 19 Aug 2019 00:38:37 GMT"
                     ],
                     "content-type": [
                         "application/json"
                     ],
-                    "date": [
-                        "Sat, 17 Aug 2019 20:30:36 GMT"
+                    "cache-control": [
+                        "no-store, no-cache"
                     ],
                     "content-length": [
-                        "4440"
+                        "4518"
                     ]
                 },
                 "body": {
@@ -127,117 +127,8 @@
                                     "cors": [],
                                     "capabilities": []
                                 }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/erwelch-test/providers/Microsoft.DocumentDB/databaseAccounts/erwelchtesting",
-                                "name": "erwelchtesting",
-                                "location": "Australia Central",
-                                "type": "Microsoft.DocumentDB/databaseAccounts",
-                                "kind": "GlobalDocumentDB",
-                                "tags": {
-                                    "defaultExperience": "Core (SQL)",
-                                    "testing": "-nwdAJSw3xU=:500;-nwdANrFyqM=:500",
-                                    "join(id, '_testing')": "Did it work?",
-                                    "testingstrings": "erwelchtest_testing",
-                                    "test": "test",
-                                    "erwelchtest_throughput": "400"
-                                },
-                                "properties": {
-                                    "provisioningState": "Succeeded",
-                                    "documentEndpoint": "https://erwelchtesting.documents.azure.com:443/",
-                                    "ipRangeFilter": "",
-                                    "enableAutomaticFailover": false,
-                                    "enableMultipleWriteLocations": false,
-                                    "enablePartitionKeyMonitor": false,
-                                    "isVirtualNetworkFilterEnabled": false,
-                                    "virtualNetworkRules": [],
-                                    "EnabledApiTypes": "Sql",
-                                    "databaseAccountOfferType": "Standard",
-                                    "consistencyPolicy": {
-                                        "defaultConsistencyLevel": "Session",
-                                        "maxIntervalInSeconds": 5,
-                                        "maxStalenessPrefix": 100
-                                    },
-                                    "configurationOverrides": {},
-                                    "writeLocations": [
-                                        {
-                                            "id": "erwelchtesting-australiacentral",
-                                            "locationName": "Australia Central",
-                                            "documentEndpoint": "https://erwelchtesting-australiacentral.documents.azure.com:443/",
-                                            "provisioningState": "Succeeded",
-                                            "failoverPriority": 0,
-                                            "isZoneRedundant": false
-                                        }
-                                    ],
-                                    "readLocations": [
-                                        {
-                                            "id": "erwelchtesting-australiacentral",
-                                            "locationName": "Australia Central",
-                                            "documentEndpoint": "https://erwelchtesting-australiacentral.documents.azure.com:443/",
-                                            "provisioningState": "Succeeded",
-                                            "failoverPriority": 0,
-                                            "isZoneRedundant": false
-                                        }
-                                    ],
-                                    "locations": [
-                                        {
-                                            "id": "erwelchtesting-australiacentral",
-                                            "locationName": "Australia Central",
-                                            "documentEndpoint": "https://erwelchtesting-australiacentral.documents.azure.com:443/",
-                                            "provisioningState": "Succeeded",
-                                            "failoverPriority": 0,
-                                            "isZoneRedundant": false
-                                        }
-                                    ],
-                                    "failoverPolicies": [
-                                        {
-                                            "id": "erwelchtesting-australiacentral",
-                                            "locationName": "Australia Central",
-                                            "failoverPriority": 0
-                                        }
-                                    ],
-                                    "cors": [],
-                                    "capabilities": []
-                                }
                             }
                         ]
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.DocumentDB/databaseAccounts/cctestcosmosdb?api-version=2015-04-08",
-                "body": "mock_body",
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 400,
-                    "message": "BadRequest"
-                },
-                "headers": {
-                    "content-length": [
-                        "233"
-                    ],
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "date": [
-                        "Sat, 17 Aug 2019 20:30:37 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "code": "BadRequest",
-                        "message": "Invalid supplied IpRangeFilter: 0.0.0.0/1,11.12.13.14,21.22.23.24,0,.,0,.,0,.,0,/,1,,,1,2,8,.,0,.,0,.,0,/,1\r\nActivityId: def7dc90-c12d-11e9-9a11-acde48001122, Microsoft.Azure.Documents.Common/2.5.1"
                     }
                 }
             }

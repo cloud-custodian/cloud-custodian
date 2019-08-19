@@ -15,7 +15,6 @@ import logging
 from concurrent.futures import as_completed
 from itertools import groupby
 
-import azure.mgmt.cosmosdb
 from azure.cosmos.cosmos_client import CosmosClient
 from azure.cosmos.errors import HTTPFailure
 from azure.mgmt.cosmosdb.models import DatabaseAccountPatchParameters, VirtualNetworkRule, \
@@ -433,7 +432,7 @@ class CosmosSetNetworkRulesAction(SetNetworkRulesAction):
         self.rule_limit = 200
 
     def _process_resource(self, resource):
-        existing_ip = resource['properties'].get('ipRangeFilter', [])
+        existing_ip = resource['properties'].get('ipRangeFilter', '').split(',')
         rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
 
         # Cosmos DB does not have real bypass
@@ -469,12 +468,11 @@ class CosmosSetNetworkRulesAction(SetNetworkRulesAction):
                          'failover_priority': loc['failoverPriority'],
                          'is_zone_redundant': loc.get('isZoneRedundant', False)})
 
-        resource['properties']['ipRangeFilter']=','.join(rules)
-        resource['properties']['virtualNetworkRules']=[VirtualNetworkRule(id=r) for r in vnet_rules]
+        resource['properties']['ipRangeFilter'] = ','.join(rules)
+        resource['properties']['virtualNetworkRules'] = [VirtualNetworkRule(id=r) for r in vnet_rules]
 
         # Update resource
-        client = self.client # type: azure.mgmt.cosmosdb.CosmosDB
-        client.database_accounts.create_or_update(
+        self.client.database_accounts.create_or_update(
             resource['resourceGroup'],
             resource['name'],
             create_update_parameters=resource
