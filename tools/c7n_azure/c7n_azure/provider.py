@@ -31,6 +31,7 @@ class Azure(Provider):
         if options['account_id'] is None:
             session = local_session(self.get_session_factory(options))
             options['account_id'] = session.get_subscription_id()
+        options['cache'] = 'memory'
         return options
 
     def initialize_policies(self, policy_collection, options):
