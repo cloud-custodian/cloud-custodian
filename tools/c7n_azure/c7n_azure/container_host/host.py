@@ -34,7 +34,9 @@ from c7n.resources import load_resources
 from c7n.utils import local_session
 from c7n_azure import entry
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
-from c7n_azure.constants import (ENV_CONTAINER_EVENT_QUEUE_ID,
+from c7n_azure.constants import (CONTAINER_EVENT_TRIGGER_MODE,
+                                 CONTAINER_TIME_TRIGGER_MODE,
+                                 ENV_CONTAINER_EVENT_QUEUE_ID,
                                  ENV_CONTAINER_EVENT_QUEUE_NAME,
                                  ENV_CONTAINER_OPTION_LOG_GROUP,
                                  ENV_CONTAINER_OPTION_METRICS,
@@ -129,8 +131,7 @@ class Host:
             raise e
 
         # Filter to hashes we have not seen before
-        new_blobs = [b for b in blobs
-                     if b.properties.content_settings.content_md5 != self.blob_cache.get(b.name)]
+        new_blobs = self._get_new_blobs(blobs)
 
         # Get all YAML files on disk that are no longer in blob storage
         cached_policy_files = [f for f in os.listdir(self.policy_cache)
@@ -165,6 +166,40 @@ class Host:
         if self.require_event_update:
             self.update_event_subscriptions()
 
+    def _get_new_blobs(self, blobs):
+        new_blobs = []
+        for blob in blobs:
+            md5_hash = blob.properties.content_settings.content_md5
+            if not md5_hash:
+                blob, md5_hash = self._try_create_md5_content_hash(blob)
+            if blob and md5_hash and md5_hash != self.blob_cache.get(blob.name):
+                new_blobs.append(blob)
+        return new_blobs
+
+    def _try_create_md5_content_hash(self, blob):
+        # Not all storage clients provide the md5 hash when uploading a file
+        # so, we need to make sure that hash exists.
+        (client, container, _) = self.policy_blob_client
+        log.info("Applying md5 content hash to policy {}".format(blob.name))
+
+        try:
+            # Get the blob contents
+            blob_bytes = client.get_blob_to_bytes(container, blob.name)
+
+            # Re-upload the blob. validate_content ensures that the md5 hash is created
+            client.create_blob_from_bytes(container, blob.name, blob_bytes.content,
+                validate_content=True)
+
+            # Re-fetch the blob with the new hash
+            hashed_blob = client.get_blob_properties(container, blob.name)
+
+            return hashed_blob, hashed_blob.properties.content_settings.content_md5
+        except AzureHttpError as e:
+            log.warning("Failed to apply a md5 content hash to policy {}. "
+                        "This policy will be skipped.".format(blob.name))
+            log.error(e)
+            return None, None
+
     def load_policy(self, path, policies):
         """
         Loads a YAML file and prompts scheduling updates
@@ -184,9 +219,23 @@ class Host:
                         policies.update({p.name: {'policy': p}})
 
                         # Update periodic and set event update flag
-                        self.update_periodic(p)
-                        if p.data.get('mode', {}).get('events'):
+                        policy_mode = p.data.get('mode', {}).get('type')
+                        if policy_mode == CONTAINER_TIME_TRIGGER_MODE:
+                            self.update_periodic(p)
+                        elif policy_mode == CONTAINER_EVENT_TRIGGER_MODE:
                             self.require_event_update = True
+                        else:
+                            log.warning(
+                                "Unsupported policy mode for Azure Container Host: {}. "
+                                "{} will not be run. "
+                                "Supported policy modes include \"{}\" and \"{}\"."
+                                .format(
+                                    policy_mode,
+                                    p.data['name'],
+                                    CONTAINER_EVENT_TRIGGER_MODE,
+                                    CONTAINER_TIME_TRIGGER_MODE
+                                )
+                            )
 
             except Exception as exc:
                 log.error('Invalid policy file %s %s' % (path, exc))
@@ -233,18 +282,17 @@ class Host:
         Update scheduled policies using cron type
         periodic scheduling.
         """
-        if policy.data.get('mode', {}).get('schedule'):
-            trigger = CronTrigger.from_crontab(policy.data['mode']['schedule'])
-            trigger.jitter = jitter_seconds
-            self.scheduler.add_job(self.run_policy,
-                                   trigger,
-                                   id=policy.name,
-                                   name=policy.name,
-                                   args=[policy, None, None],
-                                   coalesce=True,
-                                   max_instances=1,
-                                   replace_existing=True,
-                                   misfire_grace_time=20)
+        trigger = CronTrigger.from_crontab(policy.data['mode']['schedule'])
+        trigger.jitter = jitter_seconds
+        self.scheduler.add_job(self.run_policy,
+                               trigger,
+                               id=policy.name,
+                               name=policy.name,
+                               args=[policy, None, None],
+                               coalesce=True,
+                               max_instances=1,
+                               replace_existing=True,
+                               misfire_grace_time=20)
 
     def update_event_subscriptions(self):
         """
@@ -359,7 +407,15 @@ class Host:
         Create a storage client using unusual ID/group reference
         as this is what we require for event subscriptions
         """
-        storage_client = self.session.client('azure.mgmt.storage.StorageManagementClient')
+
+        # Use a different session object if the queue is in a different subscription
+        queue_subscription_id = ResourceIdParser.get_subscription_id(queue_resource_id)
+        if queue_subscription_id != self.session.subscription_id:
+            session = Session(queue_subscription_id)
+        else:
+            session = self.session
+
+        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
 
         account = storage_client.storage_accounts.get_properties(
             ResourceIdParser.get_resource_group(queue_resource_id),
