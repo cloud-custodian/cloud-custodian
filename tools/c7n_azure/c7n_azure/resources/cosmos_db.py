@@ -88,6 +88,9 @@ class CosmosDBChildResource(ChildResourceManager):
         raise_on_exception = False
         annotate_parent = True
 
+        id = '_rid'
+        name = 'id'
+
     @staticmethod
     @lru_cache()
     def get_cosmos_key(resource_group, resource_name, client, readonly=True):

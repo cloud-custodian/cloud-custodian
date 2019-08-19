@@ -98,6 +98,9 @@ class KeyVaultKeys(ChildResourceManager):
         parent_manager_name = 'keyvault'
         raise_on_exception = False
 
+        id = 'kid'
+        name = 'kid'
+
         @classmethod
         def extra_args(cls, parent_resource):
             return {'vault_base_url': generate_key_vault_url(parent_resource['name'])}
