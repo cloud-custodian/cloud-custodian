@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 from abc import abstractmethod
 
-from azure.mgmt.storage.models import IPRule, \
-    NetworkRuleSet, StorageAccountUpdateParameters, VirtualNetworkRule
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.utils import resolve_service_tag_alias
 from netaddr import IPAddress
@@ -24,69 +21,7 @@ from netaddr import IPAddress
 from c7n.filters.core import type_schema
 
 
-class SetNetworkRulesAction(AzureBaseAction):
-    """ Set Network Rules Action
-
-    Updates Azure Storage Firewalls and Virtual Networks settings.
-
-    By default the firewall rules are replaced with the new values.  The ``append``
-    flag can be used to force merging the new rules with the existing ones on
-    the resource.
-
-    You may also reference azure public cloud Service Tags by name in place of
-    an IP address.  Use ``ServiceTags.`` followed by the ``name`` of any group
-    from https://www.microsoft.com/en-us/download/details.aspx?id=56519.
-
-    Note that there are firewall rule number limits and that you will likely need to
-    use a regional block to fit within the limit.  The limit for storage accounts is
-    200 rules.
-
-    .. code-block:: yaml
-
-        - type: set-firewall-rules
-              bypass-rules:
-                  - Logging
-                  - Metrics
-              ip-rules:
-                  - 11.12.13.0/16
-                  - ServiceTags.AppService.CentralUS
-
-
-    :example:
-
-    Find storage accounts without any firewall rules.
-
-    Configure default-action to ``Deny`` and then allow:
-    - Azure Logging and Metrics services
-    - Two specific IPs
-    - Two subnets
-
-    .. code-block:: yaml
-
-        policies:
-            - name: add-storage-firewall
-              resource: azure.storage
-
-            filters:
-                - type: value
-                  key: properties.networkAcls.ipRules
-                  value_type: size
-                  op: eq
-                  value: 0
-
-            actions:
-                - type: set-firewall-rules
-                  bypass-rules:
-                      - Logging
-                      - Metrics
-                  ip-rules:
-                      - 11.12.13.0/16
-                      - 21.22.23.24
-                  virtual-network-rules:
-                      - <subnet_resource_id>
-                      - <subnet_resource_id>
-
-    """
+class SetFirewallAction(AzureBaseAction):
 
     schema = type_schema(
         'set-firewall-rules',
@@ -103,7 +38,7 @@ class SetNetworkRulesAction(AzureBaseAction):
 
     @abstractmethod
     def __init__(self, data, manager=None):
-        super(SetNetworkRulesAction, self).__init__(data, manager)
+        super(SetFirewallAction, self).__init__(data, manager)
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()

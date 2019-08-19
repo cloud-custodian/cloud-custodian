@@ -17,20 +17,19 @@ from itertools import groupby
 
 from azure.cosmos.cosmos_client import CosmosClient
 from azure.cosmos.errors import HTTPFailure
-from azure.mgmt.cosmosdb.models import DatabaseAccountPatchParameters, VirtualNetworkRule, \
-    DatabaseAccountCreateUpdateParameters
-from c7n_azure.actions.firewall import SetNetworkRulesAction
-from netaddr import IPSet
-
-from c7n.filters import ValueFilter
-from c7n.utils import type_schema
+from azure.mgmt.cosmosdb.models import VirtualNetworkRule
 from c7n_azure import constants
 from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import ResourceIdParser
+from netaddr import IPSet
+
+from c7n.filters import ValueFilter
+from c7n.utils import type_schema
 
 try:
     from functools import lru_cache
@@ -69,7 +68,7 @@ class CosmosDB(ArmResourceManager):
         doc_groups = ['Databases']
 
         service = 'azure.mgmt.cosmosdb'
-        client = 'CosmosDB'  # type: azure.mgmt.cosmosdb.CosmosDB
+        client = 'CosmosDB'
         enum_spec = ('database_accounts', 'list', None)
         default_report_fields = (
             'name',
@@ -405,19 +404,98 @@ class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
 
         ip_range_string = resource['properties']['ipRangeFilter']
 
-        resource_rules = IPSet(ip_range_string.split(','))
+        # We need to remove the 'magic string' they use for AzureCloud bypass
+        ip_range_string = ip_range_string.replace('0.0.0.0', '')
+        parts = ip_range_string.split(',')
+
+        resource_rules = IPSet(filter(None, parts))
 
         return resource_rules
 
 
 @CosmosDB.action_registry.register('set-firewall-rules')
-class CosmosSetNetworkRulesAction(SetNetworkRulesAction):
+class CosmosSetFirewallAction(SetFirewallAction):
+    """ Set Firewall Rules Action
 
+     Updates CosmosDB Firewall settings.  Learn about the firewall at:
+     https://docs.microsoft.com/en-us/azure/cosmos-db/firewall-support
+
+     By default the firewall rules are replaced with the new values.  The ``append``
+     flag can be used to force merging the new rules with the existing ones on
+     the resource.
+
+     You may also reference azure public cloud Service Tags by name in place of
+     an IP address.  Use ``ServiceTags.`` followed by the ``name`` of any group
+     from https://www.microsoft.com/en-us/download/details.aspx?id=56519.
+
+     Note that there are firewall rule number limits.  The limit for CosmosDB is
+     1000 rules (maximum tested rule count).
+
+     .. code-block:: yaml
+
+         - type: set-firewall-rules
+               ip-rules:
+                   - 11.12.13.0/16
+                   - ServiceTags.AppService.CentralUS
+
+
+     :example:
+
+     Find CosmosDB accounts without any firewall rules.
+
+     Enable the firewall and allow:
+     - All Azure Cloud IP space
+     - All Portal UI IP space
+     - Two additional external IP ranges
+
+     Mark ``append: True`` to ensure we only add to the existing configuration
+     which in this case means we don't remove any previously configured
+     vnet firewall rules.
+
+     .. code-block:: yaml
+
+        policies:
+          - name: cosmos-firewall
+            resource: azure.cosmosdb
+            filters:
+              # The firewall is disabled
+              - type: value
+                key: properties.ipRangeFilter
+                value: empty
+            actions:
+              - type: set-firewall-rules
+                append: True
+                bypass-rules:
+                  - AzureCloud
+                  - Portal
+                ip-rules:
+                  - 19.0.0.0/16
+                  - 20.0.1.2
+
+
+     Cosmos firewalls are disabled by simply configuring them with empty values.
+     We can do this with an empty action, which defaults to ``append: False``.
+
+     .. code-block:: yaml
+
+        policies:
+          - name: cosmos-firewall-clear
+            resource: azure.cosmosdb
+            filters:
+              # The firewall is enabled
+              - not:
+                - type: value
+                  key: properties.ipRangeFilter
+                  value: empty
+            actions:
+              - type: set-firewall-rules
+
+
+     """
     schema = type_schema(
         'set-firewall-rules',
         required=[],
         **{
-            'default-action': {'enum': ['Allow', 'Deny'], "default": 'Deny'},
             'append': {'type': 'boolean', "default": False},
             'bypass-rules': {'type': 'array', 'items': {
                 'enum': ['Portal', 'AzureCloud']}},
@@ -427,12 +505,12 @@ class CosmosSetNetworkRulesAction(SetNetworkRulesAction):
     )
 
     def __init__(self, data, manager=None):
-        super(CosmosSetNetworkRulesAction, self).__init__(data, manager)
+        super(CosmosSetFirewallAction, self).__init__(data, manager)
         self._log = logging.getLogger('custodian.azure.cosmosdb')
-        self.rule_limit = 200
+        self.rule_limit = 1000
 
     def _process_resource(self, resource):
-        existing_ip = resource['properties'].get('ipRangeFilter', '').split(',')
+        existing_ip = filter(None, resource['properties'].get('ipRangeFilter', '').split(','))
         rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
 
         # Cosmos DB does not have real bypass
@@ -446,7 +524,7 @@ class CosmosSetNetworkRulesAction(SetNetworkRulesAction):
                           '52.169.50.45',
                           '52.187.184.26'])
         if 'AzureCloud' in bypass:
-            rules.add(['0.0.0.0'])
+            rules.append('0.0.0.0')
 
         # If the user has too many rules log and skip
         if len(rules) > self.rule_limit:
@@ -458,18 +536,20 @@ class CosmosSetNetworkRulesAction(SetNetworkRulesAction):
         # Add VNET rules
         existing_vnet = \
             [r['id'] for r in resource['properties'].get('virtualNetworkRules', [])]
-        vnet_rules = self._build_vnet_rules(existing_vnet, self.data.get('virtual-network-rules', []))
+        vnet_rules = self._build_vnet_rules(existing_vnet,
+                                            self.data.get('virtual-network-rules', []))
 
         # Workaround for bug https://git.io/fjFLY
         resource['properties']['locations'] = []
         for loc in resource['properties'].get('readLocations'):
             resource['properties']['locations'].append(
-                        {'location_name': loc['locationName'],
-                         'failover_priority': loc['failoverPriority'],
-                         'is_zone_redundant': loc.get('isZoneRedundant', False)})
+                {'location_name': loc['locationName'],
+                 'failover_priority': loc['failoverPriority'],
+                 'is_zone_redundant': loc.get('isZoneRedundant', False)})
 
         resource['properties']['ipRangeFilter'] = ','.join(rules)
-        resource['properties']['virtualNetworkRules'] = [VirtualNetworkRule(id=r) for r in vnet_rules]
+        resource['properties']['virtualNetworkRules'] = \
+            [VirtualNetworkRule(id=r) for r in vnet_rules]
 
         # Update resource
         self.client.database_accounts.create_or_update(

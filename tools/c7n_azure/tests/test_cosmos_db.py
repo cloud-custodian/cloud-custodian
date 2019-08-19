@@ -14,16 +14,13 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-import copy
-
 from azure.cosmos.cosmos_client import CosmosClient
-
-from azure_common import BaseTest, arm_template, cassette_name, requires_arm_polling
+from azure_common import BaseTest, arm_template, cassette_name
+from c7n_azure.resources.cosmos_db import CosmosDBChildResource
+from c7n_azure.session import Session
 from mock import patch
 
 from c7n.utils import local_session
-from c7n_azure.resources.cosmos_db import CosmosDBChildResource
-from c7n_azure.session import Session
 
 
 class CosmosDBTest(BaseTest):
@@ -157,7 +154,7 @@ class CosmosDBFirewallActionTest(BaseTest):
 
     def getResource(self):
         cosmos_accounts = self.client.database_accounts.list()
-        filtered = [r for r in cosmos_accounts.current_page if r.name is 'cctestcosmosdb']
+        filtered = [r for r in cosmos_accounts.current_page if r.name == 'cctestcosmosdb']
         return filtered
 
     @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
