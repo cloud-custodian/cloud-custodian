@@ -1,0 +1,61 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerGroups_custodian_aci_name": {
+            "defaultValue": "custodian-aci",
+            "type": "string"
+        },
+        "image_repository": {
+            "defaultValue": "cloudcustodian/c7n",
+            "type": "string"
+        },
+        "image_tag": {
+            "defaultValue": "latest",
+            "type": "string"
+        },
+        "restart_policy": {
+            "type": "string",
+            "allowedValues": [
+                "Always",
+                "OnFailure",
+                "Never"
+            ],
+            "defaultValue": "Always"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "apiVersion": "2018-04-01",
+            "name": "[parameters('containerGroups_custodian_aci_name')]",
+            "location": "westus2",
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[parameters('containerGroups_custodian_aci_name')]",
+                        "properties": {
+                            "image": "[concat(parameters('image_repository'), ':', parameters('image_tag'))]",
+                            "command": [
+                                "/usr/local/bin/python3",
+                                "-m",
+                                "c7n_azure.container_host.host"
+                            ],
+                            "ports": [],
+                            "environmentVariables": [],
+                            "resources": {
+                                "requests": {
+                                    "memoryInGB": 1.5,
+                                    "cpu": 1
+                                }
+                            }
+                        }
+                    }
+                ],
+                "restartPolicy": "[parameters('restart_policy')]",
+                "osType": "Linux"
+            }
+        }
+    ]
+}
