@@ -3,7 +3,11 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "aci_name": {
-            "defaultValue": "custodian-aci",
+            "defaultValue": "[concat('custodian-', parameters('azure_subscription_id'))]",
+            "type": "string"
+        },
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
             "type": "string"
         },
         "image_repository": {
@@ -23,35 +27,36 @@
             ],
             "defaultValue": "Always"
         },
-        "azure_tenant_id": {
-            "type": "string"
-        },
-        "azure_client_id": {
+        "user_assigned_identity_name": {
             "type": "string"
         },
         "azure_event_queue_name": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "[concat('custodian-', parameters('azure_subscription_id'))]"
         },
         "azure_subscription_id": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "[subscription().subscriptionId]"
         },
         "azure_container_storage": {
             "type": "string"
         },
         "azure_event_queue_resource_id": {
             "type": "string"
-        },
-        "azure_client_secret": {
-            "type": "string"
         }
     },
-    "variables": {},
     "resources": [
         {
             "type": "Microsoft.ContainerInstance/containerGroups",
-            "apiVersion": "2018-06-01",
+            "apiVersion": "2018-10-01",
             "name": "[parameters('aci_name')]",
-            "location": "westus2",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('user_assigned_identity_name'))]": {}
+                }
+            },
             "properties": {
                 "containers": [
                     {
@@ -66,12 +71,12 @@
                             "ports": [],
                             "environmentVariables": [
                                 {
-                                    "name": "AZURE_TENANT_ID",
-                                    "value": "[parameters('azure_tenant_id')]"
+                                    "name": "AZURE_USE_MSI",
+                                    "value": "1"
                                 },
                                 {
                                     "name": "AZURE_CLIENT_ID",
-                                    "value": "[parameters('azure_client_id')]"
+                                    "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('user_assigned_identity_name')), '2018-11-30').clientId]"
                                 },
                                 {
                                     "name": "AZURE_EVENT_QUEUE_NAME",
@@ -88,10 +93,6 @@
                                 {
                                     "name": "AZURE_EVENT_QUEUE_RESOURCE_ID",
                                     "value": "[parameters('azure_event_queue_resource_id')]"
-                                },
-                                {
-                                    "name": "AZURE_CLIENT_SECRET",
-                                    "secureValue": "[parameters('azure_client_secret')]"
                                 }
                             ],
                             "resources": {
