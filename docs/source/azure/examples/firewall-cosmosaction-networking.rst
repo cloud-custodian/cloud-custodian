@@ -31,7 +31,6 @@ all of the Azure Cloud as well as additional space in our data center.
 
     actions:
       - type: set-firewall-rules
-        append: True
         bypass-rules:   # Enable firewall and allow all Azure Cloud
           - AzureCloud
           - Portal

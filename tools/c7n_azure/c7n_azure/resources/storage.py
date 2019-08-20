@@ -129,6 +129,16 @@ class StorageSetFirewallAction(SetFirewallAction):
 
      """
 
+    schema = type_schema(
+        'set-firewall-rules',
+        rinherit=SetFirewallAction.schema,
+        **{
+            'default-action': {'enum': ['Allow', 'Deny'], "default": 'Deny'},
+            'bypass-rules': {'type': 'array', 'items': {
+                'enum': ['AzureServices', 'Logging', 'Metrics']}},
+        }
+    )
+
     def __init__(self, data, manager=None):
         super(StorageSetFirewallAction, self).__init__(data, manager)
         self._log = logging.getLogger('custodian.azure.storage')

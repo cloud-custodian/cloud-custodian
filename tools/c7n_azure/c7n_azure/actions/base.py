@@ -16,7 +16,6 @@ Actions to perform on Azure resources
 """
 import abc
 import logging
-import sys
 
 import six
 from c7n_azure import constants
@@ -65,8 +64,6 @@ class AzureBaseAction(BaseAction):
             try:
                 self._process_resource(r)
             except Exception as e:
-                if "pytest" in sys.modules:
-                    raise e
                 if isinstance(e, CloudError):
                     self.log.error("Failed to process resource.\n"
                                    "Type: {0}.\n"

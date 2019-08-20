@@ -494,15 +494,13 @@ class CosmosSetFirewallAction(SetFirewallAction):
 
 
      """
+
     schema = type_schema(
         'set-firewall-rules',
-        required=[],
+        rinherit=SetFirewallAction.schema,
         **{
-            'append': {'type': 'boolean', "default": False},
             'bypass-rules': {'type': 'array', 'items': {
                 'enum': ['Portal', 'AzureCloud']}},
-            'ip-rules': {'type': 'array', 'items': {'type': 'string'}},
-            'virtual-network-rules': {'type': 'array', 'items': {'type': 'string'}}
         }
     )
 

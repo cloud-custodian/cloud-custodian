@@ -48,6 +48,24 @@ class CosmosDBTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
+            p = self.load_policy({
+                'name': 'test-azure-cosmosdb',
+                'resource': 'azure.cosmosdb',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctestcosmosdb'}],
+                'actions': [
+                    {'type': 'set-firewall-rules',
+                     'bypass-rules': ['Portal'],
+                     'ip-rules': ['0.0.0.0/1', '11.12.13.14', '21.22.23.24']
+                     }
+                ]
+            }, validate=True)
+            self.assertTrue(p)
+
     @arm_template('cosmosdb.json')
     def test_find_by_name(self):
         p = self.load_policy({
@@ -152,11 +170,6 @@ class CosmosDBTest(BaseTest):
 
 class CosmosDBFirewallActionTest(BaseTest):
 
-    def getResource(self):
-        cosmos_accounts = self.client.database_accounts.list()
-        filtered = [r for r in cosmos_accounts.current_page if r.name == 'cctestcosmosdb']
-        return filtered
-
     @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
@@ -205,7 +218,7 @@ class CosmosDBFirewallActionTest(BaseTest):
                  'value': 'cctestcosmosdb'}],
             'actions': [
                 {'type': 'set-firewall-rules',
-                 'bypass-rules': ['Portal'],
+                 'bypass-rules': ['Portal', 'AzureCloud'],
                  'ip-rules': ['0.0.0.0/1', '11.12.13.14', '21.22.23.24']
                  }
             ]
@@ -225,7 +238,8 @@ class CosmosDBFirewallActionTest(BaseTest):
              '40.76.54.131',
              '52.169.50.45',
              '52.176.6.30',
-             '52.187.184.26'
+             '52.187.184.26',
+             '0.0.0.0'
              },
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
 

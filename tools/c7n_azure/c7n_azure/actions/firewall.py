@@ -27,10 +27,8 @@ class SetFirewallAction(AzureBaseAction):
         'set-firewall-rules',
         required=[],
         **{
-            'default-action': {'enum': ['Allow', 'Deny'], "default": 'Deny'},
-            'append': {'type': 'boolean', "default": False},
-            'bypass-rules': {'type': 'array', 'items': {
-                'enum': ['AzureServices', 'Logging', 'Metrics']}},
+            'append': {'type': 'boolean', 'default': False},
+            'bypass-rules': {'type': 'array'},
             'ip-rules': {'type': 'array', 'items': {'type': 'string'}},
             'virtual-network-rules': {'type': 'array', 'items': {'type': 'string'}}
         }
