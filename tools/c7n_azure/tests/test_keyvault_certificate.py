@@ -1,4 +1,4 @@
-# Copyright 2015-2018 Capital One Services, LLC
+# Copyright 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,28 +17,24 @@ import azure.keyvault.http_bearer_challenge_cache as kv_cache
 from azure_common import BaseTest, arm_template
 
 
-class KeyVaultKeyTest(BaseTest):
+class KeyVaultCertificatesTest(BaseTest):
 
     def tearDown(self, *args, **kwargs):
-        super(KeyVaultKeyTest, self).tearDown(*args, **kwargs)
+        super(KeyVaultCertificatesTest, self).tearDown(*args, **kwargs)
         kv_cache._cache = {}
 
-    def test_key_vault_keys_schema_validate(self):
+    def test_key_vault_certificates_schema_validate(self):
         p = self.load_policy({
             'name': 'test-key-vault',
-            'resource': 'azure.keyvault-keys',
-            'filters': [
-                {'type': 'keyvault', 'vaults': ['kv1', 'kv2']},
-                {'type': 'key-type', 'key-types': ['RSA', 'RSA-HSM', 'EC', 'EC-HSM']}
-            ]
+            'resource': 'azure.keyvault-certificate',
         }, validate=True)
         self.assertTrue(p)
 
     @arm_template('keyvault.json')
-    def test_key_vault_keys_keyvault(self):
+    def test_key_vault_certificates_keyvault(self):
         p = self.load_policy({
             'name': 'test-key-vault',
-            'resource': 'azure.keyvault-keys',
+            'resource': 'azure.keyvault-certificate',
             'filters': [
                 {
                     'type': 'parent',
@@ -53,19 +49,3 @@ class KeyVaultKeyTest(BaseTest):
         }, validate=True, cache=True)
         resources = p.run()
         self.assertEqual(len(resources), 2)
-
-    @arm_template('keyvault.json')
-    def test_key_vault_keys_type(self):
-        p = self.load_policy({
-            'name': 'test-key-vault',
-            'resource': 'azure.keyvault-keys',
-            'filters': [
-                {
-                    'type': 'key-type',
-                    'key-types': ['RSA', 'RSA-HSM']
-                },
-            ]
-        }, validate=True, cache=True)
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['c7n:kty'].lower(), 'rsa')
