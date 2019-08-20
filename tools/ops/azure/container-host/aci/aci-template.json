@@ -76,7 +76,7 @@
                                 },
                                 {
                                     "name": "AZURE_CLIENT_ID",
-                                    "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('user_assigned_identity_name')), '2018-11-30').clientId]"
+                                    "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('user_assigned_identity_name')), '2018-11-30').principalId]"
                                 },
                                 {
                                     "name": "AZURE_EVENT_QUEUE_NAME",
