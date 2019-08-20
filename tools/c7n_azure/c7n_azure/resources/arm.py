@@ -38,6 +38,7 @@ class ArmTypeInfo(TypeInfo):
     diagnostic_settings_enabled = True
     default_report_fields = (
         'name',
+        'type',
         'location',
         'resourceGroup'
     )
