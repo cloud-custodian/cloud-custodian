@@ -1,894 +1,378 @@
 {
   "body": {
     "items": {
-      "zones/europe-west3-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west3-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west3-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west3-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west3-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west3-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west3-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west3-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west3-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west2-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west2-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west2-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west2-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west2-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west2-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-central1-f": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-central1-f' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-central1-f", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west1-d": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west1-d' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west1-d", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-east1-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-east1-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-east1-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-east1-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-east1-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-east1-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-east1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-east1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-east1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-west1-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-west1-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-west1-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-west1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-west1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-west1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west1-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west1-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west1-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/southamerica-east1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/southamerica-east1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/southamerica-east1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/southamerica-east1-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/southamerica-east1-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/southamerica-east1-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/southamerica-east1-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/southamerica-east1-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/southamerica-east1-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west2-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west2-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west2-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
       "zones/us-east1-d": {
         "instances": [
           {
-            "status": "RUNNING", 
-            "cpuPlatform": "Intel Haswell", 
-            "kind": "compute#instance", 
+            "status": "RUNNING",
+            "cpuPlatform": "Intel Haswell",
+            "kind": "compute#instance",
             "labels": {
-              "https-server": "", 
-              "ci": "", 
-              "drone": "", 
-              "custodian": "", 
+              "https-server": "",
+              "ci": "",
+              "drone": "",
+              "custodian": "",
               "http-server": ""
-            }, 
-            "machineType": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-d/machineTypes/n1-standard-2", 
-            "description": "", 
-            "zone": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-d", 
+            },
+            "machineType": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-d/machineTypes/n1-standard-2",
+            "description": "",
+            "zone": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-d",
             "tags": {
               "items": [
-                "http-server", 
-                "https-server", 
-                "ci", 
-                "drone", 
+                "http-server",
+                "https-server",
+                "ci",
+                "drone",
                 "custodian"
-              ], 
+              ],
               "fingerprint": "YLj7N4sJwYI="
-            }, 
-            "labelFingerprint": "YLj7N4sJwYI=", 
+            },
+            "labelFingerprint": "YLj7N4sJwYI=",
             "disks": [
               {
-                "index": 0, 
-                "kind": "compute#attachedDisk", 
-                "autoDelete": true, 
-                "deviceName": "custodian", 
-                "boot": true, 
-                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-d/disks/custodian", 
-                "interface": "SCSI", 
-                "mode": "READ_WRITE", 
+                "index": 0,
+                "kind": "compute#attachedDisk",
+                "autoDelete": true,
+                "deviceName": "custodian",
+                "boot": true,
+                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-d/disks/custodian",
+                "interface": "SCSI",
+                "mode": "READ_WRITE",
                 "licenses": [
                   "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1404-trusty"
-                ], 
+                ],
                 "type": "PERSISTENT"
               }
-            ], 
+            ],
             "metadata": {
-              "kind": "compute#metadata", 
+              "kind": "compute#metadata",
               "fingerprint": "yKr6py6Xll8="
-            }, 
-            "startRestricted": false, 
-            "deletionProtection": false, 
+            },
+            "startRestricted": false,
+            "deletionProtection": false,
             "scheduling": {
-              "automaticRestart": true, 
-              "preemptible": false, 
+              "automaticRestart": true,
+              "preemptible": false,
               "onHostMaintenance": "MIGRATE"
-            }, 
-            "canIpForward": false, 
+            },
+            "canIpForward": false,
             "serviceAccounts": [
               {
                 "scopes": [
-                  "https://www.googleapis.com/auth/bigquery", 
-                  "https://www.googleapis.com/auth/cloud.useraccounts.readonly", 
-                  "https://www.googleapis.com/auth/devstorage.read_only", 
-                  "https://www.googleapis.com/auth/logging.write", 
-                  "https://www.googleapis.com/auth/monitoring.write", 
+                  "https://www.googleapis.com/auth/bigquery",
+                  "https://www.googleapis.com/auth/cloud.useraccounts.readonly",
+                  "https://www.googleapis.com/auth/devstorage.read_only",
+                  "https://www.googleapis.com/auth/logging.write",
+                  "https://www.googleapis.com/auth/monitoring.write",
                   "https://www.googleapis.com/auth/pubsub"
-                ], 
+                ],
                 "email": "628364681111-compute@developer.gserviceaccount.com"
               }
-            ], 
+            ],
             "networkInterfaces": [
               {
-                "kind": "compute#networkInterface", 
-                "network": "https://www.googleapis.com/compute/v1/projects/custodian-1291/global/networks/default", 
+                "kind": "compute#networkInterface",
+                "network": "https://www.googleapis.com/compute/v1/projects/custodian-1291/global/networks/default",
                 "accessConfigs": [
                   {
-                    "kind": "compute#accessConfig", 
-                    "type": "ONE_TO_ONE_NAT", 
-                    "name": "External NAT", 
+                    "kind": "compute#accessConfig",
+                    "type": "ONE_TO_ONE_NAT",
+                    "name": "External NAT",
                     "natIP": "104.196.149.1"
                   }
-                ], 
-                "networkIP": "10.142.0.2", 
-                "fingerprint": "u4ioByJWIjQ=", 
-                "subnetwork": "https://www.googleapis.com/compute/v1/projects/custodian-1291/regions/us-east1/subnetworks/default-07bf749b4b0e8db2", 
+                ],
+                "networkIP": "10.142.0.2",
+                "fingerprint": "u4ioByJWIjQ=",
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/custodian-1291/regions/us-east1/subnetworks/default-07bf749b4b0e8db2",
                 "name": "nic0"
               }
-            ], 
-            "creationTimestamp": "2016-04-24T01:44:01.573-07:00", 
-            "id": "4179518482904332734", 
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-d/instances/custodian", 
+            ],
+            "creationTimestamp": "2016-04-24T01:44:01.573-07:00",
+            "id": "4179518482904332734",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-d/instances/custodian",
             "name": "custodian"
           }
         ]
-      }, 
+      },
       "zones/us-east1-b": {
         "instances": [
           {
-            "status": "TERMINATED", 
-            "cpuPlatform": "Unknown CPU Platform", 
-            "kind": "compute#instance", 
-            "machineType": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-b/machineTypes/n1-standard-1", 
-            "description": "", 
-            "zone": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-b", 
+            "status": "TERMINATED",
+            "cpuPlatform": "Unknown CPU Platform",
+            "kind": "compute#instance",
+            "machineType": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-b/machineTypes/n1-standard-1",
+            "description": "",
+            "zone": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-b",
             "tags": {
               "items": [
-                "custodian", 
-                "dev", 
-                "http-server", 
+                "custodian",
+                "dev",
+                "http-server",
                 "https-server"
-              ], 
+              ],
               "fingerprint": "64R2DbCkcGg="
-            }, 
-            "labelFingerprint": "42WmSpB8rSM=", 
+            },
+            "labelFingerprint": "42WmSpB8rSM=",
             "disks": [
               {
-                "index": 0, 
-                "kind": "compute#attachedDisk", 
-                "autoDelete": true, 
-                "deviceName": "custodian-dev", 
-                "boot": true, 
-                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-b/disks/custodian-dev", 
-                "interface": "SCSI", 
-                "mode": "READ_WRITE", 
+                "index": 0,
+                "kind": "compute#attachedDisk",
+                "autoDelete": true,
+                "deviceName": "custodian-dev",
+                "boot": true,
+                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-b/disks/custodian-dev",
+                "interface": "SCSI",
+                "mode": "READ_WRITE",
                 "licenses": [
                   "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1604-xenial"
-                ], 
+                ],
                 "type": "PERSISTENT"
               }
-            ], 
+            ],
             "metadata": {
-              "kind": "compute#metadata", 
+              "kind": "compute#metadata",
               "fingerprint": "yKr6py6Xll8="
-            }, 
-            "startRestricted": false, 
-            "deletionProtection": false, 
+            },
+            "startRestricted": false,
+            "deletionProtection": false,
             "scheduling": {
-              "automaticRestart": true, 
-              "preemptible": false, 
+              "automaticRestart": true,
+              "preemptible": false,
               "onHostMaintenance": "MIGRATE"
-            }, 
-            "canIpForward": false, 
+            },
+            "canIpForward": false,
             "serviceAccounts": [
               {
                 "scopes": [
                   "https://www.googleapis.com/auth/cloud-platform"
-                ], 
+                ],
                 "email": "628364681111-compute@developer.gserviceaccount.com"
               }
-            ], 
+            ],
             "networkInterfaces": [
               {
-                "kind": "compute#networkInterface", 
-                "network": "https://www.googleapis.com/compute/v1/projects/custodian-1291/global/networks/default", 
+                "kind": "compute#networkInterface",
+                "network": "https://www.googleapis.com/compute/v1/projects/custodian-1291/global/networks/default",
                 "accessConfigs": [
                   {
-                    "kind": "compute#accessConfig", 
-                    "type": "ONE_TO_ONE_NAT", 
+                    "kind": "compute#accessConfig",
+                    "type": "ONE_TO_ONE_NAT",
                     "name": "External NAT"
                   }
-                ], 
-                "networkIP": "10.142.0.3", 
-                "fingerprint": "wbsB3SaM7JQ=", 
-                "subnetwork": "https://www.googleapis.com/compute/v1/projects/custodian-1291/regions/us-east1/subnetworks/default-07bf749b4b0e8db2", 
+                ],
+                "networkIP": "10.142.0.3",
+                "fingerprint": "wbsB3SaM7JQ=",
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/custodian-1291/regions/us-east1/subnetworks/default-07bf749b4b0e8db2",
                 "name": "nic0"
               }
-            ], 
-            "creationTimestamp": "2017-05-01T12:34:32.859-07:00", 
-            "id": "4158127351007949610", 
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-b/instances/custodian-dev", 
+            ],
+            "creationTimestamp": "2017-05-01T12:34:32.859-07:00",
+            "id": "4158127351007949610",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-east1-b/instances/custodian-dev",
             "name": "custodian-dev"
           }
         ]
-      }, 
-      "zones/australia-southeast1-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/australia-southeast1-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/australia-southeast1-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-east1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-east1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-east1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-southeast1-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-southeast1-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-southeast1-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-southeast1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-southeast1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-southeast1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-southeast1-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-southeast1-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-southeast1-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/australia-southeast1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/australia-southeast1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/australia-southeast1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-central1-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-central1-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-central1-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-south1-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-south1-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-south1-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-central1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-central1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-central1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
+      },
       "zones/us-central1-b": {
         "instances": [
           {
-            "status": "RUNNING", 
-            "cpuPlatform": "Intel Haswell", 
-            "kind": "compute#instance", 
-            "machineType": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/machineTypes/n1-standard-1", 
-            "description": "", 
-            "zone": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b", 
+            "status": "RUNNING",
+            "cpuPlatform": "Intel Haswell",
+            "kind": "compute#instance",
+            "machineType": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/machineTypes/n1-standard-1",
+            "description": "",
+            "zone": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b",
             "tags": {
               "items": [
                 "https-server"
-              ], 
+              ],
               "fingerprint": "nNZ0SA7CJyk="
-            }, 
-            "labelFingerprint": "42WmSpB8rSM=", 
+            },
+            "labelFingerprint": "42WmSpB8rSM=",
             "disks": [
               {
-                "index": 0, 
-                "kind": "compute#attachedDisk", 
-                "autoDelete": true, 
-                "deviceName": "c7n-jenkins", 
-                "boot": true, 
+                "index": 0,
+                "kind": "compute#attachedDisk",
+                "autoDelete": true,
+                "deviceName": "c7n-jenkins",
+                "boot": true,
                 "guestOsFeatures": [
                   {
                     "type": "VIRTIO_SCSI_MULTIQUEUE"
                   }
-                ], 
-                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/disks/c7n-jenkins", 
-                "interface": "SCSI", 
-                "mode": "READ_WRITE", 
+                ],
+                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/disks/c7n-jenkins",
+                "interface": "SCSI",
+                "mode": "READ_WRITE",
                 "licenses": [
                   "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
-                ], 
+                ],
                 "type": "PERSISTENT"
               }
-            ], 
+            ],
             "metadata": {
-              "kind": "compute#metadata", 
+              "kind": "compute#metadata",
               "fingerprint": "yKr6py6Xll8="
-            }, 
-            "startRestricted": false, 
-            "deletionProtection": false, 
+            },
+            "startRestricted": false,
+            "deletionProtection": false,
             "scheduling": {
-              "automaticRestart": true, 
-              "preemptible": false, 
+              "automaticRestart": true,
+              "preemptible": false,
               "onHostMaintenance": "MIGRATE"
-            }, 
-            "canIpForward": false, 
+            },
+            "canIpForward": false,
             "serviceAccounts": [
               {
                 "scopes": [
-                  "https://www.googleapis.com/auth/devstorage.read_only", 
-                  "https://www.googleapis.com/auth/logging.write", 
-                  "https://www.googleapis.com/auth/monitoring.write", 
-                  "https://www.googleapis.com/auth/servicecontrol", 
-                  "https://www.googleapis.com/auth/service.management.readonly", 
+                  "https://www.googleapis.com/auth/devstorage.read_only",
+                  "https://www.googleapis.com/auth/logging.write",
+                  "https://www.googleapis.com/auth/monitoring.write",
+                  "https://www.googleapis.com/auth/servicecontrol",
+                  "https://www.googleapis.com/auth/service.management.readonly",
                   "https://www.googleapis.com/auth/trace.append"
-                ], 
+                ],
                 "email": "628364681111-compute@developer.gserviceaccount.com"
               }
-            ], 
+            ],
             "networkInterfaces": [
               {
-                "kind": "compute#networkInterface", 
-                "network": "https://www.googleapis.com/compute/v1/projects/custodian-1291/global/networks/default", 
+                "kind": "compute#networkInterface",
+                "network": "https://www.googleapis.com/compute/v1/projects/custodian-1291/global/networks/default",
                 "accessConfigs": [
                   {
-                    "kind": "compute#accessConfig", 
-                    "type": "ONE_TO_ONE_NAT", 
-                    "name": "External NAT", 
+                    "kind": "compute#accessConfig",
+                    "type": "ONE_TO_ONE_NAT",
+                    "name": "External NAT",
                     "natIP": "104.154.233.11"
                   }
-                ], 
-                "networkIP": "10.128.0.3", 
-                "fingerprint": "LVfKg4FlPDs=", 
-                "subnetwork": "https://www.googleapis.com/compute/v1/projects/custodian-1291/regions/us-central1/subnetworks/default-48aec19374439812", 
+                ],
+                "networkIP": "10.128.0.3",
+                "fingerprint": "LVfKg4FlPDs=",
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/custodian-1291/regions/us-central1/subnetworks/default-48aec19374439812",
                 "name": "nic0"
               }
-            ], 
-            "creationTimestamp": "2018-05-19T05:15:46.024-07:00", 
-            "id": "2966820606951926687", 
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/instances/c7n-jenkins", 
+            ],
+            "creationTimestamp": "2018-05-19T05:15:46.024-07:00",
+            "id": "2966820606951926687",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/instances/c7n-jenkins",
             "name": "c7n-jenkins"
-          }, 
+          },
           {
-            "status": "TERMINATED", 
-            "cpuPlatform": "Unknown CPU Platform", 
-            "kind": "compute#instance", 
-            "machineType": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/machineTypes/n1-standard-1", 
-            "description": "", 
-            "zone": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b", 
+            "status": "TERMINATED",
+            "cpuPlatform": "Unknown CPU Platform",
+            "kind": "compute#instance",
+            "machineType": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/machineTypes/n1-standard-1",
+            "description": "",
+            "zone": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b",
             "tags": {
               "items": [
-                "http-server", 
+                "http-server",
                 "https-server"
-              ], 
+              ],
               "fingerprint": "6smc4R4d39I="
-            }, 
-            "labelFingerprint": "42WmSpB8rSM=", 
+            },
+            "labelFingerprint": "42WmSpB8rSM=",
             "disks": [
               {
-                "index": 0, 
-                "kind": "compute#attachedDisk", 
-                "autoDelete": true, 
-                "deviceName": "drone", 
-                "boot": true, 
-                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/disks/drone", 
-                "interface": "SCSI", 
-                "mode": "READ_WRITE", 
+                "index": 0,
+                "kind": "compute#attachedDisk",
+                "autoDelete": true,
+                "deviceName": "drone",
+                "boot": true,
+                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/disks/drone",
+                "interface": "SCSI",
+                "mode": "READ_WRITE",
                 "licenses": [
                   "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1604-xenial"
-                ], 
+                ],
                 "type": "PERSISTENT"
-              }, 
+              },
               {
-                "index": 1, 
-                "kind": "compute#attachedDisk", 
-                "autoDelete": false, 
-                "deviceName": "drone-11-1", 
-                "boot": false, 
-                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/disks/drone-11-1", 
-                "interface": "SCSI", 
-                "mode": "READ_WRITE", 
+                "index": 1,
+                "kind": "compute#attachedDisk",
+                "autoDelete": false,
+                "deviceName": "drone-11-1",
+                "boot": false,
+                "source": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/disks/drone-11-1",
+                "interface": "SCSI",
+                "mode": "READ_WRITE",
                 "licenses": [
                   "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1404-trusty"
-                ], 
+                ],
                 "type": "PERSISTENT"
               }
-            ], 
+            ],
             "metadata": {
-              "kind": "compute#metadata", 
+              "kind": "compute#metadata",
               "fingerprint": "yKr6py6Xll8="
-            }, 
-            "startRestricted": false, 
-            "deletionProtection": false, 
+            },
+            "startRestricted": false,
+            "deletionProtection": false,
             "scheduling": {
-              "automaticRestart": true, 
-              "preemptible": false, 
+              "automaticRestart": true,
+              "preemptible": false,
               "onHostMaintenance": "MIGRATE"
-            }, 
-            "canIpForward": false, 
+            },
+            "canIpForward": false,
             "serviceAccounts": [
               {
                 "scopes": [
-                  "https://www.googleapis.com/auth/servicecontrol", 
-                  "https://www.googleapis.com/auth/service.management.readonly", 
-                  "https://www.googleapis.com/auth/logging.write", 
-                  "https://www.googleapis.com/auth/monitoring.write", 
-                  "https://www.googleapis.com/auth/trace.append", 
+                  "https://www.googleapis.com/auth/servicecontrol",
+                  "https://www.googleapis.com/auth/service.management.readonly",
+                  "https://www.googleapis.com/auth/logging.write",
+                  "https://www.googleapis.com/auth/monitoring.write",
+                  "https://www.googleapis.com/auth/trace.append",
                   "https://www.googleapis.com/auth/devstorage.read_write"
-                ], 
+                ],
                 "email": "628364689111-compute@developer.gserviceaccount.com"
               }
-            ], 
+            ],
             "networkInterfaces": [
               {
-                "kind": "compute#networkInterface", 
-                "network": "https://www.googleapis.com/compute/v1/projects/custodian-1291/global/networks/default", 
+                "kind": "compute#networkInterface",
+                "network": "https://www.googleapis.com/compute/v1/projects/custodian-1291/global/networks/default",
                 "accessConfigs": [
                   {
-                    "kind": "compute#accessConfig", 
-                    "type": "ONE_TO_ONE_NAT", 
+                    "kind": "compute#accessConfig",
+                    "type": "ONE_TO_ONE_NAT",
                     "name": "External NAT"
                   }
-                ], 
-                "networkIP": "10.128.0.2", 
-                "fingerprint": "taUvjbNj9Jg=", 
-                "subnetwork": "https://www.googleapis.com/compute/v1/projects/custodian-1291/regions/us-central1/subnetworks/default-48aec19374439812", 
+                ],
+                "networkIP": "10.128.0.2",
+                "fingerprint": "taUvjbNj9Jg=",
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/custodian-1291/regions/us-central1/subnetworks/default-48aec19374439812",
                 "name": "nic0"
               }
-            ], 
-            "creationTimestamp": "2017-11-01T03:28:50.885-07:00", 
-            "id": "4913675096949006093", 
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/instances/drone", 
+            ],
+            "creationTimestamp": "2017-11-01T03:28:50.885-07:00",
+            "id": "4913675096949006093",
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/custodian-1291/zones/us-central1-b/instances/drone",
             "name": "drone"
           }
         ]
-      }, 
-      "zones/asia-northeast1-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-northeast1-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-northeast1-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-northeast1-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-northeast1-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-northeast1-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-northeast1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-northeast1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-northeast1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-west1-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-west1-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-west1-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-east4-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-east4-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-east4-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-south1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-south1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-south1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-east4-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-east4-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-east4-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/us-east4-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/us-east4-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/us-east4-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west4-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west4-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west4-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west4-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west4-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west4-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/europe-west4-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/europe-west4-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/europe-west4-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/northamerica-northeast1-c": {
-        "warning": {
-          "message": "There are no results for scope 'zones/northamerica-northeast1-c' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/northamerica-northeast1-c", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/asia-south1-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/asia-south1-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/asia-south1-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/northamerica-northeast1-a": {
-        "warning": {
-          "message": "There are no results for scope 'zones/northamerica-northeast1-a' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/northamerica-northeast1-a", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/australia-southeast1-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/australia-southeast1-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/australia-southeast1-b", 
-              "key": "scope"
-            }
-          ]
-        }
-      }, 
-      "zones/northamerica-northeast1-b": {
-        "warning": {
-          "message": "There are no results for scope 'zones/northamerica-northeast1-b' on this page.", 
-          "code": "NO_RESULTS_ON_PAGE", 
-          "data": [
-            {
-              "value": "zones/northamerica-northeast1-b", 
-              "key": "scope"
-            }
-          ]
-        }
       }
-    }, 
-    "kind": "compute#instanceAggregatedList", 
-    "id": "projects/custodian-1291/aggregated/instances", 
+    },
+    "kind": "compute#instanceAggregatedList",
+    "id": "projects/custodian-1291/aggregated/instances",
     "selfLink": "https://www.googleapis.com/compute/v1/projects/custodian-1291/aggregated/instances"
-  }, 
+  },
   "headers": {
-    "status": "200", 
-    "content-length": "23509", 
-    "transfer-encoding": "chunked", 
-    "expires": "Tue, 05 Jun 2018 21:49:39 GMT", 
-    "vary": "Origin, X-Origin", 
-    "-content-encoding": "gzip", 
-    "date": "Tue, 05 Jun 2018 21:49:39 GMT", 
-    "x-xss-protection": "1; mode=block", 
-    "content-location": "https://www.googleapis.com/compute/v1/projects/custodian-1291/aggregated/instances?alt=json", 
-    "x-content-type-options": "nosniff", 
-    "server": "GSE", 
-    "etag": "\"dLU3ttbJ5Mh6hJSRk-Gjiq7lx0w=/-tgowH3t_UbZPG_jLR-EzY6mQ3Q=\"", 
-    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
-    "x-frame-options": "SAMEORIGIN", 
-    "alt-svc": "quic=\":443\"; ma=2592000; v=\"43,42,41,39,35\"", 
+    "status": "200",
+    "content-length": "23509",
+    "transfer-encoding": "chunked",
+    "expires": "Tue, 05 Jun 2018 21:49:39 GMT",
+    "vary": "Origin, X-Origin",
+    "-content-encoding": "gzip",
+    "date": "Tue, 05 Jun 2018 21:49:39 GMT",
+    "x-xss-protection": "1; mode=block",
+    "content-location": "https://www.googleapis.com/compute/v1/projects/custodian-1291/aggregated/instances?alt=json",
+    "x-content-type-options": "nosniff",
+    "server": "GSE",
+    "etag": "\"dLU3ttbJ5Mh6hJSRk-Gjiq7lx0w=/-tgowH3t_UbZPG_jLR-EzY6mQ3Q=\"",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "x-frame-options": "SAMEORIGIN",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"43,42,41,39,35\"",
     "content-type": "application/json; charset=UTF-8"
   }
 }
