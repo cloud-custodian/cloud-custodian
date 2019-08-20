@@ -7,7 +7,7 @@ Jinja2==2.10.1
 jsonschema>=2.5.1
 ruamel.yaml>=0.15.93
 six>=1.12.0
-datadog==0.28.0
+datadog==0.29.3
 sendgrid==6.0.5
-redis==3.2.1
+redis==3.3.8
 ldap3==2.6
