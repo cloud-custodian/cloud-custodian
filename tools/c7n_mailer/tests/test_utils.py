@@ -42,7 +42,7 @@ class ResourceFormat(unittest.TestCase):
         self.assertEqual(
             utils.resource_format(
                 {'InternetGatewayId': 'igw-x', 'Attachments': []},
-                'internet-gateway'),
+                'aws.internet-gateway'),
             'id: igw-x  attachments: 0')
 
     def test_alb(self):

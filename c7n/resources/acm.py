@@ -53,7 +53,8 @@ class DescribeCertificate(DescribeSource):
             super(DescribeCertificate, self).augment(resources))
 
 
-register_universal_tags(Certificate.filter_registry, Certificate.action_registry)
+register_universal_tags(
+    Certificate.filter_registry, Certificate.action_registry, compatibility=False)
 
 
 @Certificate.action_registry.register('delete')
