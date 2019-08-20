@@ -26,6 +26,7 @@ import c7n_azure.resources.aci
 import c7n_azure.resources.generic_arm_resource
 import c7n_azure.resources.cosmos_db
 import c7n_azure.resources.key_vault
+import c7n_azure.resources.key_vault_certificate
 import c7n_azure.resources.key_vault_keys
 import c7n_azure.resources.load_balancer
 import c7n_azure.resources.resourcegroup
