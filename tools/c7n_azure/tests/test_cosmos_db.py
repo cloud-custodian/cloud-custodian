@@ -167,7 +167,40 @@ class CosmosDBTest(BaseTest):
         self.assertEqual(1, len(resources))
         self.assertEqual('Hash', resources[0]['partitionKey']['kind'])
 
+    @arm_template('cosmosdb.json')
+    def test_store_throughput_state_collection_action(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-collection',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'id',
+                    'op': 'eq',
+                    'value': 'cccontainer'
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'save-throughput-state',
+                    'state-tag': 'test-store-throughput'
+                }
+            ]
+        })
 
+        collections = p.run()
+        self.assertEqual(len(collections), 1)
+
+        client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
+        cosmos_account = client.database_accounts.get('test_cosmosdb', 'cctestcosmosdb')
+        self.assertTrue('test-store-throughput' in cosmos_account.tags)
+
+        tag_value = cosmos_account.tags['test-store-throughput']
+        expected_throughput = collections[0]['c7n:offer']['content']['offerThroughput']
+        expected_tag_value = '{}:{}'.format(collections[0]['_rid'], expected_throughput)
+        self.assertEqual(expected_tag_value, tag_value)
+
+        
 class CosmosDBFirewallActionTest(BaseTest):
 
     @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
@@ -353,29 +386,30 @@ class CosmosDBFirewallActionTest(BaseTest):
                  kwargs['create_update_parameters']['properties']['virtualNetworkRules']]))
 
 
-class CosmosDBReplaceOfferActionTest(BaseTest):
-
+class CosmosDBThroughputActionsTest(BaseTest):
     def setUp(self, *args, **kwargs):
-        super(CosmosDBReplaceOfferActionTest, self).setUp(*args, **kwargs)
-        client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
+        super(CosmosDBThroughputActionsTest, self).setUp(*args, **kwargs)
+        self.client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
         key = CosmosDBChildResource.get_cosmos_key(
-            'test_cosmosdb', 'cctestcosmosdb', client, readonly=False)
+            'test_cosmosdb', 'cctestcosmosdb', self.client, readonly=False)
         self.data_client = CosmosClient(
             url_connection='https://cctestcosmosdb.documents.azure.com:443/',
             auth={
                 'masterKey': key
             }
         )
+        self.offer = None
 
     def tearDown(self, *args, **kwargs):
-        super(CosmosDBReplaceOfferActionTest, self).tearDown(*args, **kwargs)
-        self.data_client.ReplaceOffer(
-            self.initial_offer['_self'],
-            self.initial_offer
-        )
+        super(CosmosDBThroughputActionsTest, self).tearDown(*args, **kwargs)
+        if self.offer:
+            self.offer['content']['offerThroughput'] = 400
+            self.data_client.ReplaceOffer(
+                self.offer['_self'],
+                self.offer
+            )
 
     def test_replace_offer_collection_action(self):
-
         p = self.load_policy({
             'name': 'test-azure-cosmosdb',
             'resource': 'azure.cosmosdb-collection',
@@ -401,11 +435,72 @@ class CosmosDBReplaceOfferActionTest(BaseTest):
             ]
         })
         collections = p.run()
+        self.offer = collections[0]['c7n:offer']
+
+        self.assertEqual(len(collections), 1)
+        self._assert_offer_throughput_equals(500, collections[0]['_self'])
+
+    def test_restore_throughput_state_updates_throughput_from_tag(self):
+
+        p1 = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-collection',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'id',
+                    'op': 'eq',
+                    'value': 'cccontainer'
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'save-throughput-state',
+                    'state-tag': 'test-restore-throughput'
+                }
+            ]
+        })
+
+        collections = p1.run()
         self.assertEqual(len(collections), 1)
 
-        self.initial_offer = collections[0]['c7n:offer'][0]
-        self.collection = collections[0]
-        self._assert_offer_throughput_equals(500, collections[0]['_self'])
+        collection_offer = collections[0]['c7n:offer']
+        self.offer = collection_offer
+
+        throughput_to_restore = collection_offer['content']['offerThroughput']
+
+        collection_offer['content']['offerThroughput'] = throughput_to_restore + 100
+
+        self.data_client.ReplaceOffer(
+            collection_offer['_self'],
+            collection_offer
+        )
+
+        self._assert_offer_throughput_equals(throughput_to_restore + 100, collections[0]['_self'])
+
+        p2 = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-collection',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'id',
+                    'op': 'eq',
+                    'value': 'cccontainer'
+                },
+            ],
+            'actions': [
+                {
+                    'type': 'restore-throughput-state',
+                    'state-tag': 'test-restore-throughput'
+                }
+            ]
+        })
+
+        collections = p2.run()
+
+        self.assertEqual(len(collections), 1)
+        self._assert_offer_throughput_equals(throughput_to_restore, collections[0]['_self'])
 
     def _assert_offer_throughput_equals(self, throughput, resource_self):
         offers = self.data_client.ReadOffers()

@@ -32,11 +32,18 @@ for file in "$templateDirectory"/*.json; do
                          "userObjectId=$azureAdUserObjectId"
 
         vault_name=$(az keyvault list --resource-group $rgName --query [0].name | tr -d '"')
-        az keyvault key create --vault-name $vault_name --name cctestrsa --kty RSA
-        az keyvault key create --vault-name $vault_name --name cctestec --kty EC
 
-        az keyvault certificate create --vault-name $vault_name --name cctest1 -p "$(az keyvault certificate get-default-policy)"
-        az keyvault certificate create --vault-name $vault_name --name cctest2 -p "$(az keyvault certificate get-default-policy)"
+        storage_id=$(az storage account list --resource-group ${rgName} --query [0].id --out tsv)
+
+        az keyvault key create --vault-name ${vault_name} --name cctestrsa --kty RSA
+        az keyvault key create --vault-name ${vault_name} --name cctestec --kty EC
+
+        az keyvault certificate create --vault-name ${vault_name} --name cctest1 -p "$(az keyvault certificate get-default-policy)"
+        az keyvault certificate create --vault-name ${vault_name} --name cctest2 -p "$(az keyvault certificate get-default-policy)"
+
+        az role assignment create --role "Storage Account Key Operator Service Role" --assignee cfa8b339-82a2-471a-a3c9-0fc0be7a4093 --scope ${storage_id}
+        az keyvault storage add --vault-name ${vault_name} -n storage1 --active-key-name key1 --resource-id ${storage_id} --auto-regenerate-key True --regeneration-period P180D
+        az keyvault storage add --vault-name ${vault_name} -n storage2 --active-key-name key2 --resource-id ${storage_id} --auto-regenerate-key False
 
       elif [[ "$filenameNoExtension" =~ "aks" ]]; then
         az group deployment create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --mode Complete --no-wait

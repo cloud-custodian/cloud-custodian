@@ -142,6 +142,9 @@ class TypeInfo(object):
     service = ''
     client = ''
 
+    # Default id field, resources should override if different (used for meta filters, report etc)
+    id = 'id'
+
     resource = constants.RESOURCE_ACTIVE_DIRECTORY
 
 
