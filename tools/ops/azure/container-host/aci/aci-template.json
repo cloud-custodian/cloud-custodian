@@ -45,6 +45,9 @@
             "type": "string"
         }
     },
+    "variables": {
+        "user_assigned_identity_resource_id": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('user_assigned_identity_name'))]"
+    },
     "resources": [
         {
             "type": "Microsoft.ContainerInstance/containerGroups",
@@ -54,7 +57,7 @@
             "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
-                    "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('user_assigned_identity_name'))]": {}
+                    "[variables('user_assigned_identity_resource_id')]": {}
                 }
             },
             "properties": {
@@ -76,7 +79,7 @@
                                 },
                                 {
                                     "name": "AZURE_CLIENT_ID",
-                                    "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('user_assigned_identity_name')), '2018-11-30').principalId]"
+                                    "value": "[reference(variables('user_assigned_identity_resource_id'), '2018-11-30').clientId]"
                                 },
                                 {
                                     "name": "AZURE_EVENT_QUEUE_NAME",
