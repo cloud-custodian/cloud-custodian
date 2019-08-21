@@ -476,7 +476,7 @@ class CosmosSetFirewallAction(SetFirewallAction):
 
 
      Cosmos firewalls are disabled by simply configuring them with empty values.
-     We can do this with an empty action, which defaults to ``append: False``.
+     To make this action explicit we require you to provide the empty rules array.
 
      .. code-block:: yaml
 
@@ -491,6 +491,7 @@ class CosmosSetFirewallAction(SetFirewallAction):
                   value: empty
             actions:
               - type: set-firewall-rules
+                ip-rules: []
 
 
      """
@@ -511,27 +512,26 @@ class CosmosSetFirewallAction(SetFirewallAction):
 
     def _process_resource(self, resource):
         existing_ip = filter(None, resource['properties'].get('ipRangeFilter', '').split(','))
-        rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
+        ip_rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
 
         # Cosmos DB does not have real bypass
         # instead the portal UI adds these values to your
         # rules filter when you check the box.
-        bypass = self.data.get('bypass-rules', [])
-        if 'Portal' in bypass:
-            rules.extend(['104.42.195.92',
+        bypass_rules = self.data.get('bypass-rules', [])
+        if 'Portal' in bypass_rules:
+            ip_rules.extend(['104.42.195.92',
                           '40.76.54.131',
                           '52.176.6.30',
                           '52.169.50.45',
                           '52.187.184.26'])
-        if 'AzureCloud' in bypass:
-            rules.append('0.0.0.0')
+        if 'AzureCloud' in bypass_rules:
+            ip_rules.append('0.0.0.0')
 
         # If the user has too many rules log and skip
-        if len(rules) > self.rule_limit:
-            self._log.error("Skipped updating firewall for %s. "
+        if len(ip_rules) > self.rule_limit:
+            raise ValueError("Skipped updating firewall for %s. "
                             "%s exceeds maximum rule count of %s." %
-                            (resource['name'], len(rules), self.rule_limit))
-            return
+                            (resource['name'], len(ip_rules), self.rule_limit))
 
         # Add VNET rules
         existing_vnet = \
@@ -547,7 +547,7 @@ class CosmosSetFirewallAction(SetFirewallAction):
                  'failover_priority': loc['failoverPriority'],
                  'is_zone_redundant': loc.get('isZoneRedundant', False)})
 
-        resource['properties']['ipRangeFilter'] = ','.join(rules)
+        resource['properties']['ipRangeFilter'] = ','.join(ip_rules)
         resource['properties']['virtualNetworkRules'] = \
             [VirtualNetworkRule(id=r) for r in vnet_rules]
 

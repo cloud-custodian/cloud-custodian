@@ -23,6 +23,7 @@ from c7n_azure.utils import ThreadHelper
 from msrestazure.azure_exceptions import CloudError
 
 from c7n.actions import BaseAction, EventAction
+from c7n.exceptions import PolicyValidationError
 
 
 @six.add_metaclass(abc.ABCMeta)

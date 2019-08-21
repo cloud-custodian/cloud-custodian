@@ -61,14 +61,19 @@ class SetFirewallAction(AzureBaseAction):
     def _build_ip_rules(self, existing_ip, new_rules):
         rules = []
         for rule in new_rules:
+            # attempt to resolve this rule as a service tag alias
+            # if it isn't a valid alias then we'll get `None` back.
             resolved_set = resolve_service_tag_alias(rule)
             if resolved_set:
+                # this is a service tag alias, so we need to insert the whole
+                # aliased array into the ruleset
                 ranges = list(resolved_set.iter_cidrs())
                 for r in range(len(ranges)):
                     if len(ranges[r]) == 1:
                         ranges[r] = IPAddress(ranges[r].first)
                 rules.extend(map(str, ranges))
             else:
+                # just a normal rule, append
                 rules.append(rule)
 
         if self.append:
