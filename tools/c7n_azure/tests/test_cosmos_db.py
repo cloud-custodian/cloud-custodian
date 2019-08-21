@@ -200,7 +200,7 @@ class CosmosDBTest(BaseTest):
         expected_tag_value = '{}:{}'.format(collections[0]['_rid'], expected_throughput)
         self.assertEqual(expected_tag_value, tag_value)
 
-        
+
 class CosmosDBFirewallActionTest(BaseTest):
 
     @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
