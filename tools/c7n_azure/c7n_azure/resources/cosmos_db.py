@@ -422,8 +422,8 @@ class CosmosSetFirewallAction(SetFirewallAction):
      Updates CosmosDB Firewall settings.  Learn about the firewall at:
      https://docs.microsoft.com/en-us/azure/cosmos-db/firewall-support
 
-     By default the firewall rules are replaced with the new values.  The ``append``
-     flag can be used to force merging the new rules with the existing ones on
+     By default the firewall rules are appended with the new values.  The ``append: False``
+     flag can be used to replace the old rules with the new ones on
      the resource.
 
      You may also reference azure public cloud Service Tags by name in place of
@@ -450,9 +450,7 @@ class CosmosSetFirewallAction(SetFirewallAction):
      - All Portal UI IP space
      - Two additional external IP ranges
 
-     Mark ``append: True`` to ensure we only add to the existing configuration
-     which in this case means we don't remove any previously configured
-     vnet firewall rules.
+     ``append: True`` (default) ensures we only add to the existing configuration.
 
      .. code-block:: yaml
 
@@ -476,7 +474,7 @@ class CosmosSetFirewallAction(SetFirewallAction):
 
 
      Cosmos firewalls are disabled by simply configuring them with empty values.
-     To make this action explicit we require you to provide the empty rules array.
+     We can do this by passing an empty array with ``append: False``
 
      .. code-block:: yaml
 
@@ -491,6 +489,7 @@ class CosmosSetFirewallAction(SetFirewallAction):
                   value: empty
             actions:
               - type: set-firewall-rules
+                append: False
                 ip-rules: []
 
 
@@ -509,25 +508,42 @@ class CosmosSetFirewallAction(SetFirewallAction):
         super(CosmosSetFirewallAction, self).__init__(data, manager)
         self._log = logging.getLogger('custodian.azure.cosmosdb')
         self.rule_limit = 1000
+        self.portal = ['104.42.195.92',
+                       '40.76.54.131',
+                       '52.176.6.30',
+                       '52.169.50.45',
+                       '52.187.184.26']
+        self.azure_cloud = ['0.0.0.0']
 
     def _process_resource(self, resource):
-        existing_ip = filter(None, resource['properties'].get('ipRangeFilter', '').split(','))
-        ip_rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
 
-        # Cosmos DB does not have real bypass
-        # instead the portal UI adds these values to your
-        # rules filter when you check the box.
-        bypass_rules = self.data.get('bypass-rules', [])
+        # IP rules
+        existing_ip = list(filter(None, resource['properties'].get('ipRangeFilter', '').split(',')))
+        if self.data.get('ip-rules') is not None:
+            ip_rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
+        else:
+            ip_rules = existing_ip
+
+        # Bypass rules
+        #  Cosmos DB does not have real bypass
+        #  instead the portal UI adds values to your
+        #  rules filter when you check the bypass box.
+        existing_bypass = []
+        if set(self.azure_cloud).issubset(existing_ip):
+            existing_bypass.append('AzureCloud')
+
+        if set(self.portal).issubset(existing_ip):
+            existing_bypass.append('Portal')
+
+        # If unset, then we put the old values back in to emulate patch behavior
+        bypass_rules = self.data.get('bypass-rules', existing_bypass)
+
         if 'Portal' in bypass_rules:
-            ip_rules.extend(['104.42.195.92',
-                          '40.76.54.131',
-                          '52.176.6.30',
-                          '52.169.50.45',
-                          '52.187.184.26'])
+            ip_rules.extend(set(self.portal).difference(ip_rules))
         if 'AzureCloud' in bypass_rules:
-            ip_rules.append('0.0.0.0')
+            ip_rules.extend(set(self.azure_cloud).difference(ip_rules))
 
-        # If the user has too many rules log and skip
+        # If the user has too many rules raise exception
         if len(ip_rules) > self.rule_limit:
             raise ValueError("Skipped updating firewall for %s. "
                             "%s exceeds maximum rule count of %s." %
@@ -536,8 +552,12 @@ class CosmosSetFirewallAction(SetFirewallAction):
         # Add VNET rules
         existing_vnet = \
             [r['id'] for r in resource['properties'].get('virtualNetworkRules', [])]
-        vnet_rules = self._build_vnet_rules(existing_vnet,
-                                            self.data.get('virtual-network-rules', []))
+
+        if self.data.get('virtual-network-rules') is not None:
+            vnet_rules = self._build_vnet_rules(existing_vnet,
+                                                self.data.get('virtual-network-rules', []))
+        else:
+            vnet_rules = existing_vnet
 
         # Workaround for bug https://git.io/fjFLY
         resource['properties']['locations'] = []

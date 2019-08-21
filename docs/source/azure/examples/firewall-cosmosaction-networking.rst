@@ -8,6 +8,8 @@ expected ranges.
 We then reconfigure that firewall to known-safe defaults which include a bypass for
 all of the Azure Cloud as well as additional space in our data center.
 
+Virtual network rules are not specified so they will not be modified.
+
 .. code-block:: yaml
 
  policies:
@@ -31,6 +33,7 @@ all of the Azure Cloud as well as additional space in our data center.
 
     actions:
       - type: set-firewall-rules
+        append: False
         bypass-rules:   # Enable firewall and allow all Azure Cloud
           - AzureCloud
           - Portal

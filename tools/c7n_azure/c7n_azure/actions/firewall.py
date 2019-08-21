@@ -27,7 +27,7 @@ class SetFirewallAction(AzureBaseAction):
         'set-firewall-rules',
         required=[],
         **{
-            'append': {'type': 'boolean', 'default': False},
+            'append': {'type': 'boolean', 'default': True},
             'bypass-rules': {'type': 'array'},
             'ip-rules': {'type': 'array', 'items': {'type': 'string'}},
             'virtual-network-rules': {'type': 'array', 'items': {'type': 'string'}}
@@ -40,7 +40,7 @@ class SetFirewallAction(AzureBaseAction):
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()
-        self.append = self.data.get('append', False)
+        self.append = self.data.get('append', True)
 
     @abstractmethod
     def _process_resource(self, resource):
