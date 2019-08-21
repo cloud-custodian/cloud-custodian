@@ -96,7 +96,7 @@ class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
 
     def _query_rules(self, resource):
         ip_range_string = resource['properties']['ipRangeFilter']
-            
+
         parts = ip_range_string.split(',')
 
         # We need to remove the 'magic string' they use for AzureCloud bypass
