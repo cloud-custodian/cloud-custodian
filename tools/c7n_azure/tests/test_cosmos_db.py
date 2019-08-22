@@ -203,7 +203,7 @@ class CosmosDBTest(BaseTest):
 
 class CosmosDBFirewallActionTest(BaseTest):
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
@@ -236,7 +236,7 @@ class CosmosDBFirewallActionTest(BaseTest):
                 '104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26'.split(',')),
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
@@ -270,7 +270,7 @@ class CosmosDBFirewallActionTest(BaseTest):
                 '52.176.6.30,52.169.50.45,52.187.184.26'.split(',')),
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
@@ -313,7 +313,7 @@ class CosmosDBFirewallActionTest(BaseTest):
              },
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
@@ -347,7 +347,7 @@ class CosmosDBFirewallActionTest(BaseTest):
             {'21.22.23.24'},
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
