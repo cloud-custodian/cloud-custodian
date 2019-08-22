@@ -20,7 +20,7 @@ import time
 from datetime import datetime
 from dateutil import tz
 import jmespath
-from mock import mock
+from mock import mock, patch
 from jsonschema.exceptions import ValidationError
 
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -1649,6 +1649,16 @@ class TestLaunchTemplate(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 8)
         self.assertTrue(all(['LaunchTemplateData' in r for r in resources]))
+
+    def test_launch_template_id_not_found(self):
+        error_response = {'Error': {'Code': 'InvalidLaunchTemplateId.NotFound'}}
+        operation_name = 'DescribeLaunchTemplateVersions'
+        with patch("c7n.utils.local_session") as mock_local_session:
+            describe_template = mock_local_session.client.describe_launch_template_versions
+            describe_template.side_effect = ClientError(error_response, operation_name)
+            with self.assertRaises(ClientError):
+                describe_template(LaunchTemplateId='badname', Versions=['1'])
+                describe_template.assert_called_once()
 
 
 class TestReservedInstance(BaseTest):
