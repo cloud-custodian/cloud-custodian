@@ -232,3 +232,136 @@ class InstanceTemplateDelete(MethodAction):
                                               r['selfLink']).groups()
         return {'project': project,
                 'instanceTemplate': instance_template}
+
+
+@resources.register('autoscaler')
+class Autoscaler(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/autoscalers"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'autoscalers'
+        id = 'name'
+        enum_spec = ('aggregatedList', 'items.*.autoscalers[]', None)
+
+        @staticmethod
+        def get(client, resource_info):
+            project, zone, autoscaler = re.match(
+                'projects/(.*?)/zones/(.*?)/autoscalers/(.*)',
+                resource_info['resourceName']).groups()
+
+            return client.execute_command(
+                'get', {'project': project,
+                        'zone': zone,
+                        'autoscaler': autoscaler})
+
+
+@Autoscaler.action_registry.register('set')
+class AutoscalerSet(MethodAction):
+    """
+    `Patches <https://cloud.google.com/compute/docs/reference/rest/v1/autoscalers/patch>`_
+    configuration parameters for the autoscaling algorithm.
+
+    The `coolDownPeriodSec` specifies the number of seconds that the autoscaler
+    should wait before it starts collecting information from a new instance.
+
+    The `cpuUtilization.utilizationTarget` specifies the target CPU utilization that the
+    autoscaler should maintain.
+
+    The `loadBalancingUtilization.utilizationTarget` specifies fraction of backend capacity
+    utilization (set in HTTP(S) load balancing configuration) that autoscaler should maintain.
+
+    The `minNumReplicas` specifies the minimum number of replicas that the autoscaler can
+    scale down to.
+
+    The `maxNumReplicas` specifies the maximum number of instances that the autoscaler can
+    scale up to.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-autoscaler-set
+            resource: gcp.autoscaler
+            filters:
+              - type: value
+                key: name
+                value: instance-group-2
+            actions:
+              - type: set
+                coolDownPeriodSec: 20
+                cpuUtilization:
+                  utilizationTarget: 0.7
+                loadBalancingUtilization:
+                  utilizationTarget: 0.7
+                minNumReplicas: 1
+                maxNumReplicas: 4
+    """
+    schema = type_schema('set',
+                         **{
+                             'coolDownPeriodSec': {
+                                 'type': 'integer',
+                                 'minimum': 15
+                             },
+                             'cpuUtilization': {
+                                 'type': 'object',
+                                 'required': ['utilizationTarget'],
+                                 'properties': {
+                                     'utilizationTarget': {
+                                         'type': 'number',
+                                         'exclusiveMinimum': 0,
+                                         'maximum': 1
+                                     }
+                                 },
+                             },
+                             'loadBalancingUtilization': {
+                                 'type': 'object',
+                                 'required': ['utilizationTarget'],
+                                 'properties': {
+                                     'utilizationTarget': {
+                                         'type': 'number',
+                                         'exclusiveMinimum': 0,
+                                         'maximum': 1
+                                     }
+                                 }
+                             },
+                             'maxNumReplicas': {
+                                 'type': 'integer',
+                                 'exclusiveMinimum': 0
+                             },
+                             'minNumReplicas': {
+                                 'type': 'integer',
+                                 'exclusiveMinimum': 0
+                             }
+                         })
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/autoscalers/(.*)')
+
+    def get_resource_params(self, model, resource):
+        project, zone, autoscaler = self.path_param_re.match(resource['selfLink']).groups()
+        body = {}
+
+        if 'coolDownPeriodSec' in self.data:
+            body['coolDownPeriodSec'] = self.data['coolDownPeriodSec']
+
+        if 'cpuUtilization' in self.data:
+            body['cpuUtilization'] = self.data['cpuUtilization']
+
+        if 'loadBalancingUtilization' in self.data:
+            body['loadBalancingUtilization'] = self.data['loadBalancingUtilization']
+
+        if 'maxNumReplicas' in self.data:
+            body['maxNumReplicas'] = self.data['maxNumReplicas']
+
+        if 'minNumReplicas' in self.data:
+            body['minNumReplicas'] = self.data['minNumReplicas']
+
+        result = {'project': project,
+                  'zone': zone,
+                  'autoscaler': autoscaler,
+                  'body': {
+                      'autoscalingPolicy': body
+                  }}
+
+        return result

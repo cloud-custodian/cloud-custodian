@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest
+from azure_common import BaseTest, cassette_name
 from c7n_azure.utils import IpRangeHelper
 from netaddr import IPRange, IPSet
 
@@ -63,4 +63,26 @@ class IpRangeHelperTest(BaseTest):
         data = {'whatever': ['1.2.2.127']}
         actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
         expected = IPSet(IPRange('1.2.2.127', '1.2.2.127'))
+        self.assertEqual(expected, actual)
+
+    @cassette_name('servicetags')
+    def test_parse_alias(self):
+        data = {'whatever': ['ServiceTags.ApiManagement.WestUS']}
+        actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
+        expected = IPSet(['13.64.39.16/32', '40.112.242.148/31', '40.112.243.240/28'])
+        self.assertEqual(expected, actual)
+
+    @cassette_name('servicetags')
+    def test_parse_alias_and_blocks(self):
+        data = {'whatever': ['ServiceTags.ApiManagement.WestUS', '1.2.2.127', '1.2.2.128/25']}
+        actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
+        expected = IPSet(['13.64.39.16/32', '40.112.242.148/31', '40.112.243.240/28',
+                          '1.2.2.127/32', '1.2.2.128/25'])
+        self.assertEqual(expected, actual)
+
+    @cassette_name('servicetags')
+    def test_parse_alias_invalid(self):
+        data = {'whatever': ['ServiceTags.ApiManagement.Invalid', '1.2.2.127', '1.2.2.128/25']}
+        actual = IpRangeHelper.parse_ip_ranges(data, 'whatever')
+        expected = IPSet(['1.2.2.127/32', '1.2.2.128/25'])
         self.assertEqual(expected, actual)

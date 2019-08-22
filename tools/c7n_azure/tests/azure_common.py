@@ -75,6 +75,35 @@ ACTIVITY_LOG_RESPONSE = {
     ]
 }
 
+SERVICE_TAG_RESPONSE = {
+    "values": [
+        {
+            "name": "ApiManagement",
+            "id": "ApiManagement",
+            "properties": {
+                "addressPrefixes": [
+                    "13.69.64.76/31",
+                    "13.69.66.144/28",
+                    "23.101.67.140/32",
+                    "51.145.179.78/32",
+                    "137.117.160.56/32"
+                ]
+            }
+        },
+        {
+            "name": "ApiManagement.WestUS",
+            "id": "ApiManagement.WestUS",
+            "properties": {
+                "addressPrefixes": [
+                    "13.64.39.16/32",
+                    "40.112.242.148/31",
+                    "40.112.243.240/28"
+                ]
+            }
+        }
+    ]
+}
+
 
 class AzureVCRBaseTest(VCRTestCase):
 
@@ -222,6 +251,11 @@ class AzureVCRBaseTest(VCRTestCase):
         data = response['body']['data']
 
         if isinstance(data, dict):
+            # Replace service tag responses
+            if data.get('type', '') == 'Microsoft.Network/serviceTags':
+                response['body']['data'] = SERVICE_TAG_RESPONSE
+                return response
+
             # Replace AD graph responses
             odata_metadata = data.get('odata.metadata')
             if odata_metadata and "directoryObjects" in odata_metadata:

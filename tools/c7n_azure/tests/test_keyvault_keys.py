@@ -13,12 +13,15 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import azure.keyvault.http_bearer_challenge_cache as kv_cache
 from azure_common import BaseTest, arm_template
-from c7n_azure.session import Session
-from c7n.utils import local_session, reset_session_cache
 
 
 class KeyVaultKeyTest(BaseTest):
+
+    def tearDown(self, *args, **kwargs):
+        super(KeyVaultKeyTest, self).tearDown(*args, **kwargs)
+        kv_cache._cache = {}
 
     def test_key_vault_keys_schema_validate(self):
         p = self.load_policy({
@@ -33,21 +36,21 @@ class KeyVaultKeyTest(BaseTest):
 
     @arm_template('keyvault.json')
     def test_key_vault_keys_keyvault(self):
-        mgmt_client = local_session(Session).client('azure.mgmt.keyvault.KeyVaultManagementClient')
-        kvs = [k for k in mgmt_client.vaults.list_by_resource_group('test_keyvault')]
-        self.assertEqual(len(kvs), 1)
-        reset_session_cache()
-
         p = self.load_policy({
             'name': 'test-key-vault',
             'resource': 'azure.keyvault-keys',
             'filters': [
                 {
-                    'type': 'keyvault',
-                    'vaults': [kvs[0].name]
+                    'type': 'parent',
+                    'filter': {
+                        'type': 'value',
+                        'key': 'name',
+                        'op': 'glob',
+                        'value': 'cckeyvault1*'
+                    }
                 },
             ]
-        }, validate=True)
+        }, validate=True, cache=True)
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
@@ -62,7 +65,7 @@ class KeyVaultKeyTest(BaseTest):
                     'key-types': ['RSA', 'RSA-HSM']
                 },
             ]
-        }, validate=True)
+        }, validate=True, cache=True)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0]['c7n:kty'].lower(), 'rsa')
