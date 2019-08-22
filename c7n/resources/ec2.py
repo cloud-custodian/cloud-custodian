@@ -40,7 +40,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.iam import CheckPermissions
-from c7n.utils import type_schema, filter_empty
+from c7n.utils import type_schema, filter_empty, local_session
 
 
 RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")

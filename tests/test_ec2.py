@@ -1653,7 +1653,7 @@ class TestLaunchTemplate(BaseTest):
     def test_launch_template_id_not_found(self):
         error_response = {'Error': {'Code': 'InvalidLaunchTemplateId.NotFound'}}
         operation_name = 'DescribeLaunchTemplateVersions'
-        with patch("c7n.utils.local_session") as mock_local_session:
+        with patch("c7n.resources.ec2.local_session") as mock_local_session:
             describe_template = mock_local_session.client.describe_launch_template_versions
             describe_template.side_effect = ClientError(error_response, operation_name)
             with self.assertRaises(ClientError):
