@@ -1,344 +1,344 @@
 {
-  "headers": {
-    "expires": "Sun, 04 Nov 2018 11:19:58 GMT",
-    "date": "Sun, 04 Nov 2018 11:19:58 GMT",
-    "cache-control": "private, max-age=0, must-revalidate, no-transform",
-    "etag": "\"PK0MyxtovUaxy69bPtATUipTy9Q=/60qbcoJMK2JkO9UaJJNTX6FBLMk=\"",
-    "vary": "Origin, X-Origin",
-    "content-type": "application/json; charset=UTF-8",
-    "x-content-type-options": "nosniff",
-    "x-frame-options": "SAMEORIGIN",
-    "x-xss-protection": "1; mode=block",
-    "server": "GSE",
-    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
-    "transfer-encoding": "chunked",
-    "status": "200",
-    "content-length": "13115",
-    "-content-encoding": "gzip",
-    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/subnetworks?alt=json"
-  },
   "body": {
-    "kind": "compute#subnetworkAggregatedList",
-    "id": "projects/cloud-custodian/aggregated/subnetworks",
     "items": {
-      "regions/us-central1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "4686700484947109325",
-            "creationTimestamp": "2018-07-08T02:36:34.617-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.128.0.0/20",
-            "gatewayAddress": "10.128.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "secondaryIpRanges": [
-              {
-                "rangeName": "gke-dev-services-c80c41a4",
-                "ipCidrRange": "10.0.0.0/20"
-              },
-              {
-                "rangeName": "gke-dev-pods-c80c41a4",
-                "ipCidrRange": "10.52.0.0/14"
-              }
-            ],
-            "fingerprint": "mY3t2x3BRBU=",
-            "enableFlowLogs": false
-          }
-        ]
-      },
-      "regions/europe-west1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "5767476095283389901",
-            "creationTimestamp": "2018-07-08T02:36:34.475-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.132.0.0/20",
-            "gatewayAddress": "10.132.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "Kredavz0sVQ="
-          }
-        ]
-      },
-      "regions/us-west1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "8759999334775023053",
-            "creationTimestamp": "2018-07-08T02:36:34.558-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.138.0.0/20",
-            "gatewayAddress": "10.138.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "Q-JeDNmewBg="
-          }
-        ]
-      },
-      "regions/asia-east1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "2340503818446071245",
-            "creationTimestamp": "2018-07-08T02:36:34.589-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.140.0.0/20",
-            "gatewayAddress": "10.140.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "o-Y1VZLR-Cc="
-          }
-        ]
-      },
-      "regions/us-east1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "7218213045966497229",
-            "creationTimestamp": "2018-07-08T02:36:34.540-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.142.0.0/20",
-            "gatewayAddress": "10.142.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "vRGPrrCbl-Q="
-          }
-        ]
-      },
-      "regions/asia-northeast1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "3815280332445083085",
-            "creationTimestamp": "2018-07-08T02:36:34.533-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.146.0.0/20",
-            "gatewayAddress": "10.146.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "pornEeZXMB8="
-          }
-        ]
-      },
-      "regions/asia-southeast1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "4787697890748032461",
-            "creationTimestamp": "2018-07-08T02:36:34.680-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.148.0.0/20",
-            "gatewayAddress": "10.148.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "ZlDe2-BuRn8="
-          }
-        ]
-      },
-      "regions/us-east4": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "2685758432437102029",
-            "creationTimestamp": "2018-07-08T02:36:34.561-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.150.0.0/20",
-            "gatewayAddress": "10.150.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east4",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east4/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "xrfoRaYwD28="
-          }
-        ]
-      },
-      "regions/australia-southeast1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "738988622042916301",
-            "creationTimestamp": "2018-07-08T02:36:34.584-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.152.0.0/20",
-            "gatewayAddress": "10.152.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "ot_N5lOFl3c="
-          }
-        ]
-      },
-      "regions/europe-west2": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "393781643534165453",
-            "creationTimestamp": "2018-07-08T02:36:34.678-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.154.0.0/20",
-            "gatewayAddress": "10.154.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west2",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west2/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "nSJRiHtnS04="
-          }
-        ]
-      },
-      "regions/europe-west3": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "3713191480964965837",
-            "creationTimestamp": "2018-07-08T02:36:34.508-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.156.0.0/20",
-            "gatewayAddress": "10.156.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west3",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west3/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "7rtT_M8IsaY="
-          }
-        ]
-      },
-      "regions/southamerica-east1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "2259856487384638925",
-            "creationTimestamp": "2018-07-08T02:36:34.671-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.158.0.0/20",
-            "gatewayAddress": "10.158.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-east1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-east1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "pkIm_JPHY3I="
-          }
-        ]
-      },
-      "regions/asia-south1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "51893188686538189",
-            "creationTimestamp": "2018-07-08T02:36:34.596-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.160.0.0/20",
-            "gatewayAddress": "10.160.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "q8tuEGa7zbw="
-          }
-        ]
-      },
-      "regions/northamerica-northeast1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "4526141198534731213",
-            "creationTimestamp": "2018-07-08T02:36:34.626-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.162.0.0/20",
-            "gatewayAddress": "10.162.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "suOXNlp0ZFU="
-          }
-        ]
-      },
-      "regions/europe-west4": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "2658994463991162317",
-            "creationTimestamp": "2018-07-08T02:36:34.620-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.164.0.0/20",
-            "gatewayAddress": "10.164.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west4",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west4/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "097svdJmUwk="
-          }
-        ]
-      },
-      "regions/europe-north1": {
-        "subnetworks": [
-          {
-            "kind": "compute#subnetwork",
-            "id": "3855750585209611725",
-            "creationTimestamp": "2018-07-08T02:36:34.559-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.166.0.0/20",
-            "gatewayAddress": "10.166.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-north1",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-north1/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "7a2W124vx6s="
-          }
-        ]
-      },
       "regions/us-west2": {
         "subnetworks": [
           {
-            "kind": "compute#subnetwork",
-            "id": "2092086827055130207",
-            "creationTimestamp": "2018-07-13T05:18:56.311-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.168.0.0/20",
-            "gatewayAddress": "10.168.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west2",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west2/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "83FGPSsB80g="
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.168.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west2", 
+            "fingerprint": "83FGPSsB80g=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.168.0.0/20", 
+            "creationTimestamp": "2018-07-13T05:18:56.311-07:00", 
+            "id": "2092086827055130207", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west2/subnetworks/default", 
+            "name": "default"
           }
         ]
-      },
+      }, 
+      "regions/asia-northeast1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.146.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1", 
+            "fingerprint": "pornEeZXMB8=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.146.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.533-07:00", 
+            "id": "3815280332445083085", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/us-west1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.138.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west1", 
+            "fingerprint": "Q-JeDNmewBg=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.138.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.558-07:00", 
+            "id": "8759999334775023053", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-west1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/southamerica-east1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.158.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-east1", 
+            "fingerprint": "pkIm_JPHY3I=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.158.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.671-07:00", 
+            "id": "2259856487384638925", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/southamerica-east1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/europe-west4": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.164.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west4", 
+            "fingerprint": "097svdJmUwk=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.164.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.620-07:00", 
+            "id": "2658994463991162317", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west4/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/asia-east1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.140.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1", 
+            "fingerprint": "o-Y1VZLR-Cc=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.140.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.589-07:00", 
+            "id": "2340503818446071245", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/europe-north1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.166.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-north1", 
+            "fingerprint": "7a2W124vx6s=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.166.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.559-07:00", 
+            "id": "3855750585209611725", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-north1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/asia-southeast1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.148.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast1", 
+            "fingerprint": "ZlDe2-BuRn8=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.148.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.680-07:00", 
+            "id": "4787697890748032461", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-southeast1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/us-east4": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.150.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east4", 
+            "fingerprint": "xrfoRaYwD28=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.150.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.561-07:00", 
+            "id": "2685758432437102029", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east4/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/europe-west1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.132.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west1", 
+            "fingerprint": "Kredavz0sVQ=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.132.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.475-07:00", 
+            "id": "5767476095283389901", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/europe-west2": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.154.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west2", 
+            "fingerprint": "nSJRiHtnS04=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.154.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.678-07:00", 
+            "id": "393781643534165453", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west2/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/europe-west3": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.156.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west3", 
+            "fingerprint": "7rtT_M8IsaY=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.156.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.508-07:00", 
+            "id": "3713191480964965837", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/europe-west3/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/australia-southeast1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.152.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast1", 
+            "fingerprint": "ot_N5lOFl3c=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.152.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.584-07:00", 
+            "id": "738988622042916301", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/australia-southeast1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/asia-south1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.160.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south1", 
+            "fingerprint": "q8tuEGa7zbw=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.160.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.596-07:00", 
+            "id": "51893188686538189", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-south1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/us-east1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.142.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1", 
+            "fingerprint": "vRGPrrCbl-Q=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.142.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.540-07:00", 
+            "id": "7218213045966497229", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-east1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/us-central1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.128.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1", 
+            "secondaryIpRanges": [
+              {
+                "rangeName": "gke-dev-services-c80c41a4", 
+                "ipCidrRange": "10.0.0.0/20"
+              }, 
+              {
+                "rangeName": "gke-dev-pods-c80c41a4", 
+                "ipCidrRange": "10.52.0.0/14"
+              }
+            ], 
+            "enableFlowLogs": false, 
+            "fingerprint": "mY3t2x3BRBU=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.128.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.617-07:00", 
+            "id": "4686700484947109325", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
       "regions/asia-east2": {
         "subnetworks": [
           {
-            "kind": "compute#subnetwork",
-            "id": "8503104730769897313",
-            "creationTimestamp": "2018-10-28T12:10:06.984-07:00",
-            "name": "default",
-            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
-            "ipCidrRange": "10.170.0.0/20",
-            "gatewayAddress": "10.170.0.1",
-            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east2",
-            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east2/subnetworks/default",
-            "privateIpGoogleAccess": false,
-            "fingerprint": "WYHTJobxuoc="
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.170.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east2", 
+            "fingerprint": "WYHTJobxuoc=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.170.0.0/20", 
+            "creationTimestamp": "2018-10-28T12:10:06.984-07:00", 
+            "id": "8503104730769897313", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-east2/subnetworks/default", 
+            "name": "default"
+          }
+        ]
+      }, 
+      "regions/northamerica-northeast1": {
+        "subnetworks": [
+          {
+            "kind": "compute#subnetwork", 
+            "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default", 
+            "gatewayAddress": "10.162.0.1", 
+            "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast1", 
+            "fingerprint": "suOXNlp0ZFU=", 
+            "privateIpGoogleAccess": false, 
+            "ipCidrRange": "10.162.0.0/20", 
+            "creationTimestamp": "2018-07-08T02:36:34.626-07:00", 
+            "id": "4526141198534731213", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/northamerica-northeast1/subnetworks/default", 
+            "name": "default"
           }
         ]
       }
-    },
+    }, 
+    "kind": "compute#subnetworkAggregatedList", 
+    "id": "projects/cloud-custodian/aggregated/subnetworks", 
     "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/subnetworks"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "13115", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/subnetworks?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "expires": "Sun, 04 Nov 2018 11:19:58 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "GSE", 
+    "etag": "\"PK0MyxtovUaxy69bPtATUipTy9Q=/60qbcoJMK2JkO9UaJJNTX6FBLMk=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "date": "Sun, 04 Nov 2018 11:19:58 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"", 
+    "content-type": "application/json; charset=UTF-8", 
+    "-content-encoding": "gzip"
   }
 }

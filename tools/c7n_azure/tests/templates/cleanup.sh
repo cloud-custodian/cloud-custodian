@@ -31,7 +31,7 @@ fi
 
 # Destroy Azure Policy Assignment
 if [ $# -eq 0 ] || [[ "$@" =~ "policyassignment" ]]; then
-  az policy assignment delete --name cctestpolicy --no-wait
+  az policy assignment delete --name cctestpolicy
 else
   echo "Skipping policyassignment"
 fi

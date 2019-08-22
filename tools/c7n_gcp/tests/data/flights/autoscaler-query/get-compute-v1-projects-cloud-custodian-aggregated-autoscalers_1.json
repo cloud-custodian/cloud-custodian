@@ -1,0 +1,49 @@
+{
+  "body": {
+    "items": {
+      "zones/us-central1-a": {
+        "autoscalers": [
+          {
+            "status": "ACTIVE", 
+            "kind": "compute#autoscaler", 
+            "target": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instanceGroupManagers/micro-instance-group-1-to-10", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a", 
+            "autoscalingPolicy": {
+              "maxNumReplicas": 10, 
+              "cpuUtilization": {
+                "utilizationTarget": 0.6
+              }, 
+              "minNumReplicas": 1, 
+              "coolDownPeriodSec": 60
+            }, 
+            "creationTimestamp": "2019-06-10T07:56:43.615-07:00", 
+            "id": "3503520257074778436", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/autoscalers/micro-instance-group-1-to-10", 
+            "name": "micro-instance-group-1-to-10"
+          }
+        ]
+      }
+    }, 
+    "kind": "compute#autoscalerAggregatedList", 
+    "id": "projects/cloud-custodian/aggregated/autoscalers", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/autoscalers"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "22703", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/autoscalers?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "expires": "Mon, 10 Jun 2019 15:30:40 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "GSE", 
+    "-content-encoding": "gzip", 
+    "etag": "\"MrcvN7ChCTB9ru9NDAWX9W-A0rg=/XvUjxb2s6a37Q0G7NF3Qbxv0tik=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "date": "Mon, 10 Jun 2019 15:30:40 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

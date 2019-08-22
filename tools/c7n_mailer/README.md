@@ -31,7 +31,7 @@ and run a policy that triggers an email to your inbox.
 4. In AWS, locate or create a role that has read access to the queue. Grab the
    role ARN and set it as `role` in `mailer.yml`.
 
-there is different notification endpoints options, you can combine both.
+There are different notification endpoints options, you can combine both.
 
 ### Email:
 Make sure your email address is verified in SES, and set it as
@@ -49,7 +49,13 @@ role: arn:aws:iam::123456790:role/c7n-mailer-test
 from_address: you@example.com
 ```
 
-(Also set `region` if you are in a region other than `us-east-1`.)
+You can also set `region` if you are in a region other than `us-east-1` as well as `lambda_tags` to give the mailer tags.
+
+```yaml
+region: us-east-2
+lambda_tags:
+  owner: ops
+```
 
 Now let's make a Custodian policy to populate your mailer queue. Create a
 `test-policy.yml` file with this content (update `to` and `queue` to match your
@@ -313,7 +319,7 @@ and here is a description of the options:
 |           | `smtp_port`     | integer          | smtp port (default is 25)                                                                                                                                                           |
 |           | `smtp_ssl`      | boolean          | this defaults to True                                                                                                                                                               |
 |           | `smtp_username` | string           |                                                                                                                                                                                     |
-|           | `smtp_password` | string           |                                                                                                                                                                                     |
+|           | `smtp_password` | secured string   |                                                                                                                                                                                     |
 
 If `smtp_server` is unset, `c7n_mailer` will use AWS SES or Azure SendGrid.
 
@@ -334,9 +340,9 @@ These fields are not necessary if c7n_mailer is run in a instance/lambda/etc wit
 
 #### SendGrid Config
 
-| Required? | Key                | Type   | Notes              |
-|:---------:|:-------------------|:-------|:-------------------|
-|           | `sendgrid_api_key` | string | SendGrid API token |
+| Required? | Key                | Type           | Notes              |
+|:---------:|:-------------------|:---------------|:-------------------|
+|           | `sendgrid_api_key` | secured string | SendGrid API token |
 SendGrid is only supported for Azure Cloud use with Azure Storage Queue currently.
 
 #### Splunk HEC Config
@@ -360,6 +366,34 @@ The following configuration items are *all* optional. The ones marked "Required 
 |           | `https_proxy` | string |       |
 |           | `profile`     | string |       |
 
+
+#### Secured String
+
+In order to ensure sensitive data is not stored plaintext in a policy, `c7n-mailer` supports secured
+strings. You can treat it as a regular `string` or use `secured string` features.
+
+##### AWS
+
+You can use KMS to encrypt your secrets and use encrypted secret in mailer policy.
+Custodian tries to decrypt the string using KMS, if it fails c7n treats it as a plaintext secret.
+
+```yaml
+    plaintext_secret: <raw_secret>
+    secured_string: <encrypted_secret>
+```
+
+##### Azure
+
+You can store your secrets in Azure Key Vault secrets and reference them from the policy.
+
+```yaml
+    plaintext_secret: <raw_secret>
+    secured_string:
+        type: azure.keyvault
+        secret: https://your-vault.vault.azure.net/secrets/your-secret
+```
+
+Note: `secrets.get` permission on the KeyVault for the Service Principal is required.
 
 ## Configuring a policy to send email
 
@@ -531,7 +565,7 @@ The following extra global functions are available:
 | `resource_tag(resource, key)`                                                | retrieve a tag value from a resource or return an empty string, aliased as get_resource_tag_value |
 | `format_resource(resource, resource_type)`                                   | renders a one line summary of a resource                                                          |
 | `date_time_format(utc_str, tz_str='US/Eastern', format='%Y %b %d %H:%M %Z')` | customize rendering of an utc datetime string                                                     |
-| `seach(expression, value)`                                                   | jmespath search value using expression                                                            |
+| `search(expression, value)`                                                  | jmespath search value using expression                                                            |
 | `yaml_safe(value)`                                                           | yaml dumper                                                                                       |
 
 The following extra jinja filters are available:

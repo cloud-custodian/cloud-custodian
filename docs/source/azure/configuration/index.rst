@@ -12,5 +12,6 @@ Azure Functions and monitoring the results of policies.
   :glob:
 
   authentication
-  hostingoptions
+  functionshosting
+  containerhosting
   monitoring

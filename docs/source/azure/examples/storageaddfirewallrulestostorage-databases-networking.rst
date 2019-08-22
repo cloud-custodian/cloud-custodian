@@ -3,6 +3,11 @@
 Storage - Add storage firewall rules
 ====================================
 
+Finds storage accounts with no ip rules and modifies them to:
+- Deny public access
+- Enable Logging and Metrics access to the database
+- Allow access from the locations specified by ``ip-rules`` and ``virtual-network-rules``
+
 .. code-block:: yaml
 
     policies:
@@ -19,7 +24,7 @@ Storage - Add storage firewall rules
           value: 0
 
         actions:
-        - type: set-network-rules
+        - type: set-firewall-rules
           default-action: Deny
           bypass: [Logging, Metrics]
           ip-rules:
@@ -28,6 +33,14 @@ Storage - Add storage firewall rules
           virtual-network-rules:
               - virtual-network-resource-id: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/subnet1
               - virtual-network-resource-id: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet2/subnets/subnet2
+
+Finds storage acocunt with no ip rules and modifies it to:
+- Enable Logging and Metrics access to the database
+- Allow access from the location specified by ``ip-rules``
+
+Note: Because this policy leaves the storage account open to access by all 
+ip addresses, the new rules will have no effect on the performance until 
+the ``default-action`` is set to Deny.
 
 .. code-block:: yaml
 
@@ -45,7 +58,7 @@ Storage - Add storage firewall rules
           value: 0
 
         actions:
-        - type: set-network-rules
+        - type: set-firewall-rules
           default-action: Allow
           bypass: [Logging, Metrics]
           ip-rules:

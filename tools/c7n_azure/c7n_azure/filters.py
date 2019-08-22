@@ -25,7 +25,6 @@ from azure.mgmt.costmanagement.models import (QueryAggregation,
 from azure.mgmt.policyinsights import PolicyInsightsClient
 from dateutil import tz as tzutils
 from dateutil.parser import parse
-from netaddr import AddrFormatError
 
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
@@ -572,16 +571,6 @@ class FirewallRulesFilter(Filter):
     def log(self):
         raise NotImplementedError()
 
-    def validate(self):
-        try:
-            IpRangeHelper.parse_ip_ranges(self.data, 'include')
-            IpRangeHelper.parse_ip_ranges(self.data, 'equal')
-            IpRangeHelper.parse_ip_ranges(self.data, 'any')
-            IpRangeHelper.parse_ip_ranges(self.data, 'only')
-        except AddrFormatError as e:
-            raise PolicyValidationError("Invalid IP range found. %s" % e)
-        return self
-
     def process(self, resources, event=None):
         self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
         self.policy_equal = IpRangeHelper.parse_ip_ranges(self.data, 'equal')
@@ -606,7 +595,7 @@ class FirewallRulesFilter(Filter):
         """
         Queries firewall rules for a resource. Override in concrete classes.
         :param resource:
-        :return: A set of netaddr.IPRange or netaddr.IPSet with rules defined for the resource.
+        :return: A set of netaddr.IPSet with rules defined for the resource.
         """
         raise NotImplementedError()
 
@@ -891,3 +880,46 @@ class CostFilter(ValueFilter):
             r['ResourceId'] = r['ResourceId'].lower()
 
         return result_list
+
+
+class ParentFilter(Filter):
+    """
+    Meta filter that allows you to filter child resources by applying filters to their
+    parent resources.
+
+    You can use any filter supported by corresponding parent resource type.
+
+    :examples:
+
+    Find Azure KeyVault Keys from Key Vaults with ``owner:ProjectA`` tag.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: kv-keys-from-tagged-keyvaults
+            resource: azure.keyvault-keys
+            filters:
+              - type: parent
+                filter:
+                  type: value
+                  key: tags.owner
+                  value: ProjectA
+    """
+
+    schema = type_schema(
+        'parent', filter={'type': 'object'}, required=['type'])
+    schema_alias = True
+
+    def __init__(self, data, manager=None):
+        super(ParentFilter, self).__init__(data, manager)
+        self.parent_manager = self.manager.get_parent_manager()
+        self.parent_filter = self.parent_manager.filter_registry.factory(
+            self.data['filter'],
+            self.parent_manager)
+
+    def process(self, resources, event=None):
+        parent_resources = self.parent_filter.process(self.parent_manager.resources())
+        parent_resources_ids = [p['id'] for p in parent_resources]
+
+        parent_key = self.manager.resource_type.parent_key
+        return [r for r in resources if r[parent_key] in parent_resources_ids]

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "custodian_cleanup",
+                "Value": "Resource does not meet policy: delete@2019/08/07"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "6e4df3da-c851-4084-9ec3-6f7fa93e2933",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6e4df3da-c851-4084-9ec3-6f7fa93e2933",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "97",
+                "date": "Tue, 06 Aug 2019 18:24:13 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
