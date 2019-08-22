@@ -1,5 +1,5 @@
-Firewall - Rules Filtering
-==============================================
+Firewall - Filter Storage Accounts By Rules
+============================================
 
 This example demonstrates a common filtering scenario where we would
 like to ensure all firewalls are configured to only allow access from
@@ -40,3 +40,5 @@ to remediate the non-compliant resources.
                   - '8.8.8.8'
                   - '10.0.0.0/16'
                   - '20.0.0.0 - 20.10.0.0'
+
+

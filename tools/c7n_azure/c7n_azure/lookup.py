@@ -24,10 +24,11 @@ class Lookup(object):
         'oneOf': [
             {
                 'properties': {
-                    RESOURCE_SOURCE: {'type': 'string'},
+                    'type': {'type': 'string', 'enum': [RESOURCE_SOURCE]},
+                    'key': {'type': 'string'}
                 },
-                'required': [RESOURCE_SOURCE],
-                'additionalProperties': False
+                'additionalProperties': False,
+                'required': ['type', 'key']
             }
         ]
     }
@@ -54,16 +55,16 @@ class Lookup(object):
 
     @staticmethod
     def is_lookup(source):
-        return type(source) is dict and Lookup.RESOURCE_SOURCE in source
+        return type(source) is dict
 
     @staticmethod
     def get_value(source, data=None):
-        if Lookup.RESOURCE_SOURCE in source:
+        if source['type'] == Lookup.RESOURCE_SOURCE:
             return Lookup.get_value_from_resource(source, data)
 
     @staticmethod
     def get_value_from_resource(source, resource):
-        value = jmespath.search(source[Lookup.RESOURCE_SOURCE], resource)
+        value = jmespath.search(source['key'], resource)
 
         if value is not None:
             return value

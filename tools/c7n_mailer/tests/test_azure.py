@@ -25,7 +25,7 @@ from common import (
     MAILER_CONFIG_AZURE, ASQ_MESSAGE, ASQ_MESSAGE_TAG,
     ASQ_MESSAGE_SLACK, ASQ_MESSAGE_DATADOG, logger
 )
-from mock import MagicMock, patch, call, ANY
+from mock import MagicMock, patch, call, ANY, Mock
 
 
 class AzureTest(unittest.TestCase):
@@ -87,7 +87,7 @@ class AzureTest(unittest.TestCase):
 
     @patch('sendgrid.SendGridAPIClient.send')
     def test_sendgrid_handler(self, mock_send):
-        sendgrid_delivery = SendGridDelivery(MAILER_CONFIG_AZURE, logger)
+        sendgrid_delivery = SendGridDelivery(MAILER_CONFIG_AZURE, Mock(), logger)
         sendgrid_messages = \
             sendgrid_delivery.get_to_addrs_sendgrid_messages_map(self.loaded_message)
         result = sendgrid_delivery.sendgrid_handler(self.loaded_message, sendgrid_messages)

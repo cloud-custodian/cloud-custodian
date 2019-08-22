@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest
-from c7n_azure.resources.storage import StorageSetNetworkRulesAction
+from c7n_azure.resources.storage import StorageSetFirewallAction
 
 
 class TestFirewallActions(BaseTest):
@@ -25,21 +25,13 @@ class TestFirewallActions(BaseTest):
             'bypass-rules': ['Logging', 'Metrics'],
         }
 
-        resource = {
-            'properties': {
-                'networkAcls': {
-                    'bypass': 'Hello,World'
-                }
-            }
-        }
-
-        action = StorageSetNetworkRulesAction(data)
+        action = StorageSetFirewallAction(data)
         action.append = False
-        rules = action._build_bypass_rules(resource, data['bypass-rules'])
+        rules = action._build_bypass_rules(['Hello', 'World'], data['bypass-rules'])
         self.assertEqual('Logging,Metrics', rules)
 
         action.append = True
-        rules = action._build_bypass_rules(resource, data['bypass-rules'])
+        rules = action._build_bypass_rules(['Hello', 'World'], data['bypass-rules'])
         self.assertEqual('Logging,Metrics,Hello,World', rules)
 
     def test_build_vnet_rules(self):
@@ -47,23 +39,13 @@ class TestFirewallActions(BaseTest):
             'virtual-network-rules': ['id1', 'id2']
         }
 
-        resource = {
-            'properties': {
-                'networkAcls': {
-                    'virtualNetworkRules': [
-                        {'id': 'Hello'}, {'id': 'World'}
-                    ]
-                }
-            }
-        }
-
-        action = StorageSetNetworkRulesAction(data)
+        action = StorageSetFirewallAction(data)
         action.append = False
-        rules = action._build_vnet_rules(resource, data['virtual-network-rules'])
+        rules = action._build_vnet_rules(['Hello', 'World'], data['virtual-network-rules'])
         self.assertEqual(sorted(['id1', 'id2']), sorted(rules))
 
         action.append = True
-        rules = action._build_vnet_rules(resource, data['virtual-network-rules'])
+        rules = action._build_vnet_rules(['Hello', 'World'], data['virtual-network-rules'])
         self.assertEqual(sorted(['id1', 'id2', 'Hello', 'World']), sorted(rules))
 
     def test_build_ip_rules(self):
@@ -71,22 +53,13 @@ class TestFirewallActions(BaseTest):
             'ip-rules': ['1.1.1.1', '6.0.0.0/16']
         }
 
-        resource = {
-            'properties': {
-                'networkAcls': {
-                    'ipRules': [
-                        {'value': '1.1.1.1'}, {'value': '8.0.0.0/12'}]
-                }
-            }
-        }
-
-        action = StorageSetNetworkRulesAction(data)
+        action = StorageSetFirewallAction(data)
         action.append = False
-        rules = action._build_ip_rules(resource, data['ip-rules'])
+        rules = action._build_ip_rules(['1.1.1.1', '8.0.0.0/12'], data['ip-rules'])
         self.assertEqual(sorted(['1.1.1.1', '6.0.0.0/16']), sorted(rules))
 
         action.append = True
-        rules = action._build_ip_rules(resource, data['ip-rules'])
+        rules = action._build_ip_rules(['1.1.1.1', '8.0.0.0/12'], data['ip-rules'])
         self.assertEqual(sorted(['1.1.1.1', '6.0.0.0/16', '8.0.0.0/12']), sorted(rules))
 
     def test_build_ip_rules_alias(self):
@@ -94,23 +67,14 @@ class TestFirewallActions(BaseTest):
             'ip-rules': ['ServiceTags.ApiManagement.WestUS', '6.0.0.0/16']
         }
 
-        resource = {
-            'properties': {
-                'networkAcls': {
-                    'ipRules': [
-                        {'value': '1.1.1.1'}, {'value': '8.0.0.0/12'}]
-                }
-            }
-        }
-
-        action = StorageSetNetworkRulesAction(data)
+        action = StorageSetFirewallAction(data)
         action.append = False
-        rules = action._build_ip_rules(resource, data['ip-rules'])
+        rules = action._build_ip_rules(['1.1.1.1', '8.0.0.0/12'], data['ip-rules'])
         self.assertIn('6.0.0.0/16', rules)
         self.assertEqual(4, len(rules))
 
         # With append we expect all our specified values + others from the service tag.
         action.append = True
-        rules = action._build_ip_rules(resource, data['ip-rules'])
+        rules = action._build_ip_rules(['1.1.1.1', '8.0.0.0/12'], data['ip-rules'])
         self.assertTrue({'6.0.0.0/16', '1.1.1.1', '8.0.0.0/12'} <= set(rules))
         self.assertEqual(6, len(rules))

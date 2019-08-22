@@ -14,17 +14,17 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:16 GMT"
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:51 GMT"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
                     ],
                     "content-length": [
                         "461"
@@ -53,28 +53,28 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
+                    "x-ms-max-media-storage-usage-mb": [
+                        "2048"
+                    ],
+                    "x-ms-databaseaccount-consumed-mb": [
+                        "0"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ],
                     "x-ms-databaseaccount-reserved-mb": [
                         "0"
                     ],
                     "date": [
-                        "Fri, 05 Jul 2019 21:32:17 GMT"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-ms-databaseaccount-provisioned-mb": [
-                        "0"
-                    ],
-                    "x-ms-databaseaccount-consumed-mb": [
-                        "0"
-                    ],
-                    "x-ms-max-media-storage-usage-mb": [
-                        "2048"
+                        "Tue, 20 Aug 2019 23:37:51 GMT"
                     ],
                     "x-ms-media-storage-usage-mb": [
+                        "0"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-ms-databaseaccount-provisioned-mb": [
                         "0"
                     ]
                 },
@@ -90,15 +90,23 @@
                             {
                                 "name": "South Central US",
                                 "databaseAccountEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/"
+                            },
+                            {
+                                "name": "Japan East",
+                                "databaseAccountEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/"
                             }
                         ],
                         "readableLocations": [
                             {
                                 "name": "South Central US",
                                 "databaseAccountEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/"
+                            },
+                            {
+                                "name": "Japan East",
+                                "databaseAccountEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/"
                             }
                         ],
-                        "enableMultipleWriteLocations": false,
+                        "enableMultipleWriteLocations": true,
                         "userReplicationPolicy": {
                             "asyncReplication": false,
                             "minReplicaSetSize": 3,
@@ -133,17 +141,17 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:17 GMT"
-                    ],
                     "content-type": [
                         "application/json"
                     ],
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:52 GMT"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
                     "content-length": [
-                        "1717"
+                        "2604"
                     ]
                 },
                 "body": {
@@ -155,13 +163,19 @@
                                 "location": "South Central US",
                                 "type": "Microsoft.DocumentDB/databaseAccounts",
                                 "kind": "GlobalDocumentDB",
-                                "tags": {},
+                                "tags": {
+                                    "ipRangeFilter": "11.12.13.14,21.22.23.24",
+                                    "virtualNetworkRules": "[]",
+                                    "bypass": "None",
+                                    "test-store-throughput": "UP4IAJytpGM=:500",
+                                    "test-restore-throughput": "UP4IAJytpGM=:400"
+                                },
                                 "properties": {
                                     "provisioningState": "Succeeded",
                                     "documentEndpoint": "https://cctestcosmosdb.documents.azure.com:443/",
-                                    "ipRangeFilter": "0.0.0.0/1,128.0.0.0/1",
+                                    "ipRangeFilter": "",
                                     "enableAutomaticFailover": false,
-                                    "enableMultipleWriteLocations": false,
+                                    "enableMultipleWriteLocations": true,
                                     "enablePartitionKeyMonitor": false,
                                     "isVirtualNetworkFilterEnabled": false,
                                     "virtualNetworkRules": [],
@@ -181,6 +195,14 @@
                                             "provisioningState": "Succeeded",
                                             "failoverPriority": 0,
                                             "isZoneRedundant": false
+                                        },
+                                        {
+                                            "id": "cctestcosmosdb-japaneast",
+                                            "locationName": "Japan East",
+                                            "documentEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/",
+                                            "provisioningState": "Succeeded",
+                                            "failoverPriority": 1,
+                                            "isZoneRedundant": false
                                         }
                                     ],
                                     "readLocations": [
@@ -190,6 +212,14 @@
                                             "documentEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/",
                                             "provisioningState": "Succeeded",
                                             "failoverPriority": 0,
+                                            "isZoneRedundant": false
+                                        },
+                                        {
+                                            "id": "cctestcosmosdb-japaneast",
+                                            "locationName": "Japan East",
+                                            "documentEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/",
+                                            "provisioningState": "Succeeded",
+                                            "failoverPriority": 1,
                                             "isZoneRedundant": false
                                         }
                                     ],
@@ -201,6 +231,14 @@
                                             "provisioningState": "Succeeded",
                                             "failoverPriority": 0,
                                             "isZoneRedundant": false
+                                        },
+                                        {
+                                            "id": "cctestcosmosdb-japaneast",
+                                            "locationName": "Japan East",
+                                            "documentEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/",
+                                            "provisioningState": "Succeeded",
+                                            "failoverPriority": 1,
+                                            "isZoneRedundant": false
                                         }
                                     ],
                                     "failoverPolicies": [
@@ -208,6 +246,11 @@
                                             "id": "cctestcosmosdb-southcentralus",
                                             "locationName": "South Central US",
                                             "failoverPriority": 0
+                                        },
+                                        {
+                                            "id": "cctestcosmosdb-japaneast",
+                                            "locationName": "Japan East",
+                                            "failoverPriority": 1
                                         }
                                     ],
                                     "cors": [],
@@ -232,17 +275,17 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:17 GMT"
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:53 GMT"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
                     ],
                     "content-length": [
                         "461"
@@ -271,28 +314,28 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
+                    "x-ms-max-media-storage-usage-mb": [
+                        "2048"
+                    ],
+                    "x-ms-databaseaccount-consumed-mb": [
+                        "0"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ],
                     "x-ms-databaseaccount-reserved-mb": [
                         "0"
                     ],
                     "date": [
-                        "Fri, 05 Jul 2019 21:32:18 GMT"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-ms-databaseaccount-provisioned-mb": [
-                        "0"
-                    ],
-                    "x-ms-databaseaccount-consumed-mb": [
-                        "0"
-                    ],
-                    "x-ms-max-media-storage-usage-mb": [
-                        "2048"
+                        "Tue, 20 Aug 2019 23:37:52 GMT"
                     ],
                     "x-ms-media-storage-usage-mb": [
+                        "0"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-ms-databaseaccount-provisioned-mb": [
                         "0"
                     ]
                 },
@@ -308,15 +351,23 @@
                             {
                                 "name": "South Central US",
                                 "databaseAccountEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/"
+                            },
+                            {
+                                "name": "Japan East",
+                                "databaseAccountEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/"
                             }
                         ],
                         "readableLocations": [
                             {
                                 "name": "South Central US",
                                 "databaseAccountEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/"
+                            },
+                            {
+                                "name": "Japan East",
+                                "databaseAccountEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/"
                             }
                         ],
-                        "enableMultipleWriteLocations": false,
+                        "enableMultipleWriteLocations": true,
                         "userReplicationPolicy": {
                             "asyncReplication": false,
                             "minReplicaSetSize": 3,
@@ -351,29 +402,35 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "x-ms-transport-request-id": [
-                        "336747"
+                    "x-ms-item-count": [
+                        "1"
                     ],
                     "lsn": [
-                        "17"
-                    ],
-                    "x-ms-number-of-read-regions": [
-                        "0"
-                    ],
-                    "x-ms-session-token": [
-                        "0:-1#17"
-                    ],
-                    "x-ms-resource-quota": [
-                        "databases=1000;collections=5000;users=500000;permissions=2000000;"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:18 GMT"
-                    ],
-                    "x-ms-activity-id": [
-                        "934749fb-ca4d-4bbc-af15-e336bb4593b7"
+                        "40"
                     ],
                     "x-ms-resource-usage": [
                         "databases=1;collections=1;users=0;permissions=0;"
+                    ],
+                    "x-ms-number-of-read-regions": [
+                        "1"
+                    ],
+                    "x-ms-session-token": [
+                        "0:-1#40"
+                    ],
+                    "x-ms-activity-id": [
+                        "af2b2a12-49df-4ad3-a326-44b1f28450b8"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-ms-transport-request-id": [
+                        "361072"
+                    ],
+                    "x-ms-schemaversion": [
+                        "1.8"
+                    ],
+                    "x-ms-resource-quota": [
+                        "databases=1000;collections=5000;users=500000;permissions=2000000;"
                     ],
                     "x-ms-request-charge": [
                         "2"
@@ -381,17 +438,11 @@
                     "content-type": [
                         "application/json"
                     ],
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "x-ms-item-count": [
-                        "1"
-                    ],
-                    "x-ms-schemaversion": [
-                        "1.8"
-                    ],
                     "x-ms-serviceversion": [
-                        "version=2.4.0.0"
+                        "version=2.5.0.0"
+                    ],
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:53 GMT"
                     ]
                 },
                 "body": {
@@ -400,12 +451,12 @@
                         "Databases": [
                             {
                                 "id": "cctestcdatabase",
-                                "_rid": "rO11AA==",
-                                "_self": "dbs/rO11AA==/",
-                                "_etag": "\"00000500-0000-0500-0000-5d1a64d90000\"",
+                                "_rid": "UP4IAA==",
+                                "_self": "dbs/UP4IAA==/",
+                                "_etag": "\"00008f02-0000-0500-0000-5d5752610000\"",
                                 "_colls": "colls/",
                                 "_users": "users/",
-                                "_ts": 1562010841
+                                "_ts": 1566003809
                             }
                         ],
                         "_count": 1
@@ -416,7 +467,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://cctestcosmosdb-southcentralus.documents.azure.com//dbs/rO11AA==/colls/",
+                "uri": "https://cctestcosmosdb-southcentralus.documents.azure.com//dbs/UP4IAA==/colls/",
                 "body": null,
                 "headers": {}
             },
@@ -426,29 +477,38 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "x-ms-transport-request-id": [
-                        "228281"
+                    "x-ms-item-count": [
+                        "1"
                     ],
                     "lsn": [
-                        "17"
-                    ],
-                    "x-ms-number-of-read-regions": [
-                        "0"
-                    ],
-                    "x-ms-session-token": [
-                        "0:-1#17"
-                    ],
-                    "x-ms-resource-quota": [
-                        "collections=5000;"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:18 GMT"
-                    ],
-                    "x-ms-activity-id": [
-                        "1ca89d5a-8b2e-48aa-b339-756e1513a866"
+                        "40"
                     ],
                     "x-ms-resource-usage": [
                         "collections=1;"
+                    ],
+                    "x-ms-number-of-read-regions": [
+                        "1"
+                    ],
+                    "x-ms-session-token": [
+                        "0:-1#40"
+                    ],
+                    "x-ms-alt-content-path": [
+                        "dbs/cctestcdatabase"
+                    ],
+                    "x-ms-activity-id": [
+                        "b846f2f6-c0c9-485b-a5d2-f9ca36f4d1eb"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-ms-transport-request-id": [
+                        "374561"
+                    ],
+                    "x-ms-schemaversion": [
+                        "1.8"
+                    ],
+                    "x-ms-resource-quota": [
+                        "collections=5000;"
                     ],
                     "x-ms-request-charge": [
                         "2"
@@ -456,20 +516,11 @@
                     "content-type": [
                         "application/json"
                     ],
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "x-ms-alt-content-path": [
-                        "dbs/cctestcdatabase"
-                    ],
-                    "x-ms-item-count": [
-                        "1"
-                    ],
-                    "x-ms-schemaversion": [
-                        "1.8"
-                    ],
                     "x-ms-serviceversion": [
-                        "version=2.4.0.0"
+                        "version=2.5.0.0"
+                    ],
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:53 GMT"
                     ]
                 },
                 "body": {
@@ -502,6 +553,9 @@
                                     ],
                                     "kind": "Hash"
                                 },
+                                "uniqueKeyPolicy": {
+                                    "uniqueKeys": []
+                                },
                                 "conflictResolutionPolicy": {
                                     "mode": "LastWriterWins",
                                     "conflictResolutionPath": "/_ts",
@@ -510,10 +564,10 @@
                                 "geospatialConfig": {
                                     "type": "Geography"
                                 },
-                                "_rid": "rO11AN0Gz8s=",
-                                "_ts": 1562010858,
-                                "_self": "dbs/rO11AA==/colls/rO11AN0Gz8s=/",
-                                "_etag": "\"00000700-0000-0500-0000-5d1a64ea0000\"",
+                                "_rid": "UP4IAJytpGM=",
+                                "_ts": 1566003827,
+                                "_self": "dbs/UP4IAA==/colls/UP4IAJytpGM=/",
+                                "_etag": "\"00009102-0000-0500-0000-5d5752730000\"",
                                 "_docs": "docs/",
                                 "_sprocs": "sprocs/",
                                 "_triggers": "triggers/",
@@ -539,17 +593,17 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:20 GMT"
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:53 GMT"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
                     ],
                     "content-length": [
                         "461"
@@ -578,28 +632,28 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
+                    "x-ms-max-media-storage-usage-mb": [
+                        "2048"
+                    ],
+                    "x-ms-databaseaccount-consumed-mb": [
+                        "0"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ],
                     "x-ms-databaseaccount-reserved-mb": [
                         "0"
                     ],
                     "date": [
-                        "Fri, 05 Jul 2019 21:32:20 GMT"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-ms-databaseaccount-provisioned-mb": [
-                        "0"
-                    ],
-                    "x-ms-databaseaccount-consumed-mb": [
-                        "0"
-                    ],
-                    "x-ms-max-media-storage-usage-mb": [
-                        "2048"
+                        "Tue, 20 Aug 2019 23:37:54 GMT"
                     ],
                     "x-ms-media-storage-usage-mb": [
+                        "0"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-ms-databaseaccount-provisioned-mb": [
                         "0"
                     ]
                 },
@@ -615,15 +669,23 @@
                             {
                                 "name": "South Central US",
                                 "databaseAccountEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/"
+                            },
+                            {
+                                "name": "Japan East",
+                                "databaseAccountEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/"
                             }
                         ],
                         "readableLocations": [
                             {
                                 "name": "South Central US",
                                 "databaseAccountEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/"
+                            },
+                            {
+                                "name": "Japan East",
+                                "databaseAccountEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/"
                             }
                         ],
-                        "enableMultipleWriteLocations": false,
+                        "enableMultipleWriteLocations": true,
                         "userReplicationPolicy": {
                             "asyncReplication": false,
                             "minReplicaSetSize": 3,
@@ -658,23 +720,29 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "x-ms-transport-request-id": [
-                        "342876"
+                    "x-ms-item-count": [
+                        "1"
                     ],
                     "lsn": [
-                        "17"
+                        "40"
                     ],
                     "x-ms-number-of-read-regions": [
-                        "0"
+                        "1"
                     ],
                     "x-ms-session-token": [
-                        "0:-1#17"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:20 GMT"
+                        "0:-1#40"
                     ],
                     "x-ms-activity-id": [
-                        "10c6c6e8-8b80-4662-badc-60b62f475fcf"
+                        "059b6674-eb53-4950-9bf3-1d1a6e0c99a5"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-ms-transport-request-id": [
+                        "344823"
+                    ],
+                    "x-ms-schemaversion": [
+                        "1.8"
                     ],
                     "x-ms-request-charge": [
                         "2"
@@ -682,17 +750,11 @@
                     "content-type": [
                         "application/json"
                     ],
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "x-ms-item-count": [
-                        "1"
-                    ],
-                    "x-ms-schemaversion": [
-                        "1.8"
-                    ],
                     "x-ms-serviceversion": [
-                        "version=2.4.0.0"
+                        "version=2.5.0.0"
+                    ],
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:54 GMT"
                     ]
                 },
                 "body": {
@@ -700,9 +762,9 @@
                         "_rid": "",
                         "Offers": [
                             {
-                                "resource": "dbs/rO11AA==/colls/rO11AN0Gz8s=/",
+                                "resource": "dbs/UP4IAA==/colls/UP4IAJytpGM=/",
                                 "offerType": "Invalid",
-                                "offerResourceId": "rO11AN0Gz8s=",
+                                "offerResourceId": "UP4IAJytpGM=",
                                 "offerVersion": "V2",
                                 "content": {
                                     "offerThroughput": 400,
@@ -712,13 +774,13 @@
                                         "maxThroughputEverProvisioned": 500,
                                         "maxConsumedStorageEverInKB": 0
                                     },
-                                    "offerLastReplaceTimestamp": 1562362327
+                                    "offerLastReplaceTimestamp": 1566343466
                                 },
-                                "id": "wc0c",
-                                "_rid": "wc0c",
-                                "_self": "offers/wc0c/",
-                                "_etag": "\"0000d600-0000-0500-0000-5d1fc1d70000\"",
-                                "_ts": 1562362327
+                                "id": "vOzv",
+                                "_rid": "vOzv",
+                                "_self": "offers/vOzv/",
+                                "_etag": "\"0000a60f-0000-0500-0000-5d5c812a0000\"",
+                                "_ts": 1566343466
                             }
                         ],
                         "_count": 1
@@ -739,17 +801,17 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:21 GMT"
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
                     ],
                     "content-type": [
                         "application/json"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:55 GMT"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
                     ],
                     "content-length": [
                         "461"
@@ -778,28 +840,28 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-store, no-cache"
+                    "x-ms-max-media-storage-usage-mb": [
+                        "2048"
+                    ],
+                    "x-ms-databaseaccount-consumed-mb": [
+                        "0"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ],
                     "x-ms-databaseaccount-reserved-mb": [
                         "0"
                     ],
                     "date": [
-                        "Fri, 05 Jul 2019 21:32:21 GMT"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-ms-databaseaccount-provisioned-mb": [
-                        "0"
-                    ],
-                    "x-ms-databaseaccount-consumed-mb": [
-                        "0"
-                    ],
-                    "x-ms-max-media-storage-usage-mb": [
-                        "2048"
+                        "Tue, 20 Aug 2019 23:37:55 GMT"
                     ],
                     "x-ms-media-storage-usage-mb": [
+                        "0"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-ms-databaseaccount-provisioned-mb": [
                         "0"
                     ]
                 },
@@ -815,15 +877,23 @@
                             {
                                 "name": "South Central US",
                                 "databaseAccountEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/"
+                            },
+                            {
+                                "name": "Japan East",
+                                "databaseAccountEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/"
                             }
                         ],
                         "readableLocations": [
                             {
                                 "name": "South Central US",
                                 "databaseAccountEndpoint": "https://cctestcosmosdb-southcentralus.documents.azure.com:443/"
+                            },
+                            {
+                                "name": "Japan East",
+                                "databaseAccountEndpoint": "https://cctestcosmosdb-japaneast.documents.azure.com:443/"
                             }
                         ],
-                        "enableMultipleWriteLocations": false,
+                        "enableMultipleWriteLocations": true,
                         "userReplicationPolicy": {
                             "asyncReplication": false,
                             "minReplicaSetSize": 3,
@@ -848,7 +918,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://cctestcosmosdb-southcentralus.documents.azure.com//offers/wc0c/",
+                "uri": "https://cctestcosmosdb-southcentralus.documents.azure.com//offers/vOzv/",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -858,60 +928,60 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "x-ms-transport-request-id": [
-                        "401990"
-                    ],
                     "lsn": [
-                        "18"
-                    ],
-                    "x-ms-quorum-acked-lsn": [
-                        "17"
-                    ],
-                    "x-ms-number-of-read-regions": [
-                        "0"
-                    ],
-                    "x-ms-session-token": [
-                        "0:-1#18"
-                    ],
-                    "x-ms-cosmos-quorum-acked-llsn": [
-                        "17"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:21 GMT"
-                    ],
-                    "x-ms-activity-id": [
-                        "cf3ab69b-aab9-4db6-910e-eabf3f457f00"
-                    ],
-                    "x-ms-request-charge": [
-                        "9.9"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-ms-current-write-quorum": [
-                        "3"
+                        "41"
                     ],
                     "x-ms-current-replica-set-size": [
                         "4"
                     ],
+                    "x-ms-number-of-read-regions": [
+                        "1"
+                    ],
+                    "x-ms-quorum-acked-lsn": [
+                        "40"
+                    ],
+                    "x-ms-session-token": [
+                        "0:-1#41"
+                    ],
+                    "x-ms-cosmos-quorum-acked-llsn": [
+                        "40"
+                    ],
+                    "x-ms-activity-id": [
+                        "a24c20b0-d751-4e21-9637-ee9e3fc410d7"
+                    ],
                     "cache-control": [
                         "no-store, no-cache"
                     ],
-                    "etag": [
-                        "\"0000d700-0000-0500-0000-5d1fc1e60000\""
+                    "x-ms-transport-request-id": [
+                        "16441"
                     ],
                     "x-ms-schemaversion": [
                         "1.8"
                     ],
+                    "etag": [
+                        "\"0000a70f-0000-0500-0000-5d5c84540000\""
+                    ],
+                    "x-ms-request-charge": [
+                        "19.81"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
                     "x-ms-serviceversion": [
-                        "version=2.4.0.0"
+                        "version=2.5.0.0"
+                    ],
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:56 GMT"
+                    ],
+                    "x-ms-current-write-quorum": [
+                        "3"
                     ]
                 },
                 "body": {
                     "data": {
-                        "resource": "dbs/rO11AA==/colls/rO11AN0Gz8s=/",
+                        "resource": "dbs/UP4IAA==/colls/UP4IAJytpGM=/",
                         "offerType": "Invalid",
-                        "offerResourceId": "rO11AN0Gz8s=",
+                        "offerResourceId": "UP4IAJytpGM=",
                         "offerVersion": "V2",
                         "content": {
                             "offerThroughput": 500,
@@ -921,13 +991,13 @@
                                 "maxThroughputEverProvisioned": 500,
                                 "maxConsumedStorageEverInKB": 0
                             },
-                            "offerLastReplaceTimestamp": 1562362342
+                            "offerLastReplaceTimestamp": 1566344276
                         },
-                        "id": "wc0c",
-                        "_rid": "wc0c",
-                        "_self": "offers/wc0c/",
-                        "_etag": "\"0000d700-0000-0500-0000-5d1fc1e60000\"",
-                        "_ts": 1562362342
+                        "id": "vOzv",
+                        "_rid": "vOzv",
+                        "_self": "offers/vOzv/",
+                        "_etag": "\"0000a70f-0000-0500-0000-5d5c84540000\"",
+                        "_ts": 1566344276
                     }
                 }
             }
@@ -945,23 +1015,29 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "x-ms-transport-request-id": [
-                        "305113"
+                    "x-ms-item-count": [
+                        "1"
                     ],
                     "lsn": [
-                        "18"
+                        "41"
                     ],
                     "x-ms-number-of-read-regions": [
-                        "0"
+                        "1"
                     ],
                     "x-ms-session-token": [
-                        "0:-1#18"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:22 GMT"
+                        "0:-1#41"
                     ],
                     "x-ms-activity-id": [
-                        "3443d1b8-9eaa-4c75-8383-fa25bc5fab6b"
+                        "ffa28f95-3a7f-474f-97aa-e355ae3976a1"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-ms-transport-request-id": [
+                        "401093"
+                    ],
+                    "x-ms-schemaversion": [
+                        "1.8"
                     ],
                     "x-ms-request-charge": [
                         "2"
@@ -969,17 +1045,11 @@
                     "content-type": [
                         "application/json"
                     ],
-                    "cache-control": [
-                        "no-store, no-cache"
-                    ],
-                    "x-ms-item-count": [
-                        "1"
-                    ],
-                    "x-ms-schemaversion": [
-                        "1.8"
-                    ],
                     "x-ms-serviceversion": [
-                        "version=2.4.0.0"
+                        "version=2.5.0.0"
+                    ],
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:55 GMT"
                     ]
                 },
                 "body": {
@@ -987,9 +1057,9 @@
                         "_rid": "",
                         "Offers": [
                             {
-                                "resource": "dbs/rO11AA==/colls/rO11AN0Gz8s=/",
+                                "resource": "dbs/UP4IAA==/colls/UP4IAJytpGM=/",
                                 "offerType": "Invalid",
-                                "offerResourceId": "rO11AN0Gz8s=",
+                                "offerResourceId": "UP4IAJytpGM=",
                                 "offerVersion": "V2",
                                 "content": {
                                     "offerThroughput": 500,
@@ -999,13 +1069,13 @@
                                         "maxThroughputEverProvisioned": 500,
                                         "maxConsumedStorageEverInKB": 0
                                     },
-                                    "offerLastReplaceTimestamp": 1562362342
+                                    "offerLastReplaceTimestamp": 1566344276
                                 },
-                                "id": "wc0c",
-                                "_rid": "wc0c",
-                                "_self": "offers/wc0c/",
-                                "_etag": "\"0000d700-0000-0500-0000-5d1fc1e60000\"",
-                                "_ts": 1562362342
+                                "id": "vOzv",
+                                "_rid": "vOzv",
+                                "_self": "offers/vOzv/",
+                                "_etag": "\"0000a70f-0000-0500-0000-5d5c84540000\"",
+                                "_ts": 1566344276
                             }
                         ],
                         "_count": 1
@@ -1016,7 +1086,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://cctestcosmosdb-southcentralus.documents.azure.com//offers/wc0c/",
+                "uri": "https://cctestcosmosdb-southcentralus.documents.azure.com//offers/vOzv/",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -1026,76 +1096,76 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "x-ms-transport-request-id": [
-                        "375551"
-                    ],
                     "lsn": [
-                        "19"
-                    ],
-                    "x-ms-quorum-acked-lsn": [
-                        "18"
-                    ],
-                    "x-ms-number-of-read-regions": [
-                        "0"
-                    ],
-                    "x-ms-session-token": [
-                        "0:-1#19"
-                    ],
-                    "x-ms-cosmos-quorum-acked-llsn": [
-                        "18"
-                    ],
-                    "date": [
-                        "Fri, 05 Jul 2019 21:32:22 GMT"
-                    ],
-                    "x-ms-activity-id": [
-                        "ca5a1a67-a099-4d92-9fe6-5b37e9dfc3d4"
-                    ],
-                    "x-ms-request-charge": [
-                        "9.9"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-ms-current-write-quorum": [
-                        "3"
+                        "42"
                     ],
                     "x-ms-current-replica-set-size": [
                         "4"
                     ],
+                    "x-ms-number-of-read-regions": [
+                        "1"
+                    ],
+                    "x-ms-quorum-acked-lsn": [
+                        "41"
+                    ],
+                    "x-ms-session-token": [
+                        "0:-1#42"
+                    ],
+                    "x-ms-cosmos-quorum-acked-llsn": [
+                        "41"
+                    ],
+                    "x-ms-activity-id": [
+                        "8328a35a-1cb9-4857-9dc0-7941dec0d651"
+                    ],
                     "cache-control": [
                         "no-store, no-cache"
                     ],
-                    "etag": [
-                        "\"0000d800-0000-0500-0000-5d1fc1e60000\""
+                    "x-ms-transport-request-id": [
+                        "403540"
                     ],
                     "x-ms-schemaversion": [
                         "1.8"
                     ],
+                    "etag": [
+                        "\"0000a80f-0000-0500-0000-5d5c84540000\""
+                    ],
+                    "x-ms-request-charge": [
+                        "19.81"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
                     "x-ms-serviceversion": [
-                        "version=2.4.0.0"
+                        "version=2.5.0.0"
+                    ],
+                    "date": [
+                        "Tue, 20 Aug 2019 23:37:55 GMT"
+                    ],
+                    "x-ms-current-write-quorum": [
+                        "3"
                     ]
                 },
                 "body": {
                     "data": {
-                        "resource": "dbs/rO11AA==/colls/rO11AN0Gz8s=/",
+                        "resource": "dbs/UP4IAA==/colls/UP4IAJytpGM=/",
                         "offerType": "Invalid",
-                        "offerResourceId": "rO11AN0Gz8s=",
+                        "offerResourceId": "UP4IAJytpGM=",
                         "offerVersion": "V2",
                         "content": {
-                            "offerThroughput": 500,
+                            "offerThroughput": 400,
                             "offerIsRUPerMinuteThroughputEnabled": false,
                             "offerMinimumThroughputParameters": {
                                 "maxCountOfSharedThroughputCollectionsEverCreated": 0,
                                 "maxThroughputEverProvisioned": 500,
                                 "maxConsumedStorageEverInKB": 0
                             },
-                            "offerLastReplaceTimestamp": 1562362342
+                            "offerLastReplaceTimestamp": 1566344276
                         },
-                        "id": "wc0c",
-                        "_rid": "wc0c",
-                        "_self": "offers/wc0c/",
-                        "_etag": "\"0000d800-0000-0500-0000-5d1fc1e60000\"",
-                        "_ts": 1562362342
+                        "id": "vOzv",
+                        "_rid": "vOzv",
+                        "_self": "offers/vOzv/",
+                        "_etag": "\"0000a80f-0000-0500-0000-5d5c84540000\"",
+                        "_ts": 1566344276
                     }
                 }
             }
