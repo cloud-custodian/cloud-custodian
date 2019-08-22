@@ -22,14 +22,15 @@ for file in "$templateDirectory"/*.json; do
       az group create --name $rgName --location $resourceLocation
       if [[ "$filenameNoExtension" =~ "keyvault-no-policies" ]]; then
         az group deployment create --resource-group $rgName --template-file $file \
-            --parameters "tenantId=$azureTenantId"
+            --parameters "tenantId=$azureTenantId" --no-wait
       elif [[ "$filenameNoExtension" =~ "keyvault" ]]; then
         azureAdUserObjectId=$(az ad signed-in-user show --query objectId)
         azureAdUserObjectId=${azureAdUserObjectId//\"}
 
         az group deployment create --resource-group $rgName --template-file $file \
             --parameters "tenantId=$azureTenantId" \
-                         "userObjectId=$azureAdUserObjectId"
+                         "userObjectId=$azureAdUserObjectId" \
+                         --no-wait
 
         vault_name=$(az keyvault list --resource-group $rgName --query [0].name | tr -d '"')
 
