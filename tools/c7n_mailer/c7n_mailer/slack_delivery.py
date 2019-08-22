@@ -200,7 +200,7 @@ class SlackDelivery(object):
                 response.status_code, response.text)
             return
 
-        if not response.text == 'ok':
+        elif response.text != 'ok':
             self.logger.info("Error in sending Slack message. Status:%s, response:%s",
-                             response.status_code, response.text)
+                             response.status_code, response_json['error'])
             return
