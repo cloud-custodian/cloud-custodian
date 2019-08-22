@@ -321,7 +321,8 @@ class PullMode(PolicyExecutionMode):
                 self.policy.name, self.policy.end, now)
             return False
         if self.policy.region and (
-                self.policy.region != self.policy.options.region):
+                self.policy.region != self.policy.options.region) and (
+                self.policy.region != 'all'):
             self.policy.log.info(
                 "Skipping policy:%s target-region:%s current-region:%s",
                 self.policy.name, self.policy.region,
