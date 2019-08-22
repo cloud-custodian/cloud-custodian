@@ -13,19 +13,19 @@
 # limitations under the License.
 
 import logging
+
 import six
-from c7n_azure.actions.notify import Notify
-from c7n_azure.actions.logic_app import LogicAppAction
 from c7n_azure import constants
-from c7n_azure.provider import resources
+from c7n_azure.actions.logic_app import LogicAppAction
+from c7n_azure.actions.notify import Notify
 from c7n_azure.filters import ParentFilter
+from c7n_azure.provider import resources
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
-from c7n.query import sources
+from c7n.query import sources, MaxResourceLimit
 from c7n.utils import local_session
-
 
 log = logging.getLogger('custodian.azure.query')
 
@@ -232,7 +232,20 @@ class QueryResourceManager(ResourceManager):
             resources = self.augment(self.source.get_resources(query))
             self._cache.save(cache_key, resources)
 
-        return self.filter_resources(resources)
+        resource_count = len(resources)
+        resources = self.filter_resources(resources)
+
+        # Check if we're out of a policies execution limits.
+        if self.data == self.ctx.policy.data:
+            self.check_resource_limit(len(resources), resource_count)
+        return resources
+
+    def check_resource_limit(self, selection_count, population_count):
+        """Check if policy's execution affects more resources then its limit.
+        """
+        p = self.ctx.policy
+        max_resource_limits = MaxResourceLimit(p, selection_count, population_count)
+        return max_resource_limits.check_resource_limits()
 
     def get_resources(self, resource_ids, **params):
         resource_client = self.get_client()

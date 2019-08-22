@@ -22,7 +22,7 @@ from googleapiclient.errors import HttpError
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
-from c7n.query import sources
+from c7n.query import sources, MaxResourceLimit
 from c7n.utils import local_session
 
 
@@ -149,7 +149,21 @@ class QueryResourceManager(ResourceManager):
         key = self.get_cache_key(q)
         resources = self._fetch_resources(q)
         self._cache.save(key, resources)
-        return self.filter_resources(resources)
+
+        resource_count = len(resources)
+        resources = self.filter_resources(resources)
+
+        # Check if we're out of a policies execution limits.
+        if self.data == self.ctx.policy.data:
+            self.check_resource_limit(len(resources), resource_count)
+        return resources
+
+    def check_resource_limit(self, selection_count, population_count):
+        """Check if policy's execution affects more resources then its limit.
+        """
+        p = self.ctx.policy
+        max_resource_limits = MaxResourceLimit(p, selection_count, population_count)
+        return max_resource_limits.check_resource_limits()
 
     def _fetch_resources(self, query):
         try:
