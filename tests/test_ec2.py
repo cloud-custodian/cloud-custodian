@@ -20,7 +20,7 @@ import time
 from datetime import datetime
 from dateutil import tz
 import jmespath
-from mock import mock, patch
+from mock import mock
 from jsonschema.exceptions import ValidationError
 
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -1656,7 +1656,8 @@ class TestLaunchTemplate(BaseTest):
         p = self.load_policy(
             {'name': 'lt-missing', 'resource': 'launch-template-version'},
             session_factory=factory)
-        resources = p.resource_manager.get_resources([('lt-0a49586208137d8de', '1'), ('lt-0877401c93c294001', '3')])
+        resources = p.resource_manager.get_resources(
+            [('lt-0a49586208137d8de', '1'), ('lt-0877401c93c294001', '3')])
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['LaunchTemplateId'], good_lt_id)
 
