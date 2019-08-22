@@ -1,0 +1,20 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidLaunchTemplateId.NotFound",
+            "Message": "The specified launch template, with template ID lt-0a49586208137d8de, does not exist."
+        },
+        "ResponseMetadata": {
+            "RequestId": "9d35a1b1-b6df-4f7a-bd2c-0fec6dec4de8",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked",
+                "date": "Thu, 22 Aug 2019 23:40:45 GMT",
+                "connection": "close",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

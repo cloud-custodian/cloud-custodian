@@ -1651,14 +1651,14 @@ class TestLaunchTemplate(BaseTest):
         self.assertTrue(all(['LaunchTemplateData' in r for r in resources]))
 
     def test_launch_template_id_not_found(self):
-        error_response = {'Error': {'Code': 'InvalidLaunchTemplateId.NotFound'}}
-        operation_name = 'DescribeLaunchTemplateVersions'
-        with patch("c7n.utils.local_session") as mock_local_session:
-            describe_template = mock_local_session.client.describe_launch_template_versions
-            describe_template.side_effect = ClientError(error_response, operation_name)
-            with self.assertRaises(ClientError):
-                describe_template(LaunchTemplateId='badname', Versions=['1'])
-                describe_template.assert_called_once()
+        factory = self.record_flight_data("test_ami_not_found_err")
+        good_lt_id = 'lt-0877401c93c294001'
+        p = self.load_policy(
+            {'name': 'lt-missing', 'resource': 'launch-template-version'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources([('lt-0a49586208137d8de', '1'), ('lt-0877401c93c294001', '3')])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LaunchTemplateId'], good_lt_id)
 
 
 class TestReservedInstance(BaseTest):
