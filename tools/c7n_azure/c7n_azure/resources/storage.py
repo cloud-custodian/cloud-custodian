@@ -465,3 +465,44 @@ class StorageSettingsUtilities(object):
 
         return getattr(client, 'set_{}_service_properties'
                        .format(storage_type))(logging=logging_settings)
+
+
+@Storage.action_registry.register('set-https-traffic')
+class SetHttpsTrafficAction(AzureBaseAction):
+    """Action that updates the EnableHttpsTrafficOnly setting on Storage Accounts.
+
+    :example:
+
+        Set EnableHttpsTrafficOnly to True
+
+    .. code-block:: yaml
+
+        policies:
+            - name: set-https-traffic-to-true
+            resource: azure.storage
+            actions:
+                - type: set-https-traffic
+                value: true
+    """
+
+    # Default to true assuming user wants secure connection
+    schema = type_schema(
+        'set-https-traffic',
+        required=[],
+        **{
+            'value': {'type': 'boolean', "default": True},
+        })
+
+    def __init__(self, data, manager=None):
+        super(SetHttpsTrafficAction, self).__init__(data, manager)
+        self.log = logging.getLogger('custodian.azure.storage')
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.storage_accounts.update(
+            resource['resourceGroup'],
+            resource['name'],
+            StorageAccountUpdateParameters(enable_https_traffic_only=self.data.get('value'))
+        )
