@@ -100,6 +100,8 @@ func update(ctx context.Context, image string, dockerClient *client.Client) {
 		_ = jsonmessage.DisplayJSONMessagesStream(out, os.Stdout, 1, true, nil)
 	}
 
+	defer out.Close()
+
 	// Touch the marker file
 	if _, err := os.Stat(updateMarker); err == nil {
 		if err := os.Chtimes(updateMarker, now, now); err != nil {
