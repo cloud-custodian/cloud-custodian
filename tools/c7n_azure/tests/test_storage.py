@@ -21,6 +21,8 @@ from mock import patch, MagicMock
 
 from c7n.utils import get_annotation_prefix
 from c7n.utils import local_session
+from c7n_azure.session import Session
+from azure.mgmt.storage.models import StorageAccountUpdateParameters
 
 
 class StorageTest(BaseTest):
@@ -522,20 +524,31 @@ class StorageTest(BaseTest):
         StorageSettingsUtilities.update_logging(
             TABLE_TYPE, mock_storage_account, log_settings, session=mock_session)
 
-        mock_get_storage_key.assert_called_with(
-            'mock_resource_group', 'mock_storage_account', mock_session)
-        mock_set_table_properties.assert_called_once()
+    def test_storage_settings_enable_https_traffic_action(self):
+        with patch('azure.mgmt.storage.v%s.operations.'
+        '_storage_accounts_operations.StorageAccountsOperations.update'
+        % self._get_storage_management_client_api_string()) as update_storage_mock:
+            p = self.load_policy({
+                'name': 'my-first-policy',
+                'resource': 'azure.storage',
+                'filters': [
+                    {'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cctstorage*'}
+                ],
+                'actions': [
+                    {'type': 'set-https-traffic',
+                    'value': 'true'}
+                ]
+            })
+            p.run()
+            update_parameter = StorageAccountUpdateParameters(enable_https_traffic_only='true')
+            update_storage_mock.assert_called_with(
+                'test_storage', "cctstoragey6akyqpagdt3o", update_parameter)
 
-    @patch('azure.storage.blob.blockblobservice.BlockBlobService.set_blob_service_properties')
-    def test_storage_settings_update_logging_blob(self, mock_set_blob_properties):
-        mock_storage_account = {
-            "resourceGroup": "mock_resource_group",
-            "name": "mock_storage_account"
-        }
-        mock_token = 'mock_token'
-        log_settings = MagicMock()
-
-        StorageSettingsUtilities.update_logging(
-            BLOB_TYPE, mock_storage_account, log_settings, token=mock_token)
-
-        mock_set_blob_properties.assert_called_once()
+    def _get_storage_management_client_api_string(self):
+        return local_session(Session)\
+            .client('azure.mgmt.storage.StorageManagementClient')\
+            .DEFAULT_API_VERSION.replace("-", "_")
