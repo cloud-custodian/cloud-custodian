@@ -1651,7 +1651,7 @@ class TestLaunchTemplate(BaseTest):
         self.assertTrue(all(['LaunchTemplateData' in r for r in resources]))
 
     def test_launch_template_id_not_found(self):
-        factory = self.record_flight_data("test_ami_not_found_err")
+        factory = self.replay_flight_data("test_ami_not_found_err")
         good_lt_id = 'lt-0877401c93c294001'
         p = self.load_policy(
             {'name': 'lt-missing', 'resource': 'launch-template-version'},
