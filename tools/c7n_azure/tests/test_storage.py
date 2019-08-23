@@ -558,13 +558,16 @@ class StorageTest(BaseTest):
                 ],
                 'actions': [
                     {'type': 'require-secure-transfer',
-                    'value': 'True'}
+                    'value': True}
                 ]
             })
             p.run()
-            update_parameter = StorageAccountUpdateParameters(enable_https_traffic_only='True')
-            update_storage_mock.assert_called_with(
-                'test_storage', "cctstoragey6akyqpagdt3o", update_parameter)
+            update_parameter = StorageAccountUpdateParameters(enable_https_traffic_only=True)
+            args = update_storage_mock.call_args_list[0][0]
+
+            self.assertEqual(args[0], 'test_storage')
+            self.assertTrue(args[1].startswith('cctstorage'))
+            self.assertEqual(args[2], update_parameter)
 
     def _get_storage_management_client_api_string(self):
         return local_session(Session)\
