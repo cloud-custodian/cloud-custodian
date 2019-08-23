@@ -1992,9 +1992,10 @@ class CreateFlowLogs(BaseAction):
     def validate(self):
         self.state = self.data.get('state', True)
         if self.state:
-            if not self.data.get('DeliverLogsPermissionArn'):
+            if (self.data.get('LogDestinationType') == 's3' and
+               self.data.get('DeliverLogsPermissionArn')):
                 raise PolicyValidationError(
-                    'DeliverLogsPermissionArn required when '
+                    'DeliverLogsPermissionArn not required with destination as s3 when'
                     'creating flow-logs on %s' % (self.manager.data,))
             if (not self.data.get('LogGroupName') and not self.data.get('LogDestination')):
                 raise PolicyValidationError(
