@@ -467,33 +467,34 @@ class StorageSettingsUtilities(object):
                        .format(storage_type))(logging=logging_settings)
 
 
-@Storage.action_registry.register('set-https-traffic')
-class SetHttpsTrafficAction(AzureBaseAction):
-    """Action that updates the EnableHttpsTrafficOnly setting on Storage Accounts.
+@Storage.action_registry.register('require-secure-transfer')
+class RequireSecureTransferAction(AzureBaseAction):
+    """Action that updates the Secure Transfer setting on Storage Accounts.
+    Programatically, this will be seen by updating the EnableHttpsTrafficOnly setting
 
     :example:
 
-        Set EnableHttpsTrafficOnly to True
+        Set Secure Transfer Required to True
 
     .. code-block:: yaml
 
         policies:
-            - name: set-https-traffic-to-true
+            - name: require-secure-transfer
               resource: azure.storage
               actions:
-              - type: set-https-traffic
-                value: true
+              - type: require-secure-transfer
+                value: True
     """
 
     # Default to true assuming user wants secure connection
     schema = type_schema(
-        'set-https-traffic',
+        'require-secure-transfer',
         **{
             'value': {'type': 'boolean', "default": True},
         })
 
     def __init__(self, data, manager=None):
-        super(SetHttpsTrafficAction, self).__init__(data, manager)
+        super(RequireSecureTransferAction, self).__init__(data, manager)
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()

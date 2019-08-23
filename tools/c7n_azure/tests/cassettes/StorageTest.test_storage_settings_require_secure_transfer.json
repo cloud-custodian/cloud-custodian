@@ -14,24 +14,24 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
+                    "content-length": [
+                        "15747"
+                    ],
+                    "date": [
+                        "Fri, 23 Aug 2019 16:58:47 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "d28d451c-55c8-45fd-9658-1cb0de1edf47",
+                        "6b218423-441c-4392-a347-2b7eafa0472a",
+                        "1ec4b285-09a8-418b-9d1b-7d7bf04d1993",
+                        "7818b741-1f5a-484e-8815-ede3d9d720c3",
+                        "76a3565a-9749-41df-9ef0-d1cf3c53503e"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Fri, 23 Aug 2019 00:04:02 GMT"
-                    ],
-                    "content-length": [
-                        "15748"
-                    ],
-                    "x-ms-original-request-ids": [
-                        "2cfbcfa0-0482-4d46-a448-33468ba5a67d",
-                        "eb8191aa-d1b9-4ded-917e-b3b9f9e4207b",
-                        "fc71c953-3c8f-46f8-a3e9-7552dd605f9b",
-                        "900b4e36-8e57-483c-bfd6-0c0914dfea5f",
-                        "88ee2c6c-3c5e-413a-9174-448c646d5a2a"
+                    "cache-control": [
+                        "no-cache"
                     ]
                 },
                 "body": {
@@ -468,7 +468,7 @@
                                         ],
                                         "defaultAction": "Deny"
                                     },
-                                    "supportsHttpsTrafficOnly": false,
+                                    "supportsHttpsTrafficOnly": true,
                                     "encryption": {
                                         "services": {
                                             "file": {
