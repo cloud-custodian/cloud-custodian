@@ -470,11 +470,12 @@ class StorageSettingsUtilities(object):
 @Storage.action_registry.register('require-secure-transfer')
 class RequireSecureTransferAction(AzureBaseAction):
     """Action that updates the Secure Transfer setting on Storage Accounts.
-    Programatically, this will be seen by updating the EnableHttpsTrafficOnly setting
+    Programmatically, this will be seen by updating the EnableHttpsTrafficOnly setting
 
     :example:
 
-        Set Secure Transfer Required to True
+       Turns on Secure transfer required for all storage accounts. This will reject requests that
+       use HTTP to your storage accounts.
 
     .. code-block:: yaml
 
