@@ -1,22 +1,22 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Unsuccessful": [], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "33afe06e-de8e-4e07-803c-7435f5cbd000", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "vary": "Accept-Encoding", 
-                "date": "Fri, 02 Nov 2018 21:48:21 GMT", 
-                "server": "AmazonEC2"
-            }
-        }, 
+        "ClientToken": "rPg75zxg3CoD0FIsjmETO7i3vlDfujvJ4fXvhnYuvBc=",
         "FlowLogIds": [
-            "fl-061d3f3b816da485e"
-        ], 
-        "ClientToken": "LeufVjrP/fkZbjxFlNUErFlijDZf1A89z4aCjHIqCxM="
+            "fl-0fe58629b419a1230"
+        ],
+        "Unsuccessful": [],
+        "ResponseMetadata": {
+            "RequestId": "2b3d0572-c082-4e4f-9d1c-0a836dedfa44",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "accept-encoding",
+                "date": "Fri, 23 Aug 2019 17:51:32 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
     }
 }

@@ -1,18 +1,18 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "FlowLogs": [], 
+        "FlowLogs": [],
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "bad4f4f1-afa6-48d1-ac78-2970a939d998", 
+            "RequestId": "4cb232af-722b-4960-a7eb-0d42ee265f79",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "vary": "Accept-Encoding", 
-                "date": "Fri, 02 Nov 2018 21:48:21 GMT", 
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "accept-encoding",
+                "date": "Fri, 23 Aug 2019 17:51:32 GMT",
                 "server": "AmazonEC2"
-            }
+            },
+            "RetryAttempts": 0
         }
     }
 }

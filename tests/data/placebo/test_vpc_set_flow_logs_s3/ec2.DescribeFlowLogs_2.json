@@ -1,39 +1,38 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "FlowLogs": [
             {
-                "LogDestinationType": "s3", 
-                "ResourceId": "vpc-d2d616b5", 
                 "CreationTime": {
-                    "hour": 21, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 21, 
-                    "microsecond": 961000, 
-                    "year": 2018, 
-                    "day": 2, 
-                    "minute": 48
-                }, 
-                "TrafficType": "ALL", 
-                "FlowLogStatus": "ACTIVE", 
-                "FlowLogId": "fl-061d3f3b816da485e", 
-                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/testing-vpc-flow-log-role", 
-                "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz", 
-                "DeliverLogsStatus": "SUCCESS"
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 8,
+                    "day": 23,
+                    "hour": 17,
+                    "minute": 51,
+                    "second": 33,
+                    "microsecond": 145000
+                },
+                "DeliverLogsStatus": "SUCCESS",
+                "FlowLogId": "fl-0fe58629b419a1230",
+                "FlowLogStatus": "ACTIVE",
+                "ResourceId": "vpc-d2d616b5",
+                "TrafficType": "ALL",
+                "LogDestinationType": "s3",
+                "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz"
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "8b3a9439-620d-440b-8b4a-3634460f9684", 
+            "RequestId": "f4cec796-2342-4fa3-a2b2-07230145f0cb",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "vary": "Accept-Encoding", 
-                "date": "Fri, 02 Nov 2018 21:48:21 GMT", 
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "accept-encoding",
+                "date": "Fri, 23 Aug 2019 17:51:33 GMT",
                 "server": "AmazonEC2"
-            }
+            },
+            "RetryAttempts": 0
         }
     }
 }

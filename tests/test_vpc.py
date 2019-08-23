@@ -2604,8 +2604,6 @@ class FlowLogsTest(BaseTest):
                         "type": "set-flow-log",
                         "LogDestinationType": "s3",
                         "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz",
-                        "DeliverLogsPermissionArn":
-                            "arn:aws:iam::644160558196:role/testing-vpc-flow-log-role",
                     }
                 ],
             },
