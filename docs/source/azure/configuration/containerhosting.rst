@@ -43,8 +43,30 @@ the policy will be ignored.
 Deployment Options
 ##################
 
-Helm Chart
-----------
+Azure Container Instance
+------------------------
+
+The ARM template to deploy the Azure Container Host is provided for deploying an ACI instance
+against a single subscription using a `user assigned identity <https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview>`_ 
+for authentication.
+
+Here is an example deployment of the ARM template using the azure cli:
+
+.. code-block:: bash
+
+    az group deployment create \
+        --resource-group my-resource-group \
+        --template-file tools/ops/azure/container-host/aci/aci-template.json \
+        --parameters \
+            aci_name=cloud-custodian \
+            user_assigned_identity_name=my-uai \
+            azure_subscription_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
+            azure_event_queue_name=custodian-aci-queue \
+            azure_container_storage=https://myStorageAccount.blob.core.windows.net/aci-policies \
+            azure_event_queue_resource_id=/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/my-resource-group/providers/Microsoft.Storage/storageAccounts/myStorageAccount
+
+Kubernetes (Helm Chart)
+-----------------------
 
 A helm chart is provided that will deploy a set of cloud custodian containers against a set of 
 subscriptions to be monitored. For information on how to customize the values, reference 
@@ -80,7 +102,7 @@ To deploy the chart:
 
 
 Helm Chart Deployment Script
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Additionally, a utility script for deploying the helm chart against either a single subscription 
 or all subscriptions in a management group is provided. When deploying for a management group,
@@ -131,7 +153,7 @@ all of the containers will share the same policy storage and storage account for
     --help                          Show this message and exit.
 
 Examples
-^^^^^^^^
+________
 
 Deploy against a single subscription:
 

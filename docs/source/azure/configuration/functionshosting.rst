@@ -255,19 +255,18 @@ The following example shows an Event Grid Function that runs when a value is wri
 .. code-block:: yaml
 
     policies:
-        - name: tag-key-vault-creator
-          resource: azure.keyvault
-          mode:
-            type: azure-event-grid
-            events: [{
-                resourceProvider: 'Microsoft.KeyVault/vaults',
-                event: 'write'
-              }]
-          filters:
-            - "tag:CreatorEmail": null
-          actions:
-            - type: auto-tag-user
-              tag: CreatorEmail
+      - name: tag-key-vault-creator
+        resource: azure.keyvault
+        mode:
+          type: azure-event-grid
+          events:
+            - resourceProvider: Microsoft.KeyVault/vaults
+              event: write
+        filters:
+          - "tag:CreatorEmail": null
+        actions:
+          - type: auto-tag-user
+            tag: CreatorEmail
 
 Advanced Authentication Options
 ###############################

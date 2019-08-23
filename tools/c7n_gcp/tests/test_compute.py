@@ -237,3 +237,79 @@ class InstanceTemplateTest(BaseTest):
         except HttpError as e:
             self.assertTrue(re.match(".*The resource '%s' was not found.*" %
                                      resource_full_name, str(e)))
+
+
+class AutoscalerTest(BaseTest):
+
+    def test_autoscaler_query(self):
+        project_id = 'cloud-custodian'
+        resource_name = 'micro-instance-group-1-to-10'
+        session_factory = self.replay_flight_data('autoscaler-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-autoscaler-dryrun',
+             'resource': 'gcp.autoscaler'},
+            session_factory=session_factory)
+        resources = policy.run()
+
+        self.assertEqual(resources[0]['name'], resource_name)
+
+    def test_autoscaler_get(self):
+        resource_name = 'instance-group-1'
+        session_factory = self.replay_flight_data('autoscaler-get')
+
+        policy = self.load_policy(
+            {'name': 'gcp-autoscaler-audit',
+             'resource': 'gcp.autoscaler',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['v1.compute.autoscalers.insert']
+             }},
+            session_factory=session_factory)
+
+        exec_mode = policy.get_execution_mode()
+        event = event_data('autoscaler-insert.json')
+        resources = exec_mode.run(event, None)
+
+        self.assertEqual(resources[0]['name'], resource_name)
+
+    def test_autoscaler_set(self):
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('autoscaler-set', project_id=project_id)
+
+        p = self.load_policy(
+            {'name': 'gcp-autoscaler-set',
+             'resource': 'gcp.autoscaler',
+             'filters': [{'name': 'instance-group-2'}],
+             'actions': [{'type': 'set',
+                          'coolDownPeriodSec': 30,
+                          'cpuUtilization': {
+                              'utilizationTarget': 0.7
+                          },
+                          'loadBalancingUtilization': {
+                              'utilizationTarget': 0.7
+                          },
+                          'minNumReplicas': 1,
+                          'maxNumReplicas': 4
+                          }]},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(3)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'zone': 'us-central1-a',
+                     'filter': 'name = instance-group-2'})
+
+        result_policy = result['items'][0]['autoscalingPolicy']
+
+        self.assertEqual(result_policy['coolDownPeriodSec'], 30)
+        self.assertEqual(result_policy['cpuUtilization']['utilizationTarget'], 0.7)
+        self.assertEqual(result_policy['loadBalancingUtilization']['utilizationTarget'], 0.7)
+        self.assertEqual(result_policy['minNumReplicas'], 1)
+        self.assertEqual(result_policy['maxNumReplicas'], 4)

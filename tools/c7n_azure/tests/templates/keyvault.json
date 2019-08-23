@@ -85,6 +85,12 @@
                                 "ListIssuers",
                                 "SetIssuers",
                                 "DeleteIssuers"
+                            ],
+                            "storage": [
+                                "Get",
+                                "List",
+                                "Set",
+                                "regeneratekey"
                             ]
                         }
                     }
@@ -94,6 +100,18 @@
                 "enabledForTemplateDeployment": false
             },
             "dependsOn": []
+        },
+        {
+          "name": "[concat('cckvstorage', uniqueString(resourceGroup().id))]",
+          "type": "Microsoft.Storage/storageAccounts",
+          "apiVersion": "2016-01-01",
+          "sku": {
+            "name": "Standard_LRS"
+          },
+          "kind": "Storage",
+          "location": "southcentralus",
+          "tags": {},
+          "properties": {}
         },
         {
             "type": "Microsoft.KeyVault/vaults/providers/locks",

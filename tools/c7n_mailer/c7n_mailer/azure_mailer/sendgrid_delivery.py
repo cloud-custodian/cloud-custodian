@@ -14,6 +14,7 @@
 
 import sendgrid
 import six
+from c7n_mailer.utils import decrypt
 from c7n_mailer.utils import (get_message_subject)
 from c7n_mailer.utils_email import is_email, get_mimetext_message
 from python_http_client import exceptions
@@ -22,11 +23,12 @@ from sendgrid.helpers.mail import Mail, To, From
 
 class SendGridDelivery(object):
 
-    def __init__(self, config, logger):
+    def __init__(self, config, session, logger):
         self.config = config
         self.logger = logger
-        self.sendgrid_client = \
-            sendgrid.SendGridAPIClient(self.config.get('sendgrid_api_key', ''))
+        self.session = session
+        api_key = decrypt(self.config, self.logger, self.session, 'sendgrid_api_key')
+        self.sendgrid_client = sendgrid.SendGridAPIClient(api_key)
 
     def get_to_addrs_sendgrid_messages_map(self, queue_message):
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }

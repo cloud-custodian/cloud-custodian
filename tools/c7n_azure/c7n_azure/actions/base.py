@@ -64,10 +64,17 @@ class AzureBaseAction(BaseAction):
             try:
                 self._process_resource(r)
             except Exception as e:
-                self.log.error("Failed to process resource.\n"
-                               "Type: {0}.\n"
-                               "Name: {1}.\n"
-                               "Error: {2}".format(r['type'], r['name'], e))
+                if isinstance(e, CloudError):
+                    self.log.error("Failed to process resource.\n"
+                                   "Type: {0}.\n"
+                                   "Name: {1}.\n"
+                                   "Error: {2}\n"
+                                   "Message: {3}".format(r['type'], r['name'], e, e.message))
+                else:
+                    self.log.error("Failed to process resource.\n"
+                                   "Type: {0}.\n"
+                                   "Name: {1}.\n"
+                                   "Error: {2}".format(r['type'], r['name'], e))
 
     def _prepare_processing(self):
         pass

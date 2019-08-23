@@ -319,7 +319,7 @@ and here is a description of the options:
 |           | `smtp_port`     | integer          | smtp port (default is 25)                                                                                                                                                           |
 |           | `smtp_ssl`      | boolean          | this defaults to True                                                                                                                                                               |
 |           | `smtp_username` | string           |                                                                                                                                                                                     |
-|           | `smtp_password` | string           |                                                                                                                                                                                     |
+|           | `smtp_password` | secured string   |                                                                                                                                                                                     |
 
 If `smtp_server` is unset, `c7n_mailer` will use AWS SES or Azure SendGrid.
 
@@ -340,9 +340,9 @@ These fields are not necessary if c7n_mailer is run in a instance/lambda/etc wit
 
 #### SendGrid Config
 
-| Required? | Key                | Type   | Notes              |
-|:---------:|:-------------------|:-------|:-------------------|
-|           | `sendgrid_api_key` | string | SendGrid API token |
+| Required? | Key                | Type           | Notes              |
+|:---------:|:-------------------|:---------------|:-------------------|
+|           | `sendgrid_api_key` | secured string | SendGrid API token |
 SendGrid is only supported for Azure Cloud use with Azure Storage Queue currently.
 
 #### Splunk HEC Config
@@ -366,6 +366,34 @@ The following configuration items are *all* optional. The ones marked "Required 
 |           | `https_proxy` | string |       |
 |           | `profile`     | string |       |
 
+
+#### Secured String
+
+In order to ensure sensitive data is not stored plaintext in a policy, `c7n-mailer` supports secured
+strings. You can treat it as a regular `string` or use `secured string` features.
+
+##### AWS
+
+You can use KMS to encrypt your secrets and use encrypted secret in mailer policy.
+Custodian tries to decrypt the string using KMS, if it fails c7n treats it as a plaintext secret.
+
+```yaml
+    plaintext_secret: <raw_secret>
+    secured_string: <encrypted_secret>
+```
+
+##### Azure
+
+You can store your secrets in Azure Key Vault secrets and reference them from the policy.
+
+```yaml
+    plaintext_secret: <raw_secret>
+    secured_string:
+        type: azure.keyvault
+        secret: https://your-vault.vault.azure.net/secrets/your-secret
+```
+
+Note: `secrets.get` permission on the KeyVault for the Service Principal is required.
 
 ## Configuring a policy to send email
 

@@ -17,7 +17,7 @@ from azure_common import BaseTest
 from c7n_azure.lookup import Lookup
 
 
-class TagsTest(BaseTest):
+class LookupTest(BaseTest):
 
     def test_lookup_type(self):
         number_schema = {'type': 'number'}
@@ -48,7 +48,8 @@ class TagsTest(BaseTest):
             }
         }
         source = {
-            Lookup.RESOURCE_SOURCE: 'field_level_1.field_level_2',
+            'type': Lookup.RESOURCE_SOURCE,
+            'key': 'field_level_1.field_level_2',
             'default-value': 'value_2'
         }
 
@@ -62,7 +63,8 @@ class TagsTest(BaseTest):
             }
         }
         source = {
-            Lookup.RESOURCE_SOURCE: 'field_level_1.field_level_2',
+            'type': Lookup.RESOURCE_SOURCE,
+            'key': 'field_level_1.field_level_2',
             'default-value': 'value_2'
         }
 
@@ -76,7 +78,8 @@ class TagsTest(BaseTest):
             }
         }
         source = {
-            Lookup.RESOURCE_SOURCE: 'field_level_1.field_level_2',
+            'type': Lookup.RESOURCE_SOURCE,
+            'key': 'field_level_1.field_level_2',
             'default-value': 'value_2'
         }
 
@@ -90,7 +93,8 @@ class TagsTest(BaseTest):
             }
         }
         source = {
-            Lookup.RESOURCE_SOURCE: 'field_level_1.field_level_2'
+            'type': Lookup.RESOURCE_SOURCE,
+            'key': 'field_level_1.field_level_2'
         }
 
         with self.assertRaises(Exception):
