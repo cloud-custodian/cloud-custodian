@@ -479,23 +479,21 @@ class SetHttpsTrafficAction(AzureBaseAction):
 
         policies:
             - name: set-https-traffic-to-true
-            resource: azure.storage
-            actions:
-                - type: set-https-traffic
+              resource: azure.storage
+              actions:
+              - type: set-https-traffic
                 value: true
     """
 
     # Default to true assuming user wants secure connection
     schema = type_schema(
         'set-https-traffic',
-        required=[],
         **{
             'value': {'type': 'boolean', "default": True},
         })
 
     def __init__(self, data, manager=None):
         super(SetHttpsTrafficAction, self).__init__(data, manager)
-        self.log = logging.getLogger('custodian.azure.storage')
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()
