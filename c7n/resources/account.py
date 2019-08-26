@@ -24,7 +24,6 @@ from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
@@ -35,7 +34,7 @@ from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema, generate_arn
 
 from c7n.resources.iam import CredentialReport
-
+from c7n.resources.securityhub import OtherResourcePostFinding
 
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')

@@ -57,7 +57,6 @@ from concurrent.futures import as_completed
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
-from c7n.actions.securityhub import OtherResourcePostFinding
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
@@ -72,6 +71,7 @@ from c7n.tags import universal_augment, register_universal_tags
 from c7n.utils import (
     local_session, type_schema, get_retry, chunks, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
+from c7n.resources.securityhub import OtherResourcePostFinding
 
 log = logging.getLogger('custodian.rds')
 
