@@ -65,10 +65,10 @@ class Host:
         load_resources()
 
         self.session = local_session(Session)
-        self.host_subscription_session = self.session
-        host_subscription_id = ResourceIdParser.get_subscription_id(event_queue_id)
-        if host_subscription_id != self.session.subscription_id:
-            self.host_subscription_session = Session(subscription_id=host_subscription_id)
+        self.storage_session = self.session
+        storage_subscription_id = ResourceIdParser.get_subscription_id(event_queue_id)
+        if storage_subscription_id != self.session.subscription_id:
+            self.storage_session = Session(subscription_id=storage_subscription_id)
 
         # Load configuration
         self.options = Host.build_options(output_dir, log_group, metrics)
@@ -122,7 +122,7 @@ class Host:
         """
         if not self.policy_blob_client:
             self.policy_blob_client = Storage.get_blob_client_by_uri(self.policy_storage_uri,
-                                                                     self.host_subscription_session)
+                                                                     self.storage_session)
         (client, container, prefix) = self.policy_blob_client
 
         try:
@@ -319,7 +319,7 @@ class Host:
         if not self.queue_service:
             self.queue_service = Storage.get_queue_client_by_storage_account(
                 self.queue_storage_account,
-                self.host_subscription_session)
+                self.storage_session)
 
         while True:
             try:
@@ -391,7 +391,7 @@ class Host:
         as this is what we require for event subscriptions
         """
 
-        storage_client = self.host_subscription_session \
+        storage_client = self.storage_session \
             .client('azure.mgmt.storage.StorageManagementClient')
 
         account = storage_client.storage_accounts.get_properties(
