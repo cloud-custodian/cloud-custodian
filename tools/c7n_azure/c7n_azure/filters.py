@@ -727,15 +727,21 @@ class CostFilter(ValueFilter):
     separately (e.g. SQL Server and SQL Server Databases). Warning message is logged if we detect
     different currencies.
 
-    Timeframe can be either number of days before today or one of:
+    Timeframe options:
 
-    WeekToDate,
-    MonthToDate,
-    YearToDate,
-    TheLastWeek,
-    TheLastMonth,
-    TheLastYear
+      - Number of days before today
 
+      - All days in current calendar period until today:
+
+        - ``WeekToDate``
+        - ``MonthToDate``
+        - ``YearToDate``
+
+      - All days in the previous calendar period:
+
+        - ``TheLastWeek``
+        - ``TheLastMonth``
+        - ``TheLastYear``
 
     :examples:
 

@@ -465,3 +465,44 @@ class StorageSettingsUtilities(object):
 
         return getattr(client, 'set_{}_service_properties'
                        .format(storage_type))(logging=logging_settings)
+
+
+@Storage.action_registry.register('require-secure-transfer')
+class RequireSecureTransferAction(AzureBaseAction):
+    """Action that updates the Secure Transfer setting on Storage Accounts.
+    Programmatically, this will be seen by updating the EnableHttpsTrafficOnly setting
+
+    :example:
+
+       Turns on Secure transfer required for all storage accounts. This will reject requests that
+       use HTTP to your storage accounts.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: require-secure-transfer
+              resource: azure.storage
+              actions:
+              - type: require-secure-transfer
+                value: True
+    """
+
+    # Default to true assuming user wants secure connection
+    schema = type_schema(
+        'require-secure-transfer',
+        **{
+            'value': {'type': 'boolean', "default": True},
+        })
+
+    def __init__(self, data, manager=None):
+        super(RequireSecureTransferAction, self).__init__(data, manager)
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.storage_accounts.update(
+            resource['resourceGroup'],
+            resource['name'],
+            StorageAccountUpdateParameters(enable_https_traffic_only=self.data.get('value'))
+        )
