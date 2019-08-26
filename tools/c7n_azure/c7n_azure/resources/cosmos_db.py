@@ -118,9 +118,6 @@ class CosmosDBChildResource(ChildResourceManager):
         raise_on_exception = False
         annotate_parent = True
 
-        id = '_rid'
-        name = 'id'
-
         default_report_fields = (
             'id',
             '_ts',

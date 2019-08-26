@@ -99,7 +99,6 @@ class KeyVaultKeys(ChildResourceManager):
         raise_on_exception = False
 
         id = 'kid'
-        name = 'kid'
 
         default_report_fields = (
             'kid',
