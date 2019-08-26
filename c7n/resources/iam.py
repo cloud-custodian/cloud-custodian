@@ -32,7 +32,6 @@ from botocore.exceptions import ClientError
 
 
 from c7n.actions import BaseAction
-from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.filters.multiattr import MultiAttrFilter
@@ -44,6 +43,7 @@ from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
 from c7n.utils import local_session, type_schema, chunks, filter_empty, QueryParser
 
 from c7n.resources.aws import Arn
+from c7n.resources.securityhub import OtherResourcePostFinding
 
 
 @resources.register('iam-group')
