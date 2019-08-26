@@ -118,6 +118,12 @@ class CosmosDBChildResource(ChildResourceManager):
         raise_on_exception = False
         annotate_parent = True
 
+        default_report_fields = (
+            'id',
+            '_ts',
+            '_self'
+        )
+
     @staticmethod
     @lru_cache()
     def get_cosmos_key(resource_group, resource_name, client, readonly=True):
