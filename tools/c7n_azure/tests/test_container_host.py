@@ -48,11 +48,12 @@ class ContainerHostTest(BaseTest):
         self.assertEqual('test_path', result['output_dir'])
         self.assertEqual(None, result['metrics'])
 
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('tempfile.mkdtemp', return_value='test_path')
-    def test_init(self, _1, _2, _3, _4):
+    def test_init(self, _1, _2, _3, _4, _5):
         host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
         jobs = host.scheduler.get_jobs()
         update_policy_job = [j for j in jobs if j.id == 'update_policies']
@@ -63,11 +64,12 @@ class ContainerHostTest(BaseTest):
         self.assertIsNotNone(update_policy_job)
         self.assertIsNotNone(poll_queue_job)
 
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
-    def test_update_policies(self, get_blob_client_mock, _1, _2, _3):
+    def test_update_policies(self, get_blob_client_mock, _1, _2, _3, _4):
         # mock blob list call
         client_mock = Mock()
         client_mock.list_blobs.return_value = [
@@ -98,11 +100,12 @@ class ContainerHostTest(BaseTest):
         self.assertEqual(1, len([j for j in jobs if j.id == 'blob1.yml']))
         self.assertEqual(1, len([j for j in jobs if j.id == 'blob2.YAML']))
 
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
-    def test_update_policies_add_remove(self, get_blob_client_mock, _1, _2, _3):
+    def test_update_policies_add_remove(self, get_blob_client_mock, _1, _2, _3, _4):
         """
         Run a series of add/update/removal of policy blobs
         and verify jobs and caches are updated correctly
@@ -186,11 +189,12 @@ class ContainerHostTest(BaseTest):
         jobs = host.scheduler.get_jobs()
         self.assertEqual(0, len([j for j in jobs if j.func == host.run_policy]))
 
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
-    def test_update_policies_create_content_hash(self, get_blob_client_mock, _1, _2, _3):
+    def test_update_policies_create_content_hash(self, get_blob_client_mock, _1, _2, _3, _4):
         client_mock = Mock()
         client_mock.list_blobs.return_value = [
             ContainerHostTest.get_mock_blob("blob1.yml", None),  # no hash
@@ -220,12 +224,13 @@ class ContainerHostTest(BaseTest):
         jobs = host.scheduler.get_jobs()
         self.assertEqual(1, len([j for j in jobs if j.id == 'blob1.yml']))
 
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
     def test_update_policies_ignore_policy_if_failed_to_create_content_hash(self,
-            get_blob_client_mock, _1, _2, _3):
+            get_blob_client_mock, _1, _2, _3, _4):
         client_mock = Mock()
         client_mock.list_blobs.return_value = [
             ContainerHostTest.get_mock_blob("blob1.yml", None),  # no hash
@@ -260,7 +265,7 @@ class ContainerHostTest(BaseTest):
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
     @patch('c7n_azure.container_host.host.Host.update_policies')
     @patch('c7n_azure.container_host.host.AzureEventSubscription')
-    @patch('c7n_azure.container_host.host.StringInAdvancedFilter')
+    @patch('c7n_azure.container_host.host.EventSubscriptionFilter')
     def test_update_event_subscriptions(self, event_filter_mock, _0, _1, _2, _3, _4):
         host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
 
@@ -300,17 +305,16 @@ class ContainerHostTest(BaseTest):
         }
 
         # Verify we get all three events with no duplicates
-        host.update_event_subscriptions()
-        event_filter_mock.assert_called_with(key='Data.OperationName', values={
-            'Microsoft.KeyVault/vaults/write',
-            'Microsoft.Network/virtualNetworks/write',
-            'Microsoft.Resources/subscriptions/resourceGroups/write'})
+        host.update_event_subscription()
+        event_filter_mock.assert_called_with(
+            included_event_types=['Microsoft.Resources.ResourceWriteSuccess'])
 
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage')
     @patch('c7n_azure.container_host.host.Host.run_policies_for_event')
-    def test_poll_queue(self, run_policy_mock, storage_mock, _1, _2):
+    def test_poll_queue(self, run_policy_mock, storage_mock, _1, _2, _3):
         host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
 
         host.policies = {
@@ -363,11 +367,12 @@ class ContainerHostTest(BaseTest):
         host.poll_queue()
         self.assertEqual(1, run_policy_mock.call_count)
 
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage')
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.BlockingScheduler.add_job')
-    def test_run_policy_for_event(self, add_job_mock, _0, _1, _2):
+    def test_run_policy_for_event(self, add_job_mock, _0, _1, _2, _3):
         host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
 
         host.policies = {
