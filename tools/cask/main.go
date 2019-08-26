@@ -46,11 +46,13 @@ const defaultImageName string = "cloudcustodian/c7n:latest"
 const imageOverrideEnv = "CUSTODIAN_IMAGE"
 const updateInterval = time.Hour
 
+var version string
+
 func main() {
 	// Select image from env or default
 	activeImage := getDockerImageName()
 
-	fmt.Printf("Custodian Cask (%v)\n", activeImage)
+	fmt.Printf("Custodian Cask %v (%v)\n", version, activeImage)
 
 	ctx := context.Background()
 
