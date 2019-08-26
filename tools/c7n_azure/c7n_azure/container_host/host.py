@@ -25,8 +25,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from azure.common import AzureHttpError
 from azure.mgmt.eventgrid.models import (
-    EventSubscriptionFilter, StorageQueueEventSubscriptionDestination,
-    StringInAdvancedFilter)
+    EventSubscriptionFilter, StorageQueueEventSubscriptionDestination)
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
@@ -81,8 +80,8 @@ class Host:
 
         self.queue_service = None
 
-        # Track required event subscription updates
-        self.require_event_update = False
+        # Register event subscription
+        self.update_event_subscription()
 
         # Policy cache and dictionary
         self.policy_cache = tempfile.mkdtemp()
@@ -163,9 +162,6 @@ class Host:
         # Assign our copy back over the original
         self.policies = policies_copy
 
-        if self.require_event_update:
-            self.update_event_subscriptions()
-
     def _get_new_blobs(self, blobs):
         new_blobs = []
         for blob in blobs:
@@ -218,13 +214,11 @@ class Host:
                         p.validate()
                         policies.update({p.name: {'policy': p}})
 
-                        # Update periodic and set event update flag
+                        # Update periodic
                         policy_mode = p.data.get('mode', {}).get('type')
                         if policy_mode == CONTAINER_TIME_TRIGGER_MODE:
                             self.update_periodic(p)
-                        elif policy_mode == CONTAINER_EVENT_TRIGGER_MODE:
-                            self.require_event_update = True
-                        else:
+                        elif policy_mode != CONTAINER_EVENT_TRIGGER_MODE:
                             log.warning(
                                 "Unsupported policy mode for Azure Container Host: {}. "
                                 "{} will not be run. "
@@ -244,7 +238,7 @@ class Host:
         """
         Unload a policy file that has changed or been removed.
         Take the copy from disk and pop all policies from dictionary
-        and update scheduled jobs and event registrations.
+        and update scheduled jobs.
         """
         with open(path, "r") as stream:
             try:
@@ -265,13 +259,6 @@ class Host:
 
         for name in periodic_to_remove:
             self.scheduler.remove_job(job_id=name)
-
-        # update event
-        event_names = \
-            [p['name'] for p in policy_config['policies'] if p.get('mode', {}).get('events')]
-
-        if event_names:
-            self.require_event_update = True
 
         os.unlink(path)
 
@@ -294,35 +281,25 @@ class Host:
                                replace_existing=True,
                                misfire_grace_time=20)
 
-    def update_event_subscriptions(self):
+    def update_event_subscription(self):
         """
-        Find unique list of all subscribed events and
-        update a single event subscription to channel
-        them to an Azure Queue.
+        Create a single event subscription to channel
+        all events to an Azure Queue.
         """
         log.info('Updating event grid subscriptions')
         destination = \
             StorageQueueEventSubscriptionDestination(resource_id=self.queue_storage_account.id,
                                                      queue_name=self.event_queue_name)
 
-        # Get total unique event list to use in event subscription
-        policy_items = self.policies.items()
-        events_lists = [v['policy'].data.get('mode', {}).get('events') for n, v in policy_items]
-        flat_events = [e for l in events_lists if l for e in l if e]
-        resolved_events = AzureEvents.get_event_operations(flat_events)
-        unique_events = set(resolved_events)
-
-        # Build event filter strings
-        advance_filter = StringInAdvancedFilter(key='Data.OperationName', values=unique_events)
-        event_filter = EventSubscriptionFilter(advanced_filters=[advance_filter])
+        # Build event filter
+        event_filter = EventSubscriptionFilter(
+            included_event_types=['Microsoft.Resources.ResourceWriteSuccess'])
 
         # Update event subscription
         AzureEventSubscription.create(destination,
                                       self.event_queue_name,
                                       self.session.get_subscription_id(),
                                       self.session, event_filter)
-
-        self.require_event_update = False
 
     def poll_queue(self):
         """
