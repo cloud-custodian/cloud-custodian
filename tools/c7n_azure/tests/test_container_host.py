@@ -14,8 +14,11 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import os
 import shutil
+import tempfile
 
+import yaml
 from azure.common import AzureHttpError
 from azure.storage.queue.models import QueueMessage
 from mock import ANY, Mock, patch
@@ -418,6 +421,29 @@ class ContainerHostTest(BaseTest):
         host.policies = {}
         host.run_policies_for_event(message)
         self.assertFalse(add_job_mock.called)
+
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
+    @patch('c7n_azure.container_host.host.BlockingScheduler.start')
+    @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
+    @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
+    @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
+    @patch('yaml.safe_load', side_effect=yaml.YAMLError())
+    @patch('os.unlink')
+    def test_unload_policy_file_with_yaml_error(self,
+            os_unlink, yaml_safe_load, _1, _2, _3, _4, _5):
+        host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
+
+        # Create a bad yaml file
+        file_path = tempfile.mktemp(suffix=".yaml")
+        with open(file_path, 'w') as f:
+            f.write("bad yaml file")
+
+        result = host.unload_policy_file(file_path, None)
+        self.assertIsNone(result)
+        os_unlink.assert_called()
+
+        # Clean up the file
+        os.remove(file_path)
 
     @staticmethod
     def download_policy_blob(_, name, path):
