@@ -1,14 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-       "tenantId": {
-          "type": "string",
-          "metadata": {
-            "description": "The id of the azure ad tenant."
-          }
-        }
-    },
     "variables": {},
     "resources": [
         {
@@ -23,7 +15,7 @@
                     "family": "A",
                     "name": "Standard"
                 },
-                "tenantId": "[parameters('tenantId')]",
+                "tenantId": "[subscription().tenantId]",
                 "accessPolicies": [],
                 "enabledForDeployment": false,
                 "enabledForDiskEncryption": false,
