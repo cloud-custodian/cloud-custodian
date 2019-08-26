@@ -325,8 +325,8 @@ class Host:
         # Update event subscription
         AzureEventSubscription.create(destination,
                                       self.event_queue_name,
-                                      self.host_subscription_session.get_subscription_id(),
-                                      self.host_subscription_session, event_filter)
+                                      self.session.get_subscription_id(),
+                                      self.session, event_filter)
 
         self.require_event_update = False
 
