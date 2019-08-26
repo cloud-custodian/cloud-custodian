@@ -10,6 +10,11 @@ image:
 defaultEnvironment:
   AZURE_TENANT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
+# Default values for environment variables that are
+# stored as Secrets instead of directly passed 
+# environment variables
+defaultSecretEnvironment: {}
+
 # Provide 1 or more sets of environment variables
 # Each one will create a new deployment, each 
 # targetting a subscription
@@ -21,7 +26,8 @@ subscriptionHosts:
     environment:
       AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       AZURE_CLIENT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-      AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       AZURE_CONTAINER_STORAGE: "https://storageAccount.blob.core.windows.net/policyContainerName"
       AZURE_EVENT_QUEUE_NAME: "example-event-queue"
       AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/resourceGroupName/providers/Microsoft.Storage/storageAccounts/storageAccount"
+    secretEnvironment: 
+      AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
