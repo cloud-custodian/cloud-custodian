@@ -56,7 +56,7 @@ class AzurePolicyModeTest(BaseTest):
                 'resource': 'azure.vm',
                 'mode':
                     {'type': FUNCTION_TIME_TRIGGER_MODE,
-                     'schedule': '0 * /5 * * * *',
+                     'schedule': '0 */5 * * * *',
                      'provision-options': {
                          'servicePlan': {
                              'name': 'test-cloud-custodian',
@@ -183,7 +183,7 @@ class AzurePolicyModeTest(BaseTest):
                 'resource': 'azure.vm',
                 'mode':
                     {'type': CONTAINER_TIME_TRIGGER_MODE,
-                     'schedule': '* /5 * * * *'}
+                     'schedule': '*/5 * * * *'}
             })
             self.assertTrue(p)
 
