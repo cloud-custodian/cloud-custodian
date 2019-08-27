@@ -43,7 +43,7 @@ class PostgresqlDatabase(ChildArmResourceManager):
         parent_manager_name = 'postgresqlserver'
         resource_type = 'Microsoft.DBforPostgreSQL/servers/databases'
 
-        enable_tag_operations = False  # GH Issue #4543 
+        enable_tag_operations = False
 
         @classmethod
         def extra_args(cls, parent_resource):
