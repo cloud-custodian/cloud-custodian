@@ -19,7 +19,6 @@ import zlib
 import jmespath
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
-from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
@@ -29,6 +28,7 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
+from c7n.resources.securityhub import OtherResourcePostFinding
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
 

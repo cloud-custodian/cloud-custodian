@@ -69,6 +69,14 @@ func TestProcessOutputArgs(t *testing.T) {
 		{name: "long_equal",
 			args: []string{"run", "--output-dir=.", "foo.yaml"},
 			want: []string{"run", "-s", pwd, "foo.yaml"}},
+
+		{name: "other_params_grid",
+			args: []string{"report", "--output-dir=.", "foo.yaml", "--format", "grid"},
+			want: []string{"report", "-s", pwd, "foo.yaml", "--format", "grid"}},
+
+		{name: "other_params_dryrun",
+			args: []string{"run", "--output-dir=.", "foo.yaml", "--dry-run"},
+			want: []string{"run", "-s", pwd, "foo.yaml", "--dry-run"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

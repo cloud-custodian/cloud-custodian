@@ -1,4 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
+# Copyright 2018-2019 Amazon.com, Inc. or its affiliates.
+# All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,21 +12,220 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
-
-import hashlib
 import jmespath
 import json
+import hashlib
+import logging
 
-from .core import BaseAction
-from c7n.utils import (
-    type_schema, local_session, chunks, dumps, filter_empty, get_partition)
+from c7n.actions import Action
+from c7n.filters import Filter
 from c7n.exceptions import PolicyValidationError
-
-from c7n.manager import resources as aws_resources
+from c7n.manager import resources
+from c7n.policy import LambdaMode, execution
+from c7n.utils import (
+    local_session, type_schema,
+    chunks, dumps, filter_empty, get_partition
+)
 from c7n.version import version
+
+from .aws import AWS
+
+log = logging.getLogger('c7n.securityhub')
+
+
+class SecurityHubFindingFilter(Filter):
+    """Check if there are Security Hub Findings related to the resources
+    """
+    schema = type_schema(
+        'finding',
+        # Many folks do an aggregator region, allow them to use that
+        # for filtering.
+        region={'type': 'string'},
+        query={'type': 'object'})
+    schema_alias = True
+    permissions = ('securityhub:GetFindings',)
+    annotation_key = 'c7n:finding-filter'
+    query_shape = 'AwsSecurityFindingFilters'
+
+    def validate(self):
+        query = self.data.get('query')
+        if query:
+            from c7n.resources import aws
+            aws.shape_validate(query, self.query_shape, 'securityhub')
+
+    def process(self, resources, event=None):
+        client = local_session(
+            self.manager.session_factory).client(
+                'securityhub', region_name=self.data.get('region'))
+        found = []
+        params = dict(self.data.get('query', {}))
+
+        for r_arn, resource in zip(self.manager.get_arns(resources), resources):
+            params['ResourceId'] = [{"Value": r_arn, "Comparison": "EQUALS"}]
+            findings = client.get_findings(Filters=params).get("Findings")
+            if len(findings) > 0:
+                resource[self.annotation_key] = findings
+                found.append(resource)
+        return found
+
+    @classmethod
+    def register_resources(klass, registry, resource_class):
+        """ meta model subscriber on resource registration.
+
+        SecurityHub Findings Filter
+        """
+        for rtype, resource_manager in registry.items():
+            if not resource_manager.has_arn():
+                continue
+            if 'post-finding' in resource_manager.action_registry:
+                continue
+            resource_class.filter_registry.register('finding', klass)
+
+
+resources.subscribe(resources.EVENT_REGISTER, SecurityHubFindingFilter.register_resources)
+
+
+@execution.register('hub-action')
+@execution.register('hub-finding')
+class SecurityHub(LambdaMode):
+    """
+    Execute a policy lambda in response to security hub finding event or action.
+
+    .. example:
+
+    This policy will provision a lambda and security hub custom action.
+    The action can be invoked on a finding or insight result (collection
+    of findings). The action name will have the resource type prefixed as
+    custodian actions are resource specific.
+
+    .. code-block: yaml
+
+       policy:
+         - name: remediate
+           resource: aws.ec2
+           mode:
+             type: hub-action
+             role: MyRole
+           actions:
+            - snapshot
+            - type: set-instance-profile
+              name: null
+            - stop
+
+    .. example:
+
+    This policy will provision a lambda that will process high alert findings from
+    guard duty (note custodian also has support for guard duty events directly).
+
+    .. code-block: yaml
+
+       policy:
+         - name: remediate
+           resource: aws.iam
+           filters:
+             - type: event
+               key: detail.findings[].ProductFields.aws/securityhub/ProductName
+               value: GuardDuty
+             - type: event
+               key: detail.findings[].ProductFields.aws/securityhub/ProductName
+               value: GuardDuty
+           actions:
+             - remove-keys
+
+    Note, for custodian we support additional resources in the finding via the Other resource,
+    so these modes work for resources that security hub doesn't natively support.
+
+    https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cloudwatch-events.html
+    """
+
+    schema = type_schema(
+        'hub-finding', aliases=('hub-action',),
+        rinherit=LambdaMode.schema)
+
+    ActionFinding = 'Security Hub Findings - Custom Action'
+    ActionInsight = 'Security Hub Insight Results'
+    ImportFinding = 'Security Hub Findings - Imported'
+
+    handlers = {
+        ActionFinding: 'resolve_action_finding',
+        ActionInsight: 'resolve_action_insight',
+        ImportFinding: 'resolve_import_finding'
+    }
+
+    def resolve_findings(self, findings):
+        rids = set()
+        for f in findings:
+            for r in f['Resources']:
+                # Security hub invented some new arn format for a few resources...
+                # detect that and normalize to something sane.
+                if r['Id'].startswith('AWS') and r['Type'] == 'AwsIamAccessKey':
+                    rids.add('arn:aws:iam::%s:user/%s' % (
+                        f['AwsAccountId'],
+                        r['Details']['AwsIamAccessKey']['UserName']))
+                elif not r['Id'].startswith('arn'):
+                    log.warning("security hub unknown id:%s rtype:%s",
+                                r['Id'], r['Type'])
+                else:
+                    rids.add(r['Id'])
+        return rids
+
+    def resolve_action_insight(self, event):
+        rtype = event['detail']['resultType']
+        rids = [list(i.keys())[0] for i in event['detail']['insightResults']]
+        client = local_session(
+            self.policy.session_factory).client('securityhub')
+        insights = client.get_insights(
+            InsightArns=[event['detail']['insightArn']]).get(
+                'Insights', ())
+        if not insights or len(insights) > 1:
+            return []
+        insight = insights.pop()
+        params = {}
+        params['Filters'] = insight['Filters']
+        params['Filters'][rtype] = [
+            {'Comparison': 'EQUALS', 'Value': r} for r in rids]
+        findings = client.get_findings(**params).get('Findings', ())
+        return self.resolve_findings(findings)
+
+    def resolve_action_finding(self, event):
+        return self.resolve_findings(event['detail']['findings'])
+
+    def resolve_import_finding(self, event):
+        return self.resolve_findings(event['detail']['findings'])
+
+    def resolve_resources(self, event):
+        # For centralized setups in a hub aggregator account
+        self.assume_member(event)
+
+        event_type = event['detail-type']
+        arn_resolver = getattr(self, self.handlers[event_type])
+        arns = arn_resolver(event)
+
+        # Lazy import to avoid aws sdk runtime dep in core
+        from c7n.resources.aws import Arn
+        resource_map = {Arn.parse(r) for r in arns}
+
+        # sanity check on finding resources matching policy resource
+        # type's service.
+        if self.policy.resource_manager.type != 'account':
+            log.info(
+                "mode:security-hub resolve resources %s", list(resource_map))
+            if not resource_map:
+                return []
+            resource_arns = [
+                r for r in resource_map
+                if r.service == self.policy.resource_manager.resource_type.service]
+            resources = self.policy.resource_manager.get_resources(
+                [r.resource for r in resource_arns])
+        else:
+            resources = self.policy.resource_manager.get_resources([])
+            resources[0]['resource-arns'] = resource_arns
+        return resources
 
 
 FindingTypes = {
@@ -40,7 +240,7 @@ FindingTypes = {
 SECHUB_VALUE_SIZE_LIMIT = 1024
 
 
-class PostFinding(BaseAction):
+class PostFinding(Action):
     """Report a finding to AWS Security Hub.
 
     Custodian acts as a finding provider, allowing users to craft
@@ -346,5 +546,6 @@ class OtherResourcePostFinding(PostFinding):
             resource_manager.action_registry.register('post-finding', klass)
 
 
-aws_resources.subscribe(
-    aws_resources.EVENT_FINAL, OtherResourcePostFinding.register_resource)
+AWS.resources.subscribe(
+    AWS.resources.EVENT_FINAL,
+    OtherResourcePostFinding.register_resource)
