@@ -17,10 +17,10 @@ Linux
 sudo sh -c 'wget -q https://cloudcustodian.io/downloads/custodian-cask/linux-latest/custodian-cask -P /usr/local/bin && chmod +x /usr/local/bin/custodian-cask'
 ```
 
-Darwin
+MacOS (Darwin)
 
 ```shell
-sudo sh -c 'wget -q https://cloudcustodian.io/downloads/custodian-cask/darwin-latest/custodian-cask -P /usr/local/bin && chmod +x /usr/local/bin/custodian-cask'
+sudo sh -c '(cd /usr/local/bin && curl -fsSLO https://cloudcustodian.io/downloads/custodian-cask/darwin-latest/custodian-cask && chmod +x /usr/local/bin/custodian-cask)'
 ```
 
 Windows (cmd.exe)
