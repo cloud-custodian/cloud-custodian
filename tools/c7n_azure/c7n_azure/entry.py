@@ -64,6 +64,8 @@ import c7n_azure.resources.appserviceplan
 import c7n_azure.resources.dns_zone
 import c7n_azure.resources.event_hub
 import c7n_azure.resources.record_set  # noqa: F401
+import c7n_azure.resources.postgresql_server
+import c7n_azure.resources.postgresql_database
 
 
 def initialize_azure():
