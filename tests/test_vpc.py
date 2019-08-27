@@ -2620,6 +2620,26 @@ class FlowLogsTest(BaseTest):
         ]
         self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
 
+    def test_vpc_set_flow_logs_cw_validation(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "c7n-vpc-flow-logs-cloud-watch",
+                "resource": "vpc",
+                "filters": [
+                    {"tag:Name": "FlowLogTest"}, {"type": "flow-logs", "enabled": False}
+                ],
+                "actions": [
+                    {
+                        "type": "set-flow-log",
+                        "LogDestinationType": "cloud-watch-logs",
+                        "LogGroupName": "/custodian/vpc_logs",
+                    }
+                ],
+            }
+        )
+
     def test_vpc_delete_flow_logs(self):
         session_factory = self.replay_flight_data("test_vpc_delete_flow_logs")
         p = self.load_policy(
