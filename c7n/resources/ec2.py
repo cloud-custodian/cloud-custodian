@@ -1867,9 +1867,16 @@ class LaunchTemplate(query.QueryResourceManager):
         results = []
         # We may end up fetching duplicates on $Latest and $Version
         for tid, tversions in t_versions.items():
-            ltv = client.describe_launch_template_versions(
-                LaunchTemplateId=tid, Versions=tversions).get(
-                    'LaunchTemplateVersions')
+            try:
+                ltv = client.describe_launch_template_versions(
+                    LaunchTemplateId=tid, Versions=tversions).get(
+                        'LaunchTemplateVersions')
+            except ClientError as e:
+                if e.response['Error']['Code'] == "InvalidLaunchTemplateId.NotFound":
+                    continue
+                if e.response['Error']['Code'] == "InvalidLaunchTemplateId.VersionNotFound":
+                    continue
+                raise
             if not tversions:
                 tversions = [str(t['VersionNumber']) for t in ltv]
             for tversion, t in zip(tversions, ltv):

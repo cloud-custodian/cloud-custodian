@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchTemplateVersions": [
+            {
+                "LaunchTemplateId": "lt-0877401c93c294001",
+                "LaunchTemplateName": "test",
+                "VersionNumber": 3,
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 27,
+                    "hour": 19,
+                    "minute": 24,
+                    "second": 34,
+                    "microsecond": 0
+                },
+                "CreatedBy": "arn:aws:iam::644160558196:user/Samson.Shi@capitalone.com",
+                "DefaultVersion": true,
+                "LaunchTemplateData": {
+                    "ImageId": "ami-04bfee437f38a691e",
+                    "InstanceType": "t1.micro",
+                    "SecurityGroupIds": [
+                        "sg-00cd07381bc482d51"
+                    ]
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "6d4c6484-8189-4db9-9776-942ce3cffadf",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "accept-encoding",
+                "date": "Fri, 23 Aug 2019 00:23:20 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
