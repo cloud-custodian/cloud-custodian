@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"configuration\":{\"handler\":\"custodian_policy.run\",\"role\":\"arn:aws:iam::644160558196:role/Nuke\",\"functionName\":\"custodian-nuke-emr\",\"tracingConfig\":{\"mode\":\"PassThrough\"},\"runtime\":\"python2.7\",\"description\":\"Policy to wipe out existing EMR clusters under a\\ngiven account.\\n\",\"codeSize\":1503191.0,\"version\":\"$LATEST\",\"timeout\":60.0,\"revisionId\":\"8061bd24-42cd-4af1-a22a-b8394810720f\",\"codeSha256\":\"tuQfxxupmcWsnp2itiN3TIMQ+U/vTSshwiGy3mpxy30\\u003d\",\"memorySize\":512.0,\"layers\":[],\"lastModified\":\"2017-09-05T17:22:39.010+0000\",\"functionArn\":\"arn:aws:lambda:us-east-1:644160558196:function:custodian-nuke-emr\"},\"supplementaryConfiguration\":{\"Policy\":\"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Id\\\":\\\"default\\\",\\\"Statement\\\":[{\\\"Sid\\\":\\\"custodian-nuke-emr\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"events.amazonaws.com\\\"},\\\"Action\\\":\\\"lambda:InvokeFunction\\\",\\\"Resource\\\":\\\"arn:aws:lambda:us-east-1:644160558196:function:custodian-nuke-emr\\\",\\\"Condition\\\":{\\\"ArnLike\\\":{\\\"AWS:SourceArn\\\":\\\"arn:aws:events:us-east-1:644160558196:rule/custodian-nuke-emr\\\"}}}]}\",\"Concurrency\":{\"reservedConcurrentExecutions\":5.0},\"Tags\":{}}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "f8a17281-c814-4a18-8bd5-b7011ee00b6b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f8a17281-c814-4a18-8bd5-b7011ee00b6b",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1378",
+                "date": "Mon, 29 Jul 2019 20:55:51 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

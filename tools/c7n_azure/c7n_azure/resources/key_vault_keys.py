@@ -88,6 +88,8 @@ class KeyVaultKeys(ChildResourceManager):
     """
 
     class resource_type(ChildTypeInfo):
+        doc_groups = ['Security']
+
         resource = constants.RESOURCE_VAULT
         service = 'azure.keyvault'
         client = 'KeyVaultClient'
@@ -96,9 +98,24 @@ class KeyVaultKeys(ChildResourceManager):
         parent_manager_name = 'keyvault'
         raise_on_exception = False
 
+        id = 'kid'
+
+        default_report_fields = (
+            'kid',
+            'attributes.enabled',
+            'attributes.exp',
+            'attributes.recoveryLevel'
+        )
+
         @classmethod
         def extra_args(cls, parent_resource):
             return {'vault_base_url': generate_key_vault_url(parent_resource['name'])}
+
+    def augment(self, resources):
+        resources = super(KeyVaultKeys, self).augment(resources)
+        # When KeyVault contains certificates, it creates corresponding key and secret objects to
+        # store cert data. They are managed by KeyVault it is not possible to do any actions.
+        return [r for r in resources if not r.get('managed')]
 
 
 @KeyVaultKeys.filter_registry.register('keyvault')

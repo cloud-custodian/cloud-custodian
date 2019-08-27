@@ -33,6 +33,8 @@ class DnsZone(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Networking']
+
         service = 'azure.mgmt.dns'
         client = 'DnsManagementClient'
         enum_spec = ('zones', 'list', {})

@@ -61,6 +61,8 @@ class WebApp(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Compute', 'Web']
+
         service = 'azure.mgmt.web'
         client = 'WebSiteManagementClient'
         enum_spec = ('web_apps', 'list', None)

@@ -61,6 +61,8 @@ class LoadBalancer(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Networking']
+
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('load_balancers', 'list_all', None)
@@ -73,17 +75,19 @@ class FrontEndIp(RelatedResourceFilter):
 
     :example:
 
-        .. code-block:: yaml
+    Find all load balancers with a ipv6 public front end.
 
-            policies:
-               - name: loadbalancer-with-ipv6-frontend
-                 resource: azure.loadbalancer
-                 filters:
-                    - type: frontend-public-ip
-                      key: properties.publicIPAddressVersion
-                      op: in
-                      value_type: normalize
-                      value: "ipv6"
+    .. code-block:: yaml
+
+        policies:
+           - name: loadbalancer-with-ipv6-frontend
+             resource: azure.loadbalancer
+             filters:
+                - type: frontend-public-ip
+                  key: properties.publicIPAddressVersion
+                  op: in
+                  value_type: normalize
+                  value: "ipv6"
     """
 
     schema = type_schema('frontend-public-ip', rinherit=ValueFilter.schema)

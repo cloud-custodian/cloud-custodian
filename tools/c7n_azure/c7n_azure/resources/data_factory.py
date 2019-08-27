@@ -40,6 +40,8 @@ class DataFactory(ArmResourceManager):
 
     """
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Analytics']
+
         service = 'azure.mgmt.datafactory'
         client = 'DataFactoryManagementClient'
         enum_spec = ('factories', 'list', None)

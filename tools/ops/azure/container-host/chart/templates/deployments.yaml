@@ -1,0 +1,37 @@
+{{- range $host := .Values.subscriptionHosts }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ $host.name }}"
+  labels:
+    {{- include "azureContainerHostLabels" $host | nindent 4 }}
+    {{ template "azureTargetSubscriptionLabel" $host }}
+    cloudcustodian.io/release-name: "{{ $.Release.Name }}"
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      {{- include "azureContainerHostLabels" $host | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "azureContainerHostLabels" $host | nindent 8}}
+        {{ template "azureTargetSubscriptionLabel" $host }}
+    spec:
+      containers:
+      - name: "{{ $host.name }}"
+        image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+        imagePullPolicy: "{{ $.Values.image.pullPolicy }}"
+        env: 
+        {{- $env := merge $host.environment $.Values.defaultEnvironment }}
+        {{- range $name, $value := $env }}
+        - name: {{ $name }}
+          value: {{ $value }}
+        {{- end }}
+        command: 
+          - "/usr/local/bin/python3"
+        args:
+          - "-m"
+          - "c7n_azure.container_host.host"
+{{- end -}}

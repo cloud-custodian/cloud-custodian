@@ -255,7 +255,7 @@ one of the following keys:
 - account_id
 - assume_role
 - log_group
-- metrics_enabled
+- metrics
 - output_dir
 - cache_period
 - dryrun
@@ -273,7 +273,7 @@ different account using assume_role. A policy definition for this looks like:
             role: arn:aws:iam::123456789012:role/lambda-role
             execution-options:
               assume_role: arn:aws:iam::210987654321:role/target-role
-              metrics_enabled: false
+              metrics: aws
         resource: ec2
         filters:
           - "tag:Custodian": present

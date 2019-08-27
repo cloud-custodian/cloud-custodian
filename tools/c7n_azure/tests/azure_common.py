@@ -16,6 +16,7 @@ import email.utils as eut
 import json
 import os
 import re
+from functools import wraps
 
 import msrest.polling
 from azure_serializer import AzureSerializer
@@ -74,6 +75,35 @@ ACTIVITY_LOG_RESPONSE = {
     ]
 }
 
+SERVICE_TAG_RESPONSE = {
+    "values": [
+        {
+            "name": "ApiManagement",
+            "id": "ApiManagement",
+            "properties": {
+                "addressPrefixes": [
+                    "13.69.64.76/31",
+                    "13.69.66.144/28",
+                    "23.101.67.140/32",
+                    "51.145.179.78/32",
+                    "137.117.160.56/32"
+                ]
+            }
+        },
+        {
+            "name": "ApiManagement.WestUS",
+            "id": "ApiManagement.WestUS",
+            "properties": {
+                "addressPrefixes": [
+                    "13.64.39.16/32",
+                    "40.112.242.148/31",
+                    "40.112.243.240/28"
+                ]
+            }
+        }
+    ]
+}
+
 
 class AzureVCRBaseTest(VCRTestCase):
 
@@ -115,11 +145,23 @@ class AzureVCRBaseTest(VCRTestCase):
                         'expires',
                         'content-location']
 
+    def __init__(self, *args, **kwargs):
+        super(AzureVCRBaseTest, self).__init__(*args, **kwargs)
+        self.vcr_enabled = not os.environ.get('C7N_TEST_RUN_LIVE')
+
     def is_playback(self):
         # You can't do this in setup because it is actually required by the base class
         # setup (via our callbacks), but it is also not possible to do until the base class setup
         # has completed initializing the cassette instance.
-        return not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path)
+        cassette_exists = not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path)
+        return self.vcr_enabled and cassette_exists
+
+    def _get_cassette_name(self):
+        test_method = getattr(self, self._testMethodName)
+        name_override = getattr(test_method, 'cassette_name', None)
+        method_name = name_override or self._testMethodName
+        return '{0}.{1}.yaml'.format(self.__class__.__name__,
+                                     method_name)
 
     def _get_vcr_kwargs(self):
         return super(VCRTestCase, self)._get_vcr_kwargs(
@@ -214,6 +256,11 @@ class AzureVCRBaseTest(VCRTestCase):
         data = response['body']['data']
 
         if isinstance(data, dict):
+            # Replace service tag responses
+            if data.get('type', '') == 'Microsoft.Network/serviceTags':
+                response['body']['data'] = SERVICE_TAG_RESPONSE
+                return response
+
             # Replace AD graph responses
             odata_metadata = data.get('odata.metadata')
             if odata_metadata and "directoryObjects" in odata_metadata:
@@ -245,7 +292,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
     @staticmethod
     def _replace_subscription_id(s):
-        prefixes = ['(/|%2F)subscriptions(/|%2F)',
+        prefixes = ['(/|%2F)?subscriptions(/|%2F)',
                     '"subscription":\\s*"']
         regex = r"(?P<prefix>(%s))" \
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
@@ -330,6 +377,11 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                 self._tenant_patch.start()
                 self.addCleanup(self._tenant_patch.stop)
 
+            self._subscription_patch = patch('c7n_azure.session.Session.get_subscription_id',
+                                             return_value=DEFAULT_SUBSCRIPTION_ID)
+            self._subscription_patch.start()
+            self.addCleanup(self._subscription_patch.stop)
+
     def get_test_date(self, tz=None):
         header_date = self.cassette.responses[0]['headers'].get('date') \
             if self.cassette.responses else None
@@ -392,12 +444,20 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
 
 def arm_template(template):
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             template_file_path = os.path.dirname(__file__) + "/templates/" + template
             if not os.path.isfile(template_file_path):
                 return args[0].fail("ARM template {} is not found".format(template_file_path))
             return func(*args, **kwargs)
         return wrapper
+    return decorator
+
+
+def cassette_name(name):
+    def decorator(func):
+        func.cassette_name = name
+        return func
     return decorator
 
 

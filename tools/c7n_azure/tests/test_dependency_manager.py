@@ -77,9 +77,20 @@ class DependencyManagerTest(BaseTest):
         d = DependencyManager.get_dependency_packages_list(
             ['c7n-azure', 'c7n-azure'],
             ['azure-cli-core'])
-        self.assertTrue('azure-cli-core' not in d)
+
+        # expected dependencies
         self.assertTrue('adal' in d)
+
+        # excluded packages are missing
+        self.assertTrue('azure-cli-core' not in d)
+
+        # dependencies that are substrings of another are includes
+        self.assertTrue('applicationinsights' in d)
+        self.assertTrue('azure-mgmt-applicationinsights' in d)
+
+        # dependencies are sorted
         self.assertEqual(sorted(d), d)
+
         # Remove versions from all packages & make sure there is no duplicates in the list
         regex = "^[^<>~=]*"
         d_no_versions = [re.match(regex, p).group(0) for p in d]

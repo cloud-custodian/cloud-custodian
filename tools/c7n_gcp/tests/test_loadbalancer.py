@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from time import sleep
-
 from gcp_common import BaseTest, event_data
 
 
@@ -180,6 +179,36 @@ class LoadBalancingSslPolicyTest(BaseTest):
         self.assertEqual(len(instances), 1)
         self.assertEqual(instances[0]['kind'], 'compute#sslPolicy')
         self.assertEqual(instances[0]['name'], 'custodian-ssl-policiy-0')
+
+    def test_loadbalancer_ssl_policy_delete(self):
+        project_id = 'custodian-test-project-0'
+        session_factory = self.replay_flight_data('lb-ssl-policy-delete',
+                                                  project_id=project_id)
+        base_policy = {'name': 'lb-ssl-policy-delete',
+                       'resource': 'gcp.loadbalancer-ssl-policy'}
+
+        policy = self.load_policy(
+            dict(base_policy,
+                 filters=[{'type': 'value',
+                           'key': 'minTlsVersion',
+                           'op': 'ne',
+                           'value': 'TLS_1_2'}],
+                 actions=[{'type': 'delete'}]),
+            session_factory=session_factory)
+        resources = policy.run()
+        self.assertEqual(2, len(resources))
+        self.assertIsNot('TLS_1_2', resources[0]['minTlsVersion'])
+        self.assertIsNot('TLS_1_2', resources[1]['minTlsVersion'])
+
+        if self.recording:
+            sleep(1)
+
+        client = policy.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id})
+        items = result['items']
+        self.assertEqual(1, len(items))
+        self.assertEqual('TLS_1_2', items[0]['minTlsVersion'])
 
 
 class LoadBalancingSslCertificateTest(BaseTest):

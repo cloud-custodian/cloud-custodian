@@ -55,8 +55,8 @@ class KeyVault(ArmResourceManager):
 
     :example:
 
-    This policy will find all KeyVaults with an access of Service Principals not in the white list
-    that exceed read-only access
+    This policy will find all KeyVaults where Service Principals that
+    have access permissions that exceed `read-only`.
 
     .. code-block:: yaml
 
@@ -105,6 +105,8 @@ class KeyVault(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Security']
+
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
         enum_spec = ('vaults', 'list', None)

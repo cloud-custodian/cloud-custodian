@@ -89,8 +89,12 @@ class AzureStorageOutput(DirectoryOutput):
                         blob_name,
                         os.path.join(root, f))
                 except AzureHttpError as e:
-                    self.log.error("Error writing output. Confirm output storage URL is correct "
-                                   "and that 'Storage Blob Contributor' role is assigned. \n" +
+                    if e.status_code == 403:
+                        self.log.error("Access Error: Storage Blob Data Contributor Role "
+                                       "is required to write to Azure Blob Storage.")
+                    else:
+                        self.log.error("Error writing output. "
+                                       "Confirm output storage URL is correct. \n" +
                                    str(e))
 
                 self.log.debug("%s uploaded" % blob_name)
@@ -172,8 +176,7 @@ class AppInsightsLogHandler(LoggingHandler):
             self.client.track_exception(*record.exc_info, properties=properties)
             return
 
-        formatted_message = self.format(record)
-        self.client.track_trace(formatted_message, properties=properties, severity=record.levelname)
+        self.client.track_trace(record.msg, properties=properties, severity=record.levelname)
 
 
 @log_outputs.register('azure')

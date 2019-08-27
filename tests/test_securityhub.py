@@ -14,11 +14,70 @@
 
 from jsonschema.exceptions import ValidationError
 from c7n.exceptions import PolicyValidationError
-from .common import BaseTest
+from .common import BaseTest, event_data
+
 
 import time
 
 LambdaFindingId = "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23" # NOQA
+
+
+class SecurityHubMode(BaseTest):
+
+    def test_resolve_import_finding(self):
+        factory = self.replay_flight_data('test_security_hub_mode_resolve')
+        policy = self.load_policy({
+            'name': 'trail-fixer',
+            'resource': 'aws.iam-user',
+            'mode': {
+                'type': 'hub-finding',
+                'role': 'foo'}},
+            session_factory=factory)
+        event = event_data("event-securityhub-iamkey-finding-action.json")
+        hub = policy.get_execution_mode()
+        resources = hub.resolve_import_finding(event)
+        self.assertEqual(
+            sorted(resources),
+            sorted(['arn:aws:iam::644160558196:user/kapil']))
+        resources = hub.resolve_resources(event)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['UserName'], 'kapil')
+
+    def test_resolve_action_finding(self):
+        policy = self.load_policy({
+            'name': 'trail-fixer',
+            'resource': 'aws.cloudtrail',
+            'mode': {
+                'type': 'hub-finding',
+                'role': 'foo'}})
+        event = event_data("event-securityhub-cloudtrail-finding-action.json")
+        hub = policy.get_execution_mode()
+        resources = hub.resolve_action_finding(event)
+        self.assertEqual(
+            sorted(resources),
+            sorted([
+                'arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails']))
+
+    def test_resolve_action_insight(self):
+        factory = self.replay_flight_data(
+            "test_security_hub_mode_action_insight")
+        policy = self.load_policy({
+            'name': 'iam-key',
+            'resource': 'aws.iam-user',
+            'mode': {
+                'type': 'hub-action',
+                'role': 'foo'}},
+            session_factory=factory)
+        hub = policy.get_execution_mode()
+        event = event_data("event-securityhub-insight-2.json")
+        resources = hub.resolve_action_insight(event)
+        self.assertEqual(
+            sorted(resources),
+            sorted([
+                'arn:aws:iam::644160558196:user/brent.clements',
+                'arn:aws:iam::644160558196:user/david.shepherd2',
+                'arn:aws:iam::644160558196:user/david.yun',
+                'arn:aws:iam::644160558196:user/kapil']))
 
 
 class SecurityHubTest(BaseTest):

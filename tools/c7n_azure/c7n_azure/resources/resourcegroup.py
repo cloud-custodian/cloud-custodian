@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import ResourceIdParser
 
-from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.utils import type_schema
 
@@ -35,9 +34,39 @@ class ResourceGroup(ArmResourceManager):
             - name: find-all-resource-groups
               resource: azure.resourcegroup
 
+    :example:
+
+    Find all Resource Groups that have no resources in the subscription.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: test - azure
+            resource: azure.resourcegroup
+            filters:
+              - type: empty-group
+
+    :example:
+
+    Delete all Resource Groups in the subscription tagged with 'ShouldBeDeleted'.
+
+    **Warning: Deleting a resource group will delete all resources inside the resource group.**
+
+    .. code-block:: yaml
+
+        policies:
+          - name: test - azure
+            resource: azure.resourcegroup
+            filters:
+                - tag:ShouldBeDeleted: present
+            actions:
+                - type: delete
+
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Resource Group', 'Subscription']
+
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
         enum_spec = ('resource_groups', 'list', None)
@@ -59,12 +88,6 @@ class ResourceGroup(ArmResourceManager):
 
 @ResourceGroup.filter_registry.register('empty-group')
 class EmptyGroup(Filter):
-    # policies:
-    #   - name: test - azure
-    #   resource: azure.resourcegroup
-    #   filters:
-    #       - type: empty-group
-
     schema = type_schema('empty-group')
 
     def __call__(self, group):
@@ -78,16 +101,9 @@ class EmptyGroup(Filter):
 
 
 @ResourceGroup.action_registry.register('delete')
-class DeleteResourceGroup(BaseAction):
-    # policies:
-    #   - name: test - azure
-    #   resource: azure.resourcegroup
-    #   actions:
-    #       - type: delete
-
+class DeleteResourceGroup(AzureBaseAction):
     schema = type_schema('delete')
 
-    def process(self, groups):
-        for group in groups:
-            self.manager.log.info('Removing resource group ' + group['name'])
-            self.manager.get_client().resource_groups.delete(group['name'])
+    def _process_resource(self, group):
+        self.manager.log.info('Removing resource group ' + group['name'])
+        self.manager.get_client().resource_groups.delete(group['name'])

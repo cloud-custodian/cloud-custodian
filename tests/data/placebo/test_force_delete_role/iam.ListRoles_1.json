@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "Roles": [
+            {
+                "Path": "/aws-service-role/support.amazonaws.com/",
+                "RoleName": "AWSServiceRoleForSupport",
+                "RoleId": "AROAJWGLHKEUYCDFCDPXG",
+                "Arn": "arn:aws:iam::XXXXXXXXXXXX:role/aws-service-role/support.amazonaws.com/AWSServiceRoleForSupport",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 19,
+                    "hour": 23,
+                    "minute": 27,
+                    "second": 57,
+                    "microsecond": 0
+                },
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22support.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
+                "Description": "Enables resource access for AWS to provide billing, administrative and support services",
+                "MaxSessionDuration": 3600
+            },
+            {
+                "Path": "/",
+                "RoleName": "c7n-pratyush-test",
+                "RoleId": "AROA4WFP4XXCUSREXX2XL",
+                "Arn": "arn:aws:iam::XXXXXXXXXXXX:role/c7n-pratyush-test",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 7,
+                    "day": 2,
+                    "hour": 18,
+                    "minute": 46,
+                    "second": 58,
+                    "microsecond": 0
+                },
+                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22lambda.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
+                "Description": "Allows Lambda functions to call AWS services on your behalf.",
+                "MaxSessionDuration": 3600
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "b6eb030c-9cfb-11e9-aa62-71a42e37a73f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b6eb030c-9cfb-11e9-aa62-71a42e37a73f",
+                "content-type": "text/xml",
+                "content-length": "1797",
+                "date": "Tue, 02 Jul 2019 19:00:52 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

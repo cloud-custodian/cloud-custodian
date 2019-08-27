@@ -23,14 +23,24 @@ from concurrent.futures import as_completed
 
 import six
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
+from azure.keyvault import KeyVaultAuthentication, AccessToken
+from azure.keyvault import KeyVaultClient, KeyVaultId
 from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
+from c7n_azure import constants
+from c7n_azure.constants import RESOURCE_VAULT
+import itertools
+from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
 
 from c7n.utils import chunks, local_session
-from c7n_azure import constants
+
+try:
+    from functools import lru_cache
+except ImportError:
+    from backports.functools_lru_cache import lru_cache
 
 
 class ResourceIdParser(object):
@@ -408,9 +418,13 @@ class IpRangeHelper(object):
         ranges = [[s.strip() for s in r.split('-')] for r in data[key]]
         result = IPSet()
         for r in ranges:
-            if len(r) > 2:
-                raise Exception('Invalid range. Use x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.')
-            result.add(IPRange(*r) if len(r) == 2 else IPNetwork(r[0]))
+            resolved_set = resolve_service_tag_alias(r[0])
+            if resolved_set is not None:
+                result.update(resolved_set)
+            else:
+                if len(r) > 2:
+                    raise Exception('Invalid range. Use x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.')
+                result.add(IPRange(*r) if len(r) == 2 else IPNetwork(r[0]))
         return result
 
 
@@ -431,7 +445,7 @@ class AppInsightsHelper(object):
 
     @staticmethod
     def _get_instrumentation_key(resource_group_name, resource_name):
-        from .session import Session
+        from c7n_azure.session import Session
         s = local_session(Session)
         client = s.client('azure.mgmt.applicationinsights.ApplicationInsightsManagementClient')
         try:
@@ -500,3 +514,61 @@ class RetentionPeriod(object):
         units = next(units for units in RetentionPeriod.Units
             if units.iso8601_symbol == iso8601_symbol)
         return period, units
+
+
+@lru_cache()
+def get_keyvault_secret(user_identity_id, keyvault_secret_id):
+    secret_id = KeyVaultId.parse_secret_id(keyvault_secret_id)
+    access_token = None
+
+    # Use UAI if client_id is provided
+    if user_identity_id:
+        msi = MSIAuthentication(
+            client_id=user_identity_id,
+            resource=RESOURCE_VAULT)
+    else:
+        msi = MSIAuthentication(
+            resource=RESOURCE_VAULT)
+
+    access_token = AccessToken(token=msi.token['access_token'])
+    credentials = KeyVaultAuthentication(lambda _1, _2, _3: access_token)
+
+    kv_client = KeyVaultClient(credentials)
+    return kv_client.get_secret(secret_id.vault, secret_id.name, secret_id.version).value
+
+
+@lru_cache()
+def get_service_tag_list():
+    """ Gets service tags, note that the region passed to the API
+    doesn't seem to do anything, so we use a fixed one to improve caching"""
+
+    from c7n_azure.session import Session
+    s = local_session(Session)  # type: Session
+
+    client = s.client('azure.mgmt.network._network_management_client.NetworkManagementClient')
+
+    return client.service_tags.list('westus')
+
+
+def get_service_tag_ip_space(resource_name='AzureCloud', region=None):
+    """ Gets service tags, optionally filtered by resource name and region.
+    Note that the region passed to the API doesn't seem to do anything, but
+    you have to provide one.  Filtering is done on the result set."""
+
+    tags = get_service_tag_list()
+
+    name_filter = resource_name.lower()
+    if region:
+        name_filter += '.' + region.lower()
+
+    ip_lists = [v.properties.address_prefixes for v in tags.values if name_filter == v.name.lower()]
+
+    return list(itertools.chain.from_iterable(ip_lists))
+
+
+def resolve_service_tag_alias(rule):
+    if rule.lower().startswith('servicetags'):
+        p = rule.split('.')
+        resource_name = p[1] if 1 < len(p) else None
+        resource_region = p[2] if 2 < len(p) else None
+        return IPSet(get_service_tag_ip_space(resource_name, resource_region))

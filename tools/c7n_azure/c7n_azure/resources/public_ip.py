@@ -22,17 +22,26 @@ class PublicIPAddress(ArmResourceManager):
 
     :example:
 
-    Finds all Public IPs in the subscription.
+    This policy will find all public IP addresses under DDoS attack over the last 72 hours
 
     .. code-block:: yaml
 
         policies:
-            - name: find-all-public-ips
-              resource: azure.publicip
+          - name: publicip-dropping-packets
+            resource: azure.publicip
+            filters:
+              - type: metric
+                metric: IfUnderDDoSAttack
+                op: gt
+                aggregation: maximum
+                threshold: 0
+                timeframe: 72
 
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Networking']
+
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('public_ip_addresses', 'list_all', None)

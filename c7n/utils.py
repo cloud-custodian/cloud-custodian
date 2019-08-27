@@ -330,6 +330,10 @@ REGION_PARTITION_MAP = {
 }
 
 
+def get_partition(region):
+    return REGION_PARTITION_MAP.get(region, 'aws')
+
+
 def generate_arn(
         service, resource, partition='aws',
         region=None, account_id=None, resource_type=None, separator='/'):

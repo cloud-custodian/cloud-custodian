@@ -17,7 +17,7 @@ import sys
 import unittest
 
 try:
-    from azure.functions_worker.bindings.queue import QueueMessage
+    from azure.functions.queue import QueueMessage
 except ImportError:
     pass
 

@@ -38,6 +38,8 @@ class ContainerRegistry(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Containers']
+
         service = 'azure.mgmt.containerregistry'
         client = 'ContainerRegistryManagementClient'
         enum_spec = ('registries', 'list', None)

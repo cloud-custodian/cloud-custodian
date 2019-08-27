@@ -8,11 +8,28 @@ from os import path
 import boto3
 import jsonschema
 from c7n_mailer import deploy, utils
-from c7n_mailer.azure.azure_queue_processor import MailerAzureQueueProcessor
-from c7n_mailer.azure import deploy as azure_deploy
+from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure_mailer import deploy as azure_deploy
 from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from c7n_mailer.utils import get_provider, Providers
 from ruamel import yaml
+
+AZURE_KV_SECRET_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'type': {'enum': ['azure.keyvault']},
+        'secret': {'type': 'string'}
+    },
+    'required': ['type', 'secret'],
+    'additionalProperties': False
+}
+
+SECURED_STRING_SCHEMA = {
+    'oneOf': [
+        {'type': 'string'},
+        AZURE_KV_SECRET_SCHEMA
+    ]
+}
 
 CONFIG_SCHEMA = {
     'type': 'object',
@@ -90,7 +107,7 @@ CONFIG_SCHEMA = {
         'smtp_port': {'type': 'integer'},
         'smtp_ssl': {'type': 'boolean'},
         'smtp_username': {'type': 'string'},
-        'smtp_password': {'type': 'string'},
+        'smtp_password': SECURED_STRING_SCHEMA,
         'ldap_email_key': {'type': 'string'},
         'ldap_uid_tags': {'type': 'array', 'items': {'type': 'string'}},
         'debug': {'type': 'boolean'},
@@ -111,7 +128,7 @@ CONFIG_SCHEMA = {
         'datadog_application_key': {'type': 'string'},      # TODO: encrypt with KMS?
         'slack_token': {'type': 'string'},
         'slack_webhook': {'type': 'string'},
-        'sendgrid_api_key': {'type': 'string'},
+        'sendgrid_api_key': SECURED_STRING_SCHEMA,
         'splunk_hec_url': {'type': 'string'},
         'splunk_hec_token': {'type': 'string'},
         'splunk_remove_paths': {

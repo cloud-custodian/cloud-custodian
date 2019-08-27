@@ -118,6 +118,36 @@ class LoadBalancingSslPolicy(QueryResourceManager):
                     'resourceName'].rsplit('/', 1)[-1]})
 
 
+@LoadBalancingSslPolicy.action_registry.register('delete')
+class LoadBalancingSslPolicyDelete(MethodAction):
+    """The action is used for Load Balancing SSL Policies delete.
+    GCP action is https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies/delete.
+
+    Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-load-balancing-ssl-policies-delete
+            resource: gcp.loadbalancer-ssl-policy
+            filters:
+              - type: value
+                key: minTlsVersion
+                op: ne
+                value: TLS_1_2
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.source.query.session_factory).get_default_project()
+        return {
+            'project': project,
+            'sslPolicy': resource['name']}
+
+
 @resources.register('loadbalancer-ssl-certificate')
 class LoadBalancingSslCertificate(QueryResourceManager):
     """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/sslCertificates

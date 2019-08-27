@@ -362,11 +362,20 @@ class LambdaMode(ServerlessExecutionMode):
 
     def validate(self):
         super(LambdaMode, self).validate()
-        prefix = self.policy.data.get('function-prefix', 'custodian-')
+        prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
         if len(prefix + self.policy.name) > 64:
             raise PolicyValidationError(
                 "Custodian Lambda policies have a max length with prefix of 64"
                 " policy:%s prefix:%s" % (prefix, self.policy.name))
+        tags = self.policy.data['mode'].get('tags')
+        if not tags:
+            return
+        reserved_overlap = [t for t in tags if t.startswith('custodian-')]
+        if reserved_overlap:
+            log.warning((
+                'Custodian reserves policy lambda '
+                'tags starting with custodian - policy specifies %s' % (
+                    ', '.join(reserved_overlap))))
 
     def get_metrics(self, start, end, period):
         from c7n.mu import LambdaManager, PolicyLambda
@@ -478,6 +487,12 @@ class LambdaMode(ServerlessExecutionMode):
         return resources
 
     def provision(self):
+        # auto tag lambda policies with mode and version, we use the
+        # version in mugc to effect cleanups.
+        tags = self.policy.data['mode'].setdefault('tags', {})
+        tags['custodian-info'] = "mode=%s:version=%s" % (
+            self.policy.data['mode']['type'], version)
+
         from c7n import mu
         with self.policy.ctx:
             self.policy.log.info(
@@ -632,7 +647,10 @@ class ASGInstanceState(LambdaMode):
 
 @execution.register('guard-duty')
 class GuardDutyMode(LambdaMode):
-    """Incident Response for AWS Guard Duty"""
+    """Incident Response for AWS Guard Duty.
+
+    This policy fires on guard duty events for the given resource type.
+    """
 
     schema = utils.type_schema('guard-duty', rinherit=LambdaMode.schema)
 

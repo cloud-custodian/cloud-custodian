@@ -39,7 +39,6 @@ from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session
 
-
 log = logging.getLogger('custodian.serverless')
 
 
@@ -99,6 +98,17 @@ class PythonPackageArchive(object):
         if not self._closed:
             raise ValueError("Archive not closed, size not accurate")
         return os.stat(self._temp_archive_file.name).st_size
+
+    def create_zinfo(self, file):
+        if not isinstance(file, zipfile.ZipInfo):
+            file = zinfo(file)
+
+        # Ensure we apply the compression
+        file.compress_type = self.zip_compression
+        # Mark host OS as Linux for all archives
+        file.create_system = 3
+
+        return file
 
     def add_modules(self, ignore, modules):
         """Add the named Python modules to the archive. For consistency's sake
@@ -202,12 +212,7 @@ class PythonPackageArchive(object):
 
         """
         assert not self._closed, "Archive closed"
-        if not isinstance(dest, zipfile.ZipInfo):
-            dest = zinfo(dest)  # see for some caveats
-        # Ensure we apply the compression
-        dest.compress_type = self.zip_compression
-        # Mark host OS as Linux for all archives
-        dest.create_system = 3
+        dest = self.create_zinfo(dest)
         self._zip_file.writestr(dest, contents)
 
     def close(self):
@@ -219,8 +224,7 @@ class PythonPackageArchive(object):
         self._zip_file.close()
         log.debug(
             "Created custodian serverless archive size: %0.2fmb",
-            (os.path.getsize(self._temp_archive_file.name) / (
-                1024.0 * 1024.0)))
+            (os.path.getsize(self._temp_archive_file.name) / (1024.0 * 1024.0)))
         return self
 
     def remove(self):
@@ -347,7 +351,7 @@ class LambdaManager(object):
                     Dimensions=[{
                         'Name': 'FunctionName',
                         'Value': (
-                            isinstance(f, dict) and f['FunctionName'] or f.name)}],
+                                isinstance(f, dict) and f['FunctionName'] or f.name)}],
                     Statistics=["Sum"],
                     StartTime=start,
                     EndTime=end,
@@ -396,8 +400,7 @@ class LambdaManager(object):
         for k in new_config:
             # Layers need special handling as they have extra info on describe.
             if k == 'Layers' and k in old_config and new_config[k]:
-                if sorted(new_config[k]) != sorted([
-                        l['Arn'] for l in old_config[k]]):
+                if sorted(new_config[k]) != sorted([l['Arn'] for l in old_config[k]]):
                     changed.append(k)
             # Vpc needs special handling as a dict with lists
             elif k == 'VpcConfig' and k in old_config and new_config[k]:
@@ -870,6 +873,9 @@ class PolicyLambda(AbstractLambdaFunction):
         if self.policy.data['mode']['type'] == 'config-rule':
             events.append(
                 ConfigRule(self.policy.data['mode'], session_factory))
+        elif self.policy.data['mode']['type'] == 'hub-action':
+            events.append(
+                SecurityHubAction(self.policy, session_factory))
         else:
             events.append(
                 CloudWatchEventSource(
@@ -1030,6 +1036,14 @@ class CloudWatchEventSource(object):
                 'eventTypeCode': list(self.data['events'])}
             if self.data.get('categories', []):
                 payload['detail']['eventTypeCategory'] = self.data['categories']
+        elif event_type == 'hub-finding':
+            payload['source'] = ['aws.securityhub']
+            payload['detail-type'] = ['Security Hub Findings - Imported']
+        elif event_type == 'hub-action':
+            payload['source'] = ['aws.securityhub']
+            payload['detail-type'] = [
+                'Security Hub Findings - Custom Action',
+                'Security Hub Insight Results']
         elif event_type == 'periodic':
             pass
         else:
@@ -1076,7 +1090,7 @@ class CloudWatchEventSource(object):
         # Add Targets
         found = False
         response = self.client.list_targets_by_rule(Rule=func.name)
-        # CWE seems to be quite picky about function arns (no aliases/versions)
+        # CloudWatchE seems to be quite picky about function arns (no aliases/versions)
         func_arn = func.arn
 
         if func_arn.count(':') > 6:
@@ -1125,6 +1139,75 @@ class CloudWatchEventSource(object):
                     "Could not remove targets for rule %s error: %s",
                     func.name, e)
             self.client.delete_rule(Name=func.name)
+
+
+class SecurityHubAction(object):
+
+    def __init__(self, policy, session_factory):
+        self.policy = policy
+        self.session_factory = session_factory
+        self.cwe = CloudWatchEventSource(
+            self.policy.data['mode'], session_factory)
+
+    def __repr__(self):
+        return "<SecurityHub Action %s>" % self.policy.name
+
+    def _get_arn(self):
+        return 'arn:aws:securityhub:%s:%s:action/custom/%s' % (
+            self.policy.options.region,
+            self.policy.options.account_id,
+            self.policy.name)
+
+    def delta(self, src, tgt):
+        for k in ('Name', 'Description'):
+            if src[k] != tgt[k]:
+                return True
+        return False
+
+    def get(self, name):
+        client = local_session(self.session_factory).client('securityhub')
+        subscriber = self.cwe.get(name)
+        arn = self._get_arn()
+        actions = client.describe_action_targets(
+            ActionTargetArns=[arn]).get('ActionTargets', ())
+        assert len(actions) in (0, 1), "Found duplicate action %s" % (
+            actions,)
+        action = actions and actions.pop() or None
+        return {'event': subscriber, 'action': action}
+
+    def add(self, func):
+        self.cwe.add(func)
+        client = local_session(self.session_factory).client('securityhub')
+        action = self.get(func.name).get('action')
+        arn = self._get_arn()
+        params = {'Name': (
+            self.policy.data.get('title') or (
+                "%s %s" % (self.policy.resource_type.split('.')[-1].title(),
+                          self.policy.name))),
+                  'Description': (
+                      self.policy.data.get('description') or
+                      self.policy.data.get('title') or
+                      self.policy.name),
+                  'Id': self.policy.name}
+        params['Description'] = params['Description'].strip()[:500]
+        if not action:
+            log.debug('Creating SecurityHub Action %s' % arn)
+            return client.create_action_target(
+                **params).get('ActionTargetArn')
+        params.pop('Id')
+        if self.delta(action, params):
+            log.debug('Updating SecurityHub Action %s' % arn)
+            client.update_action_target(ActionTargetArn=arn, **params)
+        return arn
+
+    def update(self, func):
+        self.cwe.update(func)
+        self.add(func)
+
+    def remove(self, func):
+        self.cwe.remove(func)
+        client = local_session(self.session_factory).client('securityhub')
+        client.delete_action_target(ActionTargetArn=self._get_arn())
 
 
 class BucketLambdaNotification(object):
@@ -1408,7 +1491,7 @@ class SNSSubscription(object):
                             response = sns_client.unsubscribe(
                                 SubscriptionArn=subscription['SubscriptionArn'])
                             log.debug("Unsubscribed %s from %s" %
-                                (func.name, topic_name))
+                                      (func.name, topic_name))
                         except sns_client.exceptions.NotFoundException:
                             pass
                         raise Done  # break out of both for loops
@@ -1454,7 +1537,7 @@ class BucketSNSNotification(SNSSubscription):
                 'TopicArn': topic_arn,
                 'Events': ['s3:ObjectCreated:*']})
             s3.put_bucket_notification_configuration(Bucket=bucket['Name'],
-                NotificationConfiguration=notifies)
+                                                     NotificationConfiguration=notifies)
             topic_arns = [topic_arn]
         return topic_arns
 
@@ -1497,10 +1580,10 @@ class ConfigRule(object):
                 config_type = manager.get_model().config_type
             else:
                 raise Exception("You may have attempted to deploy a config "
-                        "based lambda function with an unsupported config type. "
-                        "The most recent AWS config types are here: http://docs.aws"
-                        ".amazon.com/config/latest/developerguide/resource"
-                        "-config-reference.html.")
+                                "based lambda function with an unsupported config type. "
+                                "The most recent AWS config types are here: http://docs.aws"
+                                ".amazon.com/config/latest/developerguide/resource"
+                                "-config-reference.html.")
             params['Scope'] = {
                 'ComplianceResourceTypes': [config_type]}
         else:

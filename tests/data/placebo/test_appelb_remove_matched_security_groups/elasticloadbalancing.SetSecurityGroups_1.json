@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroupIds": [
+            "sg-01a19f602ecaf25f4"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "43e7a555-a990-11e9-a7d0-654218cb3bcd",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "43e7a555-a990-11e9-a7d0-654218cb3bcd",
+                "content-type": "text/xml",
+                "content-length": "378",
+                "date": "Thu, 18 Jul 2019 19:14:28 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

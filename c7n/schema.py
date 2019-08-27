@@ -130,7 +130,8 @@ def specific_error(error):
     if t is not None:
         found = None
         for idx, v in enumerate(error.validator_value):
-            if '$ref' in v and v['$ref'].rsplit('/', 2)[-1] == t:
+            if ('$ref' in v and
+                    v['$ref'].rsplit('/', 2)[-1].rsplit('.', 1)[-1] == t):
                 found = idx
                 break
             elif 'type' in v and t in v['properties']['type']['enum']:

@@ -1,0 +1,85 @@
+{
+    "status_code": 200,
+    "data": {
+        "OpsItem": {
+            "CreatedBy": "arn:aws:iam::644160558196:user/kapil",
+            "CreatedTime": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 7,
+                "day": 29,
+                "hour": 17,
+                "minute": 40,
+                "second": 27,
+                "microsecond": 85000
+            },
+            "Description": "checking-lambdas",
+            "LastModifiedBy": "arn:aws:iam::644160558196:user/kapil",
+            "LastModifiedTime": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 7,
+                "day": 29,
+                "hour": 19,
+                "minute": 55,
+                "second": 43,
+                "microsecond": 258000
+            },
+            "Notifications": [
+                {
+                    "Arn": "arn:aws:sns:us-west-2:644160558196:aws-command"
+                }
+            ],
+            "RelatedOpsItems": [],
+            "Status": "Resolved",
+            "OpsItemId": "oi-3199a7cf2d35",
+            "Title": "checking-lambdas",
+            "Source": "Cloud Custodian",
+            "OperationalData": {
+                "/aws/dedup": {
+                    "Value": "{\"dedupString\": \"57a538066184d23255b108df942f5555\"}",
+                    "Type": "SearchableString"
+                },
+                "/aws/resources": {
+                    "Value": "[{\"arn\": \"arn:aws:lambda:us-west-2:644160558196:function:CloudCustodian\"}]",
+                    "Type": "SearchableString"
+                },
+                "/custodian/dedup": {
+                    "Value": "57a538066184d23255b108df942f5555",
+                    "Type": "SearchableString"
+                },
+                "/custodian/execution-id": {
+                    "Value": "54379d13-e32a-4c6f-906a-5c658e04c2dd",
+                    "Type": "String"
+                },
+                "/custodian/policy": {
+                    "Value": "{\"name\": \"checking-lambdas\", \"resource\": \"aws.lambda\", \"actions\": [{\"type\": \"post-item\"}]}",
+                    "Type": "String"
+                },
+                "/custodian/policy-name": {
+                    "Value": "checking-lambdas",
+                    "Type": "SearchableString"
+                },
+                "/custodian/resource": {
+                    "Value": "lambda",
+                    "Type": "SearchableString"
+                },
+                "/custodian/version": {
+                    "Value": "0.8.44.2",
+                    "Type": "String"
+                }
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "6f5a1563-6001-47ee-89ec-349f3f4efe7e",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6f5a1563-6001-47ee-89ec-349f3f4efe7e",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1220",
+                "date": "Mon, 29 Jul 2019 23:55:49 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -22,7 +22,7 @@ class Disk(ArmResourceManager):
 
     :example:
 
-    This policy will disks that are not being managed by a VM
+    This policy will find all data disks that are not being managed by a VM.
 
     .. code-block:: yaml
 
@@ -37,6 +37,8 @@ class Disk(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Storage']
+
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
         enum_spec = ('disks', 'list', None)

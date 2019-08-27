@@ -1,0 +1,86 @@
+{
+    "version": "0",
+    "id": "f1575e70-2205-7e04-149e-79dc4d883ba6",
+    "detail-type": "Security Hub Findings - Custom Action",
+    "source": "aws.securityhub",
+    "account": "644160558196",
+    "time": "2019-07-11T17:35:56Z",
+    "region": "us-east-1",
+    "resources": [
+        "arn:aws:securityhub:us-east-1:644160558196:action/custom/aws"
+    ],
+    "detail": {
+        "actionName": "Ec2 aws",
+        "actionDescription": "This is cool.",
+        "findings": [
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:securityhub:us-east-1:644160558196:subscription/cis-aws-foundations-benchmark/v/1.2.0/2.2/finding/c82767be-e5e9-4c4e-a38c-477154ae38a2",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/securityhub",
+                "GeneratorId": "arn:aws:securityhub:::ruleset/cis-aws-foundations-benchmark/v/1.2.0/rule/2.2",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+                ],
+                "FirstObservedAt": "2019-01-23T23:22:13.019Z",
+                "LastObservedAt": "2019-07-11T08:33:43.280Z",
+                "CreatedAt": "2019-01-23T23:22:13.019Z",
+                "UpdatedAt": "2019-07-11T16:13:05.556Z",
+                "Severity": {
+                    "Product": 0,
+                    "Normalized": 0
+                },
+                "Title": "2.2 Ensure CloudTrail log file validation is enabled (Scored)",
+                "Description": "CloudTrail log file validation creates a digitally signed digest file containing a hash of each log that CloudTrail writes to S3. These digest files can be used to determine whether a log file was changed, deleted, or unchanged after CloudTrail delivered the log. It is recommended that file validation be enabled on all CloudTrails.",
+                "Remediation": {
+                    "Recommendation": {
+                        "Text": "For directions on how to fix this issue, please consult the AWS Security Hub CIS documentation.",
+                        "Url": "https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards.html#securityhub-standards-checks-2.2"
+                    }
+                },
+                "ProductFields": {
+                    "StandardsGuideArn": "arn:aws:securityhub:::ruleset/cis-aws-foundations-benchmark/v/1.2.0",
+                    "StandardsGuideSubscriptionArn": "arn:aws:securityhub:us-east-1:644160558196:subscription/cis-aws-foundations-benchmark/v/1.2.0",
+                    "RuleId": "2.2",
+                    "RecommendationUrl": "https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards.html#securityhub-standards-checks-2.2",
+                    "RelatedAWSResources:0/name": "securityhub-cloud-trail-log-file-validation-enabled-v4949q",
+                    "RelatedAWSResources:0/type": "AWS::Config::ConfigRule",
+                    "RecordState": "ACTIVE",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/securityhub/arn:aws:securityhub:us-east-1:644160558196:subscription/cis-aws-foundations-benchmark/v/1.2.0/2.2/finding/c82767be-e5e9-4c4e-a38c-477154ae38a2",
+                    "aws/securityhub/SeverityLabel": "INFORMATIONAL",
+                    "aws/securityhub/ProductName": "Security Hub",
+                    "aws/securityhub/CompanyName": "AWS"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsCloudTrailTrail",
+                        "Id": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "Other": {
+                                "name": "skunk-trails",
+                                "s3BucketName": "custodian-skunk-trails",
+                                "includeGlobalServiceEvents": "true",
+                                "isMultiRegionTrail": "true",
+                                "homeRegion": "us-east-1",
+                                "trailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails",
+                                "logFileValidationEnabled": "true",
+                                "hasCustomEventSelectors": "false",
+                                "isOrganizationTrail": "false"
+                            }
+                        }
+                    }
+                ],
+                "Compliance": {
+                    "Status": "PASSED"
+                },
+                "RecordState": "ACTIVE",
+                "WorkflowState": "NEW",
+                "approximateArrivalTimestamp": 1562861589.38,
+                "updatedAt": "2019-07-11T16:13:05.556Z"
+            }
+        ]
+    },
+    "debug": true
+}

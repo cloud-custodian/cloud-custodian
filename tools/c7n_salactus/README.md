@@ -1,10 +1,14 @@
-# Eater of S3 Buckets
+# c7n-salactus: Distributed Scale out S3 processing
+
 
 Salactus, inspired by the planet eaters.
 
 Distributed, scale out s3 scanning
 
-# Use Cases
+**Note** this was built a few years before AWS S3 Batch Operations
+which maybe a simpler solution for the problem domain.
+
+## Use Cases
 
 Sometimes you really want to scan all objects, or in the words of gary
 oldman from the professional, "bring me EVERYONE" :-) There are a
@@ -19,7 +23,7 @@ buckets, the intent is always to optimize for throughput across a
 population measured in billions.
 
 
-# Usage
+## Usage
 
 ```
 $ apt-get install redis-server | or elasticache
@@ -67,7 +71,7 @@ The components of salactus are
 
  - keyset-scan - handles pages of 1k objects and dispatches to object visitor
  
-# Sample Configuration
+## Sample Configuration
 
 The below sample configuration can be used to scan all objects in all
 buckets in the specified account and generate JSON reports on any

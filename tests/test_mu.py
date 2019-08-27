@@ -28,6 +28,8 @@ import time
 import unittest
 import zipfile
 
+import mock
+
 from c7n.mu import (
     custodian_archive,
     LambdaFunction,
@@ -37,10 +39,13 @@ from c7n.mu import (
     CloudWatchLogSubscription,
     SNSSubscription,
     SQSSubscription,
+    CloudWatchEventSource
 )
+
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from .common import BaseTest, event_data, functional, Bag, TestConfig as Config
+from .common import (
+    BaseTest, event_data, functional, Bag, ACCOUNT_ID, TestConfig as Config)
 from .data import helloworld
 
 
@@ -539,6 +544,44 @@ class PolicyLambdaProvision(BaseTest):
                 "detail-type": ["EC2 Instance Launch Unsuccessful"],
             },
         )
+
+    def test_cwe_security_hub_action(self):
+        factory = self.replay_flight_data('test_mu_cwe_sechub_action')
+        p = self.load_policy({
+            'name': 'sechub',
+            'resource': 'account',
+            'mode': {
+                'type': 'hub-action'}},
+            session_factory=factory,
+            config={'account_id': ACCOUNT_ID})
+        mu_policy = PolicyLambda(p)
+        events = mu_policy.get_events(factory)
+        self.assertEqual(len(events), 1)
+        hub_action = events.pop()
+        hub_action.cwe = cwe = mock.Mock(CloudWatchEventSource)
+        cwe.get.return_value = False
+        cwe.update.return_value = True
+        cwe.add.return_value = True
+
+        self.assertEqual(repr(hub_action), "<SecurityHub Action sechub>")
+        self.assertEqual(
+            hub_action._get_arn(),
+            "arn:aws:securityhub:us-east-1:644160558196:action/custom/sechub")
+        self.assertEqual(
+            hub_action.get(mu_policy.name), {'event': False, 'action': None})
+        hub_action.add(mu_policy)
+        self.assertEqual(
+            {'event': False,
+             'action': {
+                 'ActionTargetArn': ('arn:aws:securityhub:us-east-1:'
+                                     '644160558196:action/custom/sechub'),
+                 'Name': 'Account sechub', 'Description': 'sechub'}},
+            hub_action.get(mu_policy.name))
+        hub_action.update(mu_policy)
+        hub_action.remove(mu_policy)
+        self.assertEqual(
+            hub_action.get(mu_policy.name),
+            {'event': False, 'action': None})
 
     def test_cwe_schedule(self):
         session_factory = self.replay_flight_data("test_cwe_schedule", zdata=True)

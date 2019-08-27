@@ -21,48 +21,55 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"regexp"
+	"runtime"
+	"strings"
+	"syscall"
+	"time"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/stdcopy"
-	"log"
-	"os"
-	"path/filepath"
-	"regexp"
-	"runtime"
-	"strings"
-	"time"
+	"github.com/thoas/go-funk"
 )
 
-const CONTAINER_HOME string = "/home/custodian/"
-const DEFAULT_IMAGE_NAME string = "cloudcustodian/c7n:latest"
-const IMAGE_OVERRIDE_ENV = "CUSTODIAN_IMAGE"
-const UPDATE_INTERVAL = time.Hour
+const containerHome string = "/home/custodian/"
+const defaultImageName string = "cloudcustodian/c7n:latest"
+const imageOverrideEnv = "CUSTODIAN_IMAGE"
+const updateInterval = time.Hour
 
 func main() {
 	// Select image from env or default
-	activeImage := DockerImageName()
+	activeImage := getDockerImageName()
 
 	fmt.Printf("Custodian Cask (%v)\n", activeImage)
 
 	ctx := context.Background()
 
 	// Create a docker client
-	dockerClient := GetClient()
+	dockerClient := getClient()
 
 	// Update docker image if needed
-	Update("docker.io/" + activeImage, dockerClient, ctx)
+	update(ctx, "docker.io/"+activeImage, dockerClient)
 
 	// Create container
-	id := Create(activeImage, dockerClient, ctx)
+	id := create(ctx, activeImage, dockerClient)
+
+	// Create signal channel and register notify
+	handleSignals(ctx, id, dockerClient)
 
 	// Run
-	Run(id, dockerClient, ctx)
+	run(ctx, id, dockerClient)
 }
 
-// Creates a docker client using the host environment variables
-func GetClient() *client.Client {
+// getClient Creates a docker client using the host environment variables
+func getClient() *client.Client {
 	dockerClient, err := client.NewEnvClient()
 	if err != nil {
 		log.Fatalf("Unable to create docker client. %v", err)
@@ -70,44 +77,49 @@ func GetClient() *client.Client {
 	return dockerClient
 }
 
-// Pulls the latest docker image and creates
+// update Pulls the latest docker image and creates
 // a marker file so it is not pulled again until
 // the specified time elapses or the file is deleted.
-func Update(image string, dockerClient *client.Client, ctx context.Context) {
-	updateMarker := UpdateMarkerFilename(image)
+func update(ctx context.Context, image string, dockerClient *client.Client) {
+	updateMarker := updateMarkerFilename(image)
 	now := time.Now()
 
 	// Check if there is a marker indicating last pull for this image
 	info, err := os.Stat(updateMarker)
-	if err == nil && info.ModTime().Add(UPDATE_INTERVAL).After(now) {
+
+	if err == nil && info.ModTime().Add(updateInterval).After(now) {
 		fmt.Printf("Skipped image pull - Last checked %d minutes ago.\n\n", uint(now.Sub(info.ModTime()).Minutes()))
 		return
 	}
 
 	// Pull the image
-	out, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{ })
+	out, err := dockerClient.ImagePull(ctx, image, types.ImagePullOptions{})
 	if err != nil {
-		log.Printf( "Image Pull failed, will use cached image if available. %v", err)
+		log.Printf("Image Pull failed, will use cached image if available. %v", err)
 	} else {
 		_ = jsonmessage.DisplayJSONMessagesStream(out, os.Stdout, 1, true, nil)
 	}
 
-	// Update the marker file
-	_, err = os.OpenFile(updateMarker, os.O_RDONLY|os.O_CREATE, 0666)
-	if err != nil {
-		log.Printf( "Unable to write to temporary directory. %v", err)
+	// Touch the marker file
+	if _, err := os.Stat(updateMarker); err == nil {
+		if err := os.Chtimes(updateMarker, now, now); err != nil {
+			log.Printf("Unable to update cache marker file. %v", err)
+		}
+	} else {
+		if _, err = os.OpenFile(updateMarker, os.O_RDWR|os.O_CREATE, 0666); err != nil {
+			log.Printf("Unable to write to temporary directory. %v", err)
+		}
 	}
 }
 
-// Create a container with appropriate arguments.
+// create a container with appropriate arguments.
 // Includes creating mounts and updating paths.
-func Create(image string, dockerClient *client.Client, ctx context.Context) string {
+func create(ctx context.Context, image string, dockerClient *client.Client) string {
 	// Prepare configuration
 	args := os.Args[1:]
-	originalOutput := SubstituteOutput(args)
-	originalPolicy := SubstitutePolicy(args)
-	binds := GenerateBinds(originalOutput, originalPolicy)
-	envs := GenerateEnvs()
+	processOutputArgs(&args)
+	binds := generateBinds(args)
+	envs := generateEnvs()
 
 	// Create container
 	cont, err := dockerClient.ContainerCreate(
@@ -115,10 +127,10 @@ func Create(image string, dockerClient *client.Client, ctx context.Context) stri
 		&container.Config{
 			Image: image,
 			Cmd:   args,
-			Env: envs,
+			Env:   envs,
 		},
 		&container.HostConfig{
-			Binds: binds,
+			Binds:       binds,
 			NetworkMode: "host",
 		},
 		nil,
@@ -130,9 +142,9 @@ func Create(image string, dockerClient *client.Client, ctx context.Context) stri
 	return cont.ID
 }
 
-// Run container and wait for it to complete.
+// run container and wait for it to complete.
 // Copy log output to stdout and stderr.
-func Run(id string, dockerClient *client.Client, ctx context.Context) {
+func run(ctx context.Context, id string, dockerClient *client.Client) {
 	// Docker Run
 	err := dockerClient.ContainerStart(ctx, id, types.ContainerStartOptions{})
 	if err != nil {
@@ -149,94 +161,95 @@ func Run(id string, dockerClient *client.Client, ctx context.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = dockerClient.ContainerRemove(
+		ctx, id, types.ContainerRemoveOptions{RemoveVolumes: true})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-// Create the bind mounts for input/output
-func GenerateBinds(outputPath string, policyPath string) []string {
-	// Policy
-	policy, err := filepath.Abs(policyPath)
-	if err != nil {
-		log.Fatalf("Unable to load policy. %v", err)
-	}
+// generateBinds Create the bind mounts for input/output
+func generateBinds(args []string) []string {
+	var binds []string
 
-	containerPolicy := CONTAINER_HOME + filepath.Base(policy)
-	binds := []string{
-		policy + ":" + containerPolicy + ":ro",
-	}
+	// Loop through all args looking for paths
+	// so we can create bind mounts and rewrite the arg
+	for i, arg := range args {
+		if isPath(arg) {
+			containerPath := containerHome + filepath.Base(arg)
+			absPath, err := filepath.Abs(arg)
+			if err == nil {
+				binds = append(binds, absPath+":"+containerHome+filepath.Base(absPath)+":rw")
+			}
 
-	// Output Path
-	if outputPath != "" {
-		outputPath, err = filepath.Abs(outputPath)
-		if err != nil {
-			log.Fatalf("Unable to parse output path. %v", err)
+			args[i] = containerPath
 		}
 
-		binds = append(binds, outputPath + ":" + CONTAINER_HOME + "output:rw")
 	}
 
 	// Azure CLI support
-	azureCliConfig := GetAzureCliConfigPath()
+	azureCliConfig := getAzureCliConfigPath()
 	if azureCliConfig != "" {
 		// Bind as RW for token refreshes
-		binds = append(binds, azureCliConfig + ":" + CONTAINER_HOME + ".azure:rw")
+		binds = append(binds, azureCliConfig+":"+containerHome+".azure:rw")
 	}
 
 	// AWS config
-	awsConfig := GetAwsConfigPath()
+	awsConfig := getAwsConfigPath()
 	if awsConfig != "" {
-		binds = append(binds, awsConfig + ":" + CONTAINER_HOME + ".aws:ro")
+		binds = append(binds, awsConfig+":"+containerHome+".aws:ro")
+	}
+
+	// Default cache location
+	if !funk.Any(funk.Intersect(args, []string{"-f", "--cache"})) {
+		cacheDefault := getFolderFromHome(".cache")
+		binds = append(binds, cacheDefault+":"+containerHome+".cache:rw")
 	}
 
 	return binds
 }
 
-// Fix the policy arguments
-func SubstitutePolicy(args []string) string {
-	if len(args) == 0 ||
-		strings.EqualFold(args[0], "schema")  ||
-		strings.EqualFold(args[0], "version") {
-		return ""
-	}
-
-	originalPolicy := args[len(args)-1]
-	args[len(args)-1] = CONTAINER_HOME + filepath.Base(originalPolicy)
-
-	return originalPolicy
-}
-
-// Fix the output arguments
-func SubstituteOutput(args []string) string {
+func processOutputArgs(argsp *[]string) {
 	var outputPath string
+	args := *argsp
 
-	for i := range args{
-		arg := args[i]
-		if arg == "-s" || arg == "--output-dir" {
-			outputPath = args[i+1]
-				if IsLocalStorage(outputPath) {
-					args[i+1] = CONTAINER_HOME + "output"
-					return outputPath
+	for i, arg := range args {
+		if strings.HasPrefix(arg, "-s") || strings.HasPrefix(arg, "--output-dir") {
+			// normalize argument separator
+			if strings.HasPrefix(arg, "-s=") || strings.HasPrefix(arg, "--output-dir=") {
+				outputPath = strings.Split(arg, "=")[1]
 
-				}
-		}
-
-		if strings.HasPrefix(arg, "-s=") || strings.HasPrefix(arg, "--output-dir=") {
-			outputPath = strings.Split(arg, "=")[1]
-			if IsLocalStorage(outputPath) {
-				args[i] = "-s=" + CONTAINER_HOME + "output"
-				return outputPath
+				args[i] = "-s"
+				args = append(args, "")
+				copy(args[i+1:], args[i:])
+				args[i+1] = outputPath
 			}
+
+			// make absolute path and ensure exists
+			outputPath, err := filepath.Abs(args[i+1])
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			err = os.MkdirAll(outputPath, 0700)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			args[i+1] = outputPath
 		}
 	}
 
-	return ""
+	*argsp = args
 }
 
-// Get list of environment variables
-func GenerateEnvs() []string {
+// generateEnvs Get list of environment variables
+func generateEnvs() []string {
 	var envs []string
 
 	// Bulk include matching variables
-	var re = regexp.MustCompile(`^AWS|^AZURE_|^MSI_|^GOOGLE`)
+	var re = regexp.MustCompile(`^AWS|^AZURE_|^MSI_|^GOOGLE|CLOUDSDK`)
 	for _, s := range os.Environ() {
 		if re.MatchString(s) {
 			envs = append(envs, s)
@@ -246,9 +259,9 @@ func GenerateEnvs() []string {
 	return envs
 }
 
-// Find Azure CLI Config if available so
+// getAzureCliConfigPath Find Azure CLI Config if available so
 // we can mount it on the container.
-func GetAzureCliConfigPath() string {
+func getAzureCliConfigPath() string {
 	// Check for override location
 	azureCliConfig := os.Getenv("AZURE_CONFIG_DIR")
 	if azureCliConfig != "" {
@@ -256,13 +269,7 @@ func GetAzureCliConfigPath() string {
 	}
 
 	// Check for default location
-	var configPath string
-
-	if runtime.GOOS == "windows" {
-		configPath = filepath.Join(os.Getenv("USERPROFILE"), ".azure")
-	} else {
-		configPath = filepath.Join(os.Getenv("HOME"), ".azure")
-	}
+	configPath := getFolderFromHome(".azure")
 
 	if _, err := os.Stat(configPath); err == nil {
 		return configPath
@@ -271,16 +278,10 @@ func GetAzureCliConfigPath() string {
 	return ""
 }
 
-// Find AWS Config if available so
+// getAwsConfigPath Find AWS Config if available so
 // we can mount it on the container.
-func GetAwsConfigPath() string {
-	var configPath string
-
-	if runtime.GOOS == "windows" {
-		configPath = filepath.Join(os.Getenv("USERPROFILE"), ".aws")
-	} else {
-		configPath = filepath.Join(os.Getenv("HOME"), ".aws")
-	}
+func getAwsConfigPath() string {
+	configPath := getFolderFromHome(".aws")
 
 	if _, err := os.Stat(configPath); err == nil {
 		return configPath
@@ -289,23 +290,62 @@ func GetAwsConfigPath() string {
 	return ""
 }
 
-func IsLocalStorage(output string) bool {
-	return !(strings.HasPrefix(output, "s3://") ||
-			strings.HasPrefix(output, "azure://") ||
-			strings.HasPrefix(output, "gs://"))
+// getFolderFromHome helps us get a
+// folder in the users home directory
+func getFolderFromHome(subdir string) string {
+	var configPath string
+
+	if runtime.GOOS == "windows" {
+		configPath = os.Getenv("USERPROFILE")
+	} else {
+		configPath = os.Getenv("HOME")
+	}
+
+	return filepath.Join(configPath, subdir)
 }
 
-func DockerImageName() string {
-	image := os.Getenv(IMAGE_OVERRIDE_ENV)
+func isLocalStorage(output string) bool {
+	return !(strings.HasPrefix(output, "s3://") ||
+		strings.HasPrefix(output, "azure://") ||
+		strings.HasPrefix(output, "gs://"))
+}
+
+// isPath attempts to confirm if an argument
+// is a path, and thus needs a bind
+func isPath(arg string) bool {
+	_, err := os.Stat(arg)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+func getDockerImageName() string {
+	image := os.Getenv(imageOverrideEnv)
 	if len(image) == 0 {
-		return DEFAULT_IMAGE_NAME
+		return defaultImageName
 	}
 	return image
 }
 
-func UpdateMarkerFilename(image string) string {
+func updateMarkerFilename(image string) string {
 	sha := sha1.New()
 	sha.Write([]byte(image))
 	hash := hex.EncodeToString(sha.Sum(nil))
-	return filepath.Join(os.TempDir(), "custodian-cask-update-" + hash[0:5])
+	return filepath.Join(os.TempDir(), "custodian-cask-update-"+hash[0:5])
+}
+
+func handleSignals(ctx context.Context, id string, dockerClient *client.Client) {
+	gracefulExit := make(chan os.Signal, 1)
+	signal.Notify(gracefulExit, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		sig := <-gracefulExit
+		fmt.Printf("Received %v, stopping container\n", sig)
+		timeout := 0 * time.Second
+		err := dockerClient.ContainerStop(ctx, id, &timeout)
+		if err != nil {
+			fmt.Printf("Error stopping container: %v\n", err)
+		}
+	}()
 }

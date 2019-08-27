@@ -28,7 +28,9 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
+from c7n.resources.securityhub import OtherResourcePostFinding
+from c7n.utils import (
+    chunks, local_session, type_schema, get_retry, parse_cidr)
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -427,6 +429,15 @@ class DhcpOptionsFilter(Filter):
         return found
 
 
+@Vpc.action_registry.register('post-finding')
+class VpcPostFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        fr = super(VpcPostFinding, self).format_resource(r)
+        fr['Type'] = 'AwsEc2Vpc'
+        return fr
+
+
 @resources.register('subnet')
 class Subnet(query.QueryResourceManager):
 
@@ -666,7 +677,7 @@ class SGUsage(Filter):
 
     def get_permissions(self):
         return list(itertools.chain(
-            [self.manager.get_resource_manager(m).get_permissions()
+            *[self.manager.get_resource_manager(m).get_permissions()
              for m in
              ['lambda', 'eni', 'launch-config', 'security-group']]))
 
@@ -1128,10 +1139,17 @@ class SGPermission(Filter):
 
 
 SGPermissionSchema = {
-    'IpProtocol': {'enum': [-1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+    'match-operator': {'type': 'string', 'enum': ['or', 'and']},
+    'Ports': {'type': 'array', 'items': {'type': 'integer'}},
+    'SelfReference': {'type': 'boolean'},
     'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
-    'FromPort': {'type': 'integer'},
-    'ToPort': {'type': 'integer'},
+    'IpProtocol': {'enum': ["-1", -1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+    'FromPort': {'oneOf': [
+        {'$ref': '#/definitions/filters/value'},
+        {'type': 'integer'}]},
+    'ToPort': {'oneOf': [
+        {'$ref': '#/definitions/filters/value'},
+        {'type': 'integer'}]},
     'UserIdGroupPairs': {},
     'IpRanges': {},
     'PrefixListIds': {},
@@ -1148,12 +1166,7 @@ class IPPermission(SGPermission):
     schema = {
         'type': 'object',
         'additionalProperties': False,
-        'properties': {
-            'type': {'enum': ['ingress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
-            'SelfReference': {'type': 'boolean'}
-        },
+        'properties': {'type': {'enum': ['ingress']}},
         'required': ['type']}
     schema['properties'].update(SGPermissionSchema)
 
@@ -1165,11 +1178,7 @@ class IPPermissionEgress(SGPermission):
     schema = {
         'type': 'object',
         'additionalProperties': False,
-        'properties': {
-            'type': {'enum': ['egress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'SelfReference': {'type': 'boolean'}
-        },
+        'properties': {'type': {'enum': ['egress']}},
         'required': ['type']}
     schema['properties'].update(SGPermissionSchema)
 
@@ -1256,6 +1265,15 @@ class RemovePermissions(BaseAction):
                 method(GroupId=r['GroupId'], IpPermissions=groups)
 
 
+@SecurityGroup.action_registry.register('post-finding')
+class SecurityGroupPostFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        fr = super(SecurityGroupPostFinding, self).format_resource(r)
+        fr['Type'] = 'AwsEc2SecurityGroup'
+        return fr
+
+
 @resources.register('eni')
 class NetworkInterface(query.QueryResourceManager):
 
@@ -1334,7 +1352,7 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
 @NetworkInterface.filter_registry.register('vpc')
 class InterfaceVpcFilter(net_filters.VpcFilter):
 
-    RelatedIdsExpress = "VpcId"
+    RelatedIdsExpression = "VpcId"
 
 
 @NetworkInterface.action_registry.register('modify-security-groups')

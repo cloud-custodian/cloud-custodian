@@ -14,16 +14,15 @@
 
 import uuid
 
+from c7n_azure.provider import resources
+from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.utils import StringUtils, PortsRangeHelper
+from msrestazure.azure_exceptions import CloudError
+
 from c7n.actions import BaseAction
 from c7n.filters import Filter, FilterValidationError
 from c7n.filters.core import PolicyValidationError
 from c7n.utils import type_schema
-
-from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.utils import StringUtils, PortsRangeHelper
-
-from msrestazure.azure_exceptions import CloudError
 
 
 @resources.register('networksecuritygroup')
@@ -74,6 +73,8 @@ class NetworkSecurityGroup(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Networking']
+
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('network_security_groups', 'list_all', None)

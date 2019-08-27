@@ -115,6 +115,28 @@ def generateBucketContents(s3, bucket, contents=None):
 
 class BucketMetrics(BaseTest):
 
+    def test_metrics_dims(self):
+        factory = self.replay_flight_data('test_s3_metrics_user_dims')
+        p = self.load_policy({
+            'name': 's3',
+            'resource': 's3',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId = 'c7n-ssm-build'"}],
+            'filters': [{
+                'type': 'metrics',
+                'name': 'BucketSizeBytes',
+                'dimensions': {
+                    'StorageType': 'StandardStorage'},
+                'days': 7,
+                'value': 100,
+                'op': 'gte'}]},
+            session_factory=factory,
+            config={'region': 'us-east-2'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n.metrics', resources[0])
+
     def test_metrics(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
 from c7n_azure.resources.storage import StorageSettingsUtilities
 from c7n_azure.storage_utils import StorageUtilities
@@ -21,6 +21,8 @@ from mock import patch, MagicMock
 
 from c7n.utils import get_annotation_prefix
 from c7n.utils import local_session
+from c7n_azure.session import Session
+from azure.mgmt.storage.models import StorageAccountUpdateParameters
 
 
 class StorageTest(BaseTest):
@@ -52,6 +54,7 @@ class StorageTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('storage.json')
+    @cassette_name('firewall')
     def test_firewall_rules_include(self):
         p = self.load_policy({
             'name': 'test-azure-storage',
@@ -69,6 +72,79 @@ class StorageTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('storage.json')
+    @cassette_name('firewall')
+    def test_firewall_rules_any(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'any': ['1.2.2.128/25', '8.8.8.8', '10.10.10.10']}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('storage.json')
+    @cassette_name('firewall')
+    def test_firewall_rules_not_any(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'any': ['8.8.8.8', '10.10.10.10']}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('storage.json')
+    @cassette_name('firewall')
+    def test_firewall_rules_not_only(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'only': ['1.2.2.128/25', '10.10.10.10']}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('storage.json')
+    @cassette_name('firewall')
+    def test_firewall_rules_only(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-rules',
+                 'only': ['1.2.2.128/25', '3.1.1.1', '10.10.10.10']}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('storage.json')
+    @cassette_name('firewall')
     def test_firewall_rules_not_include_all_ranges(self):
         p = self.load_policy({
             'name': 'test-azure-storage',
@@ -86,6 +162,7 @@ class StorageTest(BaseTest):
         self.assertEqual(0, len(resources))
 
     @arm_template('storage.json')
+    @cassette_name('firewall')
     def test_firewall_rules_include_cidr(self):
         p = self.load_policy({
             'name': 'test-azure-storage',
@@ -103,6 +180,7 @@ class StorageTest(BaseTest):
         self.assertEqual(1, len(resources))
 
     @arm_template('storage.json')
+    @cassette_name('firewall')
     def test_firewall_rules_not_include_cidr(self):
         p = self.load_policy({
             'name': 'test-azure-storage',
@@ -120,6 +198,7 @@ class StorageTest(BaseTest):
         self.assertEqual(0, len(resources))
 
     @arm_template('storage.json')
+    @cassette_name('firewall')
     def test_firewall_rules_equal(self):
         p = self.load_policy({
             'name': 'test-azure-storage',
@@ -137,6 +216,7 @@ class StorageTest(BaseTest):
         self.assertEqual(1, len(resources))
 
     @arm_template('storage.json')
+    @cassette_name('firewall')
     def test_firewall_rules_not_equal(self):
         p = self.load_policy({
             'name': 'test-azure-storage',
@@ -461,3 +541,35 @@ class StorageTest(BaseTest):
             BLOB_TYPE, mock_storage_account, log_settings, token=mock_token)
 
         mock_set_blob_properties.assert_called_once()
+
+    def test_storage_settings_require_secure_transfer(self):
+        with patch('azure.mgmt.storage.v%s.operations.'
+        '_storage_accounts_operations.StorageAccountsOperations.update'
+        % self._get_storage_management_client_api_string()) as update_storage_mock:
+            p = self.load_policy({
+                'name': 'my-first-policy',
+                'resource': 'azure.storage',
+                'filters': [
+                    {'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cctstorage*'}
+                ],
+                'actions': [
+                    {'type': 'require-secure-transfer',
+                    'value': True}
+                ]
+            })
+            p.run()
+            args = update_storage_mock.call_args_list[0][0]
+
+            self.assertEqual(args[0], 'test_storage')
+            self.assertTrue(args[1].startswith('cctstorage'))
+            self.assertEqual(args[2],
+                StorageAccountUpdateParameters(enable_https_traffic_only=True))
+
+    def _get_storage_management_client_api_string(self):
+        return local_session(Session)\
+            .client('azure.mgmt.storage.StorageManagementClient')\
+            .DEFAULT_API_VERSION.replace("-", "_")

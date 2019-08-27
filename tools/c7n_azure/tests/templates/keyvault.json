@@ -2,12 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "tenantId": {
-          "type": "string",
-          "metadata": {
-            "description": "The id of the azure ad tenant."
-          }
-        },
         "userObjectId": {
           "type": "string",
           "metadata": {
@@ -45,10 +39,10 @@
                           }
                     ]
                 },
-                "tenantId": "[parameters('tenantId')]",
+                "tenantId": "[subscription().tenantId]",
                 "accessPolicies": [
                     {
-                        "tenantId": "[parameters('tenantId')]",
+                        "tenantId": "[subscription().tenantId]",
                         "objectId": "[parameters('userObjectId')]",
                         "permissions": {
                             "keys": [
@@ -85,6 +79,12 @@
                                 "ListIssuers",
                                 "SetIssuers",
                                 "DeleteIssuers"
+                            ],
+                            "storage": [
+                                "Get",
+                                "List",
+                                "Set",
+                                "regeneratekey"
                             ]
                         }
                     }
@@ -94,6 +94,18 @@
                 "enabledForTemplateDeployment": false
             },
             "dependsOn": []
+        },
+        {
+          "name": "[concat('cckvstorage', uniqueString(resourceGroup().id))]",
+          "type": "Microsoft.Storage/storageAccounts",
+          "apiVersion": "2016-01-01",
+          "sku": {
+            "name": "Standard_LRS"
+          },
+          "kind": "Storage",
+          "location": "southcentralus",
+          "tags": {},
+          "properties": {}
         },
         {
             "type": "Microsoft.KeyVault/vaults/providers/locks",

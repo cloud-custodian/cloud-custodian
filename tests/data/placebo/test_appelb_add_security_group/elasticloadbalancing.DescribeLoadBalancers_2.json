@@ -1,0 +1,56 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoadBalancers": [
+            {
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:123412341234:loadbalancer/app/test-abc/543530edaee12345",
+                "DNSName": "internal-test-abc-398177229.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneId": "ABCDXDOTRQ7X77",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 18,
+                    "minute": 9,
+                    "second": 43,
+                    "microsecond": 630000
+                },
+                "LoadBalancerName": "test-abc",
+                "Scheme": "internal",
+                "VpcId": "vpc-3d05f145",
+                "State": {
+                    "Code": "active"
+                },
+                "Type": "application",
+                "AvailabilityZones": [
+                    {
+                        "ZoneName": "us-east-1b",
+                        "SubnetId": "subnet-085d1234"
+                    },
+                    {
+                        "ZoneName": "us-east-1a",
+                        "SubnetId": "subnet-da895678"
+                    }
+                ],
+                "SecurityGroups": [
+                    "sg-01a19f602ecaf25f4",
+                    "sg-c573e6b3"
+                ],
+                "IpAddressType": "ipv4"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "438cdb64-a990-11e9-8978-ad60691c507d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "438cdb64-a990-11e9-8978-ad60691c507d",
+                "content-type": "text/xml",
+                "content-length": "8807",
+                "vary": "accept-encoding",
+                "date": "Thu, 18 Jul 2019 19:14:28 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
