@@ -1997,6 +1997,10 @@ class CreateFlowLogs(BaseAction):
                 raise PolicyValidationError(
                     'DeliverLogsPermissionArn not required with destination as s3 when'
                     'creating flow-logs on %s' % (self.manager.data,))
+            if (self.data.get('LogDestinationType') == 'cloud-watch-logs' and
+               not self.data.get('DeliverLogsPermissionArn')):
+                raise PolicyValidationError(
+                    'DeliverLogsPermissionArn required when LogDestinationType is cloud-watch-logs')
             if (not self.data.get('LogGroupName') and not self.data.get('LogDestination')):
                 raise PolicyValidationError(
                     'Either LogGroupName or LogDestination required')
