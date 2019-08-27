@@ -297,7 +297,7 @@ class AzurePeriodicMode(AzureFunctionMode, PullMode):
                                schedule={
                                     'type': 'string',
                                     # Based on NCRONTAB used by Azure Functions: https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer#ncrontab-examples
-                                    'pattern': '([0-9]|\,|\*\/|\-)+ (\*|[0-9]|\,|\/|\-)+ (\*|[0-9]|\,|\/|\-)+ (\*|[0-9]|[1-2][0-9]|3[0-1]|\,|\*\/|\-)+ ([Jj](an|anuary)|[Ff](eb|ebruary)|[Mm](ar|arch)|[Aa](pr|pril)|[Mm]ay|[Jj](un|une)|[Jj](ul|uly)|[Aa](ug|ugust)|[Ss](ep|ept|eptember)|[Oo](ct|ctober)|[Nn](ov|ovember)|[Dd](ec|ecember)|\,|\*\/|[1-9]|1[0-2]|\*)+ ([Mm](on|onday)|[Tt](u|ue|ues|uesday)|[Ww](ed|ednesday)|[Tt](h|hu|hur|hurs|hursday)|[Ff](ri|riday)|[Ss](at|aturday)|[Ss](un|unday)|[0-6]|\,|\*|\-)+'},     
+                                    'pattern': '([0-9]|\,|\*\/|\-)+ (\*|[0-9]|\,|\/|\-)+ (\*|[0-9]|\,|\/|\-)+ (\*|[0-9]|[1-2][0-9]|3[0-1]|\,|\*\/|\-)+ ([Jj](an|anuary)|[Ff](eb|ebruary)|[Mm](ar|arch)|[Aa](pr|pril)|[Mm]ay|[Jj](un|une)|[Jj](ul|uly)|[Aa](ug|ugust)|[Ss](ep|ept|eptember)|[Oo](ct|ctober)|[Nn](ov|ovember)|[Dd](ec|ecember)|\,|\*\/|[1-9]|1[0-2]|\*)+ ([Mm](on|onday)|[Tt](u|ue|ues|uesday)|[Ww](ed|ednesday)|[Tt](h|hu|hur|hurs|hursday)|[Ff](ri|riday)|[Ss](at|aturday)|[Ss](un|unday)|[0-6]|\,|\*|\-)+'
                                 },
                                rinherit=AzureFunctionMode.schema)
 
