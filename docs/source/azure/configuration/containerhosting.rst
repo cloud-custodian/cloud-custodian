@@ -77,22 +77,24 @@ the helm chart's values.yaml.
     # sample-values.yaml
 
     defaultEnvironment:
-    AZURE_TENANT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    AZURE_CLIENT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    AZURE_EVENT_QUEUE_NAME: "cloud-custodian-events"
+      AZURE_TENANT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      AZURE_CLIENT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      AZURE_EVENT_QUEUE_NAME: "cloud-custodian-events"
+    
+    defaultSecretEnvironment:
+      AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
     subscriptionHosts:
-    - name: "my-first-subscription"
+      - name: "my-first-subscription"
         environment:
-        AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-        AZURE_CONTAINER_STORAGE: "https://firstStorageAccount.blob.core.windows.net/cloud-custodian-policies"
-        AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Storage/storageAccounts/firstStorageAccount"
-    - name: "my-second-subscription"
+          AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          AZURE_CONTAINER_STORAGE: "https://firstStorageAccount.blob.core.windows.net/cloud-custodian-policies"
+          AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Storage/storageAccounts/firstStorageAccount"
+      - name: "my-second-subscription"
         environment:
-        AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-        AZURE_CONTAINER_STORAGE: "https://secondStorageAccount.blob.core.windows.net/more-policies"
-        AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myOtherResourceGroup/providers/Microsoft.Storage/storageAccounts/secondStorageAccount"
+          AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          AZURE_CONTAINER_STORAGE: "https://secondStorageAccount.blob.core.windows.net/more-policies"
+          AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myOtherResourceGroup/providers/Microsoft.Storage/storageAccounts/secondStorageAccount"
 
 To deploy the chart:
 
@@ -138,6 +140,7 @@ all of the containers will share the same policy storage and storage account for
     Options:
     -n, --name TEXT           [required]
     -e, --env <TEXT TEXT>...
+    --secret-env <TEXT TEXT>...
     --help                    Show this message and exit.
 
 
@@ -150,6 +153,7 @@ all of the containers will share the same policy storage and storage account for
     Options:
     -m, --management-group-id TEXT  [required]
     -e, --env <TEXT TEXT>...
+    --secret-env <TEXT TEXT>...
     --help                          Show this message and exit.
 
 Examples
@@ -166,7 +170,7 @@ Deploy against a single subscription:
         --name my-subscription \
         --env AZURE_TENANT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
         --env AZURE_SUBSCRIPTION_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        --env AZURE_CLIENT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
+        --secret-env AZURE_CLIENT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
         --env AZURE_CLIENT_SECRET "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
         --env AZURE_CONTAINER_STORAGE "https://myStorageAccount.blob.core.windows.net/policyContainer" \
         --env AZURE_EVENT_QUEUE_RESOURCE_ID "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Storage/storageAccounts/myStorageAccount" \
@@ -183,7 +187,7 @@ Deploy against a management group:
         --management-group-id "my-management-group" \
         --env AZURE_TENANT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
         --env AZURE_CLIENT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        --env AZURE_CLIENT_SECRET "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
+        --secret-env AZURE_CLIENT_SECRET "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
         --env AZURE_CONTAINER_STORAGE "https://myStorageAccount.blob.core.windows.net/policyContainer" \
         --env AZURE_EVENT_QUEUE_RESOURCE_ID "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Storage/storageAccounts/myStorageAccount" \
 
