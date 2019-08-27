@@ -71,7 +71,7 @@ class AzurePolicyModeTest(BaseTest):
                      }}
             })
             self.assertTrue(p)
-    
+
     def test_azure_function_periodic_schema_schedule_valid(self):
         policy = {
             'name': 'test-azure-schema-schedule-valid',
@@ -109,7 +109,7 @@ class AzurePolicyModeTest(BaseTest):
 
         invalid_schedules = [
             '* * * * *',
-            '* * * * * * *'
+            '0 * * * * * *',
             '* * * * * *',
             '0 0 0 0 0 0',
             '15-60 * * * * 7'
@@ -119,7 +119,7 @@ class AzurePolicyModeTest(BaseTest):
             policy['mode']['schedule'] = invalid_schedule
             with self.assertRaises(ValidationError):
                 self.load_policy(policy, validate=True)
-    
+
     def test_container_periodic_schema_schedule_valid(self):
         policy = {
             'name': 'test-azure-periodic-mode',
@@ -130,10 +130,10 @@ class AzurePolicyModeTest(BaseTest):
         }
 
         valid_schedules = [
-            '5 */2 * * friday',
-            '* 5 * February *',
-            '5-7 * * * 1-5',
-            '5,8,10 * * Jan Mon'
+            '5 */2 * * fri',
+            ' * 5 * feb * ',
+            '5-7 * * * 1-5 ',
+            '5,8,10 * * jan mon'
         ]
 
         result = True
@@ -154,10 +154,10 @@ class AzurePolicyModeTest(BaseTest):
         }
 
         invalid_schedules = [
-            '* * * * *',
-            '* * * * * * '
-            '0 0 0 0 0',
-            '* 15 * Jan 7'
+            '* * * *',
+            '* * * * * *'
+            '*/15 * Jan 1-5',
+            '* 15 * jan 7',
         ]
 
         for invalid_schedule in invalid_schedules:
