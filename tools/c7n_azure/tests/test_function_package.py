@@ -21,6 +21,7 @@ from azure_common import BaseTest
 from c7n_azure.function_package import FunctionPackage, AzurePythonPackageArchive
 from c7n_azure.constants import ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, \
     FUNCTION_TIME_TRIGGER_MODE, FUNCTION_EVENT_TRIGGER_MODE
+from jsonschema import ValidationError
 from mock import patch, MagicMock, PropertyMock
 
 from azure.mgmt.web.models.user import User
@@ -51,6 +52,54 @@ class FunctionPackageTest(BaseTest):
         self.assertEqual(binding['bindings'][0]['type'], 'timerTrigger')
         self.assertEqual(binding['bindings'][0]['name'], 'input')
         self.assertEqual(binding['bindings'][0]['schedule'], '0 1 0 1 1 1')
+
+    def test_valid_periodic_function_regex(self):
+        policy = {
+            'name': 'test-azure-public-ip',
+            'resource': 'azure.publicip',
+            'mode': {
+                'type': FUNCTION_TIME_TRIGGER_MODE,
+                'schedule': ''
+            }
+        }
+
+        valid_schedules = [
+            '0 5 */2 * * friday',
+            '0 * 5 * February *',
+            '5-7 * * * * 1-5',
+            '5,8,10 * * * Jan Mon'
+        ]
+
+        result = True
+        for valid_schedule in valid_schedules:
+            policy['mode']['schedule'] = valid_schedule
+            p = self.load_policy(policy, validate=True)
+            result = result and p
+
+        self.assertTrue(result)
+
+    def test_invalid_periodic_function_regex(self):
+        policy = {
+            'name': 'test-azure-public-ip',
+            'resource': 'azure.publicip',
+            'mode': {
+                'type': FUNCTION_TIME_TRIGGER_MODE,
+                'schedule': ''
+            }
+        }
+
+        invalid_schedules = [
+            '* * * * *',
+            '* * * * * * *'
+            '* * * * * *',
+            '0 0 0 0 0 0',
+            '15-60 * * * * 7'
+        ]
+
+        for invalid_schedule in invalid_schedules:
+            policy['mode']['schedule'] = invalid_schedule
+            with self.assertRaises(ValidationError):
+                self.load_policy(policy, validate=True)
 
     def test_add_function_config_events(self):
         p = self.load_policy({
