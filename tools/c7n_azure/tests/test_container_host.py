@@ -263,6 +263,46 @@ class ContainerHostTest(BaseTest):
         jobs = host.scheduler.get_jobs()
         self.assertEqual(0, len([j for j in jobs if j.id == 'blob1.yml']))
 
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
+    @patch('c7n_azure.container_host.host.BlockingScheduler.start')
+    @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
+    @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
+    @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
+    def test_update_policies_list_blobs_azure_http_error(self,
+            get_blob_client_mock, _2, _3, _4, _5):
+        client_mock = Mock()
+        client_mock.list_blobs.side_effect = AzureHttpError("failed to list blobs", 400)
+        get_blob_client_mock.return_value = (client_mock, None, None)
+
+        host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
+        with self.assertRaises(AzureHttpError):
+            host.update_policies()
+        client_mock.list_blobs.assert_called()
+
+    @patch('c7n_azure.container_host.host.Host.update_event_subscription')
+    @patch('c7n_azure.container_host.host.BlockingScheduler.start')
+    @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
+    @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
+    @patch('c7n_azure.container_host.host.Storage.get_blob_client_by_uri')
+    @patch('os.makedirs', wraps=os.makedirs)
+    def test_update_policies_in_subfolders(self,
+            makedirs_mock, get_blob_client_mock, _2, _3, _4, _5):
+        blob_name = "path/to/blob.yml"
+        client_mock = Mock()
+        client_mock.list_blobs.return_value = [ContainerHostTest.get_mock_blob(blob_name, 'blob')]
+        client_mock.get_blob_to_path = self.download_policy_blob
+        get_blob_client_mock.return_value = (client_mock, None, None)
+
+        self.addCleanup(lambda: shutil.rmtree(host.policy_cache))
+
+        host = Host(DEFAULT_EVENT_QUEUE_ID, DEFAULT_EVENT_QUEUE_NAME, DEFAULT_POLICY_STORAGE)
+        host.update_policies()
+        self.assertEqual(1, len(host.policies.items()))
+        jobs = host.scheduler.get_jobs()
+        self.assertEqual(1, len([j for j in jobs if j.id == blob_name]))
+        blob_dir = os.path.join(host.policy_cache, blob_name)
+        makedirs_mock.assert_any_call(os.path.dirname(blob_dir))
+
     @patch('c7n_azure.container_host.host.BlockingScheduler.start')
     @patch('c7n_azure.container_host.host.Host.prepare_queue_storage')
     @patch('c7n_azure.container_host.host.Storage.get_queue_client_by_storage_account')
