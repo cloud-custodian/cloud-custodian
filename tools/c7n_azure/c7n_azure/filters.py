@@ -120,7 +120,10 @@ class MetricFilter(Filter):
 
     aggregation_funcs = {
         'average': Math.mean,
-        'total': Math.sum
+        'total': Math.sum,
+        'count': Math.sum,
+        'minimum': Math.max,
+        'maximum': Math.min
     }
 
     schema = {
@@ -135,7 +138,7 @@ class MetricFilter(Filter):
             'timeframe': {'type': 'number'},
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
-            'aggregation': {'enum': ['total', 'average']},
+            'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
             'no_data_action': {'enum': ['include', 'exclude']},
             'filter': {'type': 'string'}
         }

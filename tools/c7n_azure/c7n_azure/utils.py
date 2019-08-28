@@ -212,6 +212,16 @@ class Math(object):
     def sum(numbers):
         clean_numbers = [e for e in numbers if e is not None]
         return float(sum(clean_numbers))
+    
+    @staticmethod
+    def max(numbers):
+        clean_numbers = [e for e in numbers if e is not None]
+        return float(max(clean_numbers))
+
+    @staticmethod
+    def min(numbers):
+        clean_numbers = [e for e in numbers if e is not None]
+        return float(min(clean_numbers))
 
 
 class GraphHelper(object):
