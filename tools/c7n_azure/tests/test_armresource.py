@@ -125,7 +125,7 @@ class ArmResourceTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 0)
-    
+
     @arm_template('vm.json')
     def test_metric_filter_invalid_metric(self):
         p = self.load_policy({
