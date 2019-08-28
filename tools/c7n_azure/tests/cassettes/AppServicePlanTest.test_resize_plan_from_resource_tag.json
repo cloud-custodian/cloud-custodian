@@ -4,131 +4,6 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-win?api-version=2018-02-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "date": [
-                        "Thu, 22 Aug 2019 04:10:30 GMT"
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "1388"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-win",
-                        "name": "cctest-appserviceplan-win",
-                        "type": "Microsoft.Web/serverfarms",
-                        "kind": "app",
-                        "location": "East US",
-                        "tags": {
-                            "sku": "B1"
-                        },
-                        "properties": {
-                            "serverFarmId": 29359,
-                            "name": "cctest-appserviceplan-win",
-                            "workerSize": "Default",
-                            "workerSizeId": 0,
-                            "workerTierName": null,
-                            "numberOfWorkers": 0,
-                            "currentWorkerSize": "Default",
-                            "currentWorkerSizeId": 0,
-                            "currentNumberOfWorkers": 0,
-                            "status": "Ready",
-                            "webSpace": "test_appserviceplan-EastUSwebspace",
-                            "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
-                            "adminSiteName": null,
-                            "hostingEnvironment": null,
-                            "hostingEnvironmentProfile": null,
-                            "maximumNumberOfWorkers": 1,
-                            "planName": "VirtualDedicatedPlan",
-                            "adminRuntimeSiteName": null,
-                            "computeMode": "Shared",
-                            "siteMode": "Limited",
-                            "geoRegion": "East US",
-                            "perSiteScaling": false,
-                            "maximumElasticWorkerCount": 1,
-                            "numberOfSites": 0,
-                            "hostingEnvironmentId": null,
-                            "isSpot": false,
-                            "spotExpirationTime": null,
-                            "freeOfferExpirationTime": null,
-                            "tags": {
-                                "sku": "B1"
-                            },
-                            "kind": "app",
-                            "resourceGroup": "test_appserviceplan",
-                            "reserved": false,
-                            "isXenon": false,
-                            "hyperV": false,
-                            "mdmId": "waws-prod-blu-083_29359",
-                            "targetWorkerCount": 1,
-                            "targetWorkerSizeId": 0,
-                            "provisioningState": "Succeeded",
-                            "webSiteId": null,
-                            "existingServerFarmIds": null
-                        },
-                        "sku": {
-                            "name": "F1",
-                            "tier": "Free",
-                            "size": "F1",
-                            "family": "F",
-                            "capacity": 0
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "PATCH",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-win?api-version=2016-09-01",
-                "body": "mock_body",
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 202,
-                    "message": "Accepted"
-                },
-                "headers": {
-                    "date": [
-                        "Thu, 22 Aug 2019 04:10:32 GMT"
-                    ],
-                    "location": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverFarms/cctest-appserviceplan-win/operationresults/404d150c-23cb-43b9-af01-bf6c5d74517b?api-version=2016-09-01"
-                    ],
-                    "content-length": [
-                        "0"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ]
-                },
-                "body": {
-                    "string": ""
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Web/serverfarms?api-version=2018-02-01",
                 "body": null,
                 "headers": {}
@@ -139,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Thu, 22 Aug 2019 04:10:33 GMT"
-                    ],
                     "content-type": [
                         "application/json"
+                    ],
+                    "date": [
+                        "Wed, 28 Aug 2019 06:18:05 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "content-length": [
-                        "12021"
+                        "9365"
                     ]
                 },
                 "body": {
@@ -165,12 +40,12 @@
                                     "sku": "B1"
                                 },
                                 "properties": {
-                                    "serverFarmId": 13869736,
+                                    "serverFarmId": 13950228,
                                     "name": "cctest-appserviceplan-win",
                                     "workerSize": "Default",
                                     "workerSizeId": 0,
                                     "workerTierName": null,
-                                    "numberOfWorkers": 0,
+                                    "numberOfWorkers": 1,
                                     "currentWorkerSize": null,
                                     "currentWorkerSizeId": null,
                                     "currentNumberOfWorkers": null,
@@ -180,7 +55,7 @@
                                     "adminSiteName": null,
                                     "hostingEnvironment": null,
                                     "hostingEnvironmentProfile": null,
-                                    "maximumNumberOfWorkers": 1,
+                                    "maximumNumberOfWorkers": 10,
                                     "planName": "VirtualDedicatedPlan",
                                     "adminRuntimeSiteName": null,
                                     "computeMode": "Shared",
@@ -209,11 +84,11 @@
                                     "existingServerFarmIds": null
                                 },
                                 "sku": {
-                                    "name": "F1",
-                                    "tier": "Free",
-                                    "size": "F1",
-                                    "family": "F",
-                                    "capacity": 0
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "family": "S",
+                                    "capacity": 1
                                 }
                             }
                         ],

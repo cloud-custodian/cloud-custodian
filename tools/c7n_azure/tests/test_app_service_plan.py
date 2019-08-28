@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure.mgmt.resource.resources.models import GenericResource
 from azure.mgmt.web import WebSiteManagementClient
 from azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
@@ -113,17 +112,6 @@ class AppServicePlanTest(BaseTest):
            'AppServicePlansOperations.update')
     @arm_template('appserviceplan.json')
     def test_resize_plan_from_resource_tag(self, update_mock):
-        app_plan = self.client.app_service_plans.get('test_appserviceplan',
-                                                     'cctest-appserviceplan-win')
-
-        self.assertNotEqual(app_plan.sku.name, 'B1')
-
-        resource_client = self.session.client(
-            'azure.mgmt.resource.ResourceManagementClient')
-
-        tags_patch = GenericResource(tags={'sku': 'B1'})
-        resource_client.resources.update_by_id(app_plan.id, "2016-09-01", tags_patch)
-
         p = self.load_policy({
             'name': 'test-azure-appserviceplan',
             'resource': 'azure.appserviceplan',
