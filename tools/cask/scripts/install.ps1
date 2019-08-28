@@ -20,6 +20,9 @@ $base = "$env:LOCALAPPDATA\custodian"
 
 try
 {
+    # Ensure folder
+    md -Force $base | Out-Null
+
     # Download
     Invoke-WebRequest -OutFile "$base\custodian-cask.exe" "$url"
 

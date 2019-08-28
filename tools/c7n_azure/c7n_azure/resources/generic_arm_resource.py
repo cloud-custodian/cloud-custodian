@@ -44,6 +44,13 @@ class GenericArmResource(ArmResourceManager):
         resource_type = 'armresource'
         enable_tag_operations = True
 
+        default_report_fields = (
+            'name',
+            'type',
+            'location',
+            'resourceGroup'
+        )
+
     def tag_operation_enabled(self, resource_type):
         if resource_type.lower() in arm_resource_types:
             return arm_resource_types[resource_type.lower()].enable_tag_operations

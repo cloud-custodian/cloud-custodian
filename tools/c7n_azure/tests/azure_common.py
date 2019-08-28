@@ -145,11 +145,16 @@ class AzureVCRBaseTest(VCRTestCase):
                         'expires',
                         'content-location']
 
+    def __init__(self, *args, **kwargs):
+        super(AzureVCRBaseTest, self).__init__(*args, **kwargs)
+        self.vcr_enabled = not os.environ.get('C7N_TEST_RUN_LIVE')
+
     def is_playback(self):
         # You can't do this in setup because it is actually required by the base class
         # setup (via our callbacks), but it is also not possible to do until the base class setup
         # has completed initializing the cassette instance.
-        return not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path)
+        cassette_exists = not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path)
+        return self.vcr_enabled and cassette_exists
 
     def _get_cassette_name(self):
         test_method = getattr(self, self._testMethodName)

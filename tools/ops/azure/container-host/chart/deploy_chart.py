@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import base64
 import logging
 import os
 import re
@@ -34,7 +35,7 @@ SUBSCRIPTION_TYPE = '/subscriptions'
 
 class Deployment(object):
 
-    def __init__(self, ctx, default_environment=None):
+    def __init__(self, ctx, default_environment=None, default_secret_environment=None):
         logging.basicConfig(level=logging.INFO, format='%(message)s')
 
         self.dry_run = ctx.parent.params.get('dry_run')
@@ -47,6 +48,7 @@ class Deployment(object):
         self.image_pull_policy = ctx.parent.params.get('image_pull_policy')
 
         self.default_environment = default_environment
+        self.default_secret_environment = default_secret_environment
         self.subscription_hosts = []
 
     def run(self):
@@ -64,7 +66,11 @@ class Deployment(object):
             self.deployment_name, values_file_path, namespace=self.deployment_namespace,
             dry_run=self.dry_run)
         logger.info(helm_command)
-        os.system(helm_command)
+        exit_status = os.system(helm_command)
+
+        os.remove(values_file_path)
+        if exit_status:
+            exit(exit_status)
 
     def build_values_dict(self):
         values = {}
@@ -86,10 +92,11 @@ class Deployment(object):
         if value:
             values.setdefault('image', {})[key] = value
 
-    def add_subscription_host(self, name='', environment={}):
+    def add_subscription_host(self, name='', environment={}, secret_environment={}):
         self.subscription_hosts.append({
             'name': name,
             'environment': environment,
+            'secretEnvironment': secret_environment,
         })
 
     @staticmethod
@@ -107,30 +114,32 @@ class Deployment(object):
         if namespace:
             command += ' --namespace {}'.format(namespace)
         command += ' --values {}'.format(values_file_path)
-        chart_path = os.path.dirname(__file__)
+        chart_path = os.path.dirname(__file__) or os.getcwd()
         command += ' {} {}'.format(deployment_name, chart_path)
         return command
 
 
 class SubscriptionDeployment(Deployment):
 
-    def __init__(self, ctx, name='', env=[]):
+    def __init__(self, ctx, name='', env=[], secret_env=[]):
         super(SubscriptionDeployment, self).__init__(ctx)
         self.name = name
         self.environment = {e[0]: e[1] for e in env}
+        self.secret_environment = {e[0]: base64.b64encode(e[1].encode()) for e in secret_env}
 
         self.run()
 
     def build_values_dict(self):
-        self.add_subscription_host(self.name, self.environment)
+        self.add_subscription_host(self.name, self.environment, self.secret_environment)
         return super(SubscriptionDeployment, self).build_values_dict()
 
 
 class ManagementGroupDeployment(Deployment):
 
-    def __init__(self, ctx, management_group_id, env=[]):
+    def __init__(self, ctx, management_group_id, env=[], secret_env=[]):
         super(ManagementGroupDeployment, self).__init__(ctx,
-            default_environment={e[0]: e[1] for e in env})
+            default_environment={e[0]: e[1] for e in env},
+            default_secret_environment={e[0]: base64.b64encode(e[1].encode()) for e in secret_env})
         self.management_group_id = management_group_id
         load_resources()
         self.session = local_session(Session)
@@ -183,6 +192,7 @@ def cli(deployment_name, deployment_namespace, image_repository='', image_tag=''
 @cli.command('subscription')
 @click.option('--name', '-n', required=True)
 @click.option('--env', '-e', type=click.Tuple([str, str]), multiple=True)
+@click.option('--secret-env', type=click.Tuple([str, str]), multiple=True)
 @click.pass_context
 class SubscriptionDeploymentCommand(SubscriptionDeployment):
     pass
@@ -192,6 +202,7 @@ class SubscriptionDeploymentCommand(SubscriptionDeployment):
 @click.pass_context
 @click.option('--management-group-id', '-m', required=True)
 @click.option('--env', '-e', type=click.Tuple([str, str]), multiple=True)
+@click.option('--secret-env', type=click.Tuple([str, str]), multiple=True)
 class ManagementGroupDeploymentCommand(ManagementGroupDeployment):
     pass
 
