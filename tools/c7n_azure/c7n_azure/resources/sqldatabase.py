@@ -33,7 +33,7 @@ from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper
 log = logging.getLogger('custodian.azure.sqldatabase')
 
 
-@resources.register('sqldatabase')
+@resources.register('sql-database', aliases=['sqldatabase'])
 class SqlDatabase(ChildArmResourceManager):
     """SQL Server Database Resource
 

@@ -20,7 +20,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 from netaddr import IPRange, IPSet
 
 
-@resources.register('sqlserver')
+@resources.register('sql-server', aliases=['sqlserver'])
 class SqlServer(ArmResourceManager):
     """SQL Server Resource
 
