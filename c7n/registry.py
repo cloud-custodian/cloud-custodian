@@ -103,7 +103,9 @@ class PluginRegistry(object):
         if factory:
             return factory
 
-        return next((v for k, v in self._factories.items() if v.aliases and name in v.aliases), None)
+        return next((v for k, v in self._factories.items()
+                     if v.aliases and name in v.aliases),
+                    None)
 
     def keys(self):
         return self._factories.keys()
