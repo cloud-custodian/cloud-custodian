@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
+
 import sendgrid
 import six
-from c7n_mailer.utils import decrypt
-from c7n_mailer.utils import (get_message_subject)
-from c7n_mailer.utils_email import is_email, get_mimetext_message
 from python_http_client import exceptions
-from sendgrid.helpers.mail import Mail, To, From
+from sendgrid.helpers.mail import From, Mail, To
+
+from c7n_mailer.utils import decrypt, get_message_subject
+from c7n_mailer.utils_email import get_mimetext_message, is_email
 
 
 class SendGridDelivery(object):
@@ -94,18 +96,19 @@ class SendGridDelivery(object):
 
         for email_to_addrs, message in six.iteritems(to_addrs_to_email_messages_map):
             for to_address in email_to_addrs:
+                message_string = base64.b64decode(message.get_payload()).decode('utf-8')
                 if email_format == "html":
                     mail = Mail(
                         from_email=From(from_address),
                         to_emails=To(to_address),
                         subject=subject,
-                        html_content=message.as_string())
+                        html_content=message_string)
                 else:
                     mail = Mail(
                         from_email=From(from_address),
                         to_emails=To(to_address),
                         subject=subject,
-                        plain_text_content=message.as_string())
+                        plain_text_content=message_string)
                 try:
                     self.sendgrid_client.send(mail)
                 except (exceptions.UnauthorizedError, exceptions.BadRequestsError) as e:
