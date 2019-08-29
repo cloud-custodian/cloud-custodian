@@ -40,7 +40,6 @@ class StorageContainer(ChildArmResourceManager):
 
     class resource_type(ChildArmResourceManager.resource_type):
         doc_groups = ['Storage']
-
         service = 'azure.mgmt.storage'
         client = 'StorageManagementClient'
         enum_spec = ('blob_containers', 'list', None)
