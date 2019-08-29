@@ -18,6 +18,7 @@ from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, casset
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode, AzureModeCommon
+from jsonschema import ValidationError
 from mock import mock, patch, Mock
 
 
@@ -47,6 +48,25 @@ class AzurePolicyModeTest(BaseTest):
                      }}
             })
             self.assertTrue(p)
+
+    def test_azure_function_event_mode_too_many_events_throws(self):
+        with self.sign_out_patch():
+            with self.assertRaises(ValidationError):
+                self.load_policy({
+                    'name': 'test-azure-serverless-mode',
+                    'resource': 'azure.vm',
+                    'mode': {
+                        'type': FUNCTION_EVENT_TRIGGER_MODE,
+                        'events': [
+                            'VmWrite',
+                            'AppServicePlanWrite',
+                            'CognitiveServiceWrite',
+                            'CosmosDbWrite',
+                            'DataFactoryWrite',
+                            'DataLakeWrite'
+                        ]
+                    }
+                }, validate=True)
 
     def test_azure_function_periodic_mode_schema_validation(self):
         with self.sign_out_patch():
