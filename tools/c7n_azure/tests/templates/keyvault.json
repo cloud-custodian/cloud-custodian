@@ -106,18 +106,6 @@
           "location": "southcentralus",
           "tags": {},
           "properties": {}
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/providers/locks",
-            "apiVersion": "2016-09-01",
-            "name": "[concat(variables('kvname'), '/Microsoft.Authorization/lock')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', variables('kvname'))]"
-            ],
-            "properties": {
-                "level": "CanNotDelete",
-                "notes": "Keyvault should not be deleted."
-            }
         }
     ]
 }

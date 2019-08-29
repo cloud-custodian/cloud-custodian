@@ -13,20 +13,22 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from datetime import datetime, timedelta, tzinfo
 import fnmatch
 import json
-import unittest
 import os
 import shutil
+import unittest
 import zipfile
+from datetime import datetime, timedelta, tzinfo
+from distutils.util import strtobool
 
 import boto3
-from botocore.response import StreamingBody
 import jmespath
-from placebo import pill
 import placebo
+from botocore.response import StreamingBody
+from placebo import pill
 from six import StringIO
+
 
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH
@@ -314,7 +316,7 @@ class PillTest(unittest.TestCase):
         default region. It is unused when replaying stored data.
         """
 
-        if os.environ.get("C7N_FUNCTIONAL") == "yes":
+        if strtobool(os.environ.get('C7N_FUNCTIONAL', 'no')):
             self.recording = True
             return lambda region=region, assume=None: boto3.Session(region_name=region)
 
