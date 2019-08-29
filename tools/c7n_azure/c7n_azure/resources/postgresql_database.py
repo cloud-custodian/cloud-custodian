@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ChildArmResourceManager
+from c7n_azure.resources.arm import ChildResourceManager
+from c7n_azure.query import ChildTypeInfo
 
 
 @resources.register('postgresql-database')
-class PostgresqlDatabase(ChildArmResourceManager):
+class PostgresqlDatabase(ChildResourceManager):
     """PostgreSQL Database Resource
 
     The ``azure.postgresql-database`` resource is a child resource of the PostgreSQL Server
@@ -41,21 +42,17 @@ class PostgresqlDatabase(ChildArmResourceManager):
                   value: dev
     """
 
-    class resource_type(ChildArmResourceManager.resource_type):
+    class resource_type(ChildTypeInfo):
         doc_groups = ['Databases']
 
         service = 'azure.mgmt.rdbms.postgresql'
         client = 'PostgreSQLManagementClient'
         enum_spec = ('databases', 'list_by_server', None)
         parent_manager_name = 'postgresql-server'
-        resource_type = 'Microsoft.DBforPostgreSQL/servers/databases'
         default_report_fields = (
             'name',
-            'resourceGroup',
             '"c7n:parent-id"'
         )
-
-        enable_tag_operations = False
 
         @classmethod
         def extra_args(cls, parent_resource):
