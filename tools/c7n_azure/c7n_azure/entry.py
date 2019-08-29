@@ -33,6 +33,7 @@ import c7n_azure.resources.load_balancer
 import c7n_azure.resources.resourcegroup
 import c7n_azure.resources.public_ip
 import c7n_azure.resources.storage
+import c7n_azure.resources.storage_container
 import c7n_azure.resources.sqlserver
 import c7n_azure.resources.sqldatabase
 import c7n_azure.resources.vm
