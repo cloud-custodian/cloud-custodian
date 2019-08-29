@@ -20,12 +20,12 @@ from c7n_azure.resources.arm import ChildArmResourceManager
 class PostgresqlDatabase(ChildArmResourceManager):
     """PostgreSQL Database Resource
 
-    The ``azure.postgresql-database`` resource is a child resource of the PostgreSQL Server 
+    The ``azure.postgresql-database`` resource is a child resource of the PostgreSQL Server
     resource, and the PostgreSQL Server parent id is available as the ``c7n:parent-id`` property.
 
     :example:
 
-    Finds all PostgreSQL Databases that are children of PostgreSQL Servers with the 
+    Finds all PostgreSQL Databases that are children of PostgreSQL Servers with the
     environment:dev tag
 
     .. code-block:: yaml
