@@ -10,6 +10,14 @@ schedules:
 
 variables:
 - group: AzureLiveTests
+- name: AZURE_CLIENT_ID
+  value: $(azure-client-id)
+- name: AZURE_CLIENT_SECRET
+  value: $(azure-client-secret)
+- name: AZURE_TENANT_ID
+  value: $(azure-tenant-id)
+- name: AZURE_SUBSCRIPTION_ID
+  value: $(azure-subscription-id)
 
 jobs:
 - job: 'azure_nightly_test_run'
@@ -32,7 +40,7 @@ jobs:
     - script: python -m pip install --upgrade pip && pip install . && pip install -r requirements-dev.txt
       displayName: "Install Dependencies"
 
-    - script: az login --service-principal -u ${azure-client-id} -p ${azure-client-secret} --tenant ${azure-tenant-id} && az account set -s ${azure-subscription-id}
+    - script: az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} && az account set -s ${AZURE_SUBSCRIPTION_ID}
       displayName: "Login to Azure"
 
     - script: tools/c7n_azure/tests/templates/provision.sh
