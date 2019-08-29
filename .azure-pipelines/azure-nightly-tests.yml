@@ -1,9 +1,21 @@
+trigger: none
+
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily midnight build
+  branches:
+    include:
+    - master
+
 variables:
-- group: CustodianCoreCI
+- group: AzureLiveTests
 
 jobs:
 - job: 'azure_nightly_test_run'
   displayName: 'Azure Nightly Test Run'
+  timeoutInMinutes: 0
+  cancelTimeoutInMinutes: 0
+
   pool:
     vmImage: 'Ubuntu-16.04'
 
