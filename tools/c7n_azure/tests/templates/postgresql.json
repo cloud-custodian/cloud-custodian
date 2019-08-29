@@ -12,7 +12,7 @@
         {
             "apiVersion": "2017-12-01",
             "type": "Microsoft.DBforPostgreSQL/servers",
-            "location": "westus2",
+            "location": "[resourceGroup().location]",
             "name": "[parameters('serverName')]",
             "properties": {
                 "version": "10",

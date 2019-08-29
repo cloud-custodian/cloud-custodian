@@ -1,4 +1,4 @@
-# Copyright 2018 Capital One Services, LLC
+# 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,22 +16,29 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ChildArmResourceManager
 
 
-@resources.register('postgresqldatabase')
+@resources.register('postgresql-database')
 class PostgresqlDatabase(ChildArmResourceManager):
     """PostgreSQL Database Resource
 
-    The ``azure.postgresqldatabase`` resource is a child resource of the PostgreSQL Server resource,
-    and the PostgreSQL Server parent id is available as the ``c7n:parent-id`` property.
+    The ``azure.postgresql-database`` resource is a child resource of the PostgreSQL Server 
+    resource, and the PostgreSQL Server parent id is available as the ``c7n:parent-id`` property.
 
     :example:
 
-    Finds all PostgreSQL Databases in the subscription.
+    Finds all PostgreSQL Databases that are children of PostgreSQL Servers with the 
+    environment:dev tag
 
     .. code-block:: yaml
 
         policies:
-            - name: find-all-postgresql-databases
-              resource: azure.postgresqldatabase
+          - name: find-all-dev-postgresql-databases
+            resource: azure.postgresql-database
+            filters:
+              - type: parent
+                filter:
+                  type: value
+                  key: tags.environment
+                  value: dev
     """
 
     class resource_type(ChildArmResourceManager.resource_type):
@@ -40,8 +47,13 @@ class PostgresqlDatabase(ChildArmResourceManager):
         service = 'azure.mgmt.rdbms.postgresql'
         client = 'PostgreSQLManagementClient'
         enum_spec = ('databases', 'list_by_server', None)
-        parent_manager_name = 'postgresqlserver'
+        parent_manager_name = 'postgresql-server'
         resource_type = 'Microsoft.DBforPostgreSQL/servers/databases'
+        default_report_fields = (
+            'name',
+            'resourceGroup',
+            '"c7n:parent-id"'
+        )
 
         enable_tag_operations = False
 

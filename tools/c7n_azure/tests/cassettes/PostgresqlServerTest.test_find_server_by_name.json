@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Tue, 27 Aug 2019 21:24:19 GMT"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "date": [
+                        "Thu, 29 Aug 2019 04:32:52 GMT"
+                    ],
                     "content-length": [
-                        "788"
+                        "898"
                     ]
                 },
                 "body": {
@@ -46,14 +46,14 @@
                                         "storageAutoGrow": "Disabled"
                                     },
                                     "version": "10",
-                                    "sslEnforcement": "Enabled",
+                                    "sslEnforcement": "Disabled",
                                     "userVisibleState": "Ready",
                                     "fullyQualifiedDomainName": "cctestpostgresqlservernxmxlpd5w73ag.postgres.database.azure.com",
-                                    "earliestRestoreDate": "2019-08-27T21:24:18.857+00:00",
+                                    "earliestRestoreDate": "2019-08-28T17:55:28.257+00:00",
                                     "replicationRole": "",
                                     "masterServerId": ""
                                 },
-                                "location": "westus2",
+                                "location": "southcentralus",
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlservernxmxlpd5w73ag",
                                 "name": "cctestpostgresqlservernxmxlpd5w73ag",
                                 "type": "Microsoft.DBforPostgreSQL/servers"

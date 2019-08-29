@@ -1,4 +1,4 @@
-# Copyright 2015-2018 Capital One Services, LLC
+# 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,18 +19,17 @@ from azure_common import BaseTest, arm_template
 class PostgresqlDatabaseTest(BaseTest):
 
     def test_postgresql_database_schema_validate(self):
-        with self.sign_out_patch():
-            p = self.load_policy({
-                'name': 'test-postgresql-database-schema-validate',
-                'resource': 'azure.postgresqldatabase'
-            }, validate=True)
-            self.assertTrue(p)
+        p = self.load_policy({
+            'name': 'test-postgresql-database-schema-validate',
+            'resource': 'azure.postgresql-database'
+        }, validate=True)
+        self.assertTrue(p)
 
     @arm_template('postgresql.json')
     def test_find_database_by_name(self):
         p = self.load_policy({
             'name': 'test-get-database-by-name',
-            'resource': 'azure.postgresqldatabase',
+            'resource': 'azure.postgresql-database',
             'filters': [
                 {
                     'type': 'value',
@@ -43,4 +42,3 @@ class PostgresqlDatabaseTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], 'cctestdb')

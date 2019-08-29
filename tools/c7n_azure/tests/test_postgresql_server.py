@@ -1,4 +1,4 @@
-# Copyright 2015-2018 Capital One Services, LLC
+# 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,18 +19,17 @@ from azure_common import BaseTest, arm_template
 class PostgresqlServerTest(BaseTest):
 
     def test_postgresql_server_schema_validate(self):
-        with self.sign_out_patch():
-            p = self.load_policy({
-                'name': 'test-postgresql-server-schema-validate',
-                'resource': 'azure.postgresqlserver'
-            }, validate=True)
-            self.assertTrue(p)
+        p = self.load_policy({
+            'name': 'test-postgresql-server-schema-validate',
+            'resource': 'azure.postgresql-server'
+        }, validate=True)
+        self.assertTrue(p)
 
     @arm_template('postgresql.json')
     def test_find_server_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-postgresql-server',
-            'resource': 'azure.postgresqlserver',
+            'resource': 'azure.postgresql-server',
             'filters': [
                 {
                     'type': 'value',
@@ -43,4 +42,3 @@ class PostgresqlServerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['name'].startswith('cctestpostgresqlserver'))
