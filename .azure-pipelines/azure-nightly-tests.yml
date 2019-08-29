@@ -6,6 +6,7 @@ schedules:
   branches:
     include:
     - master
+  always: true
 
 variables:
 - group: AzureLiveTests
@@ -31,7 +32,7 @@ jobs:
     - script: python -m pip install --upgrade pip && pip install . && pip install -r requirements-dev.txt
       displayName: "Install Dependencies"
 
-    - script: az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} && az account set -s ${AZURE_SUBSCRIPTION_ID}
+    - script: az login --service-principal -u ${azure-client-id} -p ${azure-client-secret} --tenant ${azure-tenant-id} && az account set -s ${azure-subscription-id}
       displayName: "Login to Azure"
 
     - script: tools/c7n_azure/tests/templates/provision.sh
