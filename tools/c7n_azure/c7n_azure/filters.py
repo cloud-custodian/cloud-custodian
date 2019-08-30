@@ -196,8 +196,8 @@ class MetricFilter(Filter):
                 aggregation=self.aggregation,
                 filter=self.filter
             )
-        except Exception:
-            self.log.warning("could not get metric:%s on %s" % (
+        except self.client.models(self.client._get_api_version('metrics')).ErrorResponseException:
+            self.log.error("could not get metric:%s on %s" % (
                 self.metric, resource['id']))
             return None
 
