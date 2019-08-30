@@ -70,6 +70,7 @@ setup(
                       "azure-mgmt-network>=4.0.0",
                       "azure-mgmt-redis",
                       "azure-mgmt-resource==2.1.0",
+                      "azure-mgmt-rdbms",
                       "azure-mgmt-sql",
                       "azure-mgmt-storage",
                       "azure-mgmt-web",
