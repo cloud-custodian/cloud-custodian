@@ -25,6 +25,7 @@ from azure.mgmt.costmanagement.models import (QueryAggregation,
 from azure.mgmt.policyinsights import PolicyInsightsClient
 from dateutil import tz as tzutils
 from dateutil.parser import parse
+from msrest.exceptions import HttpOperationError
 
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
@@ -185,7 +186,6 @@ class MetricFilter(Filter):
 
     def get_metric_data(self, resource):
         cached_metric_data = self._get_cached_metric_data(resource)
-        models = self.client.models(self.client._get_api_version('metrics'))
         if cached_metric_data:
             return cached_metric_data['measurement']
         try:
@@ -197,7 +197,7 @@ class MetricFilter(Filter):
                 aggregation=self.aggregation,
                 filter=self.filter
             )
-        except models.ErrorResponseException as e:
+        except HttpOperationError as e:
             self.log.error("could not get metric:%s on %s. Full error: %s" % (
                 self.metric, resource['id'], str(e)))
             return None
