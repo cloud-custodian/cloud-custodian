@@ -8,6 +8,7 @@ schedules:
     - master
   always: true
 
+# Remap KV group variables to C7N env names
 variables:
 - group: AzureLiveTests
 - name: AZURE_CLIENT_ID
