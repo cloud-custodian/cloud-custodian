@@ -6,9 +6,19 @@ schedules:
   branches:
     include:
     - master
+  always: true
 
+# Remap KV group variables to C7N env names
 variables:
 - group: AzureLiveTests
+- name: AZURE_CLIENT_ID
+  value: $(azure-client-id)
+- name: AZURE_CLIENT_SECRET
+  value: $(azure-client-secret)
+- name: AZURE_TENANT_ID
+  value: $(azure-tenant-id)
+- name: AZURE_SUBSCRIPTION_ID
+  value: $(azure-subscription-id)
 
 jobs:
 - job: 'azure_nightly_test_run'
