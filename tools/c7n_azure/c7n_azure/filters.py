@@ -185,6 +185,7 @@ class MetricFilter(Filter):
 
     def get_metric_data(self, resource):
         cached_metric_data = self._get_cached_metric_data(resource)
+        models = self.client.models(self.client._get_api_version('metrics'))
         if cached_metric_data:
             return cached_metric_data['measurement']
         try:
@@ -196,9 +197,9 @@ class MetricFilter(Filter):
                 aggregation=self.aggregation,
                 filter=self.filter
             )
-        except self.client.models(self.client._get_api_version('metrics')).ErrorResponseException:
-            self.log.error("could not get metric:%s on %s" % (
-                self.metric, resource['id']))
+        except models.ErrorResponseException as e:
+            self.log.error("could not get metric:%s on %s. Full error: %s" % (
+                self.metric, resource['id'], str(e)))
             return None
 
         if len(metrics_data.value) > 0 and len(metrics_data.value[0].timeseries) > 0:
