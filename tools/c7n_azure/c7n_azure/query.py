@@ -15,11 +15,14 @@
 import logging
 
 import six
+from collections import Iterable
+
 from c7n_azure import constants
 from c7n_azure.actions.logic_app import LogicAppAction
 from c7n_azure.actions.notify import Notify
 from c7n_azure.filters import ParentFilter
 from c7n_azure.provider import resources
+
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
@@ -317,7 +320,15 @@ class ChildResourceManager(QueryResourceManager):
         else:
             op = getattr(client, list_op)
 
-        return [r.serialize(True) for r in op(**params)]
+        result = op(**params)
+
+        if isinstance(result, Iterable):
+            return [r.serialize(True) for r in result]
+        elif hasattr(result, 'value'):
+            return [r.serialize(True) for r in result.value]
+
+        raise TypeError("Enumerating resources resulted in a return"
+                        "value which could not be iterated.")
 
     @staticmethod
     def register_child_specific(registry, _):

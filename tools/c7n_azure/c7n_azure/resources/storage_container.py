@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ChildArmResourceManager
+from c7n_azure.query import ChildTypeInfo, ChildResourceManager
 
 
 @resources.register('storage-container')
-class StorageContainer(ChildArmResourceManager):
+class StorageContainer(ChildResourceManager):
     """Storage Container Resource
 
     :example:
@@ -38,7 +38,7 @@ class StorageContainer(ChildArmResourceManager):
                 value: None   # Possible values: Blob, Container, None
     """
 
-    class resource_type(ChildArmResourceManager.resource_type):
+    class resource_type(ChildTypeInfo):
         doc_groups = ['Storage']
         service = 'azure.mgmt.storage'
         client = 'StorageManagementClient'
@@ -48,11 +48,7 @@ class StorageContainer(ChildArmResourceManager):
         resource_type = 'Microsoft.Storage/storageAccounts/blobServices/containers'
         enable_tag_operations = False
 
-    def enumerate_resources(self, parent_resource, type_info, **params):
-        client = self.get_client()
-
-        params.update({'resource_group_name': parent_resource['resourceGroup'],
-                       'account_name': parent_resource['name']})
-
-        # Storage SDK is non-standard and returns `dict` from `list`
-        return [r.serialize(True) for r in client.blob_containers.list(**params).value]
+        @classmethod
+        def extra_args(cls, parent_resource):
+            return {'resource_group_name': parent_resource['resourceGroup'],
+                    'account_name': parent_resource['name']}
