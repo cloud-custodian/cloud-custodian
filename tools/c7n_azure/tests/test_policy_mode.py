@@ -46,7 +46,7 @@ class AzurePolicyModeTest(BaseTest):
                              'name': 'testschemaname'
                          }
                      }}
-            })
+            }, validate=True)
             self.assertTrue(p)
 
     def test_azure_function_event_mode_too_many_events_throws(self):
@@ -88,7 +88,7 @@ class AzurePolicyModeTest(BaseTest):
                              'name': 'testschemaname'
                          }
                      }}
-            })
+            }, validate=True)
             self.assertTrue(p)
 
     def test_azure_function_periodic_schema_schedule_valid(self):
@@ -192,7 +192,7 @@ class AzurePolicyModeTest(BaseTest):
                 'mode':
                     {'type': CONTAINER_EVENT_TRIGGER_MODE,
                      'events': ['VmWrite']}
-            })
+            }, validate=True)
             self.assertTrue(p)
 
     def test_container_periodic_mode_schema_validation(self):
@@ -203,7 +203,7 @@ class AzurePolicyModeTest(BaseTest):
                 'mode':
                     {'type': CONTAINER_TIME_TRIGGER_MODE,
                      'schedule': '*/5 * * * *'}
-            })
+            }, validate=True)
             self.assertTrue(p)
 
     def test_init_azure_function_mode_with_service_plan(self):
