@@ -15,6 +15,8 @@
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
+from c7n.filters.core import ValueFilter, type_schema
+
 
 @resources.register('webapp')
 class WebApp(ArmResourceManager):
@@ -74,3 +76,19 @@ class WebApp(ArmResourceManager):
             'properties.hostNames[0]'
         )
         resource_type = 'Microsoft.Web/serverFarms'
+
+@WebApp.filter_registry.register('ssl-setting')
+class SslSettingFilter(ValueFilter):
+    schema = type_schema('ssl-setting', rinherit=ValueFilter.schema)
+    schema_alias = True
+
+    def __call__(self, i):
+        if 'sslSettings' not in i:
+            client = self.manager.get_client().web_apps
+            print(i)
+            instance = (
+                client.get_configuration(i['resourceGroup'], i['name'])
+            )
+            i['sslSettings'] = instance.serialize()
+
+        return super(SslSettingFilter, self).__call__(i['sslSettings'])
