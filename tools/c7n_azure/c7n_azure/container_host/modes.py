@@ -49,8 +49,16 @@ class AzureContainerHostMode(ServerlessExecutionMode):
 @execution.register(CONTAINER_TIME_TRIGGER_MODE)
 class AzureContainerPeriodicMode(AzureContainerHostMode, PullMode):
     """A policy that runs at specified time intervals."""
+    # Pattern based on apscheduler's CronTrigger:
+    # https://github.com/agronholm/apscheduler/tree/master/apscheduler/triggers/cron
+    schedule_regex = (r'^\s?(\*|[0-9]|\,|\/|\-)+ '
+                      r'(\*|[0-9]|\,|\/|\-)+ '
+                      r'(\*|[1-9]|[1-2][0-9]|3[0-1]|\,|\*\/|\-)+ '
+                      r'(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|'
+                      r'\,|\*\/|[1-9]|1[0-2]|\*)+ '
+                      r'(mon|tue|wed|thu|fri|sat|sun|[0-6]|\,|\*|\-)+\s?$')
     schema = utils.type_schema(CONTAINER_TIME_TRIGGER_MODE,
-                               schedule={'type': 'string'},
+                               schedule={'type': 'string', 'pattern': schedule_regex},
                                rinherit=AzureContainerHostMode.schema)
 
     def provision(self):

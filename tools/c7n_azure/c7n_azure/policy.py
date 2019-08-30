@@ -293,8 +293,19 @@ class AzureModeCommon:
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
     """A policy that runs/execute s in azure functions at specified
     time intervals."""
+    # Based on NCRONTAB used by Azure Functions:
+    # https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer
+    schedule_regex = (r'^\s?([0-5]?[0-9]|\,|(\*\/)|\-)+ '
+                      r'(\*|[0-5]?[0-9]|\,|\/|\-)+ '
+                      r'(\*|[0-9]|(1[0-9])|(2[0-3])|\,|\/|\-)+ '
+                      r'(\*|[1-9]|([1-2][0-9])|(3[0-1])|\,|\*\/|\-)+ '
+                      r'([Jj](an|anuary)|[Ff](eb|ebruary)|[Mm](ar|arch)|[Aa](pr|pril)|[Mm]ay|'
+                      r'[Jj](un|une)|[Jj](ul|uly)|[Aa](ug|ugust)|[Ss](ep|eptember)|[Oo](ct'
+                      r'|ctober)|[Nn](ov|ovember)|[Dd](ec|ecember)|\,|\*\/|[1-9]|(1[0-2])|\*)+ '
+                      r'([Mm](on|onday)|[Tt](u|ue|ues|uesday)|[Ww](ed|ednesday)|[Tt](hu|hursday)|'
+                      r'[Ff](ri|riday)|[Ss](at|aturday)|[Ss](un|unday)|[0-6]|\,|\*|\-)+\s?$')
     schema = utils.type_schema(FUNCTION_TIME_TRIGGER_MODE,
-                               schedule={'type': 'string'},
+                               schedule={'type': 'string', 'pattern': schedule_regex},
                                rinherit=AzureFunctionMode.schema)
 
     def provision(self):
