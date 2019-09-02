@@ -135,8 +135,8 @@ There are several ways to get a list of possible keys for each resource.
 
 - Special operators:
     - ``glob`` - Provides Glob matching support
-    - ``regex`` - Provides Regex matching support but ignores case
-    - ``regex-case`` - Provides case sensitive Regex matching support
+    - ``regex`` - Provides Regex matching support but ignores case (1)
+    - ``regex-case`` - Provides case sensitive Regex matching support (1)
 
 
   .. code-block:: yaml
@@ -147,6 +147,9 @@ There are several ways to get a list of possible keys for each resource.
            op: regex                        ─▶ Special operator
            value: (custodian|c7n)_\w+       ─▶ Regex string
 
+  1. These operators are implemented using ``re.match``. If a filter isn't working as expected take a look at the `re`__ documentation.
+
+  __ https://docs.python.org/3/library/re.html#search-vs-match
 
 - Transformations:
   Transformations on the value can be done using the ``value_type`` keyword.  The
