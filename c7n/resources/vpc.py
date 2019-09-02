@@ -1992,22 +1992,19 @@ class CreateFlowLogs(BaseAction):
     def validate(self):
         self.state = self.data.get('state', True)
         if self.state:
-            if (self.data.get('LogDestinationType') == 's3' and
-               self.data.get('DeliverLogsPermissionArn')):
-                raise PolicyValidationError(
-                    'DeliverLogsPermissionArn not required with destination as s3 when'
-                    'creating flow-logs on %s' % (self.manager.data,))
-            if (self.data.get('LogDestinationType') == 'cloud-watch-logs' and
-               not self.data.get('DeliverLogsPermissionArn')):
-                raise PolicyValidationError(
-                    'DeliverLogsPermissionArn required when LogDestinationType is cloud-watch-logs')
-            if (not self.data.get('LogGroupName') and not self.data.get('LogDestination')):
-                raise PolicyValidationError(
-                    'Either LogGroupName or LogDestination required')
-            if (self.data.get('LogDestinationType') == 's3' and
-               not self.data.get('LogDestination')):
-                raise PolicyValidationError(
-                    'LogDestination required when LogDestinationType is s3')
+            if self.data.get('LogDestinationType') == 's3':
+                if (self.data.get('DeliverLogsPermissionArn') or self.data.get('LogGroupName') or
+                 not self.data.get('LogDestination')):
+                    raise PolicyValidationError(
+                        "LogDestination can't be empty and " 
+                        'DeliverLogsPermissionArn/LogGroupName are not required with s3 as destination'
+                        'when creating flow-logs on %s' % (self.manager.data,))
+            else:
+                if (not self.data.get('DeliverLogsPermissionArn') or
+                 not (self.data.get('LogGroupName') or self.data.get('LogDestination'))):
+                    raise PolicyValidationError(
+                        "DeliverLogsPermissionArn and LogGroupName/LogDestination can't "
+                        'be empty when LogDestinationType is cloud-watch-logs')
         return self
 
     def delete_flow_logs(self, client, rids):
