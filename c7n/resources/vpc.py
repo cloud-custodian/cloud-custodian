@@ -1996,9 +1996,9 @@ class CreateFlowLogs(BaseAction):
                 if (self.data.get('DeliverLogsPermissionArn') or self.data.get('LogGroupName') or
                  not self.data.get('LogDestination')):
                     raise PolicyValidationError(
-                        "LogDestination can't be empty and " 
-                        'DeliverLogsPermissionArn/LogGroupName are not required with s3 as destination'
-                        'when creating flow-logs on %s' % (self.manager.data,))
+                        "LogDestination can't be empty and "
+                        'DeliverLogsPermissionArn/LogGroupName are not required with s3 as '
+                        'destination when creating flow-logs on %s' % (self.manager.data,))
             else:
                 if (not self.data.get('DeliverLogsPermissionArn') or
                  not (self.data.get('LogGroupName') or self.data.get('LogDestination'))):
