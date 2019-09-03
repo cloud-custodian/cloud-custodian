@@ -32,7 +32,7 @@ subscriptionHosts:
     secretEnvironment: 
       AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
-# Optional Custodain Mailer deployed as a CronJob
+# Optional Custodian Mailer deployed as a CronJob
 mailer:
 
   # A mailer will be deployed only if this is true
