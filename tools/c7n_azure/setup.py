@@ -73,6 +73,7 @@ setup(
                       "azure-mgmt-rdbms",
                       "azure-mgmt-sql",
                       "azure-mgmt-storage",
+                      "azure-mgmt-subscription",
                       "azure-mgmt-web",
                       "azure-mgmt-monitor",
                       "azure-mgmt-policyinsights",

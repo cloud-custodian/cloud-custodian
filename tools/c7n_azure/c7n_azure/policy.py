@@ -328,15 +328,16 @@ class AzureEventGridMode(AzureFunctionMode):
     azure event."""
 
     schema = utils.type_schema(FUNCTION_EVENT_TRIGGER_MODE,
-                               events={'type': 'array', 'items': {
-                                   'oneOf': [
-                                       {'type': 'string'},
-                                       {'type': 'object',
-                                        'required': ['resourceProvider', 'event'],
-                                        'properties': {
-                                            'resourceProvider': {'type': 'string'},
-                                            'event': {'type': 'string'}}}]
-                               }},
+                               events={'type': 'array',
+                                    'maxItems': 5,
+                                    'items': {
+                                        'oneOf': [
+                                            {'type': 'string'},
+                                            {'type': 'object',
+                                                'required': ['resourceProvider', 'event'],
+                                                'properties': {
+                                                    'resourceProvider': {'type': 'string'},
+                                                    'event': {'type': 'string'}}}]}},
                                required=['events'],
                                rinherit=AzureFunctionMode.schema)
 
