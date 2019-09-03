@@ -25,6 +25,7 @@ from azure.mgmt.costmanagement.models import (QueryAggregation,
 from azure.mgmt.policyinsights import PolicyInsightsClient
 from dateutil import tz as tzutils
 from dateutil.parser import parse
+from msrest.exceptions import HttpOperationError
 
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
@@ -120,7 +121,10 @@ class MetricFilter(Filter):
 
     aggregation_funcs = {
         'average': Math.mean,
-        'total': Math.sum
+        'total': Math.sum,
+        'count': Math.sum,
+        'minimum': Math.max,
+        'maximum': Math.min
     }
 
     schema = {
@@ -135,7 +139,7 @@ class MetricFilter(Filter):
             'timeframe': {'type': 'number'},
             'interval': {'enum': [
                 'PT1M', 'PT5M', 'PT15M', 'PT30M', 'PT1H', 'PT6H', 'PT12H', 'P1D']},
-            'aggregation': {'enum': ['total', 'average']},
+            'aggregation': {'enum': ['total', 'average', 'count', 'minimum', 'maximum']},
             'no_data_action': {'enum': ['include', 'exclude']},
             'filter': {'type': 'string'}
         }
@@ -184,15 +188,19 @@ class MetricFilter(Filter):
         cached_metric_data = self._get_cached_metric_data(resource)
         if cached_metric_data:
             return cached_metric_data['measurement']
-
-        metrics_data = self.client.metrics.list(
-            resource['id'],
-            timespan=self.timespan,
-            interval=self.interval,
-            metricnames=self.metric,
-            aggregation=self.aggregation,
-            filter=self.filter
-        )
+        try:
+            metrics_data = self.client.metrics.list(
+                resource['id'],
+                timespan=self.timespan,
+                interval=self.interval,
+                metricnames=self.metric,
+                aggregation=self.aggregation,
+                filter=self.filter
+            )
+        except HttpOperationError as e:
+            self.log.error("could not get metric:%s on %s. Full error: %s" % (
+                self.metric, resource['id'], str(e)))
+            return None
 
         if len(metrics_data.value) > 0 and len(metrics_data.value[0].timeseries) > 0:
             m = [getattr(item, self.aggregation)

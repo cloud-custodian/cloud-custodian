@@ -54,7 +54,7 @@ class AppServicePlan(ArmResourceManager):
             'resourceGroup',
             'kind'
         )
-        resource_type = 'Microsoft.Web/sites'
+        resource_type = 'Microsoft.Web/serverfarms'
 
 
 @AppServicePlan.action_registry.register('resize-plan')

@@ -12,34 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
 from azure_common import BaseTest, arm_template
 
 
-class DnsZoneTest(BaseTest):
+class PostgresqlDatabaseTest(BaseTest):
 
-    def test_dns_zone_schema_validate(self):
-        with self.sign_out_patch():
-            p = self.load_policy({
-                'name': 'azure-dns-policy',
-                'resource': 'azure.dnszone'
-            }, validate=True)
-            self.assertTrue(p)
-
-    @arm_template('dns.json')
-    def test_find_by_name(self):
+    def test_postgresql_database_schema_validate(self):
         p = self.load_policy({
-            'name': 'test-find-by-name',
-            'resource': 'azure.dnszone',
+            'name': 'test-postgresql-database-schema-validate',
+            'resource': 'azure.postgresql-database'
+        }, validate=True)
+        self.assertTrue(p)
+
+    @arm_template('postgresql.json')
+    def test_find_database_by_name(self):
+        p = self.load_policy({
+            'name': 'test-get-database-by-name',
+            'resource': 'azure.postgresql-database',
             'filters': [
                 {
                     'type': 'value',
                     'key': 'name',
-                    'op': 'regex',
-                    'value': '.*\\.cloudcustodiantest\\.com$'
+                    'op': 'eq',
+                    'value': 'cctestdb'
                 }
             ]
         })
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['name'].endswith('.cloudcustodiantest.com'))

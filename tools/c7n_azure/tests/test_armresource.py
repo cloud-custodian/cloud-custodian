@@ -126,6 +126,26 @@ class ArmResourceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    @arm_template('vm.json')
+    def test_metric_filter_invalid_metric(self):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'InvalidMetric',
+                 'aggregation': 'average',
+                 'op': 'gte',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(0, len(resources))
+
     def test_metric_filter_invalid_missing_metric(self):
         policy = {
             'name': 'test-azure-metric',
