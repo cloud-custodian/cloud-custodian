@@ -1,0 +1,12 @@
+
+The following {{ policy['resource'] }} resources
+
+{% for resource in resources %}
+   {{ format_resource(resource, policy['resource']) }}
+{% endfor %}
+
+in account: {{ account }}
+
+Matched policy:
+
+{{ policy|yaml_safe(default_flow_style=False) }}

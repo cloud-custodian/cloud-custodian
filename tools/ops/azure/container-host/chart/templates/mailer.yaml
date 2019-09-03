@@ -1,0 +1,67 @@
+{{- if .Values.mailer.enabled -}}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: "{{ .Release.Name }}-mailer"
+spec:
+  schedule: "{{ .Values.mailer.schedule }}"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 3
+  jobTemplate: 
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: "{{ .Release.Name }}-mailer"
+              image: "{{ .Values.mailer.image.repository }}:{{ .Values.mailer.image.tag }}"
+              imagePullPolicy: "{{ .Values.mailer.image.pullPolicy }}"
+              {{- if .Values.mailer.environment }}
+              env:
+              {{- range $name, $value := .Values.mailer.environment }}
+              - name: {{ $name }}
+                value: {{ $value }}
+              {{- end }}
+              {{- end }}
+              {{- if .Values.mailer.secretEnvironment }}
+              envFrom:
+                - secretRef:
+                    name: "{{ .Release.Name }}-mailer-secret-environment"
+              {{- end }}
+              volumeMounts:
+                - name: mailer-config
+                  mountPath: /etc/config
+              command:
+                - "/usr/local/bin/c7n-mailer"
+              args:
+                - "--run"
+                - "--config"
+                - "/etc/config/mailer-config.yaml"
+          volumes:
+            - name: mailer-config
+              configMap:
+                name: "{{ .Release.Name }}-sendgrid-config"
+                items:
+                  - key: sendgrid-config
+                    path: mailer-config.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-sendgrid-config"
+data:
+  sendgrid-config: |
+  {{- toYaml .Values.mailer.config | nindent 4 }}
+{{- if .Values.mailer.secretEnvironment }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "{{ .Release.Name }}-mailer-secret-environment"
+data:
+{{- range $secretName, $secretValue := .Values.mailer.secretEnvironment }}
+  {{ $secretName }}: {{ $secretValue }}
+{{- end -}}
+{{- end }}
+{{- end -}}
