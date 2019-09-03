@@ -85,7 +85,7 @@ class Deployment(object):
         })
 
     def build_helm_command(self, values_file_path):
-        command = 'helm upgrade --install'
+        command = 'helm upgrade --install --debug'
         if self.dry_run:
             command += ' --dry-run'
         if self.deployment_namespace:
