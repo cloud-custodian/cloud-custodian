@@ -43,10 +43,18 @@ jobs:
 
     - script: az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} && az account set -s ${AZURE_SUBSCRIPTION_ID}
       displayName: "Login to Azure"
+      env:
+        AZURE_CLIENT_ID: $(azure-client-id)
+        AZURE_CLIENT_SECRET: $(azure-client-secret)
+        AZURE_SUBSCRIPTION_ID: $(azure-subscription-id)
+        AZURE_TENANT_ID: $(azure-tenant-id)
 
     - script: tools/c7n_azure/tests/templates/provision.sh
       displayName: "Provision Azure Resources"
-    
+      env:
+        AZURE_CLIENT_ID: $(azure-client-id)
+        AZURE_CLIENT_SECRET: $(azure-client-secret)
+
     - script: C7N_TEST_RUN=true C7N_FUNCTIONAL=yes pytest tools/c7n_azure/tests
       displayName: "Run Azure tests without cassettes"
 
