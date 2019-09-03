@@ -146,7 +146,7 @@ class WebhookTest(BaseTest):
             "body": "resources[].name",
             "body-size": 10,
             "headers": {
-                "test": "`header`"
+                "test": "'header'"
             },
             "query-params": {
                 "foo": "resources[0].name"

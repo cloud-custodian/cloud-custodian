@@ -122,7 +122,6 @@ class CosmosDBTest(BaseTest):
                  'include': ['3.1.1.1']}],
         }, validate=True)
         resources = p.run()
-        print(resources)
         self.assertEqual(1, len(resources))
 
     @arm_template('cosmosdb.json')
