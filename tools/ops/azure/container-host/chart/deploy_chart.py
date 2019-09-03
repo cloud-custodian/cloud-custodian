@@ -24,8 +24,7 @@ import yaml
 
 from c7n.resources import load_resources
 from c7n.utils import local_session
-from c7n_azure.constants import (ENV_CONTAINER_EVENT_QUEUE_NAME,
-                                 ENV_CONTAINER_OPTION_OUTPUT_DIR, ENV_SUB_ID)
+from c7n_azure.constants import ENV_CONTAINER_EVENT_QUEUE_NAME, ENV_SUB_ID
 from c7n_azure.session import Session
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -58,7 +57,7 @@ class Deployment(object):
 
         with open(self.helm_values_file, 'r') as values_file:
             values = yaml.load(values_file)
-        sub_hosts = values.setdefault([])
+        sub_hosts = values.setdefault('subscriptionHosts', [])
         sub_hosts += self.subscription_hosts
         values_file_path = Deployment.write_values_to_file(values)
 
@@ -89,13 +88,13 @@ class Deployment(object):
         command = 'helm upgrade --install'
         if self.dry_run:
             command += ' --dry-run'
-        if self.namespace:
-            command += '\n\t --namespace {}'.format(self.namespace)
-        command += '\n\t --values {}'.format(values_file_path)
+        if self.deployment_namespace:
+            command += ' --namespace {}'.format(self.deployment_namespace)
+        command += '\\\n\t --values {}'.format(values_file_path)
         for helm_set_value in self.helm_set_values:
-            command += '\n\t --set {}'.format(helm_set_value)
+            command += '\\\n\t --set {}'.format(helm_set_value)
         chart_path = os.path.dirname(__file__) or os.getcwd()
-        command += '\n\t {} {}'.format(self.deployment_name, chart_path)
+        command += '\\\n\t {} {}'.format(self.deployment_name, chart_path)
         return command
 
     @staticmethod
@@ -168,8 +167,7 @@ class ManagementGroupDeployment(Deployment):
 @click.option('--helm-values-file', '-v', required=True)
 @click.option('--helm-set', '-s', multiple=True)
 @click.option('--dry-run/--no-dry-run', default=False)
-def cli(deployment_name, deployment_namespace, image_repository='', image_tag='',
-        image_pull_policy='', dry_run=False):
+def cli(deployment_name, deployment_namespace, helm_values_file=None, helm_set=None, dry_run=False):
     pass
 
 
