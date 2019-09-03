@@ -42,9 +42,15 @@ class ResourceQuery(object):
         if extra_args:
             params.update(extra_args)
 
-        op = getattr(getattr(resource_manager.get_client(), enum_op), list_op)
-        data = [r.serialize(True) for r in op(**params)]
-
+        data = []
+        try:
+            op = getattr(getattr(resource_manager.get_client(), enum_op), list_op)
+            data = [r.serialize(True) for r in op(**params)]
+        except Exception as e:
+            log.error("Failed to query resource.\n"
+                      "Type: azure.{0}.\n"
+                      "Error: {1}".format(resource_manager.type, e))
+            six.raise_from(Exception('Failed to query resources.'), e)
         return data
 
     @staticmethod
@@ -114,7 +120,6 @@ class ChildResourceQuery(ResourceQuery):
 
 @sources.register('describe-child-azure')
 class ChildDescribeSource(DescribeSource):
-
     resource_query_factory = ChildResourceQuery
 
     def __init__(self, manager):
@@ -163,6 +168,7 @@ class ChildTypeInfo(TypeInfo):
 
 class QueryMeta(type):
     """metaclass to have consistent action/filter registry for new resources."""
+
     def __new__(cls, name, parents, attrs):
         if 'filter_registry' not in attrs:
             attrs['filter_registry'] = FilterRegistry(
@@ -176,7 +182,6 @@ class QueryMeta(type):
 
 @six.add_metaclass(QueryMeta)
 class QueryResourceManager(ResourceManager):
-
     class resource_type(TypeInfo):
         pass
 
@@ -272,7 +277,6 @@ class QueryResourceManager(ResourceManager):
 
 @six.add_metaclass(QueryMeta)
 class ChildResourceManager(QueryResourceManager):
-
     child_source = 'describe-child-azure'
     parent_manager = None
 
