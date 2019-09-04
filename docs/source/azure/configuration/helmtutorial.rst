@@ -3,4 +3,5 @@
 Tutorial - Helm Deployment
 ==========================
 
-This is the tutorial for deploying the Container Host helm chart.
+This is a step-by-step tutorial for deploying the Azure Container Host in Azure Kubernetes Service 
+(AKS) with the provided helm chart and deployment script.
