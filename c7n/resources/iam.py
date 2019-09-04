@@ -193,7 +193,7 @@ User.filter_registry.register('marked-for-op', TagActionFilter)
 @User.action_registry.register('set-groups')
 class SetGroups(BaseAction):
     """Set a specific IAM user as added/removed from a group
-    
+
     :example:
 
       .. code-block:: yaml
