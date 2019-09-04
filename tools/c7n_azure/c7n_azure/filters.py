@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 import operator
 from abc import ABCMeta, abstractmethod
 from concurrent.futures import as_completed
@@ -23,6 +24,9 @@ from azure.mgmt.costmanagement.models import (QueryAggregation,
                                               QueryFilter, QueryGrouping,
                                               QueryTimePeriod, TimeframeType)
 from azure.mgmt.policyinsights import PolicyInsightsClient
+from c7n_azure.tags import TagHelper
+from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
+                             StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil import tz as tzutils
 from dateutil.parser import parse
 from msrest.exceptions import HttpOperationError
@@ -31,9 +35,6 @@ from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.offhours import OffHour, OnHour, Time
 from c7n.utils import chunks, get_annotation_prefix, type_schema
-from c7n_azure.tags import TagHelper
-from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
-                             StringUtils, ThreadHelper, now, utcnow)
 
 scalar_ops = {
     'eq': operator.eq,
@@ -296,6 +297,7 @@ class TagActionFilter(Filter):
         op={'type': 'string'})
     schema_alias = True
     current_date = None
+    log = logging.getLogger('custodian.azure.filters.TagActionFilter')
 
     def validate(self):
         op = self.data.get('op')
@@ -398,6 +400,7 @@ class DiagnosticSettingsFilter(ValueFilter):
 
     schema = type_schema('diagnostic-settings', rinherit=ValueFilter.schema)
     schema_alias = True
+    log = logging.getLogger('custodian.azure.filters.DiagnosticSettingsFilter')
 
     def process(self, resources, event=None):
         futures = []
@@ -566,6 +569,7 @@ class FirewallRulesFilter(Filter):
     }
 
     schema_alias = True
+    log = logging.getLogger('custodian.azure.filters.FirewallRulesFilter')
 
     def __init__(self, data, manager=None):
         super(FirewallRulesFilter, self).__init__(data, manager)
@@ -573,11 +577,6 @@ class FirewallRulesFilter(Filter):
         self.policy_equal = None
         self.policy_any = None
         self.policy_only = None
-
-    @property
-    @abstractmethod
-    def log(self):
-        raise NotImplementedError()
 
     def process(self, resources, event=None):
         self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
@@ -682,6 +681,7 @@ class ResourceLockFilter(Filter):
         })
 
     schema_alias = True
+    log = logging.getLogger('custodian.azure.filters.ResourceLockFilter')
 
     def __init__(self, data, manager=None):
         super(ResourceLockFilter, self).__init__(data, manager)
@@ -703,7 +703,7 @@ class ResourceLockFilter(Filter):
         client = self.manager.get_client('azure.mgmt.resource.locks.ManagementLockClient')
         result = []
         for resource in resources:
-            if resource.get('resourceGroup') is None:
+            if is_resource_group(resource):
                 locks = [r.serialize(True) for r in
                          client.management_locks.list_at_resource_group_level(
                     resource['name'])]
@@ -796,6 +796,7 @@ class CostFilter(ValueFilter):
         })
 
     schema_alias = True
+    log = logging.getLogger('custodian.azure.filters.CostFilter')
 
     def __init__(self, data, manager=None):
         data['key'] = 'PreTaxCost'  # can also be Currency, but now only PreTaxCost is supported

@@ -140,9 +140,10 @@ class StorageSetFirewallAction(SetFirewallAction):
         }
     )
 
+    log = logging.getLogger('custodian.azure.storage.StorageSetFirewallAction')
+
     def __init__(self, data, manager=None):
         super(StorageSetFirewallAction, self).__init__(data, manager)
-        self._log = logging.getLogger('custodian.azure.storage')
         self.rule_limit = 200
 
     def _process_resource(self, resource):
@@ -190,11 +191,6 @@ class StorageFirewallRulesFilter(FirewallRulesFilter):
 
     def __init__(self, data, manager=None):
         super(StorageFirewallRulesFilter, self).__init__(data, manager)
-        self._log = logging.getLogger('custodian.azure.storage')
-
-    @property
-    def log(self):
-        return self._log
 
     def _query_rules(self, resource):
 
@@ -288,10 +284,11 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
                              'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]}}
                          )
 
+    log = logging.getLogger('custodian.azure.storage.StorageDiagnosticSettingsFilter')
+
     def __init__(self, data, manager=None):
         super(StorageDiagnosticSettingsFilter, self).__init__(data, manager)
         self.storage_type = data.get('storage-type')
-        self.log = logging.getLogger('custodian.azure.storage')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
@@ -379,13 +376,13 @@ class SetLogSettingsAction(AzureBaseAction):
                              'retention': {'type': 'number'}
                          }
                          )
+    log = logging.getLogger('custodian.azure.storage.SetLogSettingsAction')
 
     def __init__(self, data, manager=None):
         super(SetLogSettingsAction, self).__init__(data, manager)
         self.storage_types = data['storage-types']
         self.logs_to_enable = data['log']
         self.retention = data['retention']
-        self.log = logging.getLogger('custodian.azure.storage')
         self.token = None
 
     def validate(self):

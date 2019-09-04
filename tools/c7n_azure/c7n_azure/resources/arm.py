@@ -25,8 +25,6 @@ from c7n_azure.query import QueryResourceManager, QueryMeta, ChildResourceManage
     ChildTypeInfo, TypeMeta
 from c7n_azure.utils import ResourceIdParser
 
-from c7n.utils import local_session
-
 arm_resource_types = {}
 
 
@@ -60,9 +58,8 @@ class ArmResourceManager(QueryResourceManager):
 
     def get_resources(self, resource_ids):
         resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
-        session = local_session(self.session_factory)
         data = [
-            resource_client.resources.get_by_id(rid, session.resource_api_version(rid))
+            resource_client.resources.get_by_id(rid, self._session.resource_api_version(rid))
             for rid in resource_ids
         ]
         return self.augment([r.serialize(True) for r in data])
@@ -96,8 +93,7 @@ class ArmResourceManager(QueryResourceManager):
                 klass.filter_registry.register('offhour', AzureOffHour)
                 klass.filter_registry.register('onhour', AzureOnHour)
 
-                if resource != 'resourcegroup':
-                    klass.action_registry.register('delete', DeleteAction)
+                klass.action_registry.register('delete', DeleteAction)
 
                 if klass.resource_type.diagnostic_settings_enabled:
                     klass.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)

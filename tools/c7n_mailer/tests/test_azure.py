@@ -17,15 +17,15 @@ import json
 import unittest
 import zlib
 
+from mock import ANY, MagicMock, Mock, call, patch
+
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_mailer.azure_mailer import deploy
-from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.azure_mailer.azure_queue_processor import \
+    MailerAzureQueueProcessor
 from c7n_mailer.azure_mailer.sendgrid_delivery import SendGridDelivery
-from common import (
-    MAILER_CONFIG_AZURE, ASQ_MESSAGE, ASQ_MESSAGE_TAG,
-    ASQ_MESSAGE_SLACK, ASQ_MESSAGE_DATADOG, logger
-)
-from mock import MagicMock, patch, call, ANY, Mock
+from common import (ASQ_MESSAGE, ASQ_MESSAGE_DATADOG, ASQ_MESSAGE_SLACK,
+                    ASQ_MESSAGE_TAG, MAILER_CONFIG_AZURE, logger)
 
 
 class AzureTest(unittest.TestCase):
@@ -93,6 +93,8 @@ class AzureTest(unittest.TestCase):
         result = sendgrid_delivery.sendgrid_handler(self.loaded_message, sendgrid_messages)
         self.assertTrue(result)
         mock_send.assert_called()
+        mail_contents = mock_send.call_args[0][0].contents[0].content
+        self.assertIn('The following azure.keyvault resources', mail_contents)
 
     @patch('c7n_mailer.azure_mailer.deploy.FunctionPackage')
     def test_build_function_package(self, package_mock):

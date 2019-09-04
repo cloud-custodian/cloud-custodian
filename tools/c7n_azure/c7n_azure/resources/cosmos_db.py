@@ -41,7 +41,7 @@ except ImportError:
     from backports.functools_lru_cache import lru_cache
 
 max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
-log = logging.getLogger('azure.cosmosdb')
+log = logging.getLogger('custodian.azure.cosmosdb')
 THROUGHPUT_MULTIPLIER = 100
 
 
@@ -88,11 +88,6 @@ class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
 
     def __init__(self, data, manager=None):
         super(CosmosDBFirewallRulesFilter, self).__init__(data, manager)
-        self._log = logging.getLogger('custodian.azure.cosmosdb')
-
-    @property
-    def log(self):
-        return self._log
 
     def _query_rules(self, resource):
         ip_range_string = resource['properties']['ipRangeFilter']
@@ -261,7 +256,7 @@ class CosmosDBOfferFilter(ValueFilter):
             self.executor_factory,
             self.manager.get_parent_manager(),
             self._process_account_set,
-            self.log
+            log
         )
 
     def _process_account_set(self, resources, data_client):
@@ -323,7 +318,7 @@ class CosmosDBReplaceOfferAction(AzureBaseAction):
             self.executor_factory,
             self.manager.get_parent_manager(),
             self._process_account_set,
-            self.log,
+            log,
             readonly=False
         )
 
@@ -396,7 +391,7 @@ class CosmosDBRestoreStateAction(CosmosDBReplaceOfferAction):
                     if container:
                         self._process_resource(container, account_client, container_throughput)
             else:
-                self.log.warning('No tag {} on parent resource, {}.'.format(
+                log.warning('No tag {} on parent resource, {}.'.format(
                     tag_name, parent_account))
 
         except Exception as e:
@@ -450,7 +445,7 @@ class CosmosDBSaveStateAction(AzureBaseAction):
             self.executor_factory,
             self.manager.get_parent_manager(),
             self._process_account_set,
-            self.log
+            log
         )
 
     def _process_account_set(self, resources, account_client):
@@ -637,7 +632,6 @@ class CosmosSetFirewallAction(SetFirewallAction):
 
     def __init__(self, data, manager=None):
         super(CosmosSetFirewallAction, self).__init__(data, manager)
-        self._log = logging.getLogger('custodian.azure.cosmosdb')
         self.rule_limit = 1000
         self.portal = ['104.42.195.92',
                        '40.76.54.131',

@@ -30,6 +30,8 @@ from msrest.serialization import Model
 from msrest.service_client import ServiceClient
 from vcr_unittest import VCRTestCase
 
+from c7n.config import Config, Bag
+from c7n.policy import ExecutionContext
 from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
@@ -338,6 +340,13 @@ class AzureVCRBaseTest(VCRTestCase):
 
 
 class BaseTest(TestUtils, AzureVCRBaseTest):
+
+    test_context = ExecutionContext(
+        Session,
+        Bag(name="xyz", provider_name='azure'),
+        Config.empty()
+    )
+
     """ Azure base testing class.
     """
     def __init__(self, *args, **kwargs):
