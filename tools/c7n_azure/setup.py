@@ -64,6 +64,7 @@ setup(
                       "azure-mgmt-dns",
                       "azure-mgmt-eventgrid",
                       "azure-mgmt-eventhub",
+                      "azure-mgmt-hdinsight",
                       "azure-mgmt-iothub",
                       "azure-mgmt-keyvault",
                       "azure-mgmt-managementgroups",

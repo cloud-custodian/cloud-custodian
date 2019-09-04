@@ -1,0 +1,140 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.HDInsight/clusters?api-version=2018-06-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-hdi-served-by": [
+                        "global"
+                    ],
+                    "date": [
+                        "Wed, 04 Sep 2019 20:06:43 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1796"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_hdinsight/providers/Microsoft.HDInsight/clusters/cctesthdinsighthbheaulh37fm4",
+                                "name": "cctesthdinsighthbheaulh37fm4",
+                                "type": "Microsoft.HDInsight/clusters",
+                                "location": "South Central US",
+                                "etag": "95c1cf82-36f4-4fe9-9331-9c1313be94b0",
+                                "tags": null,
+                                "properties": {
+                                    "clusterVersion": "3.6.1000.67",
+                                    "clusterHdpVersion": "2.6.5.3009-43",
+                                    "osType": "Linux",
+                                    "clusterDefinition": {
+                                        "blueprint": "https://blueprints.azurehdinsight.net/hadoop-3.6.1000.67.1908082122.json",
+                                        "kind": "HADOOP",
+                                        "componentVersion": {
+                                            "Hadoop": "2.7"
+                                        }
+                                    },
+                                    "computeProfile": {
+                                        "roles": [
+                                            {
+                                                "name": "headnode",
+                                                "targetInstanceCount": 2,
+                                                "hardwareProfile": {
+                                                    "vmSize": "standard_d12_v2"
+                                                },
+                                                "osProfile": {
+                                                    "linuxOperatingSystemProfile": {
+                                                        "username": "sshuser"
+                                                    }
+                                                },
+                                                "encryptDataDisks": false
+                                            },
+                                            {
+                                                "name": "workernode",
+                                                "targetInstanceCount": 4,
+                                                "hardwareProfile": {
+                                                    "vmSize": "standard_d4_v2"
+                                                },
+                                                "osProfile": {
+                                                    "linuxOperatingSystemProfile": {
+                                                        "username": "sshuser"
+                                                    }
+                                                },
+                                                "encryptDataDisks": false
+                                            },
+                                            {
+                                                "name": "zookeepernode",
+                                                "targetInstanceCount": 3,
+                                                "hardwareProfile": {
+                                                    "vmSize": "standard_a2_v2"
+                                                },
+                                                "osProfile": {
+                                                    "linuxOperatingSystemProfile": {
+                                                        "username": "sshuser"
+                                                    }
+                                                },
+                                                "encryptDataDisks": false
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "clusterState": "Running",
+                                    "createdDate": "2019-09-04T19:32:42.26",
+                                    "quotaInfo": {
+                                        "coresUsed": 40
+                                    },
+                                    "connectivityEndpoints": [
+                                        {
+                                            "name": "SSH",
+                                            "protocol": "TCP",
+                                            "location": "cctesthdinsighthbheaulh37fm4-ssh.azurehdinsight.net",
+                                            "port": 22
+                                        },
+                                        {
+                                            "name": "HTTPS",
+                                            "protocol": "TCP",
+                                            "location": "cctesthdinsighthbheaulh37fm4.azurehdinsight.net",
+                                            "port": 443
+                                        }
+                                    ],
+                                    "tier": "standard",
+                                    "storageProfile": {
+                                        "storageaccounts": [
+                                            {
+                                                "name": "ccstoragehbheaulh37fm4.blob.core.windows.net",
+                                                "resourceId": null,
+                                                "msiResourceId": null,
+                                                "key": null,
+                                                "fileSystem": null,
+                                                "container": "cctesthdinsighthbheaulh37fm4",
+                                                "saskey": null,
+                                                "isDefault": true
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
