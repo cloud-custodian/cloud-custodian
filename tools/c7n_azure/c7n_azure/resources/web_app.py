@@ -60,6 +60,18 @@ class WebApp(ArmResourceManager):
                 threshold: 1000
                 timeframe: 72
 
+    :example:
+
+    This policy will find all web apps with minimum TLS encryption version not equal to 1.2
+
+        policies:
+          - name: webapp-min-tls-enforcement
+            resource: azure.webapp
+            filters:
+              - type: configuration
+                key: minTlsVersion
+                value: '1.2'
+                op: ne
     """
 
     class resource_type(ArmResourceManager.resource_type):
@@ -77,18 +89,18 @@ class WebApp(ArmResourceManager):
         )
         resource_type = 'Microsoft.Web/serverFarms'
 
-@WebApp.filter_registry.register('ssl-setting')
-class SslSettingFilter(ValueFilter):
-    schema = type_schema('ssl-setting', rinherit=ValueFilter.schema)
+
+@WebApp.filter_registry.register('configuration')
+class ConfigurationFilter(ValueFilter):
+    schema = type_schema('configuration', rinherit=ValueFilter.schema)
     schema_alias = True
 
     def __call__(self, i):
-        if 'sslSettings' not in i:
+        if 'configuration' not in i:
             client = self.manager.get_client().web_apps
-            print(i)
             instance = (
                 client.get_configuration(i['resourceGroup'], i['name'])
             )
-            i['sslSettings'] = instance.serialize()
+            i['configuration'] = instance.serialize()['properties']
 
-        return super(SslSettingFilter, self).__call__(i['sslSettings'])
+        return super(ConfigurationFilter, self).__call__(i['configuration'])
