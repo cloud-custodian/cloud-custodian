@@ -64,6 +64,8 @@ class WebApp(ArmResourceManager):
 
     This policy will find all web apps with minimum TLS encryption version not equal to 1.2
 
+    .. code-block:: yaml
+
         policies:
           - name: webapp-min-tls-enforcement
             resource: azure.webapp

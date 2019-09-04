@@ -44,7 +44,7 @@ class WebAppTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-    
+
     @arm_template('webapp.json')
     def test_find_by_min_tls(self):
         # webapp.json deploys a webapp with minTlsVerion='1.0'

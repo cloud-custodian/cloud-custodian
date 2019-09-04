@@ -1,10 +1,10 @@
 .. _azure_examples_function_app_cors:
 
-Function Apps - Find Functions with Open CORS policy
+Function Apps - Find Functions with Open CORS Policy
 ===============================================================
 
 Filter to select all Function Apps with open an CORS policy. An open CORS policy 
-here defined as a wildcard, "*".
+here defined as a wildcard, `*`.
 
 .. code-block:: yaml
 
