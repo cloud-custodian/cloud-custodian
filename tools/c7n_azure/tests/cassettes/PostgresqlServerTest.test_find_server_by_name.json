@@ -1,0 +1,67 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBforPostgreSQL/servers?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 29 Aug 2019 04:32:52 GMT"
+                    ],
+                    "content-length": [
+                        "898"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "B_Gen5_1",
+                                    "tier": "Basic",
+                                    "family": "Gen5",
+                                    "capacity": 1
+                                },
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "storageProfile": {
+                                        "storageMB": 5120,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutoGrow": "Disabled"
+                                    },
+                                    "version": "10",
+                                    "sslEnforcement": "Disabled",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "cctestpostgresqlservernxmxlpd5w73ag.postgres.database.azure.com",
+                                    "earliestRestoreDate": "2019-08-28T17:55:28.257+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": ""
+                                },
+                                "location": "southcentralus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlservernxmxlpd5w73ag",
+                                "name": "cctestpostgresqlservernxmxlpd5w73ag",
+                                "type": "Microsoft.DBforPostgreSQL/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

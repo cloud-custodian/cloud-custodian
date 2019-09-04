@@ -52,7 +52,7 @@ class FunctionTest(BaseTest):
 
     def test_deploy_function(self):
         factory = self.replay_flight_data('mu-deploy')
-        manager = mu.CloudFunctionManager(factory)
+        manager = mu.CloudFunctionManager(factory, 'us-central1')
         func = self.get_function(factory=factory)
         manager.publish(func)
         func_info = manager.get(func.name)

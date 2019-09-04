@@ -77,22 +77,24 @@ the helm chart's values.yaml.
     # sample-values.yaml
 
     defaultEnvironment:
-    AZURE_TENANT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    AZURE_CLIENT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    AZURE_EVENT_QUEUE_NAME: "cloud-custodian-events"
+      AZURE_TENANT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      AZURE_CLIENT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      AZURE_EVENT_QUEUE_NAME: "cloud-custodian-events"
+    
+    defaultSecretEnvironment:
+      AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
     subscriptionHosts:
-    - name: "my-first-subscription"
+      - name: "my-first-subscription"
         environment:
-        AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-        AZURE_CONTAINER_STORAGE: "https://firstStorageAccount.blob.core.windows.net/cloud-custodian-policies"
-        AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Storage/storageAccounts/firstStorageAccount"
-    - name: "my-second-subscription"
+          AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          AZURE_CONTAINER_STORAGE: "https://firstStorageAccount.blob.core.windows.net/cloud-custodian-policies"
+          AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Storage/storageAccounts/firstStorageAccount"
+      - name: "my-second-subscription"
         environment:
-        AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-        AZURE_CONTAINER_STORAGE: "https://secondStorageAccount.blob.core.windows.net/more-policies"
-        AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myOtherResourceGroup/providers/Microsoft.Storage/storageAccounts/secondStorageAccount"
+          AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          AZURE_CONTAINER_STORAGE: "https://secondStorageAccount.blob.core.windows.net/more-policies"
+          AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myOtherResourceGroup/providers/Microsoft.Storage/storageAccounts/secondStorageAccount"
 
 To deploy the chart:
 
@@ -117,10 +119,9 @@ all of the containers will share the same policy storage and storage account for
 
     Options:
     -d, --deployment-name TEXT
-    -s, --deployment-namespace TEXT
-    --image-repository TEXT
-    --image-tag TEXT
-    --image-pull-policy TEXT
+    -n, --deployment-namespace TEXT
+    -v, --helm-values-file TEXT     [required]
+    -s, --helm-set TEXT
     --dry-run / --no-dry-run
     --help                          Show this message and exit.
 
@@ -129,17 +130,14 @@ all of the containers will share the same policy storage and storage account for
     subscription
 
 
-
     # subscription subcommand
     $ python tools/ops/azure/container-host/chart/deploy_chart.py subscription --help
 
     Usage: deploy_chart.py subscription [OPTIONS]
 
     Options:
-    -n, --name TEXT           [required]
-    -e, --env <TEXT TEXT>...
-    --help                    Show this message and exit.
-
+    -i, --subscription-id TEXT  [required]
+    --help                      Show this message and exit.
 
 
     # management_group subcommand
@@ -148,8 +146,7 @@ all of the containers will share the same policy storage and storage account for
     Usage: deploy_chart.py management_group [OPTIONS]
 
     Options:
-    -m, --management-group-id TEXT  [required]
-    -e, --env <TEXT TEXT>...
+    -i, --management-group-id TEXT  [required]
     --help                          Show this message and exit.
 
 Examples
@@ -159,18 +156,12 @@ Deploy against a single subscription:
 
 .. code-block:: bash
 
-    python tools/ops/azure/container-host/chart/deploy_chart.py \
+    python cloud-custodian/tools/ops/azure/container-host/chart/deploy_chart.py \
         --deployment-name azure-c7n \
         --deployment-namespace cloud-custodian \
-        subscription \
-        --name my-subscription \
-        --env AZURE_TENANT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        --env AZURE_SUBSCRIPTION_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        --env AZURE_CLIENT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        --env AZURE_CLIENT_SECRET "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        --env AZURE_CONTAINER_STORAGE "https://myStorageAccount.blob.core.windows.net/policyContainer" \
-        --env AZURE_EVENT_QUEUE_RESOURCE_ID "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Storage/storageAccounts/myStorageAccount" \
-        --env AZURE_EVENT_QUEUE_NAME "my-subscription-c7n"
+        --helm-values-file path/to/my-values.yaml \
+        --helm-set defaultSecretEnvironment.AZURE_CLIENT_SECRET=some-secret-value \
+        subscription --subscription-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 Deploy against a management group:
 
@@ -179,11 +170,7 @@ Deploy against a management group:
     python tools/ops/azure/container-host/chart/deploy_chart.py \
         --deployment-name azure-c7n \
         --deployment-namespace cloud-custodian \
-        management_group \
-        --management-group-id "my-management-group" \
-        --env AZURE_TENANT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        --env AZURE_CLIENT_ID "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        --env AZURE_CLIENT_SECRET "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        --env AZURE_CONTAINER_STORAGE "https://myStorageAccount.blob.core.windows.net/policyContainer" \
-        --env AZURE_EVENT_QUEUE_RESOURCE_ID "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Storage/storageAccounts/myStorageAccount" \
+        --helm-values-file path/to/my-values.yaml \
+        --helm-set defaultSecretEnvironment.AZURE_CLIENT_SECRET=some-secret-value \
+        management_group --management-group-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 

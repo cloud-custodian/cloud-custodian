@@ -73,4 +73,4 @@ class WebApp(ArmResourceManager):
             'kind',
             'properties.hostNames[0]'
         )
-        resource_type = 'Microsoft.Web/serverFarms'
+        resource_type = 'Microsoft.Web/sites'

@@ -97,5 +97,5 @@ Use `{account_id}` for Subscription ID.
 Authentication to Storage
 -------------------------
 
-The account working with storage will require `Blob Data Contributor` on either the storage account
+The account working with storage will require `Storage Blob Data Contributor` on either the storage account
 or a higher scope.

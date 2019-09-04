@@ -63,7 +63,12 @@ class Host:
         log.info("Running Azure Cloud Custodian Self-Host")
 
         load_resources()
+
         self.session = local_session(Session)
+        self.storage_session = self.session
+        storage_subscription_id = ResourceIdParser.get_subscription_id(event_queue_id)
+        if storage_subscription_id != self.session.subscription_id:
+            self.storage_session = Session(subscription_id=storage_subscription_id)
 
         # Load configuration
         self.options = Host.build_options(output_dir, log_group, metrics)
@@ -117,7 +122,7 @@ class Host:
         """
         if not self.policy_blob_client:
             self.policy_blob_client = Storage.get_blob_client_by_uri(self.policy_storage_uri,
-                                                                     self.session)
+                                                                     self.storage_session)
         (client, container, prefix) = self.policy_blob_client
 
         try:
@@ -154,6 +159,8 @@ class Host:
             policy_path = os.path.join(self.policy_cache, blob.name)
             if os.path.exists(policy_path):
                 self.unload_policy_file(policy_path, policies_copy)
+            elif not os.path.isdir(os.path.dirname(policy_path)):
+                os.makedirs(os.path.dirname(policy_path))
 
             client.get_blob_to_path(container, blob.name, policy_path)
             self.load_policy(policy_path, policies_copy)
@@ -287,9 +294,8 @@ class Host:
         all events to an Azure Queue.
         """
         log.info('Updating event grid subscriptions')
-        destination = \
-            StorageQueueEventSubscriptionDestination(resource_id=self.queue_storage_account.id,
-                                                     queue_name=self.event_queue_name)
+        destination = StorageQueueEventSubscriptionDestination(
+            resource_id=self.queue_storage_account.id, queue_name=self.event_queue_name)
 
         # Build event filter
         event_filter = EventSubscriptionFilter(
@@ -313,7 +319,7 @@ class Host:
         if not self.queue_service:
             self.queue_service = Storage.get_queue_client_by_storage_account(
                 self.queue_storage_account,
-                self.session)
+                self.storage_session)
 
         while True:
             try:
@@ -385,14 +391,8 @@ class Host:
         as this is what we require for event subscriptions
         """
 
-        # Use a different session object if the queue is in a different subscription
-        queue_subscription_id = ResourceIdParser.get_subscription_id(queue_resource_id)
-        if queue_subscription_id != self.session.subscription_id:
-            session = Session(queue_subscription_id)
-        else:
-            session = self.session
-
-        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_client = self.storage_session \
+            .client('azure.mgmt.storage.StorageManagementClient')
 
         account = storage_client.storage_accounts.get_properties(
             ResourceIdParser.get_resource_group(queue_resource_id),

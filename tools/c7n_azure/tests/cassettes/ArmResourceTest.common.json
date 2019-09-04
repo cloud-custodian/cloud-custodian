@@ -14,25 +14,25 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
+                    "content-length": [
+                        "17671"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Wed, 12 Jun 2019 19:06:45 GMT"
+                    "cache-control": [
+                        "no-cache"
                     ],
-                    "content-length": [
-                        "5092"
+                    "date": [
+                        "Thu, 29 Aug 2019 23:10:41 GMT"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_disk2_940c13b1ee61416ba97c4c68af01a3a5",
-                                "name": "cctestvm_disk2_940c13b1ee61416ba97c4c68af01a3a5",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_disk2_8a37f775b2e44dd3b0f63279011d951d",
+                                "name": "cctestvm_disk2_8a37f775b2e44dd3b0f63279011d951d",
                                 "type": "Microsoft.Compute/disks",
                                 "sku": {
                                     "name": "Standard_LRS",
@@ -46,8 +46,8 @@
                                 }
                             },
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_5f09339a9e1b4b8883e45fd1c7d8601b",
-                                "name": "cctestvm_OsDisk_1_5f09339a9e1b4b8883e45fd1c7d8601b",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_a9720ac41e08475ba6c0199584b8faaa",
+                                "name": "cctestvm_OsDisk_1_a9720ac41e08475ba6c0199584b8faaa",
                                 "type": "Microsoft.Compute/disks",
                                 "sku": {
                                     "name": "Standard_LRS",
@@ -99,6 +99,48 @@
                                 "kind": "Storage",
                                 "location": "southcentralus",
                                 "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "3932"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 29 Aug 2019 23:10:42 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm",
+                                "name": "test_vm",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
                             }
                         ]
                     }

@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json"
-                    ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json"
+                    ],
                     "date": [
-                        "Mon, 12 Aug 2019 21:53:51 GMT"
+                        "Thu, 22 Aug 2019 03:54:33 GMT"
                     ],
                     "content-length": [
-                        "9180"
+                        "12041"
                     ]
                 },
                 "body": {
@@ -37,7 +37,7 @@
                                 "kind": "linux",
                                 "location": "East US",
                                 "properties": {
-                                    "serverFarmId": 13732131,
+                                    "serverFarmId": 13869746,
                                     "name": "cctest-appserviceplan-linux",
                                     "workerSize": "Default",
                                     "workerSizeId": 0,
@@ -85,249 +85,10 @@
                                     "family": "S",
                                     "capacity": 1
                                 }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan-linux/providers/Microsoft.Web/serverfarms/cctest-consumption-linux",
-                                "name": "cctest-consumption-linux",
-                                "type": "Microsoft.Web/serverfarms",
-                                "kind": "functionapp",
-                                "location": "East US",
-                                "properties": {
-                                    "serverFarmId": 13732132,
-                                    "name": "cctest-consumption-linux",
-                                    "workerSize": "Default",
-                                    "workerSizeId": 0,
-                                    "workerTierName": null,
-                                    "numberOfWorkers": 0,
-                                    "currentWorkerSize": null,
-                                    "currentWorkerSizeId": null,
-                                    "currentNumberOfWorkers": null,
-                                    "status": "Ready",
-                                    "webSpace": "test_appserviceplan-linux-EastUSwebspace",
-                                    "subscription": null,
-                                    "adminSiteName": null,
-                                    "hostingEnvironment": null,
-                                    "hostingEnvironmentProfile": null,
-                                    "maximumNumberOfWorkers": 0,
-                                    "planName": "VirtualDedicatedPlan",
-                                    "adminRuntimeSiteName": null,
-                                    "computeMode": "Shared",
-                                    "siteMode": null,
-                                    "geoRegion": "East US",
-                                    "perSiteScaling": null,
-                                    "maximumElasticWorkerCount": null,
-                                    "numberOfSites": 0,
-                                    "hostingEnvironmentId": null,
-                                    "isSpot": null,
-                                    "spotExpirationTime": null,
-                                    "freeOfferExpirationTime": null,
-                                    "tags": null,
-                                    "kind": "functionapp",
-                                    "resourceGroup": "test_appserviceplan-linux",
-                                    "reserved": null,
-                                    "isXenon": null,
-                                    "hyperV": null,
-                                    "mdmId": null,
-                                    "targetWorkerCount": null,
-                                    "targetWorkerSizeId": null,
-                                    "provisioningState": null,
-                                    "webSiteId": null,
-                                    "existingServerFarmIds": null
-                                },
-                                "sku": {
-                                    "name": "Y1",
-                                    "tier": "Dynamic",
-                                    "size": "Y1",
-                                    "family": "Y",
-                                    "capacity": 0
-                                }
                             }
                         ],
                         "nextLink": null,
                         "id": null
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "PATCH",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan-linux/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-linux?api-version=2018-02-01",
-                "body": "mock_body",
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
-                    ],
-                    "etag": [
-                        "\"1D551586F2482D5\""
-                    ],
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "date": [
-                        "Mon, 12 Aug 2019 21:54:10 GMT"
-                    ],
-                    "content-length": [
-                        "1424"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan-linux/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-linux",
-                        "name": "cctest-appserviceplan-linux",
-                        "type": "Microsoft.Web/serverfarms",
-                        "kind": "linux",
-                        "location": "East US",
-                        "properties": {
-                            "serverFarmId": 25426,
-                            "name": "cctest-appserviceplan-linux",
-                            "sku": {
-                                "name": "F1",
-                                "tier": "Free",
-                                "size": "F1",
-                                "capacity": 1
-                            },
-                            "workerSize": "Default",
-                            "workerSizeId": 0,
-                            "workerTierName": null,
-                            "numberOfWorkers": 1,
-                            "currentWorkerSize": "Default",
-                            "currentWorkerSizeId": 0,
-                            "currentNumberOfWorkers": 1,
-                            "status": "Ready",
-                            "webSpace": "test_appserviceplan-linux-EastUSwebspace",
-                            "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
-                            "adminSiteName": null,
-                            "hostingEnvironment": null,
-                            "hostingEnvironmentProfile": null,
-                            "maximumNumberOfWorkers": 1,
-                            "planName": "VirtualDedicatedPlan",
-                            "adminRuntimeSiteName": null,
-                            "computeMode": "Dedicated",
-                            "siteMode": null,
-                            "geoRegion": "East US",
-                            "perSiteScaling": false,
-                            "maximumElasticWorkerCount": 1,
-                            "numberOfSites": 0,
-                            "hostingEnvironmentId": null,
-                            "isSpot": false,
-                            "spotExpirationTime": null,
-                            "freeOfferExpirationTime": null,
-                            "tags": null,
-                            "kind": "linux",
-                            "resourceGroup": "test_appserviceplan-linux",
-                            "reserved": true,
-                            "isXenon": false,
-                            "hyperV": false,
-                            "mdmId": "waws-prod-blu-089_25426",
-                            "targetWorkerCount": 1,
-                            "targetWorkerSizeId": 0,
-                            "provisioningState": null,
-                            "webSiteId": null,
-                            "existingServerFarmIds": null
-                        },
-                        "sku": {
-                            "name": "F1",
-                            "tier": "Free",
-                            "size": "F1",
-                            "capacity": 1
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "request": {
-                "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan-linux/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-linux?api-version=2018-02-01",
-                "body": null,
-                "headers": {}
-            },
-            "response": {
-                "status": {
-                    "code": 200,
-                    "message": "OK"
-                },
-                "headers": {
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "date": [
-                        "Mon, 12 Aug 2019 21:54:12 GMT"
-                    ],
-                    "content-length": [
-                        "1386"
-                    ]
-                },
-                "body": {
-                    "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan-linux/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-linux",
-                        "name": "cctest-appserviceplan-linux",
-                        "type": "Microsoft.Web/serverfarms",
-                        "kind": "linux",
-                        "location": "East US",
-                        "properties": {
-                            "serverFarmId": 25426,
-                            "name": "cctest-appserviceplan-linux",
-                            "workerSize": "Default",
-                            "workerSizeId": 0,
-                            "workerTierName": null,
-                            "numberOfWorkers": 1,
-                            "currentWorkerSize": "Default",
-                            "currentWorkerSizeId": 0,
-                            "currentNumberOfWorkers": 1,
-                            "status": "Ready",
-                            "webSpace": "test_appserviceplan-linux-EastUSwebspace",
-                            "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
-                            "adminSiteName": null,
-                            "hostingEnvironment": null,
-                            "hostingEnvironmentProfile": null,
-                            "maximumNumberOfWorkers": 1,
-                            "planName": "VirtualDedicatedPlan",
-                            "adminRuntimeSiteName": null,
-                            "computeMode": "Dedicated",
-                            "siteMode": null,
-                            "geoRegion": "East US",
-                            "perSiteScaling": false,
-                            "maximumElasticWorkerCount": 1,
-                            "numberOfSites": 0,
-                            "hostingEnvironmentId": null,
-                            "isSpot": false,
-                            "spotExpirationTime": null,
-                            "freeOfferExpirationTime": null,
-                            "tags": null,
-                            "kind": "linux",
-                            "resourceGroup": "test_appserviceplan-linux",
-                            "reserved": true,
-                            "isXenon": false,
-                            "hyperV": false,
-                            "mdmId": "waws-prod-blu-089_25426",
-                            "targetWorkerCount": 1,
-                            "targetWorkerSizeId": 0,
-                            "provisioningState": "InProgress",
-                            "webSiteId": null,
-                            "existingServerFarmIds": null
-                        },
-                        "sku": {
-                            "name": "F1",
-                            "tier": "Free",
-                            "size": "F1",
-                            "family": "F",
-                            "capacity": 1
-                        }
                     }
                 }
             }

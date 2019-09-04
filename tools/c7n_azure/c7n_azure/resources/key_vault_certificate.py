@@ -57,6 +57,11 @@ class KeyVaultCertificate(ChildResourceManager):
         parent_manager_name = 'keyvault'
         raise_on_exception = False
 
+        default_report_fields = (
+            'id',
+            'attributes.expires'
+        )
+
         @classmethod
         def extra_args(cls, parent_resource):
             return {'vault_base_url': generate_key_vault_url(parent_resource['name'])}

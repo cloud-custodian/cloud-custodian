@@ -19,7 +19,8 @@
       "location": "East US",
       "scale": null,
       "properties": {},
-      "dependsOn": []
+      "dependsOn": [],
+      "tags": {"sku": "B1"}
     },
     {
       "type": "Microsoft.Web/serverfarms",

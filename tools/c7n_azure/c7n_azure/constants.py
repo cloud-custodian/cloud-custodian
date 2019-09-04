@@ -136,3 +136,5 @@ BLOB_TYPE = 'blob'
 QUEUE_TYPE = 'queue'
 TABLE_TYPE = 'table'
 FILE_TYPE = 'file'
+
+RESOURCE_GROUPS_TYPE = 'resourceGroups'

@@ -6,32 +6,55 @@ IFS=$'\n\t'
 resourceLocation="South Central US"
 templateDirectory="$( cd "$( dirname "$0" )" && pwd )"
 
+delete_resource() {
+    echo "Delete for $filenameNoExtension started"
+    fileName=${1##*/}
+    filenameNoExtension=${fileName%.*}
+    rgName="test_$filenameNoExtension"
+
+    if [[ "$fileName" == "cost-management-export.json" ]]; then
+        token=$(az account get-access-token --query accessToken --output tsv)
+        url=https://management.azure.com/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.CostManagement/exports/cccostexport?api-version=2019-01-01
+        curl -X DELETE -H "Authorization: Bearer ${token}" ${url}
+    fi
+
+    az group delete --name $rgName --yes --output None
+
+    echo "Delete for $filenameNoExtension complete"
+}
+
+delete_acs() {
+    echo "Delete for ACS started"
+    rgName=test_containerservice
+    az group delete --name $rgName --yes --no-wait
+    echo "Delete for ACS complete"
+}
+
+delete_policy_assignment() {
+    echo "Delete for policy assignment started"
+    az policy assignment delete --name cctestpolicy
+    echo "Delete for policy assignment complete"
+}
+
 # Delete RG's for each template file
 for file in "$templateDirectory"/*.json; do
-  fileName=${file##*/}
-  filenameNoExtension=${fileName%.*}
-  rgName="test_$filenameNoExtension"
+    fileName=${file##*/}
+    filenameNoExtension=${fileName%.*}
 
-  if [ $# -eq 0 ] || [[ "$@" =~ "$filenameNoExtension" ]]; then
-    echo "Deleting $rgName"
-    az group delete --name $rgName --yes --no-wait
-  else
-    echo "Skipping $rgName"
-  fi
-
+    if [ $# -eq 0 ] || [[ "$@" =~ "$filenameNoExtension" ]]; then
+        delete_resource ${file} &
+    fi
 done
 
 # Destroy ACS resource
-rgName=test_containerservice
 if [ $# -eq 0 ] || [[ "$@" =~ "containerservice" ]]; then
-  az group delete --name $rgName --yes --no-wait
-else
-  echo "Skipping $rgName"
+    delete_acs &
 fi
 
 # Destroy Azure Policy Assignment
 if [ $# -eq 0 ] || [[ "$@" =~ "policyassignment" ]]; then
-  az policy assignment delete --name cctestpolicy
-else
-  echo "Skipping policyassignment"
+    delete_policy_assignment &
 fi
+
+# Wait until all cleanup is finished
+wait
