@@ -3,24 +3,18 @@
 Azure Container Hosting
 =======================
 
-The Azure provider can be run in a containerized environment using the official cloud custodian 
-`docker image <https://hub.docker.com/r/cloudcustodian/c7n>`_. The Azure Container Host knows 
-how to handle both periodic and event based policies.
+The Azure Container Host is an alternative execution mode for the cloud custodian azure provider.
+Running the Azure Container Host is done with the `official custodian docker image <https://hub.docker.com/r/cloudcustodian/c7n>`_
+by providing the custom entry point, ``/usr/local/bin/python3 -m c7n_azure.container_host.host``, 
+and custom configuration through environment variables.
 
-The Azure Container Host will read policies from an Azure Blob Container and, depending on their mode,
-will listen for event triggers or run them periodically. Event triggers are pulled from an event 
-queue within a storage account.
+The Azure Container Host will periodically scan azure blob storage for a set of custodian policies 
+to execute in either a periodic or event based mode against a target subscription. Once the
+Azure Container Host is deployed, any policies uploaded to blob storage are automatically loaded and
+running against an Azure Subscription. This makes it very easy to manage and run a large number of
+policies.
 
-To run the container, pass the docker command as `/usr/local/bin/python3 -m c7n_azure.container_host.host`
-and authenticate through environment variables (see :ref:`azure_authentication`). It is also important
-to make sure that the container host is authenticated as a contributor on the policy storage and a 
-message processor on the event queue.
-
-There are 3 important environment variables that are specific to the container host. 
-
-* ``AZURE_EVENT_QUEUE_RESOURCE_ID``: The resource ID for a storage account for the event queue.
-* ``AZURE_EVENT_QUEUE_NAME``: The name of the event queue. If this queue does not exist, it will be created.
-* ``AZURE_CONTAINER_STORAGE``: The URI to an azure blob container that will hold all of the policies for this container host.
+.. image:: resources/container-host.png
 
 Supported Policy Modes
 ######################
@@ -40,15 +34,13 @@ the policy will be ignored.
 
   .. c7n-schema:: mode.container-event
 
-Deployment Options
-##################
+Configuration
+#############
 
-Before making a deployment, there must first be a 
-`General Purpose V2 Azure Storage Account <https://docs.microsoft.com/en-us/azure/storage/>`_
-with a blob container. This is where the Azure Container Host will poll for cloud custodian
-policy files.
+Configuration for the container host is provided as environment variables. 
+See :ref:`azure_authentication` for authenticating the contaienr host. 
 
-The identity used for the container host will also need the following roles in azure: 
+The identity provided to the container host must have the following roles in azure:
 
 - ``Reader`` and ``Storage Blob Data Contributor`` on the Storage Account that holds the policy files.
 
@@ -56,138 +48,34 @@ The identity used for the container host will also need the following roles in a
 
 - Any other roles that are needed to run the policies that the container host will run. For example, if there is a policy that filters the ``azure.vm`` resource, the ``Reader`` role will be required for the VMs that are in the container host's target subscription.
 
-Azure Container Instance
-------------------------
+There are several environment variables specific to the container host:
 
-The ARM template to deploy the Azure Container Host is provided for deploying an ACI instance
-against a single subscription using a `user assigned identity <https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview>`_ 
-for authentication.
++-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Variable Name                     | Required | Description                                                                                                                                                         |
++===================================+==========+=====================================================================================================================================================================+
+| ``AZURE_CONTAINER_STORAGE``       | required | The URL to the azure blob container to load custodian policies from.                                                                                                |
++-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``AZURE_EVENT_QUEUE_RESOURCE_ID`` | required | The resource id of the storage account to hold the event queue.                                                                                                     |
++-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``AZURE_EVENT_QUEUE_NAME``        | required | The name of the event queue that the container host will listen on. If this does not exist, it will be created.                                                     |
++-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``AZURE_CONTAINER_LOG_GROUP``     |          | The application insights to send log output to. In the format: ``azure://<instrumentation_key_guid>``.                                                              |
++-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``AZURE_CONTAINER_METRICS``       |          | The application insights to send metrics output to. In the format: ``azure://<instrumentation_key_guid>``.                                                          |
++-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``AZURE_CONTAINER_OUTPUT_DIR``    |          | The URL of the storage account blob container to send log output to. In the format: ``azure://<storage_account_name>.blob.core.windows.net/<blob_container_name>``. |
++-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-Here is an example deployment of the ARM template using the azure cli:
+Running Locally
+###############
 
-.. code-block:: bash
+The container host can be run locally with ``python -m c7n_azure.container_host.host``.
+You will need to provide all of the same configuration specified above through either environment 
+variables or CLI options. Run ``python -m c7n_azure.container_host.host --help`` for more information.
 
-    az group deployment create \
-        --resource-group my-resource-group \
-        --template-file tools/ops/azure/container-host/aci/aci-template.json \
-        --parameters \
-            aci_name=cloud-custodian \
-            user_assigned_identity_name=my-uai \
-            azure_subscription_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
-            azure_event_queue_name=custodian-aci-queue \
-            azure_container_storage=https://myStorageAccount.blob.core.windows.net/aci-policies \
-            azure_event_queue_resource_id=/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/my-resource-group/providers/Microsoft.Storage/storageAccounts/myStorageAccount
+Deployment Options
+##################
 
-Kubernetes (Helm Chart)
------------------------
-
-A helm chart is provided that will deploy a set of cloud custodian containers against a set of 
-subscriptions to be monitored. For information on how to customize the values, reference 
-the helm chart's values.yaml.
-
-Before deploying the chart, there must already be a kubernetes cluster with tiller installed and the 
-helm client should be pointed at this cluster. If the cluster is RBAC enabled, tiller must have a 
-`service account with the appropriate cluster role <https://helm.sh/docs/using_helm/#role-based-access-control>`_.
-
-.. code-block:: yaml
-
-    # sample-values.yaml
-
-    defaultEnvironment:
-      AZURE_TENANT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-      AZURE_CLIENT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-      AZURE_EVENT_QUEUE_NAME: "cloud-custodian-events"
-    
-    defaultSecretEnvironment:
-      AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-
-    subscriptionHosts:
-      - name: "my-first-subscription"
-        environment:
-          AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-          AZURE_CONTAINER_STORAGE: "https://firstStorageAccount.blob.core.windows.net/cloud-custodian-policies"
-          AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Storage/storageAccounts/firstStorageAccount"
-      - name: "my-second-subscription"
-        environment:
-          AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-          AZURE_CONTAINER_STORAGE: "https://secondStorageAccount.blob.core.windows.net/more-policies"
-          AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myOtherResourceGroup/providers/Microsoft.Storage/storageAccounts/secondStorageAccount"
-
-To deploy the chart:
-
-.. code-block:: bash
-
-    helm upgrade --install --debug --namespace cloud-custodian --values /path/to/sample-values.yaml my-cloud-custodian-deployment tools/ops/azure/container-host/chart
-
-
-Helm Chart Deployment Script
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Additionally, a utility script for deploying the helm chart against either a single subscription 
-or all subscriptions in a management group is provided. When deploying for a management group,
-all of the containers will share the same policy storage and storage account for event queues.
-
-.. code-block:: bash
-
-    # Usage
-    $ python tools/ops/azure/container-host/chart/deploy_chart.py --help
-
-    Usage: deploy_chart.py [OPTIONS] COMMAND [ARGS]...
-
-    Options:
-    -d, --deployment-name TEXT
-    -n, --deployment-namespace TEXT
-    -v, --helm-values-file TEXT     [required]
-    -s, --helm-set TEXT
-    --dry-run / --no-dry-run
-    --help                          Show this message and exit.
-
-    Commands:
-    management_group
-    subscription
-
-
-    # subscription subcommand
-    $ python tools/ops/azure/container-host/chart/deploy_chart.py subscription --help
-
-    Usage: deploy_chart.py subscription [OPTIONS]
-
-    Options:
-    -i, --subscription-id TEXT  [required]
-    --help                      Show this message and exit.
-
-
-    # management_group subcommand
-    $ python tools/ops/azure/container-host/chart/deploy_chart.py management_group --help
-
-    Usage: deploy_chart.py management_group [OPTIONS]
-
-    Options:
-    -i, --management-group-id TEXT  [required]
-    --help                          Show this message and exit.
-
-Examples
-________
-
-Deploy against a single subscription:
-
-.. code-block:: bash
-
-    python cloud-custodian/tools/ops/azure/container-host/chart/deploy_chart.py \
-        --deployment-name azure-c7n \
-        --deployment-namespace cloud-custodian \
-        --helm-values-file path/to/my-values.yaml \
-        --helm-set defaultSecretEnvironment.AZURE_CLIENT_SECRET=some-secret-value \
-        subscription --subscription-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
-Deploy against a management group:
-
-.. code-block:: bash
-
-    python tools/ops/azure/container-host/chart/deploy_chart.py \
-        --deployment-name azure-c7n \
-        --deployment-namespace cloud-custodian \
-        --helm-values-file path/to/my-values.yaml \
-        --helm-set defaultSecretEnvironment.AZURE_CLIENT_SECRET=some-secret-value \
-        management_group --management-group-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
+For quick deployments, we provide tooling for 2 methods of deploying the Azure Container Host:
+:ref:`ACI <azure_configuration_acitutorial>`, and 
+:ref:`Kubernetes with a Helm chart <azure_configuration_helmtutorial>`.

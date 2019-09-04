@@ -12,6 +12,17 @@ Azure Functions and monitoring the results of policies.
   :glob:
 
   authentication
+  monitoring
+
+Hosting Options
+---------------
+
+.. toctree::
+  :maxdepth: 2
+  :titlesonly:
+  :glob:
+
   functionshosting
   containerhosting
-  monitoring
+  ./acitutorial.rst
+  ./helmtutorial.rst
