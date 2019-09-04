@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "User": {
+            "Path": "/",
+            "UserName": "Bob",
+            "UserId": "AIDA4WFP4XXCU5RBT74KO",
+            "Arn": "arn:aws:iam::872247246277:user/Bob",
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 9,
+                "day": 4,
+                "hour": 20,
+                "minute": 15,
+                "second": 13,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "9acd58aa-cf51-11e9-9c00-67a3a16c78d7",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9acd58aa-cf51-11e9-9c00-67a3a16c78d7",
+                "content-type": "text/xml",
+                "content-length": "455",
+                "date": "Wed, 04 Sep 2019 20:21:40 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

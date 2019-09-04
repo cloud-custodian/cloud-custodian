@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Groups": [
+            {
+                "Path": "/",
+                "GroupName": "AdminGroup",
+                "GroupId": "AGPAJHYEJ6DMZRAVTSRQA",
+                "Arn": "arn:aws:iam::872247246277:group/AdminGroup",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2016,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 5,
+                    "minute": 54,
+                    "second": 38,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "9b0be7d4-cf51-11e9-a2b6-ad23e8e68f06",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9b0be7d4-cf51-11e9-a2b6-ad23e8e68f06",
+                "content-type": "text/xml",
+                "content-length": "596",
+                "date": "Wed, 04 Sep 2019 20:21:40 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "User": {
+            "Path": "/",
+            "UserName": "Pratyush",
+            "UserId": "AIDA4WFP4XXCWEXJRLIFY",
+            "Arn": "arn:aws:iam::872247246277:user/Pratyush",
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 6,
+                "day": 21,
+                "hour": 6,
+                "minute": 35,
+                "second": 38,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "9b65eefc-cf51-11e9-9fa8-cf61bfdf53a8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "9b65eefc-cf51-11e9-9fa8-cf61bfdf53a8",
+                "content-type": "text/xml",
+                "content-length": "465",
+                "date": "Wed, 04 Sep 2019 20:21:41 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
