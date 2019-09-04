@@ -14,7 +14,7 @@ Install
 Linux
 
 ```shell
-sudo sh -c 'wget -q https://cloudcustodian.io/downloads/custodian-cask/linux-latest/custodian-cask -P /usr/local/bin && chmod +x /usr/local/bin/custodian-cask'
+sudo sh -c 'wget -q https://cloudcustodian.io/downloads/custodian-cask/linux-latest/custodian-cask -O /usr/local/bin/custodian-cask && chmod +x /usr/local/bin/custodian-cask'
 ```
 
 MacOS (Darwin)
