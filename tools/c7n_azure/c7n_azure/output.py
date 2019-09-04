@@ -52,11 +52,12 @@ class AzureStorageOutput(DirectoryOutput):
 
     DEFAULT_BLOB_FOLDER_PREFIX = '{policy_name}/{now:%Y/%m/%d/%H/}'
 
+    log = logging.getLogger('custodian.azure.output.AzureStorageOutput')
+
     def __init__(self, ctx, config=None):
         self.ctx = ctx
         self.config = config
 
-        self.log = logging.getLogger('custodian.output')
         self.root_dir = tempfile.mkdtemp()
         self.output_dir = self.get_output_path(self.ctx.options.output_dir)
         self.blob_service, self.container, self.file_prefix = \

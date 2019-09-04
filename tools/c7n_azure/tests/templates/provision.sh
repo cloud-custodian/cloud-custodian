@@ -49,6 +49,22 @@ deploy_resource() {
 
         az group deployment create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --mode Complete --output None
 
+    elif [[ "$fileName" == "cost-management-export.json" ]]; then
+
+        # Deploy storage account required for the export
+        az group deployment create --resource-group $rgName --template-file $file --mode Complete --output None
+
+        token=$(az account get-access-token --query accessToken --output tsv)
+        storage_id=$(az storage account list --resource-group $rgName --query [0].id --output tsv)
+        subscription_id=$(az account show --query id --output tsv)
+        url=https://management.azure.com/subscriptions/${subscription_id}/providers/Microsoft.CostManagement/exports/cccostexport?api-version=2019-01-01
+
+        eval "echo \"$(cat cost-management-export-body.template)\"" > cost-management.body
+
+        curl -X PUT -d "@cost-management.body" -H "content-type: application/json" -H "Authorization: Bearer ${token}" ${url}
+
+        rm -f cost-management.body
+
     else
         az group deployment create --resource-group $rgName --template-file $file --mode Complete --output None
     fi
@@ -85,7 +101,6 @@ if [ $# -eq 0 ] || [[ "$@" =~ "containerservice" ]]; then
     deploy_acs &
 fi
 
-# Deploy Azure Policy Assignment
 if [ $# -eq 0 ] || [[ "$@" =~ "policyassignment" ]]; then
     deploy_policy_assignment &
 fi
