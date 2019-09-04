@@ -18,9 +18,9 @@ message processor on the event queue.
 
 There are 3 important environment variables that are specific to the container host. 
 
-* `AZURE_EVENT_QUEUE_RESOURCE_ID`: The resource ID for a storage account for the event queue.
-* `AZURE_EVENT_QUEUE_NAME`: The name of the event queue. If this queue does not exist, it will be created.
-* `AZURE_CONTAINER_STORAGE`: The URI to an azure blob container that will hold all of the policies for this container host.
+* ``AZURE_EVENT_QUEUE_RESOURCE_ID``: The resource ID for a storage account for the event queue.
+* ``AZURE_EVENT_QUEUE_NAME``: The name of the event queue. If this queue does not exist, it will be created.
+* ``AZURE_CONTAINER_STORAGE``: The URI to an azure blob container that will hold all of the policies for this container host.
 
 Supported Policy Modes
 ######################
@@ -42,6 +42,19 @@ the policy will be ignored.
 
 Deployment Options
 ##################
+
+Before making a deployment, there must first be a 
+`General Purpose V2 Azure Storage Account <https://docs.microsoft.com/en-us/azure/storage/>`_
+with a blob container. This is where the Azure Container Host will poll for cloud custodian
+policy files.
+
+The identity used for the container host will also need the following roles in azure: 
+
+- ``Reader`` and ``Storage Blob Data Contributor`` on the Storage Account that holds the policy files.
+
+- ``Reader`` and ``Storage Queue Message Processor`` on the Storage Account that the event queue will live in.
+
+- Any other roles that are needed to run the policies that the container host will run. For example, if there is a policy that filters the ``azure.vm`` resource, the ``Reader`` role will be required for the VMs that are in the container host's target subscription.
 
 Azure Container Instance
 ------------------------
@@ -71,6 +84,10 @@ Kubernetes (Helm Chart)
 A helm chart is provided that will deploy a set of cloud custodian containers against a set of 
 subscriptions to be monitored. For information on how to customize the values, reference 
 the helm chart's values.yaml.
+
+Before deploying the chart, there must already be a kubernetes cluster with tiller installed and the 
+helm client should be pointed at this cluster. If the cluster is RBAC enabled, tiller must have a 
+`service account with the appropriate cluster role <https://helm.sh/docs/using_helm/#role-based-access-control>`_.
 
 .. code-block:: yaml
 
