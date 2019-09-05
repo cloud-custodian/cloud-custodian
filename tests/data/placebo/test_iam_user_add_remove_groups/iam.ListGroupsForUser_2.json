@@ -6,7 +6,7 @@
                 "Path": "/",
                 "GroupName": "AdminGroup",
                 "GroupId": "AGPAJHYEJ6DMZRAVTSRQA",
-                "Arn": "arn:aws:iam::872247246277:group/AdminGroup",
+                "Arn": "arn:aws:iam::123456789000:group/AdminGroup",
                 "CreateDate": {
                     "__class__": "datetime",
                     "year": 2016,

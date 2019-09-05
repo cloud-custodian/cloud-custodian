@@ -5,7 +5,7 @@
             "Path": "/",
             "UserName": "Bob",
             "UserId": "AIDA4WFP4XXC3C4MN2RNZ",
-            "Arn": "arn:aws:iam::872247246277:user/Bob",
+            "Arn": "arn:aws:iam::123456789000:user/Bob",
             "CreateDate": {
                 "__class__": "datetime",
                 "year": 2019,
