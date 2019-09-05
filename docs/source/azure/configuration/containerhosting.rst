@@ -3,16 +3,23 @@
 Azure Container Hosting
 =======================
 
-The Azure Container Host is an alternative execution mode for the cloud custodian azure provider.
-Running the Azure Container Host is done with the `official custodian docker image <https://hub.docker.com/r/cloudcustodian/c7n>`_
-by providing the custom entry point, ``/usr/local/bin/python3 -m c7n_azure.container_host.host``, 
-and custom configuration through environment variables.
+The Azure Container Host is an alternate execution mode for the cloud custodian azure provider.
+Running the Azure Container Host is done with the `official custodian docker image <https://hub.docker.com/r/cloudcustodian/c7n>`_.
+See the :ref:`ACI <azure_configuration_acitutorial>` and :ref:`Kubernetes <azure_configuration_helmtutorial>` deployment tutorials
+to get started running the Azure Container Host.
+
+How It Works
+############
 
 The Azure Container Host will periodically scan azure blob storage for a set of custodian policies 
-to execute in either a periodic or event based mode against a target subscription. Once the
-Azure Container Host is deployed, any policies uploaded to blob storage are automatically loaded and
-running against an Azure Subscription. This makes it very easy to manage and run a large number of
-policies.
+to execute in either a periodic or event based mode against a target subscription. For periodic
+policies, the container host will execute the policy on the cron schedule that is provided. For event
+based policies, the container host maintains an azure queue that subscribes to events in the target
+azure subscription.
+
+Once the Azure Container Host is deployed, any policies uploaded to blob storage are automatically 
+loaded and running against an Azure Subscription. This makes it very easy to manage and run a large 
+number of policies.
 
 .. image:: resources/container-host.png
 
@@ -38,16 +45,6 @@ Configuration
 #############
 
 Configuration for the container host is provided as environment variables. 
-See :ref:`azure_authentication` for authenticating the contaienr host. 
-
-The identity provided to the container host must have the following roles in azure:
-
-- ``Reader`` and ``Storage Blob Data Contributor`` on the Storage Account that holds the policy files.
-
-- ``Reader`` and ``Storage Queue Message Processor`` on the Storage Account that the event queue will live in.
-
-- Any other roles that are needed to run the policies that the container host will run. For example, if there is a policy that filters the ``azure.vm`` resource, the ``Reader`` role will be required for the VMs that are in the container host's target subscription.
-
 There are several environment variables specific to the container host:
 
 +-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -65,6 +62,17 @@ There are several environment variables specific to the container host:
 +-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | ``AZURE_CONTAINER_OUTPUT_DIR``    |          | The URL of the storage account blob container to send log output to. In the format: ``azure://<storage_account_name>.blob.core.windows.net/<blob_container_name>``. |
 +-----------------------------------+----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+In additiona to the above environment variables, authentication must be provided to the container host.
+See :ref:`azure_authentication` for authenticating the container host with an azure identity.
+
+Once an identity has been established, it will need the following roles in azure:
+
+- ``Reader`` and ``Storage Blob Data Contributor`` on the Storage Account that holds the policy files.
+
+- ``Contributor`` and ``Storage Queue Message Processor`` on the Storage Account that the event queue will live in.
+
+- Any other roles that are needed to run the policies that the container host will run. For example, if there is a policy that filters the ``azure.vm`` resource, the ``Reader`` role will be required for the VMs that are in the container host's target subscription.
 
 Running Locally
 ###############
