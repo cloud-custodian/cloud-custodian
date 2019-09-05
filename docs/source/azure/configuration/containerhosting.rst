@@ -8,8 +8,8 @@ Running the Azure Container Host is done with the `official custodian docker ima
 See the :ref:`ACI <azure_configuration_acitutorial>` and :ref:`Kubernetes <azure_configuration_helmtutorial>` deployment tutorials
 to get started running the Azure Container Host.
 
-How It Works
-############
+Overview
+########
 
 The Azure Container Host will periodically scan azure blob storage for a set of custodian policies 
 to execute in either a periodic or event based mode against a target subscription. For periodic
@@ -22,6 +22,17 @@ loaded and running against an Azure Subscription. This makes it very easy to man
 number of policies.
 
 .. image:: resources/container-host.png
+
+It is also possible to configure a set of container hosts to each monitor an Azure Subscription.
+This can be useful for monitoring a Management Group or other collections of subscriptions. 
+These Container Hosts could be managed with any container orchestration, but we provide the tooling
+and :ref:`a tutorial <azure_configuration_helmtutorial>` for deploying container hosts inside 
+Kubernetes with a Helm chart.
+
+.. image:: resources/container-host-multiple.png
+
+In this diagram, each Container Host is reading and writing to the same policy and monitoring resources,
+but they could each be configured to interact with their own Storage Accounts or Application Insights instances.
 
 Supported Policy Modes
 ######################
