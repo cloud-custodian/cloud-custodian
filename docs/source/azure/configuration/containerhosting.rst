@@ -29,17 +29,42 @@ Supported Policy Modes
 The container host will only run policies with one of the following modes specified. Otherwise, 
 the policy will be ignored.
 
-- container-periodic
+Periodic
+^^^^^^^^
 
-    Run the policy periodically based on a provided crontab schedule.
+Periodic policies must specify a mode with type ``container-periodic`` and a cron schedule. This 
+schedule can specify when the policy should run. For example: once every hour, on midnight on every 
+weekday, or once a month.
 
-  .. c7n-schema:: mode.container-periodic
+.. code-block:: yaml
 
-- container-event
+    policies:
+    - name: run-every-day-at-midnight
+      resource: azure.resourcegroup
+      mode:
+        type: container-periodic
+        schedule: '0 0 * * *'
 
-    Run the policy when particular events are dropped into the specified event queue.
+.. c7n-schema:: mode.container-periodic
 
-  .. c7n-schema:: mode.container-event
+Event Based
+^^^^^^^^^^^
+
+Event based policies must specify a mode with the type ``container-event`` and a set of events that 
+will trigger the execution. For example: after a new resource group is created.
+
+.. code-block:: yaml
+
+    policies:
+    - name: run-on-new-resource-group
+      resource: azure.resourcegroup
+      mode:
+        type: container-event
+        events: 
+          - resourceProvider: Microsoft.Resources/subscriptions/resourceGroups
+            event: write
+
+.. c7n-schema:: mode.container-event
 
 Configuration
 #############
