@@ -63,7 +63,7 @@ class ResizePlan(AzureBaseAction):
 
     :example:
 
-    Resize App Service Plan to F1 plan with 1 instance.
+    Resize App Service Plan to B1 plan with 2 instance.
 
     .. code-block:: yaml
 
@@ -72,8 +72,8 @@ class ResizePlan(AzureBaseAction):
           resource: azure.appserviceplan
           actions:
            - type: resize-plan
-             size: F1
-             count: 1
+             size: B1
+             count: 2
 
 
     :example:
@@ -118,6 +118,7 @@ class ResizePlan(AzureBaseAction):
 
     schema = utils.type_schema(
         'resize-plan',
+        required=['size'],
         **{
             'size': Lookup.lookup_type({'type': 'string',
                                         'enum': ['F1', 'B1', 'B2', 'B3', 'D1',
@@ -143,14 +144,13 @@ class ResizePlan(AzureBaseAction):
         if resource['kind'] == 'linux':
             model.reserved = True
 
-        if 'size' in self.data:
-            size = Lookup.extract(self.data.get('size'), resource)
-            model.sku = models.SkuDescription()
-            model.sku.tier = ResizePlan.get_sku_name(size)
-            model.sku.name = size
+        size = Lookup.extract(self.data.get('size'), resource)
+        model.sku = models.SkuDescription()
+        model.sku.tier = ResizePlan.get_sku_name(size)
+        model.sku.name = size
 
         if 'count' in self.data:
-            model.target_worker_count = Lookup.extract(self.data.get('count'), resource)
+            model.sku.capacity = Lookup.extract(self.data.get('count'), resource)
 
         try:
             self.client.app_service_plans.update(resource['resourceGroup'], resource['name'], model)

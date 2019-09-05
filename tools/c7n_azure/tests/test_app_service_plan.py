@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure.mgmt.web import WebSiteManagementClient
 from azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
+from jsonschema import ValidationError
 from mock import patch
 
 from c7n.utils import local_session
@@ -68,15 +69,17 @@ class AppServicePlanTest(BaseTest):
             ],
             'actions': [
                 {'type': 'resize-plan',
-                 'size': 'F1'}]
-        })
+                 'size': 'B1',
+                 'count': 2}]
+        }, validate=True)
         resources = p.run()
         self.assertEqual(1, len(resources))
 
         name, args, kwargs = update_mock.mock_calls[0]
         self.assertEqual('cctest-appserviceplan-win', args[1])
-        self.assertEqual('F1', args[2].sku.name)
-        self.assertEqual('FREE', args[2].sku.tier)
+        self.assertEqual('B1', args[2].sku.name)
+        self.assertEqual('BASIC', args[2].sku.tier)
+        self.assertEqual(2, args[2].sku.capacity)
 
     @patch('azure.mgmt.web.operations.app_service_plans_operations.'
            'AppServicePlansOperations.update')
@@ -98,15 +101,17 @@ class AppServicePlanTest(BaseTest):
             ],
             'actions': [
                 {'type': 'resize-plan',
-                 'size': 'F1'}]
-        })
+                 'size': 'B1',
+                 'count': 3}]
+        }, validate=True)
         resources = p.run()
         self.assertEqual(1, len(resources))
 
         name, args, kwargs = update_mock.mock_calls[0]
         self.assertEqual('cctest-appserviceplan-linux', args[1])
-        self.assertEqual('F1', args[2].sku.name)
-        self.assertEqual('FREE', args[2].sku.tier)
+        self.assertEqual('B1', args[2].sku.name)
+        self.assertEqual('BASIC', args[2].sku.tier)
+        self.assertEqual(3, args[2].sku.capacity)
 
     @patch('azure.mgmt.web.operations.app_service_plans_operations.'
            'AppServicePlansOperations.update')
@@ -127,8 +132,7 @@ class AppServicePlanTest(BaseTest):
                      'type': 'resource',
                      'key': 'tags.sku'
                  }}],
-        })
-
+        }, validate=True)
         resources = p.run()
         self.assertEqual(1, len(resources))
 
@@ -153,7 +157,7 @@ class AppServicePlanTest(BaseTest):
             'actions': [
                 {'type': 'resize-plan',
                  'size': 'F1'}]
-        })
+        }, validate=True)
         p.run()
 
         logger.assert_called_once_with(
@@ -176,9 +180,19 @@ class AppServicePlanTest(BaseTest):
             'actions': [
                 {'type': 'resize-plan',
                  'size': 'F1'}]
-        })
+        }, validate=True)
         p.run()
 
         logger.assert_called_once_with(
             'Skipping cctest-consumption-linux, '
             'because this App Service Plan is for Consumption Azure Functions.')
+
+    def test_resize_missing_size_property(self):
+        with self.assertRaises(ValidationError):
+            self.load_policy({
+                'name': 'test-azure-appserviceplan',
+                'resource': 'azure.appserviceplan',
+                'actions': [
+                    {'type': 'resize-plan',
+                     'count': '1'}]
+            }, validate=True)
