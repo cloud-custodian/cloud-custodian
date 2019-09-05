@@ -98,11 +98,11 @@ class ConfigurationFilter(ValueFilter):
     schema_alias = True
 
     def __call__(self, i):
-        if 'configuration' not in i:
+        if 'c7n:configuration' not in i:
             client = self.manager.get_client().web_apps
             instance = (
                 client.get_configuration(i['resourceGroup'], i['name'])
             )
-            i['configuration'] = instance.serialize()['properties']
+            i['c7n:configuration'] = instance.serialize(keep_readonly=True)['properties']
 
-        return super(ConfigurationFilter, self).__call__(i['configuration'])
+        return super(ConfigurationFilter, self).__call__(i['c7n:configuration'])
