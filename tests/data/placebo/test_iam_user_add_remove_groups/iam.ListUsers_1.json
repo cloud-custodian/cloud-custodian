@@ -5,16 +5,16 @@
             {
                 "Path": "/",
                 "UserName": "Bob",
-                "UserId": "AIDA4WFP4XXCU5RBT74KO",
+                "UserId": "AIDA4WFP4XXC3C4MN2RNZ",
                 "Arn": "arn:aws:iam::872247246277:user/Bob",
                 "CreateDate": {
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 9,
-                    "day": 4,
-                    "hour": 20,
-                    "minute": 15,
-                    "second": 13,
+                    "day": 5,
+                    "hour": 19,
+                    "minute": 29,
+                    "second": 2,
                     "microsecond": 0
                 }
             },
@@ -37,13 +37,13 @@
         ],
         "IsTruncated": false,
         "ResponseMetadata": {
-            "RequestId": "9a99286e-cf51-11e9-802b-b9c99487764f",
+            "RequestId": "ce21d30f-d013-11e9-aaa5-3d97689ee397",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "9a99286e-cf51-11e9-802b-b9c99487764f",
+                "x-amzn-requestid": "ce21d30f-d013-11e9-aaa5-3d97689ee397",
                 "content-type": "text/xml",
                 "content-length": "795",
-                "date": "Wed, 04 Sep 2019 20:21:40 GMT"
+                "date": "Thu, 05 Sep 2019 19:31:49 GMT"
             },
             "RetryAttempts": 0
         }

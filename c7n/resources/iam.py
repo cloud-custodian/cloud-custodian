@@ -217,32 +217,26 @@ class SetGroups(BaseAction):
         required=['state', 'group']
     )
 
-    permissions = ('iam:AddUser', 'iam:RemoveUser',)
+    permissions = ('iam:AddUserToGroup', 'iam:RemoveUserFromGroup',)
 
     def validate(self):
-        if self.data.get('group') == '' or self.data.get('state') == '':
-            raise PolicyValidationError('group and state cannot be empty on %s'
+        if self.data.get('group') == '':
+            raise PolicyValidationError('group cannot be empty on %s'
                 % (self.manager.data))
 
     def process(self, resources):
         group_name = self.data['group']
         state = self.data['state']
         client = local_session(self.manager.session_factory).client('iam')
+        op_map = {
+            'add': client.add_user_to_group,
+            'remove': client.remove_user_from_group
+        }
         for r in resources:
-            if state == "add":
-                try:
-                    client.add_user_to_group(
-                        GroupName=group_name,
-                        UserName=r['UserName'])
-                except client.exceptions.NoSuchEntityException:
-                    continue
-            elif state == "remove":
-                try:
-                    client.remove_user_from_group(
-                        GroupName=group_name,
-                        UserName=r['UserName'])
-                except client.exceptions.NoSuchEntityException:
-                    continue
+            try:
+                op_map[state](GroupName=group_name, UserName=r['UserName'])
+            except client.exceptions.NoSuchEntityException:
+                continue
 
 
 @resources.register('iam-policy')
