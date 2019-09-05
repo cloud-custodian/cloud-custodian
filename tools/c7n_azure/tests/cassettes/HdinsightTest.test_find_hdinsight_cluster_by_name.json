@@ -14,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-hdi-served-by": [
-                        "global"
-                    ],
-                    "date": [
-                        "Wed, 04 Sep 2019 20:06:43 GMT"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "x-ms-hdi-served-by": [
+                        "global"
+                    ],
+                    "date": [
+                        "Thu, 05 Sep 2019 00:53:38 GMT"
                     ],
                     "content-length": [
-                        "1796"
+                        "1797"
                     ]
                 },
                 "body": {
@@ -38,7 +38,7 @@
                                 "name": "cctesthdinsighthbheaulh37fm4",
                                 "type": "Microsoft.HDInsight/clusters",
                                 "location": "South Central US",
-                                "etag": "95c1cf82-36f4-4fe9-9331-9c1313be94b0",
+                                "etag": "ae079228-3287-484a-9446-d6761cdd1c98",
                                 "tags": null,
                                 "properties": {
                                     "clusterVersion": "3.6.1000.67",
@@ -57,7 +57,7 @@
                                                 "name": "headnode",
                                                 "targetInstanceCount": 2,
                                                 "hardwareProfile": {
-                                                    "vmSize": "standard_d12_v2"
+                                                    "vmSize": "standard_a2m_v2"
                                                 },
                                                 "osProfile": {
                                                     "linuxOperatingSystemProfile": {
@@ -68,9 +68,9 @@
                                             },
                                             {
                                                 "name": "workernode",
-                                                "targetInstanceCount": 4,
+                                                "targetInstanceCount": 1,
                                                 "hardwareProfile": {
-                                                    "vmSize": "standard_d4_v2"
+                                                    "vmSize": "standard_a2m_v2"
                                                 },
                                                 "osProfile": {
                                                     "linuxOperatingSystemProfile": {
@@ -96,9 +96,9 @@
                                     },
                                     "provisioningState": "Succeeded",
                                     "clusterState": "Running",
-                                    "createdDate": "2019-09-04T19:32:42.26",
+                                    "createdDate": "2019-09-04T23:20:47.837",
                                     "quotaInfo": {
-                                        "coresUsed": 40
+                                        "coresUsed": 6
                                     },
                                     "connectivityEndpoints": [
                                         {

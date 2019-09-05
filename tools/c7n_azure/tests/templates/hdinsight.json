@@ -83,7 +83,7 @@
                             "minInstanceCount": 1,
                             "targetInstanceCount": 2,
                             "hardwareProfile": {
-                                "vmSize": "Standard_D12_V2"
+                                "vmSize": "Standard_A2m_v2"
                             },
                             "osProfile": {
                                 "linuxOperatingSystemProfile": {
@@ -94,9 +94,9 @@
                         },
                         {
                             "name": "workernode",
-                            "targetInstanceCount": 4,
+                            "targetInstanceCount": 1,
                             "hardwareProfile": {
-                                "vmSize": "Standard_D4_V2"
+                                "vmSize": "Standard_A2m_v2"
                             },
                             "osProfile": {
                                 "linuxOperatingSystemProfile": {

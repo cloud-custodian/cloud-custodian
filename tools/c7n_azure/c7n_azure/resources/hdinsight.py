@@ -46,10 +46,10 @@ class Hdinsight(ArmResourceManager):
             resource: azure.hdinsight
             filters:
               - type: value
-                key: properties.computeProfile.roles[?name=='workernode'].targetInstanceCount
-                op: in
+                key: properties.computeProfile.roles[?name=='workernode'].targetInstanceCount | [0]
+                op: eq
+                value_type: integer
                 value: 3
-                value_type: swap
 
     """
 
