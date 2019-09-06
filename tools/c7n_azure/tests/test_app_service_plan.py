@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure.mgmt.web import WebSiteManagementClient
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.session import Session
 from jsonschema import ValidationError
 from mock import patch
@@ -48,6 +48,16 @@ class AppServicePlanTest(BaseTest):
                      'size': 'F1'}],
             }, validate=True)
             self.assertTrue(p)
+
+        # size and count are missing
+        with self.assertRaises(ValidationError):
+            self.load_policy({
+                'name': 'test-azure-appserviceplan',
+                'resource': 'azure.appserviceplan',
+                'actions': [
+                    {'type': 'resize-plan'}
+                ]
+            }, validate=True)
 
     @patch('azure.mgmt.web.operations.app_service_plans_operations.'
            'AppServicePlansOperations.update')
@@ -116,6 +126,7 @@ class AppServicePlanTest(BaseTest):
     @patch('azure.mgmt.web.operations.app_service_plans_operations.'
            'AppServicePlansOperations.update')
     @arm_template('appserviceplan.json')
+    @cassette_name('test_resize_plan_win')
     def test_resize_plan_from_resource_tag(self, update_mock):
         p = self.load_policy({
             'name': 'test-azure-appserviceplan',
@@ -187,12 +198,34 @@ class AppServicePlanTest(BaseTest):
             'Skipping cctest-consumption-linux, '
             'because this App Service Plan is for Consumption Azure Functions.')
 
-    def test_resize_missing_size_property(self):
-        with self.assertRaises(ValidationError):
-            self.load_policy({
-                'name': 'test-azure-appserviceplan',
-                'resource': 'azure.appserviceplan',
-                'actions': [
-                    {'type': 'resize-plan',
-                     'count': '1'}]
-            }, validate=True)
+    @patch('azure.mgmt.web.operations.app_service_plans_operations.'
+           'AppServicePlansOperations.update')
+    @arm_template('appserviceplan.json')
+    @cassette_name('test_resize_plan_win')
+    def test_resize_plan_win_only_count(self, update_mock):
+        p = self.load_policy({
+            'name': 'test-azure-appserviceplan-win',
+            'resource': 'azure.appserviceplan',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctest-appserviceplan-win'},
+                {'type': 'value',
+                 'key': 'sku.name',
+                 'op': 'eq',
+                 'value': 'S1'}
+            ],
+            'actions': [
+                {'type': 'resize-plan',
+                 'count': 3}]
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+        name, args, kwargs = update_mock.mock_calls[0]
+        self.assertEqual('cctest-appserviceplan-win', args[1])
+        self.assertEqual('S1', args[2].sku.name)
+        self.assertEqual('Standard', args[2].sku.tier)
+        self.assertEqual(3, args[2].sku.capacity)

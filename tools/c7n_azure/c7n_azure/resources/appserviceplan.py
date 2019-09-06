@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n import utils
-
+from azure.mgmt.web import models
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.lookup import Lookup
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.actions.base import AzureBaseAction
-from azure.mgmt.web import models
-from c7n_azure.lookup import Lookup
 
 
 @resources.register('appserviceplan')
@@ -116,9 +114,14 @@ class ResizePlan(AzureBaseAction):
 
     """
 
-    schema = utils.type_schema(
-        'resize-plan',
-        **{
+    schema = {
+        'type': 'object',
+        'anyOf': [
+            {'required': ['size']},
+            {'required': ['count']}
+        ],
+        'properties': {
+            'type': {'enum': ['resize-plan']},
             'size': Lookup.lookup_type({'type': 'string',
                                         'enum': ['F1', 'B1', 'B2', 'B3', 'D1',
                                                  'S1', 'S2', 'S3', 'P1', 'P2',
@@ -127,7 +130,7 @@ class ResizePlan(AzureBaseAction):
                                         }),
             'count': Lookup.lookup_type({'type': 'integer'})
         }
-    )
+    }
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()  # type azure.mgmt.web.WebSiteManagementClient
