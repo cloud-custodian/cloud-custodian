@@ -195,7 +195,7 @@ class TestUtils(unittest.TestCase):
     # Backport from stdlib for 2.7 compat, drop when 2.7 support is dropped.
     def assertRegex(self, text, expected_regex, msg=None):
         """Fail the test unless the text matches the regular expression."""
-        if isinstance(expected_regex, (str, bytes)):
+        if isinstance(expected_regex, six.string_types):
             assert expected_regex, "expected_regex must not be empty."
             expected_regex = re.compile(expected_regex)
         if not expected_regex.search(text):
