@@ -17,6 +17,7 @@ from azure_common import BaseTest
 import pytest
 
 
+# Deployment requires Graph permissions
 @pytest.mark.skiplive
 class ContainerServiceTest(BaseTest):
     def setUp(self):
