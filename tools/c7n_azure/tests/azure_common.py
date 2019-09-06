@@ -301,7 +301,14 @@ class AzureVCRBaseTest(VCRTestCase):
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
                 % '|'.join(['(%s)' % p for p in prefixes])
 
-        return re.sub(regex, r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
+        match = re.search(regex, s)
+        s = re.sub(regex, r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
+        
+        if match is not None:
+            sub_id = match.group(0)
+            s = s.replace(sub_id[-12:], DEFAULT_SUBSCRIPTION_ID[-12:])
+
+        return s
 
     @staticmethod
     def _replace_tenant_id(s):
