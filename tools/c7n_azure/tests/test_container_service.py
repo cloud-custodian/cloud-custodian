@@ -14,8 +14,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest
+import pytest
 
 
+@pytest.mark.skiplive
 class ContainerServiceTest(BaseTest):
     def setUp(self):
         super(ContainerServiceTest, self).setUp()
