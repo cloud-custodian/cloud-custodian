@@ -516,6 +516,7 @@ class CosmosDBThroughputActionsTest(BaseTest):
         self.assertIsNotNone(offer)
         self.assertEqual(throughput, offer['content']['offerThroughput'])
 
+
 def live_session_wait():
     if local_session(Session).get_subscription_id() != DEFAULT_SUBSCRIPTION_ID:
         sleep(30)

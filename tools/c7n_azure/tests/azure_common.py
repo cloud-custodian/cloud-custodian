@@ -303,7 +303,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
         match = re.search(regex, s)
         s = re.sub(regex, r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
-        
+
         if match is not None:
             sub_id = match.group(0)
             s = s.replace(sub_id[-12:], DEFAULT_SUBSCRIPTION_ID[-12:])
