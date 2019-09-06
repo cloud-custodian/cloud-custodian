@@ -2,13 +2,6 @@
     "contentVersion": "1.0.0.0",
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "parameters": {
-        "dataFactoryName": {
-            "type": "string",
-            "defaultValue": "cctest-data-factory",
-            "metadata": {
-                "description": "Name of the data factory. Must be globally unique."
-            }
-        },
         "dataFactoryLocation": {
             "type": "string",
             "allowedValues": [
@@ -90,10 +83,12 @@
         "inputDatasetName": "ArmtemplateTestDatasetIn",
         "outputDatasetName": "ArmtemplateTestDatasetOut",
         "pipelineName": "ArmtemplateSampleCopyPipeline",
-        "triggerName": "ArmTemplateTestTrigger"
+        "triggerName": "ArmTemplateTestTrigger",
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "name": "[concat('cctest-data-factory', variables('suffix'))]"
     },
     "resources": [{
-        "name": "[parameters('dataFactoryName')]",
+        "name": "[variables('name')]",
         "apiVersion": "2017-09-01-preview",
         "type": "Microsoft.DataFactory/factories",
         "location": "[parameters('dataFactoryLocation')]",
@@ -105,7 +100,7 @@
                 "type": "linkedservices",
                 "name": "[variables('azureStorageLinkedServiceName')]",
                 "dependsOn": [
-                    "[parameters('dataFactoryName')]"
+                    "[variables('name')]"
                 ],
                 "apiVersion": "2017-09-01-preview",
                 "properties": {
@@ -123,7 +118,7 @@
                 "type": "datasets",
                 "name": "[variables('inputDatasetName')]",
                 "dependsOn": [
-                    "[parameters('dataFactoryName')]",
+                    "[variables('name')]",
                     "[variables('azureStorageLinkedServiceName')]"
                 ],
                 "apiVersion": "2017-09-01-preview",
@@ -143,7 +138,7 @@
                 "type": "datasets",
                 "name": "[variables('outputDatasetName')]",
                 "dependsOn": [
-                    "[parameters('dataFactoryName')]",
+                    "[variables('name')]",
                     "[variables('azureStorageLinkedServiceName')]"
                 ],
                 "apiVersion": "2017-09-01-preview",
@@ -163,7 +158,7 @@
                 "type": "pipelines",
                 "name": "[variables('pipelineName')]",
                 "dependsOn": [
-                    "[parameters('dataFactoryName')]",
+                    "[variables('name')]",
                     "[variables('azureStorageLinkedServiceName')]",
                     "[variables('inputDatasetName')]",
                     "[variables('outputDatasetName')]"
@@ -196,7 +191,7 @@
                 "type": "triggers",
                 "name": "[variables('triggerName')]",
                 "dependsOn": [
-                    "[parameters('dataFactoryName')]",
+                    "[variables('name')]",
                     "[variables('azureStorageLinkedServiceName')]",
                     "[variables('inputDatasetName')]",
                     "[variables('outputDatasetName')]",

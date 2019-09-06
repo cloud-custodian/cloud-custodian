@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Groups": [],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "ce06d165-d013-11e9-aaa5-3d97689ee397",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ce06d165-d013-11e9-aaa5-3d97689ee397",
+                "content-type": "text/xml",
+                "content-length": "322",
+                "date": "Thu, 05 Sep 2019 19:31:48 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

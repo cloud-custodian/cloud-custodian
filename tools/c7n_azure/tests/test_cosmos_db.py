@@ -54,9 +54,9 @@ class CosmosDBTest(BaseTest):
                 'filters': [
                     {'type': 'value',
                      'key': 'name',
-                     'op': 'eq',
+                     'op': 'glob',
                      'value_type': 'normalize',
-                     'value': 'cctestcosmosdb'}],
+                     'value': 'cctestcosmosdb*'}],
                 'actions': [
                     {'type': 'set-firewall-rules',
                      'bypass-rules': ['Portal'],
@@ -74,9 +74,9 @@ class CosmosDBTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -122,7 +122,6 @@ class CosmosDBTest(BaseTest):
                  'include': ['3.1.1.1']}],
         }, validate=True)
         resources = p.run()
-        print(resources)
         self.assertEqual(1, len(resources))
 
     @arm_template('cosmosdb.json')
@@ -214,9 +213,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'ip-rules': ['0.0.0.0/1', '11.12.13.14', '21.22.23.24']
@@ -247,9 +246,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'append': False,
@@ -281,9 +280,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'append': False,
@@ -324,9 +323,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'append': False,
@@ -358,9 +357,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'append': True,
