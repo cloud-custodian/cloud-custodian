@@ -251,6 +251,37 @@ class IamUserTag(BaseTest):
             {'Env': 'Dev',
              'maid_status': 'Resource does not meet policy: delete@2019/01/25'})
 
+    def test_iam_user_add_remove_groups(self):
+        factory = self.replay_flight_data('test_iam_user_add_remove_groups')
+        client = factory().client('iam')
+        response = client.list_groups_for_user(UserName='Bob')
+        self.assertEqual(len(response.get('Groups')), 0)
+        p = self.load_policy({
+            'name': 'add-remove-user',
+            'resource': 'iam-user',
+            'filters': [{'type': 'value', 'key': 'UserName', 'value': 'Bob'}],
+            'actions': [
+                {'type': 'set-groups', 'state': 'add', 'group': 'AdminGroup'}
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        response = client.list_groups_for_user(UserName='Bob')
+        self.assertEqual(len(response.get('Groups')), 1)
+        self.assertEqual(response.get('Groups')[0]['GroupName'], 'AdminGroup')
+        p = self.load_policy({
+            'name': 'add-remove-user',
+            'resource': 'iam-user',
+            'filters': [{'type': 'value', 'key': 'UserName', 'value': 'Bob'}],
+            'actions': [
+                {'type': 'set-groups', 'state': 'remove', 'group': 'AdminGroup'}
+            ]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        response = client.list_groups_for_user(UserName='Bob')
+        self.assertEqual(len(response.get('Groups')), 0)
+
 
 class IAMMFAFilter(BaseTest):
 
