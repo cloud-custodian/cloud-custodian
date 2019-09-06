@@ -29,6 +29,15 @@ from c7n.config import Config
 from .common import BaseTest
 
 
+class TestTesting(BaseTest):
+
+    def test_assert_regex(self):
+        self.assertRaises(
+            AssertionError,
+            self.assertRegex,
+            "^hello", "not hello world")
+
+
 class Backoff(BaseTest):
 
     def test_retry_passthrough(self):

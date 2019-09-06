@@ -18,6 +18,7 @@ import datetime
 import io
 import logging
 import os
+import re
 import shutil
 import tempfile
 import unittest
@@ -190,6 +191,19 @@ class TestUtils(unittest.TestCase):
             logger.setLevel(old_logger_level)
 
         return log_file
+
+    # Backport from stdlib for 2.7 compat, drop when 2.7 support is dropped.
+    def assertRegex(self, text, expected_regex, msg=None):
+        """Fail the test unless the text matches the regular expression."""
+        if isinstance(expected_regex, six.string_types):
+            assert expected_regex, "expected_regex must not be empty."
+            expected_regex = re.compile(expected_regex)
+        if not expected_regex.search(text):
+            standardMsg = "Regex didn't match: %r not found in %r" % (
+                expected_regex.pattern, text)
+            # _formatMessage ensures the longMessage option is respected
+            msg = self._formatMessage(msg, standardMsg)
+            raise self.failureException(msg)
 
 
 class TextTestIO(io.StringIO):

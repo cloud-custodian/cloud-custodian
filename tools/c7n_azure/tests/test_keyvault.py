@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.resources.key_vault import KeyVaultUpdateAccessPolicyAction, WhiteListFilter
 from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
@@ -46,6 +46,7 @@ class KeyVaultTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
@@ -208,73 +209,79 @@ class KeyVaultTest(BaseTest):
         return client.__module__ + '.' + client.__class__.__name__
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_include(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
                 {'type': 'firewall-rules',
-                 'include': ['3.1.1.1']}],
+                 'include': ['1.0.0.0']}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_not_include_all_ranges(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
                 {'type': 'firewall-rules',
-                 'include': ['3.1.1.1', '3.1.1.2-3.1.1.2']}],
+                 'include': ['1.0.0.0', '127.0.0.1']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_include_cidr(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
                 {'type': 'firewall-rules',
-                 'include': ['1.2.2.128/25']}],
+                 'include': ['128.0.0.0/1']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(1, len(resources))
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_not_include_cidr(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
                 {'type': 'firewall-rules',
-                 'include': ['2.2.2.128/25']}],
+                 'include': ['127.0.0.0/8']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_equal(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
                 {'type': 'firewall-rules',
-                 'equal': ['3.1.1.1-3.1.1.1', '1.2.2.128/25']}],
+                 'equal': ['0.0.0.0-126.255.255.255', '128.0.0.0-255.255.255.255']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(1, len(resources))
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_not_equal(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
                 {'type': 'firewall-rules',
-                 'equal': ['3.1.1.1-3.1.1.2', '3.1.1.1-3.1.1.1', '1.2.2.128/25']}],
+                 'equal': ['0.0.0.0-126.255.255.255', '128.0.0.0-255.255.255.254']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
