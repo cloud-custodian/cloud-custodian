@@ -185,19 +185,12 @@ class MetricFilter(Filter):
             processed = list(w.map(self.process_resource, resources))
             return [item for item in processed if item is not None]
 
-    def get_metric_data(self, resource):
+    def append_metric_data(self, resource):
         cached_metric_data = self._get_cached_metric_data(resource)
         if cached_metric_data:
             return cached_metric_data['measurement']
         try:
-            metrics_data = self.client.metrics.list(
-                resource['id'],
-                timespan=self.timespan,
-                interval=self.interval,
-                metricnames=self.metric,
-                aggregation=self.aggregation,
-                filter=self.filter
-            )
+            metrics_data = self.get_metric_data(resource)
         except HttpOperationError as e:
             self.log.error("could not get metric:%s on %s. Full error: %s" % (
                 self.metric, resource['id'], str(e)))
@@ -212,6 +205,16 @@ class MetricFilter(Filter):
         self._write_metric_to_resource(resource, metrics_data, m)
 
         return m
+    
+    def get_metric_data(self, resource):
+        return self.client.metrics.list(
+                resource['id'],
+                timespan=self.timespan,
+                interval=self.interval,
+                metricnames=self.metric,
+                aggregation=self.aggregation,
+                filter=self.filter
+            )
 
     def _write_metric_to_resource(self, resource, metrics_data, m):
         resource_metrics = resource.setdefault(get_annotation_prefix('metrics'), {})
@@ -236,7 +239,7 @@ class MetricFilter(Filter):
         return metrics.get(self._get_metrics_cache_key())
 
     def passes_op_filter(self, resource):
-        m_data = self.get_metric_data(resource)
+        m_data = self.append_metric_data(resource)
         if m_data is None:
             return self.no_data_action == 'include'
         aggregate_value = self.func(m_data)
