@@ -36,8 +36,8 @@ class IoTHubTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
-                 'value': 'cctest-iothub'}],
+                 'op': 'glob',
+                 'value': 'cctest-iothub*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
