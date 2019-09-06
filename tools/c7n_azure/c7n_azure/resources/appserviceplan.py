@@ -129,8 +129,10 @@ class ResizePlan(AzureBaseAction):
                                                  'PC2', 'PC3', 'PC4']
                                         }),
             'count': Lookup.lookup_type({'type': 'integer'})
-        }
+        },
+        'additionalProperties': False
     }
+    schema_alias = True
 
     def _prepare_processing(self):
         self.client = self.manager.get_client()  # type azure.mgmt.web.WebSiteManagementClient
