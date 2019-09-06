@@ -143,7 +143,7 @@ class AppServicePlanTest(BaseTest):
                      'type': 'resource',
                      'key': 'tags.sku'
                  }}],
-        }, validate=True)
+        })
         resources = p.run()
         self.assertEqual(1, len(resources))
 
