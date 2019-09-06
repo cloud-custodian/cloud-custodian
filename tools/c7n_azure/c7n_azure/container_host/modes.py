@@ -35,9 +35,10 @@ class AzureContainerHostMode(ServerlessExecutionMode):
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
+    log = logging.getLogger('custodian.azure.AzureContainerHostMode')
+
     def __init__(self, policy):
         self.policy = policy
-        self.log = logging.getLogger('custodian.azure.AzureContainerHostMode')
 
     def run(self, event=None, lambda_context=None):
         raise NotImplementedError("subclass responsibility")

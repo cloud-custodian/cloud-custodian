@@ -15,6 +15,7 @@ import collections
 import datetime
 import enum
 import hashlib
+import itertools
 import logging
 import re
 import time
@@ -29,7 +30,6 @@ from azure.mgmt.managementgroups import ManagementGroupsAPI
 from azure.mgmt.web.models import NameValuePair
 from c7n_azure import constants
 from c7n_azure.constants import RESOURCE_VAULT
-import itertools
 from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
@@ -41,6 +41,10 @@ try:
     from functools import lru_cache
 except ImportError:
     from backports.functools_lru_cache import lru_cache
+
+
+resource_group_regex = re.compile(r'/subscriptions/[^/]+/resourceGroups/[^/]+(/)?$',
+                                  re.IGNORECASE)
 
 
 class ResourceIdParser(object):
@@ -83,6 +87,14 @@ class ResourceIdParser(object):
     def get_full_type(resource_id):
         return '/'.join([ResourceIdParser.get_namespace(resource_id),
                          ResourceIdParser.get_resource_type(resource_id)])
+
+
+def is_resource_group_id(rid):
+    return resource_group_regex.match(rid)
+
+
+def is_resource_group(resource):
+    return resource['type'] == constants.RESOURCE_GROUPS_TYPE
 
 
 class StringUtils(object):

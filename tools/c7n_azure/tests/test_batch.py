@@ -36,8 +36,8 @@ class BatchTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
-                 'value': 'cctest'}],
+                 'op': 'glob',
+                 'value': 'cctest*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

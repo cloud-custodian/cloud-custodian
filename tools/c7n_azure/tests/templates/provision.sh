@@ -26,7 +26,11 @@ deploy_resource() {
 
     if [[ "$fileName" == "keyvault.json" ]]; then
 
-        azureAdUserObjectId=$(az ad signed-in-user show --query objectId --output tsv)
+        if [[ $(az account show --query user.type --out tsv) == "user" ]]; then
+            azureAdUserObjectId=$(az ad signed-in-user show --query objectId --output tsv)
+        else
+            azureAdUserObjectId=$(az ad sp  show --id ${AZURE_CLIENT_ID} --query objectId --out tsv)
+        fi
 
         az group deployment create --resource-group $rgName --template-file $file \
             --parameters "userObjectId=$azureAdUserObjectId" --output None
@@ -41,13 +45,29 @@ deploy_resource() {
         az keyvault certificate create --vault-name ${vault_name} --name cctest1 -p "$(az keyvault certificate get-default-policy)" --output None
         az keyvault certificate create --vault-name ${vault_name} --name cctest2 -p "$(az keyvault certificate get-default-policy)" --output None
 
-        az role assignment create --role "Storage Account Key Operator Service Role" --assignee cfa8b339-82a2-471a-a3c9-0fc0be7a4093 --scope ${storage_id} --output None
+     #   az role assignment create --role "Storage Account Key Operator Service Role" --assignee cfa8b339-82a2-471a-a3c9-0fc0be7a4093 --scope ${storage_id} --output None
         az keyvault storage add --vault-name ${vault_name} -n storage1 --active-key-name key1 --resource-id ${storage_id} --auto-regenerate-key True --regeneration-period P180D  --output None
         az keyvault storage add --vault-name ${vault_name} -n storage2 --active-key-name key2 --resource-id ${storage_id} --auto-regenerate-key False --output None
 
     elif [[ "$fileName" == "aks.json" ]]; then
 
         az group deployment create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --mode Complete --output None
+
+    elif [[ "$fileName" == "cost-management-export.json" ]]; then
+
+        # Deploy storage account required for the export
+        az group deployment create --resource-group $rgName --template-file $file --mode Complete --output None
+
+        token=$(az account get-access-token --query accessToken --output tsv)
+        storage_id=$(az storage account list --resource-group $rgName --query [0].id --output tsv)
+        subscription_id=$(az account show --query id --output tsv)
+        url=https://management.azure.com/subscriptions/${subscription_id}/providers/Microsoft.CostManagement/exports/cccostexport?api-version=2019-01-01
+
+        eval "echo \"$(cat cost-management-export-body.template)\"" > cost-management.body
+
+        curl -X PUT -d "@cost-management.body" -H "content-type: application/json" -H "Authorization: Bearer ${token}" ${url}
+
+        rm -f cost-management.body
 
     else
         az group deployment create --resource-group $rgName --template-file $file --mode Complete --output None
@@ -85,7 +105,6 @@ if [ $# -eq 0 ] || [[ "$@" =~ "containerservice" ]]; then
     deploy_acs &
 fi
 
-# Deploy Azure Policy Assignment
 if [ $# -eq 0 ] || [[ "$@" =~ "policyassignment" ]]; then
     deploy_policy_assignment &
 fi

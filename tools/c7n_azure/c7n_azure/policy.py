@@ -19,18 +19,18 @@ import sys
 import six
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
+from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
+from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE,
+                                 RESOURCE_GROUPS_TYPE)
+from c7n_azure.function_package import FunctionPackage
+from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
 from c7n.actions import EventAction
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
 from c7n.utils import local_session
-from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
-from c7n_azure.function_package import FunctionPackage
-from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE,
-                                 FUNCTION_TIME_TRIGGER_MODE)
-from c7n_azure.functionapp_utils import FunctionAppUtilities
-from c7n_azure.storage_utils import StorageUtilities
-from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -99,10 +99,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     default_storage_name = "custodian"
 
-    def __init__(self, policy):
+    log = logging.getLogger('custodian.azure.policy.AzureFunctionMode')
 
+    def __init__(self, policy):
         self.policy = policy
-        self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
         self.function_params = None
         self.function_app = None
@@ -241,7 +241,9 @@ class AzureModeCommon:
         """
         expected_type = policy.resource_manager.resource_type.resource_type
 
-        if expected_type == 'Microsoft.Resources/subscriptions/resourceGroups':
+        if expected_type == 'armresource':
+            return event['subject']
+        elif expected_type == RESOURCE_GROUPS_TYPE:
             extract_regex = '/subscriptions/[^/]+/resourceGroups/[^/]+'
         else:
             types = expected_type.split('/')
@@ -328,15 +330,16 @@ class AzureEventGridMode(AzureFunctionMode):
     azure event."""
 
     schema = utils.type_schema(FUNCTION_EVENT_TRIGGER_MODE,
-                               events={'type': 'array', 'items': {
-                                   'oneOf': [
-                                       {'type': 'string'},
-                                       {'type': 'object',
-                                        'required': ['resourceProvider', 'event'],
-                                        'properties': {
-                                            'resourceProvider': {'type': 'string'},
-                                            'event': {'type': 'string'}}}]
-                               }},
+                               events={'type': 'array',
+                                    'maxItems': 5,
+                                    'items': {
+                                        'oneOf': [
+                                            {'type': 'string'},
+                                            {'type': 'object',
+                                                'required': ['resourceProvider', 'event'],
+                                                'properties': {
+                                                    'resourceProvider': {'type': 'string'},
+                                                    'event': {'type': 'string'}}}]}},
                                required=['events'],
                                rinherit=AzureFunctionMode.schema)
 

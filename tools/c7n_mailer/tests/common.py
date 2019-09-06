@@ -11,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import fakeredis
 import logging
 import os
 
-from c7n_mailer.ldap_lookup import LdapLookup, Redis
-from ldap3 import Server, Connection, MOCK_SYNC
+import fakeredis
+from ldap3 import MOCK_SYNC, Connection, Server
 from ldap3.strategy import mockBase
+
+from c7n_mailer.ldap_lookup import LdapLookup, Redis
 
 logger = logging.getLogger('custodian.mailer')
 
@@ -61,8 +62,11 @@ MAILER_CONFIG_AZURE = {
     'queue_url': 'asq://storageaccount.queue.core.windows.net/queuename',
     'from_address': 'you@youremail.com',
     'sendgrid_api_key': 'SENDGRID_API_KEY',
-    'templates_folders': [os.path.abspath(os.path.dirname(__file__)),
-                          os.path.abspath('/')],
+    'templates_folders': [
+        os.path.abspath(os.path.dirname(__file__)),
+        os.path.abspath('/'),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), 'test-templates')),
+    ],
 }
 
 RESOURCE_1 = {

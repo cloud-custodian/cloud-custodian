@@ -11,7 +11,15 @@ delete_resource() {
     fileName=${1##*/}
     filenameNoExtension=${fileName%.*}
     rgName="test_$filenameNoExtension"
+
+    if [[ "$fileName" == "cost-management-export.json" ]]; then
+        token=$(az account get-access-token --query accessToken --output tsv)
+        url=https://management.azure.com/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.CostManagement/exports/cccostexport?api-version=2019-01-01
+        curl -X DELETE -H "Authorization: Bearer ${token}" ${url}
+    fi
+
     az group delete --name $rgName --yes --output None
+
     echo "Delete for $filenameNoExtension complete"
 }
 

@@ -20,7 +20,8 @@ from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math, PortsRangeHelper,
                              ResourceIdParser, StringUtils, custodian_azure_send_override,
-                             get_keyvault_secret, get_service_tag_ip_space)
+                             get_keyvault_secret, get_service_tag_ip_space, is_resource_group_id,
+                             is_resource_group)
 from mock import patch, Mock
 
 from c7n.config import Bag
@@ -58,6 +59,7 @@ class UtilsTest(BaseTest):
         self.assertEqual(ResourceIdParser.get_resource_group(RESOURCE_ID), "rgtest")
 
     def test_get_resource_type(self):
+
         self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID), "virtualMachines")
         self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID_CHILD), "databases")
 
@@ -298,3 +300,19 @@ class UtilsTest(BaseTest):
         # Invalid tag
         result = get_service_tag_ip_space('foo')
         self.assertEqual(0, len(result))
+
+    def test_is_resource_group_id(self):
+        self.assertTrue(is_resource_group_id('/subscriptions/GUID/resourceGroups/rg'))
+        self.assertTrue(is_resource_group_id('/subscriptions/GUID/resourceGroups/rg/'))
+        self.assertTrue(is_resource_group_id('/Subscriptions/GUID/resourcegroups/rg'))
+
+        self.assertFalse(is_resource_group_id('/subscriptions/GUID/rg/'))
+        self.assertFalse(is_resource_group_id('subscriptions/GUID/rg/'))
+        self.assertFalse(is_resource_group_id('/GUID/rg/'))
+        self.assertFalse(is_resource_group_id('/subscriptions/GUID/rg/providers/vm/vm'))
+        self.assertFalse(is_resource_group_id('/subscriptions/GUID/rg/providers'))
+        self.assertFalse(is_resource_group_id('/subscriptions/GUID/rg/p'))
+
+    def test_is_resource_group(self):
+        self.assertTrue(is_resource_group({'type': 'resourceGroups'}))
+        self.assertFalse(is_resource_group({'type': 'virtualMachines'}))

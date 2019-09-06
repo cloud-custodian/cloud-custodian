@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-
 from c7n_azure.filters import FirewallRulesFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
@@ -85,12 +83,7 @@ class SqlServerFirewallRulesFilter(FirewallRulesFilter):
 
     def __init__(self, data, manager=None):
         super(SqlServerFirewallRulesFilter, self).__init__(data, manager)
-        self._log = logging.getLogger('custodian.azure.sqlserver')
         self.client = None
-
-    @property
-    def log(self):
-        return self._log
 
     def process(self, resources, event=None):
         self.client = self.manager.get_client()

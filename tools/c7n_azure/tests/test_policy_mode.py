@@ -46,8 +46,27 @@ class AzurePolicyModeTest(BaseTest):
                              'name': 'testschemaname'
                          }
                      }}
-            })
+            }, validate=True)
             self.assertTrue(p)
+
+    def test_azure_function_event_mode_too_many_events_throws(self):
+        with self.sign_out_patch():
+            with self.assertRaises(ValidationError):
+                self.load_policy({
+                    'name': 'test-azure-serverless-mode',
+                    'resource': 'azure.vm',
+                    'mode': {
+                        'type': FUNCTION_EVENT_TRIGGER_MODE,
+                        'events': [
+                            'VmWrite',
+                            'AppServicePlanWrite',
+                            'CognitiveServiceWrite',
+                            'CosmosDbWrite',
+                            'DataFactoryWrite',
+                            'DataLakeWrite'
+                        ]
+                    }
+                }, validate=True)
 
     def test_azure_function_periodic_mode_schema_validation(self):
         with self.sign_out_patch():
@@ -69,7 +88,7 @@ class AzurePolicyModeTest(BaseTest):
                              'name': 'testschemaname'
                          }
                      }}
-            })
+            }, validate=True)
             self.assertTrue(p)
 
     def test_azure_function_periodic_schema_schedule_valid(self):
@@ -173,7 +192,7 @@ class AzurePolicyModeTest(BaseTest):
                 'mode':
                     {'type': CONTAINER_EVENT_TRIGGER_MODE,
                      'events': ['VmWrite']}
-            })
+            }, validate=True)
             self.assertTrue(p)
 
     def test_container_periodic_mode_schema_validation(self):
@@ -184,7 +203,7 @@ class AzurePolicyModeTest(BaseTest):
                 'mode':
                     {'type': CONTAINER_TIME_TRIGGER_MODE,
                      'schedule': '*/5 * * * *'}
-            })
+            }, validate=True)
             self.assertTrue(p)
 
     def test_init_azure_function_mode_with_service_plan(self):
@@ -393,7 +412,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.resources.resourcegroup.DeleteResourceGroup._process_resource')
+    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_function_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -424,7 +443,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.resources.resourcegroup.DeleteResourceGroup._process_resource')
+    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_container_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -471,18 +490,19 @@ class AzurePolicyModeTest(BaseTest):
         rg_id = "/subscriptions/ea98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_emptyrg"
         nsg_id = rg_id + '/providers/Microsoft.Network/networkSecurityGroups/test-nsg'
         sr_id = nsg_id + '/securityRules/test-rule'
+        string_as_is = 'as-is-for-armresource'
         resource_type = ''
         policy = Mock()
         policy.resource_manager.resource_type.resource_type = resource_type
 
         event = {'subject': rg_id}
-        policy.resource_manager.resource_type.resource_type =\
-            'Microsoft.Resources/subscriptions/resourceGroups'
+        policy.resource_manager.resource_type.resource_type = \
+            'resourceGroups'
         self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), rg_id)
 
         event = {'subject': nsg_id}
-        policy.resource_manager.resource_type.resource_type =\
-            'Microsoft.Resources/subscriptions/resourceGroups'
+        policy.resource_manager.resource_type.resource_type = \
+            'resourceGroups'
         self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), rg_id)
 
         event = {'subject': nsg_id}
@@ -494,6 +514,11 @@ class AzurePolicyModeTest(BaseTest):
         policy.resource_manager.resource_type.resource_type =\
             'Microsoft.Network/networksecuritygroups'
         self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), nsg_id)
+
+        event = {'subject': string_as_is}
+        policy.resource_manager.resource_type.resource_type =\
+            'armresource'
+        self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), string_as_is)
 
     @staticmethod
     def get_sample_event():

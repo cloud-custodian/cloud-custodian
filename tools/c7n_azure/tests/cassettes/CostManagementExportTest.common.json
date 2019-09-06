@@ -1,0 +1,79 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CostManagement/exports?api-version=2019-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "session-id": [
+                        "1dd9e837-0aeb-49cb-bf3b-4a68c429731d"
+                    ],
+                    "access-control-allow-origin": [
+                        "*"
+                    ],
+                    "date": [
+                        "Wed, 28 Aug 2019 18:35:31 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "773"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.CostManagement/exports/cccostexport",
+                                "name": "cccostexport",
+                                "type": "Microsoft.CostManagement/exports",
+                                "eTag": "\"1d55dc9b37a0895\"",
+                                "properties": {
+                                    "schedule": {
+                                        "status": "Active",
+                                        "recurrence": "Daily",
+                                        "recurrencePeriod": {
+                                            "from": "2019-08-28T02:38:12.68Z",
+                                            "to": "2050-02-01T08:00:00Z"
+                                        }
+                                    },
+                                    "format": "Csv",
+                                    "deliveryInfo": {
+                                        "destination": {
+                                            "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cost-management-export/providers/Microsoft.Storage/storageAccounts/cccmstorageceqqwjzvp2dii",
+                                            "container": "test",
+                                            "rootFolderPath": "test"
+                                        }
+                                    },
+                                    "definition": {
+                                        "type": "Usage",
+                                        "timeframe": "MonthToDate",
+                                        "dataSet": {
+                                            "granularity": "Daily",
+                                            "aggregation": {},
+                                            "grouping": [],
+                                            "sorting": []
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
