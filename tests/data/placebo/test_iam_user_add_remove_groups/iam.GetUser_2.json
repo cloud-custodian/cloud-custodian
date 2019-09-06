@@ -3,27 +3,27 @@
     "data": {
         "User": {
             "Path": "/",
-            "UserName": "Pratyush",
-            "UserId": "AIDA4WFP4XXCWEXJRLIFY",
-            "Arn": "arn:aws:iam::123456789000:user/Pratyush",
+            "UserName": "Bob",
+            "UserId": "AIDA4WFP4XXC3C4MN2RNZ",
+            "Arn": "arn:aws:iam::123456789000:user/Bob",
             "CreateDate": {
                 "__class__": "datetime",
                 "year": 2019,
-                "month": 6,
-                "day": 21,
-                "hour": 6,
-                "minute": 35,
-                "second": 38,
+                "month": 9,
+                "day": 5,
+                "hour": 19,
+                "minute": 29,
+                "second": 2,
                 "microsecond": 0
             }
         },
         "ResponseMetadata": {
-            "RequestId": "ce4ab895-d013-11e9-aaa5-3d97689ee397",
+            "RequestId": "cead98ad-d013-11e9-b58c-6dee0d78c915",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "ce4ab895-d013-11e9-aaa5-3d97689ee397",
+                "x-amzn-requestid": "cead98ad-d013-11e9-b58c-6dee0d78c915",
                 "content-type": "text/xml",
-                "content-length": "465",
+                "content-length": "455",
                 "date": "Thu, 05 Sep 2019 19:31:49 GMT"
             },
             "RetryAttempts": 0
