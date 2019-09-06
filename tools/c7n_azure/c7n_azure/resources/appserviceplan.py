@@ -118,7 +118,6 @@ class ResizePlan(AzureBaseAction):
 
     schema = utils.type_schema(
         'resize-plan',
-        required=['size'],
         **{
             'size': Lookup.lookup_type({'type': 'string',
                                         'enum': ['F1', 'B1', 'B2', 'B3', 'D1',
@@ -145,9 +144,15 @@ class ResizePlan(AzureBaseAction):
             model.reserved = True
 
         size = Lookup.extract(self.data.get('size'), resource)
+
+        # get existing tier
         model.sku = models.SkuDescription()
-        model.sku.tier = ResizePlan.get_sku_name(size)
-        model.sku.name = size
+        model.sku.tier = resource['sku']['tier']
+        model.sku.name = resource['sku']['name']
+
+        if 'size' in self.data:
+            model.sku.tier = ResizePlan.get_sku_name(size)
+            model.sku.name = size
 
         if 'count' in self.data:
             model.sku.capacity = Lookup.extract(self.data.get('count'), resource)
