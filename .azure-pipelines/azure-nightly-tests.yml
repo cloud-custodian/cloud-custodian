@@ -57,7 +57,7 @@ jobs:
         AZURE_CLIENT_ID: $(azure-client-id)
         AZURE_CLIENT_SECRET: $(azure-client-secret)
 
-    - script: C7N_TEST_RUN=true C7N_FUNCTIONAL=yes pytest tools/c7n_azure/tests
+    - script: C7N_TEST_RUN=true C7N_FUNCTIONAL=yes pytest -v -m "not skiplive" tools/c7n_azure/tests
       displayName: "Run Azure tests without cassettes"
 
     - script: tools/c7n_azure/tests/templates/cleanup.sh --skip keyvault cost-management-export containerservice
