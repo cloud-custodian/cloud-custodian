@@ -1,9 +1,10 @@
 {
   "variables": {
-    "dedicatedfunctionAppName": "cloud-custodian-test-dedicated",
-    "consumptionfunctionAppName": "cloud-custodian-test-consumption",
+    "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+    "dedicatedfunctionAppName": "[concat('cloud-custodian-test-dedicated', variables('suffix'))]",
+    "consumptionfunctionAppName": "[concat('cloud-custodian-test-consumption', variables('suffix'))]",
     "appHostingPlanName": "cloud-custodian-test",
-    "storageAccountName": "cloudcustodiantest",
+    "storageAccountName": "[concat('ccfuncapp', variables('suffix'))]",
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
   },
   "resources": [

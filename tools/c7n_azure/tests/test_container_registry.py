@@ -36,8 +36,8 @@ class ContainerRegistryTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
-                 'value': 'cctestcontainerregistry'}],
+                 'op': 'glob',
+                 'value': 'cctestcontainerregistry*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
