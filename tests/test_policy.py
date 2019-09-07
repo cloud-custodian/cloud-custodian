@@ -224,7 +224,7 @@ class PolicyMeta(BaseTest):
         names = self._visit_filters_and_actions(visitor)
         if names:
             self.fail(
-                "missing additionalProperties: Fallse on actions/filters\n %s" % (
+                "missing additionalProperties: False on actions/filters\n %s" % (
                     " \n".join(names)))
 
     def test_filter_action_type(self):
