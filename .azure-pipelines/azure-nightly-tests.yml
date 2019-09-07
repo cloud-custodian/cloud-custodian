@@ -49,7 +49,9 @@ jobs:
         AZURE_SUBSCRIPTION_ID: $(azure-subscription-id)
         AZURE_TENANT_ID: $(azure-tenant-id)
 
-    - script: tools/c7n_azure/tests/templates/provision.sh
+    # Skip some resources due to some restrictions with their provisioning using Service Principal account
+    # We maintain those resources in the test subscription available for the tests
+    - script: tools/c7n_azure/tests/templates/provision.sh --skip keyvault cost-management-export containerservice
       displayName: "Provision Azure Resources"
       env:
         AZURE_CLIENT_ID: $(azure-client-id)
@@ -58,6 +60,6 @@ jobs:
     - script: C7N_TEST_RUN=true C7N_FUNCTIONAL=yes pytest tools/c7n_azure/tests
       displayName: "Run Azure tests without cassettes"
 
-    - script: tools/c7n_azure/tests/templates/cleanup.sh
+    - script: tools/c7n_azure/tests/templates/cleanup.sh --skip keyvault cost-management-export containerservice
       displayName: "Cleanup Azure Resources"
       condition: always()

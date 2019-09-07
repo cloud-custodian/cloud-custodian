@@ -5,13 +5,33 @@ IFS=$'\n\t'
 
 # If `az ad signed-in-user show` fails then update your Azure CLI version
 
+# If you can't provision keyvault or cost-management-export resources please ensure you use
+# your user account and not a Service Principals.
+# cost-management-export: requires SP to have valid email claim
+# keyvault: Managed Storage can't be provisioned with SP
+
 resourceLocation="South Central US"
 templateDirectory="$( cd "$( dirname "$0" )" && pwd )"
 
-if [ $# -eq 0 ] || [[ "$@" =~ "aks" ]]; then
-    if [[ -z "$AZURE_CLIENT_ID" ]] || [[ -z "$AZURE_CLIENT_SECRET" ]]; then
-        echo "AZURE_CLIENT_ID AND AZURE_CLIENT_SECRET environment variables are required to deploy AKS"
-        exit 1
+if [[ $(az account show --query user.type --out tsv) == "user" ]]; then
+    is_user=1
+else
+    is_user=0
+fi
+
+if [[ $# -eq 0 ]]; then
+    # If there is no arguments -- deploy everything
+    deploy_all=1
+else
+    if [[ $1 == "--skip" ]]; then
+        # If we see option '--skip' -- deploy everything except for specific templates
+        deploy_all=1
+        skip_list="${@:2}"
+        echo $skip_list
+    else
+        # If there is no '--skip', deploy specific templates
+        deploy_all=0
+        deploy_list="${@:1}"
     fi
 fi
 
@@ -26,12 +46,12 @@ deploy_resource() {
 
     if [[ "$fileName" == "keyvault.json" ]]; then
 
-        if [[ $(az account show --query user.type --out tsv) == "user" ]]; then
-            azureAdUserObjectId=$(az ad signed-in-user show --query objectId --output tsv)
-        else
-            azureAdUserObjectId=$(az ad sp  show --id ${AZURE_CLIENT_ID} --query objectId --out tsv)
+        if [[ ${is_user} -ne 1 ]]; then
+            echo "KeyVault can't be provisioned with Service Principal due to Keyvault Managed Storage Account restrictions"
+            exit 1
         fi
 
+        azureAdUserObjectId=$(az ad signed-in-user show --query objectId --output tsv)
         az group deployment create --resource-group $rgName --template-file $file \
             --parameters "userObjectId=$azureAdUserObjectId" --output None
 
@@ -54,6 +74,11 @@ deploy_resource() {
         az group deployment create --resource-group $rgName --template-file $file --parameters client_id=$AZURE_CLIENT_ID client_secret=$AZURE_CLIENT_SECRET --mode Complete --output None
 
     elif [[ "$fileName" == "cost-management-export.json" ]]; then
+
+        if [[ ${is_user} -ne 1 ]]; then
+            echo "Cost Management Export can't be provisioned with Service Principal due to Keyvault Managed Storage Account restrictions"
+            exit 1
+        fi
 
         # Deploy storage account required for the export
         az group deployment create --resource-group $rgName --template-file $file --mode Complete --output None
@@ -91,21 +116,46 @@ deploy_policy_assignment() {
     echo "Deployment for policy assignment complete"
 }
 
+function should_deploy() {
+    if [[ ${deploy_all} -eq 1 ]]; then
+        if ! [[ "${skip_list[@]}" =~ $1 ]]; then
+            return 1
+        fi
+    else
+        if [[ "${deploy_list[@]}" =~ $1 ]]; then
+            return 1
+        fi
+    fi
+    return 0
+}
+
+# Ensure AZURE_CLIENT_ID and AZURE_CLIENT_SECRET are available for AKS deployment
+should_deploy "aks"
+if [[ $? -eq 1 ]]; then
+    if [[ -z "$AZURE_CLIENT_ID" ]] || [[ -z "$AZURE_CLIENT_SECRET" ]]; then
+        echo "AZURE_CLIENT_ID AND AZURE_CLIENT_SECRET environment variables are required to deploy AKS"
+        exit 1
+    fi
+fi
+
 # Create resource groups and deploy for each template file
 for file in "$templateDirectory"/*.json; do
     fileName=${file##*/}
     filenameNoExtension=${fileName%.*}
-
-    if [ $# -eq 0 ] || [[ "$@" =~ "$filenameNoExtension" ]]; then
+    should_deploy "$filenameNoExtension"
+    if [[ $? -eq 1 ]]; then
         deploy_resource ${file} &
     fi
 done
 
-if [ $# -eq 0 ] || [[ "$@" =~ "containerservice" ]]; then
+# Provision non-arm resources
+should_deploy "containerservice"
+if [[ $? -eq 1 ]]; then
     deploy_acs &
 fi
 
-if [ $# -eq 0 ] || [[ "$@" =~ "policyassignment" ]]; then
+should_deploy "policy"
+if [[ $? -eq 1 ]]; then
     deploy_policy_assignment &
 fi
 
