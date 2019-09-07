@@ -205,16 +205,16 @@ class MetricFilter(Filter):
         self._write_metric_to_resource(resource, metrics_data, m)
 
         return m
-    
+
     def get_metric_data(self, resource):
         return self.client.metrics.list(
-                resource['id'],
-                timespan=self.timespan,
-                interval=self.interval,
-                metricnames=self.metric,
-                aggregation=self.aggregation,
-                filter=self.filter
-            )
+            resource['id'],
+            timespan=self.timespan,
+            interval=self.interval,
+            metricnames=self.metric,
+            aggregation=self.aggregation,
+            filter=self.filter
+        )
 
     def _write_metric_to_resource(self, resource, metrics_data, m):
         resource_metrics = resource.setdefault(get_annotation_prefix('metrics'), {})
