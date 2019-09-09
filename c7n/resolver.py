@@ -52,7 +52,8 @@ class URIResolver(object):
             else:
                 contents = response.read().decode('utf-8')
 
-        response.close()
+            response.close()
+
         self.cache.save(("uri-resolver", uri), contents)
         return contents
 
