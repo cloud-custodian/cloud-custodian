@@ -106,7 +106,7 @@ class TestRestApi(BaseTest):
                 'op': 'update',
                 'days': 2}
             ]},
-        session_factory=session_factory)
+            session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 1)
         client = session_factory().client("apigateway")
