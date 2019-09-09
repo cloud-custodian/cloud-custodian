@@ -92,6 +92,7 @@ MATCH = 'match'
 EXCEPT_PORTS = 'exceptPorts'
 IP_PROTOCOL = 'ipProtocol'
 ACCESS = 'access'
+PREFIX = 'prefix'
 
 ALLOW_OPERATION = 'Allow'
 DENY_OPERATION = 'Deny'
@@ -187,7 +188,8 @@ class NetworkSecurityGroupPortsAction(BaseAction):
             PORTS: {'type': 'string'},
             EXCEPT_PORTS: {'type': 'string'},
             IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP', '*']},
-            DIRECTION: {'type': 'string', 'enum': ['Inbound', 'Outbound']}
+            DIRECTION: {'type': 'string', 'enum': ['Inbound', 'Outbound']},
+            PREFIX: {'type': 'string', 'maxLength': 44}  # 80 symbols limit, guid takes 36
         },
         'required': ['type', DIRECTION]
     }
@@ -218,6 +220,7 @@ class NetworkSecurityGroupPortsAction(BaseAction):
 
         ip_protocol = self.data.get(IP_PROTOCOL, '*')
         direction = self.data[DIRECTION]
+        prefix = self.data.get(PREFIX, 'c7n-policy-')
         # Build a list of ports described in the action.
         ports = PortsRangeHelper.get_ports_set_from_string(self.data.get(PORTS, '0-65535'))
         except_ports = PortsRangeHelper.get_ports_set_from_string(self.data.get(EXCEPT_PORTS, ''))
@@ -243,7 +246,7 @@ class NetworkSecurityGroupPortsAction(BaseAction):
             lowest_priority = rules[0]['properties']['priority'] if len(rules) > 0 else 4096
 
             # Create new top-priority rule to allow/block ports from the action.
-            rule_name = 'c7n-policy-' + str(uuid.uuid1())
+            rule_name = prefix + str(uuid.uuid1())
             new_rule = {
                 'name': rule_name,
                 'properties': {

@@ -19,18 +19,18 @@ import sys
 import six
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
+from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
+from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE,
+                                 RESOURCE_GROUPS_TYPE)
+from c7n_azure.function_package import FunctionPackage
+from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
 from c7n.actions import EventAction
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
 from c7n.utils import local_session
-from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
-from c7n_azure.function_package import FunctionPackage
-from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE,
-                                 FUNCTION_TIME_TRIGGER_MODE)
-from c7n_azure.functionapp_utils import FunctionAppUtilities
-from c7n_azure.storage_utils import StorageUtilities
-from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -241,7 +241,9 @@ class AzureModeCommon:
         """
         expected_type = policy.resource_manager.resource_type.resource_type
 
-        if expected_type == 'Microsoft.Resources/subscriptions/resourceGroups':
+        if expected_type == 'armresource':
+            return event['subject']
+        elif expected_type == RESOURCE_GROUPS_TYPE:
             extract_regex = '/subscriptions/[^/]+/resourceGroups/[^/]+'
         else:
             types = expected_type.split('/')

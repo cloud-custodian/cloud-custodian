@@ -2,10 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "variables": {
-        "sitesName":"cctestwebapp",
-        "hostname":"cctestwebapp.azurewebsites.net",
-        "serverfarms_name": "[concat('ccctestServicePlane', uniqueString(resourceGroup().id))]"
-        
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "sitesName":"[concat('cctestwebapp', variables('suffix'))]",
+        "hostname":"[concat(variables('sitesName'), '.azurewebsites.net')]",
+        "serverfarms_name": "[concat('ccctestServicePlane', variables('suffix'))]"
     },
     "resources": [
         {

@@ -190,6 +190,55 @@ User.action_registry.register('mark-for-op', TagDelayedAction)
 User.filter_registry.register('marked-for-op', TagActionFilter)
 
 
+@User.action_registry.register('set-groups')
+class SetGroups(BaseAction):
+    """Set a specific IAM user as added/removed from a group
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-user-add-remove
+          resource: iam-user
+          filters:
+            - type: value
+              key: UserName
+              value: Bob
+          actions:
+            - type: set-groups
+              state: remove
+              group: Admin
+
+    """
+    schema = type_schema(
+        'set-groups',
+        state={'enum': ['add', 'remove']},
+        group={'type': 'string'},
+        required=['state', 'group']
+    )
+
+    permissions = ('iam:AddUserToGroup', 'iam:RemoveUserFromGroup',)
+
+    def validate(self):
+        if self.data.get('group') == '':
+            raise PolicyValidationError('group cannot be empty on %s'
+                % (self.manager.data))
+
+    def process(self, resources):
+        group_name = self.data['group']
+        state = self.data['state']
+        client = local_session(self.manager.session_factory).client('iam')
+        op_map = {
+            'add': client.add_user_to_group,
+            'remove': client.remove_user_from_group
+        }
+        for r in resources:
+            try:
+                op_map[state](GroupName=group_name, UserName=r['UserName'])
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+
 @resources.register('iam-policy')
 class Policy(QueryResourceManager):
 

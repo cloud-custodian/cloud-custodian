@@ -30,13 +30,37 @@
                     "defaultAction": "Deny",
                     "ipRules": [
                         {
-                            "value": "3.1.1.1",
+                            "value": "0.0.0.0/2",
                             "action": "Allow"
                         },
                         {
-                            "value": "1.2.2.128/25",
+                            "value": "64.0.0.0/3",
                             "action": "Allow"
-                          }
+                        },
+                        {
+                            "value": "96.0.0.0/4",
+                            "action": "Allow"
+                        },
+                        {
+                            "value": "112.0.0.0/5",
+                            "action": "Allow"
+                        },
+                        {
+                            "value": "120.0.0.0/6",
+                            "action": "Allow"
+                        },
+                        {
+                            "value": "124.0.0.0/7",
+                            "action": "Allow"
+                        },
+                        {
+                            "value": "126.0.0.0/8",
+                            "action": "Allow"
+                        },
+                        {
+                            "value": "128.0.0.0/1",
+                            "action": "Allow"
+                        }
                     ]
                 },
                 "tenantId": "[subscription().tenantId]",

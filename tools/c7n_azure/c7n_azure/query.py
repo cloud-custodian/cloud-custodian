@@ -73,10 +73,11 @@ class ResourceQuery(object):
 
 @sources.register('describe-azure')
 class DescribeSource(object):
+    resource_query_factory = ResourceQuery
 
     def __init__(self, manager):
         self.manager = manager
-        self.query = ResourceQuery(manager.session_factory)
+        self.query = self.resource_query_factory(self.manager.session_factory)
 
     def get_resources(self, query):
         return self.query.filter(self.manager)
@@ -94,21 +95,17 @@ class ChildResourceQuery(ResourceQuery):
     parents identifiers. ie. SQL and Cosmos databases
     """
 
-    def __init__(self, session_factory, manager):
-        super(ChildResourceQuery, self).__init__(session_factory)
-        self.manager = manager
-
     def filter(self, resource_manager, **params):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)  # type: ChildTypeInfo
 
-        parents = self.manager.get_parent_manager()
+        parents = resource_manager.get_parent_manager()
 
         # Have to query separately for each parent's children.
         results = []
         for parent in parents.resources():
             try:
-                subset = self.manager.enumerate_resources(parent, m, **params)
+                subset = resource_manager.enumerate_resources(parent, m, **params)
 
                 if subset:
                     # If required, append parent resource ID to all child resources
@@ -130,14 +127,6 @@ class ChildResourceQuery(ResourceQuery):
 @sources.register('describe-child-azure')
 class ChildDescribeSource(DescribeSource):
     resource_query_factory = ChildResourceQuery
-
-    def __init__(self, manager):
-        self.manager = manager
-        self.query = self.get_query()
-
-    def get_query(self):
-        return self.resource_query_factory(
-            self.manager.session_factory, self.manager)
 
 
 class TypeMeta(type):

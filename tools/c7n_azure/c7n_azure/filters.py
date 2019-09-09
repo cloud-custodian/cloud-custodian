@@ -14,6 +14,7 @@
 import logging
 import operator
 from abc import ABCMeta, abstractmethod
+from concurrent.futures import as_completed
 from datetime import timedelta
 
 import six
@@ -25,8 +26,7 @@ from azure.mgmt.costmanagement.models import (QueryAggregation,
 from azure.mgmt.policyinsights import PolicyInsightsClient
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
-                             StringUtils, ThreadHelper, now, utcnow)
-from concurrent.futures import as_completed
+                             StringUtils, ThreadHelper, now, utcnow, is_resource_group)
 from dateutil import tz as tzutils
 from dateutil.parser import parse
 from msrest.exceptions import HttpOperationError
@@ -703,7 +703,7 @@ class ResourceLockFilter(Filter):
         client = self.manager.get_client('azure.mgmt.resource.locks.ManagementLockClient')
         result = []
         for resource in resources:
-            if resource.get('resourceGroup') is None:
+            if is_resource_group(resource):
                 locks = [r.serialize(True) for r in
                          client.management_locks.list_at_resource_group_level(
                     resource['name'])]

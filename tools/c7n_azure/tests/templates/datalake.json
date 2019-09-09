@@ -1,18 +1,15 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "accounts_cctestdatalake_name": {
-            "defaultValue": "cctestdatalake",
-            "type": "String"
-        }
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "name": "[concat('ccdatalake', variables('suffix'))]"
     },
-    "variables": {},
     "resources": [
         {
             "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/tabarlow/providers/Microsoft.DataLakeStore/accounts/cctestdatalake'.",
             "type": "Microsoft.DataLakeStore/accounts",
-            "name": "[parameters('accounts_cctestdatalake_name')]",
+            "name": "[variables('name')]",
             "apiVersion": "2016-11-01",
             "location": "eastus2",
             "scale": null,

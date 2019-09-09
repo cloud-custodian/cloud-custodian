@@ -2,12 +2,15 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {},
-    "variables": {},
+    "variables": {
+		"suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+		"name":"[concat('cctestcosmosdb', variables('suffix'))]"
+	},
     "resources": [
         {
             "type": "Microsoft.DocumentDB/databaseAccounts",
             "kind": "GlobalDocumentDB",
-            "name": "cctestcosmosdb",
+            "name": "[variables('name')]",
             "apiVersion": "2016-03-31",
             "location": "South Central US",
             "scale": null,
@@ -19,15 +22,15 @@
                     "maxIntervalInSeconds": 5,
                     "maxStalenessPrefix": 100
                 },
-                "name": "cctestcosmosdb"
+                "name": "[variables('name')]"
             },
             "dependsOn": []
         },
 		{
 			"type": "Microsoft.DocumentDB/databaseAccounts/apis/databases",
-			"name": "cctestcosmosdb/sql/cctestcdatabase",
+			"name": "[concat(variables('name'), '/sql/cctestcdatabase')]",
 			"apiVersion": "2016-03-31",
-			"dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts/', 'cctestcosmosdb')]" ],
+			"dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts/', variables('name'))]" ],
 			"properties":{
 				"resource":{
 					"id": "cctestcdatabase"
@@ -36,9 +39,9 @@
 		},
 		{
 			"type": "Microsoft.DocumentDb/databaseAccounts/apis/databases/containers",
-			"name": "cctestcosmosdb/sql/cctestcdatabase/cccontainer",
+			"name": "[concat(variables('name'), '/sql/cctestcdatabase/cccontainer')]",
 			"apiVersion": "2016-03-31",
-			"dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts/apis/databases', 'cctestcosmosdb', 'sql', 'cctestcdatabase')]" ],
+			"dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts/apis/databases', variables('name'), 'sql', 'cctestcdatabase')]" ],
 			"properties":
 			{
 				"resource":{

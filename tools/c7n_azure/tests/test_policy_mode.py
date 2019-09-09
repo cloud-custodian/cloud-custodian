@@ -292,7 +292,7 @@ class AzurePolicyModeTest(BaseTest):
 
         function_mode = AzureFunctionMode(p)
         params = function_mode.get_function_app_params()
-        self.assertRegexpMatches(params.function_app_name, "invalid-policy-name1-[a-zA-Z0-9]+")
+        self.assertRegex(params.function_app_name, "invalid-policy-name1-[a-zA-Z0-9]+")
 
     def test_init_azure_function_mode_with_resource_ids(self):
         ai_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
@@ -412,7 +412,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.resources.resourcegroup.DeleteResourceGroup._process_resource')
+    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_function_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -443,7 +443,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.resources.resourcegroup.DeleteResourceGroup._process_resource')
+    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_container_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -490,18 +490,19 @@ class AzurePolicyModeTest(BaseTest):
         rg_id = "/subscriptions/ea98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_emptyrg"
         nsg_id = rg_id + '/providers/Microsoft.Network/networkSecurityGroups/test-nsg'
         sr_id = nsg_id + '/securityRules/test-rule'
+        string_as_is = 'as-is-for-armresource'
         resource_type = ''
         policy = Mock()
         policy.resource_manager.resource_type.resource_type = resource_type
 
         event = {'subject': rg_id}
-        policy.resource_manager.resource_type.resource_type =\
-            'Microsoft.Resources/subscriptions/resourceGroups'
+        policy.resource_manager.resource_type.resource_type = \
+            'resourceGroups'
         self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), rg_id)
 
         event = {'subject': nsg_id}
-        policy.resource_manager.resource_type.resource_type =\
-            'Microsoft.Resources/subscriptions/resourceGroups'
+        policy.resource_manager.resource_type.resource_type = \
+            'resourceGroups'
         self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), rg_id)
 
         event = {'subject': nsg_id}
@@ -513,6 +514,11 @@ class AzurePolicyModeTest(BaseTest):
         policy.resource_manager.resource_type.resource_type =\
             'Microsoft.Network/networksecuritygroups'
         self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), nsg_id)
+
+        event = {'subject': string_as_is}
+        policy.resource_manager.resource_type.resource_type =\
+            'armresource'
+        self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), string_as_is)
 
     @staticmethod
     def get_sample_event():

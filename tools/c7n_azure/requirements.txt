@@ -1,4 +1,4 @@
-vcrpy==2.0.1
+vcrpy==2.1.0
 vcrpy_unittest==0.1.7
 backports.functools_lru_cache==1.5
 azure-functions; python_version >= '3.6'
