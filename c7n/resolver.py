@@ -42,13 +42,18 @@ class URIResolver(object):
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
             req = Request(uri, headers={"Accept-Encoding": "gzip"})
-            fh = urlopen(req)
-            content = gzip.decompress(fh.read())
-            fh.close()
-            decomp_req = content.splitlines()
-            contents = ''
-            for line in decomp_req:
-                contents += line.decode('utf-8')
+            response = urlopen(req)
+            if response.info().get('Content-Encoding') == 'gzip':
+                content = gzip.decompress(response.read())
+                response.close()
+                decomp_req = content.splitlines()
+                contents = ''
+                for line in decomp_req:
+                    contents += line.decode('utf-8')
+            else:
+                contents = response.read().decode('utf-8')
+                response.close()
+
         self.cache.save(("uri-resolver", uri), contents)
         return contents
 
