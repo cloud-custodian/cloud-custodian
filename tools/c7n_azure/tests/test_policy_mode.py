@@ -18,6 +18,7 @@ from azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, casset
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode, AzureModeCommon
+from jsonschema import ValidationError
 from mock import mock, patch, Mock
 
 
@@ -45,8 +46,27 @@ class AzurePolicyModeTest(BaseTest):
                              'name': 'testschemaname'
                          }
                      }}
-            })
+            }, validate=True)
             self.assertTrue(p)
+
+    def test_azure_function_event_mode_too_many_events_throws(self):
+        with self.sign_out_patch():
+            with self.assertRaises(ValidationError):
+                self.load_policy({
+                    'name': 'test-azure-serverless-mode',
+                    'resource': 'azure.vm',
+                    'mode': {
+                        'type': FUNCTION_EVENT_TRIGGER_MODE,
+                        'events': [
+                            'VmWrite',
+                            'AppServicePlanWrite',
+                            'CognitiveServiceWrite',
+                            'CosmosDbWrite',
+                            'DataFactoryWrite',
+                            'DataLakeWrite'
+                        ]
+                    }
+                }, validate=True)
 
     def test_azure_function_periodic_mode_schema_validation(self):
         with self.sign_out_patch():
@@ -55,7 +75,7 @@ class AzurePolicyModeTest(BaseTest):
                 'resource': 'azure.vm',
                 'mode':
                     {'type': FUNCTION_TIME_TRIGGER_MODE,
-                     'schedule': '0 * /5 * * * *',
+                     'schedule': '0 */5 * * * *',
                      'provision-options': {
                          'servicePlan': {
                              'name': 'test-cloud-custodian',
@@ -68,8 +88,101 @@ class AzurePolicyModeTest(BaseTest):
                              'name': 'testschemaname'
                          }
                      }}
-            })
+            }, validate=True)
             self.assertTrue(p)
+
+    def test_azure_function_periodic_schema_schedule_valid(self):
+        policy = {
+            'name': 'test-azure-schema-schedule-valid',
+            'resource': 'azure.vm',
+            'mode': {
+                'type': FUNCTION_TIME_TRIGGER_MODE,
+                'schedule': ''
+            }
+        }
+
+        valid_schedules = [
+            '0 5 */2 * * friday',
+            '0 * 5 * February *',
+            '5-7 * * * * 1-5',
+            '5,8,10 * * * Jan Mon'
+        ]
+
+        result = True
+        for valid_schedule in valid_schedules:
+            policy['mode']['schedule'] = valid_schedule
+            p = self.load_policy(policy, validate=True)
+            result = result and p
+
+        self.assertTrue(result)
+
+    def test_azure_function_periodic_schema_schedule_invalid(self):
+        policy = {
+            'name': 'test-azure-schema-schedule-invalid',
+            'resource': 'azure.vm',
+            'mode': {
+                'type': FUNCTION_TIME_TRIGGER_MODE,
+                'schedule': ''
+            }
+        }
+
+        invalid_schedules = [
+            '* * * * *',
+            '0 * * * * * *',
+            '* * * * * *',
+            '0 0 0 0 0 0',
+            '15-60 * * * * 7'
+        ]
+
+        for invalid_schedule in invalid_schedules:
+            policy['mode']['schedule'] = invalid_schedule
+            with self.assertRaises(ValidationError):
+                self.load_policy(policy, validate=True)
+
+    def test_container_periodic_schema_schedule_valid(self):
+        policy = {
+            'name': 'test-azure-periodic-mode',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': CONTAINER_TIME_TRIGGER_MODE,
+                    'schedule': ''}
+        }
+
+        valid_schedules = [
+            '5 */2 * * fri',
+            ' * 5 * feb * ',
+            '5-7 * * * 1-5 ',
+            '5,8,10 * * jan mon'
+        ]
+
+        result = True
+        for valid_schedule in valid_schedules:
+            policy['mode']['schedule'] = valid_schedule
+            p = self.load_policy(policy, validate=True)
+            result = result and p
+
+        self.assertTrue(result)
+
+    def test_container_periodic_schema_schedule_invalid(self):
+        policy = {
+            'name': 'test-azure-periodic-mode',
+            'resource': 'azure.vm',
+            'mode':
+                {'type': CONTAINER_TIME_TRIGGER_MODE,
+                    'schedule': ''}
+        }
+
+        invalid_schedules = [
+            '* * * *',
+            '* * * * * *'
+            '*/15 * Jan 1-5',
+            '* 15 * jan 7',
+        ]
+
+        for invalid_schedule in invalid_schedules:
+            policy['mode']['schedule'] = invalid_schedule
+            with self.assertRaises(ValidationError):
+                self.load_policy(policy, validate=True)
 
     def test_container_event_mode_schema_validation(self):
         with self.sign_out_patch():
@@ -79,7 +192,7 @@ class AzurePolicyModeTest(BaseTest):
                 'mode':
                     {'type': CONTAINER_EVENT_TRIGGER_MODE,
                      'events': ['VmWrite']}
-            })
+            }, validate=True)
             self.assertTrue(p)
 
     def test_container_periodic_mode_schema_validation(self):
@@ -89,8 +202,8 @@ class AzurePolicyModeTest(BaseTest):
                 'resource': 'azure.vm',
                 'mode':
                     {'type': CONTAINER_TIME_TRIGGER_MODE,
-                     'schedule': '* /5 * * * *'}
-            })
+                     'schedule': '*/5 * * * *'}
+            }, validate=True)
             self.assertTrue(p)
 
     def test_init_azure_function_mode_with_service_plan(self):
@@ -179,7 +292,7 @@ class AzurePolicyModeTest(BaseTest):
 
         function_mode = AzureFunctionMode(p)
         params = function_mode.get_function_app_params()
-        self.assertRegexpMatches(params.function_app_name, "invalid-policy-name1-[a-zA-Z0-9]+")
+        self.assertRegex(params.function_app_name, "invalid-policy-name1-[a-zA-Z0-9]+")
 
     def test_init_azure_function_mode_with_resource_ids(self):
         ai_id = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups' \
@@ -299,7 +412,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.resources.resourcegroup.DeleteResourceGroup._process_resource')
+    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_function_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -330,7 +443,7 @@ class AzurePolicyModeTest(BaseTest):
 
     @arm_template('emptyrg.json')
     @cassette_name('resourcegroup')
-    @patch('c7n_azure.resources.resourcegroup.DeleteResourceGroup._process_resource')
+    @patch('c7n_azure.actions.delete.DeleteAction._process_resource')
     def test_empty_group_container_event(self, mock_delete):
         p = self.load_policy({
             'name': 'test-azure-resource-group',
@@ -377,18 +490,19 @@ class AzurePolicyModeTest(BaseTest):
         rg_id = "/subscriptions/ea98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_emptyrg"
         nsg_id = rg_id + '/providers/Microsoft.Network/networkSecurityGroups/test-nsg'
         sr_id = nsg_id + '/securityRules/test-rule'
+        string_as_is = 'as-is-for-armresource'
         resource_type = ''
         policy = Mock()
         policy.resource_manager.resource_type.resource_type = resource_type
 
         event = {'subject': rg_id}
-        policy.resource_manager.resource_type.resource_type =\
-            'Microsoft.Resources/subscriptions/resourceGroups'
+        policy.resource_manager.resource_type.resource_type = \
+            'resourceGroups'
         self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), rg_id)
 
         event = {'subject': nsg_id}
-        policy.resource_manager.resource_type.resource_type =\
-            'Microsoft.Resources/subscriptions/resourceGroups'
+        policy.resource_manager.resource_type.resource_type = \
+            'resourceGroups'
         self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), rg_id)
 
         event = {'subject': nsg_id}
@@ -400,6 +514,11 @@ class AzurePolicyModeTest(BaseTest):
         policy.resource_manager.resource_type.resource_type =\
             'Microsoft.Network/networksecuritygroups'
         self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), nsg_id)
+
+        event = {'subject': string_as_is}
+        policy.resource_manager.resource_type.resource_type =\
+            'armresource'
+        self.assertEqual(AzureModeCommon.extract_resource_id(policy, event), string_as_is)
 
     @staticmethod
     def get_sample_event():

@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import sendgrid
 import six
-from c7n_mailer.utils import decrypt
-from c7n_mailer.utils import (get_message_subject)
-from c7n_mailer.utils_email import is_email, get_mimetext_message
 from python_http_client import exceptions
-from sendgrid.helpers.mail import Mail, To, From
+from sendgrid.helpers.mail import Content, Email, Header, Mail, To
+
+from c7n_mailer.utils import decrypt
+from c7n_mailer.utils_email import get_mimetext_message, is_email
 
 
 class SendGridDelivery(object):
@@ -85,28 +86,10 @@ class SendGridDelivery(object):
             queue_message['action'].get('template', 'default'),
             to_addrs_to_email_messages_map))
 
-        from_address = self.config.get('from_address', '')
-        subject = get_message_subject(queue_message)
-        email_format = queue_message['action'].get('template_format', None)
-        if not email_format:
-            email_format = queue_message['action'].get(
-                'template', 'default').endswith('html') and 'html' or 'plain'
-
         for email_to_addrs, message in six.iteritems(to_addrs_to_email_messages_map):
             for to_address in email_to_addrs:
-                if email_format == "html":
-                    mail = Mail(
-                        from_email=From(from_address),
-                        to_emails=To(to_address),
-                        subject=subject,
-                        html_content=message.as_string())
-                else:
-                    mail = Mail(
-                        from_email=From(from_address),
-                        to_emails=To(to_address),
-                        subject=subject,
-                        plain_text_content=message.as_string())
                 try:
+                    mail = SendGridDelivery._sendgrid_mail_from_email_message(message)
                     self.sendgrid_client.send(mail)
                 except (exceptions.UnauthorizedError, exceptions.BadRequestsError) as e:
                     self.logger.warning(
@@ -122,3 +105,44 @@ class SendGridDelivery(object):
                     )
                     return False
         return True
+
+    @staticmethod
+    def _sendgrid_mail_from_email_message(message):
+        """
+        Create a Mail object from an instance of email.message.EmailMessage.
+
+        This is a copy and tweak of Mail.from_EmailMessage from the SendGrid SDK
+        to get around a bug where it creates an Email object and later requires
+        that object to be an instance of a To, Cc, or Bcc object.
+
+        It also strips out any reserved key headers on the message object.
+        """
+
+        mail = Mail(
+            from_email=Email(message.get('From')),
+            subject=message.get('Subject'),
+
+            # Create a To object instead of an Email object
+            to_emails=To(message.get('To')),
+        )
+        try:
+            body = message.get_content()
+        except AttributeError:
+            # Python2
+            body = message.get_payload(decode=True).decode('utf-8')
+        mail.add_content(Content(
+            message.get_content_type(),
+            body.strip()
+        ))
+
+        # These headers are not allowed on the message object
+        # https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.headers
+        skip_headers = [
+            'x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'Content-Type',
+            'Content-Transfer-Encoding', 'To', 'From', 'Subject', 'Reply-To', 'CC', 'BCC'
+        ]
+
+        for k, v in message.items():
+            if k not in skip_headers:
+                mail.add_header(Header(k, v))
+        return mail

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.constants import RESOURCE_GROUPS_TYPE
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import ResourceIdParser
@@ -70,7 +70,7 @@ class ResourceGroup(ArmResourceManager):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
         enum_spec = ('resource_groups', 'list', None)
-        resource_type = 'Microsoft.Resources/subscriptions/resourceGroups'
+        resource_type = RESOURCE_GROUPS_TYPE
 
     def get_resources(self, resource_ids):
         resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
@@ -98,12 +98,3 @@ class EmptyGroup(Filter):
                 .list_by_resource_group(group['name'])
         )
         return not any(True for _ in resources_iterator)
-
-
-@ResourceGroup.action_registry.register('delete')
-class DeleteResourceGroup(AzureBaseAction):
-    schema = type_schema('delete')
-
-    def _process_resource(self, group):
-        self.manager.log.info('Removing resource group ' + group['name'])
-        self.manager.get_client().resource_groups.delete(group['name'])

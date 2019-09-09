@@ -36,9 +36,9 @@ class RedisTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestredis'}],
+                 'value': 'cctestredis*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

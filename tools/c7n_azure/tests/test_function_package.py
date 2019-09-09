@@ -39,7 +39,7 @@ class FunctionPackageTest(BaseTest):
             'resource': 'azure.publicip',
             'mode':
                 {'type': FUNCTION_TIME_TRIGGER_MODE,
-                 'schedule': '0 1 0 0 0'}
+                 'schedule': '0 1 0 1 1 1'}
         })
 
         packer = FunctionPackage(p.data['name'])
@@ -50,7 +50,7 @@ class FunctionPackageTest(BaseTest):
 
         self.assertEqual(binding['bindings'][0]['type'], 'timerTrigger')
         self.assertEqual(binding['bindings'][0]['name'], 'input')
-        self.assertEqual(binding['bindings'][0]['schedule'], '0 1 0 0 0')
+        self.assertEqual(binding['bindings'][0]['schedule'], '0 1 0 1 1 1')
 
     def test_add_function_config_events(self):
         p = self.load_policy({
