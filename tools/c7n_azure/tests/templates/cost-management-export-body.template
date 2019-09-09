@@ -3,7 +3,7 @@
         \"schedule\": {
             \"recurrence\": \"Daily\",
             \"recurrencePeriod\": {
-                \"from\": \"2019-08-28T02:38:12.680Z\",
+                \"from\": \"$(date --iso-8601=minutes)\",
                 \"to\": \"2050-02-01T08:00:00.000Z\"
             },
             \"status\": \"Active\"

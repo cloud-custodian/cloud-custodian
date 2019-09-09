@@ -6,6 +6,22 @@ IFS=$'\n\t'
 resourceLocation="South Central US"
 templateDirectory="$( cd "$( dirname "$0" )" && pwd )"
 
+if [[ $# -eq 0 ]]; then
+    # If there is no arguments -- deploy everything
+    cleanup_all=1
+else
+    if [[ $1 == "--skip" ]]; then
+        # If we see option '--skip' -- deploy everything except for specific templates
+        cleanup_all=1
+        skip_list="${@:2}"
+        echo $skip_list
+    else
+        # If there is no '--skip', deploy specific templates
+        cleanup_all=0
+        cleanup_list="${@:1}"
+    fi
+fi
+
 delete_resource() {
     echo "Delete for $filenameNoExtension started"
     fileName=${1##*/}
@@ -36,23 +52,40 @@ delete_policy_assignment() {
     echo "Delete for policy assignment complete"
 }
 
+
+function should_cleanup() {
+    if [[ ${cleanup_all} -eq 1 ]]; then
+        if ! [[ "${skip_list[@]}" =~ $1 ]]; then
+            return 1
+        fi
+    else
+        if [[ "${cleanup_list[@]}" =~ $1 ]]; then
+            return 1
+        fi
+    fi
+    return 0
+}
+
 # Delete RG's for each template file
 for file in "$templateDirectory"/*.json; do
     fileName=${file##*/}
     filenameNoExtension=${fileName%.*}
 
-    if [ $# -eq 0 ] || [[ "$@" =~ "$filenameNoExtension" ]]; then
+    should_cleanup "$filenameNoExtension"
+    if [[ $? -eq 1 ]]; then
         delete_resource ${file} &
     fi
 done
 
 # Destroy ACS resource
-if [ $# -eq 0 ] || [[ "$@" =~ "containerservice" ]]; then
+should_cleanup "containerservice"
+if [[ $? -eq 1 ]]; then
     delete_acs &
 fi
 
+should_cleanup "policy"
 # Destroy Azure Policy Assignment
-if [ $# -eq 0 ] || [[ "$@" =~ "policyassignment" ]]; then
+if [[ $? -eq 1 ]]; then
     delete_policy_assignment &
 fi
 

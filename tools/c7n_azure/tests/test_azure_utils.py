@@ -25,6 +25,7 @@ from c7n_azure.utils import (AppInsightsHelper, ManagedGroupHelper, Math, PortsR
 from mock import patch, Mock
 
 from c7n.config import Bag
+import pytest
 
 try:
     from importlib import reload
@@ -280,6 +281,8 @@ class UtilsTest(BaseTest):
             result = get_keyvault_secret(None, 'https://testkv.vault.net/secrets/testsecret/123412')
             self.assertEqual(result, mock.value)
 
+    # Test relies on substitute data in Azure Common, not designed for live data
+    @pytest.mark.skiplive
     def test_get_service_tag_ip_space(self):
         # Get with region
         result = get_service_tag_ip_space('ApiManagement', 'WestUS')
