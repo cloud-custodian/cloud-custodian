@@ -14,17 +14,17 @@
                     "message": "Ok"
                 },
                 "headers": {
-                    "date": [
-                        "Fri, 06 Sep 2019 23:22:26 GMT"
+                    "cache-control": [
+                        "no-store, no-cache"
                     ],
                     "content-type": [
                         "application/json"
                     ],
-                    "cache-control": [
-                        "no-store, no-cache"
+                    "date": [
+                        "Mon, 09 Sep 2019 21:16:06 GMT"
                     ],
                     "content-length": [
-                        "1943"
+                        "1986"
                     ]
                 },
                 "body": {
@@ -37,7 +37,8 @@
                                 "type": "Microsoft.DocumentDB/databaseAccounts",
                                 "kind": "GlobalDocumentDB",
                                 "tags": {
-                                    "test-store-throughput": "Y2pFAPUDcLY=:4"
+                                    "test-store-throughput": "UYAUAP5PyJg=:4",
+                                    "test-restore-throughput": "UYAUAP5PyJg=:4"
                                 },
                                 "properties": {
                                     "provisioningState": "Succeeded",

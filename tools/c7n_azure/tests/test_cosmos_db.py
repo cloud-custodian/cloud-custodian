@@ -13,10 +13,9 @@
 # limitations under the License.
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-from time import sleep
 
 from azure.cosmos.cosmos_client import CosmosClient
-from azure_common import BaseTest, arm_template, cassette_name, DEFAULT_SUBSCRIPTION_ID
+from azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.resources.cosmos_db import (CosmosDBChildResource, THROUGHPUT_MULTIPLIER)
 from c7n_azure.session import Session
 from mock import patch
@@ -193,7 +192,7 @@ class CosmosDBTest(BaseTest):
 
         account_name = collections[0]['c7n:parent']['name']
 
-        live_session_wait()
+        self.sleep_in_live_mode()
 
         client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
         cosmos_account = client.database_accounts.get('test_cosmosdb', account_name)
@@ -510,13 +509,8 @@ class CosmosDBThroughputActionsTest(BaseTest):
         self._assert_offer_throughput_equals(throughput_to_restore, collections[0]['_self'])
 
     def _assert_offer_throughput_equals(self, throughput, resource_self):
-        live_session_wait()
+        self.sleep_in_live_mode()
         offers = self.data_client.ReadOffers()
         offer = next((o for o in offers if o['resource'] == resource_self), None)
         self.assertIsNotNone(offer)
         self.assertEqual(throughput, offer['content']['offerThroughput'])
-
-
-def live_session_wait():
-    if local_session(Session).get_subscription_id() != DEFAULT_SUBSCRIPTION_ID:
-        sleep(30)
