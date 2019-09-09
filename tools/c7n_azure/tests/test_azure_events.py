@@ -18,6 +18,7 @@ from azure_common import BaseTest, arm_template
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
+from mock import patch
 
 
 class AzureEventsTest(BaseTest):
@@ -56,16 +57,19 @@ class AzureEventsTest(BaseTest):
         self.assertTrue('Microsoft.Compute/virtualMachines/write' in event_operations)
         self.assertTrue('Microsoft.Web/serverFarms/write' in event_operations)
 
+    @patch('azure.mgmt.eventgrid.operations.event_subscriptions_operations.'
+           'EventSubscriptionsOperations.create_or_update')
     @arm_template('storage.json')
-    def test_create_azure_event_subscription(self):
+    def test_create_azure_event_subscription(self, create_mock):
         account = self.setup_account()
         queue_name = 'cctestevensub'
         StorageUtilities.create_queue_from_storage_account(account, queue_name, self.session)
         sub_destination = StorageQueueEventSubscriptionDestination(resource_id=account.id,
                                                                    queue_name=queue_name)
         sub_name = 'custodiantestsubscription'
-        event_subscription = AzureEventSubscription.create(sub_destination,
-                                                           sub_name,
-                                                           self.session.get_subscription_id())
-        self.assertEqual(event_subscription.name, sub_name)
-        self.assertEqual(event_subscription.destination.endpoint_type, 'StorageQueue')
+        AzureEventSubscription.create(sub_destination, sub_name, self.session.get_subscription_id())
+
+        args = create_mock.mock_calls[0].args
+        self.assertEqual(args[1], sub_name)
+        self.assertEqual(args[2].destination.endpoint_type, 'StorageQueue')
+        self.assertEqual(args[2].destination.queue_name, queue_name)
