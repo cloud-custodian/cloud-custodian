@@ -193,7 +193,7 @@ class UpdateApi(BaseAction):
                 patchOperations=self.data['patch'])
 
 
-register_universal_tags(RestApi.filter_registry, RestApi.action_registry)
+register_universal_tags(RestApi.filter_registry, RestApi.action_registry, compatibility=False)
 
 
 @resources.register('rest-stage')
