@@ -67,5 +67,5 @@ class AzureEventsTest(BaseTest):
 
         args = create_mock.mock_calls[0].args
         self.assertTrue(sub_id in args[0])
-        self.assertEqual(args[1], sub_name)
-        self.assertEqual(args[2].destination, sub_destination)
+        self.assertEqual(sub_name, args[1])
+        self.assertEqual(sub_destination, args[2].destination)
