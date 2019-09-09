@@ -45,15 +45,14 @@ class URIResolver(object):
             response = urlopen(req)
             if response.info().get('Content-Encoding') == 'gzip':
                 content = gzip.decompress(response.read())
-                response.close()
                 decomp_req = content.splitlines()
                 contents = ''
                 for line in decomp_req:
                     contents += line.decode('utf-8')
             else:
                 contents = response.read().decode('utf-8')
-                response.close()
 
+        response.close()
         self.cache.save(("uri-resolver", uri), contents)
         return contents
 
