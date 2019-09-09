@@ -19,8 +19,9 @@ import jmespath
 import json
 import os.path
 import logging
+import gzip
 from six import text_type
-from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.parse import parse_qsl, urlparse
 
 from c7n.utils import format_string_values
@@ -40,9 +41,14 @@ class URIResolver(object):
         else:
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
-            fh = urlopen(uri)
-            contents = fh.read().decode('utf-8')
+            req = Request(uri, headers={"Accept-Encoding": "gzip"})
+            fh = urlopen(req)
+            content = gzip.decompress(fh.read())
             fh.close()
+            decomp_req = content.splitlines()
+            contents = ''
+            for line in decomp_req:
+                contents += line.decode('utf-8')
         self.cache.save(("uri-resolver", uri), contents)
         return contents
 
