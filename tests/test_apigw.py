@@ -14,7 +14,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from botocore.exceptions import ClientError
-import time
 
 from .common import BaseTest
 
@@ -90,7 +89,7 @@ class TestRestApi(BaseTest):
         updated = session_factory().client('apigateway').get_rest_api(
             restApiId=resources[0]['id'])
         self.assertEqual(updated['description'], 'for replacement')
-    
+
     def test_rest_api_tag_untag_mark(self):
         session_factory = self.replay_flight_data('test_rest_api_tag_untag_mark')
         self.maxDiff = None
@@ -115,6 +114,7 @@ class TestRestApi(BaseTest):
         self.assertEqual(tags.get('tags', {}),
             {'Env': 'Dev',
             'custodian_cleanup': 'Resource does not meet policy: update@2019/09/11'})
+
 
 class TestRestResource(BaseTest):
 
