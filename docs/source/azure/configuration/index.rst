@@ -3,8 +3,8 @@
 Configuring Azure Policies
 ==========================
 
-Understand your options for authentication, executing policies using 
-Azure Functions and monitoring the results of policies.
+Understand your options for authentication, hosting strategies, and monitoring 
+the results of policies.
 
 .. toctree::
   :maxdepth: 2
@@ -12,6 +12,24 @@ Azure Functions and monitoring the results of policies.
   :glob:
 
   authentication
+  monitoring
+
+Hosting Options
+---------------
+
+The Azure provider for Cloud Custodian can be hosted by Azure Functions or in a containerized environment
+like ACI or AKS. Both hosting options have periodic and event based execution modes.
+
+For a quick and inexpensive start to running custodian policies, Azure Functions are a good hosting
+strategy. The Azure Containter Host requires more up-front configuration, but can make running a 
+large number of policies against multiple subscriptions more maintanable.
+
+.. toctree::
+  :maxdepth: 2
+  :titlesonly:
+  :glob:
+
   functionshosting
   containerhosting
-  monitoring
+  ./acitutorial.rst
+  ./helmtutorial.rst
