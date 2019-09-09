@@ -110,7 +110,7 @@ class CosmosDBTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-    
+
     @arm_template('cosmosdb.json')
     def test_collection_metrics_filter(self):
         p = self.load_policy({
