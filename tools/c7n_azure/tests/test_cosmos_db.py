@@ -110,6 +110,48 @@ class CosmosDBTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+    
+    @arm_template('cosmosdb.json')
+    def test_collection_metrics_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-collection',
+            'filters': [
+                {'type': 'value',
+                 'key': 'id',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cccontainer'},
+                {'type': 'metric',
+                 'metric': 'TotalRequests',
+                 'op': 'le',
+                 'aggregation': 'average',
+                 'threshold': 1000}
+            ]
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('cosmosdb.json')
+    def test_database_metrics_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-database',
+            'filters': [
+                {'type': 'value',
+                 'key': 'id',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestcdatabase'},
+                {'type': 'metric',
+                 'metric': 'TotalRequests',
+                 'op': 'le',
+                 'aggregation': 'average',
+                 'threshold': 1000}
+            ]
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     @arm_template('cosmosdb.json')
     @cassette_name('firewall')
