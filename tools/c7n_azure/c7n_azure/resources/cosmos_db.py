@@ -176,6 +176,27 @@ class CosmosDBDatabase(CosmosDBChildResource):
 @CosmosDBDatabase.filter_registry.register('metric')
 class CosmosDBDatabaseMetricFilter(MetricFilter):
     """CosmosDB Database Metric Filter
+
+    :example:
+
+    This policy will find cosmos db databases with less than 1000 requests per day
+
+    .. code-block:: yaml
+
+        policies:
+          - name: low-request-databases
+            description: |
+              get databases with less than 1000 requests per day
+            resource: azure.cosmosdb-database
+            filters:
+              - type: metric
+                metric: TotalRequests
+                op: le
+                aggregation: average
+                interval: P1D
+                threshold: 1000
+                timeframe: 72
+
     """
     def get_metric_data(self, resource):
         if self.filter is None:
@@ -239,6 +260,46 @@ class CosmosDBCollection(CosmosDBChildResource):
                 collections.append(c)
 
         return collections
+
+
+@CosmosDBCollection.filter_registry.register('metric')
+class CosmosDBCollectionMetricFilter(MetricFilter):
+    """CosmosDB Collection Metric Filter
+
+    :example:
+
+    This policy will find cosmos db collections with less than 1000 requests per day
+
+    .. code-block:: yaml
+
+        policies:
+          - name: low-request-collections
+            description: |
+              get collections with less than 1000 requests per day
+            resource: azure.cosmosdb-database
+            filters:
+              - type: metric
+                metric: TotalRequestUnits
+                op: le
+                aggregation: average
+                interval: P1D
+                threshold: 1000
+                timeframe: 72
+
+    """
+    def get_metric_data(self, resource):
+        if self.filter is None:
+            parent_filter = "CollectionName eq '%s'" % resource['id']
+        else:
+            parent_filter = "%s and CollectionName eq '%s'" % (self.filter, resource['id'])
+        return self.client.metrics.list(
+            resource['c7n:parent-id'],
+            timespan=self.timespan,
+            interval=self.interval,
+            metricnames=self.metric,
+            aggregation=self.aggregation,
+            filter=parent_filter
+        )
 
 
 @CosmosDBCollection.filter_registry.register('offer')
