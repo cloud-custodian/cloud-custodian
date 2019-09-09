@@ -2,15 +2,15 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "c6cbf45d-0f65-4502-90ab-1b72e5b2b516",
+            "RequestId": "b06e46db-d963-4191-8f90-9687782e267b",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Mon, 09 Sep 2019 19:25:19 GMT",
+                "date": "Mon, 09 Sep 2019 19:59:04 GMT",
                 "content-type": "application/json",
-                "content-length": "1219",
+                "content-length": "1160",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "c6cbf45d-0f65-4502-90ab-1b72e5b2b516",
-                "x-amz-apigw-id": "fw8M4IENoAMEdlw="
+                "x-amzn-requestid": "b06e46db-d963-4191-8f90-9687782e267b",
+                "x-amz-apigw-id": "fxBJXKOKIAMEdJQ="
             },
             "RetryAttempts": 0
         },
@@ -35,8 +35,7 @@
                     ]
                 },
                 "tags": {
-                    "Env": "Dev",
-                    "custodian_cleanup": "Resource does not meet policy: update@2019/09/11"
+                    "target-tag": "pratyush"
                 }
             }
         ]

@@ -2,21 +2,20 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "1ca18f6d-29fd-48ca-bd95-00ad5c23eb5e",
+            "RequestId": "76c1d7b4-0665-4c1a-b991-f0a19b454a10",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Mon, 09 Sep 2019 19:25:20 GMT",
+                "date": "Mon, 09 Sep 2019 19:59:04 GMT",
                 "content-type": "application/json",
-                "content-length": "94",
+                "content-length": "35",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "1ca18f6d-29fd-48ca-bd95-00ad5c23eb5e",
-                "x-amz-apigw-id": "fw8NGKVHIAMEbog="
+                "x-amzn-requestid": "76c1d7b4-0665-4c1a-b991-f0a19b454a10",
+                "x-amz-apigw-id": "fxBJTLXvIAMEbog="
             },
             "RetryAttempts": 0
         },
         "tags": {
-            "Env": "Dev",
-            "custodian_cleanup": "Resource does not meet policy: update@2019/09/11"
+            "target-tag": "pratyush"
         }
     }
 }

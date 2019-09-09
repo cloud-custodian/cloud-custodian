@@ -92,6 +92,10 @@ class TestRestApi(BaseTest):
 
     def test_rest_api_tag_untag_mark(self):
         session_factory = self.replay_flight_data('test_rest_api_tag_untag_mark')
+        client = session_factory().client("apigateway")
+        tags = client.get_tags(resourceArn='arn:aws:apigateway:us-east-1::/restapis/dj7uijzv27')
+        self.assertEqual(tags.get('tags', {}),
+            {'target-tag': 'pratyush'})
         self.maxDiff = None
         p = self.load_policy({
             'name': 'tag-rest-api',
@@ -109,7 +113,6 @@ class TestRestApi(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 1)
-        client = session_factory().client("apigateway")
         tags = client.get_tags(resourceArn='arn:aws:apigateway:us-east-1::/restapis/dj7uijzv27')
         self.assertEqual(tags.get('tags', {}),
             {'Env': 'Dev',
