@@ -33,7 +33,7 @@ class QueryResourceManagerTest(BaseTest):
             {
                 "name": "limits",
                 "resource": "azure.resourcegroup",
-                "max-resources-percent": 2.5,
+                "max-resources-percent": 0.01,
                 'filters': [
                     {'type': 'value',
                      'key': 'name',
@@ -45,7 +45,7 @@ class QueryResourceManagerTest(BaseTest):
         p.ctx.metrics.flush = mock.MagicMock()
         output = self.capture_logging('custodian.policy', level=logging.ERROR)
         self.assertRaises(ResourceLimitExceeded, p.run)
-        self.assertTrue("policy:limits exceeded resource-limit:2.5% found:1 total:"
+        self.assertTrue("policy:limits exceeded resource-limit:0.01% found:1 total:"
                         in output.getvalue())
         self.assertEqual(
             p.ctx.metrics.buf[0]['MetricName'], 'ResourceLimitExceeded')
