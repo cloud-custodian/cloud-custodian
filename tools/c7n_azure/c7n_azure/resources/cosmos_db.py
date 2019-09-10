@@ -198,19 +198,16 @@ class CosmosDBDatabaseMetricFilter(MetricFilter):
                 timeframe: 72
 
     """
-    def get_metric_data(self, resource):
+    def get_resource_id(self, resource):
+        return resource['c7n:parent-id']
+
+    def get_filter(self, resource):
         if self.filter is None:
             parent_filter = "DatabaseName eq '%s'" % resource['id']
         else:
             parent_filter = "%s and DatabaseName eq '%s'" % (self.filter, resource['id'])
-        return self.client.metrics.list(
-            resource['c7n:parent-id'],
-            timespan=self.timespan,
-            interval=self.interval,
-            metricnames=self.metric,
-            aggregation=self.aggregation,
-            filter=parent_filter
-        )
+
+        return parent_filter
 
 
 @resources.register('cosmosdb-collection')
@@ -257,6 +254,7 @@ class CosmosDBCollection(CosmosDBChildResource):
                 c.update({'c7n:document-endpoint':
                          parent_resource.get('properties').get('documentEndpoint')})
                 c['c7n:parent'] = parent_resource
+                c['c7n:database'] = d['id']
                 collections.append(c)
 
         return collections
@@ -287,19 +285,17 @@ class CosmosDBCollectionMetricFilter(MetricFilter):
                 timeframe: 72
 
     """
-    def get_metric_data(self, resource):
-        if self.filter is None:
-            parent_filter = "CollectionName eq '%s'" % resource['id']
-        else:
-            parent_filter = "%s and CollectionName eq '%s'" % (self.filter, resource['id'])
-        return self.client.metrics.list(
-            resource['c7n:parent-id'],
-            timespan=self.timespan,
-            interval=self.interval,
-            metricnames=self.metric,
-            aggregation=self.aggregation,
-            filter=parent_filter
-        )
+    def get_resource_id(self, resource):
+        return resource['c7n:parent-id']
+
+    def get_filter(self, resource):
+        container_filter = "DatabaseName eq '%s' and CollectionName eq '%s'" \
+            % (resource['c7n:database'], resource['id'])
+
+        if self.filter is not None:
+            container_filter = "%s and %s" % (self.filter, container_filter)
+
+        return container_filter
 
 
 @CosmosDBCollection.filter_registry.register('offer')
