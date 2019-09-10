@@ -81,18 +81,15 @@ class ResolverTest(BaseTest):
     def test_handle_content_encoding(self, mock_urlopen):
         session_factory = self.replay_flight_data("test_s3_resolver")
         cache = FakeCache()
-        cm = mock.MagicMock()
-        cm.getcode.return_value = 200
-        cm.read.return_value = 'policies:'
-
-        cm.__enter__.return_value = cm
-        mock_urlopen.return_value = cm
 
         resolver = URIResolver(session_factory, cache)
+
         uri = "http://httpbin.org/gzip"
         response = urlopen(uri)
         content = resolver.handle_content_encoding(response)
+        data = json.loads(content)
 
+        self.assertEqual(data['gzipped'], True)
         self.assertEqual(response.headers['Content-Encoding'], 'gzip')
 
     def test_resolve_file(self):

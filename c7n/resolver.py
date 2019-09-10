@@ -53,11 +53,8 @@ class URIResolver(object):
         if response.info().get('Content-Encoding') != 'gzip':
             return response.read().decode('utf-8')
 
-        content = gzip.decompress(response.read())
-        decomp_req = content.splitlines()
-        contents = ''
-        for line in decomp_req:
-            contents += line.decode('utf-8')
+        data = gzip.decompress(response.read())
+        contents = str(data, 'utf-8')
 
         return contents
 
