@@ -18,6 +18,7 @@ import os
 import re
 from distutils.util import strtobool
 from functools import wraps
+from time import sleep
 
 import msrest.polling
 from azure_serializer import AzureSerializer
@@ -301,7 +302,14 @@ class AzureVCRBaseTest(VCRTestCase):
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
                 % '|'.join(['(%s)' % p for p in prefixes])
 
-        return re.sub(regex, r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
+        match = re.search(regex, s)
+
+        if match is not None:
+            sub_id = match.group(0)
+            s = s.replace(sub_id[-36:], DEFAULT_SUBSCRIPTION_ID)
+            s = s.replace(sub_id[-12:], DEFAULT_SUBSCRIPTION_ID[-12:])
+
+        return s
 
     @staticmethod
     def _replace_tenant_id(s):
@@ -404,6 +412,10 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
         else:
             return datetime.datetime.now()
+
+    def sleep_in_live_mode(self, interval=60):
+        if not self.is_playback():
+            sleep(interval)
 
     @staticmethod
     def setup_account():
