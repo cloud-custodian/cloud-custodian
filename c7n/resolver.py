@@ -19,7 +19,7 @@ import jmespath
 import json
 import os.path
 import logging
-import gzip
+import zlib
 from six import text_type
 from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.parse import parse_qsl, urlparse
@@ -53,9 +53,8 @@ class URIResolver(object):
         if response.info().get('Content-Encoding') != 'gzip':
             return response.read().decode('utf-8')
 
-        data = gzip.decompress(response.read())
-        contents = str(data, 'utf-8')
-        return contents
+        data = zlib.decompress(response.read(), 16).decode('utf8')
+        return data
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)

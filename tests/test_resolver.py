@@ -17,8 +17,9 @@ import csv
 import json
 import os
 import tempfile
+import mock
 
-from unittest.mock import patch
+from mock import patch
 from six.moves.urllib.request import urlopen
 
 from six import binary_type
@@ -77,7 +78,7 @@ class ResolverTest(BaseTest):
         self.assertEqual(content, data)
         self.assertEqual(list(cache.state.keys()), [("uri-resolver", uri)])
 
-    @patch('urllib.request.urlopen')
+    @mock.patch('six.moves.urllib.request.urlopen')
     def test_handle_content_encoding(self, mock_urlopen):
         session_factory = self.replay_flight_data("test_s3_resolver")
         cache = FakeCache()
