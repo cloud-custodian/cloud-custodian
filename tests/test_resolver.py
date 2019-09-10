@@ -19,7 +19,6 @@ import os
 import tempfile
 import mock
 
-from mock import patch
 from six.moves.urllib.request import urlopen
 
 from six import binary_type
