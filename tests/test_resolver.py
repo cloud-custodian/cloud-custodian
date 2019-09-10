@@ -93,11 +93,8 @@ class ResolverTest(BaseTest):
         uri = "http://httpbin.org/gzip"
         response = urlopen(uri)
         content = resolver.handle_content_encoding(response)
-        data = resolver.resolve(uri)
 
-        self.assertEqual(data, content)
         self.assertEqual(response.headers['Content-Encoding'], 'gzip')
-        self.assertEqual(list(cache.state.keys()), [("uri-resolver", uri)])
 
     def test_resolve_file(self):
         content = json.dumps({"universe": {"galaxy": {"system": "sun"}}})
