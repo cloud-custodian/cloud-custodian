@@ -17,6 +17,11 @@ import csv
 import json
 import os
 import tempfile
+
+from unittest.mock import patch, MagicMock
+import mock
+from six.moves.urllib.request import Request, urlopen
+
 from six import binary_type
 
 from .common import BaseTest, ACCOUNT_ID, Bag, TestConfig as Config
@@ -71,6 +76,27 @@ class ResolverTest(BaseTest):
         uri = "s3://%s/resource.json?RequestPayer=requestor" % bname
         data = resolver.resolve(uri)
         self.assertEqual(content, data)
+        self.assertEqual(list(cache.state.keys()), [("uri-resolver", uri)])
+
+    @patch('urllib.request.urlopen')
+    def test_handle_content_encoding(self, mock_urlopen):
+        session_factory = self.replay_flight_data("test_s3_resolver")
+        cache = FakeCache()
+        cm = mock.MagicMock()
+        cm.getcode.return_value = 200
+        cm.read.return_value = 'policies:'
+
+        cm.__enter__.return_value = cm
+        mock_urlopen.return_value = cm
+
+        resolver = URIResolver(session_factory, cache)
+        uri = "http://httpbin.org/gzip"
+        response = urlopen(uri)
+        content = resolver.handle_content_encoding(response)
+        data = resolver.resolve(uri)
+
+        self.assertEqual(data, content)
+        self.assertEqual(response.headers['Content-Encoding'], 'gzip')
         self.assertEqual(list(cache.state.keys()), [("uri-resolver", uri)])
 
     def test_resolve_file(self):
