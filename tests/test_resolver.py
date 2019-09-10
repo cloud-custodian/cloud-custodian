@@ -18,8 +18,8 @@ import json
 import os
 import tempfile
 
-from unittest.mock import patch, MagicMock
-from six.moves.urllib.request import Request, urlopen
+from unittest.mock import patch
+from six.moves.urllib.request import urlopen
 
 from six import binary_type
 
