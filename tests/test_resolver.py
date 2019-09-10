@@ -19,7 +19,6 @@ import os
 import tempfile
 
 from unittest.mock import patch, MagicMock
-import mock
 from six.moves.urllib.request import Request, urlopen
 
 from six import binary_type
