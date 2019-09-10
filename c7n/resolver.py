@@ -43,19 +43,24 @@ class URIResolver(object):
             # third parties, uri would need sanitization
             req = Request(uri, headers={"Accept-Encoding": "gzip"})
             response = urlopen(req)
-            if response.info().get('Content-Encoding') == 'gzip':
-                content = gzip.decompress(response.read())
-                decomp_req = content.splitlines()
-                contents = ''
-                for line in decomp_req:
-                    contents += line.decode('utf-8')
-            else:
-                contents = response.read().decode('utf-8')
-
+            contents = self.handle_content_encoding(response)
             response.close()
 
         self.cache.save(("uri-resolver", uri), contents)
         return contents
+
+    def handle_content_encoding(self, response):
+        if response.info().get('Content-Encoding') != 'gzip':
+            return response.read().decode('utf-8')
+
+        content = gzip.decompress(response.read())
+        decomp_req = content.splitlines()
+        contents = ''
+        for line in decomp_req:
+            contents += line.decode('utf-8')
+
+        return contents
+
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
