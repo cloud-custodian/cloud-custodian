@@ -55,9 +55,7 @@ class URIResolver(object):
 
         data = gzip.decompress(response.read())
         contents = str(data, 'utf-8')
-
         return contents
-
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
