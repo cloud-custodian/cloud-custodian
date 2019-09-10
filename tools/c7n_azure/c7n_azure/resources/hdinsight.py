@@ -102,9 +102,6 @@ class Resize(AzureBaseAction):
             'count': {'type': 'number'}
         })
 
-    def __init__(self, data, manager=None):
-        super(Resize, self).__init__(data, manager)
-
     def _prepare_processing(self):
         self.client = self.manager.get_client()
 

@@ -41,7 +41,8 @@ class HdinsightTest(BaseTest):
                     'value': 'cctesthdinsight*'
                 }
             ]
-        })
+        }, validate=True)
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -67,7 +68,7 @@ class HdinsightTest(BaseTest):
                     'count': 1
                 }
             ]
-        })
+        }, validate=True)
 
         resources = p.run()
         kwargs = resize_mock.mock_calls[0].kwargs
