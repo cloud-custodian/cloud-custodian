@@ -928,7 +928,7 @@ class RDSSnapshotTest(BaseTest):
         def brooklyn(delay):
             return
 
-        output = self.capture_logging("c7n.worker", level=logging.DEBUG)
+        output = self.capture_logging("c7n.retry", level=logging.DEBUG)
         self.patch(time, "sleep", brooklyn)
         self.change_environment(AWS_DEFAULT_REGION="us-east-1")
         p = self.load_policy(

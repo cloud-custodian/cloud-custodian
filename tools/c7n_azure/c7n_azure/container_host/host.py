@@ -73,8 +73,12 @@ class Host:
         # Load configuration
         self.options = Host.build_options(output_dir, log_group, metrics)
         self.policy_storage_uri = policy_storage
-        self.event_queue_name = event_queue_name
         self.event_queue_id = event_queue_id
+        self.event_queue_name = event_queue_name
+
+        # Default event queue name is the subscription ID
+        if not self.event_queue_name:
+            self.event_queue_name = self.session.subscription_id
 
         # Prepare storage bits
         self.policy_blob_client = None
@@ -430,11 +434,11 @@ class Host:
 @click.command(help="Periodically run a set of policies from an Azure storage container against "
     "a single subscription. The host will update itself with new policies and event subscriptions "
     "as they are added.")
-@click.option("--event-queue-id", "-q", envvar=ENV_CONTAINER_EVENT_QUEUE_ID, required=True,
+@click.option("--storage-id", "-q", envvar=ENV_CONTAINER_EVENT_QUEUE_ID, required=True,
               help="The resource id of the storage account to create the event queue in")
-@click.option("--event-queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME, required=True,
+@click.option("--queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME,
               help="The name of the event queue to create")
-@click.option("--policy-storage", "-p", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
+@click.option("--policy-uri", "-p", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
               help="The URI to the Azure storage container that holds the policies")
 @click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
               help="Location to send policy logs")
