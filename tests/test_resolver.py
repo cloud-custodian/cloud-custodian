@@ -85,7 +85,7 @@ class ResolverTest(BaseTest):
         resolver = URIResolver(session_factory, cache)
         uri = "http://httpbin.org/gzip"
         with closing(urlopen(uri)) as response:
-            content = resolver.handle_content_encoding(response)
+            content = resolver.handle_response_encoding(response)
             data = json.loads(content)
             self.assertEqual(data['gzipped'], True)
             self.assertEqual(response.headers['Content-Encoding'], 'gzip')

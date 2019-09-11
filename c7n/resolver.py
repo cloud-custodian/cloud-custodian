@@ -45,8 +45,8 @@ class URIResolver(object):
             req = Request(uri, headers={"Accept-Encoding": "gzip"})
             with closing(urlopen(req)) as response:
                 contents = self.handle_response_encoding(response)
-                self.cache.save(("uri-resolver", uri), contents)
 
+        self.cache.save(("uri-resolver", uri), contents)
         return contents
 
     def handle_response_encoding(self, response):
