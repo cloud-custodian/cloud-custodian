@@ -23,6 +23,7 @@ import zlib
 from six import text_type
 from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.parse import parse_qsl, urlparse
+from contextlib import closing
 
 from c7n.utils import format_string_values
 
@@ -42,14 +43,13 @@ class URIResolver(object):
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
             req = Request(uri, headers={"Accept-Encoding": "gzip"})
-            response = urlopen(req)
-            contents = self.handle_content_encoding(response)
-            response.close()
+            with closing(urlopen(req)) as response:
+                contents = self.handle_response_encoding(response)
+                self.cache.save(("uri-resolver", uri), contents)
 
-        self.cache.save(("uri-resolver", uri), contents)
         return contents
 
-    def handle_content_encoding(self, response):
+    def handle_response_encoding(self, response):
         if response.info().get('Content-Encoding') != 'gzip':
             return response.read().decode('utf-8')
 
