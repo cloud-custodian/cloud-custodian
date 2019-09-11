@@ -88,6 +88,8 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
         }
     )
 
+    schema_alias = True
+
     def _prepare_processing(self):
         self.client = self.manager.get_client()
 
