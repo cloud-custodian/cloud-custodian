@@ -29,6 +29,7 @@ from c7n.utils import format_string_values
 
 log = logging.getLogger('custodian.resolver')
 
+ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 class URIResolver(object):
 
@@ -53,7 +54,8 @@ class URIResolver(object):
         if response.info().get('Content-Encoding') != 'gzip':
             return response.read().decode('utf-8')
 
-        data = zlib.decompress(response.read(), 16).decode('utf8')
+        data = zlib.decompress(response.read(),
+                               ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')
         return data
 
     def get_s3_uri(self, uri):
