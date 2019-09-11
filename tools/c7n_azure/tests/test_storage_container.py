@@ -53,8 +53,7 @@ class StorageContainerTest(BaseTest):
 
     @arm_template('storage.json')
     @cassette_name('containers')
-    @patch('azure.mgmt.storage.v2019_04_01.operations.BlobContainersOperations.update')
-    def test_set_public_access(self, update_container_mock):
+    def test_set_public_access(self):
         with patch('azure.mgmt.storage.v%s.operations.'
         'BlobContainersOperations.update'
         % self._get_storage_management_client_api_string()) as update_container_mock:
@@ -80,7 +79,7 @@ class StorageContainerTest(BaseTest):
             args, kwargs = update_container_mock.call_args_list[0]
             self.assertEqual('test_storage', args[0])
             self.assertTrue(args[1].startswith('cctstorage'))
-            self.assertEqual(None, kwargs['public_access'])
+            self.assertEqual('None', kwargs['public_access'])
 
     def _get_storage_management_client_api_string(self):
         return local_session(Session)\

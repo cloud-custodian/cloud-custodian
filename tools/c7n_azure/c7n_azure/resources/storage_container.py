@@ -82,8 +82,9 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
     """
     schema = type_schema(
         'set-public-access',
+        required=['value'],
         **{
-            'value': {'enum': ['Container', 'Blob', 'None'], "default": 'None'},
+            'value': {'enum': ['Container', 'Blob', 'None']}
         }
     )
 
