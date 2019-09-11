@@ -136,8 +136,7 @@ class RestApi(query.QueryResourceManager):
     def generate_arn(self):
         """
          Sample arn: arn:aws:apigateway:us-east-1::/restapis/rest-api-id
-
-         This method overrides c7n.utils.generate_arn and drops 
+         This method overrides c7n.utils.generate_arn and drops
          account id from the generic arn.
         """
         if self._generate_arn is None:
