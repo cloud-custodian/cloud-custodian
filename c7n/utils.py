@@ -16,7 +16,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import copy
 import csv
 from datetime import datetime, timedelta
-import functools
 import json
 import itertools
 import logging
