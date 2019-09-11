@@ -1017,11 +1017,12 @@ class CopyRelatedResourceTag(Tag):
         return self
 
     def process(self, resources):
-        related_resources = list(
-            zip(jmespath.search('[].[%s || "c7n:NotFound"]|[]' % self.data['key'], resources),
-                resources))
+        related_resources = []
+        for rrid, r in zip(jmespath.search('[].[%s]' % self.data['key'], resources),
+                           resources):
+            related_resources.append((rrid[0], r))
         related_ids = set([r[0] for r in related_resources])
-        related_ids.discard('c7n:NotFound')
+        related_ids.discard(None)
         related_tag_map = self.get_resource_tag_map(self.data['resource'], related_ids)
 
         missing_related_tags = related_ids.difference(related_tag_map.keys())
