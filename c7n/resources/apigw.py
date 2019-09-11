@@ -135,9 +135,10 @@ class RestApi(query.QueryResourceManager):
     @property
     def generate_arn(self):
         """
-         Arn: arn:aws:apigateway:us-east-1::/restapis/dj7uijzv27
-         rest api arns do not contain account details
-         This method drops account id from the generic arn.
+         Sample arn: arn:aws:apigateway:us-east-1::/restapis/rest-api-id
+
+         This method overrides c7n.utils.generate_arn and drops 
+         account id from the generic arn.
         """
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
