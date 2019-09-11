@@ -22,7 +22,13 @@ class HdinsightTest(BaseTest):
     def test_hdinsight_schema_validate(self):
         p = self.load_policy({
             'name': 'test-hdinsight-schema-validate',
-            'resource': 'azure.hdinsight'
+            'resource': 'azure.hdinsight',
+            'actions': [
+                {
+                    'type': 'resize',
+                    'count': 1
+                }
+            ]
         }, validate=True)
         self.assertTrue(p)
 
@@ -68,7 +74,7 @@ class HdinsightTest(BaseTest):
                     'count': 1
                 }
             ]
-        }, validate=True)
+        })
 
         resources = p.run()
         kwargs = resize_mock.mock_calls[0].kwargs

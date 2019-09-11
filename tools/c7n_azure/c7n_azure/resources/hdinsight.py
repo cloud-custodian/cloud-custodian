@@ -99,7 +99,7 @@ class Resize(AzureBaseAction):
         'resize',
         required=['count'],
         **{
-            'count': {'type': 'number'}
+            'count': {'type': 'integer', 'minimum': 1}
         })
 
     def _prepare_processing(self):
@@ -109,5 +109,5 @@ class Resize(AzureBaseAction):
         self.client.clusters.resize(
             cluster['resourceGroup'],
             cluster['name'],
-            target_instance_count=self.data.get('count')
+            target_instance_count=self.data['count']
         )
