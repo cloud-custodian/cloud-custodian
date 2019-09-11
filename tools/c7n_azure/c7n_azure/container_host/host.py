@@ -26,6 +26,7 @@ from apscheduler.triggers.cron import CronTrigger
 from azure.common import AzureHttpError
 from azure.mgmt.eventgrid.models import (
     EventSubscriptionFilter, StorageQueueEventSubscriptionDestination)
+from c7n_azure.output import AzureStorageOutput
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
@@ -59,10 +60,15 @@ class Host:
 
     def __init__(self, event_queue_id, event_queue_name, policy_storage,
                  log_group=None, metrics=None, output_dir=None):
+
         logging.basicConfig(level=logging.INFO, format='%(message)s')
         log.info("Running Azure Cloud Custodian Self-Host")
 
         load_resources()
+
+        # adjust default log pattern to handle multiple subscriptions
+        AzureStorageOutput.DEFAULT_BLOB_FOLDER_PREFIX = \
+            '{account_id}/{policy_name}/{now:%Y/%m/%d/%H/}'
 
         self.session = local_session(Session)
         self.storage_session = self.session
