@@ -82,7 +82,7 @@
                                     "value": "[reference(variables('user_assigned_identity_resource_id'), '2018-11-30').clientId]"
                                 },
                                 {
-                                    "name": "AZURE_EVENT_QUEUE_NAME",
+                                    "name": "AZURE_CONTAINER_QUEUE_NAME",
                                     "value": "[parameters('azure_event_queue_name')]"
                                 },
                                 {
@@ -90,11 +90,11 @@
                                     "value": "[parameters('azure_subscription_id')]"
                                 },
                                 {
-                                    "name": "AZURE_CONTAINER_STORAGE",
+                                    "name": "AZURE_CONTAINER_POLICY_URI",
                                     "value": "[parameters('azure_container_storage')]"
                                 },
                                 {
-                                    "name": "AZURE_EVENT_QUEUE_RESOURCE_ID",
+                                    "name": "AZURE_CONTAINER_STORAGE_RESOURCE_ID",
                                     "value": "[parameters('azure_event_queue_resource_id')]"
                                 }
                             ],
