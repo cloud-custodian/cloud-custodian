@@ -134,7 +134,10 @@ class RestApi(query.QueryResourceManager):
 
     @property
     def generate_arn(self):
-        """ Generates generic arn if ID is not already arn format.
+        """
+         Arn: arn:aws:apigateway:us-east-1::/restapis/dj7uijzv27
+         rest api arns do not contain account details
+         This method drops account id from the generic arn.
         """
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
