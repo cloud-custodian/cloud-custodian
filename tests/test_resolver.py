@@ -17,11 +17,9 @@ import csv
 import json
 import os
 import tempfile
-import mock
-
+import vcr
 from contextlib import closing
 from six.moves.urllib.request import urlopen
-
 from six import binary_type
 
 from .common import BaseTest, ACCOUNT_ID, Bag, TestConfig as Config
@@ -78,13 +76,13 @@ class ResolverTest(BaseTest):
         self.assertEqual(content, data)
         self.assertEqual(list(cache.state.keys()), [("uri-resolver", uri)])
 
-    @mock.patch('six.moves.urllib.request.urlopen')
-    def test_handle_content_encoding(self, mock_urlopen):
+    def test_handle_content_encoding(self):
         session_factory = self.replay_flight_data("test_s3_resolver")
         cache = FakeCache()
         resolver = URIResolver(session_factory, cache)
         uri = "http://httpbin.org/gzip"
-        with closing(urlopen(uri)) as response:
+        with vcr.use_cassette('tests/data/vcr_cassettes/test_resolver.yaml'):
+            response = urlopen(uri)
             content = resolver.handle_response_encoding(response)
             data = json.loads(content)
             self.assertEqual(data['gzipped'], True)
