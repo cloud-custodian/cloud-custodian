@@ -31,6 +31,7 @@ log = logging.getLogger('custodian.resolver')
 
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
+
 class URIResolver(object):
 
     def __init__(self, session_factory, cache):
