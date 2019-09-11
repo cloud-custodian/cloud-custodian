@@ -143,7 +143,7 @@ class RestApi(query.QueryResourceManager):
             self._generate_arn = functools.partial(
                 generate_arn,
                 self.resource_type.service,
-                region=not self.resource_type.global_resource and self.config.region or "",
+                region=self.config.region,
                 resource_type=self.resource_type.arn_type)
         return self._generate_arn
 
