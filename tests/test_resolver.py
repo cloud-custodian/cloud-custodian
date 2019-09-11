@@ -19,6 +19,7 @@ import os
 import tempfile
 import mock
 
+from contextlib import closing
 from six.moves.urllib.request import urlopen
 
 from six import binary_type
@@ -85,12 +86,12 @@ class ResolverTest(BaseTest):
         resolver = URIResolver(session_factory, cache)
 
         uri = "http://httpbin.org/gzip"
-        response = urlopen(uri)
-        content = resolver.handle_content_encoding(response)
-        data = json.loads(content)
+        with closing(urlopen(uri)) as response:
+            content = resolver.handle_content_encoding(response)
+            data = json.loads(content)
+            self.assertEqual(data['gzipped'], True)
+            self.assertEqual(response.headers['Content-Encoding'], 'gzip')
 
-        self.assertEqual(data['gzipped'], True)
-        self.assertEqual(response.headers['Content-Encoding'], 'gzip')
 
     def test_resolve_file(self):
         content = json.dumps({"universe": {"galaxy": {"system": "sun"}}})
