@@ -8,17 +8,8 @@ schedules:
     - master
   always: true
 
-# Remap KV group variables to C7N env names
 variables:
 - group: AzureLiveTests
-- name: AZURE_CLIENT_ID
-  value: $(azure-client-id)
-- name: AZURE_CLIENT_SECRET
-  value: $(azure-client-secret)
-- name: AZURE_TENANT_ID
-  value: $(azure-tenant-id)
-- name: AZURE_SUBSCRIPTION_ID
-  value: $(azure-subscription-id)
 
 jobs:
 - job: 'azure_nightly_test_run'
@@ -63,3 +54,31 @@ jobs:
     - script: tools/c7n_azure/tests/templates/cleanup.sh --skip keyvault cost-management-export containerservice
       displayName: "Cleanup Azure Resources"
       condition: always()
+
+- job: 'azure_nightly_functions_test'
+  displayName: 'Azure Functions Nightly Test'
+  timeoutInMinutes: 0
+  cancelTimeoutInMinutes: 0
+
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+    - checkout: self
+      fetchDepth: 1
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.7'
+        architecture: 'x64'
+
+    - script: python -m pip install --upgrade pip && pip install . && pip install -r requirements-dev.txt
+      displayName: "Install Dependencies"
+
+    - script: tools/c7n_azure/tests/azure-functions/test_functions.sh
+      displayName: "Run Azure Functions Test"
+      env:
+        AZURE_CLIENT_ID: $(azure-client-id)
+        AZURE_CLIENT_SECRET: $(azure-client-secret)
+        AZURE_SUBSCRIPTION_ID: $(azure-subscription-id)
+        AZURE_TENANT_ID: $(azure-tenant-id)
