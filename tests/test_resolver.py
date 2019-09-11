@@ -18,7 +18,6 @@ import json
 import os
 import tempfile
 import vcr
-from contextlib import closing
 from six.moves.urllib.request import urlopen
 from six import binary_type
 
