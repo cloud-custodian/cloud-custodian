@@ -99,5 +99,5 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
             resource_group,
             account_name,
             resource['name'],
-            public_access=self.data.get('value')
+            public_access=self.data['value']
         )
