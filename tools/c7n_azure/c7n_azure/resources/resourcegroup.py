@@ -78,11 +78,13 @@ class ResourceGroup(ArmResourceManager):
             resource_client.resource_groups.get(ResourceIdParser.get_resource_group(rid))
             for rid in resource_ids
         ]
+        for d in data:
+            d.type = RESOURCE_GROUPS_TYPE
         return [r.serialize(True) for r in data]
 
     def augment(self, resources):
         for resource in resources:
-            resource['type'] = 'Microsoft.Resources/subscriptions/resourceGroups'
+            resource['type'] = RESOURCE_GROUPS_TYPE
         return resources
 
 

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "815061d9-be0a-4c5f-aba6-3d5fa03a18f1",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 09 Sep 2019 19:59:06 GMT",
+                "content-type": "application/json",
+                "content-length": "94",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "815061d9-be0a-4c5f-aba6-3d5fa03a18f1",
+                "x-amz-apigw-id": "fxBJoLYGoAMEbog="
+            },
+            "RetryAttempts": 0
+        },
+        "tags": {
+            "Env": "Dev",
+            "custodian_cleanup": "Resource does not meet policy: update@2019/09/11"
+        }
+    }
+}

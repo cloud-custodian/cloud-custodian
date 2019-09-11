@@ -57,7 +57,7 @@ queue_message_count = 5
 
 class Host:
 
-    def __init__(self, event_queue_id, event_queue_name, policy_storage,
+    def __init__(self, storage_id, queue_name, policy_uri,
                  log_group=None, metrics=None, output_dir=None):
         logging.basicConfig(level=logging.INFO, format='%(message)s')
         log.info("Running Azure Cloud Custodian Self-Host")
@@ -66,15 +66,15 @@ class Host:
 
         self.session = local_session(Session)
         self.storage_session = self.session
-        storage_subscription_id = ResourceIdParser.get_subscription_id(event_queue_id)
+        storage_subscription_id = ResourceIdParser.get_subscription_id(storage_id)
         if storage_subscription_id != self.session.subscription_id:
             self.storage_session = Session(subscription_id=storage_subscription_id)
 
         # Load configuration
         self.options = Host.build_options(output_dir, log_group, metrics)
-        self.policy_storage_uri = policy_storage
-        self.event_queue_id = event_queue_id
-        self.event_queue_name = event_queue_name
+        self.policy_storage_uri = policy_uri
+        self.event_queue_id = storage_id
+        self.event_queue_name = queue_name
 
         # Default event queue name is the subscription ID
         if not self.event_queue_name:
