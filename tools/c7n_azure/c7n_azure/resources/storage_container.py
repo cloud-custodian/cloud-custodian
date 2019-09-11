@@ -64,11 +64,7 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
 
     :example:
 
-       Turns on Secure transfer required for all storage accounts. This will reject requests that
-       use HTTP to your storage accounts.
-
-       Turns off public access for all Blob Storage Containers that are not in Storage Accounts with
-       an "environment:production" tag.
+       Finds all Blob Storage Containers that are not private and sets them to private
 
     .. code-block:: yaml
 
@@ -76,15 +72,13 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
             - name: set-non-production-accounts-private
               resource: azure.storage-container
               filters:
-                - type: parent
-                  filter:
-                    type: value
-                    key: tags.environment
-                    op: ne
-                    value: production
+                - type: value
+                  key: properties.publicAccess
+                  op: not-equal
+                  value: None
               actions:
-              - type: set-public-access
-                value: None
+                - type: set-public-access
+                  value: None
     """
     schema = type_schema(
         'set-public-access',
