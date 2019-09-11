@@ -1,0 +1,88 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2015-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Tue, 10 Sep 2019 15:23:36 GMT"
+                    ],
+                    "content-length": [
+                        "428"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "cctestsqlserverj6y6cbbtaphs4.database.windows.net"
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4",
+                                "name": "cctestsqlserverj6y6cbbtaphs4",
+                                "type": "Microsoft.Sql/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/firewallRules?api-version=2014-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; odata=minimalmetadata; streaming=true; charset=utf-8"
+                    ],
+                    "date": [
+                        "Tue, 10 Sep 2019 15:23:36 GMT"
+                    ],
+                    "dataserviceversion": [
+                        "3.0;"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        }
+    ]
+}
