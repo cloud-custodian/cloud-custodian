@@ -19,13 +19,17 @@ import jmespath
 import json
 import os.path
 import logging
+import zlib
 from six import text_type
-from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request, urlopen
 from six.moves.urllib.parse import parse_qsl, urlparse
+from contextlib import closing
 
 from c7n.utils import format_string_values
 
 log = logging.getLogger('custodian.resolver')
+
+ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 
 class URIResolver(object):
@@ -40,11 +44,20 @@ class URIResolver(object):
         else:
             # TODO: in the case of file: content and untrusted
             # third parties, uri would need sanitization
-            fh = urlopen(uri)
-            contents = fh.read().decode('utf-8')
-            fh.close()
+            req = Request(uri, headers={"Accept-Encoding": "gzip"})
+            with closing(urlopen(req)) as response:
+                contents = self.handle_response_encoding(response)
+
         self.cache.save(("uri-resolver", uri), contents)
         return contents
+
+    def handle_response_encoding(self, response):
+        if response.info().get('Content-Encoding') != 'gzip':
+            return response.read().decode('utf-8')
+
+        data = zlib.decompress(response.read(),
+                               ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')
+        return data
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)

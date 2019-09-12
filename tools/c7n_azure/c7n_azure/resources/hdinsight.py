@@ -14,6 +14,8 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.actions.base import AzureBaseAction
+from c7n.utils import type_schema
 
 
 @resources.register('hdinsight')
@@ -66,3 +68,46 @@ class Hdinsight(ArmResourceManager):
             'properties.clusterDefinition.kind'
         )
         resource_type = 'Microsoft.HDInsight/clusters'
+
+
+@Hdinsight.action_registry.register('resize')
+class Resize(AzureBaseAction):
+
+    """
+    Action to scale HDInsight Clusters
+
+    :example:
+
+    This policy will resize the cluster to 4 nodes
+
+    .. code-block:: yaml
+
+        policies:
+          - name: resize-hdinsight
+            resource: azure.hdinsight
+            filters:
+              - type: value
+                key: name
+                value: cctesthdinsight
+            actions:
+              - type: resize
+                count: 4
+
+    """
+
+    schema = type_schema(
+        'resize',
+        required=['count'],
+        **{
+            'count': {'type': 'integer', 'minimum': 1}
+        })
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, cluster):
+        self.client.clusters.resize(
+            cluster['resourceGroup'],
+            cluster['name'],
+            target_instance_count=self.data['count']
+        )
