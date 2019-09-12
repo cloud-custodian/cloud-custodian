@@ -537,10 +537,17 @@ class FirewallRulesFilter(Filter):
     specific notation.
 
     **include**: True if all IP space listed is included in firewall.
+
     **any**: True if any overlap in IP space exists.
+
     **only**: True if firewall IP space only includes IPs from provided space
     (firewall is subset of provided space).
+
     **equal**: the list of IP ranges or CIDR that firewall rules must match exactly.
+
+    **IMPORTANT**: this filter ignores all bypass rules. If you want to ensure your resource is
+    not available for other Azure Cloud services or from the Portal, please use ``firewall-bypass``
+    filter.
 
     :example:
 
@@ -583,12 +590,15 @@ class FirewallRulesFilter(Filter):
         self.policy_equal = None
         self.policy_any = None
         self.policy_only = None
+        self.client = None
 
     def process(self, resources, event=None):
         self.policy_include = IpRangeHelper.parse_ip_ranges(self.data, 'include')
         self.policy_equal = IpRangeHelper.parse_ip_ranges(self.data, 'equal')
         self.policy_any = IpRangeHelper.parse_ip_ranges(self.data, 'any')
         self.policy_only = IpRangeHelper.parse_ip_ranges(self.data, 'only')
+
+        self.client = self.manager.get_client()
 
         result, _ = ThreadHelper.execute_in_parallel(
             resources=resources,

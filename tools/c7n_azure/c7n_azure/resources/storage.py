@@ -194,9 +194,11 @@ class StorageFirewallRulesFilter(FirewallRulesFilter):
 
     def _query_rules(self, resource):
 
-        ip_rules = resource['properties']['networkAcls']['ipRules']
-
-        resource_rules = IPSet([r['value'] for r in ip_rules])
+        if resource['properties']['networkAcls']['defaultAction'] == 'Deny':
+            ip_rules = resource['properties']['networkAcls']['ipRules']
+            resource_rules = IPSet([r['value'] for r in ip_rules])
+        else:
+            resource_rules = IPSet(['0.0.0.0/0'])
 
         return resource_rules
 

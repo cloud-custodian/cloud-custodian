@@ -40,9 +40,16 @@ try:
 except ImportError:
     from backports.functools_lru_cache import lru_cache
 
+
 max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
 log = logging.getLogger('custodian.azure.cosmosdb')
 THROUGHPUT_MULTIPLIER = 100
+PORTAL_IPS = ['104.42.195.92',
+              '40.76.54.131',
+              '52.176.6.30',
+              '52.169.50.45',
+              '52.187.184.26']
+AZURE_CLOUD_IPS = ['0.0.0.0']
 
 
 @resources.register('cosmosdb')
@@ -86,17 +93,22 @@ class CosmosDB(ArmResourceManager):
 @CosmosDB.filter_registry.register('firewall-rules')
 class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
 
-    def __init__(self, data, manager=None):
-        super(CosmosDBFirewallRulesFilter, self).__init__(data, manager)
-
     def _query_rules(self, resource):
         ip_range_string = resource['properties']['ipRangeFilter']
+        is_virtual_network_filter_enabled = resource['properties']['isVirtualNetworkFilterEnabled']
+        if not ip_range_string:
+            if is_virtual_network_filter_enabled:
+                return IPSet()
+            else:
+                return IPSet(['0.0.0.0/0'])
 
-        parts = ip_range_string.split(',')
+        parts = set(ip_range_string.replace(' ', '').split(','))
 
-        # We need to remove the 'magic string' they use for AzureCloud bypass
-        if '0.0.0.0' in parts:
-            parts.remove('0.0.0.0')
+        # Exclude magic strings representing Portal and Azure Cloud
+        if set(PORTAL_IPS).issubset(parts):
+            parts = parts - set(PORTAL_IPS)
+        if set(AZURE_CLOUD_IPS).issubset(parts):
+            parts = parts - set(AZURE_CLOUD_IPS)
 
         resource_rules = IPSet(filter(None, parts))
 
@@ -709,12 +721,6 @@ class CosmosSetFirewallAction(SetFirewallAction):
     def __init__(self, data, manager=None):
         super(CosmosSetFirewallAction, self).__init__(data, manager)
         self.rule_limit = 1000
-        self.portal = ['104.42.195.92',
-                       '40.76.54.131',
-                       '52.176.6.30',
-                       '52.169.50.45',
-                       '52.187.184.26']
-        self.azure_cloud = ['0.0.0.0']
 
     def _process_resource(self, resource):
 
@@ -730,19 +736,19 @@ class CosmosSetFirewallAction(SetFirewallAction):
         #  instead the portal UI adds values to your
         #  rules filter when you check the bypass box.
         existing_bypass = []
-        if set(self.azure_cloud).issubset(existing_ip):
+        if set(AZURE_CLOUD_IPS).issubset(existing_ip):
             existing_bypass.append('AzureCloud')
 
-        if set(self.portal).issubset(existing_ip):
+        if set(PORTAL_IPS).issubset(existing_ip):
             existing_bypass.append('Portal')
 
         # If unset, then we put the old values back in to emulate patch behavior
         bypass_rules = self.data.get('bypass-rules', existing_bypass)
 
         if 'Portal' in bypass_rules:
-            ip_rules.extend(set(self.portal).difference(ip_rules))
+            ip_rules.extend(set(PORTAL_IPS).difference(ip_rules))
         if 'AzureCloud' in bypass_rules:
-            ip_rules.extend(set(self.azure_cloud).difference(ip_rules))
+            ip_rules.extend(set(AZURE_CLOUD_IPS).difference(ip_rules))
 
         # If the user has too many rules raise exception
         if len(ip_rules) > self.rule_limit:

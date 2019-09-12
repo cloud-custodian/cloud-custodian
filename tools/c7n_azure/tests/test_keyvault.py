@@ -14,11 +14,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure_common import BaseTest, arm_template, cassette_name
-from c7n_azure.resources.key_vault import KeyVaultUpdateAccessPolicyAction, WhiteListFilter
+from c7n_azure.resources.key_vault import (KeyVaultUpdateAccessPolicyAction, WhiteListFilter,
+                                           KeyVaultFirewallRulesFilter)
 from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 from mock import patch, Mock
 from msrestazure.azure_exceptions import CloudError
+from netaddr import IPSet
 from requests import Response
 
 from c7n.utils import local_session
@@ -285,3 +287,27 @@ class KeyVaultTest(BaseTest):
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
+
+
+class KeyVaultFirewallFilterTest(BaseTest):
+
+    def test_query_empty_network_acl(self):
+        resource = {'properties': {}}
+        expected = IPSet(['0.0.0.0/0'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_default_action_allow(self):
+        resource = {'properties': {'networkAcls': {'defaultAction': 'Allow'}}}
+        expected = IPSet(['0.0.0.0/0'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_default_action_deny(self):
+        resource = {'properties': {'networkAcls': {'defaultAction': 'Deny',
+                                                   'ipRules': [{'value': '10.0.0.0/16'},
+                                                               {'value': '8.8.8.8'}]}}}
+        expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def _get_filter(self, mode='equal'):
+        data = {mode: ['10.0.0.0/8', '127.0.0.1']}
+        return KeyVaultFirewallRulesFilter(data, Mock())
