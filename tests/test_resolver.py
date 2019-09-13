@@ -17,6 +17,7 @@ import csv
 import json
 import os
 import tempfile
+import pytest
 import vcr
 from six.moves.urllib.request import urlopen
 from six import binary_type
@@ -127,8 +128,9 @@ class ResolverTest(BaseTest):
         uri = self._helper_get_path("gzip-test-failure.json.gz")
 
         with closing(urlopen(uri)) as response:
-            content = resolver.handle_response_encoding(response)
-            self.assertEqual(content, None)
+            with pytest.raises(IOError) as err:
+                resolver.handle_response_encoding(response)
+            self.assertEqual(type(err.value), OSError)
 
 
 class UrlValueTest(BaseTest):
