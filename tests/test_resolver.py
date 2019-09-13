@@ -111,6 +111,7 @@ class ResolverTest(BaseTest):
         data = json.loads(content)
         self.assertEqual(len(data.keys()), 1)
 
+
 class UrlValueTest(BaseTest):
 
     def setUp(self):

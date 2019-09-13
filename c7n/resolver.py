@@ -70,7 +70,6 @@ class URIResolver(object):
 
         return False
 
-
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
         client = self.session_factory().client('s3')
@@ -120,7 +119,7 @@ class ValuesFrom(object):
        # inferred from extension
        format: [json, csv, csv2dict, txt]
     """
-    supported_formats = ('json', 'txt', 'csv', 'csv2dict')
+    supported_formats = ('json', 'json.gz', 'txt', 'csv', 'csv2dict')
 
     # intent is that callers embed this schema
     schema = {

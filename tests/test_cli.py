@@ -268,7 +268,7 @@ class SchemaTest(CliTest):
                 'required': ['url'],
                 'properties': {
                     'url': {'type': 'string'},
-                    'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
+                    'format': {'enum': ['csv', 'json', 'txt', 'csv2dict', 'json.gz']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
                         {'type': 'string'}]}
@@ -280,7 +280,7 @@ class SchemaTest(CliTest):
                 'required': ['url'],
                 'properties': {
                     'url': {'type': 'string'},
-                    'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
+                    'format': {'enum': ['csv', 'json', 'txt', 'csv2dict', 'json.gz']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
                         {'type': 'string'}]}
