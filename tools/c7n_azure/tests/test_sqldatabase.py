@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from azure.mgmt.sql.models import DatabaseUpdate, Sku
-from azure_common import BaseTest, arm_template
-from c7n_azure.utils import ResourceIdParser
 
+from azure_common import BaseTest, arm_template, requires_arm_polling
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
 from c7n_azure.resources.sqldatabase import (
     BackupRetentionPolicyHelper, ShortTermBackupRetentionPolicyAction)
 from c7n_azure.session import Session
+from c7n_azure.utils import ResourceIdParser
 
 
 class SqlDatabaseTest(BaseTest):
@@ -355,6 +355,7 @@ class ShortTermBackupRetentionPolicyActionSchemaTest(BaseTest):
 # operation has finished. However, this polling happens client-side and causes the tests to complete
 # slowly. In order to speed these up, the cassettes were manually modified to immediately return the
 # completed operation.
+@requires_arm_polling
 class ShortTermBackupRetentionPolicyActionTest(BaseTest):
 
     @classmethod
@@ -427,6 +428,7 @@ class LongTermBackupRetentionPolicyActionSchemaTest(BaseTest):
 # operation has finished. However, this polling happens client-side and causes the tests to complete
 # slowly. In order to speed these up, the cassettes were manually modified to immediately return the
 # completed operation.
+@requires_arm_polling
 class LongTermBackupRetentionPolicyActionTest(BaseTest):
 
     @classmethod
