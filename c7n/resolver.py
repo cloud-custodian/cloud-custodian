@@ -55,10 +55,12 @@ class URIResolver(object):
     def handle_response_encoding(self, response):
         if not self.is_compressed_file(response):
             return response.read().decode('utf-8')
-
-        data = zlib.decompress(response.read(),
+        try:
+            return zlib.decompress(response.read(),
                                ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')
-        return data
+        except ImportError:
+            log.error("File not compressed but stated as such:", response.geturl())
+            return None
 
     def is_compressed_file(self, response):
         if response.info().get('Content-Encoding') == 'gzip':

@@ -97,26 +97,38 @@ class ResolverTest(BaseTest):
             fh.flush()
             self.assertEqual(resolver.resolve("file:%s" % fh.name), content)
 
-    def test_resolve_file_gzip(self):
-        cache = FakeCache()
-        resolver = URIResolver(None, cache)
+    def _helper_get_path(self, filename):
         path = os.path.join(
             os.path.dirname(__file__),
             "data",
             "config",
-            "gzip-test-data.json.gz",
+            filename
         )
         drive, real = os.path.splitdrive(os.path.abspath(path))
         if drive:
             real = "/".join(os.path.split(real))
-            uri = "file:///%s%s" % (drive, real)
+            return "file:///%s%s" % (drive, real)
         else:
-            uri = "file://%s" % real
+            return "file://%s" % real
+
+    def test_resolve_file_gzip(self):
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+        uri = self._helper_get_path("gzip-test-data.json.gz")
 
         with closing(urlopen(uri)) as response:
             content = resolver.handle_response_encoding(response)
             data = json.loads(content)
             self.assertEqual(len(data.keys()), 1)
+
+    def test_resolve_file_fail(self):
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+        uri = self._helper_get_path("gzip-test-failure.json.gz")
+
+        with closing(urlopen(uri)) as response:
+            content = resolver.handle_response_encoding(response)
+            self.assertEqual(content, None)
 
 
 class UrlValueTest(BaseTest):
