@@ -308,6 +308,13 @@ class AzureVCRBaseTest(VCRTestCase):
             sub_id = match.group(0)
             s = s.replace(sub_id[-36:], DEFAULT_SUBSCRIPTION_ID)
             s = s.replace(sub_id[-12:], DEFAULT_SUBSCRIPTION_ID[-12:])
+        else:
+            # For function apps
+            func_regex = r"^https\:\/\/[\w-]+([a-f0-9]{12})\.(blob\.core|scm\.azurewebsites)"
+            func_match = re.search(func_regex, s)
+            if func_match is not None:
+                sub_fragment = func_match.group(1)
+                s = s.replace(sub_fragment, DEFAULT_SUBSCRIPTION_ID[-12:])
 
         return s
 
