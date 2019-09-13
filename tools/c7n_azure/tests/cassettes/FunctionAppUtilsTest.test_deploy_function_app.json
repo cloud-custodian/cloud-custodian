@@ -14,20 +14,20 @@
                     "message": "Not Found"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "content-length": [
-                        "163"
-                    ],
                     "date": [
-                        "Thu, 27 Jun 2019 00:52:42 GMT"
+                        "Fri, 13 Sep 2019 22:06:58 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-length": [
+                        "163"
+                    ],
                     "x-ms-failure-cause": [
                         "gateway"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ]
                 },
                 "body": {
@@ -53,17 +53,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json"
-                    ],
                     "date": [
-                        "Thu, 27 Jun 2019 00:52:43 GMT"
+                        "Fri, 13 Sep 2019 22:06:59 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json"
+                    ],
                     "content-length": [
-                        "1333"
+                        "1404"
                     ]
                 },
                 "body": {
@@ -72,9 +72,9 @@
                         "name": "cloud-custodian-test",
                         "type": "Microsoft.Web/serverfarms",
                         "kind": "linux",
-                        "location": "Central US",
+                        "location": "South Central US",
                         "properties": {
-                            "serverFarmId": 10432,
+                            "serverFarmId": 24239,
                             "name": "cloud-custodian-test",
                             "workerSize": "Default",
                             "workerSizeId": 0,
@@ -84,7 +84,7 @@
                             "currentWorkerSizeId": 0,
                             "currentNumberOfWorkers": 1,
                             "status": "Ready",
-                            "webSpace": "test_functionapp-reqs-CentralUSwebspace",
+                            "webSpace": "test_functionapp-reqs-SouthCentralUSwebspace",
                             "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
                             "adminSiteName": null,
                             "hostingEnvironment": null,
@@ -94,25 +94,26 @@
                             "adminRuntimeSiteName": null,
                             "computeMode": "Dedicated",
                             "siteMode": null,
-                            "geoRegion": "Central US",
+                            "geoRegion": "South Central US",
                             "perSiteScaling": false,
                             "maximumElasticWorkerCount": 1,
                             "numberOfSites": 1,
                             "hostingEnvironmentId": null,
                             "isSpot": false,
                             "spotExpirationTime": null,
-                            "freeOfferExpirationTime": null,
+                            "freeOfferExpirationTime": "2019-10-13T21:55:53.9766667",
                             "tags": null,
                             "kind": "linux",
                             "resourceGroup": "test_functionapp-reqs",
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "mdmId": "waws-prod-dm1-145_10432",
+                            "mdmId": "waws-prod-sn1-161_24239",
                             "targetWorkerCount": 0,
                             "targetWorkerSizeId": 0,
                             "provisioningState": "Succeeded",
-                            "webSiteId": null
+                            "webSiteId": null,
+                            "existingServerFarmIds": null
                         },
                         "sku": {
                             "name": "B1",
@@ -128,7 +129,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Insights/components/cloud-custodian-test?api-version=2015-05-01",
                 "body": null,
                 "headers": {}
             },
@@ -138,23 +139,23 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
                     "date": [
-                        "Thu, 27 Jun 2019 00:52:43 GMT"
-                    ],
-                    "request-context": [
-                        "appId=cid-v1:920e14b1-13f3-461a-a4bb-b4fe6f1a4525"
+                        "Fri, 13 Sep 2019 22:07:00 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "request-context": [
+                        "appId=cid-v1:920e14b1-13f3-461a-a4bb-b4fe6f1a4525"
+                    ],
                     "access-control-expose-headers": [
                         "Request-Context"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "content-length": [
-                        "770"
+                        "777"
                     ]
                 },
                 "body": {
@@ -162,20 +163,20 @@
                         "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test",
                         "name": "cloud-custodian-test",
                         "type": "microsoft.insights/components",
-                        "location": "westus2",
+                        "location": "southcentralus",
                         "tags": {},
                         "kind": "web",
-                        "etag": "\"0500fc64-0000-0600-0000-5d1411140000\"",
+                        "etag": "\"01007499-0000-0500-0000-5d7c10680000\"",
                         "properties": {
                             "Ver": "v2",
                             "ApplicationId": "cloud-custodian-test",
-                            "AppId": "04863205-7b0b-4573-adaf-4adae8907bfc",
+                            "AppId": "1d513b73-aaaa-416e-a1b9-33b3e8f963d8",
                             "Application_Type": "web",
                             "Flow_Type": null,
                             "Request_Source": "IbizaWebAppExtensionCreate",
                             "InstrumentationKey": "00000000-0000-0000-0000-000000000004",
                             "Name": "cloud-custodian-test",
-                            "CreationDate": "2019-06-27T00:38:55.1495873+00:00",
+                            "CreationDate": "2019-09-13T21:55:52.5766984+00:00",
                             "TenantId": "00000000-0000-0000-0000-000000000003",
                             "provisioningState": "Succeeded",
                             "SamplingPercentage": null
@@ -187,7 +188,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest?api-version=2019-04-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/ccfuncappc129bfa71a47?api-version=2019-04-01",
                 "body": null,
                 "headers": {}
             },
@@ -197,17 +198,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json"
-                    ],
                     "date": [
-                        "Thu, 27 Jun 2019 00:52:43 GMT"
+                        "Fri, 13 Sep 2019 22:07:00 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json"
+                    ],
                     "content-length": [
-                        "1180"
+                        "1113"
                     ]
                 },
                 "body": {
@@ -217,16 +218,12 @@
                             "tier": "Standard"
                         },
                         "kind": "Storage",
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest",
-                        "name": "cloudcustodiantest",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/ccfuncappc129bfa71a47",
+                        "name": "ccfuncappc129bfa71a47",
                         "type": "Microsoft.Storage/storageAccounts",
-                        "location": "centralus",
-                        "tags": {
-                            "CreatorEmail": "kiril@microsoft.com"
-                        },
+                        "location": "southcentralus",
+                        "tags": {},
                         "properties": {
-                            "minimumTlsVersion": "TLS1_2",
-                            "allowBlobPublicAccess": false,
                             "networkAcls": {
                                 "bypass": "AzureServices",
                                 "virtualNetworkRules": [],
@@ -238,24 +235,24 @@
                                 "services": {
                                     "file": {
                                         "enabled": true,
-                                        "lastEnabledTime": "2019-06-27T00:42:54.3609456Z"
+                                        "lastEnabledTime": "2019-09-13T21:55:52.1394269Z"
                                     },
                                     "blob": {
                                         "enabled": true,
-                                        "lastEnabledTime": "2019-06-27T00:42:54.3609456Z"
+                                        "lastEnabledTime": "2019-09-13T21:55:52.1394269Z"
                                     }
                                 },
                                 "keySource": "Microsoft.Storage"
                             },
                             "provisioningState": "Succeeded",
-                            "creationTime": "2019-06-27T00:42:54.2828220Z",
+                            "creationTime": "2019-09-13T21:55:52.0769464Z",
                             "primaryEndpoints": {
-                                "blob": "https://cloudcustodiantest.blob.core.windows.net/",
-                                "queue": "https://cloudcustodiantest.queue.core.windows.net/",
-                                "table": "https://cloudcustodiantest.table.core.windows.net/",
-                                "file": "https://cloudcustodiantest.file.core.windows.net/"
+                                "blob": "https://ccfuncappc129bfa71a47.blob.core.windows.net/",
+                                "queue": "https://ccfuncappc129bfa71a47.queue.core.windows.net/",
+                                "table": "https://ccfuncappc129bfa71a47.table.core.windows.net/",
+                                "file": "https://ccfuncappc129bfa71a47.file.core.windows.net/"
                             },
-                            "primaryLocation": "centralus",
+                            "primaryLocation": "southcentralus",
                             "statusOfPrimary": "available"
                         }
                     }
@@ -265,7 +262,7 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest/listKeys?api-version=2019-04-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/ccfuncappc129bfa71a47/listKeys?api-version=2019-04-01",
                 "body": null,
                 "headers": {}
             },
@@ -275,17 +272,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json"
-                    ],
                     "date": [
-                        "Thu, 27 Jun 2019 00:52:44 GMT"
+                        "Fri, 13 Sep 2019 22:07:00 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json"
+                    ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1198"
+                        "1199"
                     ],
                     "content-length": [
                         "288"
@@ -322,23 +319,23 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json"
-                    ],
                     "date": [
-                        "Thu, 27 Jun 2019 00:53:05 GMT"
+                        "Fri, 13 Sep 2019 22:07:19 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "etag": [
-                        "\"1D52C82A3646295\""
+                        "\"1D56A7F93AFE4EB\""
+                    ],
+                    "content-type": [
+                        "application/json"
                     ],
                     "x-ms-ratelimit-remaining-subscription-resource-requests": [
                         "499"
                     ],
                     "content-length": [
-                        "3137"
+                        "3253"
                     ]
                 },
                 "body": {
@@ -347,15 +344,15 @@
                         "name": "custodian-test-app",
                         "type": "Microsoft.Web/sites",
                         "kind": "functionapp,linux,container",
-                        "location": "Central US",
+                        "location": "South Central US",
                         "properties": {
                             "name": "custodian-test-app",
                             "state": "Running",
                             "hostNames": [
                                 "custodian-test-app.azurewebsites.net"
                             ],
-                            "webSpace": "test_functionapp-reqs-CentralUSwebspace",
-                            "selfLink": "https://waws-prod-dm1-145.api.azurewebsites.windows.net:454/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/webspaces/test_functionapp-reqs-CentralUSwebspace/sites/custodian-test-app",
+                            "webSpace": "test_functionapp-reqs-SouthCentralUSwebspace",
+                            "selfLink": "https://waws-prod-sn1-161.api.azurewebsites.windows.net:454/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/webspaces/test_functionapp-reqs-SouthCentralUSwebspace/sites/custodian-test-app",
                             "repositorySiteName": "custodian-test-app",
                             "owner": null,
                             "usageState": "Normal",
@@ -370,7 +367,7 @@
                                 "properties": [
                                     {
                                         "name": "LinuxFxVersion",
-                                        "value": "DOCKER|mcr.microsoft.com/azure-functions/python:latest"
+                                        "value": "DOCKER|mcr.microsoft.com/azure-functions/python:2.0-python3.6-appservice"
                                     },
                                     {
                                         "name": "WindowsFxVersion",
@@ -414,7 +411,7 @@
                             "reserved": true,
                             "isXenon": false,
                             "hyperV": false,
-                            "lastModifiedTimeUtc": "2019-06-27T00:52:47.1433333",
+                            "lastModifiedTimeUtc": "2019-09-13T22:07:04.4166667",
                             "storageRecoveryDefaultState": "Running",
                             "contentAvailabilityState": "Normal",
                             "runtimeAvailabilityState": "Normal",
@@ -432,15 +429,17 @@
                             "hostNamesDisabled": false,
                             "domainVerificationIdentifiers": null,
                             "kind": "functionapp,linux,container",
-                            "outboundIpAddresses": "52.173.149.254,40.78.145.43,40.122.200.61,40.77.22.57,40.122.200.161",
-                            "possibleOutboundIpAddresses": "52.173.149.254,40.78.145.43,40.122.200.61,40.77.22.57,40.122.200.161,40.77.19.89,40.77.101.75,40.77.101.182,40.122.206.112,40.77.98.66",
+                            "inboundIpAddress": "13.84.227.164",
+                            "possibleInboundIpAddresses": "13.84.227.164",
+                            "outboundIpAddresses": "13.84.227.164,52.171.221.149,52.171.217.1,52.171.217.147,52.171.219.120",
+                            "possibleOutboundIpAddresses": "13.84.227.164,52.171.221.149,52.171.217.1,52.171.217.147,52.171.219.120,52.171.52.137,13.84.201.190",
                             "containerSize": 0,
                             "dailyMemoryTimeQuota": 0,
                             "suspendedTill": null,
                             "siteDisabledReason": 0,
                             "functionExecutionUnitsCache": null,
                             "maxNumberOfWorkers": null,
-                            "homeStamp": "waws-prod-dm1-145",
+                            "homeStamp": "waws-prod-sn1-161",
                             "cloningInfo": null,
                             "hostingEnvironmentId": null,
                             "tags": null,
@@ -450,7 +449,8 @@
                             "httpsOnly": false,
                             "redundancyMode": "None",
                             "inProgressOperationId": null,
-                            "geoDistributions": null
+                            "geoDistributions": null,
+                            "privateEndpointConnections": null
                         }
                     }
                 }
