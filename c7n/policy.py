@@ -700,6 +700,13 @@ class ConfigRuleMode(LambdaMode):
     cfg_event = None
     schema = utils.type_schema('config-rule', rinherit=LambdaMode.schema)
 
+    def validate(self):
+        super(ConfigRuleMode, self).validate()
+        if not self.policy.resource_manager.resource_type.config_type:
+            raise PolicyValidationError(
+                "policy:%s AWS Config does not support resource-type:%s" % (
+                    self.policy.name, self.policy.resource_type))
+
     def resolve_resources(self, event):
         source = self.policy.resource_manager.get_source('config')
         return [source.load_resource(self.cfg_event['configurationItem'])]

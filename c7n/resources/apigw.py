@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-
+import functools
 from botocore.exceptions import ClientError
 
 from concurrent.futures import as_completed
@@ -22,6 +22,8 @@ from c7n.filters import FilterRegistry, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
+from c7n.tags import register_universal_tags
+from c7n.utils import generate_arn
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -122,13 +124,28 @@ class RestApi(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'apigateway'
-        arn_type = 'restapis'
+        arn_type = '/restapis'
         enum_spec = ('get_rest_apis', 'items', None)
         id = 'id'
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
         config_type = "AWS::ApiGateway::RestApi"
+
+    @property
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:apigateway:us-east-1::/restapis/rest-api-id
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.resource_type.service,
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type)
+        return self._generate_arn
 
 
 @RestApi.filter_registry.register('cross-account')
@@ -176,6 +193,9 @@ class UpdateApi(BaseAction):
             client.update_rest_api(
                 restApiId=r['id'],
                 patchOperations=self.data['patch'])
+
+
+register_universal_tags(RestApi.filter_registry, RestApi.action_registry, compatibility=False)
 
 
 @resources.register('rest-stage')

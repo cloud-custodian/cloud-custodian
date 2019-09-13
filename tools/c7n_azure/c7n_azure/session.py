@@ -27,15 +27,17 @@ from azure.keyvault import KeyVaultAuthentication, AccessToken
 from c7n_azure import constants
 from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
                              ManagedGroupHelper, get_keyvault_secret)
-from knack.util import CLIError
 from msrest.exceptions import AuthenticationError
 from msrestazure.azure_active_directory import MSIAuthentication
 from requests import HTTPError
 
 try:
     from azure.cli.core._profile import Profile
+    from knack.util import CLIError
 except Exception:
     Profile = None
+    CLIError = ImportError  # Assign an exception that never happens because of Auth problems
+
 
 log = logging.getLogger('custodian.azure.session')
 
