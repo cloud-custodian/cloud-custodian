@@ -130,7 +130,7 @@ class ResolverTest(BaseTest):
         with closing(urlopen(uri)) as response:
             with pytest.raises(IOError) as err:
                 resolver.handle_response_encoding(response)
-            self.assertEqual(type(err.value), OSError)
+            self.assertEqual(type(err.value), IOError)
 
 
 class UrlValueTest(BaseTest):
