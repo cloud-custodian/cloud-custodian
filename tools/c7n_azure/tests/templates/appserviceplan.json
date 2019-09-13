@@ -24,7 +24,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2015-04-01",
+      "apiVersion":"2016-09-01",
       "name": "cctest-consumption-win",
       "location": "East US",
       "sku": {
@@ -35,7 +35,8 @@
         "capacity": 0
       },
       "properties": {
-        "name": "cctest-consumption-win"
+        "name": "cctest-consumption-win",
+        "computeMode":"Dynamic"
       }
     }
   ]

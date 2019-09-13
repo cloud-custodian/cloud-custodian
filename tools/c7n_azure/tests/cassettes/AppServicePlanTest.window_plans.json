@@ -21,24 +21,27 @@
                         "no-cache"
                     ],
                     "date": [
-                        "Mon, 12 Aug 2019 21:53:51 GMT"
+                        "Fri, 13 Sep 2019 21:33:01 GMT"
                     ],
                     "content-length": [
-                        "9180"
+                        "17372"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan-linux/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-linux",
-                                "name": "cctest-appserviceplan-linux",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverfarms/cctest-appserviceplan-win",
+                                "name": "cctest-appserviceplan-win",
                                 "type": "Microsoft.Web/serverfarms",
-                                "kind": "linux",
+                                "kind": "app",
                                 "location": "East US",
+                                "tags": {
+                                    "sku": "B1"
+                                },
                                 "properties": {
-                                    "serverFarmId": 13732131,
-                                    "name": "cctest-appserviceplan-linux",
+                                    "serverFarmId": 14160914,
+                                    "name": "cctest-appserviceplan-win",
                                     "workerSize": "Default",
                                     "workerSizeId": 0,
                                     "workerTierName": null,
@@ -47,7 +50,7 @@
                                     "currentWorkerSizeId": null,
                                     "currentNumberOfWorkers": null,
                                     "status": "Ready",
-                                    "webSpace": "test_appserviceplan-linux-EastUSwebspace",
+                                    "webSpace": "test_appserviceplan-EastUSwebspace",
                                     "subscription": null,
                                     "adminSiteName": null,
                                     "hostingEnvironment": null,
@@ -65,9 +68,11 @@
                                     "isSpot": null,
                                     "spotExpirationTime": null,
                                     "freeOfferExpirationTime": null,
-                                    "tags": null,
-                                    "kind": "linux",
-                                    "resourceGroup": "test_appserviceplan-linux",
+                                    "tags": {
+                                        "sku": "B1"
+                                    },
+                                    "kind": "app",
+                                    "resourceGroup": "test_appserviceplan",
                                     "reserved": null,
                                     "isXenon": null,
                                     "hyperV": null,
@@ -87,14 +92,14 @@
                                 }
                             },
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan-linux/providers/Microsoft.Web/serverfarms/cctest-consumption-linux",
-                                "name": "cctest-consumption-linux",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan/providers/Microsoft.Web/serverfarms/cctest-consumption-win",
+                                "name": "cctest-consumption-win",
                                 "type": "Microsoft.Web/serverfarms",
                                 "kind": "functionapp",
                                 "location": "East US",
                                 "properties": {
-                                    "serverFarmId": 13732132,
-                                    "name": "cctest-consumption-linux",
+                                    "serverFarmId": 14161208,
+                                    "name": "cctest-consumption-win",
                                     "workerSize": "Default",
                                     "workerSizeId": 0,
                                     "workerTierName": null,
@@ -103,7 +108,7 @@
                                     "currentWorkerSizeId": null,
                                     "currentNumberOfWorkers": null,
                                     "status": "Ready",
-                                    "webSpace": "test_appserviceplan-linux-EastUSwebspace",
+                                    "webSpace": "test_appserviceplan-EastUSwebspace",
                                     "subscription": null,
                                     "adminSiteName": null,
                                     "hostingEnvironment": null,
@@ -123,7 +128,7 @@
                                     "freeOfferExpirationTime": null,
                                     "tags": null,
                                     "kind": "functionapp",
-                                    "resourceGroup": "test_appserviceplan-linux",
+                                    "resourceGroup": "test_appserviceplan",
                                     "reserved": null,
                                     "isXenon": null,
                                     "hyperV": null,
