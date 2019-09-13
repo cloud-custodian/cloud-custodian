@@ -113,9 +113,6 @@ class ResolverTest(BaseTest):
         else:
             uri = "file://%s" % real
 
-        print("drive", drive)
-        print("real", real)
-        print("uri", uri)
         with closing(urlopen(uri)) as response:
             content = resolver.handle_response_encoding(response)
             data = json.loads(content)
