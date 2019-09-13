@@ -33,7 +33,8 @@ class FunctionAppUtilsTest(BaseTest):
         self.session = local_session(Session)
         self.subscription_id = self.session.get_subscription_id()
         self.storage_name = 'ccfuncapp%s' % self.subscription_id[-12:]
-        self.dedicated_function_name = 'cloud-custodian-test-dedicated%s' % self.subscription_id[-12:]
+        self.dedicated_function_name = 'cloud-custodian-test-dedicated%s' \
+            % self.subscription_id[-12:]
 
     @arm_template('functionapp-reqs.json')
     def test_get_storage_connection_string(self):
