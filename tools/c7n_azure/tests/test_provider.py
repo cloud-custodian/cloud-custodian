@@ -5,21 +5,19 @@ from c7n.config import Config
 
 
 class ProviderTest(BaseTest):
+    def test_initialize_default_account_id(self):
+        # Patch get_subscription_id during provider initialization
+        with patch('c7n_azure.session.Session.get_subscription_id',
+                   return_value=DEFAULT_SUBSCRIPTION_ID):
+            options = Config.empty()
+            azure = Azure()
+            azure.initialize(options)
+            self.assertEqual(options['account_id'], DEFAULT_SUBSCRIPTION_ID)
+            session = azure.get_session_factory(options)()
 
-    @patch('c7n_azure.session.Session.get_subscription_id', return_value=DEFAULT_SUBSCRIPTION_ID)
-    def test_initialize_default_account_id(self, get_subscription_id_mock):
-        options = Config.empty()
-        azure = Azure()
-        azure.initialize(options)
+        self.assertEqual(DEFAULT_SUBSCRIPTION_ID, session.get_subscription_id())
 
-        self.assertEqual(options['account_id'], DEFAULT_SUBSCRIPTION_ID)
-
-        session = azure.get_session_factory(options)()
-        session._initialize_session()
-        self.assertEqual(session.subscription_id, DEFAULT_SUBSCRIPTION_ID)
-
-    @patch('c7n_azure.session.Session.get_subscription_id', return_value=DEFAULT_SUBSCRIPTION_ID)
-    def test_initialize_custom_account_id(self, get_subscription_id_mock):
+    def test_initialize_custom_account_id(self):
         sample_account_id = "00000000-5106-4743-99b0-c129bfa71a47"
         options = Config.empty()
         options['account_id'] = sample_account_id
@@ -28,5 +26,4 @@ class ProviderTest(BaseTest):
         self.assertEqual(options['account_id'], sample_account_id)
 
         session = azure.get_session_factory(options)()
-        session._initialize_session()
-        self.assertEqual(session.subscription_id, sample_account_id)
+        self.assertEqual(sample_account_id, session.get_subscription_id())
