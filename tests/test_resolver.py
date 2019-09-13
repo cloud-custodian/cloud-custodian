@@ -20,6 +20,7 @@ import tempfile
 import vcr
 from six.moves.urllib.request import urlopen
 from six import binary_type
+from contextlib import closing
 
 from .common import BaseTest, ACCOUNT_ID, Bag, TestConfig as Config
 from .test_s3 import destroyBucket
@@ -106,10 +107,10 @@ class ResolverTest(BaseTest):
             "gzip-test-data.json.gz",
         )
         uri = "file://%s" % path
-        response = urlopen(uri)
-        content = resolver.handle_response_encoding(response)
-        data = json.loads(content)
-        self.assertEqual(len(data.keys()), 1)
+        with closing(urlopen(uri)) as response:
+            content = resolver.handle_response_encoding(response)
+            data = json.loads(content)
+            self.assertEqual(len(data.keys()), 1)
 
 
 class UrlValueTest(BaseTest):
