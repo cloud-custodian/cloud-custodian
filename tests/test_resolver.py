@@ -21,6 +21,7 @@ import vcr
 from six.moves.urllib.request import urlopen
 from six import binary_type
 from contextlib import closing
+from pathlib import Path
 
 from .common import BaseTest, ACCOUNT_ID, Bag, TestConfig as Config
 from .test_s3 import destroyBucket
@@ -100,14 +101,16 @@ class ResolverTest(BaseTest):
     def test_resolve_file_gzip(self):
         cache = FakeCache()
         resolver = URIResolver(None, cache)
+        script_path = os.path.dirname(os.path.abspath( __file__ ))
         path = os.path.join(
-            os.path.dirname(__file__),
+            script_path,
             "data",
             "config",
             "gzip-test-data.json.gz",
         )
-        uri = "file://%s" % path
-        with closing(urlopen(uri)) as response:
+        path = "file://%s" % path
+        print("****", path)
+        with closing(urlopen(path)) as response:
             content = resolver.handle_response_encoding(response)
             data = json.loads(content)
             self.assertEqual(len(data.keys()), 1)
