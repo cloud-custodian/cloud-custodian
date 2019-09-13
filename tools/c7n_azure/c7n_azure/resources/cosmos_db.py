@@ -22,7 +22,7 @@ from azure.mgmt.cosmosdb.models import VirtualNetworkRule
 from c7n_azure import constants
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
-from c7n_azure.filters import FirewallRulesFilter
+from c7n_azure.filters import (FirewallRulesFilter, MetricFilter)
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
 from c7n_azure.resources.arm import ArmResourceManager
@@ -40,9 +40,16 @@ try:
 except ImportError:
     from backports.functools_lru_cache import lru_cache
 
+
 max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
 log = logging.getLogger('custodian.azure.cosmosdb')
 THROUGHPUT_MULTIPLIER = 100
+PORTAL_IPS = ['104.42.195.92',
+              '40.76.54.131',
+              '52.176.6.30',
+              '52.169.50.45',
+              '52.187.184.26']
+AZURE_CLOUD_IPS = ['0.0.0.0']
 
 
 @resources.register('cosmosdb')
@@ -86,17 +93,22 @@ class CosmosDB(ArmResourceManager):
 @CosmosDB.filter_registry.register('firewall-rules')
 class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
 
-    def __init__(self, data, manager=None):
-        super(CosmosDBFirewallRulesFilter, self).__init__(data, manager)
-
     def _query_rules(self, resource):
         ip_range_string = resource['properties']['ipRangeFilter']
+        is_virtual_network_filter_enabled = resource['properties']['isVirtualNetworkFilterEnabled']
+        if not ip_range_string:
+            if is_virtual_network_filter_enabled:
+                return IPSet()
+            else:
+                return IPSet(['0.0.0.0/0'])
 
-        parts = ip_range_string.split(',')
+        parts = set(ip_range_string.replace(' ', '').split(','))
 
-        # We need to remove the 'magic string' they use for AzureCloud bypass
-        if '0.0.0.0' in parts:
-            parts.remove('0.0.0.0')
+        # Exclude magic strings representing Portal and Azure Cloud
+        if set(PORTAL_IPS).issubset(parts):
+            parts = parts - set(PORTAL_IPS)
+        if set(AZURE_CLOUD_IPS).issubset(parts):
+            parts = parts - set(AZURE_CLOUD_IPS)
 
         resource_rules = IPSet(filter(None, parts))
 
@@ -173,6 +185,43 @@ class CosmosDBDatabase(CosmosDBChildResource):
         return databases
 
 
+@CosmosDBDatabase.filter_registry.register('metric')
+class CosmosDBDatabaseMetricFilter(MetricFilter):
+    """CosmosDB Database Metric Filter
+
+    :example:
+
+    This policy will find cosmos db databases with less than 1000 requests per day
+
+    .. code-block:: yaml
+
+        policies:
+          - name: low-request-databases
+            description: |
+              get databases with less than 1000 requests per day
+            resource: azure.cosmosdb-database
+            filters:
+              - type: metric
+                metric: TotalRequests
+                op: le
+                aggregation: average
+                interval: P1D
+                threshold: 1000
+                timeframe: 72
+
+    """
+    def get_resource_id(self, resource):
+        return resource['c7n:parent-id']
+
+    def get_filter(self, resource):
+        if self.filter is None:
+            parent_filter = "DatabaseName eq '%s'" % resource['id']
+        else:
+            parent_filter = "%s and DatabaseName eq '%s'" % (self.filter, resource['id'])
+
+        return parent_filter
+
+
 @resources.register('cosmosdb-collection')
 class CosmosDBCollection(CosmosDBChildResource):
     """CosmosDB Collection Resource
@@ -217,9 +266,48 @@ class CosmosDBCollection(CosmosDBChildResource):
                 c.update({'c7n:document-endpoint':
                          parent_resource.get('properties').get('documentEndpoint')})
                 c['c7n:parent'] = parent_resource
+                c['c7n:database'] = d['id']
                 collections.append(c)
 
         return collections
+
+
+@CosmosDBCollection.filter_registry.register('metric')
+class CosmosDBCollectionMetricFilter(MetricFilter):
+    """CosmosDB Collection Metric Filter
+
+    :example:
+
+    This policy will find cosmos db collections with less than 1000 requests per day
+
+    .. code-block:: yaml
+
+        policies:
+          - name: low-request-collections
+            description: |
+              get collections with less than 1000 requests per day
+            resource: azure.cosmosdb-database
+            filters:
+              - type: metric
+                metric: TotalRequestUnits
+                op: le
+                aggregation: average
+                interval: P1D
+                threshold: 1000
+                timeframe: 72
+
+    """
+    def get_resource_id(self, resource):
+        return resource['c7n:parent-id']
+
+    def get_filter(self, resource):
+        container_filter = "DatabaseName eq '%s' and CollectionName eq '%s'" \
+            % (resource['c7n:database'], resource['id'])
+
+        if self.filter is not None:
+            container_filter = "%s and %s" % (self.filter, container_filter)
+
+        return container_filter
 
 
 @CosmosDBCollection.filter_registry.register('offer')
@@ -633,12 +721,6 @@ class CosmosSetFirewallAction(SetFirewallAction):
     def __init__(self, data, manager=None):
         super(CosmosSetFirewallAction, self).__init__(data, manager)
         self.rule_limit = 1000
-        self.portal = ['104.42.195.92',
-                       '40.76.54.131',
-                       '52.176.6.30',
-                       '52.169.50.45',
-                       '52.187.184.26']
-        self.azure_cloud = ['0.0.0.0']
 
     def _process_resource(self, resource):
 
@@ -654,19 +736,19 @@ class CosmosSetFirewallAction(SetFirewallAction):
         #  instead the portal UI adds values to your
         #  rules filter when you check the bypass box.
         existing_bypass = []
-        if set(self.azure_cloud).issubset(existing_ip):
+        if set(AZURE_CLOUD_IPS).issubset(existing_ip):
             existing_bypass.append('AzureCloud')
 
-        if set(self.portal).issubset(existing_ip):
+        if set(PORTAL_IPS).issubset(existing_ip):
             existing_bypass.append('Portal')
 
         # If unset, then we put the old values back in to emulate patch behavior
         bypass_rules = self.data.get('bypass-rules', existing_bypass)
 
         if 'Portal' in bypass_rules:
-            ip_rules.extend(set(self.portal).difference(ip_rules))
+            ip_rules.extend(set(PORTAL_IPS).difference(ip_rules))
         if 'AzureCloud' in bypass_rules:
-            ip_rules.extend(set(self.azure_cloud).difference(ip_rules))
+            ip_rules.extend(set(AZURE_CLOUD_IPS).difference(ip_rules))
 
         # If the user has too many rules raise exception
         if len(ip_rules) > self.rule_limit:

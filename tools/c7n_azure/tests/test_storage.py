@@ -13,16 +13,18 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from azure.mgmt.storage.models import StorageAccountUpdateParameters
 from azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.resources.storage import StorageSettingsUtilities
+from c7n_azure.resources.storage import StorageSettingsUtilities, StorageFirewallRulesFilter
+from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
-from mock import patch, MagicMock
+from mock import patch, MagicMock, Mock
 
 from c7n.utils import get_annotation_prefix
 from c7n.utils import local_session
-from c7n_azure.session import Session
-from azure.mgmt.storage.models import StorageAccountUpdateParameters
+
+from netaddr import IPSet
 
 
 class StorageTest(BaseTest):
@@ -573,3 +575,22 @@ class StorageTest(BaseTest):
         return local_session(Session)\
             .client('azure.mgmt.storage.StorageManagementClient')\
             .DEFAULT_API_VERSION.replace("-", "_")
+
+
+class StorageFirewallFilterTest(BaseTest):
+
+    def test_query_default_allow(self):
+        resource = {'properties': {'networkAcls': {'defaultAction': 'Allow'}}}
+        expected = IPSet(['0.0.0.0/0'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_default_deny(self):
+        resource = {'properties': {'networkAcls': {'defaultAction': 'Deny',
+                                                   'ipRules': [{'value': '10.0.0.0/16'},
+                                                               {'value': '8.8.8.8'}]}}}
+        expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def _get_filter(self, mode='equal'):
+        data = {mode: ['10.0.0.0/8', '127.0.0.1']}
+        return StorageFirewallRulesFilter(data, Mock())
