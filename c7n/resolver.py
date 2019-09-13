@@ -54,7 +54,7 @@ class URIResolver(object):
 
     def handle_response_encoding(self, response):
         if not self.is_compressed_file(response):
-            return response.decode('utf-8')
+            return response.read().decode('utf-8')
 
         data = zlib.decompress(response.read(),
                                ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')

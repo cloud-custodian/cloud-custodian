@@ -75,10 +75,9 @@ class ResolverTest(BaseTest):
         self.assertEqual(content, data)
         self.assertEqual(list(cache.state.keys()), [("uri-resolver", uri)])
 
-    def test_handle_content_encoding(self):
-        session_factory = self.replay_flight_data("test_s3_resolver")
+    def test_handle_content_encoding_http(self):
         cache = FakeCache()
-        resolver = URIResolver(session_factory, cache)
+        resolver = URIResolver(None, cache)
         uri = "http://httpbin.org/gzip"
         with vcr.use_cassette('tests/data/vcr_cassettes/test_resolver.yaml'):
             response = urlopen(uri)
@@ -97,6 +96,20 @@ class ResolverTest(BaseTest):
             fh.flush()
             self.assertEqual(resolver.resolve("file:%s" % fh.name), content)
 
+    def test_resolve_file_gzip(self):
+        cache = FakeCache()
+        resolver = URIResolver(None, cache)
+        path = os.path.join(
+            os.path.dirname(__file__),
+            "data",
+            "config",
+            "gzip-test-data.json.gz",
+        )
+        uri = "file://%s" % path
+        response = urlopen(uri)
+        content = resolver.handle_response_encoding(response)
+        data = json.loads(content)
+        self.assertEqual(len(data.keys()), 1)
 
 class UrlValueTest(BaseTest):
 
