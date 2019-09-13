@@ -55,9 +55,9 @@ class WebAppTest(BaseTest):
                 {
                     'type': 'value',
                     'key': 'name',
-                    'op': 'eq',
+                    'op': 'glob',
                     'value_type': 'normalize',
-                    'value': 'cctestwebapp'},
+                    'value': 'cctestwebapp*'},
                 {
                     'type': 'configuration',
                     'key': 'minTlsVersion',
