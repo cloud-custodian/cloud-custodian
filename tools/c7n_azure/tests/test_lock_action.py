@@ -97,9 +97,9 @@ class LockActionTest(BaseTest):
             ],
         })
         self.resources = p.run()
-        resource_name = self.resources[0]['name']
 
         self.assertEqual(len(self.resources), 1)
+        resource_name = self.resources[0]['name']
         self.assertTrue(resource_name.startswith('cctestcosmosdb'))
 
         locks = [r.serialize(True) for r in self.client.management_locks.list_at_resource_level(
