@@ -50,7 +50,8 @@ class StorageContainer(ChildResourceManager):
         diagnostic_settings_enabled = False
         resource_type = 'Microsoft.Storage/storageAccounts/blobServices/containers'
         enable_tag_operations = False
-
+        raise_on_exception = False
+        
         @classmethod
         def extra_args(cls, parent_resource):
             return {'resource_group_name': parent_resource['resourceGroup'],
