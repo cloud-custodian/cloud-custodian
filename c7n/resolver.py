@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import csv
 import io
+import re
 import jmespath
 import json
 import os.path
@@ -52,12 +53,23 @@ class URIResolver(object):
         return contents
 
     def handle_response_encoding(self, response):
-        if response.info().get('Content-Encoding') != 'gzip':
-            return response.read().decode('utf-8')
+        if not self.is_compressed_file(response):
+            return response.decode('utf-8')
 
         data = zlib.decompress(response.read(),
                                ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')
         return data
+
+    def is_compressed_file(self, response):
+        if response.info().get('Content-Encoding') == 'gzip':
+            return True
+
+        local_file = re.findall(r'(^file?:\/\/)|(json.gz)$', response.geturl())
+        if len(local_file) == 2:
+            return True
+
+        return False
+
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
@@ -117,7 +129,7 @@ class ValuesFrom(object):
         'required': ['url'],
         'properties': {
             'url': {'type': 'string'},
-            'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
+            'format': {'enum': ['csv', 'json', 'txt', 'csv2dict', 'json.gz']},
             'expr': {'oneOf': [
                 {'type': 'integer'},
                 {'type': 'string'}]}
