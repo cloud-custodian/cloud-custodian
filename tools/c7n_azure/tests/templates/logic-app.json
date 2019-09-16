@@ -1,18 +1,15 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "name": {
-            "defaultValue": "cclogicapp",
-            "type": "String"
-        }
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "name": "[concat('cclogicapp', variables('suffix'))]"
     },
-    "variables": {},
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('name')]",
+            "name": "[variables('name')]",
             "location": "centralus",
             "properties": {
                 "state": "Enabled",

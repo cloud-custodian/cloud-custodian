@@ -133,7 +133,7 @@ class SetIamPolicy(MethodAction):
 
         :param resource: the same as in `get_resource_params`
         """
-        return {'resource': resource['name']}
+        return {'resource': resource[self.manager.resource_type.id]}
 
     def _add_bindings(self, existing_bindings, bindings_to_add):
         """

@@ -146,7 +146,6 @@ class KeyVaultStorageRegenerationPeriodFilter(ValueFilter):
     def __init__(self, *args, **kwargs):
         super(KeyVaultStorageRegenerationPeriodFilter, self).__init__(*args, **kwargs)
         self.data['key'] = '"{0}".regenerationPeriod'.format(gap('extra'))
-        self.data['op'] = 'eq'
 
 
 @KeyVaultStorage.filter_registry.register('active-key-name')

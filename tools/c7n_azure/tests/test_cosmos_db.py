@@ -16,9 +16,12 @@ from __future__ import (absolute_import, division, print_function,
 
 from azure.cosmos.cosmos_client import CosmosClient
 from azure_common import BaseTest, arm_template, cassette_name
-from c7n_azure.resources.cosmos_db import CosmosDBChildResource
+from c7n_azure.resources.cosmos_db import (CosmosDBChildResource, CosmosDBFirewallRulesFilter,
+                                           PORTAL_IPS, AZURE_CLOUD_IPS, THROUGHPUT_MULTIPLIER)
+
 from c7n_azure.session import Session
-from mock import patch
+from mock import patch, Mock
+from netaddr import IPSet
 
 from c7n.utils import local_session
 
@@ -54,9 +57,9 @@ class CosmosDBTest(BaseTest):
                 'filters': [
                     {'type': 'value',
                      'key': 'name',
-                     'op': 'eq',
+                     'op': 'glob',
                      'value_type': 'normalize',
-                     'value': 'cctestcosmosdb'}],
+                     'value': 'cctestcosmosdb*'}],
                 'actions': [
                     {'type': 'set-firewall-rules',
                      'bypass-rules': ['Portal'],
@@ -74,9 +77,9 @@ class CosmosDBTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -112,6 +115,48 @@ class CosmosDBTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('cosmosdb.json')
+    def test_collection_metrics_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-collection',
+            'filters': [
+                {'type': 'value',
+                 'key': 'id',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cccontainer'},
+                {'type': 'metric',
+                 'metric': 'TotalRequests',
+                 'op': 'le',
+                 'aggregation': 'average',
+                 'threshold': 1000}
+            ]
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('cosmosdb.json')
+    def test_database_metrics_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-cosmosdb',
+            'resource': 'azure.cosmosdb-database',
+            'filters': [
+                {'type': 'value',
+                 'key': 'id',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestcdatabase'},
+                {'type': 'metric',
+                 'metric': 'TotalRequests',
+                 'op': 'le',
+                 'aggregation': 'average',
+                 'threshold': 1000}
+            ]
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('cosmosdb.json')
     @cassette_name('firewall')
     def test_firewall_rules_include(self):
         p = self.load_policy({
@@ -122,7 +167,6 @@ class CosmosDBTest(BaseTest):
                  'include': ['3.1.1.1']}],
         }, validate=True)
         resources = p.run()
-        print(resources)
         self.assertEqual(1, len(resources))
 
     @arm_template('cosmosdb.json')
@@ -191,19 +235,75 @@ class CosmosDBTest(BaseTest):
         collections = p.run()
         self.assertEqual(len(collections), 1)
 
+        account_name = collections[0]['c7n:parent']['name']
+
+        self.sleep_in_live_mode()
+
         client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
-        cosmos_account = client.database_accounts.get('test_cosmosdb', 'cctestcosmosdb')
+        cosmos_account = client.database_accounts.get('test_cosmosdb', account_name)
         self.assertTrue('test-store-throughput' in cosmos_account.tags)
 
         tag_value = cosmos_account.tags['test-store-throughput']
         expected_throughput = collections[0]['c7n:offer']['content']['offerThroughput']
-        expected_tag_value = '{}:{}'.format(collections[0]['_rid'], expected_throughput)
+        expected_scaled_throughput = int(expected_throughput / THROUGHPUT_MULTIPLIER)
+        expected_tag_value = '{}:{}'.format(collections[0]['_rid'], expected_scaled_throughput)
         self.assertEqual(expected_tag_value, tag_value)
+
+
+class CosmosDBFirewallFilterTest(BaseTest):
+
+    def test_query_firewall_disabled(self):
+        resource = {'properties': {'ipRangeFilter': '', 'isVirtualNetworkFilterEnabled': False}}
+        expected = IPSet(['0.0.0.0/0'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_block_everything(self):
+        resource = {'properties': {'ipRangeFilter': '', 'isVirtualNetworkFilterEnabled': True}}
+        expected = IPSet()
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_regular(self):
+        resource = {'properties': {'ipRangeFilter': '10.0.0.0/16,8.8.8.8',
+                                   'isVirtualNetworkFilterEnabled': True}}
+        expected = IPSet(['10.0.0.0/16', '8.8.8.8'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_regular_plus_portal(self):
+        extra = ','.join(PORTAL_IPS)
+        resource = {'properties': {'ipRangeFilter': extra + ',10.0.0.0/16,8.8.8.8',
+                                   'isVirtualNetworkFilterEnabled': True}}
+        expected = IPSet(['10.0.0.0/16', '8.8.8.8'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_regular_plus_cloud(self):
+        extra = ', '.join(AZURE_CLOUD_IPS)
+        resource = {'properties': {'ipRangeFilter': extra + ',10.0.0.0/16,8.8.8.8',
+                                   'isVirtualNetworkFilterEnabled': True}}
+        expected = IPSet(['10.0.0.0/16', '8.8.8.8'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_regular_plus_portal_cloud(self):
+        extra = ','.join(PORTAL_IPS + AZURE_CLOUD_IPS)
+        resource = {'properties': {'ipRangeFilter': extra + ',10.0.0.0/16,8.8.8.8',
+                                   'isVirtualNetworkFilterEnabled': True}}
+        expected = IPSet(['10.0.0.0/16', '8.8.8.8'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_regular_plus_partial_cloud(self):
+        extra = ','.join(PORTAL_IPS[1:])
+        resource = {'properties': {'ipRangeFilter': extra + ',10.0.0.0/16,8.8.8.8',
+                                   'isVirtualNetworkFilterEnabled': True}}
+        expected = IPSet(['10.0.0.0/16', '8.8.8.8'] + PORTAL_IPS[1:])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def _get_filter(self, mode='equal'):
+        data = {mode: ['10.0.0.0/8', '127.0.0.1']}
+        return CosmosDBFirewallRulesFilter(data, Mock())
 
 
 class CosmosDBFirewallActionTest(BaseTest):
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
@@ -214,9 +314,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'ip-rules': ['0.0.0.0/1', '11.12.13.14', '21.22.23.24']
@@ -236,7 +336,7 @@ class CosmosDBFirewallActionTest(BaseTest):
                 '104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26'.split(',')),
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
@@ -247,9 +347,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'append': False,
@@ -270,7 +370,7 @@ class CosmosDBFirewallActionTest(BaseTest):
                 '52.176.6.30,52.169.50.45,52.187.184.26'.split(',')),
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
@@ -281,9 +381,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'append': False,
@@ -313,7 +413,7 @@ class CosmosDBFirewallActionTest(BaseTest):
              },
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
@@ -324,9 +424,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'append': False,
@@ -347,7 +447,7 @@ class CosmosDBFirewallActionTest(BaseTest):
             {'21.22.23.24'},
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
 
-    @patch('azure.mgmt.cosmosdb.operations.database_accounts_operations.'
+    @patch('azure.mgmt.cosmosdb.operations._database_accounts_operations.'
            'DatabaseAccountsOperations.create_or_update')
     @cassette_name('firewall_action')
     @arm_template('cosmosdb.json')
@@ -358,9 +458,9 @@ class CosmosDBFirewallActionTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'cctestcosmosdb'}],
+                 'value': 'cctestcosmosdb*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
                  'append': True,
@@ -390,10 +490,12 @@ class CosmosDBThroughputActionsTest(BaseTest):
     def setUp(self, *args, **kwargs):
         super(CosmosDBThroughputActionsTest, self).setUp(*args, **kwargs)
         self.client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
+        sub_id = local_session(Session).get_subscription_id()[-12:]
+        account_name = "cctestcosmosdb%s" % sub_id
         key = CosmosDBChildResource.get_cosmos_key(
-            'test_cosmosdb', 'cctestcosmosdb', self.client, readonly=False)
+            'test_cosmosdb', account_name, self.client, readonly=False)
         self.data_client = CosmosClient(
-            url_connection='https://cctestcosmosdb.documents.azure.com:443/',
+            url_connection='https://%s.documents.azure.com:443/' % account_name,
             auth={
                 'masterKey': key
             }
@@ -503,7 +605,8 @@ class CosmosDBThroughputActionsTest(BaseTest):
         self._assert_offer_throughput_equals(throughput_to_restore, collections[0]['_self'])
 
     def _assert_offer_throughput_equals(self, throughput, resource_self):
+        self.sleep_in_live_mode()
         offers = self.data_client.ReadOffers()
         offer = next((o for o in offers if o['resource'] == resource_self), None)
         self.assertIsNotNone(offer)
-        self.assertEqual(offer['content']['offerThroughput'], throughput)
+        self.assertEqual(throughput, offer['content']['offerThroughput'])

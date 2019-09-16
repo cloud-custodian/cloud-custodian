@@ -29,6 +29,15 @@ spec:
         - name: {{ $name }}
           value: {{ $value }}
         {{- end }}
+        envFrom:
+          {{- if $.Values.defaultSecretEnvironment }}
+          - secretRef:
+              name: "{{ $.Release.Name }}-default-secret-environment"
+          {{- end }}
+          {{- if $host.secretEnvironment }}
+          - secretRef:
+              name: "{{ $host.name }}-secret-environment"
+          {{- end }}
         command: 
           - "/usr/local/bin/python3"
         args:

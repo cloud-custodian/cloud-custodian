@@ -52,10 +52,12 @@ class ActionsTagTest(BaseTest):
             'actions': [
                 {'type': 'tag',
                  'tag': {
-                     'resource': 'name'
+                     'type': 'resource',
+                     'key': 'name'
                  },
                  'value': {
-                     'resource': 'name'
+                     'type': 'resource',
+                     'key': 'name'
                  }},
             ]
         }, validate=True))
@@ -122,10 +124,12 @@ class ActionsTagTest(BaseTest):
         action = self._get_action(
             {
                 'tag': {
-                    'resource': 'name'
+                    'type': 'resource',
+                    'key': 'name'
                 },
                 'value': {
-                    'resource': 'type'
+                    'type': 'resource',
+                    'key': 'type'
                 }
             })
 
@@ -149,11 +153,13 @@ class ActionsTagTest(BaseTest):
         action = self._get_action(
             {
                 'tag': {
-                    'resource': 'doesnotexist',
+                    'type': 'resource',
+                    'key': 'doesnotexist',
                     'default-value': 'default_tag'
                 },
                 'value': {
-                    'resource': 'doesnotexist',
+                    'type': 'resource',
+                    'key': 'doesnotexist',
                     'default-value': 'default_value'
                 }
             })

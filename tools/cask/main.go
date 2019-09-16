@@ -33,9 +33,11 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/mattn/go-isatty"
 	"github.com/thoas/go-funk"
 )
 
@@ -44,11 +46,13 @@ const defaultImageName string = "cloudcustodian/c7n:latest"
 const imageOverrideEnv = "CUSTODIAN_IMAGE"
 const updateInterval = time.Hour
 
+var version string
+
 func main() {
 	// Select image from env or default
 	activeImage := getDockerImageName()
 
-	fmt.Printf("Custodian Cask (%v)\n", activeImage)
+	fmt.Printf("Custodian Cask %v (%v)\n", version, activeImage)
 
 	ctx := context.Background()
 
@@ -87,9 +91,29 @@ func update(ctx context.Context, image string, dockerClient *client.Client) {
 	// Check if there is a marker indicating last pull for this image
 	info, err := os.Stat(updateMarker)
 
+	// If the marker file is not expired
 	if err == nil && info.ModTime().Add(updateInterval).After(now) {
-		fmt.Printf("Skipped image pull - Last checked %d minutes ago.\n\n", uint(now.Sub(info.ModTime()).Minutes()))
-		return
+
+		// Query the existing image list for matches
+		listFilters := filters.NewArgs()
+		listFilters.Add("reference", defaultImageName)
+
+		listOptions := types.ImageListOptions{
+			All:     true,
+			Filters: listFilters,
+		}
+
+		images, err := dockerClient.ImageList(ctx, listOptions)
+		if err != nil {
+			log.Printf("Failed to enumerate docker images. %v", err)
+		}
+
+		// Skip image pull if we have an image already
+		if len(images) > 0 {
+			fmt.Printf("Skipped image pull - Last checked %d minutes ago.\n\n",
+				uint(now.Sub(info.ModTime()).Minutes()))
+			return
+		}
 	}
 
 	// Pull the image
@@ -97,7 +121,8 @@ func update(ctx context.Context, image string, dockerClient *client.Client) {
 	if err != nil {
 		log.Printf("Image Pull failed, will use cached image if available. %v", err)
 	} else {
-		_ = jsonmessage.DisplayJSONMessagesStream(out, os.Stdout, 1, true, nil)
+		isTerm := isatty.IsTerminal(os.Stdout.Fd())
+		_ = jsonmessage.DisplayJSONMessagesStream(out, os.Stdout, 1, isTerm, nil)
 	}
 
 	// Touch the marker file

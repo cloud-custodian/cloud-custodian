@@ -3,6 +3,7 @@
   "contentVersion": "1.0.0.0",
 
   "variables": {
+    "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
     "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'salinuxvm')]",
     "imagePublisher": "Canonical",
     "imageOffer": "UbuntuServer",
@@ -39,7 +40,7 @@
       "properties": {
         "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
         "dnsSettings": {
-          "domainNameLabel": "cctestvm"
+          "domainNameLabel": "[concat('cctestvm', variables('suffix'))]"
         }
       }
     },

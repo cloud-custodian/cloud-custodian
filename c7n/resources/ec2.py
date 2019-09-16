@@ -29,7 +29,7 @@ import jmespath
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 )
-from c7n.actions.securityhub import PostFinding
+
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase
@@ -39,9 +39,10 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query, utils
-from c7n.resources.iam import CheckPermissions
 from c7n.utils import type_schema, filter_empty
 
+from c7n.resources.iam import CheckPermissions
+from c7n.resources.securityhub import PostFinding
 
 RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
 
@@ -1866,9 +1867,16 @@ class LaunchTemplate(query.QueryResourceManager):
         results = []
         # We may end up fetching duplicates on $Latest and $Version
         for tid, tversions in t_versions.items():
-            ltv = client.describe_launch_template_versions(
-                LaunchTemplateId=tid, Versions=tversions).get(
-                    'LaunchTemplateVersions')
+            try:
+                ltv = client.describe_launch_template_versions(
+                    LaunchTemplateId=tid, Versions=tversions).get(
+                        'LaunchTemplateVersions')
+            except ClientError as e:
+                if e.response['Error']['Code'] == "InvalidLaunchTemplateId.NotFound":
+                    continue
+                if e.response['Error']['Code'] == "InvalidLaunchTemplateId.VersionNotFound":
+                    continue
+                raise
             if not tversions:
                 tversions = [str(t['VersionNumber']) for t in ltv]
             for tversion, t in zip(tversions, ltv):

@@ -156,7 +156,8 @@ class PolicyMeta(BaseTest):
             if arn_gen:
                 overrides.add(k)
 
-        overrides = overrides.difference(set(('account', 's3', 'hostedzone', 'log-group')))
+        overrides = overrides.difference(set(
+            ('account', 's3', 'hostedzone', 'log-group', 'rest-api')))
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -224,7 +225,7 @@ class PolicyMeta(BaseTest):
         names = self._visit_filters_and_actions(visitor)
         if names:
             self.fail(
-                "missing additionalProperties: Fallse on actions/filters\n %s" % (
+                "missing additionalProperties: False on actions/filters\n %s" % (
                     " \n".join(names)))
 
     def test_filter_action_type(self):

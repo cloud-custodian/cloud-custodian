@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicated/config/publishingcredentials/list?api-version=2018-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicatedc129bfa71a47/config/publishingcredentials/list?api-version=2018-11-01",
                 "body": null,
                 "headers": {}
             },
@@ -14,37 +14,37 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "11999"
-                    ],
                     "date": [
-                        "Mon, 22 Jul 2019 15:17:53 GMT"
+                        "Fri, 13 Sep 2019 22:07:28 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11998"
+                    ],
                     "content-length": [
-                        "762"
+                        "834"
                     ]
                 },
                 "body": {
                     "data": {
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicated/publishingcredentials/$cloud-custodian-test-dedicated",
-                        "name": "cloud-custodian-test-dedicated",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicatedc129bfa71a47/publishingcredentials/$cloud-custodian-test-dedicatedc129bfa71a47",
+                        "name": "cloud-custodian-test-dedicatedc129bfa71a47",
                         "type": "Microsoft.Web/sites/publishingcredentials",
                         "location": "South Central US",
                         "properties": {
                             "name": null,
-                            "publishingUserName": "$cloud-custodian-test-dedicated",
-                            "publishingPassword": "zhsZP0jmr4Ry0TPhdn079a8B6YRPjnHEgg3fewKdNAYadPPjbyyoaoZlBok5",
+                            "publishingUserName": "$cloud-custodian-test-dedicatedc129bfa71a47",
+                            "publishingPassword": "dbB2cxzBD27CacXmai6nhoZfhD9HhBa7TLW93muARxHp4s6l4ajhhfrLzEGm",
                             "publishingPasswordHash": null,
                             "publishingPasswordHashSalt": null,
                             "metadata": null,
                             "isDeleted": false,
-                            "scmUri": "https://$cloud-custodian-test-dedicated:zhsZP0jmr4Ry0TPhdn079a8B6YRPjnHEgg3fewKdNAYadPPjbyyoaoZlBok5@cloud-custodian-test-dedicated.scm.azurewebsites.net"
+                            "scmUri": "https://$cloud-custodian-test-dedicatedc129bfa71a47:dbB2cxzBD27CacXmai6nhoZfhD9HhBa7TLW93muARxHp4s6l4ajhhfrLzEGm@cloud-custodian-test-dedicatedc129bfa71a47.scm.azurewebsites.net"
                         }
                     }
                 }
@@ -53,7 +53,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://cloud-custodian-test-dedicated.scm.azurewebsites.net/api/deployments",
+                "uri": "https://cloud-custodian-test-dedicatedc129bfa71a47.scm.azurewebsites.net/api/deployments",
                 "body": null,
                 "headers": {}
             },
@@ -63,17 +63,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
                     "date": [
-                        "Mon, 22 Jul 2019 15:17:54 GMT"
+                        "Fri, 13 Sep 2019 22:08:36 GMT"
                     ],
                     "set-cookie": [
-                        "ARRAffinity=05b861ebe79164f1c3419b2df70ed06db5899d9a39895e36c9e927e50da322ed;Path=/;HttpOnly;Domain=cloud-custodian-test-dedicated.scm.azurewebsites.net"
+                        "ARRAffinity=801dcea84801119dfe0a0198d0d0a04dd3c698f312730808e7b1551de2ad661f;Path=/;HttpOnly;Domain=cloud-custodian-test-dedicatede3da21c66828.scm.azurewebsites.net"
                     ],
                     "etag": [
-                        "\"ffffffffc4021e9a\""
+                        "\"4e9c0286\""
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "content-length": [
                         "2"

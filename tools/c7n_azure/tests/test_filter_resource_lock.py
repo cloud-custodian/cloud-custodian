@@ -39,11 +39,11 @@ class ResourceLockFilter(BaseTest):
         }, validate=True)
         self.assertTrue(p)
 
-    @arm_template('keyvault.json')
+    @arm_template('locked.json')
     def test_find_by_lock(self):
         p = self.load_policy({
             'name': 'test-lock-filter',
-            'resource': 'azure.keyvault',
+            'resource': 'azure.disk',
             'filters': [
                 {'type': 'resource-lock',
                  'lock-type': 'ReadOnly'}
@@ -54,7 +54,7 @@ class ResourceLockFilter(BaseTest):
 
         p = self.load_policy({
             'name': 'test-lock-filter',
-            'resource': 'azure.keyvault',
+            'resource': 'azure.disk',
             'filters': [
                 {'type': 'resource-lock',
                  'lock-type': 'CanNotDelete'}
@@ -63,12 +63,12 @@ class ResourceLockFilter(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @arm_template('keyvault.json')
+    @arm_template('locked.json')
     def test_find_by_lock_type_any(self):
 
         p = self.load_policy({
             'name': 'test-lock-filter',
-            'resource': 'azure.keyvault',
+            'resource': 'azure.disk',
             'filters': [
                 {'type': 'resource-lock'}
             ]
@@ -78,7 +78,7 @@ class ResourceLockFilter(BaseTest):
 
         p = self.load_policy({
             'name': 'test-lock-filter',
-            'resource': 'azure.keyvault',
+            'resource': 'azure.disk',
             'filters': [
                 {'type': 'resource-lock',
                  'lock-type': 'Any'}

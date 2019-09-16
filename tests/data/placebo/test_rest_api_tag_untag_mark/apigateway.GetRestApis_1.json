@@ -1,0 +1,43 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "b06e46db-d963-4191-8f90-9687782e267b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 09 Sep 2019 19:59:04 GMT",
+                "content-type": "application/json",
+                "content-length": "1160",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "b06e46db-d963-4191-8f90-9687782e267b",
+                "x-amz-apigw-id": "fxBJXKOKIAMEdJQ="
+            },
+            "RetryAttempts": 0
+        },
+        "items": [
+            {
+                "id": "dj7uijzv27",
+                "name": "c7n-test-pratyush",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 9,
+                    "hour": 0,
+                    "minute": 43,
+                    "second": 51,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "PRIVATE"
+                    ]
+                },
+                "tags": {
+                    "target-tag": "pratyush"
+                }
+            }
+        ]
+    }
+}

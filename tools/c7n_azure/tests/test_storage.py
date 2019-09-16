@@ -13,14 +13,18 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from azure.mgmt.storage.models import StorageAccountUpdateParameters
 from azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.resources.storage import StorageSettingsUtilities
+from c7n_azure.resources.storage import StorageSettingsUtilities, StorageFirewallRulesFilter
+from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
-from mock import patch, MagicMock
+from mock import patch, MagicMock, Mock
 
 from c7n.utils import get_annotation_prefix
 from c7n.utils import local_session
+
+from netaddr import IPSet
 
 
 class StorageTest(BaseTest):
@@ -539,3 +543,54 @@ class StorageTest(BaseTest):
             BLOB_TYPE, mock_storage_account, log_settings, token=mock_token)
 
         mock_set_blob_properties.assert_called_once()
+
+    def test_storage_settings_require_secure_transfer(self):
+        with patch('azure.mgmt.storage.v%s.operations.'
+        '_storage_accounts_operations.StorageAccountsOperations.update'
+        % self._get_storage_management_client_api_string()) as update_storage_mock:
+            p = self.load_policy({
+                'name': 'my-first-policy',
+                'resource': 'azure.storage',
+                'filters': [
+                    {'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cctstorage*'}
+                ],
+                'actions': [
+                    {'type': 'require-secure-transfer',
+                    'value': True}
+                ]
+            })
+            p.run()
+            args = update_storage_mock.call_args_list[0][0]
+
+            self.assertEqual(args[0], 'test_storage')
+            self.assertTrue(args[1].startswith('cctstorage'))
+            self.assertEqual(args[2],
+                StorageAccountUpdateParameters(enable_https_traffic_only=True))
+
+    def _get_storage_management_client_api_string(self):
+        return local_session(Session)\
+            .client('azure.mgmt.storage.StorageManagementClient')\
+            .DEFAULT_API_VERSION.replace("-", "_")
+
+
+class StorageFirewallFilterTest(BaseTest):
+
+    def test_query_default_allow(self):
+        resource = {'properties': {'networkAcls': {'defaultAction': 'Allow'}}}
+        expected = IPSet(['0.0.0.0/0'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_default_deny(self):
+        resource = {'properties': {'networkAcls': {'defaultAction': 'Deny',
+                                                   'ipRules': [{'value': '10.0.0.0/16'},
+                                                               {'value': '8.8.8.8'}]}}}
+        expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def _get_filter(self, mode='equal'):
+        data = {mode: ['10.0.0.0/8', '127.0.0.1']}
+        return StorageFirewallRulesFilter(data, Mock())

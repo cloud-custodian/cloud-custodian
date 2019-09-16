@@ -140,9 +140,10 @@ class StorageSetFirewallAction(SetFirewallAction):
         }
     )
 
+    log = logging.getLogger('custodian.azure.storage.StorageSetFirewallAction')
+
     def __init__(self, data, manager=None):
         super(StorageSetFirewallAction, self).__init__(data, manager)
-        self._log = logging.getLogger('custodian.azure.storage')
         self.rule_limit = 200
 
     def _process_resource(self, resource):
@@ -190,17 +191,14 @@ class StorageFirewallRulesFilter(FirewallRulesFilter):
 
     def __init__(self, data, manager=None):
         super(StorageFirewallRulesFilter, self).__init__(data, manager)
-        self._log = logging.getLogger('custodian.azure.storage')
-
-    @property
-    def log(self):
-        return self._log
 
     def _query_rules(self, resource):
 
-        ip_rules = resource['properties']['networkAcls']['ipRules']
-
-        resource_rules = IPSet([r['value'] for r in ip_rules])
+        if resource['properties']['networkAcls']['defaultAction'] == 'Deny':
+            ip_rules = resource['properties']['networkAcls']['ipRules']
+            resource_rules = IPSet([r['value'] for r in ip_rules])
+        else:
+            resource_rules = IPSet(['0.0.0.0/0'])
 
         return resource_rules
 
@@ -288,10 +286,11 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
                              'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]}}
                          )
 
+    log = logging.getLogger('custodian.azure.storage.StorageDiagnosticSettingsFilter')
+
     def __init__(self, data, manager=None):
         super(StorageDiagnosticSettingsFilter, self).__init__(data, manager)
         self.storage_type = data.get('storage-type')
-        self.log = logging.getLogger('custodian.azure.storage')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
@@ -379,13 +378,13 @@ class SetLogSettingsAction(AzureBaseAction):
                              'retention': {'type': 'number'}
                          }
                          )
+    log = logging.getLogger('custodian.azure.storage.SetLogSettingsAction')
 
     def __init__(self, data, manager=None):
         super(SetLogSettingsAction, self).__init__(data, manager)
         self.storage_types = data['storage-types']
         self.logs_to_enable = data['log']
         self.retention = data['retention']
-        self.log = logging.getLogger('custodian.azure.storage')
         self.token = None
 
     def validate(self):
@@ -465,3 +464,44 @@ class StorageSettingsUtilities(object):
 
         return getattr(client, 'set_{}_service_properties'
                        .format(storage_type))(logging=logging_settings)
+
+
+@Storage.action_registry.register('require-secure-transfer')
+class RequireSecureTransferAction(AzureBaseAction):
+    """Action that updates the Secure Transfer setting on Storage Accounts.
+    Programmatically, this will be seen by updating the EnableHttpsTrafficOnly setting
+
+    :example:
+
+       Turns on Secure transfer required for all storage accounts. This will reject requests that
+       use HTTP to your storage accounts.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: require-secure-transfer
+              resource: azure.storage
+              actions:
+              - type: require-secure-transfer
+                value: True
+    """
+
+    # Default to true assuming user wants secure connection
+    schema = type_schema(
+        'require-secure-transfer',
+        **{
+            'value': {'type': 'boolean', "default": True},
+        })
+
+    def __init__(self, data, manager=None):
+        super(RequireSecureTransferAction, self).__init__(data, manager)
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.storage_accounts.update(
+            resource['resourceGroup'],
+            resource['name'],
+            StorageAccountUpdateParameters(enable_https_traffic_only=self.data.get('value'))
+        )

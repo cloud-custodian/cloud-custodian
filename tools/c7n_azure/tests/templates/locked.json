@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "diskName": {
+            "defaultValue": "[concat('cctestlockfilterdisk', uniqueString(resourceGroup().id))]",
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2019-03-01",
+            "type": "Microsoft.Compute/disks",
+            "name": "[parameters('diskName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": 32
+            },
+            "dependsOn": []
+        },
+        {	
+            "name": "cctestlockfilter",	
+            "type": "Microsoft.Authorization/locks",	
+            "apiVersion": "2016-09-01",	
+            "dependsOn": [	
+                "[resourceId('Microsoft.Compute/disks', parameters('diskName'))]"	
+            ],	
+            "properties": {	
+                "level": "CanNotDelete",	
+                "notes": "This lock is for the cc test_filter_resource_lock test"	
+            }
+        }
+    ]
+}

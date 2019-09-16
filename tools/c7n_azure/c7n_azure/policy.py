@@ -19,18 +19,18 @@ import sys
 import six
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
+from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
+from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE,
+                                 RESOURCE_GROUPS_TYPE)
+from c7n_azure.function_package import FunctionPackage
+from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
 from c7n.actions import EventAction
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
 from c7n.utils import local_session
-from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
-from c7n_azure.function_package import FunctionPackage
-from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE,
-                                 FUNCTION_TIME_TRIGGER_MODE)
-from c7n_azure.functionapp_utils import FunctionAppUtilities
-from c7n_azure.storage_utils import StorageUtilities
-from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -99,10 +99,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     default_storage_name = "custodian"
 
-    def __init__(self, policy):
+    log = logging.getLogger('custodian.azure.policy.AzureFunctionMode')
 
+    def __init__(self, policy):
         self.policy = policy
-        self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
         self.function_params = None
         self.function_app = None
@@ -241,7 +241,9 @@ class AzureModeCommon:
         """
         expected_type = policy.resource_manager.resource_type.resource_type
 
-        if expected_type == 'Microsoft.Resources/subscriptions/resourceGroups':
+        if expected_type == 'armresource':
+            return event['subject']
+        elif expected_type == RESOURCE_GROUPS_TYPE:
             extract_regex = '/subscriptions/[^/]+/resourceGroups/[^/]+'
         else:
             types = expected_type.split('/')
@@ -293,8 +295,19 @@ class AzureModeCommon:
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
     """A policy that runs/execute s in azure functions at specified
     time intervals."""
+    # Based on NCRONTAB used by Azure Functions:
+    # https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer
+    schedule_regex = (r'^\s?([0-5]?[0-9]|\,|(\*\/)|\-)+ '
+                      r'(\*|[0-5]?[0-9]|\,|\/|\-)+ '
+                      r'(\*|[0-9]|(1[0-9])|(2[0-3])|\,|\/|\-)+ '
+                      r'(\*|[1-9]|([1-2][0-9])|(3[0-1])|\,|\*\/|\-)+ '
+                      r'([Jj](an|anuary)|[Ff](eb|ebruary)|[Mm](ar|arch)|[Aa](pr|pril)|[Mm]ay|'
+                      r'[Jj](un|une)|[Jj](ul|uly)|[Aa](ug|ugust)|[Ss](ep|eptember)|[Oo](ct'
+                      r'|ctober)|[Nn](ov|ovember)|[Dd](ec|ecember)|\,|\*\/|[1-9]|(1[0-2])|\*)+ '
+                      r'([Mm](on|onday)|[Tt](u|ue|ues|uesday)|[Ww](ed|ednesday)|[Tt](hu|hursday)|'
+                      r'[Ff](ri|riday)|[Ss](at|aturday)|[Ss](un|unday)|[0-6]|\,|\*|\-)+\s?$')
     schema = utils.type_schema(FUNCTION_TIME_TRIGGER_MODE,
-                               schedule={'type': 'string'},
+                               schedule={'type': 'string', 'pattern': schedule_regex},
                                rinherit=AzureFunctionMode.schema)
 
     def provision(self):
@@ -317,15 +330,16 @@ class AzureEventGridMode(AzureFunctionMode):
     azure event."""
 
     schema = utils.type_schema(FUNCTION_EVENT_TRIGGER_MODE,
-                               events={'type': 'array', 'items': {
-                                   'oneOf': [
-                                       {'type': 'string'},
-                                       {'type': 'object',
-                                        'required': ['resourceProvider', 'event'],
-                                        'properties': {
-                                            'resourceProvider': {'type': 'string'},
-                                            'event': {'type': 'string'}}}]
-                               }},
+                               events={'type': 'array',
+                                    'maxItems': 5,
+                                    'items': {
+                                        'oneOf': [
+                                            {'type': 'string'},
+                                            {'type': 'object',
+                                                'required': ['resourceProvider', 'event'],
+                                                'properties': {
+                                                    'resourceProvider': {'type': 'string'},
+                                                    'event': {'type': 'string'}}}]}},
                                required=['events'],
                                rinherit=AzureFunctionMode.schema)
 
