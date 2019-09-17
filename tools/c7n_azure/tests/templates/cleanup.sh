@@ -32,6 +32,8 @@ delete_resource() {
         token=$(az account get-access-token --query accessToken --output tsv)
         url=https://management.azure.com/subscriptions/${AZURE_SUBSCRIPTION_ID}/providers/Microsoft.CostManagement/exports/cccostexport?api-version=2019-01-01
         curl -X DELETE -H "Authorization: Bearer ${token}" ${url}
+    elif [[ "$fileName" == "locked.json" ]]; then
+        az lock delete --name cctestlockfilter --resource-group $rgName
     fi
 
     az group delete --name $rgName --yes --output None

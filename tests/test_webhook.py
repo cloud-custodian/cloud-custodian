@@ -19,6 +19,7 @@ import mock
 from c7n.actions.webhook import Webhook
 from jsonschema.exceptions import ValidationError
 from .common import BaseTest
+import os
 
 
 class WebhookTest(BaseTest):
@@ -250,6 +251,33 @@ class WebhookTest(BaseTest):
 
         self.assertEqual("http://foo.com?policy=webhook_policy", req1['url'])
         self.assertEqual("http://foo.com?policy=webhook_policy", req2['url'])
+
+    @mock.patch('c7n.actions.webhook.urllib3.ProxyManager.request')
+    @mock.patch('c7n.actions.webhook.urllib3.PoolManager.request')
+    def test_process_with_http_proxy(self, pool_request_mock, proxy_request_mock):
+        with mock.patch.dict(os.environ,
+                             {'HTTP_PROXY': 'http://mock.http.proxy.server:8000'},
+                             clear=True):
+            resources = [
+                {
+                    "name": "test_name",
+                    "value": "test_value"
+                }
+            ]
+
+            data = {
+                "url": "http://foo.com"
+            }
+
+            wh = Webhook(data=data, manager=self._get_manager())
+            wh.process(resources)
+            proxy_req = proxy_request_mock.call_args[1]
+
+            self.assertEqual("http://foo.com", proxy_req['url'])
+            self.assertEqual("POST", proxy_req['method'])
+
+            self.assertEqual(1, proxy_request_mock.call_count)
+            self.assertEqual(0, pool_request_mock.call_count)
 
     def _get_manager(self):
         """The tests don't require real resource data

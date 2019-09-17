@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import mock
 import re
 
+import mock
 from azure_common import BaseTest, arm_template
-from jsonschema.exceptions import ValidationError
 from c7n_azure.actions.logic_app import LogicAppAction
+from c7n_azure.session import Session
+from jsonschema.exceptions import ValidationError
+
+from c7n.utils import local_session
 
 
 class LogicAppTest(BaseTest):
@@ -101,9 +104,10 @@ class LogicAppTest(BaseTest):
             }
         ]
 
+        suffix = local_session(Session).get_subscription_id()[-12:]
         data = {
             "resource-group": "test_logic-app",
-            "logic-app-name": "cclogicapp"
+            "logic-app-name": "cclogicapp{0}".format(suffix)
         }
 
         la = LogicAppAction(data=data, manager=self._get_manager())

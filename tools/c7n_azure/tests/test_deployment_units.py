@@ -115,7 +115,8 @@ class DeploymentUnitsTest(BaseTest):
         # provision function app
         func_params = {
             'name': 'cc-consumption-47182748',
-            'location': self.rg_location,
+            # Using different location due to http://go.microsoft.com/fwlink/?LinkId=825764
+            'location': 'eastus2',
             'resource_group_name': self.rg_name,
             'app_service_plan_id': None,  # auto-provision a dynamic app plan
             'app_insights_key': None,

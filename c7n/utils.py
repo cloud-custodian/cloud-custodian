@@ -22,15 +22,16 @@ import logging
 import os
 import random
 import re
+import sys
 import threading
 import time
+
 import six
-import sys
-
 from six.moves.urllib import parse as urlparse
+from six.moves.urllib.request import getproxies
 
-from c7n.exceptions import ClientError, PolicyValidationError
 from c7n import ipaddress, config
+from c7n.exceptions import ClientError, PolicyValidationError
 
 # Try to play nice in a serverless environment, where we don't require yaml
 
@@ -523,6 +524,24 @@ def parse_url_config(url):
         conf[k] = v[0]
     conf['url'] = url
     return conf
+
+
+def get_proxy_url(url):
+    proxies = getproxies()
+    url_parts = parse_url_config(url)
+
+    proxy_keys = [
+        url_parts['scheme'] + '://' + url_parts['netloc'],
+        url_parts['scheme'],
+        'all://' + url_parts['netloc'],
+        'all'
+    ]
+
+    for key in proxy_keys:
+        if key in proxies:
+            return proxies[key]
+
+    return None
 
 
 class FormatDate(object):

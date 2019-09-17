@@ -84,7 +84,9 @@ class LockActionTest(BaseTest):
                 {
                     'type': 'value',
                     'key': 'name',
-                    'value': 'cctestcosmosdb'
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cctestcosmosdb*'
                 }
             ],
             'actions': [
@@ -95,15 +97,17 @@ class LockActionTest(BaseTest):
             ],
         })
         self.resources = p.run()
+
         self.assertEqual(len(self.resources), 1)
-        self.assertEqual(self.resources[0]['name'], 'cctestcosmosdb')
+        resource_name = self.resources[0]['name']
+        self.assertTrue(resource_name.startswith('cctestcosmosdb'))
 
         locks = [r.serialize(True) for r in self.client.management_locks.list_at_resource_level(
             'test_cosmosdb',
             'Microsoft.DocumentDB',
             '',
             'databaseAccounts',
-            'cctestcosmosdb')]
+            resource_name)]
 
         self.assertEqual(len(locks), 1)
         self.assertEqual(locks[0]['properties']['level'], 'ReadOnly')
