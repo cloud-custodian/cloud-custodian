@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
+import uuid
 
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter
@@ -19,6 +21,9 @@ from c7n_azure.resources.arm import ArmResourceManager
 from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 
 from c7n.utils import type_schema
+
+AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')
+log = logging.getLogger('custodian.azure.cosmosdb')
 
 
 @resources.register('sqlserver')
@@ -92,10 +97,11 @@ class SqlServerFirewallRulesFilter(FirewallRulesFilter):
         resource_rules = IPSet()
 
         for r in query:
-            if r.start_ip_address == '0.0.0.0' and r.end_ip_address == '0.0.0.0':
+            rule = IPRange(r.start_ip_address, r.end_ip_address)
+            if rule == AZURE_SERVICES:
                 # Ignore 0.0.0.0 magic value representing Azure Cloud bypass
                 continue
-            resource_rules.add(IPRange(r.start_ip_address, r.end_ip_address))
+            resource_rules.add(rule)
 
         return resource_rules
 
@@ -104,7 +110,7 @@ class SqlServerFirewallRulesFilter(FirewallRulesFilter):
 class SqlSetFirewallAction(SetFirewallAction):
     """ Set Firewall Rules Action
 
-     Updates SQL Server Firewalls and Virtual Networks settings.
+     Updates SQL Server Firewall configuration.
 
      By default the firewall rules are replaced with the new values.  The ``append``
      flag can be used to force merging the new rules with the existing ones on
@@ -114,16 +120,11 @@ class SqlSetFirewallAction(SetFirewallAction):
      an IP address.  Use ``ServiceTags.`` followed by the ``name`` of any group
      from https://www.microsoft.com/en-us/download/details.aspx?id=56519.
 
-     Note that there are firewall rule number limits and that you will likely need to
-     use a regional block to fit within the limit.  The limit for storage accounts is
-     200 rules.
-
      .. code-block:: yaml
 
          - type: set-firewall-rules
                bypass-rules:
-                   - Logging
-                   - Metrics
+                   - AzureServices
                ip-rules:
                    - 11.12.13.0/16
                    - ServiceTags.AppService.CentralUS
@@ -131,38 +132,22 @@ class SqlSetFirewallAction(SetFirewallAction):
 
      :example:
 
-     Find storage accounts without any firewall rules.
-
-     Configure default-action to ``Deny`` and then allow:
-     - Azure Logging and Metrics services
-     - Two specific IPs
-     - Two subnets
+     Configure firewall to allow:
+     - Azure Services
+     - Two IP ranges
 
      .. code-block:: yaml
 
          policies:
-             - name: add-storage-firewall
-               resource: azure.storage
-
-             filters:
-                 - type: value
-                   key: properties.networkAcls.ipRules
-                   value_type: size
-                   op: eq
-                   value: 0
-
-             actions:
+             - name: add-sql-server-firewall
+               resource: azure.sqlserver
+               actions:
                  - type: set-firewall-rules
                    bypass-rules:
-                       - Logging
-                       - Metrics
+                       - AzureServices
                    ip-rules:
                        - 11.12.13.0/16
                        - 21.22.23.24
-                   virtual-network-rules:
-                       - <subnet_resource_id>
-                       - <subnet_resource_id>
-
      """
 
     schema = type_schema(
@@ -176,43 +161,70 @@ class SqlSetFirewallAction(SetFirewallAction):
 
     def __init__(self, data, manager=None):
         super(SqlSetFirewallAction, self).__init__(data, manager)
-        self.rule_limit = 1000
-        self.ip_rules = self.data.get('ip-rules')
+        self.log = log
 
     def _process_resource(self, resource):
-        if self.ip_rules is not None:
-            old_ip_rules = self.client.firewall_rules.list_by_server(
+        # Get existing rules
+        old_ip_rules = list(self.client.firewall_rules.list_by_server(
+            resource['resourceGroup'],
+            resource['name']))
+        old_ip_space = [IPRange(r.start_ip_address, r.end_ip_address) for r in old_ip_rules]
+
+        # Build new rules
+        new_ip_rules = self._build_ip_rules(old_ip_space, self.data.get('ip-rules', []))
+
+        # Normalize data types into IPNetwork and IPRange
+        new_ip_space = self._normalize_rules(new_ip_rules)
+
+        # Build bypass rules
+        # SQL uses a 0.0.0.0 rule to track "Azure Services" bypass
+        old_bypass = []
+        if AZURE_SERVICES in old_ip_space:
+            old_bypass.append('AzureServices')
+
+        new_bypass = self.data.get('bypass-rules', old_bypass)
+        if 'AzureServices' in new_bypass and AZURE_SERVICES not in new_ip_space:
+            new_ip_space.append(AZURE_SERVICES)
+
+        # Update ARM resources
+        to_remove_ip_space = set(old_ip_space).difference(new_ip_space)
+        for r in to_remove_ip_space:
+            remove = next(i for i in old_ip_rules
+                          if i.start_ip_address == str(IPAddress(r.first)) and
+                          i.end_ip_address == str(IPAddress(r.last)))
+            self.client.firewall_rules.delete(
                 resource['resourceGroup'],
-                resource['name'])
+                resource['name'],
+                remove.name
+            )
 
-            old_ip_space = [IPRange(r.start_ip_address, r.end_ip_address) for r in old_ip_rules]
-            new_ip_space = self._build_ip_rules(old_ip_space, self.data.get('ip-rules', []))
+        to_add_ip_space = set(new_ip_space).difference(old_ip_space)
+        for r in to_add_ip_space:
+            first = IPAddress(r.first)
+            last = IPAddress(r.last)
+            self.client.firewall_rules.create_or_update(
+                resource['resourceGroup'],
+                resource['name'],
+                self._generate_rule_name(r),
+                str(first),
+                str(last)
+            )
 
-            # If the user has too many rules log and skip
-            if len(new_ip_space) > self.rule_limit:
-                raise ValueError("Skipped updating firewall for %s. "
-                                 "%s exceeds maximum rule count of %s." %
-                                 (resource['name'], len(new_ip_space), self.rule_limit))
+        return 'Added {} rules, removed {} rules.'.format(
+            len(to_add_ip_space), len(to_remove_ip_space))
 
-            to_remove_ip_space = set(old_ip_space).difference(new_ip_space)
-            for r in to_remove_ip_space:
-                remove = next(i for i in old_ip_rules
-                              if i.start_ip_address == r.first and i.end_ip_address == r.last)
-                self.client.firewall_rules.delete(
-                    resource['resourceGroup'],
-                    resource['name'],
-                    remove.name
-                )
+    def _normalize_rules(self, new_ip_rules):
+        new_ip_space = []
+        for rule in new_ip_rules:
+            if '-' in rule:
+                parts = rule.split('-')
+                new_ip_space.append(IPRange(parts[0], parts[1]))
+            else:
+                net = IPNetwork(rule)
+                new_ip_space.append(IPRange(net.first, net.last))
+        return new_ip_space
 
-            to_add_ip_space = set(new_ip_space).difference(old_ip_space)
-            for r in to_add_ip_space:
-                net = IPNetwork(r)
-                first = IPAddress(net.first)
-                last = IPAddress(net.last)
-                self.client.firewall_rules.create_or_update(
-                    resource['resourceGroup'],
-                    resource['name'],
-                    "c7n-" + str(uuid.uuid4()),
-                    str(first),
-                    str(last)
-                )
+    def _generate_rule_name(self, rule):
+        if rule == AZURE_SERVICES:
+            return 'AllowAllWindowsAzureIps'
+        return "c7n-" + str(uuid.uuid4())

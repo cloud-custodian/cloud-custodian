@@ -19,6 +19,7 @@ from azure_common import BaseTest, cassette_name, arm_template
 from mock import patch, Mock
 from netaddr import IPRange, IPSet
 from c7n_azure.resources.sqlserver import SqlServerFirewallRulesFilter
+from parameterized import parameterized
 
 
 class SqlServerTest(BaseTest):
@@ -248,12 +249,51 @@ class SQLServerFirewallFilterTest(BaseTest):
         filter.client.firewall_rules.list_by_server.return_value = rules
         return filter
 
+
+class SQLServerFirewallActionTest(BaseTest):
+
+    scenarios = [
+        # ip rules, bypass rules, append, expected add, expected remove
+
+        # Replace, no bypass
+        ['replace', ['0.0.0.0/1', '11.12.13.14', '21.22.23.24'], None, False,
+         ['0.0.0.0/1', '11.12.13.14', '21.22.23.24'], ['1.2.2.128s25']],
+
+        # Replace, empty bypass
+        ['replace-empty-bypass', ['0.0.0.0/1', '10.0.0.0-10.0.255.255', '21.22.23.24'], [], False,
+         ['0.0.0.0/1', '10.0.0.0/16', '21.22.23.24'], ['1.2.2.128s25', 'AllowAllWindowsAzureIps']],
+
+        # Append new rules, no bypass
+        ['append', ['0.0.0.0/1', '11.12.13.14', '21.22.23.24'], None, True,
+         ['0.0.0.0/1', '11.12.13.14', '21.22.23.24'], []],
+
+        # Append new rules, empty bypass
+        ['append-empty-bypass', ['0.0.0.0/1', '11.12.13.14', '21.22.23.24'], [], True,
+         ['0.0.0.0/1', '11.12.13.14', '21.22.23.24'], []],
+
+        # Remove all
+        ['remove-all', [], [], False,
+         [], ['1.2.2.128s25', 'AllowAllWindowsAzureIps']],
+
+        # Only bypass
+        ['only-bypass', [], ['AzureServices'], False,
+         [], ['1.2.2.128s25']],
+
+        # Append bypass
+        ['append-bypass', [], ['AzureServices'], True,
+         [], []],
+    ]
+
+    @parameterized.expand(scenarios)
     @patch('azure.mgmt.sql.operations.firewall_rules_operations.'
            'FirewallRulesOperations.create_or_update')
+    @patch('azure.mgmt.sql.operations.firewall_rules_operations.'
+           'FirewallRulesOperations.delete')
     @cassette_name('firewall_action')
     @arm_template('sqlserver.json')
-    def test_set_ip_range_filter_replace(self, update_mock):
-        p = self.load_policy({
+    def test_action_policy(self, name, ip_rules, bypass_rules, append, expected_add,
+                           expected_remove, delete, update):
+        template = {
             'name': 'test-azure-sql-server',
             'resource': 'azure.sqlserver',
             'filters': [
@@ -264,65 +304,24 @@ class SQLServerFirewallFilterTest(BaseTest):
                  'value': 'cctestsqlserver*'}],
             'actions': [
                 {'type': 'set-firewall-rules',
-                 'append': False,
-                 'ip-rules': ['0.0.0.0/1', '11.12.13.14', '21.22.23.24']
-                 }
-            ]
-        })
+                 'append': append}]}
+
+        if bypass_rules is not None:
+            template['actions'][0]['bypass-rules'] = bypass_rules
+
+        if ip_rules is not None:
+            template['actions'][0]['ip-rules'] = ip_rules
+
+        p = self.load_policy(template)
         resources = p.run()
         self.assertEqual(1, len(resources))
 
-        # one call per IP *range*
-        self.assertEqual(3, len(update_mock.mock_calls))
-        name, args, kwargs = update_mock.mock_calls[0]
+        # Added IP's
+        added = IPSet()
+        for r in [IPRange(args[3], args[4]) for _, args, _ in update.mock_calls]:
+            added.add(r)
 
-        # verify other fields seem legitimate
-        self.assertEqual(resources[0]['resourceGroup'], args[0])
-        self.assertEqual(resources[0]['name'], args[1])
-        self.assertEqual('c7n', args[2][:3])
+        self.assertEqual(IPSet(expected_add), added)
 
-        # now check all the IP's
-        ips = IPSet()
-        for r in [IPRange(args[3], args[4]) for _, args, _ in update_mock.mock_calls]:
-            ips.add(r)
-
-        self.assertEqual(IPSet(['0.0.0.0/1', '11.12.13.14', '21.22.23.24']), ips)
-
-    @patch('azure.mgmt.sql.operations.firewall_rules_operations.'
-           'FirewallRulesOperations.create_or_update')
-    @cassette_name('firewall_action')
-    @arm_template('sqlserver.json')
-    def test_set_ip_range_filter_append(self, update_mock):
-        p = self.load_policy({
-            'name': 'test-azure-sql-server',
-            'resource': 'azure.sqlserver',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'glob',
-                 'value_type': 'normalize',
-                 'value': 'cctestsqlserver*'}],
-            'actions': [
-                {'type': 'set-firewall-rules',
-                 'ip-rules': ['0.0.0.0/1', '11.12.13.14', '21.22.23.24']
-                 }
-            ]
-        })
-        resources = p.run()
-        self.assertEqual(1, len(resources))
-
-        # one call per IP *range*
-        self.assertEqual(3, len(update_mock.mock_calls))
-        name, args, kwargs = update_mock.mock_calls[0]
-
-        # verify other fields seem legitimate
-        self.assertEqual(resources[0]['resourceGroup'], args[0])
-        self.assertEqual(resources[0]['name'], args[1])
-        self.assertEqual('c7n', args[2][:3])
-
-        # now check all the IP's
-        ips = IPSet()
-        for r in [IPRange(args[3], args[4]) for _, args, _ in update_mock.mock_calls]:
-            ips.add(r)
-
-        self.assertEqual(IPSet(['0.0.0.0/1', '11.12.13.14', '21.22.23.24']), ips)
+        # Removed IP's
+        self.assertEqual(set(expected_remove), set([args[2] for _, args, _ in delete.mock_calls]))

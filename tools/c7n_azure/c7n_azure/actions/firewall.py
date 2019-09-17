@@ -77,6 +77,7 @@ class SetFirewallAction(AzureBaseAction):
                 rules.append(rule)
 
         if self.append:
-            without_duplicates = [r for r in existing_ip if r not in rules]
-            rules.extend(without_duplicates)
+            for ip in existing_ip:
+                if str(ip) not in rules:
+                    rules.append(str(ip))
         return rules
