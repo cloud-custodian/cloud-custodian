@@ -285,9 +285,9 @@ class SQLServerFirewallActionTest(BaseTest):
     ]
 
     @parameterized.expand(scenarios)
-    @patch('azure.mgmt.sql.operations.firewall_rules_operations.'
+    @patch('azure.mgmt.sql.operations._firewall_rules_operations.'
            'FirewallRulesOperations.create_or_update')
-    @patch('azure.mgmt.sql.operations.firewall_rules_operations.'
+    @patch('azure.mgmt.sql.operations._firewall_rules_operations.'
            'FirewallRulesOperations.delete')
     @cassette_name('firewall_action')
     @arm_template('sqlserver.json')
