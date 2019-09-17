@@ -172,6 +172,8 @@ class Session(object):
             log.info("Using file for authentication parameters")
             with open(self.authorization_file) as json_file:
                 self._auth_params = json.load(json_file)
+            if self.subscription_id_override is not None:
+                self._auth_params['subscription_id'] = self.subscription_id_override
         else:
             log.info("Using environment variables for authentication parameters")
             self._auth_params = {
