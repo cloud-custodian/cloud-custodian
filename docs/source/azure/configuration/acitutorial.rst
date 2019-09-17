@@ -34,6 +34,7 @@ the custodian output files of running policies.
 
     account_key=$(az storage account keys list --account-name c7nstorage --query "[0].value" --output tsv)
     az storage container create --account-name c7nstorage --account-key $account_key --name c7n-aci-policies
+    az storage container create --account-name c7nstorage --account-key $account_key --name c7n-aci-logs
 
 3. Create a Managed Identity
 ----------------------------
@@ -63,11 +64,26 @@ storage account created above.
     az role assignment create --assignee <Managed Identity Client Id> \
         --role "Storage Queue Data Contributor" --scope <Storage Account Resource Id>
 
-4. Create the ACI Container Host
+4. Create an Application Insights Instance
+------------------------------------------
+
+We will point the container host to this Application Insights to gather logs and monitor the host
+and running policies.
+
+.. code-block:: bash
+
+    # You may need to add the application-insights extension
+    az extension add -n application-insights
+
+    az monitor app-insights component create --resource-group c7n-aci-tutorial --app c7n-aci-insights --location westus2    
+
+
+5. Create the ACI Container Host
 --------------------------------
 
 Now all of the required Azure resources should exist, and we can deploy the Container Host ARM template.
-Create a parameters file called ``c7n-aci-tutorial.json``
+Create a parameters file called ``c7n-aci-tutorial.json``.
+See the :ref:`Container Host Documentation<azure_containerhosting>` for information on filling out the environment variables.
 
 .. code-block:: json
 
@@ -82,16 +98,25 @@ Create a parameters file called ``c7n-aci-tutorial.json``
                 "value": "c7n-aci"
             },
             "azure_subscription_id": {
-                "value": "<Target Subscription Id>"
+                "value": "<Target Subscription ID>"
             },
-            "azure_event_queue_name": {
+            "azure_container_queue_name": {
                 "value": "c7n-aci-events"
             },
-            "azure_container_storage": {
-                "value": "https://c7nstorage.blob.core.windows.net/c7n-aci-policies"
+            "azure_container_policy_uri": {
+                "value": "<Policy Storage Container URI>"
             },
-            "azure_event_queue_resource_id": {
-                "value": "<Storage Account Resource Id>"
+            "azure_container_storage_resource_id": {
+                "value": "<Storage Account Resource ID>"
+            },
+            "azure_container_log_group": {
+                "value": "azure://<Instrumentation Key>"
+            },
+            "azure_container_metrics": {
+                "value": "azure://<Instrumentation Key>"
+            },
+            "azure_container_output_dir": {
+                "value": "<Log Storage Container URI>"
             }
         }
     }
@@ -112,7 +137,7 @@ with the following command:
 
     az container logs --resource-group c7n-aci-tutorial --name cloud-custodian --follow
 
-5. Upload a Custodian Policy
+6. Upload a Custodian Policy
 ----------------------------
 
 Finally, create a custodian policy called ``find-c7nstorage.yaml``. This policy will just find the 

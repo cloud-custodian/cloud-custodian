@@ -127,7 +127,7 @@ Account and Cluster Roler Binding for Tiller
 
 Now we are ready to deploy the helm chart and the container host. Create a file with the helm 
 configuration values for our container host. See the :ref:`Container Host Documentation<azure_containerhosting>`
-for information on filling out the environment.
+for information on filling out the environment variables.
 
 .. code-block:: yaml
 
