@@ -47,6 +47,8 @@ class KubernetesService(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'properties.kubernetesVersion',
+            'properties.agentPoolProfiles[][name, count]'
         )
         resource_type = 'Microsoft.ContainerService/managedClusters'

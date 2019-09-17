@@ -46,5 +46,6 @@ class Image(ArmResourceManager):
             'name',
             'location',
             'resourceGroup',
+            'properties.sourceVirtualMachine.id'
         )
         resource_type = 'Microsoft.Compute/images'

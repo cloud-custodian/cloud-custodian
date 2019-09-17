@@ -46,6 +46,7 @@ class VMScaleSet(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'sku.name'
         )
         resource_type = 'Microsoft.Compute/virtualMachineScaleSets'

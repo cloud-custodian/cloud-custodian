@@ -40,6 +40,7 @@ Create your new Azure Resource.
 - ``client``: Client class name of the Azure Resource SDK of the resource you added.
 - ``enum_spec``: Is a tuple of (enum_operation, list_operation, extra_args). The resource SDK client will have a list of operations this resource has.
     Place the name of the property as the enum_operation. Next, put `list` as the operations.
+- ``default_report_fields``: Fields that are used for running ``custodian report``.
 
 .. code-block:: python
 
@@ -57,7 +58,8 @@ Create your new Azure Resource.
             default_report_fields = (
                 'name',
                 'location',
-                'resourceGroup'
+                'resourceGroup',
+                'sku.name
             )
 
 

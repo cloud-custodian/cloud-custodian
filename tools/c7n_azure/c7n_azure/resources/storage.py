@@ -62,6 +62,13 @@ class Storage(ArmResourceManager):
         enum_spec = ('storage_accounts', 'list', None)
         diagnostic_settings_enabled = False
         resource_type = 'Microsoft.Storage/storageAccounts'
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup',
+            'kind',
+            'sku.name'
+        )
 
 
 @Storage.action_registry.register('set-firewall-rules')

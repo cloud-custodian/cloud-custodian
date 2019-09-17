@@ -77,6 +77,13 @@ class SqlServer(ArmResourceManager):
         enum_spec = ('servers', 'list', None)
         resource_type = 'Microsoft.Sql/servers'
 
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup',
+            'kind'
+        )
+
 
 @SqlServer.filter_registry.register('firewall-rules')
 class SqlServerFirewallRulesFilter(FirewallRulesFilter):

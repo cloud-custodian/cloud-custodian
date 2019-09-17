@@ -51,6 +51,10 @@ class StorageContainer(ChildResourceManager):
         resource_type = 'Microsoft.Storage/storageAccounts/blobServices/containers'
         enable_tag_operations = False
         raise_on_exception = False
+        default_report_fields = (
+            'name',
+            '"c7n:parent-id"'
+        )
 
         @classmethod
         def extra_args(cls, parent_resource):

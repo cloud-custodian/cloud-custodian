@@ -42,6 +42,7 @@ class ContainerGroup(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'properties.containers[].name'
         )
         resource_type = 'Microsoft.ContainerInstance/containerGroups'

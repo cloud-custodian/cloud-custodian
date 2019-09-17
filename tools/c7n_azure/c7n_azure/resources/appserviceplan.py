@@ -50,7 +50,8 @@ class AppServicePlan(ArmResourceManager):
             'name',
             'location',
             'resourceGroup',
-            'kind'
+            'kind',
+            'sku.[name, tier, capacity]'
         )
         resource_type = 'Microsoft.Web/serverfarms'
 
