@@ -27,7 +27,7 @@
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2016-09-01",
       "name": "cctest-consumption-linux",
-      "location": "East US",
+      "location": "West US",
       "sku": {
         "name": "Y1",
         "tier": "Dynamic",
