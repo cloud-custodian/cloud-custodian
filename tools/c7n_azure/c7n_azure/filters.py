@@ -319,7 +319,6 @@ class TagActionFilter(Filter):
         return self
 
     def process(self, resources, event=None):
-        from c7n_azure.utils import now
         self.tag = self.data.get('tag', DEFAULT_TAG)
         self.op = self.data.get('op', 'stop')
         self.skew = self.data.get('skew', 0)
