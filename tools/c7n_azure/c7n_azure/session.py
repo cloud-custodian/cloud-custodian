@@ -103,15 +103,17 @@ class Session(object):
                     self.credentials = result.token
                     break
 
+            # Let provided id parameter override everything else
+            if self.subscription_id_override is not None:
+                self.subscription_id = self.subscription_id_override
+
+            log.info('Authenticated [%s | %s | %s]',
+                     instance.name, self.subscription_id,
+                     "Authorization File" if self.authorization_file else "Environment Variables")
+
     def _initialize_session(self):
         """
         Creates a session using available authentication type.
-
-        Auth priority:
-        1. Token Auth
-        2. Tenant Auth
-        3. Azure CLI Auth
-
         """
 
         # Only run once
@@ -119,13 +121,11 @@ class Session(object):
             return
 
         if self.authorization_file:
-            log.info("Using file for authentication parameters")
             with open(self.authorization_file) as json_file:
                 self._auth_params = json.load(json_file)
             if self.subscription_id_override is not None:
                 self._auth_params['subscription_id'] = self.subscription_id_override
         else:
-            log.info("Using environment variables for authentication parameters")
             self._auth_params = {
                 'client_id': os.environ.get(constants.ENV_CLIENT_ID),
                 'client_secret': os.environ.get(constants.ENV_CLIENT_SECRET),
@@ -139,17 +139,20 @@ class Session(object):
                 'enable_cli_auth': True
             }
 
-        self._authenticate()
-
-        # Let provided id parameter override everything else
-        if self.subscription_id_override is not None:
-            self.subscription_id = self.subscription_id_override
-
-        if self.credentials is None:
-            log.error('Authentication failed.')
+        try:
+            self._authenticate()
+        except Exception as e:
+            if hasattr(e, 'message'):
+                log.error(e.message)
+            else:
+                log.exception("Failed to authenticate.")
             sys.exit(1)
 
-        # TODO: cleanup this workaround when issue resolved.
+        if self.credentials is None:
+            log.error('Failed to authenticate.')
+            sys.exit(1)
+
+        # Override credential type for KV auth
         # https://github.com/Azure/azure-sdk-for-python/issues/5096
         if self.resource_namespace == constants.RESOURCE_VAULT:
             access_token = AccessToken(token=self.get_bearer_token())
@@ -167,14 +170,12 @@ class Session(object):
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
 
-        klass_parameters = None
         if sys.version_info[0] < 3:
             import funcsigs
             klass_parameters = funcsigs.signature(klass).parameters
         else:
             klass_parameters = inspect.signature(klass).parameters
 
-        client = None
         if 'subscription_id' in klass_parameters:
             client = klass(credentials=self.credentials, subscription_id=self.subscription_id)
         else:
@@ -324,6 +325,11 @@ class TokenProvider:
         # type: () -> AuthenticationResult
         raise NotImplementedError()
 
+    @property
+    @abc.abstractmethod
+    def name(self):
+        # type: () -> str
+        raise NotImplementedError()
 
 class CLIProvider(TokenProvider):
     def is_available(self):
@@ -338,7 +344,7 @@ class CLIProvider(TokenProvider):
              subscription_id,
              tenant_id) = Profile().get_login_credentials(resource=self.resource_namespace)
         except CLIError as e:
-            e.message = 'Failed to authenticate with CLI credentials'
+            e.message = 'Failed to authenticate with CLI credentials. ' + e.args[0]
             raise
 
         return TokenProvider.AuthenticationResult(
@@ -346,6 +352,11 @@ class CLIProvider(TokenProvider):
             subscription_id=subscription_id,
             tenant_id=tenant_id
         )
+
+    @property
+    def name(self):
+        # type: () -> str
+        return "Azure CLI"
 
 
 class AccessTokenProvider(TokenProvider):
@@ -368,6 +379,10 @@ class AccessTokenProvider(TokenProvider):
             tenant_id=None
         )
 
+    @property
+    def name(self):
+        # type: () -> str
+        return "Access Token"
 
 class ServicePrincipalProvider(TokenProvider):
     def __init__(self, parameters, namespace):
@@ -404,6 +419,10 @@ class ServicePrincipalProvider(TokenProvider):
             tenant_id=self.tenant_id
         )
 
+    @property
+    def name(self):
+        # type: () -> str
+        return "Principal"
 
 class MSIProvider(TokenProvider):
     def __init__(self, parameters, namespace):
@@ -433,5 +452,10 @@ class MSIProvider(TokenProvider):
         return TokenProvider.AuthenticationResult(
             token=token,
             subscription_id=self.subscription_id,
-            tenant_id=self.tenant_id
+            tenant_id=None
         )
+
+    @property
+    def name(self):
+        # type: () -> str
+        return "MSI"

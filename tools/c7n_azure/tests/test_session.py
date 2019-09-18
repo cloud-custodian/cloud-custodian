@@ -115,7 +115,7 @@ class SessionTest(BaseTest):
                 s.get_subscription_id()
 
         mock_log.assert_called_once_with(
-            'Azure Authentication Failure\nError: {\n  "error": "test"\n}')
+            'Failed to authenticate with service principal.\nMessage: {\n  "error": "test"\n}')
 
     def test_initialize_msi_auth_system(self):
         with patch('msrestazure.azure_active_directory.MSIAuthentication.__init__',
@@ -158,9 +158,7 @@ class SessionTest(BaseTest):
                 s = Session()
                 s.get_subscription_id()
 
-        mock_log.assert_called_once_with(
-            'Azure Authentication Failure\n'
-            'Error: Could not authenticate using managed service identity (system identity)')
+        mock_log.assert_called_once_with('Failed to authenticate with MSI')
 
     def test_initialize_session_token(self):
         with patch.dict(os.environ,
@@ -350,9 +348,8 @@ class SessionTest(BaseTest):
                 s.get_subscription_id()
 
         mock_log.assert_called_once_with(
-            'Azure Authentication Failure\nError: '
-            'Cannot retrieve SP credentials from the Key Vault '
-            '(KV uses MSI to access) with client id: kv_client')
+            'Failed to retrieve SP credential from '
+            'Key Vault with client id: kv_client')
 
     @patch('azure.cli.core._profile.Profile.get_login_credentials')
     @patch('c7n_azure.session.log.error')
@@ -368,7 +365,5 @@ class SessionTest(BaseTest):
                 s = Session()
                 s.get_subscription_id()
 
-        mock_log.assert_called_once_with(
-            'Azure Authentication Failure\nError: '
-            'Could not authenticate with Azure CLI '
-            'credentials: Bad CLI credentials')
+        mock_log.assert_called_once_with('Failed to authenticate with CLI credentials. '
+                                         'Bad CLI credentials')
