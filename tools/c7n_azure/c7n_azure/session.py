@@ -20,7 +20,7 @@ import logging
 import os
 import sys
 import types
-from collections import namedtuple, namedtuple
+from collections import namedtuple
 
 import jwt
 import six
@@ -30,7 +30,6 @@ from azure.keyvault import KeyVaultAuthentication, AccessToken
 from c7n_azure import constants
 from c7n_azure.utils import (ResourceIdParser, StringUtils, custodian_azure_send_override,
                              ManagedGroupHelper, get_keyvault_secret)
-
 from msrest.exceptions import AuthenticationError
 from msrestazure.azure_active_directory import MSIAuthentication
 from requests import HTTPError
@@ -73,43 +72,43 @@ class Session(object):
         return self._auth_params
 
     def _authenticate(self):
-            keyvault_client_id = self._auth_params.get('keyvault_client_id')
-            keyvault_secret_id = self._auth_params.get('keyvault_secret_id')
+        keyvault_client_id = self._auth_params.get('keyvault_client_id')
+        keyvault_secret_id = self._auth_params.get('keyvault_secret_id')
 
-            # If user provided KeyVault secret, we will pull auth params information from it
-            try:
-                if keyvault_secret_id:
-                    self._auth_params.update(
-                        json.loads(
-                            get_keyvault_secret(keyvault_client_id, keyvault_secret_id)))
-            except HTTPError as e:
-                e.message = 'Failed to retrieve SP credential ' \
-                            'from Key Vault with client id: {0}'.format(keyvault_client_id)
-                raise
+        # If user provided KeyVault secret, we will pull auth params information from it
+        try:
+            if keyvault_secret_id:
+                self._auth_params.update(
+                    json.loads(
+                        get_keyvault_secret(keyvault_client_id, keyvault_secret_id)))
+        except HTTPError as e:
+            e.message = 'Failed to retrieve SP credential ' \
+                        'from Key Vault with client id: {0}'.format(keyvault_client_id)
+            raise
 
-            token_providers = [
-                AccessTokenProvider,
-                ServicePrincipalProvider,
-                MSIProvider,
-                CLIProvider
-            ]
+        token_providers = [
+            AccessTokenProvider,
+            ServicePrincipalProvider,
+            MSIProvider,
+            CLIProvider
+        ]
 
-            for provider in token_providers:
-                instance = provider(self._auth_params, self.resource_namespace)
-                if instance.is_available():
-                    result = instance.authenticate()
-                    self.subscription_id = result.subscription_id
-                    self.tenant_id = result.tenant_id
-                    self.credentials = result.token
-                    break
+        for provider in token_providers:
+            instance = provider(self._auth_params, self.resource_namespace)
+            if instance.is_available():
+                result = instance.authenticate()
+                self.subscription_id = result.subscription_id
+                self.tenant_id = result.tenant_id
+                self.credentials = result.token
+                break
 
-            # Let provided id parameter override everything else
-            if self.subscription_id_override is not None:
-                self.subscription_id = self.subscription_id_override
+        # Let provided id parameter override everything else
+        if self.subscription_id_override is not None:
+            self.subscription_id = self.subscription_id_override
 
-            log.info('Authenticated [%s | %s | %s]',
-                     instance.name, self.subscription_id,
-                     "Authorization File" if self.authorization_file else "Environment Variables")
+        log.info('Authenticated [%s | %s | %s]',
+                 instance.name, self.subscription_id,
+                 "Authorization File" if self.authorization_file else "Environment Variables")
 
     def _initialize_session(self):
         """
@@ -322,7 +321,7 @@ class TokenProvider:
 
     @abc.abstractmethod
     def authenticate(self):
-        # type: () -> AuthenticationResult
+        # type: () -> TokenProvider.AuthenticationResult
         raise NotImplementedError()
 
     @property
@@ -331,13 +330,14 @@ class TokenProvider:
         # type: () -> str
         raise NotImplementedError()
 
+
 class CLIProvider(TokenProvider):
     def is_available(self):
         # type: () -> bool
         return self.parameters.get('enable_cli_auth', False)
 
     def authenticate(self):
-        # type: () -> AuthenticationResult
+        # type: () -> TokenProvider.AuthenticationResult
 
         try:
             (token,
@@ -370,7 +370,7 @@ class AccessTokenProvider(TokenProvider):
         return self.access_token and self.subscription_id
 
     def authenticate(self):
-        # type: () -> AuthenticationResult
+        # type: () -> TokenProvider.AuthenticationResult
         token = BasicTokenAuthentication(token={'access_token': self.access_token})
 
         return TokenProvider.AuthenticationResult(
@@ -384,6 +384,7 @@ class AccessTokenProvider(TokenProvider):
         # type: () -> str
         return "Access Token"
 
+
 class ServicePrincipalProvider(TokenProvider):
     def __init__(self, parameters, namespace):
         super(ServicePrincipalProvider, self).__init__(parameters, namespace)
@@ -394,19 +395,18 @@ class ServicePrincipalProvider(TokenProvider):
 
     def is_available(self):
         # type: () -> bool
-        return self.client_id and \
-               self.client_secret and \
-               self.tenant_id and \
-               self.subscription_id
+        return (self.client_id and
+                self.client_secret and
+                self.tenant_id and
+                self.subscription_id)
 
     def authenticate(self):
-        # type: () -> AuthenticationResult
+        # type: () -> TokenProvider.AuthenticationResult
         try:
-            token = ServicePrincipalCredentials(
-                        client_id=self.client_id,
-                        secret=self.client_secret,
-                        tenant=self.tenant_id,
-                        resource=self.resource_namespace)
+            token = ServicePrincipalCredentials(client_id=self.client_id,
+                                                secret=self.client_secret,
+                                                tenant=self.tenant_id,
+                                                resource=self.resource_namespace)
         except AuthenticationError as e:
             e.message = 'Failed to authenticate with service principal.\n'\
                         'Message: {0}'.format(
@@ -424,6 +424,7 @@ class ServicePrincipalProvider(TokenProvider):
         # type: () -> str
         return "Principal"
 
+
 class MSIProvider(TokenProvider):
     def __init__(self, parameters, namespace):
         super(MSIProvider, self).__init__(parameters, namespace)
@@ -436,7 +437,7 @@ class MSIProvider(TokenProvider):
         return self.use_msi and self.subscription_id
 
     def authenticate(self):
-        # type: () -> AuthenticationResult
+        # type: () -> TokenProvider.AuthenticationResult
         try:
             if self.client_id:
                 token = MSIAuthentication(
