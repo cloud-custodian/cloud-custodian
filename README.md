@@ -252,5 +252,5 @@ See <https://cloudcustodian.io/docs/contribute.html>
 Code of Conduct
 ---------------
 
-This project adheres to the [Open Code of Conduct](https://developer.capitalone.com/single/code-of-conduct/). By
+This project adheres to the [Open Code of Conduct](https://developer.capitalone.com/resources/code-of-conduct). By
 participating, you are expected to honor this code.
