@@ -212,10 +212,11 @@ For specific instructions for AWS, Azure, and GCP, visit the relevant getting st
 Get Involved
 ------------
 
--   [Reddit](https://reddit.com/r/cloudcustodian)
 -   [Gitter](https://gitter.im/cloud-custodian/cloud-custodian)
 -   [GitHub](https://github.com/cloud-custodian/cloud-custodian)
 -   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian)
+-   [Reddit](https://reddit.com/r/cloudcustodian)
+-   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian)
 
 Additional Tools
 ----------------
