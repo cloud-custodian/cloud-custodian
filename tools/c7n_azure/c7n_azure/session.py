@@ -100,6 +100,7 @@ class Session(object):
                 self.subscription_id = result.subscription_id
                 self.tenant_id = result.tenant_id
                 self.credentials = result.token
+                self.token_provider = provider
                 break
 
         # Let provided id parameter override everything else
@@ -243,17 +244,11 @@ class Session(object):
 
     def get_tenant_id(self):
         self._initialize_session()
-        if self._is_token_auth:
-            decoded = jwt.decode(self.credentials.token['access_token'], verify=False)
-            return decoded['tid']
-
         return self.tenant_id
 
     def get_bearer_token(self):
         self._initialize_session()
-        if self._is_cli_auth:
-            return self.credentials._token_retriever()[1]
-        return self.credentials.token['access_token']
+        return self.token_provider.get_bearer_token(self.credentials)
 
     def load_auth_file(self, path):
         with open(path) as json_file:
@@ -330,6 +325,10 @@ class TokenProvider:
         # type: () -> str
         raise NotImplementedError()
 
+    @staticmethod
+    def get_bearer_token(token):
+        return token.token['access_token']
+
 
 class CLIProvider(TokenProvider):
     def is_available(self):
@@ -358,6 +357,10 @@ class CLIProvider(TokenProvider):
         # type: () -> str
         return "Azure CLI"
 
+    @staticmethod
+    def get_bearer_token(token):
+        return token._token_retriever()[1]
+
 
 class AccessTokenProvider(TokenProvider):
     def __init__(self, parameters, namespace):
@@ -373,10 +376,12 @@ class AccessTokenProvider(TokenProvider):
         # type: () -> TokenProvider.AuthenticationResult
         token = BasicTokenAuthentication(token={'access_token': self.access_token})
 
+        decoded = jwt.decode(token.token['access_token'], verify=False)
+
         return TokenProvider.AuthenticationResult(
             token=token,
             subscription_id=self.subscription_id,
-            tenant_id=None
+            tenant_id=decoded['tid']
         )
 
     @property
