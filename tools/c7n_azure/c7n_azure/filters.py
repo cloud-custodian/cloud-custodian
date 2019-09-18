@@ -330,7 +330,6 @@ class TagActionFilter(Filter):
         return super(TagActionFilter, self).process(resources, event)
 
     def __call__(self, i):
-
         v = i.get('tags', {}).get(self.tag, None)
 
         if v is None:
@@ -354,6 +353,9 @@ class TagActionFilter(Filter):
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(self.tz)
             self.current_date = now(tz=self.tz)
+        else:
+            # if it is not need to reset to timezone naive
+            self.current_date = now()
 
         return self.current_date >= (
             action_date - timedelta(days=self.skew, hours=self.skew_hours))
