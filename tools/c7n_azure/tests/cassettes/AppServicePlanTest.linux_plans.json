@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json"
-                    ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "date": [
-                        "Fri, 13 Sep 2019 21:33:00 GMT"
+                        "Tue, 17 Sep 2019 20:07:21 GMT"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ],
                     "content-length": [
-                        "17372"
+                        "18645"
                     ]
                 },
                 "body": {
@@ -37,7 +37,7 @@
                                 "kind": "linux",
                                 "location": "East US",
                                 "properties": {
-                                    "serverFarmId": 14161219,
+                                    "serverFarmId": 14203294,
                                     "name": "cctest-appserviceplan-linux",
                                     "workerSize": "Default",
                                     "workerSizeId": 0,
@@ -91,9 +91,9 @@
                                 "name": "cctest-consumption-linux",
                                 "type": "Microsoft.Web/serverfarms",
                                 "kind": "functionapp",
-                                "location": "East US",
+                                "location": "West US",
                                 "properties": {
-                                    "serverFarmId": 14161217,
+                                    "serverFarmId": 14203295,
                                     "name": "cctest-consumption-linux",
                                     "workerSize": "Default",
                                     "workerSizeId": 0,
@@ -103,7 +103,7 @@
                                     "currentWorkerSizeId": null,
                                     "currentNumberOfWorkers": null,
                                     "status": "Ready",
-                                    "webSpace": "test_appserviceplan-linux-EastUSwebspace",
+                                    "webSpace": "test_appserviceplan-linux-WestUSwebspace",
                                     "subscription": null,
                                     "adminSiteName": null,
                                     "hostingEnvironment": null,
@@ -113,7 +113,7 @@
                                     "adminRuntimeSiteName": null,
                                     "computeMode": "Shared",
                                     "siteMode": null,
-                                    "geoRegion": "East US",
+                                    "geoRegion": "West US",
                                     "perSiteScaling": null,
                                     "maximumElasticWorkerCount": null,
                                     "numberOfSites": 0,
