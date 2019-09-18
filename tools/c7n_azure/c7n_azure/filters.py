@@ -320,8 +320,6 @@ class TagActionFilter(Filter):
 
     def process(self, resources, event=None):
         from c7n_azure.utils import now
-        if self.current_date is None:
-            self.current_date = now()
         self.tag = self.data.get('tag', DEFAULT_TAG)
         self.op = self.data.get('op', 'stop')
         self.skew = self.data.get('skew', 0)
@@ -349,15 +347,14 @@ class TagActionFilter(Filter):
             self.log.warning("could not parse tag:%s value:%s on %s" % (
                 self.tag, v, i['InstanceId']))
 
+        # current_date must match timezones with the parsed date string
         if action_date.tzinfo:
-            # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(self.tz)
-            self.current_date = now(tz=self.tz)
+            current_date = now(tz=self.tz)
         else:
-            # if it is not need to reset to timezone naive
-            self.current_date = now()
+            current_date = now()
 
-        return self.current_date >= (
+        return current_date >= (
             action_date - timedelta(days=self.skew, hours=self.skew_hours))
 
 
