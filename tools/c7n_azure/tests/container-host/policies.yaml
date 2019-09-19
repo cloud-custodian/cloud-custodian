@@ -1,0 +1,69 @@
+policies:
+  - name: c7n-aci-periodic
+    description: Tests periodic policies on ACI
+    resource: azure.resourcegroup
+    mode: 
+      type: container-periodic
+      schedule: "* * * * *"
+    filters:
+      - type: value
+        key: name
+        op: eq
+        value: "%RG_NAME%"
+      - tag:c7n-aci-periodic: absent
+    actions:
+      - type: tag
+        tag: c7n-aci-periodic
+        value: passed
+  - name: c7n-aci-event
+    description: Tests event policies on ACI
+    resource: azure.resourcegroup
+    mode: 
+      type: container-event
+      events:
+        - resourceProvider: Microsoft.Resources/subscriptions/resourceGroups
+          event: write
+    filters:
+      - type: value
+        key: name
+        op: eq
+        value: "%RG_NAME%"
+      - tag:c7n-aci-event: absent
+    actions:
+      - type: tag
+        tag: c7n-aci-event
+        value: passed
+  - name: c7n-k8s-periodic
+    description: Tests periodic policies on Kubernetes
+    resource: azure.resourcegroup
+    mode: 
+      type: container-periodic
+      schedule: "* * * * *"
+    filters:
+      - type: value
+        key: name
+        op: eq
+        value: "%RG_NAME%"
+      - tag:c7n-k8s-periodic: absent
+    actions:
+      - type: tag
+        tag: c7n-k8s-periodic
+        value: passed
+  - name: c7n-k8s-event
+    description: Tests event policies on Kubernetes
+    resource: azure.resourcegroup
+    mode: 
+      type: container-event
+      events:
+        - resourceProvider: Microsoft.Resources/subscriptions/resourceGroups
+          event: write
+    filters:
+      - type: value
+        key: name
+        op: eq
+        value: "%RG_NAME%"
+      - tag:c7n-k8s-event: absent
+    actions:
+      - type: tag
+        tag: c7n-k8s-event
+        value: passed
