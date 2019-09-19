@@ -372,8 +372,9 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
     def setUpClass(cls, *args, **kwargs):
         super(BaseTest, cls).setUpClass(*args, **kwargs)
         if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
-            cls._token_patch = patch('c7n_azure.session.jwt.decode',
-                                     return_value={'tid': DEFAULT_TENANT_ID})
+            cls._token_patch = patch(
+                'c7n_azure.session.jwt.decode',
+                return_value={'tid': DEFAULT_TENANT_ID})
             cls._token_patch.start()
 
     @classmethod
