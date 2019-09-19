@@ -61,8 +61,6 @@ class Session(object):
         self.subscription_id = None
         self.tenant_id = None
         self.resource_namespace = resource
-        self._is_token_auth = False
-        self._is_cli_auth = False
         self.authorization_file = authorization_file
         self._auth_params = {}
 
@@ -99,7 +97,7 @@ class Session(object):
                 result = instance.authenticate()
                 self.subscription_id = result.subscription_id
                 self.tenant_id = result.tenant_id
-                self.credentials = result.token
+                self.credentials = result.credential
                 self.token_provider = provider
                 break
 
@@ -299,10 +297,20 @@ class Session(object):
 
         return json.dumps(function_auth_params, indent=2)
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # del state['credentials']
+        # if credentials instance of AdalAuthentication then manually pull dict and return it.
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
 
 @six.add_metaclass(abc.ABCMeta)
 class TokenProvider:
-    AuthenticationResult = namedtuple('AuthenticationResult', 'token, subscription_id, tenant_id')
+    AuthenticationResult = namedtuple(
+        'AuthenticationResult', 'credential, subscription_id, tenant_id')
 
     def __init__(self, parameters, namespace):
         # type: (dict, str) -> None
@@ -339,7 +347,7 @@ class CLIProvider(TokenProvider):
         # type: () -> TokenProvider.AuthenticationResult
 
         try:
-            (token,
+            (credential,
              subscription_id,
              tenant_id) = Profile().get_login_credentials(resource=self.resource_namespace)
         except CLIError as e:
@@ -347,7 +355,7 @@ class CLIProvider(TokenProvider):
             raise
 
         return TokenProvider.AuthenticationResult(
-            token=token,
+            credential=credential,
             subscription_id=subscription_id,
             tenant_id=tenant_id
         )
@@ -374,12 +382,12 @@ class AccessTokenProvider(TokenProvider):
 
     def authenticate(self):
         # type: () -> TokenProvider.AuthenticationResult
-        token = BasicTokenAuthentication(token={'access_token': self.access_token})
+        credential = BasicTokenAuthentication(token={'access_token': self.access_token})
 
-        decoded = jwt.decode(token.token['access_token'], verify=False)
+        decoded = jwt.decode(credential.token['access_token'], verify=False)
 
         return TokenProvider.AuthenticationResult(
-            token=token,
+            credential=credential,
             subscription_id=self.subscription_id,
             tenant_id=decoded['tid']
         )
@@ -408,7 +416,7 @@ class ServicePrincipalProvider(TokenProvider):
     def authenticate(self):
         # type: () -> TokenProvider.AuthenticationResult
         try:
-            token = ServicePrincipalCredentials(client_id=self.client_id,
+            credential = ServicePrincipalCredentials(client_id=self.client_id,
                                                 secret=self.client_secret,
                                                 tenant=self.tenant_id,
                                                 resource=self.resource_namespace)
@@ -419,7 +427,7 @@ class ServicePrincipalProvider(TokenProvider):
             raise
 
         return TokenProvider.AuthenticationResult(
-            token=token,
+            credential=credential,
             subscription_id=self.subscription_id,
             tenant_id=self.tenant_id
         )
@@ -445,18 +453,18 @@ class MSIProvider(TokenProvider):
         # type: () -> TokenProvider.AuthenticationResult
         try:
             if self.client_id:
-                token = MSIAuthentication(
+                credential = MSIAuthentication(
                     client_id=self.client_id,
                     resource=self.resource_namespace)
             else:
-                token = MSIAuthentication(
+                credential = MSIAuthentication(
                     resource=self.resource_namespace)
         except HTTPError as e:
             e.message = 'Failed to authenticate with MSI'
             raise
 
         return TokenProvider.AuthenticationResult(
-            token=token,
+            credential=credential,
             subscription_id=self.subscription_id,
             tenant_id=None
         )
