@@ -14,7 +14,7 @@
 
 from azure.graphrbac import GraphRbacManagementClient
 from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.filters import FirewallRulesFilter
+from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
 
@@ -140,6 +140,45 @@ class KeyVaultFirewallRulesFilter(FirewallRulesFilter):
             resource_rules = IPSet(['0.0.0.0/0'])
 
         return resource_rules
+
+
+@KeyVault.filter_registry.register('firewall-bypass')
+class KeyVaultFirewallBypassFilter(FirewallBypassFilter):
+    """
+    Filters resources by the firewall bypass rules.
+
+    :example:
+
+    This policy will find all KeyVaults with enabled Azure Services bypass rules
+
+    .. code-block:: yaml
+
+        policies:
+          - name: keyvault-bypass
+            resource: azure.keyvault
+            filters:
+              - type: firewall-bypass
+                mode: equal
+                list:
+                    - AzureServices
+    """
+    schema = FirewallBypassFilter.schema(['AzureServices'])
+
+    def _query_bypass(self, resource):
+
+        if 'properties' not in resource:
+            vault = self.client.vaults.get(resource['resourceGroup'], resource['name'])
+            resource['properties'] = vault.properties.serialize()
+
+        # Remove spaces from the string for the comparision
+        if 'networkAcls' not in resource['properties']:
+            return []
+
+        if resource['properties']['networkAcls']['defaultAction'] == 'Allow':
+            return ['AzureServices']
+
+        bypass_string = resource['properties']['networkAcls'].get('bypass', '').replace(' ', '')
+        return list(filter(None, bypass_string.split(',')))
 
 
 @KeyVault.filter_registry.register('whitelist')
