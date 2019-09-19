@@ -241,11 +241,18 @@ class CloudWatchLogOutput(LogOutput):
             self.config.get('netloc') == 'master') and 'master' or None
 
     def construct_stream_name(self):
-        log_stream = self.ctx.policy.name
-        if self.config.get('region') is not None:
-            log_stream = "{}/{}".format(self.ctx.options.region, log_stream)
-        if self.config.get('netloc') == 'master':
-            log_stream = "{}/{}".format(self.ctx.options.account_id, log_stream)
+        if self.config.get('stream') is None:
+            log_stream = self.ctx.policy.name
+            if self.config.get('region') is not None:
+                log_stream = "{}/{}".format(self.ctx.options.region, log_stream)
+            if self.config.get('netloc') == 'master':
+                log_stream = "{}/{}".format(self.ctx.options.account_id, log_stream)
+        else:
+            log_stream = self.config.get('stream').format(
+                region=self.ctx.options.region,
+                account=self.ctx.options.account_id,
+                policy=self.ctx.policy.name
+            )
         return log_stream
 
     def get_handler(self):
