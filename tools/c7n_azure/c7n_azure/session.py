@@ -297,15 +297,6 @@ class Session(object):
 
         return json.dumps(function_auth_params, indent=2)
 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        # del state['credentials']
-        # if credentials instance of AdalAuthentication then manually pull dict and return it.
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-
 
 @six.add_metaclass(abc.ABCMeta)
 class TokenProvider:
