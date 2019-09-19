@@ -44,6 +44,7 @@ class LockAction(AzureBaseAction):
             actions:
               - type: lock
                 lock-type: ReadOnly
+
     :example:
 
     Add CanNotDelete lock to sqldatabases tagged env:production
@@ -62,6 +63,7 @@ class LockAction(AzureBaseAction):
                 lock-type: CanNotDelete
                 lock-name: productionLock
                 lock-notes: Locking all production SQL databases via Cloud Custodian
+
      """
 
     schema = type_schema(
