@@ -53,6 +53,7 @@ class StorageContainer(ChildResourceManager):
         raise_on_exception = False
         default_report_fields = (
             'name',
+            'properties.publicAccess',
             '"c7n:parent-id"'
         )
 

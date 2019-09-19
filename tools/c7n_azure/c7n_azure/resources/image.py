@@ -42,10 +42,4 @@ class Image(ArmResourceManager):
         service = 'azure.mgmt.compute'
         client = 'ComputeManagementClient'
         enum_spec = ('images', 'list', None)
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup',
-            'properties.sourceVirtualMachine.id'
-        )
         resource_type = 'Microsoft.Compute/images'
