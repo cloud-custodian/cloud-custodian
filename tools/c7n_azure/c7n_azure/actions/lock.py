@@ -44,6 +44,24 @@ class LockAction(AzureBaseAction):
             actions:
               - type: lock
                 lock-type: ReadOnly
+    :example:
+
+    Add CanNotDelete lock to sqldatabases tagged env:production
+
+    .. code-block:: yaml
+
+       policies:
+          - name: lock-production-sqldatabase
+            resource: azure.sqldatabase
+            filters:
+              - type: value
+                key: tags.env
+                value: production
+            actions:
+              - type: lock
+                lock-type: CanNotDelete
+                lock-name: productionLock
+                lock-notes: Locking all production SQL databases via Cloud Custodian
      """
 
     schema = type_schema(
