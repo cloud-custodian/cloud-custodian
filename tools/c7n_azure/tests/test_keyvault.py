@@ -15,12 +15,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.resources.key_vault import (KeyVaultUpdateAccessPolicyAction, WhiteListFilter,
-                                           KeyVaultFirewallRulesFilter)
+                                           KeyVaultFirewallRulesFilter,
+                                           KeyVaultFirewallBypassFilter)
 from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 from mock import patch, Mock
 from msrestazure.azure_exceptions import CloudError
 from netaddr import IPSet
+from parameterized import parameterized
 import pytest
 from requests import Response
 
@@ -315,6 +317,20 @@ class KeyVaultTest(BaseTest):
         resources = p.run()
         self.assertEqual(0, len(resources))
 
+    @arm_template('keyvault.json')
+    @cassette_name('common')
+    def test_firewall_bypass(self):
+        p = self.load_policy({
+            'name': 'test-azure-keyvault',
+            'resource': 'azure.keyvault',
+            'filters': [
+                {'type': 'firewall-bypass',
+                 'mode': 'equal',
+                 'list': ['AzureServices']}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class KeyVaultFirewallFilterTest(BaseTest):
 
@@ -338,3 +354,20 @@ class KeyVaultFirewallFilterTest(BaseTest):
     def _get_filter(self, mode='equal'):
         data = {mode: ['10.0.0.0/8', '127.0.0.1']}
         return KeyVaultFirewallRulesFilter(data, Mock())
+
+
+class KeyVaultFirewallBypassFilterTest(BaseTest):
+
+    scenarios = [
+        [{}, []],
+        [{'networkAcls': {'defaultAction': 'Allow', 'bypass': ''}}, ['AzureServices']],
+        [{'networkAcls': {'defaultAction': 'Deny', 'bypass': ''}}, []],
+        [{'networkAcls': {'defaultAction': 'Deny', 'bypass': 'AzureServices'}},
+         ['AzureServices']],
+    ]
+
+    @parameterized.expand(scenarios)
+    def test_run(self, properties, expected):
+        resource = {'properties': properties}
+        f = KeyVaultFirewallBypassFilter({'mode': 'equal', 'list': []})
+        self.assertEqual(expected, f._query_bypass(resource))

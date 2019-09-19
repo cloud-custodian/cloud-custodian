@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import collections
 import datetime
 
 from azure_common import BaseTest, cassette_name
-from c7n_azure.resources.sqlserver import SqlServerFirewallRulesFilter
+from c7n_azure.resources.sqlserver import SqlServerFirewallRulesFilter, \
+    SqlServerFirewallBypassFilter
 from mock import Mock
 from netaddr import IPSet
+from parameterized import parameterized
+
+IpRange = collections.namedtuple('IpRange', 'start_ip_address end_ip_address')
 
 
 class SqlServerTest(BaseTest):
@@ -217,11 +222,28 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(0, len(resources))
 
+    @cassette_name('firewall')
+    def test_firewall_bypass(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'firewall-bypass',
+                 'mode': 'equal',
+                 'list': ['AzureServices']}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class SQLServerFirewallFilterTest(BaseTest):
 
     resource = {'name': 'test', 'resourceGroup': 'test'}
-    IpRange = collections.namedtuple('IpRange', 'start_ip_address end_ip_address')
 
     def test_query_empty_rules(self):
         rules = []
@@ -229,15 +251,15 @@ class SQLServerFirewallFilterTest(BaseTest):
         self.assertEqual(expected, self._get_filter(rules)._query_rules(self.resource))
 
     def test_query_regular_rules(self):
-        rules = [self.IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
-                 self.IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8')]
+        rules = [IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
+                 IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8')]
         expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
         self.assertEqual(expected, self._get_filter(rules)._query_rules(self.resource))
 
     def test_query_regular_rules_with_magic(self):
-        rules = [self.IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
-                 self.IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8'),
-                 self.IpRange(start_ip_address='0.0.0.0', end_ip_address='0.0.0.0')]
+        rules = [IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
+                 IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8'),
+                 IpRange(start_ip_address='0.0.0.0', end_ip_address='0.0.0.0')]
         expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
         self.assertEqual(expected, self._get_filter(rules)._query_rules(self.resource))
 
@@ -247,3 +269,24 @@ class SQLServerFirewallFilterTest(BaseTest):
         filter.client = Mock()
         filter.client.firewall_rules.list_by_server.return_value = rules
         return filter
+
+
+class SqlServerFirewallBypassFilterTest(BaseTest):
+
+    resource = {'name': 'test', 'resourceGroup': 'test'}
+
+    scenarios = [
+        [[], []],
+        [[IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
+          IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8')], []],
+        [[IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
+          IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8'),
+         IpRange(start_ip_address='0.0.0.0', end_ip_address='0.0.0.0')], ['AzureServices']],
+    ]
+
+    @parameterized.expand(scenarios)
+    def test_run(self, rules, expected):
+        f = SqlServerFirewallBypassFilter({'mode': 'equal', 'list': []}, Mock())
+        f.client = Mock()
+        f.client.firewall_rules.list_by_server.return_value = rules
+        self.assertEqual(expected, f._query_bypass(self.resource))

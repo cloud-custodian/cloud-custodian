@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import abc
 import importlib
 import inspect
 import json
@@ -19,8 +20,10 @@ import logging
 import os
 import sys
 import types
+from collections import namedtuple
 
 import jwt
+import six
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
 from azure.keyvault import KeyVaultAuthentication, AccessToken
@@ -58,8 +61,6 @@ class Session(object):
         self.subscription_id = None
         self.tenant_id = None
         self.resource_namespace = resource
-        self._is_token_auth = False
-        self._is_cli_auth = False
         self.authorization_file = authorization_file
         self._auth_params = {}
 
@@ -69,99 +70,48 @@ class Session(object):
         return self._auth_params
 
     def _authenticate(self):
-        try:
-            keyvault_client_id = self._auth_params.get('keyvault_client_id')
-            keyvault_secret_id = self._auth_params.get('keyvault_secret_id')
+        keyvault_client_id = self._auth_params.get('keyvault_client_id')
+        keyvault_secret_id = self._auth_params.get('keyvault_secret_id')
 
-            # If user provided KeyVault secret, we will pull auth params information from it
+        # If user provided KeyVault secret, we will pull auth params information from it
+        try:
             if keyvault_secret_id:
                 self._auth_params.update(
                     json.loads(
                         get_keyvault_secret(keyvault_client_id, keyvault_secret_id)))
-
-            client_id = self._auth_params.get('client_id')
-            client_secret = self._auth_params.get('client_secret')
-            access_token = self._auth_params.get('access_token')
-            tenant_id = self._auth_params.get('tenant_id')
-            use_msi = self._auth_params.get('use_msi')
-            subscription_id = self._auth_params.get('subscription_id')
-
-            if access_token and subscription_id:
-                log.info("Creating session with Token Authentication")
-                self.subscription_id = subscription_id
-                self.credentials = BasicTokenAuthentication(
-                    token={
-                        'access_token': access_token
-                    })
-                self._is_token_auth = True
-
-            elif client_id and client_secret and tenant_id and subscription_id:
-                log.info("Creating session with Service Principal Authentication")
-                self.subscription_id = subscription_id
-                self.credentials = ServicePrincipalCredentials(
-                    client_id=client_id,
-                    secret=client_secret,
-                    tenant=tenant_id,
-                    resource=self.resource_namespace)
-                self.tenant_id = tenant_id
-
-            elif use_msi and subscription_id:
-                log.info("Creating session with MSI Authentication")
-                self.subscription_id = subscription_id
-                if client_id:
-                    self.credentials = MSIAuthentication(
-                        client_id=client_id,
-                        resource=self.resource_namespace)
-                else:
-                    self.credentials = MSIAuthentication(
-                        resource=self.resource_namespace)
-
-            elif self._auth_params.get('enable_cli_auth'):
-                log.info("Creating session with Azure CLI Authentication")
-                self._is_cli_auth = True
-                (self.credentials,
-                 self.subscription_id,
-                 self.tenant_id) = Profile().get_login_credentials(
-                    resource=self.resource_namespace)
-            log.info("Session using Subscription ID: %s" % self.subscription_id)
-
-        except AuthenticationError as e:
-            log.error('Azure Authentication Failure\n'
-                      'Error: {0}'
-                      .format(json.dumps(e.inner_exception.error_response, indent=2)))
-            sys.exit(1)
         except HTTPError as e:
-            if keyvault_client_id and keyvault_secret_id:
-                log.error('Azure Authentication Failure\n'
-                          'Error: Cannot retrieve SP credentials from the Key Vault '
-                          '(KV uses MSI to access) with client id: {0}'
-                          .format(keyvault_client_id))
-            elif use_msi:
-                log.error('Azure Authentication Failure\n'
-                          'Error: Could not authenticate using managed service identity {0}'
-                          .format(client_id if client_id else '(system identity)'))
-            else:
-                log.error('Azure Authentication Failure: %s' % e.response)
-            sys.exit(1)
-        except CLIError as e:
-            log.error('Azure Authentication Failure\n'
-                      'Error: Could not authenticate with Azure CLI credentials: {0}'
-                      .format(e))
-            sys.exit(1)
-        except Exception as e:
-            log.error('Azure Authentication Failure\n'
-                      'Error: {0}'.format(e))
-            sys.exit(1)
+            e.message = 'Failed to retrieve SP credential ' \
+                        'from Key Vault with client id: {0}'.format(keyvault_client_id)
+            raise
+
+        token_providers = [
+            AccessTokenProvider,
+            ServicePrincipalProvider,
+            MSIProvider,
+            CLIProvider
+        ]
+
+        for provider in token_providers:
+            instance = provider(self._auth_params, self.resource_namespace)
+            if instance.is_available():
+                result = instance.authenticate()
+                self.subscription_id = result.subscription_id
+                self.tenant_id = result.tenant_id
+                self.credentials = result.credential
+                self.token_provider = provider
+                break
+
+        # Let provided id parameter override everything else
+        if self.subscription_id_override is not None:
+            self.subscription_id = self.subscription_id_override
+
+        log.info('Authenticated [%s | %s | %s]',
+                 instance.name, self.subscription_id,
+                 "Authorization File" if self.authorization_file else "Environment Variables")
 
     def _initialize_session(self):
         """
         Creates a session using available authentication type.
-
-        Auth priority:
-        1. Token Auth
-        2. Tenant Auth
-        3. Azure CLI Auth
-
         """
 
         # Only run once
@@ -169,13 +119,11 @@ class Session(object):
             return
 
         if self.authorization_file:
-            log.info("Using file for authentication parameters")
             with open(self.authorization_file) as json_file:
                 self._auth_params = json.load(json_file)
             if self.subscription_id_override is not None:
                 self._auth_params['subscription_id'] = self.subscription_id_override
         else:
-            log.info("Using environment variables for authentication parameters")
             self._auth_params = {
                 'client_id': os.environ.get(constants.ENV_CLIENT_ID),
                 'client_secret': os.environ.get(constants.ENV_CLIENT_SECRET),
@@ -189,17 +137,20 @@ class Session(object):
                 'enable_cli_auth': True
             }
 
-        self._authenticate()
-
-        # Let provided id parameter override everything else
-        if self.subscription_id_override is not None:
-            self.subscription_id = self.subscription_id_override
-
-        if self.credentials is None:
-            log.error('Unable to authenticate with Azure.')
+        try:
+            self._authenticate()
+        except Exception as e:
+            if hasattr(e, 'message'):
+                log.error(e.message)
+            else:
+                log.exception("Failed to authenticate.")
             sys.exit(1)
 
-        # TODO: cleanup this workaround when issue resolved.
+        if self.credentials is None:
+            log.error('Failed to authenticate.')
+            sys.exit(1)
+
+        # Override credential type for KV auth
         # https://github.com/Azure/azure-sdk-for-python/issues/5096
         if self.resource_namespace == constants.RESOURCE_VAULT:
             access_token = AccessToken(token=self.get_bearer_token())
@@ -217,14 +168,12 @@ class Session(object):
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
 
-        klass_parameters = None
         if sys.version_info[0] < 3:
             import funcsigs
             klass_parameters = funcsigs.signature(klass).parameters
         else:
             klass_parameters = inspect.signature(klass).parameters
 
-        client = None
         if 'subscription_id' in klass_parameters:
             client = klass(credentials=self.credentials, subscription_id=self.subscription_id)
         else:
@@ -293,17 +242,11 @@ class Session(object):
 
     def get_tenant_id(self):
         self._initialize_session()
-        if self._is_token_auth:
-            decoded = jwt.decode(self.credentials.token['access_token'], verify=False)
-            return decoded['tid']
-
         return self.tenant_id
 
     def get_bearer_token(self):
         self._initialize_session()
-        if self._is_cli_auth:
-            return self.credentials._token_retriever()[1]
-        return self.credentials.token['access_token']
+        return self.token_provider.get_bearer_token(self.credentials)
 
     def load_auth_file(self, path):
         with open(path) as json_file:
@@ -353,3 +296,171 @@ class Session(object):
                 "supported auth mechanism for deploying functions.")
 
         return json.dumps(function_auth_params, indent=2)
+
+
+@six.add_metaclass(abc.ABCMeta)
+class TokenProvider:
+    AuthenticationResult = namedtuple(
+        'AuthenticationResult', 'credential, subscription_id, tenant_id')
+
+    def __init__(self, parameters, namespace):
+        # type: (dict, str) -> None
+        self.parameters = parameters
+        self.resource_namespace = namespace
+
+    @abc.abstractmethod
+    def is_available(self):
+        # type: () -> bool
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def authenticate(self):
+        # type: () -> TokenProvider.AuthenticationResult
+        raise NotImplementedError()
+
+    @property
+    @abc.abstractmethod
+    def name(self):
+        # type: () -> str
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_bearer_token(token):
+        return token.token['access_token']
+
+
+class CLIProvider(TokenProvider):
+    def is_available(self):
+        # type: () -> bool
+        return self.parameters.get('enable_cli_auth', False)
+
+    def authenticate(self):
+        # type: () -> TokenProvider.AuthenticationResult
+
+        try:
+            (credential,
+             subscription_id,
+             tenant_id) = Profile().get_login_credentials(resource=self.resource_namespace)
+        except CLIError as e:
+            e.message = 'Failed to authenticate with CLI credentials. ' + e.args[0]
+            raise
+
+        return TokenProvider.AuthenticationResult(
+            credential=credential,
+            subscription_id=subscription_id,
+            tenant_id=tenant_id
+        )
+
+    @property
+    def name(self):
+        # type: () -> str
+        return "Azure CLI"
+
+    @staticmethod
+    def get_bearer_token(token):
+        return token._token_retriever()[1]
+
+
+class AccessTokenProvider(TokenProvider):
+    def __init__(self, parameters, namespace):
+        super(AccessTokenProvider, self).__init__(parameters, namespace)
+        self.subscription_id = self.parameters.get('subscription_id')
+        self.access_token = self.parameters.get('access_token')
+
+    def is_available(self):
+        # type: () -> bool
+        return self.access_token and self.subscription_id
+
+    def authenticate(self):
+        # type: () -> TokenProvider.AuthenticationResult
+        credential = BasicTokenAuthentication(token={'access_token': self.access_token})
+
+        decoded = jwt.decode(credential.token['access_token'], verify=False)
+
+        return TokenProvider.AuthenticationResult(
+            credential=credential,
+            subscription_id=self.subscription_id,
+            tenant_id=decoded['tid']
+        )
+
+    @property
+    def name(self):
+        # type: () -> str
+        return "Access Token"
+
+
+class ServicePrincipalProvider(TokenProvider):
+    def __init__(self, parameters, namespace):
+        super(ServicePrincipalProvider, self).__init__(parameters, namespace)
+        self.client_id = self.parameters.get('client_id')
+        self.client_secret = self.parameters.get('client_secret')
+        self.tenant_id = self.parameters.get('tenant_id')
+        self.subscription_id = self.parameters.get('subscription_id')
+
+    def is_available(self):
+        # type: () -> bool
+        return (self.client_id and
+                self.client_secret and
+                self.tenant_id and
+                self.subscription_id)
+
+    def authenticate(self):
+        # type: () -> TokenProvider.AuthenticationResult
+        try:
+            credential = ServicePrincipalCredentials(client_id=self.client_id,
+                                                secret=self.client_secret,
+                                                tenant=self.tenant_id,
+                                                resource=self.resource_namespace)
+        except AuthenticationError as e:
+            e.message = 'Failed to authenticate with service principal.\n'\
+                        'Message: {0}'.format(
+                            json.dumps(e.inner_exception.error_response, indent=2))
+            raise
+
+        return TokenProvider.AuthenticationResult(
+            credential=credential,
+            subscription_id=self.subscription_id,
+            tenant_id=self.tenant_id
+        )
+
+    @property
+    def name(self):
+        # type: () -> str
+        return "Principal"
+
+
+class MSIProvider(TokenProvider):
+    def __init__(self, parameters, namespace):
+        super(MSIProvider, self).__init__(parameters, namespace)
+        self.client_id = self.parameters.get('client_id')
+        self.use_msi = self.parameters.get('use_msi')
+        self.subscription_id = self.parameters.get('subscription_id')
+
+    def is_available(self):
+        # type: () -> bool
+        return self.use_msi and self.subscription_id
+
+    def authenticate(self):
+        # type: () -> TokenProvider.AuthenticationResult
+        try:
+            if self.client_id:
+                credential = MSIAuthentication(
+                    client_id=self.client_id,
+                    resource=self.resource_namespace)
+            else:
+                credential = MSIAuthentication(
+                    resource=self.resource_namespace)
+        except HTTPError as e:
+            e.message = 'Failed to authenticate with MSI'
+            raise
+
+        return TokenProvider.AuthenticationResult(
+            credential=credential,
+            subscription_id=self.subscription_id,
+            tenant_id=None
+        )
+
+    @property
+    def name(self):
+        # type: () -> str
+        return "MSI"

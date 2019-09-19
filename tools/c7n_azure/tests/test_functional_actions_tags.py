@@ -30,8 +30,6 @@ class FunctionalActionsTagsTest(BaseTest):
 
     initial_tags = {}
 
-    client = Session().client('azure.mgmt.compute.ComputeManagementClient')
-
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super(FunctionalActionsTagsTest, cls).setUpClass(*args, **kwargs)
