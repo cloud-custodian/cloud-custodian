@@ -643,6 +643,75 @@ class FirewallRulesFilter(Filter):
             raise FilterValidationError("Internal error.")
 
 
+@six.add_metaclass(ABCMeta)
+class FirewallBypassFilter(Filter):
+    """Filters resources by the firewall bypass rules
+    """
+
+    @staticmethod
+    def schema(values):
+        return type_schema(
+            'firewall-bypass',
+            required=['mode', 'list'],
+            **{
+                'mode': {'enum': ['include', 'equal', 'any', 'only']},
+                'list': {'type': 'array', 'items': {'enum': values}}
+            })
+
+    log = logging.getLogger('custodian.azure.filters.FirewallRulesFilter')
+
+    def __init__(self, data, manager=None):
+        super(FirewallBypassFilter, self).__init__(data, manager)
+        self.mode = self.data['mode']
+        self.list = set(self.data['list'])
+        self.client = None
+
+    def process(self, resources, event=None):
+        self.client = self.manager.get_client()
+
+        result, _ = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._check_resources,
+            executor_factory=self.executor_factory,
+            log=self.log
+        )
+
+        return result
+
+    def _check_resources(self, resources, event):
+        return [r for r in resources if self._check_resource(r)]
+
+    @abstractmethod
+    def _query_bypass(self, resource):
+        """
+        Queries firewall rules for a resource. Override in concrete classes.
+        :param resource:
+        :return: A set of netaddr.IPSet with rules defined for the resource.
+        """
+        raise NotImplementedError()
+
+    def _check_resource(self, resource):
+        bypass_set = set(self._query_bypass(resource))
+        ok = self._check_bypass(bypass_set)
+        return ok
+
+    def _check_bypass(self, bypass_set):
+        if self.mode == 'equal':
+            return self.list == bypass_set
+
+        elif self.mode == 'include':
+            return self.list.issubset(bypass_set)
+
+        elif self.mode == 'any':
+            return not self.list.isdisjoint(bypass_set)
+
+        elif self.mode == 'only':
+            return bypass_set.issubset(self.list)
+        else:  # validated earlier, can never happen
+            raise FilterValidationError("Internal error.")
+
+
 class ResourceLockFilter(Filter):
     """
     Filter locked resources.

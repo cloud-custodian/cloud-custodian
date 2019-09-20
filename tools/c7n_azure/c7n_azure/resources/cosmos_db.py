@@ -22,7 +22,7 @@ from azure.mgmt.cosmosdb.models import VirtualNetworkRule
 from c7n_azure import constants
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
-from c7n_azure.filters import (FirewallRulesFilter, MetricFilter)
+from c7n_azure.filters import (FirewallRulesFilter, MetricFilter, FirewallBypassFilter)
 from c7n_azure.provider import resources
 from c7n_azure.query import ChildResourceManager, ChildTypeInfo
 from c7n_azure.resources.arm import ArmResourceManager
@@ -113,6 +113,51 @@ class CosmosDBFirewallRulesFilter(FirewallRulesFilter):
         resource_rules = IPSet(filter(None, parts))
 
         return resource_rules
+
+
+@CosmosDB.filter_registry.register('firewall-bypass')
+class CosmosFirewallBypassFilter(FirewallBypassFilter):
+    """
+    Filters resources by the firewall bypass rules.
+
+    :example:
+
+    This policy will find all CosmosDB with enabled Azure Portal and Azure AzureCloud bypass rules
+
+    .. code-block:: yaml
+
+        policies:
+          - name: cosmosdb-bypass
+            resource: azure.cosmosdb
+            filters:
+              - type: firewall-bypass
+                mode: equal
+                list:
+                    - AzureCloud
+                    - Portal
+    """
+
+    schema = FirewallBypassFilter.schema(['AzureCloud', 'Portal'])
+
+    def _query_bypass(self, resource):
+        ip_range_string = resource['properties']['ipRangeFilter']
+        is_virtual_network_filter_enabled = resource['properties']['isVirtualNetworkFilterEnabled']
+        if not ip_range_string:
+            if is_virtual_network_filter_enabled:
+                return []
+            else:
+                return ['AzureCloud', 'Portal']
+
+        parts = set(ip_range_string.replace(' ', '').split(','))
+
+        result = []
+        if set(AZURE_CLOUD_IPS).issubset(parts):
+            result.append('AzureCloud')
+
+        if set(PORTAL_IPS).issubset(parts):
+            result.append('Portal')
+
+        return result
 
 
 class CosmosDBChildResource(ChildResourceManager):
