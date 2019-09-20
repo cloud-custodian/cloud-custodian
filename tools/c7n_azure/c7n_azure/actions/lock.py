@@ -71,8 +71,8 @@ class LockAction(AzureBaseAction):
         required=['lock-type'],
         **{
             'lock-type': {'enum': ['ReadOnly', 'CanNotDelete']},
-            'lock-name': {'type': 'string'},
-            'lock-notes': {'type': 'string'}
+            'lock-name': {'type': 'string', 'minLength': 1, 'maxLength': 260},
+            'lock-notes': {'type': 'string', 'minLength': 1, 'maxLength': 512}
         }
     )
 
