@@ -213,8 +213,8 @@ class OutputLogsTest(BaseTest):
             policy=Bag(name='test', resource_type='ec2'))
         output = aws.CloudWatchLogOutput(ctx, conf)
         stream = output.get_handler()
-        self.assertTrue(stream.__dict__['log_group'] == 'custodian')
-        self.assertTrue(stream.__dict__['log_stream'] == '001100/us-east-1/test')
+        self.assertTrue(stream.log_group == 'custodian')
+        self.assertTrue(stream.log_stream == '001100/us-east-1/test')
 
     def test_stream_override(self):
         session_factory = self.replay_flight_data(
@@ -231,4 +231,4 @@ class OutputLogsTest(BaseTest):
             policy=Bag(name='test', resource_type='ec2'))
         output = aws.CloudWatchLogOutput(ctx, conf)
         stream = output.get_handler()
-        self.assertTrue(stream.__dict__['log_stream'] == 'testing')
+        self.assertTrue(stream.log_stream == 'testing')
