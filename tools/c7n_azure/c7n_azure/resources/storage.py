@@ -26,7 +26,7 @@ from azure.storage.queue import QueueService
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.filters import FirewallRulesFilter, ValueFilter
+from c7n_azure.filters import FirewallRulesFilter, ValueFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
@@ -189,9 +189,6 @@ class StorageSetFirewallAction(SetFirewallAction):
 @Storage.filter_registry.register('firewall-rules')
 class StorageFirewallRulesFilter(FirewallRulesFilter):
 
-    def __init__(self, data, manager=None):
-        super(StorageFirewallRulesFilter, self).__init__(data, manager)
-
     def _query_rules(self, resource):
 
         if resource['properties']['networkAcls']['defaultAction'] == 'Deny':
@@ -201,6 +198,40 @@ class StorageFirewallRulesFilter(FirewallRulesFilter):
             resource_rules = IPSet(['0.0.0.0/0'])
 
         return resource_rules
+
+
+@Storage.filter_registry.register('firewall-bypass')
+class StorageFirewallBypassFilter(FirewallBypassFilter):
+    """
+    Filters resources by the firewall bypass rules.
+
+    :example:
+
+    This policy will find all Storage Accounts with enabled Azure Services, Metrics and Logging
+    bypass rules
+
+    .. code-block:: yaml
+
+        policies:
+          - name: storage-bypass
+            resource: azure.storage
+            filters:
+              - type: firewall-bypass
+                mode: equal
+                list:
+                    - AzureServices
+                    - Metrics
+                    - Logging
+    """
+    schema = FirewallBypassFilter.schema(['AzureServices', 'Metrics', 'Logging'])
+
+    def _query_bypass(self, resource):
+        # Remove spaces from the string for the comparision
+        if resource['properties']['networkAcls']['defaultAction'] == 'Allow':
+            return ['AzureServices', 'Metrics', 'Logging']
+
+        bypass_string = resource['properties']['networkAcls'].get('bypass', '').replace(' ', '')
+        return list(filter(None, bypass_string.split(',')))
 
 
 @Storage.filter_registry.register('storage-diagnostic-settings')

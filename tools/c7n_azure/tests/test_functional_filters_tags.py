@@ -26,8 +26,6 @@ class FunctionalFiltersTagsTest(BaseTest):
 
     initial_tags = {}
 
-    client = Session().client('azure.mgmt.compute.ComputeManagementClient')
-
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super(FunctionalFiltersTagsTest, cls).setUpClass(*args, **kwargs)

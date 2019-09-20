@@ -35,6 +35,7 @@ class DeploymentUnitsTest(BaseTest):
 
     @classmethod
     def setUpClass(cls):
+        super(DeploymentUnitsTest, cls).setUpClass()
         try:
             cls.session = local_session(Session)
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
@@ -44,6 +45,7 @@ class DeploymentUnitsTest(BaseTest):
 
     @classmethod
     def tearDownClass(cls):
+        super(DeploymentUnitsTest, cls).tearDownClass()
         try:
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
             client.resource_groups.delete(cls.rg_name)

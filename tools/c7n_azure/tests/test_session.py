@@ -45,6 +45,9 @@ class SessionTest(BaseTest):
     authorization_file_full = os.path.join(os.path.dirname(__file__),
                                            'data',
                                            'test_auth_file_full.json')
+    authorization_file_no_sub = os.path.join(os.path.dirname(__file__),
+                                           'data',
+                                           'test_auth_file_no_sub.json')
 
     def setUp(self):
         super(SessionTest, self).setUp()
@@ -70,6 +73,19 @@ class SessionTest(BaseTest):
                    autospec=True, return_value=None):
             s = Session(subscription_id=CUSTOM_SUBSCRIPTION_ID,
                         authorization_file=self.authorization_file)
+
+            self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
+            self.assertEqual(s.get_subscription_id(), CUSTOM_SUBSCRIPTION_ID)
+
+            # will vary between recorded/live auth options but useful to ensure
+            # we ended up with one of the valid values
+            self.assertTrue(s.get_tenant_id() in [DEFAULT_TENANT_ID, 'tenant'])
+
+    def test_initialize_session_auth_file_no_sub(self):
+        with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
+                   autospec=True, return_value=None):
+            s = Session(subscription_id=CUSTOM_SUBSCRIPTION_ID,
+                        authorization_file=self.authorization_file_no_sub)
 
             self.assertIs(type(s.get_credentials()), ServicePrincipalCredentials)
             self.assertEqual(s.get_subscription_id(), CUSTOM_SUBSCRIPTION_ID)
@@ -115,7 +131,7 @@ class SessionTest(BaseTest):
                 s.get_subscription_id()
 
         mock_log.assert_called_once_with(
-            'Azure Authentication Failure\nError: {\n  "error": "test"\n}')
+            'Failed to authenticate with service principal.\nMessage: {\n  "error": "test"\n}')
 
     def test_initialize_msi_auth_system(self):
         with patch('msrestazure.azure_active_directory.MSIAuthentication.__init__',
@@ -158,9 +174,7 @@ class SessionTest(BaseTest):
                 s = Session()
                 s.get_subscription_id()
 
-        mock_log.assert_called_once_with(
-            'Azure Authentication Failure\n'
-            'Error: Could not authenticate using managed service identity (system identity)')
+        mock_log.assert_called_once_with('Failed to authenticate with MSI')
 
     def test_initialize_session_token(self):
         with patch.dict(os.environ,
@@ -350,9 +364,8 @@ class SessionTest(BaseTest):
                 s.get_subscription_id()
 
         mock_log.assert_called_once_with(
-            'Azure Authentication Failure\nError: '
-            'Cannot retrieve SP credentials from the Key Vault '
-            '(KV uses MSI to access) with client id: kv_client')
+            'Failed to retrieve SP credential from '
+            'Key Vault with client id: kv_client')
 
     @patch('azure.cli.core._profile.Profile.get_login_credentials')
     @patch('c7n_azure.session.log.error')
@@ -368,7 +381,5 @@ class SessionTest(BaseTest):
                 s = Session()
                 s.get_subscription_id()
 
-        mock_log.assert_called_once_with(
-            'Azure Authentication Failure\nError: '
-            'Could not authenticate with Azure CLI '
-            'credentials: Bad CLI credentials')
+        mock_log.assert_called_once_with('Failed to authenticate with CLI credentials. '
+                                         'Bad CLI credentials')

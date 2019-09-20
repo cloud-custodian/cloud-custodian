@@ -16,15 +16,16 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from azure.mgmt.storage.models import StorageAccountUpdateParameters
 from azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.resources.storage import StorageSettingsUtilities, StorageFirewallRulesFilter
+from c7n_azure.resources.storage import StorageSettingsUtilities, StorageFirewallRulesFilter, \
+    StorageFirewallBypassFilter
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from mock import patch, MagicMock, Mock
+from netaddr import IPSet
+from parameterized import parameterized
 
 from c7n.utils import get_annotation_prefix
 from c7n.utils import local_session
-
-from netaddr import IPSet
 
 
 class StorageTest(BaseTest):
@@ -234,6 +235,25 @@ class StorageTest(BaseTest):
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
+
+    @arm_template('storage.json')
+    @cassette_name('firewall')
+    def test_firewall_bypass(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'ccipstorage*'},
+                {'type': 'firewall-bypass',
+                 'mode': 'equal',
+                 'list': ['AzureServices']}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
 
     @arm_template('storage.json')
     def test_diagnostic_settings_blob_storage_type(self):
@@ -594,3 +614,20 @@ class StorageFirewallFilterTest(BaseTest):
     def _get_filter(self, mode='equal'):
         data = {mode: ['10.0.0.0/8', '127.0.0.1']}
         return StorageFirewallRulesFilter(data, Mock())
+
+
+class StorageFirewallBypassFilterTest(BaseTest):
+
+    scenarios = [
+        ['Allow', '', ['AzureServices', 'Metrics', 'Logging']],
+        ['Deny', '', []],
+        ['Deny', 'AzureServices', ['AzureServices']],
+        ['Deny', 'AzureServices, Metrics, Logging', ['AzureServices', 'Metrics', 'Logging']]
+    ]
+
+    @parameterized.expand(scenarios)
+    def test_run(self, default_action, bypass, expected):
+        resource = {'properties': {'networkAcls': {'defaultAction': default_action,
+                                                   'bypass': bypass}}}
+        f = StorageFirewallBypassFilter({'mode': 'equal', 'list': []})
+        self.assertEqual(expected, f._query_bypass(resource))
