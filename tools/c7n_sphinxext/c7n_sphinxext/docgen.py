@@ -51,6 +51,12 @@ def get_environment():
     return env
 
 
+class SafeNoAliasDumper(yaml.SafeDumper):
+
+    def ignore_aliases(self, data):
+        return True
+
+
 class CustodianDirective(Directive):
 
     has_content = True
@@ -105,8 +111,9 @@ class CustodianSchema(CustodianDirective):
     def render_schema(cls, el):
         return cls._render(
             'schema.rst',
-            {'schema_yaml': yaml.safe_dump(
+            {'schema_yaml': yaml.dump(
                 ElementSchema.schema(cls.definitions, el),
+                Dumper=SafeNoAliasDumper,
                 default_flow_style=False)})
 
     def run(self):
