@@ -12,12 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from setuptools import setup, find_packages
+
+description = ""
+if os.path.exists('readme.md'):
+    description = open('readme.md', 'r').read()
 
 setup(
     name="c7n_gcp",
-    version='0.3.3',
-    description="Cloud Custodian - Multi Account",
+    version='0.3.5',
+    description="Cloud Custodian - Google Cloud Provider",
+    long_description=description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
