@@ -93,6 +93,15 @@ This example is the same structure as the default one.
 
 Use `{account_id}` for Subscription ID.
 
+Visualizing Application Insights Logs
+-------------------------------------
+
+We have provided the json schema for an Application Insights Workbook that will visualize
+the execution of policies. It shows when each policy was executed, the logs for actions 
+taken on resources and errors in executing policies.
+
+Instructions and more detail on deploying the workbook can be found in
+``tools/ops/azure/application-insights-workbook/README.md``
 
 Authentication to Storage
 -------------------------
