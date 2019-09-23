@@ -1,5 +1,5 @@
-boto3>=1.9.94
-botocore>=1.12.94
+boto3>=1.9.228
+botocore>=1.12.228
 docutils>=0.12
 jmespath>=0.9.0
 vcversioner==2.16.0.0
