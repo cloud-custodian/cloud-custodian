@@ -1,0 +1,314 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "query": "",
+        "crossComponentResources": [],
+        "parameters": [
+          {
+            "id": "c642a034-64d8-4932-99c0-2d1b627a8397",
+            "version": "KqlParameterItem/1.0",
+            "name": "Timespan",
+            "type": 4,
+            "description": "Select the timerange to show",
+            "value": {
+              "durationMs": 604800000
+            },
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                }
+              ]
+            }
+          },
+          {
+            "id": "0189c964-7ad7-4ef8-ae1a-202aabbabc46",
+            "version": "KqlParameterItem/1.0",
+            "name": "SubscriptionId",
+            "type": 2,
+            "description": "Shows results for a single subscription",
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "customMetrics\n| extend SubscriptionId = tostring(customDimensions['SubscriptionId'])\n| summarize count() by SubscriptionId\n| project SubscriptionId",
+            "value": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ]
+            },
+            "queryType": 0,
+            "resourceType": "microsoft.insights/components"
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components"
+      },
+      "name": "parameters - 1"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "# Policy Executions\nThis plot shows execution by policy for the selected subscription ids. See later plots for the success percentages"
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| summarize count() by Policy, bin(timestamp, {Timespan:grain})",
+        "size": 0,
+        "exportToExcelOptions": "visible",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "Timespan",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "barchart"
+      },
+      "name": "query - 2"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "# Acted on Resources\nMeasured by policy runs that have a customMetric result with name \"ActionTime\" out of all of the customMetrics results, grouped by ExecutionId. Click on a row in the table of Policies to get a query of the logs for the given run."
+      },
+      "name": "text - 8"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize actions=countif(name==\"ActionTime\") by Policy, executionId\n| summarize actionTaken=countif(actions>0), policyExecution=count() by Policy\n| extend actionPercentage = round(toreal(actionTaken) / toreal(policyExecution) * 100.0, 2)\n| order by actionPercentage desc\n",
+        "size": 0,
+        "exportFieldName": "Policy",
+        "exportParameterName": "Policy",
+        "exportDefaultValue": "<unset>",
+        "exportToExcelOptions": "visible",
+        "title": "Policies that have taken action",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "Timespan",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components"
+      },
+      "name": "query - 9"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "customMetrics\n| where name == \"ActionTime\"\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| where Policy == \"{Policy}\"\n| extend execution = tostring(customDimensions['ExecutionId'])\n| join( traces\n    | extend execution = tostring(customDimensions['ExecutionId'])\n    | order by timestamp asc\n    | summarize message=tostring(makelist(message)) by execution) on execution\n| project execution, message\n",
+        "size": 0,
+        "showAnalytics": true,
+        "showExportToExcel": true,
+        "exportToExcelOptions": "visible",
+        "title": "Query results for slected Policy",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "Timespan",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "execution",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "message",
+              "formatter": 1,
+              "formatOptions": {
+                "showIcon": true
+              }
+            }
+          ],
+          "sortBy": [
+            {
+              "itemKey": "message",
+              "sortOrder": 1
+            }
+          ],
+          "labelSettings": []
+        },
+        "tileSettings": {
+          "showBorder": false
+        },
+        "graphSettings": {
+          "type": 0
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "Policy",
+        "comparison": "isNotEqualTo",
+        "value": "<unset>"
+      },
+      "name": "query - 11"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "# Failed Policy Execution\nThe following shows the total number of exceptions by policy for the subscriptions, followed by a breakdown of the failure percentage. Note: these numbers are based on the customMetrics data and not the exceptions thrown by Python. Please see the next section for a break down of Python exceptions.\n\nWhen you select a policy in the list, a new query will appear showing the instances that the policy ran that posted a trace with either \"warning\" or \"error\" as its level, and displays the message."
+      },
+      "name": "text - 4"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize failures=countif(name==\"PolicyException\") by Policy\n| order by failures",
+        "size": 0,
+        "exportToExcelOptions": "visible",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "Timespan",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "piechart"
+      },
+      "name": "query - 3"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize failures=countif(name==\"PolicyException\") by Policy, executionId\n| summarize totalFailures=sum(failures), attempts=count() by Policy\n| extend failurePercentage = round(toreal(totalFailures) / toreal(attempts) * 100.0, 2)\n| order by failurePercentage desc\n",
+        "size": 0,
+        "exportFieldName": "Policy",
+        "exportParameterName": "Policy2",
+        "exportToExcelOptions": "visible",
+        "title": "Policy execution errors",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "Timespan",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components"
+      },
+      "name": "query - 5"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "customMetrics\n| where name == \"PolicyException\"\n| extend SubscriptionId = tostring(customDimensions['SubscriptionId'])\n| where SubscriptionId in ({SubscriptionId})\n| extend execution = tostring(customDimensions['ExecutionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| where Policy == \"{Policy2}\"\n| summarize count() by execution, Policy, SubscriptionId\n| join( traces\n    | extend execution = tostring(customDimensions['ExecutionId'])\n    | order by timestamp asc\n    | summarize message=tostring(makelist(message)) by execution\n    | project execution, message) on execution\n| summarize count() by Policy, execution, message \n| order by Policy asc",
+        "size": 0,
+        "exportToExcelOptions": "visible",
+        "title": "Log message for failed policies",
+        "noDataMessage": "No error messages logged for this policy",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "Timespan",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Policy",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "execution",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "message",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "count_",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            }
+          ],
+          "labelSettings": []
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "Policy2",
+        "comparison": "isNotEqualTo"
+      },
+      "name": "query - 11"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "# Python Exceptions\nThe following table shows the exceptions that have been thrown by the application. The columns sort by the policy experiencing the exception and the message thrown by the policy. For convenience the line and file name that the exception occured are included."
+      },
+      "name": "text - 6"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "exceptions\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend execution = tostring(customDimensions['ExecutionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| extend line = tostring(details[0]['parsedStack'][0]['line'])\n| extend file = tostring(details[0]['parsedStack'][0]['fileName'])\n| summarize count() by outerMessage, Policy, execution, line, file\n| summarize executionIds=tostring(makelist(execution)) by outerMessage, Policy, line, file\n",
+        "size": 0,
+        "exportToExcelOptions": "visible",
+        "title": "Python exceptions",
+        "noDataMessage": "No exceptions were thrown for the selected inputs",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "Timespan",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components"
+      },
+      "name": "query - 7"
+    }
+  ],
+  "styleSettings": {},
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
