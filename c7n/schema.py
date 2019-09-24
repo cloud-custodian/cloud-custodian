@@ -270,11 +270,11 @@ def generate(resource_types=()):
             r_type_name = "%s.%s" % (cloud_name, type_name)
 
             aliases = []
-            if resource_type.aliases:
-                aliases.extend(["%s.%s" % (cloud_name, a) for a in resource_type.aliases])
+            if resource_type.type_aliases:
+                aliases.extend(["%s.%s" % (cloud_name, a) for a in resource_type.type_aliases])
                 # aws gets legacy aliases with no cloud prefix
                 if cloud_name == 'aws':
-                    aliases.extend(resource_type.aliases)
+                    aliases.extend(resource_type.type_aliases)
 
             # aws gets additional alias for default name
             if cloud_name == 'aws':

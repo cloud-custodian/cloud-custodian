@@ -67,7 +67,7 @@ class PluginRegistry(object):
         # invoked as function
         if klass:
             klass.type = name
-            klass.aliases = aliases
+            klass.type_aliases = aliases
             self._factories[name] = klass
             self.notify(self.EVENT_REGISTER, klass)
             return klass
@@ -78,7 +78,7 @@ class PluginRegistry(object):
                 return klass
             self._factories[name] = klass
             klass.type = name
-            klass.aliases = aliases
+            klass.type_aliases = aliases
             self.notify(self.EVENT_REGISTER, klass)
             return klass
         return _register_class
@@ -104,7 +104,7 @@ class PluginRegistry(object):
             return factory
 
         return next((v for k, v in self._factories.items()
-                     if v.aliases and name in v.aliases),
+                     if v.type_aliases and name in v.type_aliases),
                     None)
 
     def keys(self):
