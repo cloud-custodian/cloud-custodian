@@ -15,7 +15,7 @@
             "type": 4,
             "description": "Select the timerange to show",
             "value": {
-              "durationMs": 604800000
+              "durationMs": 259200000
             },
             "typeSettings": {
               "selectableValues": [
@@ -196,7 +196,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize failures=countif(name==\"PolicyException\") by Policy\n| order by failures",
+        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| join ( traces\n    | extend executionId = tostring(customDimensions['ExecutionId'])\n    | summarize traceFailures=countif(severityLevel >= 3) by executionId) on executionId\n| summarize failures=countif(name==\"PolicyException\" or traceFailures > 0) by Policy\n| order by failures",
         "size": 0,
         "exportToExcelOptions": "visible",
         "timeContext": {
@@ -213,7 +213,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize failures=countif(name==\"PolicyException\") by Policy, executionId\n| summarize totalFailures=sum(failures), attempts=count() by Policy\n| extend failurePercentage = round(toreal(totalFailures) / toreal(attempts) * 100.0, 2)\n| order by failurePercentage desc\n",
+        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| join ( traces\n    | extend executionId = tostring(customDimensions['ExecutionId'])\n    | summarize traceFailures=countif(severityLevel >= 3) by executionId) on executionId\n| summarize failures=countif(name==\"PolicyException\" or traceFailures > 0) by Policy, executionId\n| summarize totalFailures=sum(failures), attempts=count() by Policy\n| extend failurePercentage = round(toreal(totalFailures) / toreal(attempts) * 100.0, 2)\n| order by failurePercentage desc\n",
         "size": 0,
         "exportFieldName": "Policy",
         "exportParameterName": "Policy2",
@@ -232,8 +232,9 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "customMetrics\n| where name == \"PolicyException\"\n| extend SubscriptionId = tostring(customDimensions['SubscriptionId'])\n| where SubscriptionId in ({SubscriptionId})\n| extend execution = tostring(customDimensions['ExecutionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| where Policy == \"{Policy2}\"\n| summarize count() by execution, Policy, SubscriptionId\n| join( traces\n    | extend execution = tostring(customDimensions['ExecutionId'])\n    | order by timestamp asc\n    | summarize message=tostring(makelist(message)) by execution\n    | project execution, message) on execution\n| summarize count() by Policy, execution, message \n| order by Policy asc",
+        "query": "customMetrics\n| extend SubscriptionId = tostring(customDimensions['SubscriptionId'])\n| where SubscriptionId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| where Policy == \"{Policy2}\"\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| join ( traces\n    | extend executionId = tostring(customDimensions['ExecutionId'])\n    | summarize traceFailures=countif(severityLevel >= 3) by executionId) on executionId\n| where name == \"PolicyException\" or traceFailures > 0\n| summarize count() by executionId, Policy, SubscriptionId\n| join( traces\n    | extend executionId = tostring(customDimensions['ExecutionId'])\n    | order by timestamp asc\n    | summarize message=tostring(makelist(message)) by executionId\n    | project executionId, message) on executionId\n| summarize count() by Policy, executionId, message \n| order by Policy asc",
         "size": 0,
+        "showExportToExcel": true,
         "exportToExcelOptions": "visible",
         "title": "Log message for failed policies",
         "noDataMessage": "No error messages logged for this policy",
@@ -281,7 +282,10 @@
         "parameterName": "Policy2",
         "comparison": "isNotEqualTo"
       },
-      "name": "query - 11"
+      "name": "query - 11",
+      "styleSettings": {
+        "showBorder": true
+      }
     },
     {
       "type": 1,
