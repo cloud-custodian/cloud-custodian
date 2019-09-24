@@ -51,8 +51,8 @@ class SubscriptionTest(BaseTest):
         # The lookup table for policy ID's is huge
         # so just patch in the constant to reduce test impact
         definition_patch.return_value.id = \
-            "/providers/Microsoft.Authorization/policyDefinitions/"
-        "37e0d2fe-28a5-43d6-a273-67d37d1f5606"
+            "/providers/Microsoft.Authorization/policyDefinitions/" \
+            "404c3081-a854-4457-ae30-26a93ef643f9"
 
         p = self.load_policy({
             'name': 'test-add-policy',
@@ -71,7 +71,7 @@ class SubscriptionTest(BaseTest):
                 {'type': 'add-policy',
                  'name': 'cctestpolicy_sub',
                  'display_name': 'cctestpolicy_sub',
-                 'definition_name': "Audit use of classic storage accounts"}
+                 'definition_name': "Secure transfer to storage accounts should be enabled"}
             ]
         })
         resources = p.run()

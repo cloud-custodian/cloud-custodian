@@ -36,8 +36,8 @@ class DataFactoryTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
-                 'value': 'cctest-data-factory'}],
+                 'op': 'glob',
+                 'value': 'cctest-data-factory*'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

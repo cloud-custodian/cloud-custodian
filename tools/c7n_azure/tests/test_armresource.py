@@ -13,9 +13,10 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template
+from azure_common import BaseTest, arm_template, cassette_name
 from jsonschema.exceptions import ValidationError
 from mock import patch
+from c7n_azure.resources.generic_arm_resource import GenericArmResource
 
 
 class ArmResourceTest(BaseTest):
@@ -32,6 +33,7 @@ class ArmResourceTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('vm.json')
+    @cassette_name('common')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-armresource',
@@ -126,6 +128,26 @@ class ArmResourceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    @arm_template('vm.json')
+    def test_metric_filter_invalid_metric(self):
+        p = self.load_policy({
+            'name': 'test-azure-metric',
+            'resource': 'azure.vm',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'cctestvm'},
+                {'type': 'metric',
+                 'metric': 'InvalidMetric',
+                 'aggregation': 'average',
+                 'op': 'gte',
+                 'threshold': 0}],
+        })
+        resources = p.run()
+        self.assertEqual(0, len(resources))
+
     def test_metric_filter_invalid_missing_metric(self):
         policy = {
             'name': 'test-azure-metric',
@@ -185,7 +207,7 @@ class ArmResourceTest(BaseTest):
         }
     ]
 
-    @patch('c7n_azure.query.ResourceQuery.filter',
+    @patch('c7n_azure.resources.generic_arm_resource.GenericArmResourceQuery.filter',
         return_value=fake_arm_resources)
     @patch('c7n_azure.actions.delete.DeleteAction.process',
         return_value='')
@@ -242,6 +264,7 @@ class ArmResourceTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('vm.json')
+    @cassette_name('common')
     def test_arm_resource_resource_type(self):
         p = self.load_policy({
             'name': 'test-azure-armresource-filter',
@@ -252,7 +275,8 @@ class ArmResourceTest(BaseTest):
                     'values': [
                         'Microsoft.Network/virtualNetworks',
                         'Microsoft.Storage/storageAccounts',
-                        'Microsoft.Compute/virtualMachines'
+                        'Microsoft.Compute/virtualMachines',
+                        'resourceGroups'
                     ]
                 },
                 {
@@ -265,4 +289,24 @@ class ArmResourceTest(BaseTest):
             ]
         })
         resources = p.run()
-        self.assertEqual(len(resources), 3)
+        self.assertEqual(len(resources), 4)
+
+    @arm_template('vm.json')
+    def test_arm_resource_get_resources(self):
+        rm = GenericArmResource(self.test_context,
+                                {'policies': [
+                                    {'name': 'test',
+                                     'resource': 'azure.armresource'}]})
+
+        rg_id = '/subscriptions/{0}/resourceGroups/test_vm'\
+                .format(rm.get_session().get_subscription_id())
+        ids = ['{0}/providers/Microsoft.Compute/virtualMachines/cctestvm'.format(rg_id),
+               rg_id]
+        resources = rm.get_resources(ids)
+        self.assertEqual(len(resources), 2)
+        self.assertEqual({r['type'] for r in resources},
+                         {'resourceGroups', 'Microsoft.Compute/virtualMachines'})
+        self.assertEqual({r['id'] for r in resources},
+                         set(ids))
+        self.assertEqual({r['resourceGroup'] for r in resources},
+                         {'test_vm'})

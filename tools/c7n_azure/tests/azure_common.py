@@ -16,6 +16,7 @@ import email.utils as eut
 import json
 import os
 import re
+from distutils.util import strtobool
 from functools import wraps
 
 import msrest.polling
@@ -29,6 +30,8 @@ from msrest.serialization import Model
 from msrest.service_client import ServiceClient
 from vcr_unittest import VCRTestCase
 
+from c7n.config import Config, Bag
+from c7n.policy import ExecutionContext
 from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
@@ -147,7 +150,7 @@ class AzureVCRBaseTest(VCRTestCase):
 
     def __init__(self, *args, **kwargs):
         super(AzureVCRBaseTest, self).__init__(*args, **kwargs)
-        self.vcr_enabled = not os.environ.get('C7N_TEST_RUN_LIVE')
+        self.vcr_enabled = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 
     def is_playback(self):
         # You can't do this in setup because it is actually required by the base class
@@ -337,6 +340,13 @@ class AzureVCRBaseTest(VCRTestCase):
 
 
 class BaseTest(TestUtils, AzureVCRBaseTest):
+
+    test_context = ExecutionContext(
+        Session,
+        Bag(name="xyz", provider_name='azure'),
+        Config.empty()
+    )
+
     """ Azure base testing class.
     """
     def __init__(self, *args, **kwargs):
@@ -383,14 +393,17 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             self.addCleanup(self._subscription_patch.stop)
 
     def get_test_date(self, tz=None):
-        header_date = self.cassette.responses[0]['headers'].get('date') \
-            if self.cassette.responses else None
+        if self.vcr_enabled:
+            header_date = self.cassette.responses[0]['headers'].get('date') \
+                if self.cassette.responses else None
 
-        if header_date:
-            test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
+            if header_date:
+                test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
+            else:
+                test_date = datetime.datetime.now()
+            return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
         else:
-            test_date = datetime.datetime.now()
-        return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
+            return datetime.datetime.now()
 
     @staticmethod
     def setup_account():
