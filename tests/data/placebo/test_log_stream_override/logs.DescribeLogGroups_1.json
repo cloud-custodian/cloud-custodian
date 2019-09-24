@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "logGroups": [
+            {
+                "logGroupName": "custodian",
+                "creationTime": 1568908104055,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-east-2:1234567890:log-group:custodian:*",
+                "storedBytes": 0
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "0069aaf5-2fb5-4f68-b624-2be4f0b8e6eb",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0069aaf5-2fb5-4f68-b624-2be4f0b8e6eb",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "177",
+                "date": "Thu, 19 Sep 2019 16:16:37 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

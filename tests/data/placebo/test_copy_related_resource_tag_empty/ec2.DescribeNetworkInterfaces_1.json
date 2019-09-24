@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "NetworkInterfaces": [
+            {
+                "NetworkInterfaceId": "eni-0e78f79b7b27d86ec",
+                "TagSet": []
+            },	    
+            {
+                "Attachment": {
+                    "AttachTime": {
+                        "__class__": "datetime",
+                        "year": 2019,
+                        "month": 6,
+                        "day": 21,
+                        "hour": 13,
+                        "minute": 40,
+                        "second": 19,
+                        "microsecond": 0
+                    },
+                    "AttachmentId": "eni-attach-085d0d695460607ca",
+                    "DeleteOnTermination": true,
+                    "DeviceIndex": 0,
+                    "InstanceId": "i-0f94b4d7343149de3",
+                    "InstanceOwnerId": "644160558196",
+                    "Status": "attached"
+                },
+                "NetworkInterfaceId": "eni-0e1324ba169ed7b2f"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "d4d51c9e-32df-4f1f-a5ee-fe293a9ffcb8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "4359",
+                "vary": "accept-encoding",
+                "date": "Mon, 23 Sep 2019 14:28:40 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

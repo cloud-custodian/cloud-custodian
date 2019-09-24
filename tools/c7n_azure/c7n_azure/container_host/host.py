@@ -50,7 +50,6 @@ log = logging.getLogger("c7n_azure.container-host")
 max_dequeue_count = 2
 policy_update_seconds = 60
 queue_poll_seconds = 15
-jitter_seconds = 10
 queue_timeout_seconds = 5 * 60
 queue_message_count = 5
 
@@ -97,7 +96,7 @@ class Host:
         self.policies = {}
 
         # Configure scheduler
-        self.scheduler = BlockingScheduler()
+        self.scheduler = BlockingScheduler(Host.get_scheduler_config())
         logging.getLogger('apscheduler.executors.default').setLevel(logging.ERROR)
 
         # Schedule recurring policy updates
@@ -105,13 +104,15 @@ class Host:
                                'interval',
                                seconds=policy_update_seconds,
                                id="update_policies",
-                               next_run_time=datetime.now())
+                               next_run_time=datetime.now(),
+                               executor='threadpool')
 
         # Schedule recurring queue polling
         self.scheduler.add_job(self.poll_queue,
                                'interval',
                                seconds=queue_poll_seconds,
-                               id="poll_queue")
+                               id="poll_queue",
+                               executor='threadpool')
 
         self.scheduler.start()
 
@@ -281,8 +282,7 @@ class Host:
         periodic scheduling.
         """
         trigger = CronTrigger.from_crontab(policy.data['mode']['schedule'])
-        trigger.jitter = jitter_seconds
-        self.scheduler.add_job(self.run_policy,
+        self.scheduler.add_job(Host.run_policy,
                                trigger,
                                id=policy.name,
                                name=policy.name,
@@ -290,7 +290,7 @@ class Host:
                                coalesce=True,
                                max_instances=1,
                                replace_existing=True,
-                               misfire_grace_time=20)
+                               misfire_grace_time=60)
 
     def update_event_subscription(self):
         """
@@ -373,21 +373,13 @@ class Host:
                 continue
             events = AzureEvents.get_event_operations(events)
             if operation_name in events:
-                self.scheduler.add_job(self.run_policy,
+                self.scheduler.add_job(Host.run_policy,
                                        id=k + event['id'],
                                        name=k,
                                        args=[v['policy'],
                                              event,
                                              None],
                                        misfire_grace_time=60 * 3)
-
-    def run_policy(self, policy, event, context):
-        try:
-            policy.push(event, context)
-        except Exception as e:
-            log.error(
-                "Exception running policy: %s error: %s",
-                policy.name, e)
 
     def prepare_queue_storage(self, queue_resource_id, queue_name):
         """
@@ -406,6 +398,13 @@ class Host:
                                                   queue_name,
                                                   self.session)
         return account
+
+    @staticmethod
+    def run_policy(policy, event, context):
+        try:
+            policy.push(event, context)
+        except Exception:
+            log.exception("Policy Failed: %s", policy.name)
 
     @staticmethod
     def build_options(output_dir=None, log_group=None, metrics=None):
@@ -427,31 +426,51 @@ class Host:
         return Azure().initialize(config)
 
     @staticmethod
+    def get_scheduler_config():
+        return {
+            'apscheduler.jobstores.default': {
+                'type': 'memory'
+            },
+            'apscheduler.executors.default': {
+                'class': 'apscheduler.executors.pool:ProcessPoolExecutor',
+                'max_workers': '4'
+            },
+            'apscheduler.executors.threadpool': {
+                'type': 'threadpool',
+                'max_workers': '20'
+            },
+            'apscheduler.job_defaults.coalesce': 'true',
+            'apscheduler.job_defaults.max_instances': '1',
+            'apscheduler.timezone': 'UTC',
+        }
+
+    @staticmethod
     def has_yaml_ext(filename):
         return filename.lower().endswith(('.yml', '.yaml'))
 
-
-@click.command(help="Periodically run a set of policies from an Azure storage container against "
-    "a single subscription. The host will update itself with new policies and event subscriptions "
-    "as they are added.")
-@click.option("--storage-id", "-q", envvar=ENV_CONTAINER_EVENT_QUEUE_ID, required=True,
-              help="The resource id of the storage account to create the event queue in")
-@click.option("--queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME,
-              help="The name of the event queue to create")
-@click.option("--policy-uri", "-p", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
-              help="The URI to the Azure storage container that holds the policies")
-@click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
-              help="Location to send policy logs")
-@click.option("--metrics", "-m", envvar=ENV_CONTAINER_OPTION_METRICS,
-              help="The resource name or instrumentation key for uploading metrics")
-@click.option("--output-dir", "-d", envvar=ENV_CONTAINER_OPTION_OUTPUT_DIR,
-              help="The directory for policy output")
-class HostCommand(Host):
-    pass
+    @staticmethod
+    @click.command(help="Periodically run a set of policies from an Azure storage container "
+                        "against a single subscription. The host will update itself with new "
+                        "policies and event subscriptions as they are added.")
+    @click.option("--storage-id", "-q", envvar=ENV_CONTAINER_EVENT_QUEUE_ID, required=True,
+                  help="The resource id of the storage account to create the event queue in")
+    @click.option("--queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME,
+                  help="The name of the event queue to create")
+    @click.option("--policy-uri", "-p", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
+                  help="The URI to the Azure storage container that holds the policies")
+    @click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
+                  help="Location to send policy logs")
+    @click.option("--metrics", "-m", envvar=ENV_CONTAINER_OPTION_METRICS,
+                  help="The resource name or instrumentation key for uploading metrics")
+    @click.option("--output-dir", "-d", envvar=ENV_CONTAINER_OPTION_OUTPUT_DIR,
+                  help="The directory for policy output")
+    def cli(**kwargs):
+        Host(**kwargs)
 
 
 if __name__ == "__main__":
-    HostCommand()
+    # handle CLI commands
+    Host.cli()
 
 # Need to manually initialize c7n_azure
 entry.initialize_azure()
