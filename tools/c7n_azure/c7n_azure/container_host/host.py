@@ -50,7 +50,6 @@ log = logging.getLogger("c7n_azure.container-host")
 max_dequeue_count = 2
 policy_update_seconds = 60
 queue_poll_seconds = 15
-jitter_seconds = 10
 queue_timeout_seconds = 5 * 60
 queue_message_count = 5
 
@@ -283,7 +282,6 @@ class Host:
         periodic scheduling.
         """
         trigger = CronTrigger.from_crontab(policy.data['mode']['schedule'])
-        trigger.jitter = jitter_seconds
         self.scheduler.add_job(Host.run_policy,
                                trigger,
                                id=policy.name,
@@ -292,7 +290,7 @@ class Host:
                                coalesce=True,
                                max_instances=1,
                                replace_existing=True,
-                               misfire_grace_time=20)
+                               misfire_grace_time=60)
 
     def update_event_subscription(self):
         """
