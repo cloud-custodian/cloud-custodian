@@ -176,7 +176,8 @@ class SessionTest(BaseTest):
 
         mock_log.assert_called_once_with('Failed to authenticate with MSI')
 
-    def test_initialize_session_token(self):
+    @patch('c7n_azure.session.jwt.decode', return_value={'tid': DEFAULT_TENANT_ID})
+    def test_initialize_session_token(self, _1):
         with patch.dict(os.environ,
                         {
                             constants.ENV_ACCESS_TOKEN: 'token',
@@ -303,7 +304,8 @@ class SessionTest(BaseTest):
         self.assertTrue(mock.called)
 
     @patch('c7n_azure.utils.get_keyvault_secret', return_value='{}')
-    def test_compare_auth_params(self, _1):
+    @patch('c7n_azure.session.jwt.decode', return_value={'tid': DEFAULT_TENANT_ID})
+    def test_compare_auth_params(self, _1, _2):
         reload(sys.modules['c7n_azure.session'])
         with patch.dict(os.environ,
                         {
