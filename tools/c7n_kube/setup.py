@@ -16,7 +16,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n_kube",
-    version='0.1',
+    version='0.1.1',
     description="Cloud Custodian - Kubernetes Provider",
     classifiers=[
         "Topic :: System :: Systems Administration",

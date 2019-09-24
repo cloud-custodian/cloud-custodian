@@ -31,7 +31,7 @@ extra_dependencies = ["azure-functions"] if sys.version_info[0] >= 3 else []
 
 setup(
     name="c7n_azure",
-    version='0.5.5',
+    version='0.6.0',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
