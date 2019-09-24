@@ -48,6 +48,7 @@ def get_resource(existing_tags):
                      'TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm'
     resource['name'] = 'cctestvm'
     resource['type'] = 'Microsoft.Compute/virtualMachines'
+    resource['InstanceId'] = "testInstance"
     return resource
 
 

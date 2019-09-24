@@ -195,3 +195,40 @@ class OutputMetricsTest(BaseTest):
         self.assertTrue(isinstance(sink, aws.MetricsOutput))
         sink.put_metric('ResourceCount', 101, 'Count')
         sink.flush()
+
+
+class OutputLogsTest(BaseTest):
+
+    def test_log_handler(self):
+        session_factory = self.replay_flight_data(
+            'test_log_handler')
+        conf = Bag({
+            'region': 'us-east-2',
+            'scheme': 'aws',
+            'netloc': 'master',
+            'path': 'custodian'
+        })
+        ctx = Bag(session_factory=session_factory,
+            options=Bag(account_id='001100', region='us-east-1'),
+            policy=Bag(name='test', resource_type='ec2'))
+        output = aws.CloudWatchLogOutput(ctx, conf)
+        stream = output.get_handler()
+        self.assertTrue(stream.log_group == 'custodian')
+        self.assertTrue(stream.log_stream == '001100/us-east-1/test')
+
+    def test_stream_override(self):
+        session_factory = self.replay_flight_data(
+            'test_log_stream_override')
+        conf = Bag({
+            'region': 'us-east-2',
+            'scheme': 'aws',
+            'netloc': 'master',
+            'path': 'custodian',
+            'stream': "testing"
+        })
+        ctx = Bag(session_factory=session_factory,
+            options=Bag(account_id='001100', region='us-east-1'),
+            policy=Bag(name='test', resource_type='ec2'))
+        output = aws.CloudWatchLogOutput(ctx, conf)
+        stream = output.get_handler()
+        self.assertTrue(stream.log_stream == 'testing')
