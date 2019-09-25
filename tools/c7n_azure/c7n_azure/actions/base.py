@@ -16,6 +16,7 @@ Actions to perform on Azure resources
 """
 import abc
 import logging
+import sys
 
 import six
 from c7n_azure import constants
@@ -57,13 +58,29 @@ class AzureBaseAction(BaseAction):
             chunk_size=self.chunk_size
         )
 
+    def _log_modified_resource(self, resource, message):
+        template = "Resource '{}' Modified by Custodian Action {}."
+        name = resource.get('name', 'unknown')
+        id = resource.get('id')
+        action = self.__class__.__name__
+
+        if message:
+            template += ' ' + message
+
+        self.log.info(template.format(name, action),
+                      extra={'properties': {'resource_id': id, 'action': action}})
+
     def _process_resources(self, resources, event):
         self._prepare_processing()
 
         for r in resources:
             try:
-                self._process_resource(r)
+                message = self._process_resource(r)
+                self._log_modified_resource(r, message)
             except Exception as e:
+                # only executes during test runs
+                if "pytest" in sys.modules:
+                    raise e
                 if isinstance(e, CloudError):
                     self.log.error("Failed to process resource.\n"
                                    "Type: {0}.\n"

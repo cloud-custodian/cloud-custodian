@@ -173,6 +173,9 @@ class AppInsightsLogHandler(LoggingHandler):
             'ExecutionId': self.execution_id
         }
 
+        if hasattr(record, 'properties'):
+            properties.update(record.properties)
+
         if record.exc_info:
             self.client.track_exception(*record.exc_info, properties=properties)
             return
