@@ -367,3 +367,29 @@ class SQLServerFirewallActionTest(BaseTest):
 
         # Removed IP's
         self.assertEqual(set(expected_remove), set([args[2] for _, args, _ in delete.mock_calls]))
+
+    @patch('azure.mgmt.sql.operations._firewall_rules_operations.'
+           'FirewallRulesOperations.create_or_update')
+    @cassette_name('firewall_action')
+    @arm_template('sqlserver.json')
+    def test_action_prefix(self, update):
+        template = {
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'}],
+            'actions': [
+                {'type': 'set-firewall-rules',
+                 'ip-rules': ['11.12.13.111'],
+                 'prefix': 'test-prefix'}]}
+
+        p = self.load_policy(template)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+        _, args, _ = update.mock_calls[0]
+        self.assertIn("test-prefix", args[2])
