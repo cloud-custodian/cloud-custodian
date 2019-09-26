@@ -197,9 +197,9 @@ class MetricFilter(Filter):
                 aggregation=self.aggregation,
                 filter=self.get_filter(resource)
             )
-        except HttpOperationError as e:
-            self.log.error("could not get metric:%s on %s. Full error: %s" % (
-                self.metric, resource['id'], str(e)))
+        except HttpOperationError:
+            self.log.exception("Could not get metric: %s on %s" % (
+                self.metric, resource['id']))
             return None
 
         if len(metrics_data.value) > 0 and len(metrics_data.value[0].timeseries) > 0:

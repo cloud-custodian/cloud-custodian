@@ -61,14 +61,18 @@ class AzureBaseAction(BaseAction):
     def _log_modified_resource(self, resource, message):
         template = "Resource '{}' Modified by Custodian Action {}."
         name = resource.get('name', 'unknown')
-        id = resource.get('id')
         action = self.__class__.__name__
 
         if message:
             template += ' ' + message
 
         self.log.info(template.format(name, action),
-                      extra={'properties': {'resource_id': id, 'action': action}})
+                      extra=self._get_action_log_metadata)
+
+    def _get_action_log_metadata(self, resource):
+        action = self.__class__.__name__
+        rid = resource.get('id')
+        return {'properties': {'resource_id': rid, 'action': action}}
 
     def _process_resources(self, resources, event):
         self._prepare_processing()
@@ -81,17 +85,18 @@ class AzureBaseAction(BaseAction):
                 # only executes during test runs
                 if "pytest" in sys.modules:
                     raise e
+
                 if isinstance(e, CloudError):
-                    self.log.error("Failed to process resource.\n"
-                                   "Type: {0}.\n"
-                                   "Name: {1}.\n"
-                                   "Error: {2}\n"
-                                   "Message: {3}".format(r['type'], r['name'], e, e.message))
+                    self.log.exception("Failed to process resource.\n"
+                                       "Type: {0}.\n"
+                                       "Name: {1}.\n"
+                                       "Message: {2}".format(r['type'], r['name'], e.message),
+                                       extra=self._get_action_log_metadata(r))
                 else:
-                    self.log.error("Failed to process resource.\n"
-                                   "Type: {0}.\n"
-                                   "Name: {1}.\n"
-                                   "Error: {2}".format(r['type'], r['name'], e))
+                    self.log.exception("Failed to process resource.\n"
+                                       "Type: {0}.\n"
+                                       "Name: {1}.".format(r['type'], r['name']),
+                                       extra=self._get_action_log_metadata(r))
 
     def _prepare_processing(self):
         pass
@@ -110,12 +115,23 @@ class AzureEventAction(EventAction, AzureBaseAction):
 
         for r in resources:
             try:
-                self._process_resource(r, event)
-            except CloudError as e:
-                self.log.error("Failed to process resource.\n"
-                               "Type: {0}.\n"
-                               "Name: {1}.\n"
-                               "Error: {2}".format(r['type'], r['name'], e))
+                message = self._process_resource(r, event)
+                self._log_modified_resource(r, message)
+            except Exception as e:
+                # only executes during test runs
+                if "pytest" in sys.modules:
+                    raise e
+                if isinstance(e, CloudError):
+                    self.log.exception("Failed to process resource.\n"
+                                       "Type: {0}.\n"
+                                       "Name: {1}.\n"
+                                       "Message: {2}".format(r['type'], r['name'], e.message),
+                                       extra=self._get_action_log_metadata(r))
+                else:
+                    self.log.exception("Failed to process resource.\n"
+                                       "Type: {0}.\n"
+                                       "Name: {1}.".format(r['type'], r['name']),
+                                       extra=self._get_action_log_metadata(r))
 
     @abc.abstractmethod
     def _process_resource(self, resource, event):
