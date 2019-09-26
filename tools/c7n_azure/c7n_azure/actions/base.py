@@ -67,7 +67,7 @@ class AzureBaseAction(BaseAction):
             template += ' ' + message
 
         self.log.info(template.format(name, action),
-                      extra=self._get_action_log_metadata)
+                      extra=self._get_action_log_metadata(resource))
 
     def _get_action_log_metadata(self, resource):
         action = self.__class__.__name__
