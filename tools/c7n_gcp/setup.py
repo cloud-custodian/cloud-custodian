@@ -16,7 +16,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="c7n_gcp",
-    version='0.3.2',
+    version='0.3.3',
     description="Cloud Custodian - Multi Account",
     classifiers=[
         "Topic :: System :: Systems Administration",

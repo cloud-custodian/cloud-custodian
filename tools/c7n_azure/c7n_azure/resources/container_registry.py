@@ -46,6 +46,7 @@ class ContainerRegistry(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'sku.name'
         )
         resource_type = 'Microsoft.ContainerRegistry/registries'

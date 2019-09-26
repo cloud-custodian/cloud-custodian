@@ -50,7 +50,8 @@ class CostManagementExport(QueryResourceManager):
         client = 'CostManagementClient'
         enum_spec = ('exports', 'list', None)
         default_report_fields = (
-            'name'
+            'name',
+            'properties.deliveryInfo.destination.resourceId'
         )
         resource_type = 'Microsoft.CostManagement/exports'
 

@@ -41,6 +41,7 @@ class RouteTable(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'properties.subnets[].id'
         )
         resource_type = 'Microsoft.Network/routeTables'

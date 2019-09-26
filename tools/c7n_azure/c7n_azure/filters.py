@@ -27,7 +27,6 @@ from azure.mgmt.policyinsights import PolicyInsightsClient
 from c7n_azure.tags import TagHelper
 from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
                              StringUtils, ThreadHelper, now, utcnow, is_resource_group)
-from dateutil import tz as tzutils
 from dateutil.parser import parse
 from msrest.exceptions import HttpOperationError
 
@@ -311,7 +310,7 @@ class TagActionFilter(Filter):
             raise PolicyValidationError(
                 "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
-        tz = tzutils.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = Time.get_tz(self.data.get('tz', 'utc'))
         if not tz:
             raise PolicyValidationError(
                 "Invalid timezone specified '%s' in %s" % (
@@ -319,18 +318,14 @@ class TagActionFilter(Filter):
         return self
 
     def process(self, resources, event=None):
-        from c7n_azure.utils import now
-        if self.current_date is None:
-            self.current_date = now()
         self.tag = self.data.get('tag', DEFAULT_TAG)
         self.op = self.data.get('op', 'stop')
         self.skew = self.data.get('skew', 0)
         self.skew_hours = self.data.get('skew_hours', 0)
-        self.tz = tzutils.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        self.tz = Time.get_tz(self.data.get('tz', 'utc'))
         return super(TagActionFilter, self).process(resources, event)
 
     def __call__(self, i):
-
         v = i.get('tags', {}).get(self.tag, None)
 
         if v is None:
@@ -347,15 +342,18 @@ class TagActionFilter(Filter):
         try:
             action_date = parse(action_date_str)
         except Exception:
-            self.log.warning("could not parse tag:%s value:%s on %s" % (
+            self.log.error("could not parse tag:%s value:%s on %s" % (
                 self.tag, v, i['InstanceId']))
+            return False
 
+        # current_date must match timezones with the parsed date string
         if action_date.tzinfo:
-            # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(self.tz)
-            self.current_date = now(tz=self.tz)
+            current_date = now(tz=self.tz)
+        else:
+            current_date = now()
 
-        return self.current_date >= (
+        return current_date >= (
             action_date - timedelta(days=self.skew, hours=self.skew_hours))
 
 
