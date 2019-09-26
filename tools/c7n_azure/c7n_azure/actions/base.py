@@ -59,7 +59,7 @@ class AzureBaseAction(BaseAction):
         )
 
     def _log_modified_resource(self, resource, message):
-        template = "Resource '{}' Modified by Custodian Action {}."
+        template = "Resource '{}' Modified by {}."
         name = resource.get('name', 'unknown')
         action = self.__class__.__name__
 

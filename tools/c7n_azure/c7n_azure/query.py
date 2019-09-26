@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from collections import Iterable
+from collections.abc import Iterable
 
 import six
 from c7n_azure import constants
