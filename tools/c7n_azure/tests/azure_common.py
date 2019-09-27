@@ -18,6 +18,7 @@ import os
 import re
 from distutils.util import strtobool
 from functools import wraps
+from time import sleep
 
 import msrest.polling
 from azure_serializer import AzureSerializer
@@ -301,7 +302,21 @@ class AzureVCRBaseTest(VCRTestCase):
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
                 % '|'.join(['(%s)' % p for p in prefixes])
 
-        return re.sub(regex, r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
+        match = re.search(regex, s)
+
+        if match is not None:
+            sub_id = match.group(0)
+            s = s.replace(sub_id[-36:], DEFAULT_SUBSCRIPTION_ID)
+            s = s.replace(sub_id[-12:], DEFAULT_SUBSCRIPTION_ID[-12:])
+        else:
+            # For function apps
+            func_regex = r"^https\:\/\/[\w-]+([a-f0-9]{12})\.(blob\.core|scm\.azurewebsites)"
+            func_match = re.search(func_regex, s)
+            if func_match is not None:
+                sub_fragment = func_match.group(1)
+                s = s.replace(sub_fragment, DEFAULT_SUBSCRIPTION_ID[-12:])
+
+        return s
 
     @staticmethod
     def _replace_tenant_id(s):
@@ -352,6 +367,21 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
     def __init__(self, *args, **kwargs):
         super(BaseTest, self).__init__(*args, **kwargs)
         self._requires_polling = False
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super(BaseTest, cls).setUpClass(*args, **kwargs)
+        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
+            cls._token_patch = patch(
+                'c7n_azure.session.jwt.decode',
+                return_value={'tid': DEFAULT_TENANT_ID})
+            cls._token_patch.start()
+
+    @classmethod
+    def tearDownClass(cls, *args, **kwargs):
+        super(BaseTest, cls).tearDownClass(*args, **kwargs)
+        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
+            cls._token_patch.stop()
 
     def setUp(self):
         super(BaseTest, self).setUp()
@@ -404,6 +434,10 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
         else:
             return datetime.datetime.now()
+
+    def sleep_in_live_mode(self, interval=60):
+        if not self.is_playback():
+            sleep(interval)
 
     @staticmethod
     def setup_account():

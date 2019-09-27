@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?$filter=resourceType%20eq%20%27Microsoft.KeyVault%2Fvaults%27&api-version=2015-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2018-09-30",
                 "body": null,
                 "headers": {}
             },
@@ -17,32 +17,63 @@
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 21 Jun 2019 00:18:16 GMT"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Fri, 13 Sep 2019 22:10:40 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;237,Microsoft.Compute/HighCostGet30Min;1917"
+                    ],
                     "content-length": [
-                        "467"
+                        "1501"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/erwelch-test/providers/Microsoft.KeyVault/vaults/erwelchtest",
-                                "name": "erwelchtest",
-                                "type": "Microsoft.KeyVault/vaults",
-                                "location": "westus2",
-                                "tags": {}
+                                "name": "cctestlockfilterdiskkj6zteiu22tsy",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskkj6zteiu22tsy",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 32,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "timeCreated": "2019-09-13T21:47:53.1644108+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached"
+                                }
                             },
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1",
-                                "name": "cckeyvault1",
-                                "type": "Microsoft.KeyVault/vaults",
+                                "name": "cctestlockfilterdiskgt4ngt4wopgzq",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskgt4ngt4wopgzq",
+                                "type": "Microsoft.Compute/disks",
                                 "location": "southcentralus",
-                                "tags": {}
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 32,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "timeCreated": "2019-09-13T22:07:01.3460633+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached"
+                                }
                             }
                         ]
                     }
@@ -52,7 +83,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/erwelch-test/providers/Microsoft.KeyVault/vaults/erwelchtest/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_DISK-LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskkj6zteiu22tsy/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -65,11 +96,11 @@
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 21 Jun 2019 00:18:17 GMT"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 13 Sep 2019 22:10:39 GMT"
                     ],
                     "content-length": [
                         "12"
@@ -85,7 +116,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskgt4ngt4wopgzq/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -98,14 +129,14 @@
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 21 Jun 2019 00:18:17 GMT"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Fri, 13 Sep 2019 22:10:39 GMT"
+                    ],
                     "content-length": [
-                        "327"
+                        "324"
                     ]
                 },
                 "body": {
@@ -114,11 +145,11 @@
                             {
                                 "properties": {
                                     "level": "CanNotDelete",
-                                    "notes": "Keyvault should not be deleted."
+                                    "notes": "This lock is for the cc test_filter_resource_lock test"
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1/providers/Microsoft.Authorization/locks/lock",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_locked/providers/Microsoft.Authorization/locks/cctestlockfilter",
                                 "type": "Microsoft.Authorization/locks",
-                                "name": "lock"
+                                "name": "cctestlockfilter"
                             }
                         ]
                     }
@@ -128,7 +159,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?$filter=resourceType%20eq%20%27Microsoft.KeyVault%2Fvaults%27&api-version=2015-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/disks?api-version=2018-09-30",
                 "body": null,
                 "headers": {}
             },
@@ -141,32 +172,63 @@
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 21 Jun 2019 00:18:17 GMT"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Fri, 13 Sep 2019 22:10:40 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;236,Microsoft.Compute/HighCostGet30Min;1916"
+                    ],
                     "content-length": [
-                        "467"
+                        "1501"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/erwelch-test/providers/Microsoft.KeyVault/vaults/erwelchtest",
-                                "name": "erwelchtest",
-                                "type": "Microsoft.KeyVault/vaults",
-                                "location": "westus2",
-                                "tags": {}
+                                "name": "cctestlockfilterdiskkj6zteiu22tsy",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_DISK-LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskkj6zteiu22tsy",
+                                "type": "Microsoft.Compute/disks",
+                                "location": "southcentralus",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 32,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "timeCreated": "2019-09-13T21:47:53.1644108+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached"
+                                }
                             },
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1",
-                                "name": "cckeyvault1",
-                                "type": "Microsoft.KeyVault/vaults",
+                                "name": "cctestlockfilterdiskgt4ngt4wopgzq",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskgt4ngt4wopgzq",
+                                "type": "Microsoft.Compute/disks",
                                 "location": "southcentralus",
-                                "tags": {}
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "properties": {
+                                    "creationData": {
+                                        "createOption": "Empty"
+                                    },
+                                    "diskSizeGB": 32,
+                                    "diskIOPSReadWrite": 500,
+                                    "diskMBpsReadWrite": 60,
+                                    "timeCreated": "2019-09-13T22:07:01.3460633+00:00",
+                                    "provisioningState": "Succeeded",
+                                    "diskState": "Unattached"
+                                }
                             }
                         ]
                     }
@@ -176,7 +238,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/erwelch-test/providers/Microsoft.KeyVault/vaults/erwelchtest/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_DISK-LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskkj6zteiu22tsy/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -189,11 +251,11 @@
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 21 Jun 2019 00:18:17 GMT"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 13 Sep 2019 22:10:40 GMT"
                     ],
                     "content-length": [
                         "12"
@@ -209,7 +271,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/TEST_LOCKED/providers/Microsoft.Compute/disks/cctestlockfilterdiskgt4ngt4wopgzq/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -222,14 +284,14 @@
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Fri, 21 Jun 2019 00:18:17 GMT"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Fri, 13 Sep 2019 22:10:40 GMT"
+                    ],
                     "content-length": [
-                        "327"
+                        "324"
                     ]
                 },
                 "body": {
@@ -238,11 +300,11 @@
                             {
                                 "properties": {
                                     "level": "CanNotDelete",
-                                    "notes": "Keyvault should not be deleted."
+                                    "notes": "This lock is for the cc test_filter_resource_lock test"
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1/providers/Microsoft.Authorization/locks/lock",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_locked/providers/Microsoft.Authorization/locks/cctestlockfilter",
                                 "type": "Microsoft.Authorization/locks",
-                                "name": "lock"
+                                "name": "cctestlockfilter"
                             }
                         ]
                     }

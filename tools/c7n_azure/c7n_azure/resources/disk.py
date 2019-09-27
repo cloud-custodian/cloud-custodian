@@ -45,6 +45,8 @@ class Disk(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'properties.diskState',
+            'sku.name'
         )
         resource_type = 'Microsoft.Compute/disks'

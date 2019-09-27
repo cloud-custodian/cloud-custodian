@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/cloudcustodiantest/listKeys?api-version=2019-04-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Storage/storageAccounts/ccfuncappc129bfa71a47/listKeys?api-version=2019-04-01",
                 "body": null,
                 "headers": {}
             },
@@ -14,14 +14,14 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json"
-                    ],
                     "date": [
-                        "Thu, 27 Jun 2019 00:53:10 GMT"
+                        "Fri, 13 Sep 2019 22:07:21 GMT"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json"
                     ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "1199"

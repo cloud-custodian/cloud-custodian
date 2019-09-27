@@ -1,0 +1,50 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - !!python/unicode httpbin.org
+      User-Agent:
+      - Python-urllib/2.7
+    method: GET
+    uri: http://httpbin.org/gzip
+  response:
+    body:
+      string: !!binary |
+        H4sIANIreV0C/1WOQQqDMBBF954iZG1SFaFY6EJE2mUX7QGiDjGgiSQj1Ip3b1JB6PL/9/4wa0QI
+        lR81TdDRC0E7Q0xC14PowDrfrT76omxbmJDVujWd0tIDqjrQqHChv4l3KtH2wCqj0ZohGKN4M4di
+        gGtySHfjMLAecWqU5sbKg70cWFZKfzYYjwV7o9lsh0E1p4yfqbe2/b8RPAsv01v93PfUWCWVDl1a
+        FDzLc56lBc+TmPxnGm3RFxlZPev5AAAA
+    headers:
+      access-control-allow-credentials:
+      - 'true'
+      access-control-allow-origin:
+      - '*'
+      age:
+      - '0'
+      connection:
+      - close
+      content-encoding:
+      - gzip
+      content-length:
+      - '195'
+      content-type:
+      - application/json
+      date:
+      - Wed, 11 Sep 2019 17:16:02 GMT
+      referrer-policy:
+      - no-referrer-when-downgrade
+      server:
+      - nginx
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - DENY
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

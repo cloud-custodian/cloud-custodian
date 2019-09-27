@@ -62,6 +62,7 @@ class AppServicePlanTest(BaseTest):
     @patch('azure.mgmt.web.operations.app_service_plans_operations.'
            'AppServicePlansOperations.update')
     @arm_template('appserviceplan.json')
+    @cassette_name('window_plans')
     def test_resize_plan_win(self, update_mock):
         p = self.load_policy({
             'name': 'test-azure-appserviceplan-win',
@@ -94,6 +95,7 @@ class AppServicePlanTest(BaseTest):
     @patch('azure.mgmt.web.operations.app_service_plans_operations.'
            'AppServicePlansOperations.update')
     @arm_template('appserviceplan-linux.json')
+    @cassette_name('linux_plans')
     def test_resize_plan_linux(self, update_mock):
         p = self.load_policy({
             'name': 'test-azure-appserviceplan-linux',
@@ -126,7 +128,7 @@ class AppServicePlanTest(BaseTest):
     @patch('azure.mgmt.web.operations.app_service_plans_operations.'
            'AppServicePlansOperations.update')
     @arm_template('appserviceplan.json')
-    @cassette_name('test_resize_plan_win')
+    @cassette_name('window_plans')
     def test_resize_plan_from_resource_tag(self, update_mock):
         p = self.load_policy({
             'name': 'test-azure-appserviceplan',
@@ -154,6 +156,7 @@ class AppServicePlanTest(BaseTest):
 
     @arm_template('appserviceplan.json')
     @patch('c7n_azure.resources.appserviceplan.ResizePlan.log.info')
+    @cassette_name('window_plans')
     def test_resize_consumption_win(self, logger):
         p = self.load_policy({
             'name': 'test-azure-consumption-win',
@@ -171,12 +174,13 @@ class AppServicePlanTest(BaseTest):
         }, validate=True)
         p.run()
 
-        logger.assert_called_once_with(
+        logger.assert_any_call(
             'Skipping cctest-consumption-win, '
             'because this App Service Plan is for Consumption Azure Functions.')
 
     @arm_template('appserviceplan-linux.json')
     @patch('c7n_azure.resources.appserviceplan.ResizePlan.log.info')
+    @cassette_name('linux_plans')
     def test_resize_consumption_linux(self, logger):
         p = self.load_policy({
             'name': 'test-azure-appserviceplan-linux',
@@ -194,14 +198,14 @@ class AppServicePlanTest(BaseTest):
         }, validate=True)
         p.run()
 
-        logger.assert_called_once_with(
+        logger.assert_any_call(
             'Skipping cctest-consumption-linux, '
             'because this App Service Plan is for Consumption Azure Functions.')
 
     @patch('azure.mgmt.web.operations.app_service_plans_operations.'
            'AppServicePlansOperations.update')
     @arm_template('appserviceplan.json')
-    @cassette_name('test_resize_plan_win')
+    @cassette_name('window_plans')
     def test_resize_plan_win_only_count(self, update_mock):
         p = self.load_policy({
             'name': 'test-azure-appserviceplan-win',

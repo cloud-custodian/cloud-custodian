@@ -48,6 +48,7 @@ class IoTHub(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'sku.[name, tier, capacity]'
         )
         resource_type = 'Microsoft.Devices/IotHubs'

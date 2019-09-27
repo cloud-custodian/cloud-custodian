@@ -95,13 +95,11 @@ environment variables as documented in :ref:`azure_authentication`.
 If successful, you should see output similar to the following on the command line::
 
     2016-12-20 08:35:06,133: custodian.policy:INFO Running policy my-first-policy resource: azure.vm
-    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource:ec2 has count:1 time:1.38
+    2016-12-20 08:35:07,514: custodian.policy:INFO policy: my-first-policy resource:azure.vm has count:1 time:1.38
     2016-12-20 08:35:08,188: custodian.policy:INFO policy: my-first-policy action: tag: 1 execution_time: 0.67
 
 
-You should also find a new ``my-first-policy`` directory with a log and a ``resources.json``.  The ``resources.json``
-file shows you the raw data that results from your policy after filtering is applied.  This file can help you understand the
-fields available for your resources while developing your policy.
+You should also find a new ``my-first-policy`` directory with a log and a ``resources.json``.
 
 See :ref:`filters` for more information on the features of the Value filter used in this sample.
 
@@ -112,6 +110,47 @@ See :ref:`filters` for more information on the features of the Value filter used
 
 Cloud Custodian policies can emit logs and metrics to Application Insights when the policy executes.
 Please refer to the :ref:`azure_monitoring` section for further details.
+
+.. _azure_view_policy_reults:
+
+View policy results
+-------------------
+
+The ``resources.json`` file shows you the raw data that results from your policy after filtering is applied.  This file can help you understand the
+fields available for your resources while developing your policy.
+
+See :ref:`filters` for more information on the features of the Value filter used in this sample.
+
+Custodian Report
+"""""""""""""""""""""
+Custodian has a report feature that allows the ``resources.json`` file to be viewed more concisely. 
+By default, this will output data in a CSV format, but report also provides other output formats such as ``grid`` that are more digestable.
+
+When run, the result will look like this::
+
+    +------------+------------+-----------------+-------------------------------------+
+    | name       | location   | resourceGroup   | properties.hardwareProfile.vmSize   |
+    +============+============+=================+=====================================+
+    | my_vm_name | westus     | my_vm_rg        | Standard_D2_v2                      |
+    +------------+------------+-----------------+-------------------------------------+
+
+The fields produced by ``custodian report`` vary by resource (i.e. properties.hardwareProfile.vmSize); however, you can add additional fields to your report 
+by using the ``--field`` parameter. For example, if you want to see a list of tags on this resource:
+
+.. code-block:: bash
+
+    custodian report --output-dir=. --format grid --field tags=tags custodian.yml
+
+Result::
+
+    +------------+------------+-----------------+-------------------------------------+----------------------------+
+    | name       | location   | resourceGroup   | properties.hardwareProfile.vmSize   | tagHeader                  |
+    +============+============+=================+=====================================+============================+
+    | my_vm_name | westus     | my_vm_rg        | Standard_D2_v2                      | {'custodian-tagged': True} |
+    +------------+------------+-----------------+-------------------------------------+----------------------------+
+
+The ``field`` parameter has the format ``--field header=field`` where header is the name of the column header in the report,
+and field is the JMESPath of a specific field to include in the output. All available fields for a resource can be found in the ``resources.json`` file. 
 
 
 Next Steps

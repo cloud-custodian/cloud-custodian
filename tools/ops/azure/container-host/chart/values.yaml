@@ -26,9 +26,9 @@ subscriptionHosts:
     environment:
       AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       AZURE_CLIENT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-      AZURE_CONTAINER_STORAGE: "https://storageAccount.blob.core.windows.net/policyContainerName"
-      AZURE_EVENT_QUEUE_NAME: "example-event-queue"
-      AZURE_EVENT_QUEUE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/resourceGroupName/providers/Microsoft.Storage/storageAccounts/storageAccount"
+      AZURE_CONTAINER_POLICY_URI: "https://storageAccount.blob.core.windows.net/policyContainerName"
+      AZURE_CONTAINER_QUEUE_NAME: "example-event-queue"
+      AZURE_CONTAINER_STORAGE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/resourceGroupName/providers/Microsoft.Storage/storageAccounts/storageAccount"
     secretEnvironment: 
       AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 

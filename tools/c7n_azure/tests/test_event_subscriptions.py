@@ -77,6 +77,11 @@ class AzureEventSubscriptionsTest(BaseTest):
         p_delete = self.load_policy({
             'name': 'test-azure-event-subscriptions',
             'resource': 'azure.eventsubscription',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value': self.event_sub_name}],
             'actions': [
                 {'type': 'delete'}
             ]

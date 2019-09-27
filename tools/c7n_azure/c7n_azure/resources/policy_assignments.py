@@ -47,3 +47,7 @@ class PolicyAssignments(ArmResourceManager):
         client = 'PolicyClient'
         enum_spec = ('policy_assignments', 'list', None)
         resource_type = 'Microsoft.Authorization/policyAssignments'
+        default_report_fields = (
+            'name',
+            'resourceGroup'
+        )
