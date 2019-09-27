@@ -25,6 +25,7 @@ setup(
     version='0.3.3',
     description="Cloud Custodian - Multi Account Guard Duty Setup",
     long_description=description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"

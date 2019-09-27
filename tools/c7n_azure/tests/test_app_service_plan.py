@@ -174,7 +174,7 @@ class AppServicePlanTest(BaseTest):
         }, validate=True)
         p.run()
 
-        logger.assert_called_once_with(
+        logger.assert_any_call(
             'Skipping cctest-consumption-win, '
             'because this App Service Plan is for Consumption Azure Functions.')
 
@@ -198,7 +198,7 @@ class AppServicePlanTest(BaseTest):
         }, validate=True)
         p.run()
 
-        logger.assert_called_once_with(
+        logger.assert_any_call(
             'Skipping cctest-consumption-linux, '
             'because this App Service Plan is for Consumption Azure Functions.')
 
