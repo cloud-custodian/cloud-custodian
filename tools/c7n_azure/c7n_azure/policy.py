@@ -265,12 +265,6 @@ class AzureModeCommon:
         resources = policy.resource_manager.filter_resources(
             resources, event)
 
-        if not resources:
-            policy.log.info(
-                "policy: %s resources: %s no resources found" % (
-                    policy.name, policy.resource_type))
-            return
-
         with policy.ctx:
             rt = time.time() - s
 
@@ -281,6 +275,12 @@ class AzureModeCommon:
                 "ResourceTime", rt, "Seconds", Scope="Policy")
             policy._write_file(
                 'resources.json', utils.dumps(resources, indent=2))
+
+            if not resources:
+                policy.log.info(
+                    "policy: %s resources: %s no resources found" % (
+                        policy.name, policy.resource_type))
+                return
 
             at = time.time()
             for action in policy.resource_manager.actions:
