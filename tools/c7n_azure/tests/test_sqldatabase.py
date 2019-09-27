@@ -33,6 +33,13 @@ class SqlDatabaseTest(BaseTest):
         with self.sign_out_patch():
             p = self.load_policy({
                 'name': 'test-sql-database-schema-validate',
+                'resource': 'azure.sql-database'
+            }, validate=True)
+            self.assertTrue(p)
+
+            # test alias for back-compatibility
+            p = self.load_policy({
+                'name': 'test-sql-database-schema-validate',
                 'resource': 'azure.sqldatabase'
             }, validate=True)
             self.assertTrue(p)

@@ -1343,6 +1343,7 @@ class RDSSnapshotDelete(BaseAction):
 class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     permissions = ('rds:ModifyDBInstance', 'rds:ModifyDBCluster')
+    vpc_expr = 'DBSubnetGroup.VpcId'
 
     def process(self, rds_instances):
         replication_group_map = {}

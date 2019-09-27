@@ -26,7 +26,7 @@ AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')
 log = logging.getLogger('custodian.azure.sql-server')
 
 
-@resources.register('sqlserver')
+@resources.register('sql-server', aliases=['sqlserver'])
 class SqlServer(ArmResourceManager):
     """SQL Server Resource
 
