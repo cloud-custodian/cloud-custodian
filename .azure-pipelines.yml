@@ -78,11 +78,7 @@ jobs:
 
   - task: CacheBeta@0
     inputs:
-      key: |
-        "c7n-tox"
-        $(python.version)
-        $(Agent.OS)
-        $(DAY_OF_YEAR)
+      key: '"c7n-tox" | "$(python.version)" | "$(Agent.OS)" | "$(DAY_OF_YEAR)"'
       path: $(LINUX_CACHE_DIR)
 
   - task: UsePythonVersion@0
@@ -142,11 +138,7 @@ jobs:
 
   - task: CacheBeta@0
     inputs:
-      key: |
-        "c7n-tox"
-        $(python.version)
-        $(Agent.OS)
-        $(DAY_OF_YEAR)
+      key: '"c7n-tox" | "$(python.version)" | "$(Agent.OS)" | "$(DAY_OF_YEAR)"'
       path: $(WINDOWS_CACHE_DIR)
 
   - task: UsePythonVersion@0
