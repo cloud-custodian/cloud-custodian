@@ -34,6 +34,13 @@ class SqlServerTest(BaseTest):
         with self.sign_out_patch():
             p = self.load_policy({
                 'name': 'test-policy-assignment',
+                'resource': 'azure.sql-server'
+            }, validate=True)
+            self.assertTrue(p)
+
+            # test alias for back-compatibility
+            p = self.load_policy({
+                'name': 'test-policy-assignment',
                 'resource': 'azure.sqlserver'
             }, validate=True)
             self.assertTrue(p)

@@ -266,16 +266,26 @@ def generate(resource_types=()):
         for type_name, resource_type in cloud_type.resources.items():
             if resource_types and type_name not in resource_types:
                 continue
-            alias_name = None
+
             r_type_name = "%s.%s" % (cloud_name, type_name)
+
+            aliases = []
+            if resource_type.type_aliases:
+                aliases.extend(["%s.%s" % (cloud_name, a) for a in resource_type.type_aliases])
+                # aws gets legacy aliases with no cloud prefix
+                if cloud_name == 'aws':
+                    aliases.extend(resource_type.type_aliases)
+
+            # aws gets additional alias for default name
             if cloud_name == 'aws':
-                alias_name = type_name
+                aliases.append(type_name)
+
             resource_refs.append(
                 process_resource(
                     r_type_name,
                     resource_type,
                     resource_defs,
-                    alias_name,
+                    aliases,
                     definitions,
                     cloud_name
                 ))
@@ -301,7 +311,7 @@ def generate(resource_types=()):
 
 
 def process_resource(
-        type_name, resource_type, resource_defs, alias_name=None,
+        type_name, resource_type, resource_defs, aliases=None,
         definitions=None, provider_name=None):
 
     r = resource_defs.setdefault(type_name, {'actions': {}, 'filters': {}})
@@ -380,9 +390,9 @@ def process_resource(
         ]
     }
 
-    if alias_name:
+    if aliases:
         resource_policy['allOf'][1]['properties'][
-            'resource']['enum'].append(alias_name)
+            'resource']['enum'].extend(aliases)
 
     if type_name == 'ec2':
         resource_policy['allOf'][1]['properties']['query'] = {}
