@@ -3,6 +3,10 @@ trigger:
 
 variables:
 - group: CustodianCoreCI
+- name: WINDOWS_CACHE_DIR
+  value: $(LOCALAPPDATA)\pip\cache
+- name: LINUX_CACHE_DIR
+  value: /home/vsts/.cache/pip
 
 jobs:
 
@@ -67,6 +71,19 @@ jobs:
   - checkout: self
     fetchDepth: 2
 
+  - powershell: |
+      Write-Host "##vso[task.setvariable variable=DAY_OF_YEAR]$(Get-Date).DayOfYear"
+    displayName:  Set cache date key
+
+  - task: CacheBeta@0
+    inputs:
+      key: |
+        "c7n-tox"
+        $(python.version)
+        $(Agent.OS)
+        $(DAY_OF_YEAR)
+      path: $(LINUX_CACHE_DIR)
+
   - task: UsePythonVersion@0
     displayName: "Set Python Version"
     inputs:
@@ -116,6 +133,19 @@ jobs:
   steps:
   - checkout: self
     fetchDepth: 2
+
+  - powershell: |
+      Write-Host "##vso[task.setvariable variable=DAY_OF_YEAR]$(Get-Date).DayOfYear"
+    displayName:  Set cache date key
+
+  - task: CacheBeta@0
+    inputs:
+      key: |
+        "c7n-tox"
+        $(python.version)
+        $(Agent.OS)
+        $(DAY_OF_YEAR)
+      path: $(WINDOWS_CACHE_DIR)
 
   - task: UsePythonVersion@0
     displayName: "Set Python Version"
