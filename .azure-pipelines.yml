@@ -72,7 +72,8 @@ jobs:
     fetchDepth: 2
 
   - powershell: |
-      Write-Host "##vso[task.setvariable variable=DAY_OF_YEAR]$(Get-Date).DayOfYear"
+      $date=$(Get-Date).DayOfYear;
+      Write-Host "##vso[task.setvariable variable=DAY_OF_YEAR]$date"
     displayName:  Set cache date key
 
   - task: CacheBeta@0
@@ -135,7 +136,8 @@ jobs:
     fetchDepth: 2
 
   - powershell: |
-      Write-Host "##vso[task.setvariable variable=DAY_OF_YEAR]$(Get-Date).DayOfYear"
+      $date=$(Get-Date).DayOfYear;
+      Write-Host "##vso[task.setvariable variable=DAY_OF_YEAR]$date"
     displayName:  Set cache date key
 
   - task: CacheBeta@0
