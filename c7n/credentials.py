@@ -98,7 +98,9 @@ def assumed_session(role_arn, session_name, session=None, region=None, external_
             parameters['ExternalId'] = external_id
 
         credentials = retry(
-            session.client('sts').assume_role, **parameters)['Credentials']
+            session.client(
+                'sts', endpoint_url=sts_regional_endpoint(region)
+            ).assume_role, **parameters)['Credentials']
         return dict(
             access_key=credentials['AccessKeyId'],
             secret_key=credentials['SecretAccessKey'],
@@ -123,3 +125,15 @@ def assumed_session(role_arn, session_name, session=None, region=None, external_
         region = s.get_config_variable('region') or 'us-east-1'
     s.set_config_variable('region', region)
     return Session(botocore_session=s)
+
+
+def sts_regional_endpoint(region):
+    """Get the AWS STS endpoint specific for the given region.
+
+    Returns the global endpoint if region is not specified.
+
+    For the list of regional endpoints, see https://amzn.to/2ohJgtR
+    """
+    if region:
+        return "https://sts.{}.amazonaws.com".format(region)
+    return "https://sts.amazonaws.com"

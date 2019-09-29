@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserId": "AROAIS6DAH72KKDTPRAXA:custodian-dev",
+        "Account": "644160558196",
+        "Arn": "arn:aws:sts::644160558196:assumed-role/CustodianGuardDuty/custodian-dev",
+        "ResponseMetadata": {
+            "RequestId": "2fe1c83b-e2fd-11e9-a799-d327b1809fe0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2fe1c83b-e2fd-11e9-a799-d327b1809fe0",
+                "content-type": "text/xml",
+                "content-length": "451",
+                "date": "Sun, 29 Sep 2019 21:07:46 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

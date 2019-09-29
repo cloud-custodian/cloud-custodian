@@ -13,7 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
 from botocore.exceptions import ClientError
+import placebo
 
 from c7n.credentials import SessionFactory, assumed_session
 from c7n.version import version
@@ -31,24 +33,31 @@ class Credential(BaseTest):
             session._session.user_agent().startswith("CloudCustodian/%s" % version)
         )
 
-    def xtest_assumed_session(self):
-        # placebo's datetime bug bites again
-        # https://github.com/garnaat/placebo/pull/50
+    def test_assumed_session(self):
         factory = self.replay_flight_data("test_credential_sts")
-        user = factory().client("iam").get_user()
         session = assumed_session(
-            "arn:aws:iam::644160558196:role/CloudCustodianRole",
-            "custodian-dev",
+            role_arn='arn:aws:iam::644160558196:role/CustodianGuardDuty',
+            session_name="custodian-dev",
             session=factory(),
         )
+
+        # attach the placebo flight recorder to the new session.
+        pill = placebo.attach(
+            session, os.path.join(self.placebo_dir, 'test_credential_sts'))
+        if self.recording:
+            pill.record()
+        else:
+            pill.playback()
+        self.addCleanup(pill.stop)
+
         try:
-            session.client("iam").get_user()
+            identity = session.client("sts").get_caller_identity()
         except ClientError as e:
             self.assertEqual(e.response["Error"]["Code"], "ValidationError")
-        else:
-            self.fail("sts user not identifyable this way")
 
-        self.assertEqual(user["User"]["UserName"], "kapil")
+        self.assertEqual(
+            identity['Arn'],
+            'arn:aws:sts::644160558196:assumed-role/CustodianGuardDuty/custodian-dev')
 
     def test_policy_name_user_agent(self):
         session = SessionFactory("us-east-1")
