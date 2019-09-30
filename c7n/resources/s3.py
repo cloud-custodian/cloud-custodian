@@ -151,6 +151,8 @@ class ConfigS3(query.ConfigSource):
         # aka standard
         if 'awsRegion' in item and item['awsRegion'] != 'us-east-1':
             resource['Location'] = {'LocationConstraint': item['awsRegion']}
+        else:
+            resource['Location'] = {}
 
         # owner is under acl per describe
         resource.pop('Owner', None)

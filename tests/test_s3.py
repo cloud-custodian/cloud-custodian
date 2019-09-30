@@ -889,7 +889,7 @@ class S3ConfigSource(ConfigTest):
         results = self.wait_for_config(session, queue_url, bname)
         resource_b = s3.ConfigS3(manager).load_resource(results[0])
         self.maxDiff = None
-
+        self.assertEqual(s3.get_region(resource_b), 'us-east-1')
         for k in ("Logging", "Policy", "Versioning", "Name", "Website"):
             self.assertEqual(resource_a[k], resource_b[k])
 
@@ -903,6 +903,7 @@ class S3ConfigSource(ConfigTest):
         p = self.load_policy({"name": "s3cfg", "resource": "s3"})
         source = p.resource_manager.get_source("config")
         resource = source.load_resource(event)
+        self.assertEqual(s3.get_region(resource), 'us-east-1')
         self.assertEqual(
             resource["Notification"],
             {
@@ -1084,6 +1085,7 @@ class S3ConfigSource(ConfigTest):
             {"Planet": "Earth", "Verbose": "Game"},
             {t["Key"]: t["Value"] for t in resource.pop("Tags")},
         )
+        self.assertEqual(s3.get_region(resource), 'us-east-2')
         self.assertEqual(
             resource,
             {
