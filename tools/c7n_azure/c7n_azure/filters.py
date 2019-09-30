@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import isodate
 import operator
 from abc import ABCMeta, abstractmethod
 from concurrent.futures import as_completed
@@ -157,7 +158,7 @@ class MetricFilter(Filter):
         # Number of hours from current UTC time
         self.timeframe = float(self.data.get('timeframe', self.DEFAULT_TIMEFRAME))
         # Interval as defined by Azure SDK
-        self.interval = self.data.get('interval', self.DEFAULT_INTERVAL)
+        self.interval = isodate.parse_duration(self.data.get('interval', self.DEFAULT_INTERVAL))
         # Aggregation as defined by Azure SDK
         self.aggregation = self.data.get('aggregation', self.DEFAULT_AGGREGATION)
         # Aggregation function to be used locally

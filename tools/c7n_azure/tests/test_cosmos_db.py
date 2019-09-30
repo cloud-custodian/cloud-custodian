@@ -127,9 +127,10 @@ class CosmosDBTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cccontainer'},
                 {'type': 'metric',
-                 'metric': 'TotalRequests',
+                 'metric': 'ProvisionedThroughput',
                  'op': 'le',
                  'aggregation': 'average',
+                 'interval': 'PT5M',
                  'threshold': 1000}
             ]
         }, validate=True)
@@ -148,9 +149,10 @@ class CosmosDBTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctestcdatabase'},
                 {'type': 'metric',
-                 'metric': 'TotalRequests',
+                 'metric': 'ProvisionedThroughput',
                  'op': 'le',
                  'aggregation': 'average',
+                 'interval': 'PT5M',
                  'threshold': 1000}
             ]
         }, validate=True)

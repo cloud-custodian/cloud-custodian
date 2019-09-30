@@ -14,6 +14,7 @@
 import datetime
 import email.utils as eut
 import json
+import logging
 import os
 import re
 from distutils.util import strtobool
@@ -107,6 +108,11 @@ SERVICE_TAG_RESPONSE = {
         }
     ]
 }
+
+
+logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logging.getLogger("urllib3").setLevel(logging.INFO)
+logging.getLogger("vcr").setLevel(logging.WARNING)
 
 
 class AzureVCRBaseTest(VCRTestCase):
@@ -387,14 +393,15 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
         super(BaseTest, self).setUp()
         ThreadHelper.disable_multi_threading = True
 
-        # We always patch the date so URLs that involve dates match up
-        self._utc_patch = patch.object(utils, 'utcnow', self.get_test_date)
-        self._utc_patch.start()
-        self.addCleanup(self._utc_patch.stop)
+        # We always patch the date for recordings so URLs that involve dates match up
+        if self.vcr_enabled:
+            self._utc_patch = patch.object(utils, 'utcnow', self.get_test_date)
+            self._utc_patch.start()
+            self.addCleanup(self._utc_patch.stop)
 
-        self._now_patch = patch.object(utils, 'now', self.get_test_date)
-        self._now_patch.start()
-        self.addCleanup(self._now_patch.stop)
+            self._now_patch = patch.object(utils, 'now', self.get_test_date)
+            self._now_patch.start()
+            self.addCleanup(self._now_patch.stop)
 
         if not self._requires_polling:
             # Patch Poller with constructor that always disables polling
@@ -423,17 +430,14 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             self.addCleanup(self._subscription_patch.stop)
 
     def get_test_date(self, tz=None):
-        if self.vcr_enabled:
-            header_date = self.cassette.responses[0]['headers'].get('date') \
-                if self.cassette.responses else None
+        header_date = self.cassette.responses[0]['headers'].get('date') \
+            if self.cassette.responses else None
 
-            if header_date:
-                test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
-            else:
-                test_date = datetime.datetime.now()
-            return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
+        if header_date:
+            test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
         else:
-            return datetime.datetime.now()
+            return datetime.datetime.now(tz=tz)
+        return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
 
     def sleep_in_live_mode(self, interval=60):
         if not self.is_playback():
