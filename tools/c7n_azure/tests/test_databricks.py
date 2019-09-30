@@ -13,6 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import pytest
+
 from azure_common import BaseTest, arm_template
 
 
@@ -25,7 +27,9 @@ class DatabricksTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
+    # Skip due to Azure Storage RBAC issues when databricks resource is deployed
     @arm_template('databricks.json')
+    @pytest.mark.skiplive
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-databricks',

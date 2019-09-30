@@ -46,7 +46,8 @@ class ApiManagement(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'sku.[name, capacity]'
         )
         resource_type = 'Microsoft.ApiManagement/service'
 

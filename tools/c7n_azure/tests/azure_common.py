@@ -16,7 +16,9 @@ import email.utils as eut
 import json
 import os
 import re
+from distutils.util import strtobool
 from functools import wraps
+from time import sleep
 
 import msrest.polling
 from azure_serializer import AzureSerializer
@@ -29,6 +31,8 @@ from msrest.serialization import Model
 from msrest.service_client import ServiceClient
 from vcr_unittest import VCRTestCase
 
+from c7n.config import Config, Bag
+from c7n.policy import ExecutionContext
 from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
@@ -145,11 +149,16 @@ class AzureVCRBaseTest(VCRTestCase):
                         'expires',
                         'content-location']
 
+    def __init__(self, *args, **kwargs):
+        super(AzureVCRBaseTest, self).__init__(*args, **kwargs)
+        self.vcr_enabled = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
+
     def is_playback(self):
         # You can't do this in setup because it is actually required by the base class
         # setup (via our callbacks), but it is also not possible to do until the base class setup
         # has completed initializing the cassette instance.
-        return not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path)
+        cassette_exists = not hasattr(self, 'cassette') or os.path.isfile(self.cassette._path)
+        return self.vcr_enabled and cassette_exists
 
     def _get_cassette_name(self):
         test_method = getattr(self, self._testMethodName)
@@ -293,7 +302,21 @@ class AzureVCRBaseTest(VCRTestCase):
                 r"[\da-zA-Z]{8}-([\da-zA-Z]{4}-){3}[\da-zA-Z]{12}" \
                 % '|'.join(['(%s)' % p for p in prefixes])
 
-        return re.sub(regex, r"\g<prefix>" + DEFAULT_SUBSCRIPTION_ID, s)
+        match = re.search(regex, s)
+
+        if match is not None:
+            sub_id = match.group(0)
+            s = s.replace(sub_id[-36:], DEFAULT_SUBSCRIPTION_ID)
+            s = s.replace(sub_id[-12:], DEFAULT_SUBSCRIPTION_ID[-12:])
+        else:
+            # For function apps
+            func_regex = r"^https\:\/\/[\w-]+([a-f0-9]{12})\.(blob\.core|scm\.azurewebsites)"
+            func_match = re.search(func_regex, s)
+            if func_match is not None:
+                sub_fragment = func_match.group(1)
+                s = s.replace(sub_fragment, DEFAULT_SUBSCRIPTION_ID[-12:])
+
+        return s
 
     @staticmethod
     def _replace_tenant_id(s):
@@ -332,11 +355,33 @@ class AzureVCRBaseTest(VCRTestCase):
 
 
 class BaseTest(TestUtils, AzureVCRBaseTest):
+
+    test_context = ExecutionContext(
+        Session,
+        Bag(name="xyz", provider_name='azure'),
+        Config.empty()
+    )
+
     """ Azure base testing class.
     """
     def __init__(self, *args, **kwargs):
         super(BaseTest, self).__init__(*args, **kwargs)
         self._requires_polling = False
+
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        super(BaseTest, cls).setUpClass(*args, **kwargs)
+        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
+            cls._token_patch = patch(
+                'c7n_azure.session.jwt.decode',
+                return_value={'tid': DEFAULT_TENANT_ID})
+            cls._token_patch.start()
+
+    @classmethod
+    def tearDownClass(cls, *args, **kwargs):
+        super(BaseTest, cls).tearDownClass(*args, **kwargs)
+        if os.environ.get(constants.ENV_ACCESS_TOKEN) == "fake_token":
+            cls._token_patch.stop()
 
     def setUp(self):
         super(BaseTest, self).setUp()
@@ -378,14 +423,21 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             self.addCleanup(self._subscription_patch.stop)
 
     def get_test_date(self, tz=None):
-        header_date = self.cassette.responses[0]['headers'].get('date') \
-            if self.cassette.responses else None
+        if self.vcr_enabled:
+            header_date = self.cassette.responses[0]['headers'].get('date') \
+                if self.cassette.responses else None
 
-        if header_date:
-            test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
+            if header_date:
+                test_date = datetime.datetime(*eut.parsedate(header_date[0])[:6])
+            else:
+                test_date = datetime.datetime.now()
+            return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
         else:
-            test_date = datetime.datetime.now()
-        return test_date.replace(hour=23, minute=59, second=59, microsecond=0)
+            return datetime.datetime.now()
+
+    def sleep_in_live_mode(self, interval=60):
+        if not self.is_playback():
+            sleep(interval)
 
     @staticmethod
     def setup_account():

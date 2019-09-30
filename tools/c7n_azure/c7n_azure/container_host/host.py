@@ -25,8 +25,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from azure.common import AzureHttpError
 from azure.mgmt.eventgrid.models import (
-    EventSubscriptionFilter, StorageQueueEventSubscriptionDestination,
-    StringInAdvancedFilter)
+    EventSubscriptionFilter, StorageQueueEventSubscriptionDestination)
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
@@ -36,12 +35,12 @@ from c7n_azure import entry
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
 from c7n_azure.constants import (CONTAINER_EVENT_TRIGGER_MODE,
                                  CONTAINER_TIME_TRIGGER_MODE,
-                                 ENV_CONTAINER_EVENT_QUEUE_ID,
-                                 ENV_CONTAINER_EVENT_QUEUE_NAME,
                                  ENV_CONTAINER_OPTION_LOG_GROUP,
                                  ENV_CONTAINER_OPTION_METRICS,
                                  ENV_CONTAINER_OPTION_OUTPUT_DIR,
-                                 ENV_CONTAINER_POLICY_STORAGE)
+                                 ENV_CONTAINER_POLICY_URI,
+                                 ENV_CONTAINER_QUEUE_NAME,
+                                 ENV_CONTAINER_STORAGE_RESOURCE_ID)
 from c7n_azure.provider import Azure
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities as Storage
@@ -51,26 +50,34 @@ log = logging.getLogger("c7n_azure.container-host")
 max_dequeue_count = 2
 policy_update_seconds = 60
 queue_poll_seconds = 15
-jitter_seconds = 10
 queue_timeout_seconds = 5 * 60
 queue_message_count = 5
 
 
 class Host:
 
-    def __init__(self, event_queue_id, event_queue_name, policy_storage,
+    def __init__(self, storage_id, queue_name, policy_uri,
                  log_group=None, metrics=None, output_dir=None):
         logging.basicConfig(level=logging.INFO, format='%(message)s')
         log.info("Running Azure Cloud Custodian Self-Host")
 
         load_resources()
+
         self.session = local_session(Session)
+        self.storage_session = self.session
+        storage_subscription_id = ResourceIdParser.get_subscription_id(storage_id)
+        if storage_subscription_id != self.session.subscription_id:
+            self.storage_session = Session(subscription_id=storage_subscription_id)
 
         # Load configuration
         self.options = Host.build_options(output_dir, log_group, metrics)
-        self.policy_storage_uri = policy_storage
-        self.event_queue_name = event_queue_name
-        self.event_queue_id = event_queue_id
+        self.policy_storage_uri = policy_uri
+        self.event_queue_id = storage_id
+        self.event_queue_name = queue_name
+
+        # Default event queue name is the subscription ID
+        if not self.event_queue_name:
+            self.event_queue_name = self.session.subscription_id
 
         # Prepare storage bits
         self.policy_blob_client = None
@@ -81,15 +88,15 @@ class Host:
 
         self.queue_service = None
 
-        # Track required event subscription updates
-        self.require_event_update = False
+        # Register event subscription
+        self.update_event_subscription()
 
         # Policy cache and dictionary
         self.policy_cache = tempfile.mkdtemp()
         self.policies = {}
 
         # Configure scheduler
-        self.scheduler = BlockingScheduler()
+        self.scheduler = BlockingScheduler(Host.get_scheduler_config())
         logging.getLogger('apscheduler.executors.default').setLevel(logging.ERROR)
 
         # Schedule recurring policy updates
@@ -97,13 +104,15 @@ class Host:
                                'interval',
                                seconds=policy_update_seconds,
                                id="update_policies",
-                               next_run_time=datetime.now())
+                               next_run_time=datetime.now(),
+                               executor='threadpool')
 
         # Schedule recurring queue polling
         self.scheduler.add_job(self.poll_queue,
                                'interval',
                                seconds=queue_poll_seconds,
-                               id="poll_queue")
+                               id="poll_queue",
+                               executor='threadpool')
 
         self.scheduler.start()
 
@@ -118,7 +127,7 @@ class Host:
         """
         if not self.policy_blob_client:
             self.policy_blob_client = Storage.get_blob_client_by_uri(self.policy_storage_uri,
-                                                                     self.session)
+                                                                     self.storage_session)
         (client, container, prefix) = self.policy_blob_client
 
         try:
@@ -155,6 +164,8 @@ class Host:
             policy_path = os.path.join(self.policy_cache, blob.name)
             if os.path.exists(policy_path):
                 self.unload_policy_file(policy_path, policies_copy)
+            elif not os.path.isdir(os.path.dirname(policy_path)):
+                os.makedirs(os.path.dirname(policy_path))
 
             client.get_blob_to_path(container, blob.name, policy_path)
             self.load_policy(policy_path, policies_copy)
@@ -162,9 +173,6 @@ class Host:
 
         # Assign our copy back over the original
         self.policies = policies_copy
-
-        if self.require_event_update:
-            self.update_event_subscriptions()
 
     def _get_new_blobs(self, blobs):
         new_blobs = []
@@ -218,13 +226,11 @@ class Host:
                         p.validate()
                         policies.update({p.name: {'policy': p}})
 
-                        # Update periodic and set event update flag
+                        # Update periodic
                         policy_mode = p.data.get('mode', {}).get('type')
                         if policy_mode == CONTAINER_TIME_TRIGGER_MODE:
                             self.update_periodic(p)
-                        elif policy_mode == CONTAINER_EVENT_TRIGGER_MODE:
-                            self.require_event_update = True
-                        else:
+                        elif policy_mode != CONTAINER_EVENT_TRIGGER_MODE:
                             log.warning(
                                 "Unsupported policy mode for Azure Container Host: {}. "
                                 "{} will not be run. "
@@ -244,7 +250,7 @@ class Host:
         """
         Unload a policy file that has changed or been removed.
         Take the copy from disk and pop all policies from dictionary
-        and update scheduled jobs and event registrations.
+        and update scheduled jobs.
         """
         with open(path, "r") as stream:
             try:
@@ -266,13 +272,6 @@ class Host:
         for name in periodic_to_remove:
             self.scheduler.remove_job(job_id=name)
 
-        # update event
-        event_names = \
-            [p['name'] for p in policy_config['policies'] if p.get('mode', {}).get('events')]
-
-        if event_names:
-            self.require_event_update = True
-
         os.unlink(path)
 
         return path
@@ -283,8 +282,7 @@ class Host:
         periodic scheduling.
         """
         trigger = CronTrigger.from_crontab(policy.data['mode']['schedule'])
-        trigger.jitter = jitter_seconds
-        self.scheduler.add_job(self.run_policy,
+        self.scheduler.add_job(Host.run_policy,
                                trigger,
                                id=policy.name,
                                name=policy.name,
@@ -292,37 +290,26 @@ class Host:
                                coalesce=True,
                                max_instances=1,
                                replace_existing=True,
-                               misfire_grace_time=20)
+                               misfire_grace_time=60)
 
-    def update_event_subscriptions(self):
+    def update_event_subscription(self):
         """
-        Find unique list of all subscribed events and
-        update a single event subscription to channel
-        them to an Azure Queue.
+        Create a single event subscription to channel
+        all events to an Azure Queue.
         """
         log.info('Updating event grid subscriptions')
-        destination = \
-            StorageQueueEventSubscriptionDestination(resource_id=self.queue_storage_account.id,
-                                                     queue_name=self.event_queue_name)
+        destination = StorageQueueEventSubscriptionDestination(
+            resource_id=self.queue_storage_account.id, queue_name=self.event_queue_name)
 
-        # Get total unique event list to use in event subscription
-        policy_items = self.policies.items()
-        events_lists = [v['policy'].data.get('mode', {}).get('events') for n, v in policy_items]
-        flat_events = [e for l in events_lists if l for e in l if e]
-        resolved_events = AzureEvents.get_event_operations(flat_events)
-        unique_events = set(resolved_events)
-
-        # Build event filter strings
-        advance_filter = StringInAdvancedFilter(key='Data.OperationName', values=unique_events)
-        event_filter = EventSubscriptionFilter(advanced_filters=[advance_filter])
+        # Build event filter
+        event_filter = EventSubscriptionFilter(
+            included_event_types=['Microsoft.Resources.ResourceWriteSuccess'])
 
         # Update event subscription
         AzureEventSubscription.create(destination,
                                       self.event_queue_name,
                                       self.session.get_subscription_id(),
                                       self.session, event_filter)
-
-        self.require_event_update = False
 
     def poll_queue(self):
         """
@@ -336,7 +323,7 @@ class Host:
         if not self.queue_service:
             self.queue_service = Storage.get_queue_client_by_storage_account(
                 self.queue_storage_account,
-                self.session)
+                self.storage_session)
 
         while True:
             try:
@@ -386,7 +373,7 @@ class Host:
                 continue
             events = AzureEvents.get_event_operations(events)
             if operation_name in events:
-                self.scheduler.add_job(self.run_policy,
+                self.scheduler.add_job(Host.run_policy,
                                        id=k + event['id'],
                                        name=k,
                                        args=[v['policy'],
@@ -394,28 +381,14 @@ class Host:
                                              None],
                                        misfire_grace_time=60 * 3)
 
-    def run_policy(self, policy, event, context):
-        try:
-            policy.push(event, context)
-        except Exception as e:
-            log.error(
-                "Exception running policy: %s error: %s",
-                policy.name, e)
-
     def prepare_queue_storage(self, queue_resource_id, queue_name):
         """
         Create a storage client using unusual ID/group reference
         as this is what we require for event subscriptions
         """
 
-        # Use a different session object if the queue is in a different subscription
-        queue_subscription_id = ResourceIdParser.get_subscription_id(queue_resource_id)
-        if queue_subscription_id != self.session.subscription_id:
-            session = Session(queue_subscription_id)
-        else:
-            session = self.session
-
-        storage_client = session.client('azure.mgmt.storage.StorageManagementClient')
+        storage_client = self.storage_session \
+            .client('azure.mgmt.storage.StorageManagementClient')
 
         account = storage_client.storage_accounts.get_properties(
             ResourceIdParser.get_resource_group(queue_resource_id),
@@ -425,6 +398,13 @@ class Host:
                                                   queue_name,
                                                   self.session)
         return account
+
+    @staticmethod
+    def run_policy(policy, event, context):
+        try:
+            policy.push(event, context)
+        except Exception:
+            log.exception("Policy Failed: %s", policy.name)
 
     @staticmethod
     def build_options(output_dir=None, log_group=None, metrics=None):
@@ -446,31 +426,51 @@ class Host:
         return Azure().initialize(config)
 
     @staticmethod
+    def get_scheduler_config():
+        return {
+            'apscheduler.jobstores.default': {
+                'type': 'memory'
+            },
+            'apscheduler.executors.default': {
+                'class': 'apscheduler.executors.pool:ProcessPoolExecutor',
+                'max_workers': '4'
+            },
+            'apscheduler.executors.threadpool': {
+                'type': 'threadpool',
+                'max_workers': '20'
+            },
+            'apscheduler.job_defaults.coalesce': 'true',
+            'apscheduler.job_defaults.max_instances': '1',
+            'apscheduler.timezone': 'UTC',
+        }
+
+    @staticmethod
     def has_yaml_ext(filename):
         return filename.lower().endswith(('.yml', '.yaml'))
 
-
-@click.command(help="Periodically run a set of policies from an Azure storage container against "
-    "a single subscription. The host will update itself with new policies and event subscriptions "
-    "as they are added.")
-@click.option("--event-queue-id", "-q", envvar=ENV_CONTAINER_EVENT_QUEUE_ID, required=True,
-              help="The resource id of the storage account to create the event queue in")
-@click.option("--event-queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME, required=True,
-              help="The name of the event queue to create")
-@click.option("--policy-storage", "-p", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
-              help="The URI to the Azure storage container that holds the policies")
-@click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
-              help="Location to send policy logs")
-@click.option("--metrics", "-m", envvar=ENV_CONTAINER_OPTION_METRICS,
-              help="The resource name or instrumentation key for uploading metrics")
-@click.option("--output-dir", "-d", envvar=ENV_CONTAINER_OPTION_OUTPUT_DIR,
-              help="The directory for policy output")
-class HostCommand(Host):
-    pass
+    @staticmethod
+    @click.command(help="Periodically run a set of policies from an Azure storage container "
+                        "against a single subscription. The host will update itself with new "
+                        "policies and event subscriptions as they are added.")
+    @click.option("--storage-id", "-q", envvar=ENV_CONTAINER_STORAGE_RESOURCE_ID, required=True,
+                  help="The resource id of the storage account to create the event queue in")
+    @click.option("--queue-name", "-n", envvar=ENV_CONTAINER_QUEUE_NAME,
+                  help="The name of the event queue to create")
+    @click.option("--policy-uri", "-p", envvar=ENV_CONTAINER_POLICY_URI, required=True,
+                  help="The URI to the Azure storage container that holds the policies")
+    @click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
+                  help="Location to send policy logs")
+    @click.option("--metrics", "-m", envvar=ENV_CONTAINER_OPTION_METRICS,
+                  help="The resource name or instrumentation key for uploading metrics")
+    @click.option("--output-dir", "-d", envvar=ENV_CONTAINER_OPTION_OUTPUT_DIR,
+                  help="The directory for policy output")
+    def cli(**kwargs):
+        Host(**kwargs)
 
 
 if __name__ == "__main__":
-    HostCommand()
+    # handle CLI commands
+    Host.cli()
 
 # Need to manually initialize c7n_azure
 entry.initialize_azure()

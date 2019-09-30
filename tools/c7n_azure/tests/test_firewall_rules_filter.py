@@ -18,6 +18,7 @@ import logging
 from azure_common import BaseTest
 from c7n_azure.filters import FirewallRulesFilter
 from jsonschema import ValidationError
+from mock import Mock
 from netaddr import IPRange, IPNetwork, IPSet
 
 
@@ -32,7 +33,7 @@ class FirewallRulesFilterTest(BaseTest):
             {'rules': [IPNetwork('0.0.0.1')]},
         ]
 
-        mock = FirewallRulesFilterMock({'include': []})
+        mock = FirewallRulesFilterMock({'include': []}, Mock())
 
         mock.validate()
         actual = mock.process(satisfying_resources)
@@ -64,7 +65,7 @@ class FirewallRulesFilterTest(BaseTest):
             '0.0.0.0-0.0.0.0',
             '1.0.0.20/10',
             '2.0.0.0-2.0.0.10'
-        ]})
+        ]}, Mock())
 
         mock.validate()
         actual = mock.process(satisfying_resources + non_satisfying_resources)
@@ -91,7 +92,7 @@ class FirewallRulesFilterTest(BaseTest):
             '1.0.0.20/10',
             '2.0.0.0-2.0.0.10',
             '8.8.8.8'
-        ]})
+        ]}, Mock())
 
         mock.validate()
         actual = mock.process(satisfying_resources + non_satisfying_resources)
@@ -118,7 +119,7 @@ class FirewallRulesFilterTest(BaseTest):
             '1.0.0.20/10',
             '2.0.0.0-2.0.0.10',
             '8.8.8.8'
-        ]})
+        ]}, Mock())
 
         mock.validate()
         actual = mock.process(satisfying_resources + non_satisfying_resources)
@@ -135,7 +136,7 @@ class FirewallRulesFilterTest(BaseTest):
             {'rules': [IPNetwork('0.0.0.1')]},
         ]
 
-        mock = FirewallRulesFilterMock({'equal': []})
+        mock = FirewallRulesFilterMock({'equal': []}, Mock())
 
         mock.validate()
         actual = mock.process(satisfying_resources + non_satisfying_resources)
@@ -164,7 +165,7 @@ class FirewallRulesFilterTest(BaseTest):
             '0.0.0.0-0.0.0.0',
             '1.0.0.20/10',
             '2.0.0.0-2.0.0.10'
-        ]})
+        ]}, Mock())
 
         mock.validate()
         actual = mock.process(satisfying_resources + non_satisfying_resources)

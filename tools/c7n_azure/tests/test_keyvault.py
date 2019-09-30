@@ -13,12 +13,17 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from azure_common import BaseTest, arm_template
-from c7n_azure.resources.key_vault import KeyVaultUpdateAccessPolicyAction, WhiteListFilter
+from azure_common import BaseTest, arm_template, cassette_name
+from c7n_azure.resources.key_vault import (KeyVaultUpdateAccessPolicyAction, WhiteListFilter,
+                                           KeyVaultFirewallRulesFilter,
+                                           KeyVaultFirewallBypassFilter)
 from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 from mock import patch, Mock
 from msrestazure.azure_exceptions import CloudError
+from netaddr import IPSet
+from parameterized import parameterized
+import pytest
 from requests import Response
 
 from c7n.utils import local_session
@@ -46,6 +51,7 @@ class KeyVaultTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
@@ -85,7 +91,9 @@ class KeyVaultTest(BaseTest):
         p2 = {}
         self.assertFalse(WhiteListFilter.compare_permissions(p1, p2))
 
+    # Requires Graph access
     @arm_template('keyvault.json')
+    @pytest.mark.skiplive
     def test_whitelist(self):
         """Tests basic whitelist functionality"""
         p = self.load_policy({
@@ -208,73 +216,158 @@ class KeyVaultTest(BaseTest):
         return client.__module__ + '.' + client.__class__.__name__
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_include(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value': 'cckeyvault1*'},
                 {'type': 'firewall-rules',
-                 'include': ['3.1.1.1']}],
+                 'include': ['1.0.0.0']}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_not_include_all_ranges(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value': 'cckeyvault1*'},
                 {'type': 'firewall-rules',
-                 'include': ['3.1.1.1', '3.1.1.2-3.1.1.2']}],
+                 'include': ['1.0.0.0', '127.0.0.1']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_include_cidr(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value': 'cckeyvault1*'},
                 {'type': 'firewall-rules',
-                 'include': ['1.2.2.128/25']}],
+                 'include': ['128.0.0.0/1']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(1, len(resources))
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_not_include_cidr(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value': 'cckeyvault1*'},
                 {'type': 'firewall-rules',
-                 'include': ['2.2.2.128/25']}],
+                 'include': ['127.0.0.0/8']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_equal(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value': 'cckeyvault1*'},
                 {'type': 'firewall-rules',
-                 'equal': ['3.1.1.1-3.1.1.1', '1.2.2.128/25']}],
+                 'equal': ['0.0.0.0-126.255.255.255', '128.0.0.0-255.255.255.255']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(1, len(resources))
 
     @arm_template('keyvault.json')
+    @cassette_name('common')
     def test_firewall_rules_not_equal(self):
         p = self.load_policy({
             'name': 'test-azure-keyvault',
             'resource': 'azure.keyvault',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value': 'cckeyvault1*'},
                 {'type': 'firewall-rules',
-                 'equal': ['3.1.1.1-3.1.1.2', '3.1.1.1-3.1.1.1', '1.2.2.128/25']}],
+                 'equal': ['0.0.0.0-126.255.255.255', '128.0.0.0-255.255.255.254']}],
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
+
+    @arm_template('keyvault.json')
+    @cassette_name('common')
+    def test_firewall_bypass(self):
+        p = self.load_policy({
+            'name': 'test-azure-keyvault',
+            'resource': 'azure.keyvault',
+            'filters': [
+                {'type': 'firewall-bypass',
+                 'mode': 'equal',
+                 'list': ['AzureServices']}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
+
+class KeyVaultFirewallFilterTest(BaseTest):
+
+    def test_query_empty_network_acl(self):
+        resource = {'properties': {}}
+        expected = IPSet(['0.0.0.0/0'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_default_action_allow(self):
+        resource = {'properties': {'networkAcls': {'defaultAction': 'Allow'}}}
+        expected = IPSet(['0.0.0.0/0'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def test_query_default_action_deny(self):
+        resource = {'properties': {'networkAcls': {'defaultAction': 'Deny',
+                                                   'ipRules': [{'value': '10.0.0.0/16'},
+                                                               {'value': '8.8.8.8'}]}}}
+        expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
+        self.assertEqual(expected, self._get_filter()._query_rules(resource))
+
+    def _get_filter(self, mode='equal'):
+        data = {mode: ['10.0.0.0/8', '127.0.0.1']}
+        return KeyVaultFirewallRulesFilter(data, Mock())
+
+
+class KeyVaultFirewallBypassFilterTest(BaseTest):
+
+    scenarios = [
+        [{}, []],
+        [{'networkAcls': {'defaultAction': 'Allow', 'bypass': ''}}, ['AzureServices']],
+        [{'networkAcls': {'defaultAction': 'Deny', 'bypass': ''}}, []],
+        [{'networkAcls': {'defaultAction': 'Deny', 'bypass': 'AzureServices'}},
+         ['AzureServices']],
+    ]
+
+    @parameterized.expand(scenarios)
+    def test_run(self, properties, expected):
+        resource = {'properties': properties}
+        f = KeyVaultFirewallBypassFilter({'mode': 'equal', 'list': []})
+        self.assertEqual(expected, f._query_bypass(resource))

@@ -1650,6 +1650,17 @@ class TestLaunchTemplate(BaseTest):
         self.assertEqual(len(resources), 8)
         self.assertTrue(all(['LaunchTemplateData' in r for r in resources]))
 
+    def test_launch_template_id_not_found(self):
+        factory = self.replay_flight_data("test_launch_template_id_not_found")
+        good_lt_id = 'lt-0877401c93c294001'
+        p = self.load_policy(
+            {'name': 'lt-missing', 'resource': 'launch-template-version'},
+            session_factory=factory)
+        resources = p.resource_manager.get_resources(
+            [('lt-0a49586208137d8de', '1'), ('lt-0877401c93c294001', '3')])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LaunchTemplateId'], good_lt_id)
+
 
 class TestReservedInstance(BaseTest):
 

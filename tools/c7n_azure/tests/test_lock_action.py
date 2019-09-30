@@ -60,6 +60,21 @@ class LockActionTest(BaseTest):
 
         self.assertTrue(self.load_policy(data=policy, validate=True))
 
+        policy_with_lock_fields = {
+            'name': 'lock-cosmosdb',
+            'resource': 'azure.cosmosdb',
+            'actions': [
+                {
+                    'type': 'lock',
+                    'lock-type': 'ReadOnly',
+                    'lock-name': 'testLock',
+                    'lock-notes': 'testNotes'
+                }
+            ],
+        }
+
+        self.assertTrue(self.load_policy(data=policy_with_lock_fields, validate=True))
+
     def test_invalid_policy(self):
         # Missing lock-type parameter
         policy = {
@@ -84,29 +99,37 @@ class LockActionTest(BaseTest):
                 {
                     'type': 'value',
                     'key': 'name',
-                    'value': 'cctestcosmosdb'
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cctestcosmosdb*'
                 }
             ],
             'actions': [
                 {
                     'type': 'lock',
-                    'lock-type': 'ReadOnly'
+                    'lock-type': 'ReadOnly',
+                    'lock-name': 'testLock',
+                    'lock-notes': 'testNotes'
                 }
             ],
         })
         self.resources = p.run()
+
         self.assertEqual(len(self.resources), 1)
-        self.assertEqual(self.resources[0]['name'], 'cctestcosmosdb')
+        resource_name = self.resources[0]['name']
+        self.assertTrue(resource_name.startswith('cctestcosmosdb'))
 
         locks = [r.serialize(True) for r in self.client.management_locks.list_at_resource_level(
             'test_cosmosdb',
             'Microsoft.DocumentDB',
             '',
             'databaseAccounts',
-            'cctestcosmosdb')]
+            resource_name)]
 
         self.assertEqual(len(locks), 1)
         self.assertEqual(locks[0]['properties']['level'], 'ReadOnly')
+        self.assertEqual(locks[0]['name'], 'testLock')
+        self.assertEqual(locks[0]['properties']['notes'], 'testNotes')
         self.resources[0]['lock'] = locks[0]['name']
 
     @arm_template('cosmosdb.json')
@@ -124,7 +147,9 @@ class LockActionTest(BaseTest):
             'actions': [
                 {
                     'type': 'lock',
-                    'lock-type': 'CanNotDelete'
+                    'lock-type': 'CanNotDelete',
+                    'lock-name': 'testLock',
+                    'lock-notes': 'testNotes'
                 }
             ],
         })
@@ -137,6 +162,8 @@ class LockActionTest(BaseTest):
 
         self.assertEqual(len(locks), 1)
         self.assertEqual(locks[0]['properties']['level'], 'CanNotDelete')
+        self.assertEqual(locks[0]['name'], 'testLock')
+        self.assertEqual(locks[0]['properties']['notes'], 'testNotes')
         self.resources[0]['lock'] = locks[0]['name']
 
     @arm_template('sqlserver.json')
@@ -154,7 +181,9 @@ class LockActionTest(BaseTest):
             'actions': [
                 {
                     'type': 'lock',
-                    'lock-type': 'CanNotDelete'
+                    'lock-type': 'CanNotDelete',
+                    'lock-name': 'testLock',
+                    'lock-notes': 'testNotes'
                 }
             ],
         })
@@ -171,4 +200,6 @@ class LockActionTest(BaseTest):
 
         self.assertEqual(len(locks), 1)
         self.assertEqual(locks[0]['properties']['level'], 'CanNotDelete')
+        self.assertEqual(locks[0]['name'], 'testLock')
+        self.assertEqual(locks[0]['properties']['notes'], 'testNotes')
         self.resources[0]['lock'] = locks[0]['name']

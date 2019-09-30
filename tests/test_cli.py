@@ -249,7 +249,7 @@ class SchemaTest(CliTest):
             '$ref': '#/definitions/filters_common/value_from'
         }
         result = ElementSchema.schema(generate()['definitions'], test_schema)
-        self.assertEquals(result, ValuesFrom.schema)
+        self.assertEqual(result, ValuesFrom.schema)
 
     def test_schema_multi_expand(self):
         test_schema = {
@@ -289,14 +289,14 @@ class SchemaTest(CliTest):
         })
 
         result = yaml_dump(ElementSchema.schema(generate()['definitions'], test_schema))
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_schema_expand_not_found(self):
         test_schema = {
             '$ref': '#/definitions/filters_common/invalid_schema'
         }
         result = ElementSchema.schema(generate()['definitions'], test_schema)
-        self.assertEquals(result, None)
+        self.assertEqual(result, None)
 
 
 class ReportTest(CliTest):

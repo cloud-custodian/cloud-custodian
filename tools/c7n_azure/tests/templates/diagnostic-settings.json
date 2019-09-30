@@ -2,9 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
         "loadbalancer_name":"cctestdiagnostic_loadbalancer",
         "public_ip_loadbalancer_name":"cctestdiagnostic_loadbalancer_public_ip",
-        "storage_account_name": "[concat('diagnostic', uniqueString('cctstorage'))]",
+        "storage_account_name": "[concat('diagnostic', variables('suffix'))]",
         "diagnosticSettingName": "ccdiagnosticsettingtest"
     },
     "resources": [

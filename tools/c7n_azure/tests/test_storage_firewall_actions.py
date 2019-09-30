@@ -135,7 +135,7 @@ class StorageTestFirewallActions(BaseTest):
 
         resources = self._get_resources()
         bypass = resources[0].network_rule_set.bypass
-        self.assertEqual(bypass, 'None')
+        self.assertEqual('AzureServices', bypass)
 
     @arm_template('storage.json')
     def test_missing_bypass_network_rules_action(self):
@@ -158,30 +158,10 @@ class StorageTestFirewallActions(BaseTest):
 
         resources = self._get_resources()
         bypass = resources[0].network_rule_set.bypass
-        self.assertEqual(bypass, 'None')
+        self.assertEqual('AzureServices', bypass)
 
-    @arm_template('storage.json')
-    def test_default_action_network_rules_action(self):
-        p_add = self.load_policy({
-            'name': 'test-azure-storage-add-ips',
-            'resource': 'azure.storage',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'glob',
-                 'value_type': 'normalize',
-                 'value': 'cctstorage*'}],
-            'actions': [
-                {'type': 'set-firewall-rules',
-                 'default-action': 'Deny'}
-            ]
-        })
-
-        p_add.run()
-
-        resources = self._get_resources()
         action = resources[0].network_rule_set.default_action
-        self.assertEqual(action, DefaultAction.deny)
+        self.assertEqual(DefaultAction.deny, action)
 
     @arm_template('storage.json')
     def test_bypass_network_rules_action(self):
@@ -197,7 +177,7 @@ class StorageTestFirewallActions(BaseTest):
             'actions': [
                 {'type': 'set-firewall-rules',
                  'default-action': 'Deny',
-                 'bypass-rules': ['Metrics']}
+                 'bypass-rules': ['Metrics', 'AzureServices']}
             ]
         })
 
@@ -205,7 +185,7 @@ class StorageTestFirewallActions(BaseTest):
 
         resources = self._get_resources()
         bypass = resources[0].network_rule_set.bypass
-        self.assertEqual(bypass, 'Metrics')
+        self.assertEqual(bypass, 'Metrics, AzureServices')
 
     def _get_resources(self):
         resources = [

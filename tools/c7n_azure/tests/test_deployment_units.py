@@ -35,6 +35,7 @@ class DeploymentUnitsTest(BaseTest):
 
     @classmethod
     def setUpClass(cls):
+        super(DeploymentUnitsTest, cls).setUpClass()
         try:
             cls.session = local_session(Session)
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
@@ -44,6 +45,7 @@ class DeploymentUnitsTest(BaseTest):
 
     @classmethod
     def tearDownClass(cls):
+        super(DeploymentUnitsTest, cls).tearDownClass()
         try:
             client = cls.session.client('azure.mgmt.resource.ResourceManagementClient')
             client.resource_groups.delete(cls.rg_name)
@@ -115,7 +117,8 @@ class DeploymentUnitsTest(BaseTest):
         # provision function app
         func_params = {
             'name': 'cc-consumption-47182748',
-            'location': self.rg_location,
+            # Using different location due to http://go.microsoft.com/fwlink/?LinkId=825764
+            'location': 'eastus2',
             'resource_group_name': self.rg_name,
             'app_service_plan_id': None,  # auto-provision a dynamic app plan
             'app_insights_key': None,

@@ -45,9 +45,4 @@ class DataFactory(ArmResourceManager):
         service = 'azure.mgmt.datafactory'
         client = 'DataFactoryManagementClient'
         enum_spec = ('factories', 'list', None)
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup'
-        )
         resource_type = 'Microsoft.DataFactory/factories'

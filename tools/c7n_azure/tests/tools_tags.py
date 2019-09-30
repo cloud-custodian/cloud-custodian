@@ -48,6 +48,7 @@ def get_resource(existing_tags):
                      'TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm'
     resource['name'] = 'cctestvm'
     resource['type'] = 'Microsoft.Compute/virtualMachines'
+    resource['InstanceId'] = "testInstance"
     return resource
 
 
@@ -55,7 +56,7 @@ def get_resource_group_resource(existing_tags):
     resource = GenericResource(tags=existing_tags).serialize()
     resource['id'] = '/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_rg'
     resource['name'] = 'test_rg'
-    resource['type'] = 'Microsoft.Resources/subscriptions/resourcegroups'
+    resource['type'] = 'resourceGroups'
     return resource
 
 

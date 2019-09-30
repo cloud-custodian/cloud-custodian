@@ -14,72 +14,133 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "content-length": [
-                        "3110"
+                        "7497"
                     ],
                     "date": [
-                        "Wed, 26 Jun 2019 17:06:22 GMT"
+                        "Wed, 18 Sep 2019 23:32:12 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anluong-custodian",
-                                "name": "anluong-custodian",
-                                "location": "westus2",
-                                "tags": {
-                                    "RG-Owner": "anluong@microsoft.com",
-                                    "CreatorEmail": "anluong@microsoft.com"
-                                },
-                                "properties": {
-                                    "provisioningState": "Succeeded"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-11",
-                                "name": "anzoloch-11",
-                                "location": "centralus",
-                                "tags": {},
-                                "properties": {
-                                    "provisioningState": "Succeeded"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-cc",
-                                "name": "anzoloch-cc",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/alert-1",
+                                "name": "alert-1",
                                 "location": "eastus",
                                 "properties": {
                                     "provisioningState": "Succeeded"
                                 }
                             },
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-test-cc",
-                                "name": "anzoloch-test-cc",
-                                "location": "westus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/alert-2",
+                                "name": "alert-2",
+                                "location": "eastus",
                                 "properties": {
                                     "provisioningState": "Succeeded"
                                 }
                             },
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/catay-function-app",
-                                "name": "catay-function-app",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/alert-3",
+                                "name": "alert-3",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/alert-4",
+                                "name": "alert-4",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/alert-5",
+                                "name": "alert-5",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/alert-6",
+                                "name": "alert-6",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/alert-7",
+                                "name": "alert-7",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/alert-8",
+                                "name": "alert-8",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/andy-1",
+                                "name": "andy-1",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/andy-app",
+                                "name": "andy-app",
+                                "location": "westus",
+                                "tags": {
+                                    "GenericArm": "works-final"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/andy-batch",
+                                "name": "andy-batch",
+                                "location": "westus2",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/anzoloch-csefs-2",
+                                "name": "anzoloch-csefs-2",
                                 "location": "centralus",
                                 "properties": {
                                     "provisioningState": "Succeeded"
                                 }
                             },
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/catay-test",
-                                "name": "catay-test",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/appinsights-test",
+                                "name": "appinsights-test",
                                 "location": "westus2",
-                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/aretheseworking",
+                                "name": "aretheseworking",
+                                "location": "eastus",
                                 "properties": {
                                     "provisioningState": "Succeeded"
                                 }
@@ -93,9 +154,40 @@
                                 }
                             },
                             {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-emailer",
+                                "name": "cloud-custodian-emailer",
+                                "location": "westus2",
+                                "tags": {
+                                    "OwnerEmail": "anluong@microsoft.com"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-sentinel",
+                                "name": "cloud-custodian-sentinel",
+                                "location": "westus2",
+                                "tags": {
+                                    "GenericArm": "works-final"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-cask",
                                 "name": "custodian-cask",
                                 "location": "westus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-container-host-nightly",
+                                "name": "custodian-container-host-nightly",
+                                "location": "westus2",
                                 "properties": {
                                     "provisioningState": "Succeeded"
                                 }
@@ -104,6 +196,18 @@
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-sendgrid",
                                 "name": "custodian-sendgrid",
                                 "location": "centralus",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/DefaultResourceGroup-EUS",
+                                "name": "DefaultResourceGroup-EUS",
+                                "location": "eastus",
+                                "tags": {
+                                    "OwnerEmail": "catay@microsoft.com"
+                                },
                                 "properties": {
                                     "provisioningState": "Succeeded"
                                 }
@@ -112,7 +216,35 @@
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/erwelch-test",
                                 "name": "erwelch-test",
                                 "location": "westus2",
-                                "tags": {},
+                                "tags": {
+                                    "OwnerEmail": "erwelch@microsoft.com",
+                                    "erwelch": "testing",
+                                    "rg_name": "erwelch-test",
+                                    "test_exception": "Does this work?",
+                                    "test_from_another_tag": "100",
+                                    "erwelch-test": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/erwelch-test"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/hierch-sa-test",
+                                "name": "hierch-sa-test",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/kiril-test2",
+                                "name": "kiril-test2",
+                                "location": "eastus",
+                                "tags": {
+                                    "GenericArm": "works-final",
+                                    "attempt": "1",
+                                    "mac-test": "1"
+                                },
                                 "properties": {
                                     "provisioningState": "Succeeded"
                                 }
@@ -126,24 +258,54 @@
                                 }
                             },
                             {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/tag-rg-consump",
+                                "name": "tag-rg-consump",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/tag-rg-consumption",
+                                "name": "tag-rg-consumption",
+                                "location": "eastus",
+                                "tags": {
+                                    "OwnerEmail": "fee7b372-b4d4-4369-a8fc-20a72ac4eefc"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test-winappcons",
+                                "name": "test-winappcons",
+                                "location": "centralus",
+                                "tags": {
+                                    "OwnerEmail": "anluong@microsoft.com"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan",
+                                "name": "test_appserviceplan",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_appserviceplan-linux",
+                                "name": "test_appserviceplan-linux",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb",
                                 "name": "test_cosmosdb",
-                                "location": "southcentralus",
-                                "properties": {
-                                    "provisioningState": "Succeeded"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs",
-                                "name": "test_functionapp-reqs",
-                                "location": "southcentralus",
-                                "properties": {
-                                    "provisioningState": "Succeeded"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault",
-                                "name": "test_keyvault",
                                 "location": "southcentralus",
                                 "properties": {
                                     "provisioningState": "Succeeded"
@@ -164,6 +326,42 @@
                                 "properties": {
                                     "provisioningState": "Succeeded"
                                 }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/vm-images",
+                                "name": "vm-images",
+                                "location": "westus2",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/whatkindareyoufuncapplinux",
+                                "name": "whatkindareyoufuncapplinux",
+                                "location": "northeurope",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/whatkindareyoufuncappwin",
+                                "name": "whatkindareyoufuncappwin",
+                                "location": "centralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/wifrick",
+                                "name": "wifrick",
+                                "location": "westus2",
+                                "tags": {
+                                    "OwnerEmail": "wifrick@microsoft.com"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
                             }
                         ]
                     }
@@ -173,7 +371,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/lock_test_cosmosdb_CanNotDelete?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/testLock?api-version=2016-09-01",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -183,30 +381,31 @@
                     "message": "Created"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "content-length": [
-                        "279"
+                        "253"
                     ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "1199"
                     ],
                     "date": [
-                        "Wed, 26 Jun 2019 17:06:23 GMT"
+                        "Wed, 18 Sep 2019 23:32:12 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ]
                 },
                 "body": {
                     "data": {
                         "properties": {
-                            "level": "CanNotDelete"
+                            "level": "CanNotDelete",
+                            "notes": "testNotes"
                         },
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/lock_test_cosmosdb_CanNotDelete",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/testLock",
                         "type": "Microsoft.Authorization/locks",
-                        "name": "lock_test_cosmosdb_CanNotDelete"
+                        "name": "testLock"
                     }
                 }
             }
@@ -224,17 +423,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "date": [
-                        "Wed, 26 Jun 2019 17:06:23 GMT"
+                        "Wed, 18 Sep 2019 23:32:12 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "content-length": [
-                        "291"
+                        "265"
                     ]
                 },
                 "body": {
@@ -242,11 +441,12 @@
                         "value": [
                             {
                                 "properties": {
-                                    "level": "CanNotDelete"
+                                    "level": "CanNotDelete",
+                                    "notes": "testNotes"
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/lock_test_cosmosdb_CanNotDelete",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/testLock",
                                 "type": "Microsoft.Authorization/locks",
-                                "name": "lock_test_cosmosdb_CanNotDelete"
+                                "name": "testLock"
                             }
                         ]
                     }
@@ -256,7 +456,7 @@
         {
             "request": {
                 "method": "DELETE",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/lock_test_cosmosdb_CanNotDelete?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cosmosdb/providers/Microsoft.Authorization/locks/testLock?api-version=2016-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -266,17 +466,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "14999"
+                    ],
+                    "date": [
+                        "Wed, 18 Sep 2019 23:32:14 GMT"
                     ],
                     "content-length": [
                         "0"
                     ],
-                    "date": [
-                        "Wed, 26 Jun 2019 17:06:24 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-deletes": [
-                        "14999"
+                    "cache-control": [
+                        "no-cache"
                     ]
                 },
                 "body": {

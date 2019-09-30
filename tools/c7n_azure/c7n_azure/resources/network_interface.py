@@ -53,11 +53,6 @@ class NetworkInterface(ArmResourceManager):
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('network_interfaces', 'list_all', None)
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup'
-        )
         resource_type = 'Microsoft.Network/networkInterfaces'
 
 

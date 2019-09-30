@@ -77,6 +77,27 @@ be informed of an operations issue.
 If S3 output is also enabled, then it is also recommended to set a log group
 archival policy and to use the S3 logs as permanent/audit archive.
 
+You can also aggregate your logs within a single region or account using the same url formatting as is used for metrics.
+
+To send your logs to a region in the master account use::
+
+  $ custodian run --log-group=aws://master/<log-group-name>?region=<region> <policyfile>.yml 
+
+This will set up a stream for every region/account you run custodian against within the specified log group. 
+
+The default log stream format looks like this:
+
+  $ account_id/region/policy_name
+
+If you want to override this then you can pass the the log stream parameter like this:
+
+  $ custodian run --log-group="aws://master/<log-group-name>?region=<region>&stream=custodian_{region}_{account}_{policy} <policyfile>.yml"
+
+it currently accepts these variables:
+  {account}: the account where the check was executed.
+  {region}: the region where the check was executed.
+  {policy}: the name of the policy that was executed.
+
 
 S3 Logs & Records
 -----------------

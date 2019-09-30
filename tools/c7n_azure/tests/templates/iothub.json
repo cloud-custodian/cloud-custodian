@@ -1,17 +1,10 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "IotHubs_cctest_iothub_name": {
-            "defaultValue": "cctest-iothub",
-            "type": "String"
-        },
-        "accounts_cctest_cog_serv_name": {
-            "defaultValue": "cctest-cog-serv",
-            "type": "String"
-        }
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "name": "[concat('cctest-iothub', variables('suffix'))]"
     },
-    "variables": {},
     "resources": [
         {
             "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/tabarlow/providers/Microsoft.Devices/IotHubs/cctest-iothub'.",
@@ -21,7 +14,7 @@
                 "tier": "Standard",
                 "capacity": 1
             },
-            "name": "[parameters('IotHubs_cctest_iothub_name')]",
+            "name": "[variables('name')]",
             "apiVersion": "2018-04-01",
             "location": "westus",
             "tags": {},
@@ -49,7 +42,7 @@
                             "2",
                             "3"
                         ],
-                        "path": "[parameters('IotHubs_cctest_iothub_name')]",
+                        "path": "[variables('name')]",
                         "endpoint": "sb://iothub-ns-cctest-iot-523188-8919bbe7f4.servicebus.windows.net/"
                     },
                     "operationsMonitoringEvents": {
@@ -61,7 +54,7 @@
                             "2",
                             "3"
                         ],
-                        "path": "[concat(parameters('IotHubs_cctest_iothub_name'),'-operationmonitoring')]",
+                        "path": "[concat(variables('name'),'-operationmonitoring')]",
                         "endpoint": "sb://iothub-ns-cctest-iot-523188-8919bbe7f4.servicebus.windows.net/"
                     }
                 },

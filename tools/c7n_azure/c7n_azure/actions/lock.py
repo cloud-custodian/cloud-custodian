@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n_azure.utils import ResourceIdParser
+from azure.mgmt.resource.locks.models import ManagementLockObject
+from c7n_azure.actions.base import AzureBaseAction
+from c7n_azure.utils import ResourceIdParser, is_resource_group
 
 from c7n.utils import type_schema
-from c7n_azure.actions.base import AzureBaseAction
-from azure.mgmt.resource.locks.models import ManagementLockObject
 
 
 class LockAction(AzureBaseAction):
@@ -44,13 +44,35 @@ class LockAction(AzureBaseAction):
             actions:
               - type: lock
                 lock-type: ReadOnly
+
+    :example:
+
+    Add CanNotDelete lock to sqldatabases tagged env:production
+
+    .. code-block:: yaml
+
+       policies:
+          - name: lock-production-sqldatabase
+            resource: azure.sqldatabase
+            filters:
+              - type: value
+                key: tags.env
+                value: production
+            actions:
+              - type: lock
+                lock-type: CanNotDelete
+                lock-name: productionLock
+                lock-notes: Locking all production SQL databases via Cloud Custodian
+
      """
 
     schema = type_schema(
         'lock',
         required=['lock-type'],
         **{
-            'lock-type': {'enum': ['ReadOnly', 'CanNotDelete']}
+            'lock-type': {'enum': ['ReadOnly', 'CanNotDelete']},
+            'lock-name': {'type': 'string', 'minLength': 1, 'maxLength': 260},
+            'lock-notes': {'type': 'string', 'minLength': 1, 'maxLength': 512}
         }
     )
 
@@ -64,11 +86,14 @@ class LockAction(AzureBaseAction):
         self.client = self.manager.get_client('azure.mgmt.resource.locks.ManagementLockClient')
 
     def _process_resource(self, resource):
-        if resource.get('resourceGroup') is None:
+        lock_name = self._get_lock_name(resource)
+        lock_notes = self._get_lock_notes(resource)
+
+        if is_resource_group(resource):
             self.client.management_locks.create_or_update_at_resource_group_level(
                 resource['name'],
-                'lock_' + resource['name'] + '_' + self.lock_type,
-                ManagementLockObject(level=self.lock_type)
+                lock_name,
+                ManagementLockObject(level=self.lock_type, notes=lock_notes)
             )
         else:
             self.client.management_locks.create_or_update_at_resource_level(
@@ -77,6 +102,15 @@ class LockAction(AzureBaseAction):
                 ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
                 ResourceIdParser.get_resource_type(resource['id']),
                 resource['name'],
-                'custodian_lock_' + resource['name'] + '_' + self.lock_type,
-                ManagementLockObject(level=self.lock_type)
+                lock_name,
+                ManagementLockObject(level=self.lock_type, notes=lock_notes)
             )
+
+    def _get_lock_name(self, resource):
+        return self.data.get('lock-name',
+                             "custodian_lock_{}_{}".format(resource['name'], self.lock_type))
+
+    def _get_lock_notes(self, resource):
+        return self.data.get('lock-notes',
+                             "Custodian lock created by policy: {}"
+                             .format(self.manager.data['name']))

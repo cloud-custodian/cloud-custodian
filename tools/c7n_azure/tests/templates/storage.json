@@ -1,13 +1,17 @@
 {
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {
+  "parameters":  {
+        "storageAccountName": {
+          "type": "string",
+          "defaultValue": "[concat('cctstorage', uniqueString(resourceGroup().id))]"
+        }
   },
   "variables": {
   },
   "resources": [
     {
-      "name": "[concat('cctstorage', uniqueString(resourceGroup().id))]",
+      "name": "[parameters('storageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2016-01-01",
       "sku": {
@@ -16,7 +20,31 @@
       "kind": "Storage",
       "location": "South Central US",
       "tags": {},
-      "properties": {}
+      "properties": {},
+      "resources": [
+        {
+            "type": "blobServices/containers",
+            "apiVersion": "2018-07-01",
+            "name": "default/containerone",
+            "dependsOn": [
+                "[parameters('StorageAccountName')]"
+            ],
+            "properties": {
+                "publicAccess": "Container"
+            }
+        },
+        {
+            "type": "blobServices/containers",
+            "apiVersion": "2018-07-01",
+            "name": "default/containertwo",
+            "dependsOn": [
+                "[parameters('StorageAccountName')]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        }
+    ]
     },
     {
       "name": "[concat('cclgstorage', uniqueString(resourceGroup().id))]",

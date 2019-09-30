@@ -19,7 +19,6 @@ import zlib
 import jmespath
 
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
-from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter)
@@ -29,6 +28,7 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
+from c7n.resources.securityhub import OtherResourcePostFinding
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
 
@@ -1989,20 +1989,39 @@ class CreateFlowLogs(BaseAction):
         'eni': 'NetworkInterface'
     }
 
+    SchemaValidation = {
+        's3': {
+            'required': ['LogDestination'],
+            'absent': ['LogGroupName', 'DeliverLogsPermissionArn']
+        },
+        'cloud-watch-logs': {
+            'required': ['DeliverLogsPermissionArn'],
+            'one-of': ['LogGroupName', 'LogDestination'],
+        }
+    }
+
     def validate(self):
         self.state = self.data.get('state', True)
-        if self.state:
-            if not self.data.get('DeliverLogsPermissionArn'):
+        if not self.state:
+            return
+        destination_type = self.data.get(
+            'LogDestinationType', 'cloud-watch-logs')
+        dvalidation = self.SchemaValidation[destination_type]
+        for r in dvalidation.get('required', ()):
+            if not self.data.get(r):
                 raise PolicyValidationError(
-                    'DeliverLogsPermissionArn required when '
-                    'creating flow-logs on %s' % (self.manager.data,))
-            if (not self.data.get('LogGroupName') and not self.data.get('LogDestination')):
+                    'Required %s missing for destination-type:%s' % (
+                        r, destination_type))
+        for r in dvalidation.get('absent', ()):
+            if r in self.data:
                 raise PolicyValidationError(
-                    'Either LogGroupName or LogDestination required')
-            if (self.data.get('LogDestinationType') == 's3' and
-               not self.data.get('LogDestination')):
-                raise PolicyValidationError(
-                    'LogDestination required when LogDestinationType is s3')
+                    '%s is prohibited for destination-type:%s' % (
+                        r, destination_type))
+        if ('one-of' in dvalidation and
+                sum([1 for k in dvalidation['one-of'] if k in self.data]) != 1):
+            raise PolicyValidationError(
+                "Destination:%s Exactly one of %s required" % (
+                    destination_type, ", ".join(dvalidation['one-of'])))
         return self
 
     def delete_flow_logs(self, client, rids):

@@ -14,14 +14,14 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "date": [
-                        "Wed, 26 Jun 2019 17:06:17 GMT"
+                        "Wed, 18 Sep 2019 23:45:59 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "428"
@@ -61,17 +61,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "date": [
-                        "Wed, 26 Jun 2019 17:06:17 GMT"
+                        "Wed, 18 Sep 2019 23:46:02 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "content-length": [
-                        "2740"
+                        "2737"
                     ]
                 },
                 "body": {
@@ -88,14 +88,14 @@
                                     "collation": "SQL_Latin1_General_CP1_CI_AS",
                                     "maxSizeBytes": 268435456000,
                                     "status": "Online",
-                                    "databaseId": "bd2e2abb-449a-4da2-9479-d976d6052640",
-                                    "creationDate": "2019-06-21T17:01:59.717Z",
+                                    "databaseId": "2f600512-4097-4584-bc5a-d9d82c74b458",
+                                    "creationDate": "2019-09-16T20:25:40.02Z",
                                     "currentServiceObjectiveName": "S0",
                                     "requestedServiceObjectiveName": "S0",
                                     "defaultSecondaryLocation": "centralus",
                                     "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                                     "zoneRedundant": false,
-                                    "earliestRestoreDate": "2019-06-21T17:11:40.62Z",
+                                    "earliestRestoreDate": "2019-09-16T20:34:01.13Z",
                                     "readScale": "Disabled",
                                     "readReplicaCount": 0,
                                     "currentSku": {
@@ -120,14 +120,14 @@
                                     "collation": "SQL_Latin1_General_CP1_CI_AS",
                                     "maxSizeBytes": 2147483648,
                                     "status": "Online",
-                                    "databaseId": "1479fa50-c05f-407e-b584-f631a08285ac",
-                                    "creationDate": "2019-06-21T17:02:19.107Z",
+                                    "databaseId": "33a4a37d-e57d-4beb-9f6a-9369ead1a3c7",
+                                    "creationDate": "2019-09-16T20:26:37.58Z",
                                     "currentServiceObjectiveName": "P1",
                                     "requestedServiceObjectiveName": "P1",
                                     "defaultSecondaryLocation": "centralus",
                                     "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                                     "zoneRedundant": false,
-                                    "earliestRestoreDate": "2019-06-21T17:03:10.143Z",
+                                    "earliestRestoreDate": "2019-09-16T20:27:28.017Z",
                                     "readScale": "Enabled",
                                     "readReplicaCount": 1,
                                     "currentSku": {
@@ -153,8 +153,8 @@
                                     "collation": "SQL_Latin1_General_CP1_CI_AS",
                                     "maxSizeBytes": 32212254720,
                                     "status": "Online",
-                                    "databaseId": "7dfe2f7a-b721-48f7-975d-533e535f5956",
-                                    "creationDate": "2019-06-21T17:00:43.383Z",
+                                    "databaseId": "c7b1f283-3f8f-40e2-8dd1-dabdf2903bb7",
+                                    "creationDate": "2019-09-16T20:24:22.38Z",
                                     "currentServiceObjectiveName": "System2",
                                     "requestedServiceObjectiveName": "System2",
                                     "defaultSecondaryLocation": "centralus",
@@ -181,7 +181,7 @@
         {
             "request": {
                 "method": "PUT",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql%2Fservers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestdb_CanNotDelete?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql%2Fservers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/testLock?api-version=2016-09-01",
                 "body": "mock_body",
                 "headers": {}
             },
@@ -191,30 +191,31 @@
                     "message": "Created"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "content-length": [
-                        "370"
+                    "date": [
+                        "Wed, 18 Sep 2019 23:46:09 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-writes": [
                         "1199"
                     ],
-                    "date": [
-                        "Wed, 26 Jun 2019 17:06:17 GMT"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "334"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ]
                 },
                 "body": {
                     "data": {
                         "properties": {
-                            "level": "CanNotDelete"
+                            "level": "CanNotDelete",
+                            "notes": "testNotes"
                         },
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestdb_CanNotDelete",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/testLock",
                         "type": "Microsoft.Authorization/locks",
-                        "name": "custodian_lock_cctestdb_CanNotDelete"
+                        "name": "testLock"
                     }
                 }
             }
@@ -232,17 +233,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "date": [
-                        "Wed, 26 Jun 2019 17:06:18 GMT"
+                        "Wed, 18 Sep 2019 23:46:13 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "content-length": [
-                        "382"
+                        "346"
                     ]
                 },
                 "body": {
@@ -250,11 +251,12 @@
                         "value": [
                             {
                                 "properties": {
-                                    "level": "CanNotDelete"
+                                    "level": "CanNotDelete",
+                                    "notes": "testNotes"
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestdb_CanNotDelete",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql/servers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/testLock",
                                 "type": "Microsoft.Authorization/locks",
-                                "name": "custodian_lock_cctestdb_CanNotDelete"
+                                "name": "testLock"
                             }
                         ]
                     }
@@ -264,7 +266,7 @@
         {
             "request": {
                 "method": "DELETE",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql%2Fservers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/custodian_lock_cctestdb_CanNotDelete?api-version=2016-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_sqlserver/providers/Microsoft.Sql%2Fservers/cctestsqlserverj6y6cbbtaphs4/databases/cctestdb/providers/Microsoft.Authorization/locks/testLock?api-version=2016-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -274,17 +276,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "14999"
+                    ],
+                    "date": [
+                        "Wed, 18 Sep 2019 23:46:16 GMT"
                     ],
                     "content-length": [
                         "0"
                     ],
-                    "date": [
-                        "Wed, 26 Jun 2019 17:06:19 GMT"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-deletes": [
-                        "14999"
+                    "cache-control": [
+                        "no-cache"
                     ]
                 },
                 "body": {
