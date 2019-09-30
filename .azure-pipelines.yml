@@ -90,9 +90,6 @@ jobs:
   - script: python -m pip install --upgrade pip && pip install tox codecov
     displayName: 'Install Test Runner'
 
-  - script: tox --notest
-    displayName: 'Install Dependencies'
-
   - script: tox
     displayName: 'Tox'
 
@@ -149,9 +146,6 @@ jobs:
 
   - script: python -m pip install --upgrade pip && pip install tox
     displayName: 'Install Test Runner'
-
-  - script: tox --notest
-    displayName: 'Install Dependencies'
 
   - script: tox
     displayName: 'Tox'
