@@ -332,7 +332,7 @@ class SetQueryLogging(BaseAction):
             if log_manager.get_resources(list(group_names), augment=False):
                 groups = [{'logGroupName': g} for g in group_names]
         else:
-            common_prefix = os.path.commonprefix(group_names)
+            common_prefix = os.path.commonprefix(list(group_names))
             if common_prefix not in ('', '/'):
                 groups = log_manager.get_resources(
                     [common_prefix], augment=False)

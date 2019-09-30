@@ -27,21 +27,30 @@
             ],
             "defaultValue": "Always"
         },
-        "user_assigned_identity_name": {
-            "type": "string"
-        },
-        "azure_event_queue_name": {
-            "type": "string",
-            "defaultValue": "[concat('custodian-', parameters('azure_subscription_id'))]"
-        },
         "azure_subscription_id": {
             "type": "string",
             "defaultValue": "[subscription().subscriptionId]"
         },
-        "azure_container_storage": {
+        "user_assigned_identity_name": {
             "type": "string"
         },
-        "azure_event_queue_resource_id": {
+        "azure_container_queue_name": {
+            "type": "string",
+            "defaultValue": "[concat('custodian-', parameters('azure_subscription_id'))]"
+        },
+        "azure_container_policy_uri": {
+            "type": "string"
+        },
+        "azure_container_storage_resource_id": {
+            "type": "string"
+        },
+        "azure_container_log_group": {
+            "type": "string"
+        },
+        "azure_container_metrics": {
+            "type": "string"
+        },
+        "azure_container_output_dir": {
             "type": "string"
         }
     },
@@ -83,7 +92,7 @@
                                 },
                                 {
                                     "name": "AZURE_CONTAINER_QUEUE_NAME",
-                                    "value": "[parameters('azure_event_queue_name')]"
+                                    "value": "[parameters('azure_container_queue_name')]"
                                 },
                                 {
                                     "name": "AZURE_SUBSCRIPTION_ID",
@@ -91,11 +100,23 @@
                                 },
                                 {
                                     "name": "AZURE_CONTAINER_POLICY_URI",
-                                    "value": "[parameters('azure_container_storage')]"
+                                    "value": "[parameters('azure_container_policy_uri')]"
                                 },
                                 {
                                     "name": "AZURE_CONTAINER_STORAGE_RESOURCE_ID",
-                                    "value": "[parameters('azure_event_queue_resource_id')]"
+                                    "value": "[parameters('azure_container_storage_resource_id')]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_LOG_GROUP",
+                                    "value": "[parameters('azure_container_log_group')]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_METRICS",
+                                    "value": "[parameters('azure_container_metrics')]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_OUTPUT_DIR",
+                                    "value": "[parameters('azure_container_output_dir')]"
                                 }
                             ],
                             "resources": {

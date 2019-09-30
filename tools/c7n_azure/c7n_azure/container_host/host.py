@@ -35,12 +35,12 @@ from c7n_azure import entry
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
 from c7n_azure.constants import (CONTAINER_EVENT_TRIGGER_MODE,
                                  CONTAINER_TIME_TRIGGER_MODE,
-                                 ENV_CONTAINER_EVENT_QUEUE_ID,
-                                 ENV_CONTAINER_EVENT_QUEUE_NAME,
                                  ENV_CONTAINER_OPTION_LOG_GROUP,
                                  ENV_CONTAINER_OPTION_METRICS,
                                  ENV_CONTAINER_OPTION_OUTPUT_DIR,
-                                 ENV_CONTAINER_POLICY_STORAGE)
+                                 ENV_CONTAINER_POLICY_URI,
+                                 ENV_CONTAINER_QUEUE_NAME,
+                                 ENV_CONTAINER_STORAGE_RESOURCE_ID)
 from c7n_azure.provider import Azure
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities as Storage
@@ -452,11 +452,11 @@ class Host:
     @click.command(help="Periodically run a set of policies from an Azure storage container "
                         "against a single subscription. The host will update itself with new "
                         "policies and event subscriptions as they are added.")
-    @click.option("--storage-id", "-q", envvar=ENV_CONTAINER_EVENT_QUEUE_ID, required=True,
+    @click.option("--storage-id", "-q", envvar=ENV_CONTAINER_STORAGE_RESOURCE_ID, required=True,
                   help="The resource id of the storage account to create the event queue in")
-    @click.option("--queue-name", "-n", envvar=ENV_CONTAINER_EVENT_QUEUE_NAME,
+    @click.option("--queue-name", "-n", envvar=ENV_CONTAINER_QUEUE_NAME,
                   help="The name of the event queue to create")
-    @click.option("--policy-uri", "-p", envvar=ENV_CONTAINER_POLICY_STORAGE, required=True,
+    @click.option("--policy-uri", "-p", envvar=ENV_CONTAINER_POLICY_URI, required=True,
                   help="The URI to the Azure storage container that holds the policies")
     @click.option("--log-group", "-l", envvar=ENV_CONTAINER_OPTION_LOG_GROUP,
                   help="Location to send policy logs")
