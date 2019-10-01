@@ -23,7 +23,7 @@ from c7n_azure.constants import ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION, \
     FUNCTION_TIME_TRIGGER_MODE, FUNCTION_EVENT_TRIGGER_MODE
 from mock import patch, MagicMock, PropertyMock
 
-from azure.mgmt.web.models.user import User
+from azure.mgmt.web.models import User
 
 test_files_folder = os.path.join(os.path.dirname(__file__), 'data')
 
