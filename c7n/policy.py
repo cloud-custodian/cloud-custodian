@@ -87,17 +87,27 @@ class PolicyCollection(object):
     def __add__(self, other):
         return self.__class__(self.policies + other.policies, self.options)
 
-    def filter(self, policy_name=None, resource_type=None):
+    def filter(self, policy_patterns=[], resource_types=[]):
         results = []
-        for policy in self.policies:
-            if resource_type:
-                if policy.resource_type != resource_type:
-                    continue
-            if policy_name:
-                if not fnmatch.fnmatch(policy.name, policy_name):
-                    continue
+        for policy in self.__filter_by_patterns(policy_patterns):
+            if resource_types and policy.resource_type not in resource_types:
+                continue
             results.append(policy)
         return PolicyCollection(results, self.options)
+
+    def __filter_by_patterns(self, patterns):
+        """
+        Takes a list of patterns and returns those with matching names
+        """
+        if not patterns:
+            return self.policies
+        results = []
+        for policy in self.policies:
+            for pattern in patterns:
+                if fnmatch.fnmatch(policy.name, pattern):
+                    results.append(policy)
+                    break
+        return results
 
     def __iter__(self):
         return iter(self.policies)
