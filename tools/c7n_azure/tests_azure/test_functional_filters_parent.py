@@ -28,7 +28,7 @@ class ParentFilterFunctionalTest(BaseTest):
     def test_kv_has_keys(self):
         p = self.load_policy({
             'name': 'test-policy',
-            'resource': 'azure.keyvault-keys',
+            'resource': 'azure.keyvault-key',
             'filters': [
                 {'type': 'parent',
                  'filter': {
@@ -47,7 +47,7 @@ class ParentFilterFunctionalTest(BaseTest):
     def test_kv_has_0_keys(self):
         p = self.load_policy({
             'name': 'test-policy',
-            'resource': 'azure.keyvault-keys',
+            'resource': 'azure.keyvault-key',
             'filters': [
                 {'type': 'parent',
                  'filter': {

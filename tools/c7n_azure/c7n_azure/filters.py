@@ -996,7 +996,7 @@ class ParentFilter(Filter):
 
         policies:
           - name: kv-keys-from-tagged-keyvaults
-            resource: azure.keyvault-keys
+            resource: azure.keyvault-key
             filters:
               - type: parent
                 filter:

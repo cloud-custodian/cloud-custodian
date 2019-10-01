@@ -48,7 +48,7 @@ class KeyVaultKeyTest(BaseTest):
     def test_key_vault_keys_keyvault(self):
         p = self.load_policy({
             'name': 'test-key-vault',
-            'resource': 'azure.keyvault-keys',
+            'resource': 'azure.keyvault-key',
             'filters': [
                 {
                     'type': 'parent',
@@ -68,7 +68,7 @@ class KeyVaultKeyTest(BaseTest):
     def test_key_vault_keys_type(self):
         p = self.load_policy({
             'name': 'test-key-vault',
-            'resource': 'azure.keyvault-keys',
+            'resource': 'azure.keyvault-key',
             'filters': [
                 {
                     'type': 'key-type',
