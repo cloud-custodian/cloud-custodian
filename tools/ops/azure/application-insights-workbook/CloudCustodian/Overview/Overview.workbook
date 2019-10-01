@@ -102,7 +102,7 @@
     {
       "type": 1,
       "content": {
-        "json": "# Acted on Resources\nMeasured by policy runs that have a customMetric result with name \"ActionTime\" out of all of the customMetrics results, grouped by ExecutionId. Click on a row in the table of Policies to get a query of the logs for the given run."
+        "json": "# Actions Taken\nThe following gives a breakdown of the actions taken by the running policies. The left hand side shows the total number of resources acted on by policy. The right hand table shows the resources and the name of the action that has been taken on them.\n\nClick a row in the \"Actions by Resource\" table to retrieve the logs for the policy execution in a new table below."
       },
       "name": "text - 8"
     },
@@ -110,9 +110,10 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize actions=countif(name==\"ActionTime\") by Policy",
+        "query": "traces\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| parse message with \"Action '\" action \"' modified '\" resource \"' in resource group '\" resourceGroup \"'.\"\n| where isnotempty(action)\n| summarize resourceCount=count() by Policy",
         "size": 0,
         "exportToExcelOptions": "visible",
+        "title": "Actions by Policy",
         "timeContext": {
           "durationMs": 0
         },
@@ -128,19 +129,66 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize actions=countif(name==\"ActionTime\") by Policy, executionId\n| summarize actionsTaken=countif(actions>0), policyExecutions=count() by Policy\n| extend actionPercentage = round(toreal(actionsTaken) / toreal(policyExecutions) * 100.0, 2)\n| order by actionPercentage desc\n",
+        "query": "traces\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| extend ExecutionId = tostring(customDimensions['ExecutionId'])\n| parse message with \"Action '\" Action \"' modified '\" Resource \"' in resource group '\" ResourceGroup \"'.\"\n| where isnotempty(Action)\n| project timestamp, Policy, Action, Resource, ResourceGroup, ExecutionId\n| order by timestamp desc\n",
         "size": 0,
-        "exportFieldName": "Policy",
-        "exportParameterName": "Policy",
+        "exportFieldName": "ExecutionId",
+        "exportParameterName": "ExecutionId",
         "exportDefaultValue": "<unset>",
         "exportToExcelOptions": "visible",
-        "title": "Policies that have taken action",
+        "title": "Actions by Resource",
         "timeContext": {
           "durationMs": 0
         },
         "timeContextFromParameter": "Timespan",
         "queryType": 0,
-        "resourceType": "microsoft.insights/components"
+        "resourceType": "microsoft.insights/components",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "timestamp",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "Policy",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "Action",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "Resource",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "ResourceGroup",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "ExecutionId",
+              "formatter": 5,
+              "formatOptions": {
+                "showIcon": true
+              }
+            }
+          ],
+          "labelSettings": []
+        }
       },
       "customWidth": "70",
       "name": "query - 9"
@@ -149,12 +197,12 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "customMetrics\n| where name == \"ActionTime\"\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| where Policy == \"{Policy}\"\n| extend execution = tostring(customDimensions['ExecutionId'])\n| join( traces\n    | extend execution = tostring(customDimensions['ExecutionId'])\n    | order by timestamp asc\n    | summarize message=tostring(makelist(message)) by execution) on execution\n| project execution, message\n",
+        "query": "traces\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| where executionId == \"{ExecutionId}\"\n| project timestamp, message, severityLevel, customDimensions\n| order by timestamp asc",
         "size": 0,
         "showAnalytics": true,
         "showExportToExcel": true,
         "exportToExcelOptions": "visible",
-        "title": "Query results for slected Policy",
+        "title": "Logs for Selected Execution",
         "timeContext": {
           "durationMs": 0
         },
@@ -195,7 +243,7 @@
         }
       },
       "conditionalVisibility": {
-        "parameterName": "Policy",
+        "parameterName": "ExecutionId",
         "comparison": "isNotEqualTo",
         "value": "<unset>"
       },
