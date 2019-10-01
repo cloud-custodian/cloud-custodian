@@ -105,9 +105,9 @@ class Session(object):
         if self.subscription_id_override is not None:
             self.subscription_id = self.subscription_id_override
 
-        log.info('Authenticated [%s | %s | %s]',
+        log.info('Authenticated [%s | %s%s]',
                  instance.name, self.subscription_id,
-                 "Authorization File" if self.authorization_file else "Environment Variables")
+                 ' | Authorization File' if self.authorization_file else '')
 
     def _initialize_session(self):
         """

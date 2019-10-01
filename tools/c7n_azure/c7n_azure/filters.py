@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import isodate
 import operator
 from abc import ABCMeta, abstractmethod
 from concurrent.futures import as_completed
@@ -157,7 +158,7 @@ class MetricFilter(Filter):
         # Number of hours from current UTC time
         self.timeframe = float(self.data.get('timeframe', self.DEFAULT_TIMEFRAME))
         # Interval as defined by Azure SDK
-        self.interval = self.data.get('interval', self.DEFAULT_INTERVAL)
+        self.interval = isodate.parse_duration(self.data.get('interval', self.DEFAULT_INTERVAL))
         # Aggregation as defined by Azure SDK
         self.aggregation = self.data.get('aggregation', self.DEFAULT_AGGREGATION)
         # Aggregation function to be used locally
@@ -197,9 +198,9 @@ class MetricFilter(Filter):
                 aggregation=self.aggregation,
                 filter=self.get_filter(resource)
             )
-        except HttpOperationError as e:
-            self.log.error("could not get metric:%s on %s. Full error: %s" % (
-                self.metric, resource['id'], str(e)))
+        except HttpOperationError:
+            self.log.exception("Could not get metric: %s on %s" % (
+                self.metric, resource['id']))
             return None
 
         if len(metrics_data.value) > 0 and len(metrics_data.value[0].timeseries) > 0:

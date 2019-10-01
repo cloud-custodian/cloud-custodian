@@ -12,12 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from setuptools import setup
+
+
+description = ""
+if os.path.exists('README.md'):
+    description = open('README.md', 'r').read()
 
 setup(
     name="c7n_logexporter",
-    version='0.3.1',
+    version='0.3.2',
     description="Cloud Custodian - Cloud Watch Log S3 exporter",
+    long_description=description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"

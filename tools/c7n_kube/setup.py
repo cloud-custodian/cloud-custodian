@@ -12,12 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from setuptools import setup, find_packages
+
+# read the contents of your README file
+description = ""
+if os.path.exists('readme.md'):
+    description = open('readme.md', 'r').read()
+
 
 setup(
     name="c7n_kube",
     version='0.1.1',
     description="Cloud Custodian - Kubernetes Provider",
+    long_description=description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"

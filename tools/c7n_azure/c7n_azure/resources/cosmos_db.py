@@ -462,7 +462,7 @@ class CosmosDBReplaceOfferAction(AzureBaseAction):
                 self._process_resource(resource, account_client, throughput)
 
         except Exception as e:
-            log.warn(e)
+            log.warning(e)
 
         return resources
 
@@ -528,7 +528,7 @@ class CosmosDBRestoreStateAction(CosmosDBReplaceOfferAction):
                     tag_name, parent_account))
 
         except Exception as e:
-            log.warn(e)
+            log.warning(e)
 
         return resources
 

@@ -65,7 +65,8 @@ class Hdinsight(ArmResourceManager):
             'name',
             'location',
             'resourceGroup',
-            'properties.clusterDefinition.kind'
+            'properties.clusterDefinition.kind',
+            'properties.tier'
         )
         resource_type = 'Microsoft.HDInsight/clusters'
 

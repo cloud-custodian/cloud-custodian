@@ -72,6 +72,11 @@ class ResourceGroup(ArmResourceManager):
         enum_spec = ('resource_groups', 'list', None)
         resource_type = RESOURCE_GROUPS_TYPE
 
+        default_report_fields = (
+            'name',
+            'location'
+        )
+
     def get_resources(self, resource_ids):
         resource_client = self.get_client('azure.mgmt.resource.ResourceManagementClient')
         data = [
