@@ -28,7 +28,7 @@ from c7n_azure.utils import ThreadHelper, ResourceIdParser, generate_key_vault_u
 log = logging.getLogger('custodian.azure.keyvault.keys')
 
 
-@resources.register('keyvault-keys')
+@resources.register('keyvault-keys', aliases=['keyvault-key'])
 class KeyVaultKeys(ChildResourceManager):
     """Key Vault Keys Resource
 
