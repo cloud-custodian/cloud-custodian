@@ -117,9 +117,20 @@ class OutputTest(BaseTest):
             logging.getLogger('custodian.test').warning('test message')
 
     def test_app_insights_metrics(self):
-        policy = Bag(name='test', resource_type='azure.vm', session_factory=Session)
-        ctx = Bag(policy=policy, execution_id='00000000-0000-0000-0000-000000000000',
-                  execution_mode="event")
+        policy = Bag(name='test', resource_type='azure.vm', session_factory=Session,
+                     execution_mode="event")
+        ctx = Bag(policy=policy, execution_id='00000000-0000-0000-0000-000000000000')
+        sink = metrics_outputs.select('azure://00000000-0000-0000-0000-000000000000', ctx)
+        self.assertTrue(isinstance(sink, MetricsOutput))
+        sink.put_metric('ResourceCount', 101, 'Count')
+        sink.flush()
+
+    def test_app_insights_metrics_real_policy(self):
+        policy = self.load_policy({
+            'name': 'test-rg',
+            'resource': 'azure.resourcegroup'
+        })
+        ctx = Bag(policy=policy, execution_id='00000000-0000-0000-0000-000000000000')
         sink = metrics_outputs.select('azure://00000000-0000-0000-0000-000000000000', ctx)
         self.assertTrue(isinstance(sink, MetricsOutput))
         sink.put_metric('ResourceCount', 101, 'Count')

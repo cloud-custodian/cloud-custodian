@@ -137,7 +137,7 @@ class MetricsOutput(Metrics):
                 'ResType': self.ctx.policy.resource_type,
                 'SubscriptionId': self.subscription_id,
                 'ExecutionId': self.ctx.execution_id,
-                'ExecutionMode': self.ctx.execution_mode,
+                'ExecutionMode': self.ctx.policy.execution_mode,
                 'Unit': unit
             }
         }
