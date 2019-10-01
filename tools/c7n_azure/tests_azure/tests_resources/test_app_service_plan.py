@@ -23,11 +23,16 @@ from c7n.utils import local_session
 
 
 class AppServicePlanTest(BaseTest):
+
     def setUp(self):
         super(AppServicePlanTest, self).setUp()
         self.session = local_session(Session)
         self.client = local_session(Session).client(
             'azure.mgmt.web.WebSiteManagementClient')  # type: WebSiteManagementClient
+        self.update_mock_path =\
+            'azure.mgmt.web.v{}.operations._app_service_plans_operations.' \
+            'AppServicePlansOperations.update'\
+            .format(self.client._get_api_version('app_service_plans').replace('-', '_'))
 
     def test_app_service_plan_schema_validate(self):
         with self.sign_out_patch():
@@ -59,100 +64,97 @@ class AppServicePlanTest(BaseTest):
                 ]
             }, validate=True)
 
-    @patch('azure.mgmt.web.operations.app_service_plans_operations.'
-           'AppServicePlansOperations.update')
     @arm_template('appserviceplan.json')
     @cassette_name('window_plans')
-    def test_resize_plan_win(self, update_mock):
-        p = self.load_policy({
-            'name': 'test-azure-appserviceplan-win',
-            'resource': 'azure.appserviceplan',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctest-appserviceplan-win'},
-                {'type': 'value',
-                 'key': 'sku.name',
-                 'op': 'eq',
-                 'value': 'S1'}
-            ],
-            'actions': [
-                {'type': 'resize-plan',
-                 'size': 'B1',
-                 'count': 2}]
-        }, validate=True)
-        resources = p.run()
-        self.assertEqual(1, len(resources))
+    def test_resize_plan_win(self):
+        with patch(self.update_mock_path) as update_mock:
+            p = self.load_policy({
+                'name': 'test-azure-appserviceplan-win',
+                'resource': 'azure.appserviceplan',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctest-appserviceplan-win'},
+                    {'type': 'value',
+                     'key': 'sku.name',
+                     'op': 'eq',
+                     'value': 'S1'}
+                ],
+                'actions': [
+                    {'type': 'resize-plan',
+                     'size': 'B1',
+                     'count': 2}]
+            }, validate=True)
+            resources = p.run()
+            self.assertEqual(1, len(resources))
 
-        name, args, kwargs = update_mock.mock_calls[0]
-        self.assertEqual('cctest-appserviceplan-win', args[1])
-        self.assertEqual('B1', args[2].sku.name)
-        self.assertEqual('BASIC', args[2].sku.tier)
-        self.assertEqual(2, args[2].sku.capacity)
+            name, args, kwargs = update_mock.mock_calls[0]
+            self.assertEqual('cctest-appserviceplan-win', args[1])
+            self.assertEqual('B1', args[2].sku.name)
+            self.assertEqual('BASIC', args[2].sku.tier)
+            self.assertEqual(2, args[2].sku.capacity)
 
-    @patch('azure.mgmt.web.operations.app_service_plans_operations.'
-           'AppServicePlansOperations.update')
     @arm_template('appserviceplan-linux.json')
     @cassette_name('linux_plans')
-    def test_resize_plan_linux(self, update_mock):
-        p = self.load_policy({
-            'name': 'test-azure-appserviceplan-linux',
-            'resource': 'azure.appserviceplan',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctest-appserviceplan-linux'},
-                {'type': 'value',
-                 'key': 'sku.name',
-                 'op': 'eq',
-                 'value': 'S1'}
-            ],
-            'actions': [
-                {'type': 'resize-plan',
-                 'size': 'B1',
-                 'count': 3}]
-        }, validate=True)
-        resources = p.run()
-        self.assertEqual(1, len(resources))
+    def test_resize_plan_linux(self):
+        with patch(self.update_mock_path) as update_mock:
+            p = self.load_policy({
+                'name': 'test-azure-appserviceplan-linux',
+                'resource': 'azure.appserviceplan',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctest-appserviceplan-linux'},
+                    {'type': 'value',
+                     'key': 'sku.name',
+                     'op': 'eq',
+                     'value': 'S1'}
+                ],
+                'actions': [
+                    {'type': 'resize-plan',
+                     'size': 'B1',
+                     'count': 3}]
+            }, validate=True)
+            resources = p.run()
+            self.assertEqual(1, len(resources))
 
-        name, args, kwargs = update_mock.mock_calls[0]
-        self.assertEqual('cctest-appserviceplan-linux', args[1])
-        self.assertEqual('B1', args[2].sku.name)
-        self.assertEqual('BASIC', args[2].sku.tier)
-        self.assertEqual(3, args[2].sku.capacity)
+            name, args, kwargs = update_mock.mock_calls[0]
+            self.assertEqual('cctest-appserviceplan-linux', args[1])
+            self.assertEqual('B1', args[2].sku.name)
+            self.assertEqual('BASIC', args[2].sku.tier)
+            self.assertEqual(3, args[2].sku.capacity)
 
-    @patch('azure.mgmt.web.operations.app_service_plans_operations.'
-           'AppServicePlansOperations.update')
     @arm_template('appserviceplan.json')
     @cassette_name('window_plans')
-    def test_resize_plan_from_resource_tag(self, update_mock):
-        p = self.load_policy({
-            'name': 'test-azure-appserviceplan',
-            'resource': 'azure.appserviceplan',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctest-appserviceplan-win'}],
-            'actions': [
-                {'type': 'resize-plan',
-                 'size': {
-                     'type': 'resource',
-                     'key': 'tags.sku'
-                 }}],
-        })
-        resources = p.run()
-        self.assertEqual(1, len(resources))
+    def test_resize_plan_from_resource_tag(self):
+        with patch(self.update_mock_path) as update_mock:
+            p = self.load_policy({
+                'name': 'test-azure-appserviceplan',
+                'resource': 'azure.appserviceplan',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctest-appserviceplan-win'}],
+                'actions': [
+                    {'type': 'resize-plan',
+                     'size': {
+                         'type': 'resource',
+                         'key': 'tags.sku'
+                     }}],
+            })
+            resources = p.run()
+            self.assertEqual(1, len(resources))
 
-        name, args, kwargs = update_mock.mock_calls[0]
-        self.assertEqual('cctest-appserviceplan-win', args[1])
-        self.assertEqual('B1', args[2].sku.name)
-        self.assertEqual('BASIC', args[2].sku.tier)
+            name, args, kwargs = update_mock.mock_calls[0]
+            self.assertEqual('cctest-appserviceplan-win', args[1])
+            self.assertEqual('B1', args[2].sku.name)
+            self.assertEqual('BASIC', args[2].sku.tier)
 
     @arm_template('appserviceplan.json')
     @patch('c7n_azure.resources.appserviceplan.ResizePlan.log.info')
@@ -202,34 +204,33 @@ class AppServicePlanTest(BaseTest):
             'Skipping cctest-consumption-linux, '
             'because this App Service Plan is for Consumption Azure Functions.')
 
-    @patch('azure.mgmt.web.operations.app_service_plans_operations.'
-           'AppServicePlansOperations.update')
     @arm_template('appserviceplan.json')
     @cassette_name('window_plans')
-    def test_resize_plan_win_only_count(self, update_mock):
-        p = self.load_policy({
-            'name': 'test-azure-appserviceplan-win',
-            'resource': 'azure.appserviceplan',
-            'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'eq',
-                 'value_type': 'normalize',
-                 'value': 'cctest-appserviceplan-win'},
-                {'type': 'value',
-                 'key': 'sku.name',
-                 'op': 'eq',
-                 'value': 'S1'}
-            ],
-            'actions': [
-                {'type': 'resize-plan',
-                 'count': 3}]
-        }, validate=True)
-        resources = p.run()
-        self.assertEqual(1, len(resources))
+    def test_resize_plan_win_only_count(self):
+        with patch(self.update_mock_path) as update_mock:
+            p = self.load_policy({
+                'name': 'test-azure-appserviceplan-win',
+                'resource': 'azure.appserviceplan',
+                'filters': [
+                    {'type': 'value',
+                     'key': 'name',
+                     'op': 'eq',
+                     'value_type': 'normalize',
+                     'value': 'cctest-appserviceplan-win'},
+                    {'type': 'value',
+                     'key': 'sku.name',
+                     'op': 'eq',
+                     'value': 'S1'}
+                ],
+                'actions': [
+                    {'type': 'resize-plan',
+                     'count': 3}]
+            }, validate=True)
+            resources = p.run()
+            self.assertEqual(1, len(resources))
 
-        name, args, kwargs = update_mock.mock_calls[0]
-        self.assertEqual('cctest-appserviceplan-win', args[1])
-        self.assertEqual('S1', args[2].sku.name)
-        self.assertEqual('Standard', args[2].sku.tier)
-        self.assertEqual(3, args[2].sku.capacity)
+            name, args, kwargs = update_mock.mock_calls[0]
+            self.assertEqual('cctest-appserviceplan-win', args[1])
+            self.assertEqual('S1', args[2].sku.name)
+            self.assertEqual('Standard', args[2].sku.tier)
+            self.assertEqual(3, args[2].sku.capacity)
