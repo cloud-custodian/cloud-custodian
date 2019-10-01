@@ -15,18 +15,15 @@
             "type": 4,
             "description": "Select the timerange to show",
             "value": {
-              "durationMs": 259200000
+              "durationMs": 43200000
             },
             "typeSettings": {
               "selectableValues": [
                 {
-                  "durationMs": 900000
-                },
-                {
-                  "durationMs": 3600000
-                },
-                {
                   "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
                 },
                 {
                   "durationMs": 86400000
@@ -89,7 +86,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| summarize count() by Policy, bin(timestamp, {Timespan:grain})",
+        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend execution = tostring(customDimensions['ExecutionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| summarize timestamp=avg(timestamp) by execution, Policy\n| summarize count() by Policy, bin(timestamp, {Timespan:grain})",
         "size": 0,
         "exportToExcelOptions": "visible",
         "timeContext": {
@@ -113,7 +110,25 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize actions=countif(name==\"ActionTime\") by Policy, executionId\n| summarize actionTaken=countif(actions>0), policyExecution=count() by Policy\n| extend actionPercentage = round(toreal(actionTaken) / toreal(policyExecution) * 100.0, 2)\n| order by actionPercentage desc\n",
+        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize actions=countif(name==\"ActionTime\") by Policy",
+        "size": 0,
+        "exportToExcelOptions": "visible",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "Timespan",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "visualization": "piechart"
+      },
+      "customWidth": "30",
+      "name": "query - 12"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "customMetrics\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| summarize actions=countif(name==\"ActionTime\") by Policy, executionId\n| summarize actionsTaken=countif(actions>0), policyExecutions=count() by Policy\n| extend actionPercentage = round(toreal(actionsTaken) / toreal(policyExecutions) * 100.0, 2)\n| order by actionPercentage desc\n",
         "size": 0,
         "exportFieldName": "Policy",
         "exportParameterName": "Policy",
@@ -127,6 +142,7 @@
         "queryType": 0,
         "resourceType": "microsoft.insights/components"
       },
+      "customWidth": "70",
       "name": "query - 9"
     },
     {
@@ -207,6 +223,7 @@
         "resourceType": "microsoft.insights/components",
         "visualization": "piechart"
       },
+      "customWidth": "30",
       "name": "query - 3"
     },
     {
@@ -226,6 +243,7 @@
         "queryType": 0,
         "resourceType": "microsoft.insights/components"
       },
+      "customWidth": "70",
       "name": "query - 5"
     },
     {
@@ -234,7 +252,6 @@
         "version": "KqlItem/1.0",
         "query": "customMetrics\n| extend SubscriptionId = tostring(customDimensions['SubscriptionId'])\n| where SubscriptionId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| where Policy == \"{Policy2}\"\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| join ( traces\n    | extend executionId = tostring(customDimensions['ExecutionId'])\n    | summarize traceFailures=countif(severityLevel >= 3) by executionId) on executionId\n| where name == \"PolicyException\" or traceFailures > 0\n| summarize count() by executionId, Policy, SubscriptionId\n| join( traces\n    | extend executionId = tostring(customDimensions['ExecutionId'])\n    | order by timestamp asc\n    | summarize message=tostring(makelist(message)) by executionId\n    | project executionId, message) on executionId\n| summarize count() by Policy, executionId, message \n| order by Policy asc",
         "size": 0,
-        "showExportToExcel": true,
         "exportToExcelOptions": "visible",
         "title": "Log message for failed policies",
         "noDataMessage": "No error messages logged for this policy",
@@ -282,10 +299,7 @@
         "parameterName": "Policy2",
         "comparison": "isNotEqualTo"
       },
-      "name": "query - 11",
-      "styleSettings": {
-        "showBorder": true
-      }
+      "name": "query - 11"
     },
     {
       "type": 1,
