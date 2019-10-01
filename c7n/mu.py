@@ -37,9 +37,11 @@ from concurrent.futures import ThreadPoolExecutor
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
-from c7n.utils import parse_s3, local_session
+from c7n.utils import parse_s3, local_session, get_retry
 
 log = logging.getLogger('custodian.serverless')
+
+LambdaRetry = get_retry(('InsufficientPermissionsException',), max_attempts=2)
 
 
 class PythonPackageArchive(object):
@@ -1620,7 +1622,7 @@ class ConfigRule(object):
         if rule and self.delta(rule, params):
             log.debug("Updating config rule for %s" % self)
             rule.update(params)
-            return self.client.put_config_rule(ConfigRule=rule)
+            return LambdaRetry(self.client.put_config_rule, ConfigRule=rule)
         elif rule:
             log.debug("Config rule up to date")
             return
@@ -1636,7 +1638,7 @@ class ConfigRule(object):
             pass
 
         log.debug("Adding config rule for %s" % func.name)
-        return self.client.put_config_rule(ConfigRule=params)
+        return LambdaRetry(self.client.put_config_rule, ConfigRule=params)
 
     def remove(self, func):
         rule = self.get(func.name)

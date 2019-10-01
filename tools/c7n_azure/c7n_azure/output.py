@@ -94,9 +94,8 @@ class AzureStorageOutput(DirectoryOutput):
                         self.log.error("Access Error: Storage Blob Data Contributor Role "
                                        "is required to write to Azure Blob Storage.")
                     else:
-                        self.log.error("Error writing output. "
-                                       "Confirm output storage URL is correct. \n" +
-                                   str(e))
+                        self.log.exception("Error writing output. "
+                                           "Confirm output storage URL is correct.")
 
                 self.log.debug("%s uploaded" % blob_name)
 
@@ -138,6 +137,7 @@ class MetricsOutput(Metrics):
                 'ResType': self.ctx.policy.resource_type,
                 'SubscriptionId': self.subscription_id,
                 'ExecutionId': self.ctx.execution_id,
+                'ExecutionMode': self.ctx.execution_mode,
                 'Unit': unit
             }
         }

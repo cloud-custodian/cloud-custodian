@@ -15,6 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
+from c7n.tags import register_universal_tags, universal_augment
 
 
 @resources.register('storage-gateway')
@@ -25,3 +26,10 @@ class StorageGateway(QueryResourceManager):
         enum_spec = ('list_gateways', 'Gateways', None)
         arn = id = 'GatewayARN'
         name = 'GatewayName'
+
+    augment = staticmethod(universal_augment)
+
+
+register_universal_tags(
+    StorageGateway.filter_registry, StorageGateway.action_registry,
+    compatibility=False)
