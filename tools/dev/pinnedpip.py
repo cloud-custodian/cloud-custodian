@@ -13,6 +13,7 @@
 # limitations under the License.
 import click
 import importlib_metadata as pkgmd
+import jinja2
 
 
 def package_deps(package, deps):
@@ -22,7 +23,7 @@ def package_deps(package, deps):
         if ';' in r:
             continue
         for idx, c in enumerate(r):
-            if not c.isalnum() and not c in ('-', '_', '.'):
+            if not c.isalnum() and c not in ('-', '_', '.'):
                 break
         if idx + 1 == len(r):
             idx += 1
