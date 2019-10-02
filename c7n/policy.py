@@ -88,25 +88,73 @@ class PolicyCollection(object):
         return self.__class__(self.policies + other.policies, self.options)
 
     def filter(self, policy_patterns=[], resource_types=[]):
-        results = []
-        for policy in self._filter_by_patterns(policy_patterns):
-            if resource_types and policy.resource_type not in resource_types:
-                continue
-            results.append(policy)
+        results = self.policies
+        results = self._filter_by_patterns(results, policy_patterns)
+        results = self._filter_by_resource_types(results, resource_types)
+        # next line brings the result set in the original order of self.policies
+        results = [x for x in self.policies if x in results]
         return PolicyCollection(results, self.options)
 
-    def _filter_by_patterns(self, patterns):
+    def _filter_by_patterns(self, policies, patterns):
         """
-        Takes a list of patterns and returns those with matching names
+        Takes a list of policies and returns only those matching the given glob
+        patterns
         """
         if not patterns:
-            return self.policies
+            return policies
+
         results = []
-        for policy in self.policies:
-            for pattern in patterns:
-                if fnmatch.fnmatch(policy.name, pattern):
-                    results.append(policy)
-                    break
+        for pattern in patterns:
+            result = self._filter_by_pattern(policies, pattern)
+            results.extend(x for x in result if x not in results)
+        return results
+
+    def _filter_by_pattern(self, policies, pattern):
+        """
+        Takes a list of policies and returns only those matching the given glob
+        pattern
+        """
+        results = []
+        for policy in policies:
+            if fnmatch.fnmatch(policy.name, pattern):
+                results.append(policy)
+
+        if not results:
+            self.log.warning((
+                'Policy pattern "{}" '
+                'did not match any policies.').format(pattern))
+
+        return results
+
+    def _filter_by_resource_types(self, policies, resource_types):
+        """
+        Takes a list of policies and returns only those matching the given
+        resource types
+        """
+        if not resource_types:
+            return policies
+
+        results = []
+        for resource_type in resource_types:
+            result = self._filter_by_resource_type(policies, resource_type)
+            results.extend(x for x in result if x not in results)
+        return results
+
+    def _filter_by_resource_type(self, policies, resource_type):
+        """
+        Takes a list policies and returns only those matching the given resource
+        type
+        """
+        results = []
+        for policy in policies:
+            if policy.resource_type == resource_type:
+                results.append(policy)
+
+        if not results:
+            self.log.warning((
+                'Resource type "{}" '
+                'did not match any policies.').format(resource_type))
+
         return results
 
     def __iter__(self):
