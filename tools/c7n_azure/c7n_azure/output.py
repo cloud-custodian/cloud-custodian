@@ -155,11 +155,12 @@ class MetricsOutput(Metrics):
 
 
 class AppInsightsLogHandler(LoggingHandler):
-    def __init__(self, instrumentation_key, policy_name, subscription_id, execution_id):
+    def __init__(self, instrumentation_key, policy_name, subscription_id, execution_id, res_type):
         super(AppInsightsLogHandler, self).__init__(instrumentation_key)
         self.policy_name = policy_name
         self.subscription_id = subscription_id
         self.execution_id = execution_id
+        self.resource_type = res_type
 
     def emit(self, record):
         properties = {
@@ -170,6 +171,7 @@ class AppInsightsLogHandler(LoggingHandler):
             'Level': record.levelname,
             'Policy': self.policy_name,
             'SubscriptionId': self.subscription_id,
+            'ResType': self.resource_type,
             'ExecutionId': self.execution_id
         }
 
@@ -194,4 +196,5 @@ class AppInsightsLogOutput(LogOutput):
         return AppInsightsLogHandler(self.instrumentation_key,
                                      self.ctx.policy.name,
                                      self.subscription_id,
-                                     self.ctx.execution_id)
+                                     self.ctx.execution_id,
+                                     self.ctx.policy.resource_type)
