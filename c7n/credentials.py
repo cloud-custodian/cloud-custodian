@@ -26,6 +26,10 @@ from c7n.version import version
 from c7n.utils import get_retry
 
 
+# 0.8.45.1 compatibility with global only sts endpoints, out of caution, remove in 0.8.46.1
+USE_STS_GLOBAL = os.environ.get('C7N_USE_STS_GLOBAL', '').lower() in ('yes', 'true')
+
+
 class SessionFactory(object):
 
     def __init__(self, region, profile=None, assume_role=None, external_id=None):
@@ -98,7 +102,9 @@ def assumed_session(role_arn, session_name, session=None, region=None, external_
             parameters['ExternalId'] = external_id
 
         credentials = retry(
-            session.client('sts').assume_role, **parameters)['Credentials']
+            session.client(
+                'sts', endpoint_url=sts_regional_endpoint(region)
+            ).assume_role, **parameters)['Credentials']
         return dict(
             access_key=credentials['AccessKeyId'],
             secret_key=credentials['SecretAccessKey'],
@@ -123,3 +129,15 @@ def assumed_session(role_arn, session_name, session=None, region=None, external_
         region = s.get_config_variable('region') or 'us-east-1'
     s.set_config_variable('region', region)
     return Session(botocore_session=s)
+
+
+def sts_regional_endpoint(region):
+    """Get the AWS STS endpoint specific for the given region.
+
+    Returns the global endpoint if region is not specified.
+
+    For the list of regional endpoints, see https://amzn.to/2ohJgtR
+    """
+    if region and not USE_STS_GLOBAL:
+        return "https://sts.{}.amazonaws.com".format(region)
+    return "https://sts.amazonaws.com"
