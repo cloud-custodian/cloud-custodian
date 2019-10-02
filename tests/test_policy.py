@@ -23,6 +23,7 @@ import tempfile
 from c7n import policy, manager
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
+from c7n.resources import aws
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
@@ -362,6 +363,7 @@ class TestPolicyCollection(BaseTest):
         original = policy.PolicyCollection.from_data(
             {"policies": [{"name": "foo", "resource": "ec2"}]}, cfg
         )
+
         collection = AWS().initialize_policies(original, cfg)
         self.assertEqual(
             sorted([p.options.region for p in collection]),
@@ -369,6 +371,9 @@ class TestPolicyCollection(BaseTest):
         )
 
     def test_policy_account_expand(self):
+        factory = self.replay_flight_data('test_aws_policy_region_expand')
+        self.patch(aws, '_profile_session', factory())
+
         original = policy.PolicyCollection.from_data(
             {"policies": [{"name": "foo", "resource": "account"}]},
             Config.empty(regions=["us-east-1", "us-west-2"]),
@@ -400,6 +405,9 @@ class TestPolicyCollection(BaseTest):
              ('foo', 'us-west-2')])
 
     def test_policy_region_expand_global(self):
+        factory = self.replay_flight_data('test_aws_policy_global_expand')
+        self.patch(aws, '_profile_session', factory())
+
         original = policy.PolicyCollection.from_data(
             {
                 "policies": [

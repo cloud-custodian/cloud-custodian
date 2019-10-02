@@ -33,7 +33,7 @@ from c7n_azure.utils import ResourceIdParser, RetentionPeriod, ThreadHelper
 log = logging.getLogger('custodian.azure.sqldatabase')
 
 
-@resources.register('sqldatabase')
+@resources.register('sql-database', aliases=['sqldatabase'])
 class SqlDatabase(ChildArmResourceManager):
     """SQL Server Database Resource
 
@@ -60,6 +60,13 @@ class SqlDatabase(ChildArmResourceManager):
         parent_manager_name = 'sqlserver'
         resource_type = 'Microsoft.Sql/servers/databases'
         enable_tag_operations = False  # GH Issue #4543
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup',
+            'sku.[name, tier, capacity, family]',
+            '"c7n:parent-id"'
+        )
 
         @classmethod
         def extra_args(cls, parent_resource):

@@ -47,6 +47,6 @@ class Databricks(ArmResourceManager):
             'name',
             'location',
             'resourceGroup',
-            'kind'
+            'sku.name'
         )
         resource_type = 'Microsoft.Databricks/workspaces'

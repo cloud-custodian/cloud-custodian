@@ -39,9 +39,4 @@ class ContainerGroup(ArmResourceManager):
         service = 'azure.mgmt.containerinstance'
         client = 'ContainerInstanceManagementClient'
         enum_spec = ('container_groups', 'list', None)
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup'
-        )
         resource_type = 'Microsoft.ContainerInstance/containerGroups'

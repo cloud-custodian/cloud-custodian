@@ -24,7 +24,7 @@ import yaml
 
 from c7n.resources import load_resources
 from c7n.utils import local_session
-from c7n_azure.constants import ENV_CONTAINER_EVENT_QUEUE_NAME, ENV_SUB_ID
+from c7n_azure.constants import ENV_CONTAINER_QUEUE_NAME, ENV_SUB_ID
 from c7n_azure.session import Session
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -125,7 +125,7 @@ class SubscriptionDeployment(Deployment):
             Deployment.sub_name_to_deployment_name(subscription.display_name),
             {
                 ENV_SUB_ID: self.subscription_id,
-                ENV_CONTAINER_EVENT_QUEUE_NAME: 'c7n-{}'.format(self.subscription_id[-4:])
+                ENV_CONTAINER_QUEUE_NAME: 'c7n-{}'.format(self.subscription_id[-4:])
             }
         )
 
@@ -153,7 +153,7 @@ class ManagementGroupDeployment(Deployment):
                 Deployment.sub_name_to_deployment_name(info.display_name),
                 {
                     ENV_SUB_ID: sub_id,
-                    ENV_CONTAINER_EVENT_QUEUE_NAME: 'c7n-{}'.format(info.name[-4:])
+                    ENV_CONTAINER_QUEUE_NAME: 'c7n-{}'.format(info.name[-4:])
                 },
             )
         elif info.type == MANAGEMENT_GROUP_TYPE and info.children:

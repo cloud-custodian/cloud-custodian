@@ -318,6 +318,36 @@ class CopyRelatedResourceTag(BaseTest):
         }
         self.assertRaises(PolicyValidationError, self.load_policy, policy)
 
+    def test_copy_related_tag_empty(self):
+        # check the case where the related expression doesn't return
+        # value.
+        output = self.capture_logging('custodian.actions')
+        session_factory = self.replay_flight_data(
+            'test_copy_related_resource_tag_empty')
+        client = session_factory().client('ec2')
+        p = self.load_policy({
+            'name': 'copy-related-ec2',
+            'resource': 'aws.eni',
+            'actions': [{
+                'type': 'copy-related-tag',
+                'resource': 'ec2',
+                'skip_missing': True,
+                'key': 'Attachment.InstanceId',
+                'tags': '*'}]},
+            session_factory=session_factory)
+        p.run()
+        if self.recording:
+            time.sleep(3)
+        nics = client.describe_network_interfaces(
+            NetworkInterfaceIds=['eni-0e1324ba169ed7b2f'])['NetworkInterfaces']
+        self.assertEqual(
+            nics[0]['TagSet'],
+            [{'Key': 'Env', 'Value': 'Dev'},
+             {'Key': 'Origin', 'Value': 'Home'}])
+        self.assertEqual(
+            output.getvalue().strip(),
+            'Tagged 1 resources from related, missing-skipped 1 unchanged 0')
+
     def test_copy_related_resource_tag_multi_ref(self):
         session_factory = self.replay_flight_data('test_copy_related_resource_tag_multi_ref')
         client = session_factory().client('ec2')

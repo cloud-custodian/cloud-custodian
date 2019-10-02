@@ -39,3 +39,10 @@ class DnsZone(ArmResourceManager):
         client = 'DnsManagementClient'
         enum_spec = ('zones', 'list', {})
         resource_type = 'Microsoft.Network/dnszones'
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup',
+            'properties.numberOfRecordSets',
+            'properties.nameServers'
+        )

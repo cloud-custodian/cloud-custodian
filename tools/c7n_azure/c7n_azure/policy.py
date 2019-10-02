@@ -15,6 +15,7 @@
 import logging
 import re
 import sys
+import time
 
 import six
 from azure.mgmt.eventgrid.models import \
@@ -256,6 +257,7 @@ class AzureModeCommon:
 
     @staticmethod
     def run_for_event(policy, event=None):
+        s = time.time()
 
         resources = policy.resource_manager.get_resources(
             [AzureModeCommon.extract_resource_id(policy, event)])
@@ -263,20 +265,24 @@ class AzureModeCommon:
         resources = policy.resource_manager.filter_resources(
             resources, event)
 
-        if not resources:
-            policy.log.info(
-                "policy: %s resources: %s no resources found" % (
-                    policy.name, policy.resource_type))
-            return
-
         with policy.ctx:
+            rt = time.time() - s
+
             policy.ctx.metrics.put_metric(
                 'ResourceCount', len(resources), 'Count', Scope="Policy",
                 buffer=False)
-
+            policy.ctx.metrics.put_metric(
+                "ResourceTime", rt, "Seconds", Scope="Policy")
             policy._write_file(
                 'resources.json', utils.dumps(resources, indent=2))
 
+            if not resources:
+                policy.log.info(
+                    "policy: %s resources: %s no resources found" % (
+                        policy.name, policy.resource_type))
+                return
+
+            at = time.time()
             for action in policy.resource_manager.actions:
                 policy.log.info(
                     "policy: %s invoking action: %s resources: %d",
@@ -288,6 +294,8 @@ class AzureModeCommon:
                 policy._write_file(
                     "action-%s" % action.name, utils.dumps(results))
 
+        policy.ctx.metrics.put_metric(
+            "ActionTime", time.time() - at, "Seconds", Scope="Policy")
         return resources
 
 
@@ -373,8 +381,8 @@ class AzureEventGridMode(AzureFunctionMode):
             StorageUtilities.create_queue_from_storage_account(storage_account, queue_name, session)
             self.log.info("Storage queue creation succeeded")
             return storage_account
-        except Exception as e:
-            self.log.error('Queue creation failed with error: %s' % e)
+        except Exception:
+            self.log.exception('Queue creation failed')
             raise SystemExit
 
     def _create_event_subscription(self, storage_account, queue_name, session):
@@ -394,6 +402,6 @@ class AzureEventGridMode(AzureFunctionMode):
                                               subscription_id, session, event_filter)
                 self.log.info('Event grid subscription creation succeeded: subscription_id=%s' %
                               subscription_id)
-            except Exception as e:
-                self.log.error('Event Subscription creation failed with error: %s' % e)
+            except Exception:
+                self.log.exception('Event Subscription creation failed')
                 raise SystemExit
