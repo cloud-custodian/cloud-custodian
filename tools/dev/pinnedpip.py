@@ -53,7 +53,7 @@ def main(package, template, output):
         return
 
     with open(template) as fh:
-        t = jinja2.Template(fh.read())
+        t = jinja2.Template(fh.read(), trim_blocks=True, lstrip_blocks=True)
     with open(output, 'w') as fh:
         fh.write(t.render(pinned_packages=pinned_dep_graph))
 
