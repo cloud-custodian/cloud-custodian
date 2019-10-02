@@ -563,7 +563,7 @@ class TestPolicy(BaseTest):
             repr(policy).startswith("<Policy resource:ec2 name:ec2-utilization")
         )
 
-    def test_policy_name_and_resource_filtering(self):
+    def test_policy_name_and_resource_type_filtering(self):
 
         collection = self.load_policy_set(
             {
