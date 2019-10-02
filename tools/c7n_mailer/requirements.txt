@@ -5,9 +5,9 @@ jmespath>=0.9.0
 vcversioner==2.16.0.0
 Jinja2==2.10.1
 jsonschema>=2.5.1
-ruamel.yaml>=0.15.93
+ruamel.yaml>=0.16.5
 six>=1.12.0
-datadog==0.28.0
-sendgrid==6.0.5
-redis==3.2.1
+datadog==0.29.3
+sendgrid==6.1.0
+redis==3.3.8
 ldap3==2.6

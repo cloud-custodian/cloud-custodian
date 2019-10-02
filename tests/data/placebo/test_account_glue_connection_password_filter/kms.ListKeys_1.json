@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "Keys": [
+            {
+                "KeyId": "36812ccf-daaf-49b1-a24b-0eef254ffe41",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/36812ccf-daaf-49b1-a24b-0eef254ffe41"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "6b986ab1-8f3c-4ed7-a272-d1e7cc56e1bf",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6b986ab1-8f3c-4ed7-a272-d1e7cc56e1bf",
+                "cache-control": "no-cache, no-store, must-revalidate, private",
+                "expires": "0",
+                "pragma": "no-cache",
+                "date": "Tue, 23 Jul 2019 01:20:03 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "4802"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -116,14 +116,28 @@ class OutputTest(BaseTest):
             self.assertTrue(isinstance(log, AppInsightsLogOutput))
             logging.getLogger('custodian.test').warning('test message')
 
-    def test_app_insights_metrics(self):
-        policy = Bag(name='test', resource_type='azure.vm', session_factory=Session)
-        ctx = Bag(policy=policy, execution_id='00000000-0000-0000-0000-000000000000',
-                  execution_mode="event")
+    @patch('c7n_azure.output.MetricsOutput._put_metrics')
+    def test_app_insights_metrics(self, put_mock):
+        policy = self.load_policy({
+            'name': 'test-rg',
+            'resource': 'azure.resourcegroup'
+        })
+        ctx = Bag(policy=policy, execution_id='00000000-0000-0000-0000-000000000000')
         sink = metrics_outputs.select('azure://00000000-0000-0000-0000-000000000000', ctx)
         self.assertTrue(isinstance(sink, MetricsOutput))
         sink.put_metric('ResourceCount', 101, 'Count')
         sink.flush()
+        put_mock.assert_called_once_with(
+            'test-rg',
+            [{
+                'Name': 'ResourceCount',
+                'Value': 101,
+                'Dimensions': {'Policy': 'test-rg',
+                                         'ResType': 'azure.resourcegroup',
+                                         'SubscriptionId': 'ea42f556-5106-4743-99b0-c129bfa71a47',
+                                         'ExecutionId': '00000000-0000-0000-0000-000000000000',
+                                         'ExecutionMode': 'pull',
+                                         'Unit': 'Count'}}])
 
     @patch('logging.Logger.error')
     def test_access_error(self, logger_mock):
