@@ -129,7 +129,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "traces\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend ExecutionId = tostring(customDimensions['ExecutionId'])\n| parse message with \"Action '\" Action \"' modified '\" Resource \"' in resource group '\" ResourceGroup \"'.\"\n| where isnotempty(Action)\n| project timestamp, Policy, Action, Resource, ResourceGroup, ExecutionId\n| order by timestamp desc\n",
+        "query": "traces\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend ExecutionId = tostring(customDimensions['ExecutionId'])\n| extend ResourceType = tostring(customDimensions['ResType'])\n| parse message with \"Action '\" Action \"' modified '\" Resource \"' in resource group '\" ResourceGroup \"'.\"\n| where isnotempty(Action)\n| project timestamp, Policy, Action, ResourceType, Resource, ResourceGroup, ExecutionId\n| order by timestamp desc\n",
         "size": 0,
         "exportFieldName": "ExecutionId",
         "exportParameterName": "ExecutionId",
@@ -312,7 +312,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "traces\n| where severityLevel >= 3\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| parse message with action \" failed for '\" resource \"'. \" message\n| where isnotempty(action)\n| project timestamp, Policy, action, resource, message, executionId\n| order by timestamp desc\n",
+        "query": "traces\n| where severityLevel >= 3\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| extend ResourceType = tostring(customDimensions['ResType'])\n| parse message with action \" failed for '\" resource \"'. \" message\n| where isnotempty(action)\n| project timestamp, Policy, action, ResourceType, resource, message, executionId\n| order by timestamp desc\n",
         "size": 0,
         "exportFieldName": "executionId",
         "exportParameterName": "FailedExecutionId",
