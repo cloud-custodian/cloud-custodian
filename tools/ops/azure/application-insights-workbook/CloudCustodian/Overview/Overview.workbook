@@ -102,7 +102,7 @@
     {
       "type": 1,
       "content": {
-        "json": "# Successful Actions\nThe following gives a breakdown of the actions successfully applied by the running policies. The left hand side shows the total number of resources acted on by policy. The right hand table shows the resources and the name of the action that has been taken on them.\n\nClick a row in the \"Actions by Resource\" table to retrieve the logs for the policy execution in a new table below."
+        "json": "# Modified Resources\nThe following gives a breakdown of the resources that have been modified by the running policies. The left hand side shows the total number of resources modified by each policy. The right hand table shows the resources and the name of the action that has been taken on them.\n\nClick a row in the \"Modifications by Resource\" table to retrieve the logs for the policy execution in a new table below."
       },
       "name": "text - 8"
     },
@@ -113,7 +113,7 @@
         "query": "traces\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| extend Policy = tostring(customDimensions['Policy'])\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| parse message with \"Action '\" action \"' modified '\" resource \"' in resource group '\" resourceGroup \"'.\"\n| where isnotempty(action)\n| summarize resourceCount=count() by Policy",
         "size": 0,
         "exportToExcelOptions": "visible",
-        "title": "Successful Actions by Policy",
+        "title": "Modifications by Policy",
         "timeContext": {
           "durationMs": 0
         },
@@ -135,7 +135,7 @@
         "exportParameterName": "ExecutionId",
         "exportDefaultValue": "<unset>",
         "exportToExcelOptions": "visible",
-        "title": "Successful Actions by Resource",
+        "title": "Modifications by Resource",
         "timeContext": {
           "durationMs": 0
         },
@@ -146,9 +146,18 @@
           "formatters": [
             {
               "columnMatch": "timestamp",
-              "formatter": 0,
+              "formatter": 6,
               "formatOptions": {
                 "showIcon": true
+              },
+              "numberFormat": {
+                "unit": 0,
+                "options": {
+                  "style": "decimal"
+                }
+              },
+              "dateFormat": {
+                "formatName": "longTimePattern"
               }
             },
             {
@@ -213,15 +222,39 @@
         "gridSettings": {
           "formatters": [
             {
-              "columnMatch": "execution",
+              "columnMatch": "timestamp",
+              "formatter": 6,
+              "formatOptions": {
+                "showIcon": true
+              },
+              "dateFormat": {
+                "formatName": "longTimePattern"
+              }
+            },
+            {
+              "columnMatch": "message",
+              "formatter": 1,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "severityLevel",
               "formatter": 0,
               "formatOptions": {
                 "showIcon": true
               }
             },
             {
-              "columnMatch": "message",
-              "formatter": 1,
+              "columnMatch": "customDimensions",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "execution",
+              "formatter": 0,
               "formatOptions": {
                 "showIcon": true
               }
@@ -295,9 +328,12 @@
           "formatters": [
             {
               "columnMatch": "timestamp",
-              "formatter": 0,
+              "formatter": 6,
               "formatOptions": {
                 "showIcon": true
+              },
+              "dateFormat": {
+                "formatName": "longTimePattern"
               }
             },
             {
@@ -364,6 +400,9 @@
               "formatter": 6,
               "formatOptions": {
                 "showIcon": true
+              },
+              "dateFormat": {
+                "formatName": "longTimePattern"
               }
             },
             {
