@@ -28,7 +28,7 @@ class ParentFilterTest(BaseTest):
     def test_schema(self):
         self.assertTrue(self.load_policy({
             'name': 'test-policy',
-            'resource': 'azure.keyvault-keys',
+            'resource': 'azure.keyvault-key',
             'filters': [
                 {'type': 'parent',
                  'filter': {
@@ -61,7 +61,7 @@ class ParentFilterTest(BaseTest):
             ),
             {
                 'name': 'test-policy',
-                'resource': 'azure.keyvault-keys',
+                'resource': 'azure.keyvault-key',
                 'filters': [
                     {'type': 'parent',
                      'filter': {

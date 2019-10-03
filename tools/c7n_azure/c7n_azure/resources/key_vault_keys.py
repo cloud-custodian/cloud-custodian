@@ -28,9 +28,9 @@ from c7n_azure.utils import ThreadHelper, ResourceIdParser, generate_key_vault_u
 log = logging.getLogger('custodian.azure.keyvault.keys')
 
 
-@resources.register('keyvault-keys')
+@resources.register('keyvault-key', aliases=['keyvault-keys'])
 class KeyVaultKeys(ChildResourceManager):
-    """Key Vault Keys Resource
+    """Key Vault Key Resource
 
     :example:
 
@@ -42,7 +42,7 @@ class KeyVaultKeys(ChildResourceManager):
           - name: keyvault-keys
             description:
               List all keys from 'keyvault_test' and 'keyvault_prod' vaults
-            resource: azure.keyvault-keys
+            resource: azure.keyvault-key
             filters:
               - type: keyvault
                 vaults:
@@ -59,7 +59,7 @@ class KeyVaultKeys(ChildResourceManager):
           - name: keyvault-keys
             description:
               List all keys that are older than 30 days
-            resource: azure.keyvault-keys
+            resource: azure.keyvault-key
             filters:
               - type: value
                 key: attributes.created
@@ -78,7 +78,7 @@ class KeyVaultKeys(ChildResourceManager):
           - name: keyvault-keys
             description:
               List all non-HSM keys
-            resource: azure.keyvault-keys
+            resource: azure.keyvault-key
             filters:
               - not:
                  - type: key-type
