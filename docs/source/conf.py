@@ -125,7 +125,7 @@ html_theme_options = {
   'style_external_links': True,
   # Toc options
   'collapse_navigation': False,
-  'sticky_navigation': True,
+  'sticky_navigation': False,
   'includehidden': True,
   'titles_only': False
 }
