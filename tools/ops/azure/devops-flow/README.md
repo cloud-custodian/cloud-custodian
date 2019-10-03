@@ -6,7 +6,7 @@ This directory contains the yaml definitions for CI/CD pipelines to help manage 
 
 In order to use these pipelines directly, you must use a repository in Azure DevOps, however the steps in both of the pipelines can easily be ported to the format of other build providers. If you do not have an existing project, [Create a Project in Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops) before continuing on.
 
-The other needed Azure resource is a storage account with a container to store the policy files. If you follow the directions for hosting Cloud Custodian in a container in Azure, this account will already be created. Otherwise please follow the instructions in `docs/source/azure/configuration/containerhosting.rst`. 
+The other needed Azure resource is a storage account with a container to store the policy files. If you follow the directions for hosting Cloud Custodian in a container in Azure, this account will already be created. Otherwise, [Create a Storage Account](https://docs.microsoft.com/en-us/azure/storage/common/storage-quickstart-create-account?tabs=azure-portal) and then [Create a Container](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-portal#create-a-container) to hold policy files.
 
 Remember: For a policy to be executed in a container instance of c7n the mode must be set to either "container-periodic" or "container-event"
 
@@ -30,11 +30,13 @@ For the remainder of this tutorial, you must have a properly configured Azure De
   |- policy folder 2
     |- policy3.yaml
   ...
-- azure-pipelines.yaml
-- validation-pipeline.yaml
+- .azure-pipelines
+  |- azure-pipelines.yaml
+  |- validation-pipeline.yaml
 ```
 Where:
 * `policies` is a directory that contains any directory folder of policy yaml files. Only the yaml files within this structure will get copied to blob storage to be run on the containers
+* `.azure-pipelines` is a directory that holds all azure pipeline definitions. If other pipelines are desired, then they should also be included in this directory.
 * `azure-pipelines.yaml` copied from this directory, it defines the pipeline steps to copy policy files to blob storage
 * `validation-pipeline.yaml` copied from this directory, it defines the pipeline that validates any changed policy files before allowing a pull request to be merged into master
 
@@ -43,9 +45,9 @@ This is a very simplistic solution to act as a building block. More complex fold
 # Validation Pipeline
 
 ## Steps to setup Pipeline
-The validation pipeline is saved in `validation-pipeline.yaml` in the root directory.
+The validation pipeline is saved in `.azure-pipelines/validation-pipeline.yaml` in the root directory.
 
-1. Create a new pipeline based off of the definition `validation-pipeline.yaml`. The default trigger runs the pipeline when a pull request is opened to master.
+1. Create a new pipeline based off of the definition `.azure-pipelines/validation-pipeline.yaml`. The default trigger runs the pipeline when a pull request is opened to master.
 2. Set the variable in the build pipeline
     * POLICY_FILE_PATH - Path to the folder of the policy files that should be deployed, for this example it should be `./policies`
 3. Add a [build validation](https://docs.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops#build-validation) to the master branch. This prevents PRs from being merged without the policy validation pipeline from completing.
@@ -59,10 +61,10 @@ This pipeline runs `custodian validate` on the policy files that have changed in
 # CI Pipeline
 
 ## Steps to setup Pipeline
-The deployment pipeline is saved in `azure-pipelines.yaml` in the root directory.
+The deployment pipeline is saved in `.azure-pipelines/azure-pipelines.yaml` in the root directory.
 
 1. Create a [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml) to the resource group containing the blob storage account
-2. Create a new pipeline based off of the definition `azure-pipelines.yaml`
+2. Create a new pipeline based off of the definition `.azure-pipelines/azure-pipelines.yaml`
 3. Set the variables in the build pipeline
     * AZURE_SERVICE_CONNECTION - Name of the service connection to the resource group containing the storage account
     * STORAGE_ACCOUNT_NAME - Name of the storage account 
@@ -92,7 +94,7 @@ Pipelines can be used to deploy different subfolders of policy files to differen
 In this scenario we will create three pipelines to deploy to three different blob storage containers. Each of these storage containers will be watched by a kubernetes pod to apply the policies. Note, for development below we will have it deploy all of the policy files and not just the ones in the development folder. This is done by the following steps:
 
 1. Create a service connection for each of the resource groups that contain storage accounts that need to be accessed
-1. Create three build pipelines that are each based on `azure-pipelines.yaml` - This way if there is a change to the pipeline file all of the pipelines will be updated automatically rather than updating each one independently
+1. Create three build pipelines that are each based on `.azure-pipelines/azure-pipelines.yaml` - This way if there is a change to the pipeline file all of the pipelines will be updated automatically rather than updating each one independently
 1. Set the build pipeline variables for each instance. The important thing to remember here is that the storage account variables must be for the target account of each environment. Examples of what the values may look like are:
     * Production
         * AZURE_SERVICE_CONNECTION: CloudCustodianProduction
