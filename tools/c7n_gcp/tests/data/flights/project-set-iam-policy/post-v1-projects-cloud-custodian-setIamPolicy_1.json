@@ -1,0 +1,59 @@
+{
+  "body": {
+    "bindings": [
+      {
+        "role": "roles/automl.admin",
+        "members": [
+          "user:alex.karpitski@gmail.com",
+          "user:mediapills@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/billing.projectManager",
+        "members": [
+          "user:alex.karpitski@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/owner",
+        "members": [
+          "user:alex.karpitski@gmail.com"
+        ]
+      }
+    ], 
+    "version": 1, 
+    "etag": "BwWQAG4vI0U=", 
+    "auditConfigs": [
+      {
+        "auditLogConfigs": [
+          {
+            "logType": "ADMIN_READ"
+          }, 
+          {
+            "logType": "DATA_READ"
+          }, 
+          {
+            "logType": "DATA_WRITE"
+          }
+        ], 
+        "service": "cloudtasks.googleapis.com"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "5925", 
+    "x-xss-protection": "0", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "server-timing": "gfet4t7; dur=833", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Tue, 13 Aug 2019 14:26:46 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

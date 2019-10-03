@@ -793,6 +793,60 @@ class AccountTests(BaseTest):
         )
         self.assertEqual(len(p.run()), 1)
 
+    def test_glue_catalog_encrypted_filter(self):
+        session_factory = self.replay_flight_data("test_account_glue_encyption_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-security-config",
+                "resource": "account",
+                'filters': [{
+                    'type': 'glue-security-config',
+                    'CatalogEncryptionMode': 'SSE-KMS'},
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+    def test_glue_password_encryption_setting(self):
+        session_factory = self.replay_flight_data("test_account_glue_encyption_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-security-config",
+                "resource": "account",
+                'filters': [{
+                    'type': 'glue-security-config',
+                    'SseAwsKmsKeyId': 'alias/aws/glue'},
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+    def test_glue_connection_password_encryption(self):
+        session_factory = self.replay_flight_data("test_account_glue_connection_password_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-security-config",
+                "resource": "account",
+                'filters': [{
+                    'type': 'glue-security-config',
+                    'AwsKmsKeyId': 'alias/skunk/trails'},
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
 
 class AccountDataEvents(BaseTest):
 
