@@ -1,4 +1,4 @@
-# Cloud Custodian CI Pipelines
+# Azure DevOps Workflow for Container Host
 
 This directory contains the yaml definitions for CI/CD pipelines to help manage policies in an Azure DevOps repository structure. The two pipelines will:
 * Validate policies as part of a Pull Request by running `custodian validate`
@@ -10,7 +10,7 @@ The other needed Azure resource is a storage account with a container to store t
 
 Remember: For a policy to be executed in a container instance of c7n the mode must be set to either "container-periodic" or "container-event"
 
-- [Cloud Custodian CI Pipelines](#Cloud-Custodian-CI-Pipelines)
+- [Azure DevOps Workflow for Container Host](#Azure-DevOps-Workflow-for-Container-Host)
 - [Initialize Azure DevOps](#Initialize-Azure-DevOps)
 - [Validation Pipeline](#Validation-Pipeline)
   - [Steps to setup Pipeline](#Steps-to-setup-Pipeline)
