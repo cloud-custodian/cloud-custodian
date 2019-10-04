@@ -42,7 +42,7 @@ jobs:
 
     # Skip some resources due to some restrictions with their provisioning using Service Principal account
     # We maintain those resources in the test subscription available for the tests
-    - script: tools/c7n_azure/tests_azure/templates/provision.sh --skip keyvault cost-management-export containerservice databricks
+    - script: /bin/bash tools/c7n_azure/tests_azure/templates/provision.sh --skip keyvault cost-management-export containerservice databricks
       displayName: "Provision Azure Resources"
       env:
         AZURE_CLIENT_ID: $(azure-client-id)
@@ -51,7 +51,7 @@ jobs:
     - script: C7N_TEST_RUN=true C7N_FUNCTIONAL=yes pytest -v -m "not skiplive" tools/c7n_azure/tests_azure
       displayName: "Run Azure tests without cassettes"
 
-    - script: tools/c7n_azure/tests_azure/templates/cleanup.sh --skip keyvault cost-management-export containerservice databricks
+    - script: /bin/bash tools/c7n_azure/tests_azure/templates/cleanup.sh --skip keyvault cost-management-export containerservice databricks
       displayName: "Cleanup Azure Resources"
       condition: always()
 
@@ -75,7 +75,7 @@ jobs:
     - script: python -m pip install --upgrade pip && pip install . && pip install -r requirements-dev.txt
       displayName: "Install Dependencies"
 
-    - script: ./test_functions.sh
+    - script: /bin/bash test_functions.sh
       workingDirectory: tools/c7n_azure/tests_azure/azure-functions
       displayName: "Run Azure Functions Test"
       env:
