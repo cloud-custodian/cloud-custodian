@@ -2857,7 +2857,7 @@ class Logging(Filter):
                          bucket={'type': 'string'},
                          prefix={'type': 'string'})
 
-    permissions = ('s3:GetBucketLogging')
+    permissions = ('s3:GetBucketLogging', 'iam:ListAccountAliases')
 
     def process(self, buckets, event=None):
 
