@@ -1325,7 +1325,14 @@ class ToggleLogging(BucketActionBase):
             client = bucket_client(session, r)
             is_logging = bool(r.get('Logging'))
 
-            if (enabled and not is_logging) or (enabled and self.data.get('target_bucket') != current_target_bucket_name and self.data.get('target_prefix') != current_target_prefix):
+            current_target_bucket_name = r.get('Logging', {}).get('TargetBucket', None)
+            current_target_prefix = r.get('Logging', {}).get('TargetPrefix', None)
+
+            if (
+                (enabled and not is_logging) or
+                ((enabled and self.data.get('target_bucket') != current_target_bucket_name and
+                self.data.get('target_prefix') != current_target_prefix))
+            ):
                 variables = {
                     'account_id': self.manager.config.account_id,
                     'account': account_name,
@@ -1348,6 +1355,7 @@ class ToggleLogging(BucketActionBase):
                 client.put_bucket_logging(
                     Bucket=r['Name'], BucketLoggingStatus={})
                 continue
+
 
 @actions.register('attach-encrypt')
 class AttachLambdaEncrypt(BucketActionBase):
@@ -2821,6 +2829,7 @@ class KMSKeyResolverMixin(object):
                              key, bucket.get('Name'), region)
         return key
 
+
 @filters.register('is-not-logging')
 class Logging(Filter):
     """ Matches S3 buckets that are NOT logging to S3.
@@ -2856,14 +2865,14 @@ class Logging(Filter):
             results = w.map(self.process_bucket, buckets)
             results = list(filter(None, list(results)))
             return results
-    
+
     def process_bucket(self, b):
         logging = b.get('Logging', None)
-        
+
         # Logging is not enabled
         if not logging:
             return b
-        
+
         if self.data.get('bucket', None) or self.data.get('prefix', None):
             # Variable expansion
             session = local_session(self.manager.session_factory)
@@ -2883,9 +2892,13 @@ class Logging(Filter):
         else:
             bucket_name = self.data.get('bucket', None)
             bucket_prefix = self.data.get('prefix', None)
-        
-        if (bucket_name and logging["TargetBucket"] != bucket_name) or (bucket_prefix and logging['TargetPrefix'] != bucket_prefix):
+
+        if (
+            (bucket_name and logging["TargetBucket"] != bucket_name) or
+            (bucket_prefix and logging['TargetPrefix'] != bucket_prefix)
+        ):
             return b
+
 
 @filters.register('bucket-encryption')
 class BucketEncryption(KMSKeyResolverMixin, Filter):
