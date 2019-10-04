@@ -107,10 +107,7 @@ class LockAction(AzureBaseAction):
             )
 
     def _get_lock_name(self, resource):
-        return self.data.get('lock-name',
-                             "custodian_lock_{}_{}".format(resource['name'], self.lock_type))
+        return self.data.get('lock-name', "c7n-policy-{}".format(self.manager.data['name']))
 
     def _get_lock_notes(self, resource):
-        return self.data.get('lock-notes',
-                             "Custodian lock created by policy: {}"
-                             .format(self.manager.data['name']))
+        return self.data.get('lock-notes')
