@@ -1,0 +1,19 @@
+policies:
+  - name: c7n-aks-event
+    description: Tests event policies on ACI
+    resource: azure.resourcegroup
+    mode: 
+      type: container-event
+      events:
+        - resourceProvider: Microsoft.Resources/subscriptions/resourceGroups
+          event: write
+    filters:
+      - type: value
+        key: name
+        op: eq
+        value: "container-host-nightly-aks-event"
+      - tag:c7n-aks-event: absent
+    actions:
+      - type: tag
+        tag: c7n-aks-event
+        value: passed

@@ -1,0 +1,19 @@
+policies:
+  - name: c7n-aci-event
+    description: Tests event policies on ACI
+    resource: azure.resourcegroup
+    mode: 
+      type: container-event
+      events:
+        - resourceProvider: Microsoft.Resources/subscriptions/resourceGroups
+          event: write
+    filters:
+      - type: value
+        key: name
+        op: eq
+        value: "container-host-nightly-aci-event"
+      - tag:c7n-aci-event: absent
+    actions:
+      - type: tag
+        tag: c7n-aci-event
+        value: passed

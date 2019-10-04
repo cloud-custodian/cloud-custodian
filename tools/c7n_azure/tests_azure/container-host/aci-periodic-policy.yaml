@@ -1,0 +1,17 @@
+policies:
+  - name: c7n-aci-periodic
+    description: Tests periodic policies on ACI
+    resource: azure.resourcegroup
+    mode: 
+      type: container-periodic
+      schedule: "*/5 * * * *"
+    filters:
+      - type: value
+        key: name
+        op: eq
+        value: "container-host-nightly-aci-periodic"
+      - tag:c7n-aci-periodic: absent
+    actions:
+      - type: tag
+        tag: c7n-aci-periodic
+        value: passed
