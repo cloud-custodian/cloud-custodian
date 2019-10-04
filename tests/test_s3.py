@@ -1457,7 +1457,9 @@ class S3Test(BaseTest):
             "S3_AUGMENT_TABLE",
             [("get_bucket_logging", "Logging", None, "LoggingEnabled")],
         )
-        session_factory = self.replay_flight_data("test_s3_filter_not_logging_to_correct_bucket_or_prefix")
+        session_factory = self.replay_flight_data(
+            "test_s3_filter_not_logging_to_correct_bucket_or_prefix"
+        )
         session = session_factory()
         client = session.client("s3")
         bname = "custodian-log-test"
