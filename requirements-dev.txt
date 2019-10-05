@@ -1,19 +1,19 @@
 -r requirements.txt
 
 # Test & lint packages
-coverage==4.5.3
+coverage==4.5.4
 mock==3.0.5
 placebo==0.9.0
-flake8==3.7.7
-pytest==4.5.0
-pytest-xdist==1.28.0
+flake8==3.7.8
+pytest
+pytest-xdist
 pytest-cov==2.7.1
-twine==1.13.0
-tox==3.12.1
+twine
+tox==3.14.0
 six >= 1.12.0
 
 # Optional feature testing in c7n
-psutil==5.6.2
+psutil==5.6.3
 aws_xray_sdk==2.4.2
 
 -r tools/c7n_mailer/requirements.txt
@@ -22,7 +22,7 @@ aws_xray_sdk==2.4.2
 -r tools/c7n_kube/requirements.txt
 
 # Specific to testing mailer
-fakeredis==1.0.3
+fakeredis==1.0.4
 
 # Local package required for c7n_mailer tests
 -e tools/c7n_mailer

@@ -104,13 +104,15 @@ class SetIamPolicy(MethodAction):
         :param model: the parameters that are defined in a resource manager
         :param resource: the resource the action is applied to
         """
+        params = self._verb_arguments(resource)
         existing_bindings = self._get_existing_bindings(model, resource)
         add_bindings = self.data['add-bindings'] if 'add-bindings' in self.data else []
         remove_bindings = self.data['remove-bindings'] if 'remove-bindings' in self.data else []
         bindings_to_set = self._add_bindings(existing_bindings, add_bindings)
         bindings_to_set = self._remove_bindings(bindings_to_set, remove_bindings)
-        return {'resource': resource['name'], 'body': {
-            'policy': {'bindings': bindings_to_set} if len(bindings_to_set) > 0 else {}}}
+        params['body'] = {
+            'policy': {'bindings': bindings_to_set} if len(bindings_to_set) > 0 else {}}
+        return params
 
     def _get_existing_bindings(self, model, resource):
         """
@@ -129,7 +131,7 @@ class SetIamPolicy(MethodAction):
 
     def _verb_arguments(self, resource):
         """
-        Returns a dictionary that is passed when making the `getIamPolicy` API call.
+        Returns a dictionary passed when making the `getIamPolicy` and 'setIamPolicy' API calls.
 
         :param resource: the same as in `get_resource_params`
         """

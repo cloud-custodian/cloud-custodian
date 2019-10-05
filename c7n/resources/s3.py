@@ -151,6 +151,8 @@ class ConfigS3(query.ConfigSource):
         # aka standard
         if 'awsRegion' in item and item['awsRegion'] != 'us-east-1':
             resource['Location'] = {'LocationConstraint': item['awsRegion']}
+        else:
+            resource['Location'] = {}
 
         # owner is under acl per describe
         resource.pop('Owner', None)
@@ -402,7 +404,7 @@ S3_CONFIG_SUPPLEMENT_NULL_MAP = {
 }
 
 S3_AUGMENT_TABLE = (
-    ('get_bucket_location', 'Location', None, None),
+    ('get_bucket_location', 'Location', {}, None),
     ('get_bucket_tagging', 'Tags', [], 'TagSet'),
     ('get_bucket_policy', 'Policy', None, 'Policy'),
     ('get_bucket_acl', 'Acl', None, None),
