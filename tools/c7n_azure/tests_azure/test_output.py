@@ -23,6 +23,7 @@ from azure.common import AzureHttpError
 from .azure_common import BaseTest
 import re
 from c7n_azure.output import AzureStorageOutput
+from c7n.utils import local_session
 
 from c7n.config import Bag, Config
 from c7n.ctx import ExecutionContext
@@ -132,12 +133,13 @@ class OutputTest(BaseTest):
             [{
                 'Name': 'ResourceCount',
                 'Value': 101,
-                'Dimensions': {'Policy': 'test-rg',
-                                         'ResType': 'azure.resourcegroup',
-                                         'SubscriptionId': 'ea42f556-5106-4743-99b0-c129bfa71a47',
-                                         'ExecutionId': '00000000-0000-0000-0000-000000000000',
-                                         'ExecutionMode': 'pull',
-                                         'Unit': 'Count'}}])
+                'Dimensions':
+                    {'Policy': 'test-rg',
+                     'ResType': 'azure.resourcegroup',
+                     'SubscriptionId': local_session(Session).get_subscription_id(),
+                     'ExecutionId': '00000000-0000-0000-0000-000000000000',
+                     'ExecutionMode': 'pull',
+                     'Unit': 'Count'}}])
 
     @patch('logging.Logger.error')
     def test_access_error(self, logger_mock):

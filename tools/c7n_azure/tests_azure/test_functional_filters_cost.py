@@ -31,7 +31,7 @@ class CostFilterTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'cctestvm'},
                 {'type': 'cost',
-                 'timeframe': 1,
+                 'timeframe': 30,
                  'op': 'ge',
                  'value': 0}
             ]
@@ -58,7 +58,7 @@ class CostFilterTest(BaseTest):
                  'value_type': 'normalize',
                  'value': 'test_vm'},
                 {'type': 'cost',
-                 'timeframe': 1,
+                 'timeframe': 30,
                  'op': 'ge',
                  'value': 0}
             ]

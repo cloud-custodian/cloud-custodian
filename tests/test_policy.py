@@ -563,7 +563,7 @@ class TestPolicy(BaseTest):
             repr(policy).startswith("<Policy resource:ec2 name:ec2-utilization")
         )
 
-    def test_policy_name_filtering(self):
+    def test_policy_name_and_resource_type_filtering(self):
 
         collection = self.load_policy_set(
             {
@@ -588,17 +588,59 @@ class TestPolicy(BaseTest):
         self.assertTrue("s3-remediate" in collection)
 
         self.assertEqual(
-            [p.name for p in collection.filter("s3*")],
+            [p.name for p in collection.filter(["s3*"])],
             ["s3-remediate", "s3-global-grants"],
         )
 
         self.assertEqual(
-            [p.name for p in collection.filter("ec2*")],
+            [p.name for p in collection.filter(["ec2*"])],
             [
                 "ec2-tag-compliance-stop",
                 "ec2-tag-compliance-kill",
                 "ec2-tag-compliance-remove",
             ],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(["ec2*", "s3*"])],
+            [p.name for p in collection],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(resource_types=["ec2"])],
+            [
+                "ec2-tag-compliance-stop",
+                "ec2-tag-compliance-kill",
+                "ec2-tag-compliance-remove",
+            ],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(resource_types=["ec2", "s3"])],
+            [p.name for p in collection],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(["ec2*", "s3*"], ["ec2", "s3"])],
+            [p.name for p in collection],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(["ec2*", "s3*"], ["s3"])],
+            [
+                "s3-remediate",
+                "s3-global-grants",
+            ],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(["asdf12"])],
+            [],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(resource_types=["asdf12"])],
+            [],
         )
 
     def test_file_not_found(self):

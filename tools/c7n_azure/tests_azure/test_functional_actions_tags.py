@@ -17,7 +17,7 @@ import datetime
 
 from .azure_common import BaseTest, arm_template
 from c7n_azure.session import Session
-from mock import patch
+from c7n_azure import utils
 
 from . import tools_tags as tools
 
@@ -70,17 +70,15 @@ class FunctionalActionsTagsTest(BaseTest):
 
     @arm_template('vm.json')
     def test_mark_for_op(self):
-        with patch('c7n_azure.utils.now') as utc_patch:
-            utc_patch.return_value = self.get_test_date()
-            self._run_policy([{'type': 'mark-for-op',
-                               'tag': 'cctest_mark',
-                               'op': 'delete',
-                               'msg': '{op}, {action_date}',
-                               'days': self.DAYS}])
+        self._run_policy([{'type': 'mark-for-op',
+                           'tag': 'cctest_mark',
+                           'op': 'delete',
+                           'msg': '{op}, {action_date}',
+                           'days': self.DAYS}])
 
-            expected_date = self.get_test_date() + datetime.timedelta(days=self.DAYS)
-            expected = 'delete, ' + expected_date.strftime('%Y/%m/%d')
-            self.assertEqual(self._get_tags().get('cctest_mark'), expected)
+        expected_date = utils.now() + datetime.timedelta(days=self.DAYS)
+        expected = 'delete, ' + expected_date.strftime('%Y/%m/%d')
+        self.assertEqual(self._get_tags().get('cctest_mark'), expected)
 
     @arm_template('vm.json')
     def test_autotag_user_and_date(self):

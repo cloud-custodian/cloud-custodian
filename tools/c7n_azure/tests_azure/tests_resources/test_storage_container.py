@@ -39,6 +39,10 @@ class StorageContainerTest(BaseTest):
             'name': 'test-azure-storage-container-enum',
             'resource': 'azure.storage-container',
             'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value': 'container*'},
                 {'type': 'parent',
                  'filter':
                     {'type': 'value',
