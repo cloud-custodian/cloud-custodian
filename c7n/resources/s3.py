@@ -414,6 +414,7 @@ S3_AUGMENT_TABLE = (
     ('get_bucket_logging', 'Logging', None, 'LoggingEnabled'),
     ('get_bucket_notification_configuration', 'Notification', None, None),
     ('get_bucket_lifecycle_configuration', 'Lifecycle', None, None),
+    ('get_public_access_block', 'PublicAccessBlockConfiguration', None, None),
     #        ('get_bucket_cors', 'Cors'),
 )
 
@@ -3015,3 +3016,57 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config
         )
+
+
+@filters.register('s3-public-block')
+class S3PublicBlock(ValueFilter):
+    """Check for s3 public blocks on a bucket.
+
+    https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html
+
+    :example:
+
+    .. code-block:: yaml
+            policies:
+
+              - name: BlockPublicAcls-off
+                resource: s3
+                region: us-west-2
+                filters:
+                  - type: s3-public-block
+                    key: BlockPublicAcls
+                    value: false
+
+              - name: IgnorePublicAcls-off
+                resource: s3
+                region: us-west-2
+                filters:
+                  - type: s3-public-block
+                    key: IgnorePublicAcls
+                    value: false
+
+              - name: BlockPublicPolicy-off
+                resource: s3
+                region: us-west-2
+                filters:
+                  - type: s3-public-block
+                    key: BlockPublicPolicy
+                    value: false
+
+              - name: RestrictPublicBuckets-off
+                resource: s3
+                region: us-west-2
+                filters:
+                  - type: s3-public-block
+                    key: RestrictPublicBuckets
+                    value: false
+    """
+
+    schema = type_schema('s3-public-block', rinherit=ValueFilter.schema)
+
+    def process(self, buckets, event=None):
+        return list(filter(None, map(self.process_bucket, buckets)))
+
+    def process_bucket(self, b):
+        p = b.get('PublicAccessBlockConfiguration')
+        return p
