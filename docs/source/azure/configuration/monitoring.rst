@@ -10,13 +10,13 @@ Cloud Custodian can upload its logs to Application Insights. Each policy’s log
 **subscription id** and **execution id properties**. These logs will be found under the **trace** source in Application Insights.
 
 
-Usage example using instrumentation key:
+Usage example using an instrumentation key:
 
     .. code-block:: sh
 
         custodian run -s <output_directory> -l azure://<instrumentation_key_guid> policy.yml
 
-Usage example using resource name:
+Usage example using a resource name:
 
     .. code-block:: sh
 
@@ -31,27 +31,27 @@ By default, Cloud Custodian will upload the following metrics in all modes:
 * **ResourceCount** - the number of resources that matched the set of filters
 * **ActionTime** - the time to execute the actions.
 
-In **poll** and **azure-periodic** mode, Cloud Custodian will also publish the following metric:
+In **pull** and **azure-periodic** mode, Cloud Custodian will also publish the following metric:
 
 * **ResourceTime** - the time to query for and filter the resources,
 
-Additionally some custom filters and actions may generate their own metrics.
+Additionally, some custom filters and actions may generate their own metrics.
 These metrics will be found under the **customMetrics** source in Application Insights.
 
-Usage example using instrumentation key:
+Usage example using an instrumentation key:
 
     .. code-block:: sh
 
         custodian run -s <output_directory> -m azure://<instrumentation_key_guid> policy.yml
 
-Usage example using resource name:
+Usage example using a resource name:
 
     .. code-block:: sh
 
         custodian run -s <output_directory> -m azure://<resource_group_name>/<app_insights_name> policy.yml
 
 In **azure-periodic** and **azure-event-grid** modes, you can configure metrics under the **execution-options**.
-Like above, you can provide the instrumentation key or the resource name.
+As above, you can provide an instrumentation key or a resource name.
 
 
     .. code-block:: yaml
@@ -75,7 +75,7 @@ Like above, you can provide the instrumentation key or the resource name.
 Writing Custodian Output to Azure Blob Storage
 ----------------------------------------------
 
-You may pass the URL to a blob storage container as the output path to Custodian.
+You can pass the URL of a blob storage container as the output path to Custodian.
 You must change the URL prefix from https to azure.
 
 By default, Custodian will add the policy name and date as the prefix to the blob.

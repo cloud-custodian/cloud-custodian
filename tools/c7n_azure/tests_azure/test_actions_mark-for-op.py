@@ -15,13 +15,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import datetime
 
-from . import tools_tags as tools
-from .azure_common import BaseTest
+from c7n_azure import utils
 from c7n_azure.actions.tagging import TagDelayedAction
 from mock import patch, Mock
 
+from . import tools_tags as tools
+from .azure_common import BaseTest
 
-class TagsTest(BaseTest):
+
+class ActionsMarkForOpTest(BaseTest):
 
     existing_tags = {'pre-existing-1': 'unmodified', 'pre-existing-2': 'unmodified'}
     DAYS = 10
@@ -48,7 +50,7 @@ class TagsTest(BaseTest):
 
         tags = tools.get_tags_parameter(update_resource_tags)
 
-        date = (self.get_test_date() + datetime.timedelta(days=self.DAYS)).strftime('%Y/%m/%d')
+        date = (utils.now() + datetime.timedelta(days=self.DAYS)).strftime('%Y/%m/%d')
         expected_value = TagDelayedAction.default_template.format(op='stop', action_date=date)
         expected_tags = self.existing_tags.copy()
         expected_tags.update({'custodian_status': expected_value})

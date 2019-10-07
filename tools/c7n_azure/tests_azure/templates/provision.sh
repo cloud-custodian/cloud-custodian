@@ -27,7 +27,6 @@ else
         # If we see option '--skip' -- deploy everything except for specific templates
         deploy_all=1
         skip_list="${@:2}"
-        echo $skip_list
     else
         # If there is no '--skip', deploy specific templates
         deploy_all=0

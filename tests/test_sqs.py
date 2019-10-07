@@ -20,16 +20,16 @@ import json
 import time
 
 
-class TestSqsAction(BaseTest):
+class TestSqs(object):
 
     @functional
-    def test_sqs_delete(self):
-        session_factory = self.replay_flight_data("test_sqs_delete")
+    def test_sqs_delete(self, test):
+        session_factory = test.replay_flight_data("test_sqs_delete")
         client = session_factory().client("sqs")
         client.create_queue(QueueName="test-sqs")
         queue_url = client.get_queue_url(QueueName="test-sqs")["QueueUrl"]
 
-        p = self.load_policy(
+        p = test.load_policy(
             {
                 "name": "sqs-delete",
                 "resource": "sqs",
@@ -39,14 +39,14 @@ class TestSqsAction(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertRaises(ClientError, client.purge_queue, QueueUrl=queue_url)
-        if self.recording:
+        test.assertEqual(len(resources), 1)
+        test.assertRaises(ClientError, client.purge_queue, QueueUrl=queue_url)
+        if test.recording:
             time.sleep(60)
 
     @functional
-    def test_sqs_set_encryption(self):
-        session_factory = self.replay_flight_data("test_sqs_set_encryption")
+    def test_sqs_set_encryption(self, test):
+        session_factory = test.replay_flight_data("test_sqs_set_encryption")
 
         client_sqs = session_factory().client("sqs")
         client_sqs.create_queue(QueueName="sqs-test")
@@ -54,10 +54,10 @@ class TestSqsAction(BaseTest):
 
         def cleanup():
             client_sqs.delete_queue(QueueUrl=queue_url)
-            if self.recording:
+            if test.recording:
                 time.sleep(60)
 
-        self.addCleanup(cleanup)
+        test.addCleanup(cleanup)
 
         client_kms = session_factory().client("kms")
         key_id = client_kms.create_key(Description="West SQS encryption key")[
@@ -65,16 +65,16 @@ class TestSqsAction(BaseTest):
         ][
             "KeyId"
         ]
-        self.addCleanup(client_kms.disable_key, KeyId=key_id)
+        test.addCleanup(client_kms.disable_key, KeyId=key_id)
 
         alias_name = "alias/new-key-test-sqs"
-        self.addCleanup(client_kms.delete_alias, AliasName=alias_name)
+        test.addCleanup(client_kms.delete_alias, AliasName=alias_name)
         client_kms.create_alias(AliasName=alias_name, TargetKeyId=key_id)
 
-        if self.recording:
+        if test.recording:
             time.sleep(30)
 
-        p = self.load_policy(
+        p = test.load_policy(
             {
                 "name": "sqs-delete",
                 "resource": "sqs",
@@ -92,7 +92,10 @@ class TestSqsAction(BaseTest):
         ][
             "KmsMasterKeyId"
         ]
-        self.assertEqual(check_master_key, key_id)
+        test.assertEqual(check_master_key, key_id)
+
+
+class TestSqsAction(BaseTest):
 
     @functional
     def test_sqs_remove_matched(self):

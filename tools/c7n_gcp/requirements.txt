@@ -1,5 +1,5 @@
 retrying==1.3.3
-google-api-python-client==1.7.9
+google-api-python-client==1.7.11
 ratelimiter==1.2.0.post0
 google-auth>=1.5.0
 google-auth-httplib2>=0.0.3
