@@ -196,7 +196,36 @@
               }
             }
           ],
-          "labelSettings": []
+          "labelSettings": [
+            {
+              "columnId": "timestamp",
+              "label": "timestamp"
+            },
+            {
+              "columnId": "Policy",
+              "label": "Policy"
+            },
+            {
+              "columnId": "Action",
+              "label": "Action"
+            },
+            {
+              "columnId": "ResourceType",
+              "label": "ResourceType"
+            },
+            {
+              "columnId": "Resource",
+              "label": "Resource"
+            },
+            {
+              "columnId": "ResourceGroup",
+              "label": "ResourceGroup"
+            },
+            {
+              "columnId": "ExecutionId",
+              "label": "ExecutionId"
+            }
+          ]
         }
       },
       "customWidth": "70",
@@ -266,7 +295,24 @@
               "sortOrder": 1
             }
           ],
-          "labelSettings": []
+          "labelSettings": [
+            {
+              "columnId": "timestamp",
+              "label": "timestamp"
+            },
+            {
+              "columnId": "message",
+              "label": "message"
+            },
+            {
+              "columnId": "severityLevel",
+              "label": "severityLevel"
+            },
+            {
+              "columnId": "customDimensions",
+              "label": "customDimensions"
+            }
+          ]
         },
         "tileSettings": {
           "showBorder": false
@@ -312,7 +358,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "traces\n| where severityLevel >= 3\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| extend ResourceType = tostring(customDimensions['ResType'])\n| parse message with action \" failed for '\" resource \"'. \" message\n| where isnotempty(action)\n| project timestamp, Policy, action, ResourceType, resource, message, executionId\n| order by timestamp desc\n",
+        "query": "traces\n| extend subId = tostring(customDimensions['SubscriptionId'])\n| where subId in ({SubscriptionId})\n| where severityLevel >= 3\n| extend executionId = tostring(customDimensions['ExecutionId'])\n| extend Policy = tostring(customDimensions['Policy'])\n| extend ResourceType = tostring(customDimensions['ResType'])\n| parse message with action \" failed for '\" resource \"'. \" message\n| where isnotempty(action)\n| project timestamp, Policy, action, ResourceType, resource, message, executionId\n| order by timestamp desc\n",
         "size": 0,
         "exportFieldName": "executionId",
         "exportParameterName": "FailedExecutionId",
@@ -372,7 +418,36 @@
               }
             }
           ],
-          "labelSettings": []
+          "labelSettings": [
+            {
+              "columnId": "timestamp",
+              "label": "timestamp"
+            },
+            {
+              "columnId": "Policy",
+              "label": "Policy"
+            },
+            {
+              "columnId": "action",
+              "label": "action"
+            },
+            {
+              "columnId": "ResourceType",
+              "label": "ResourceType"
+            },
+            {
+              "columnId": "resource",
+              "label": "resource"
+            },
+            {
+              "columnId": "message",
+              "label": "message"
+            },
+            {
+              "columnId": "executionId",
+              "label": "executionId"
+            }
+          ]
         }
       },
       "customWidth": "70",
@@ -441,7 +516,26 @@
               }
             }
           ],
-          "labelSettings": []
+          "sortBy": [
+            {
+              "itemKey": "$gen_date_timestamp_0",
+              "sortOrder": 1
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "timestamp",
+              "label": "timestamp"
+            },
+            {
+              "columnId": "severityLevel",
+              "label": "severityLevel"
+            },
+            {
+              "columnId": "message",
+              "label": "message"
+            }
+          ]
         }
       },
       "conditionalVisibility": {
