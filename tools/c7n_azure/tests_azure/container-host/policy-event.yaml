@@ -1,6 +1,6 @@
 policies:
-  - name: c7n-aci-event
-    description: Tests event policies on ACI
+  - name: c7n-%HOST%-event
+    description: Tests event policies on %HOST% 
     resource: azure.resourcegroup
     mode: 
       type: container-event
@@ -11,9 +11,9 @@ policies:
       - type: value
         key: name
         op: eq
-        value: "container-host-nightly-aci-event"
-      - tag:c7n-aci-event: absent
+        value: "%RG_NAME%"
+      - tag:c7n-%HOST%-event: absent
     actions:
       - type: tag
-        tag: c7n-aci-event
+        tag: c7n-%HOST%-event
         value: passed

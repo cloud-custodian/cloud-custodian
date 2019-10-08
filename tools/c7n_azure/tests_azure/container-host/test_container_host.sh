@@ -3,56 +3,70 @@
 set -e
 export AZURE_CORE_OUTPUT="none"
 
-resource_group_name="custodian-container-host-nightly"
+random_id=$RANDOM
+rg_tests_prefix="container-host-nightly-$random_id"
 rg_tests=("aci-periodic" "aci-event" "aks-periodic" "aks-event")
+
+resource_group_name="custodian-container-host-nightly-$random_id"
+location="westus2"
+storage_account_name="c7ncontainernightly$random_id"
+app_insights_name="custodian-insights"
+
+aci_name="custodian-aci"
+aci_queue_name="aci-queue"
+aci_policy_container_name="policies-aci"
+aci_log_container_name="logs-aci"
+uai_name="custodian-aci"
+
+aks_name="custodian-aks-$random_id"
+aks_policy_container_name="policies-aks"
+aks_log_container_name="logs-aks"
 
 function cleanup {
     set +e
     echo "################################### Cleaning Up ###################################################"
     echo "Deleting all test resources"
     for rg_test in "${rg_tests[@]}"; do
-        az group delete --name "container-host-nightly-$rg_test" --yes
+        az group delete --name "$rg_tests_prefix-$rg_test" --yes
     done
     az group delete --name $resource_group_name --yes
     unset AZURE_CORE_OUTPUT
 }
 trap cleanup EXIT
 
+function upload_blob {
+    sed -e "s;%HOST%;$3;g" -e "s;%RG_NAME%;$4;g" $1 > rendered-$1
+    az storage blob upload --account-name $storage_account_name --account-key $storage_account_key --container-name $2 --file rendered-$1 --name $1
+    rm rendered-$1
+}
+
 echo "Logging in to Azure"
 az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 az account set --subscription $AZURE_SUBSCRIPTION_ID
 
 echo "################################## Creating Shared Resources #######################################"
+echo "Random Resource ID Suffix = $random_id"
 
 # Resource Group
 echo "Creating Resource Group"
-location="westus2"
 az group create --name $resource_group_name --location $location
 
 # Storage Account
 echo "Creating Storage Account"
-storage_account_name="c7ncontainernightly"
 az storage account create --resource-group $resource_group_name --name $storage_account_name
 storage_account_key=$(az storage account keys list --account-name $storage_account_name --query "[0].value" --output tsv)
 read -r storage_account_id storage_blob_endpoint <<<$(az storage account show --name $storage_account_name --query "{id: id, blobEndpoint: primaryEndpoints.blob}" --output tsv)
 
 # Application Insights
 echo "Creating Application Insights"
-app_insights_name="custodian-insights"
 az extension add --name application-insights
 az monitor app-insights component create --resource-group $resource_group_name --app $app_insights_name --location $location
 instrumentation_key="azure://$(az monitor app-insights component show --resource-group $resource_group_name --app $app_insights_name --query "instrumentationKey" --output tsv)"
 
 echo "################################## Creating ACI Resources ##########################################"
 
-aci_name="custodian-aci"
-aci_queue_name="aci-queue"
-aci_policy_container_name="policies-aci"
-aci_log_container_name="logs-aci"
-
 # Managed Identity
 echo "Creating a Managed Identity"
-uai_name="custodian-aci"
 az identity create --resource-group $resource_group_name --name $uai_name
 sleep 120  # Give some time for the identity to propagate
 
@@ -67,8 +81,8 @@ az role assignment create --assignee-object-id $uai_object_id --role "Storage Qu
 echo "Populating Storage Acount"
 az storage container create --account-name $storage_account_name --account-key $storage_account_key --name $aci_policy_container_name
 az storage container create --account-name $storage_account_name --account-key $storage_account_key --name $aci_log_container_name
-az storage blob upload --account-name $storage_account_name --account-key $storage_account_key --container-name $aci_policy_container_name --file aci-periodic-policy.yaml --name aci-periodic-policy.yaml
-az storage blob upload --account-name $storage_account_name --account-key $storage_account_key --container-name $aci_policy_container_name --file aci-event-policy.yaml --name aci-event-policy.yaml
+upload_blob policy-periodic.yaml $aci_policy_container_name aci $rg_tests_prefix-aci-periodic
+upload_blob policy-event.yaml $aci_policy_container_name aci $rg_tests_prefix-aci-event
 
 # Deploy Container Host
 echo "Deploying Container Host in ACI"
@@ -85,10 +99,6 @@ az group deployment create --resource-group $resource_group_name --template-file
 
 echo "################################## Creating AKS Resources ##########################################"
 
-aks_name="custodian-aks"
-aks_policy_container_name="policies-aks"
-aks_log_container_name="logs-aks"
-
 # Storage Permissions
 echo "Assigning Storage Permissions"
 az role assignment create --assignee $AZURE_CLIENT_ID --role "Storage Blob Data Contributor" --scope $storage_account_id
@@ -98,8 +108,8 @@ az role assignment create --assignee $AZURE_CLIENT_ID --role "Storage Queue Data
 echo "Populating Storage Account"
 az storage container create --account-name $storage_account_name --account-key $storage_account_key --name $aks_policy_container_name
 az storage container create --account-name $storage_account_name --account-key $storage_account_key --name $aks_log_container_name
-az storage blob upload --account-name $storage_account_name --account-key $storage_account_key --container-name $aks_policy_container_name --file aks-periodic-policy.yaml --name aks-periodic-policy.yaml
-az storage blob upload --account-name $storage_account_name --account-key $storage_account_key --container-name $aks_policy_container_name --file aks-event-policy.yaml --name aks-event-policy.yaml
+upload_blob policy-periodic.yaml $aks_policy_container_name aks $rg_tests_prefix-aks-periodic
+upload_blob policy-event.yaml $aks_policy_container_name aks $rg_tests_prefix-aks-event
 
 # AKS
 echo "Creating AKS Cluster"
@@ -108,8 +118,8 @@ az aks create --resource-group $resource_group_name --name $aks_name --node-coun
 # Helm Init
 echo "Initializing Helm"
 az aks get-credentials --resource-group $resource_group_name --name $aks_name --overwrite-existing
-kubectl apply -f rbac-config.yaml > /dev/null
-helm init --service-account tiller --wait > /dev/null
+kubectl apply -f rbac-config.yaml --context $aks_name > /dev/null
+helm init --service-account tiller --kube-context $aks_name --wait > /dev/null
 
 # Helm Deployment
 echo "Deploying Container Host with Helm Chart"
@@ -141,7 +151,7 @@ sleep 300
 echo "Creating Resource Groups Subjects for Policies"
 declare -A rg_test_results
 for rg_test in "${rg_tests[@]}"; do
-    az group create --location $location --name "container-host-nightly-$rg_test"
+    az group create --location $location --name "$rg_tests_prefix-$rg_test"
     rg_test_results[$rg_test]="pending"
 done
 
@@ -153,7 +163,7 @@ for i in $(seq 1 $max_attempts); do
     sleep 30
     echo "Attempt $i of $max_attempts"
     for rg_test in "${rg_tests[@]}"; do
-        rg_test_results["$rg_test"]=$(az group show --name "container-host-nightly-$rg_test" --query "tags.\"c7n-$rg_test\"" --output tsv)
+        rg_test_results["$rg_test"]=$(az group show --name "$rg_tests_prefix-$rg_test" --query "tags.\"c7n-$rg_test\"" --output tsv)
     done
 
     all_passed=true
