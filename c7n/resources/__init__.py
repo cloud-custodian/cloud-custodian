@@ -116,10 +116,10 @@ def load_resources():
         from pkg_resources import load_entry_point
         entry_point_group = 'custodian.resources'
 
-        try:
-            load_entry_point('c7n_azure', entry_point_group, 'azure')
-        except ImportError:
-            pass
+        # try:
+        #     load_entry_point('c7n_azure', entry_point_group, 'azure')
+        # except ImportError:
+        #     pass
 
         try:
             load_entry_point('c7n_gcp', entry_point_group, 'gcp')
