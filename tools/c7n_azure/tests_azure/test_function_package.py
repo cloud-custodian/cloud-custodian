@@ -58,7 +58,7 @@ class FunctionPackageTest(BaseTest):
             'resource': 'azure.publicip',
             'mode':
                 {'type': FUNCTION_EVENT_TRIGGER_MODE,
-                 'events': ['VmWrite']},
+                 'events': ['PublicIpWrite']},
         })
 
         packer = FunctionPackage(p.data['name'])
@@ -76,7 +76,7 @@ class FunctionPackageTest(BaseTest):
             'resource': 'azure.publicip',
             'mode':
                 {'type': FUNCTION_EVENT_TRIGGER_MODE,
-                 'events': ['VmWrite']},
+                 'events': ['PublicIpWrite']},
         })
 
         packer = FunctionPackage(p.data['name'])
@@ -87,7 +87,7 @@ class FunctionPackageTest(BaseTest):
                          {u'resource': u'azure.publicip',
                           u'name': u'test-azure-public-ip',
                           u'mode': {u'type': u'azure-event-grid',
-                                    u'events': [u'VmWrite']}})
+                                    u'events': [u'PublicIpWrite']}})
 
     def test_zipped_files_have_modified_timestamp(self):
         t = time.gmtime(1577854800)
@@ -128,7 +128,7 @@ class FunctionPackageTest(BaseTest):
             'resource': 'azure.resourcegroup',
             'mode':
                 {'type': FUNCTION_EVENT_TRIGGER_MODE,
-                 'events': ['VmWrite']},
+                 'events': ['ResourceGroupWrite']},
         })
 
         packer = FunctionPackage(p.data['name'])
@@ -196,7 +196,7 @@ class FunctionPackageTest(BaseTest):
             'resource': 'azure.resourcegroup',
             'mode':
                 {'type': FUNCTION_EVENT_TRIGGER_MODE,
-                 'events': ['VmWrite']},
+                 'events': ['ResourceGroupWrite']},
         })
 
         with patch.dict(os.environ,
