@@ -16,7 +16,6 @@
 #
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import time
 import os
 
 LOADED = False
@@ -108,21 +107,27 @@ def load_resources():
     if 'C7N_EXTPLUGINS' in os.environ:
         resources.load_plugins()
     else:
+        # Plugins should be loaded using pkg_resources methods (as opposed to
+        # directly importing their initialization function) because it inherently
+        # runs dependency validation that a plugin defines for itself in setup.py
+        #
+        # Directly referencing the dist name using load_entry_point should reduce
+        # some of the sys.path lookup time overhead
+        from pkg_resources import load_entry_point
+        entry_point_group = 'custodian.resources'
+
         try:
-            from c7n_azure.entry import initialize_azure
-            initialize_azure()
+            load_entry_point('c7n_azure', entry_point_group, 'azure')
         except ImportError:
             pass
 
         try:
-            from c7n_gcp.entry import initialize_gcp
-            initialize_gcp()
+            load_entry_point('c7n_gcp', entry_point_group, 'gcp')
         except ImportError:
             pass
 
         try:
-            from c7n_kube.entry import initialize_kube
-            initialize_kube()
+            load_entry_point('c7n_kube', entry_point_group, 'kube')
         except ImportError:
             pass
 
