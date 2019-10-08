@@ -28,6 +28,11 @@ from dateutil.tz import gettz, tzutc
 from ruamel import yaml
 
 
+class Providers(object):
+    AWS = 0
+    Azure = 1
+
+
 def get_jinja_env(template_folders):
     env = jinja2.Environment(trim_blocks=True, autoescape=False)
     env.filters['yaml_safe'] = functools.partial(yaml.safe_dump, default_flow_style=False)
@@ -150,6 +155,8 @@ def get_resource_tag_value(resource, k):
 
 
 def resource_format(resource, resource_type):
+    if resource_type.startswith('aws.'):
+        resource_type = resource_type.lstrip('aws.')
     if resource_type == 'ec2':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         return "%s %s %s %s %s %s" % (
@@ -342,6 +349,13 @@ def resource_format(resource, resource_type):
         return "%s" % format_struct(resource)
 
 
+def get_provider(mailer_config):
+    if mailer_config.get('queue_url', '').startswith('asq://'):
+        return Providers.Azure
+
+    return Providers.AWS
+
+
 def kms_decrypt(config, logger, session, encrypted_field):
     if config.get(encrypted_field):
         try:
@@ -363,3 +377,52 @@ def kms_decrypt(config, logger, session, encrypted_field):
     else:
         logger.debug("No encrypted value to decrypt.")
         return None
+
+
+def decrypt(config, logger, session, encrypted_field):
+    if config.get(encrypted_field):
+        provider = get_provider(config)
+        if provider == Providers.Azure:
+            from c7n_mailer.azure_mailer.utils import azure_decrypt
+            return azure_decrypt(config, logger, session, encrypted_field)
+        elif provider == Providers.AWS:
+            return kms_decrypt(config, logger, session, encrypted_field)
+        else:
+            raise Exception("Unknown provider")
+    else:
+        logger.debug("No encrypted value to decrypt.")
+        return None
+
+
+# https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
+def get_aws_username_from_event(logger, event):
+    if event is None:
+        return None
+    identity = event.get('detail', {}).get('userIdentity', {})
+    if not identity:
+        logger.warning("Could not get recipient from event \n %s" % (
+            format_struct(event)))
+        return None
+    if identity['type'] == 'AssumedRole':
+        logger.debug(
+            'In some cases there is no ldap uid is associated with AssumedRole: %s',
+            identity['arn'])
+        logger.debug(
+            'We will try to assume that identity is in the AssumedRoleSessionName')
+        user = identity['arn'].rsplit('/', 1)[-1]
+        if user is None or user.startswith('i-') or user.startswith('awslambda'):
+            return None
+        if ':' in user:
+            user = user.split(':', 1)[-1]
+        return user
+    if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
+        return identity['userName']
+    if identity['type'] == 'Root':
+        return None
+    # this conditional is left here as a last resort, it should
+    # be better documented with an example UserIdentity json
+    if ':' in identity['principalId']:
+        user_id = identity['principalId'].split(':', 1)[-1]
+    else:
+        user_id = identity['principalId']
+    return user_id

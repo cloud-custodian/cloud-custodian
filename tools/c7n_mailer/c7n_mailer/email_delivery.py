@@ -11,61 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import smtplib
-from email.mime.text import MIMEText
 from itertools import chain
+
 import six
+from c7n_mailer.smtp_delivery import SmtpDelivery
+from c7n_mailer.utils_email import is_email, get_mimetext_message
 
 from .ldap_lookup import LdapLookup
-from c7n_mailer.utils_email import is_email
 from .utils import (
-    format_struct, get_message_subject, get_resource_tag_targets,
-    get_rendered_jinja, kms_decrypt)
-
-# Those headers are defined as follows:
-#  'X-Priority': 1 (Highest), 2 (High), 3 (Normal), 4 (Low), 5 (Lowest)
-#              Non-standard, cf https://people.dsv.su.se/~jpalme/ietf/ietf-mail-attributes.html
-#              Set by Thunderbird
-#  'X-MSMail-Priority': High, Normal, Low
-#              Cf Microsoft https://msdn.microsoft.com/en-us/library/gg671973(v=exchg.80).aspx
-#              Note: May increase SPAM level on Spamassassin:
-#                    https://wiki.apache.org/spamassassin/Rules/MISSING_MIMEOLE
-#  'Priority': "normal" / "non-urgent" / "urgent"
-#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.6
-#  'Importance': "low" / "normal" / "high"
-#              Cf https://tools.ietf.org/html/rfc2156#section-5.3.4
-PRIORITIES = {
-    '1': {
-        'X-Priority': '1 (Highest)',
-        'X-MSMail-Priority': 'High',
-        'Priority': 'urgent',
-        'Importance': 'high',
-    },
-    '2': {
-        'X-Priority': '2 (High)',
-        'X-MSMail-Priority': 'High',
-        'Priority': 'urgent',
-        'Importance': 'high',
-    },
-    '3': {
-        'X-Priority': '3 (Normal)',
-        'X-MSMail-Priority': 'Normal',
-        'Priority': 'normal',
-        'Importance': 'normal',
-    },
-    '4': {
-        'X-Priority': '4 (Low)',
-        'X-MSMail-Priority': 'Low',
-        'Priority': 'non-urgent',
-        'Importance': 'low',
-    },
-    '5': {
-        'X-Priority': '5 (Lowest)',
-        'X-MSMail-Priority': 'Low',
-        'Priority': 'non-urgent',
-        'Importance': 'low',
-    }
-}
+    get_resource_tag_targets,
+    kms_decrypt, get_aws_username_from_event)
 
 
 class EmailDelivery(object):
@@ -84,17 +39,6 @@ class EmailDelivery(object):
             return LdapLookup(self.config, self.logger)
         return None
 
-    def priority_header_is_valid(self, priority_header):
-        try:
-            priority_header_int = int(priority_header)
-        except ValueError:
-            return False
-        if priority_header_int and 0 < int(priority_header_int) < 6:
-            return True
-        else:
-            self.logger.warning('mailer priority_header is not a valid string from 1 to 5')
-            return False
-
     def get_valid_emails_from_list(self, targets):
         emails = []
         for target in targets:
@@ -104,7 +48,7 @@ class EmailDelivery(object):
 
     def get_event_owner_email(self, targets, event):
         if 'event-owner' in targets:
-            aws_username = self.get_aws_username_from_event(event)
+            aws_username = get_aws_username_from_event(self.logger, event)
             if aws_username:
                 # is using SSO, the target might already be an email
                 if is_email(aws_username):
@@ -112,6 +56,7 @@ class EmailDelivery(object):
                 # if the LDAP config is set, lookup in ldap
                 elif self.config.get('ldap_uri', False):
                     return self.ldap_lookup.get_email_to_addrs_from_uid(aws_username)
+
                 # the org_domain setting is configured, append the org_domain
                 # to the username from AWS
                 elif self.config.get('org_domain', False):
@@ -158,11 +103,20 @@ class EmailDelivery(object):
         explicit_emails = self.get_valid_emails_from_list(resource_owner_tag_values)
 
         # resolve the contact info from ldap
+        ldap_emails = []
+        org_emails = []
         non_email_ids = list(set(resource_owner_tag_values).difference(explicit_emails))
-        ldap_emails = list(chain.from_iterable([self.ldap_lookup.get_email_to_addrs_from_uid
-                                              (uid) for uid in non_email_ids]))
+        if self.config.get('ldap_uri', False):
+            ldap_emails = list(chain.from_iterable([self.ldap_lookup.get_email_to_addrs_from_uid
+                                                    (uid) for uid in non_email_ids]))
 
-        return list(chain(explicit_emails, ldap_emails))
+        elif self.config.get('org_domain', False):
+            self.logger.debug(
+                "Using org_domain to reconstruct email addresses from contact_tags values")
+            org_domain = self.config.get('org_domain')
+            org_emails = [uid + '@' + org_domain for uid in non_email_ids]
+
+        return list(chain(explicit_emails, ldap_emails, org_emails))
 
     def get_account_emails(self, sqs_message):
         email_list = []
@@ -240,7 +194,9 @@ class EmailDelivery(object):
         to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(sqs_message)
         to_addrs_to_mimetext_map = {}
         for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
-            to_addrs_to_mimetext_map[to_addrs] = self.get_mimetext_message(
+            to_addrs_to_mimetext_map[to_addrs] = get_mimetext_message(
+                self.config,
+                self.logger,
                 sqs_message,
                 resources,
                 list(to_addrs)
@@ -248,66 +204,14 @@ class EmailDelivery(object):
         # eg: { ('milton@initech.com', 'peter@initech.com'): mimetext_message }
         return to_addrs_to_mimetext_map
 
-    def send_smtp_email(self, smtp_server, message, to_addrs):
-        smtp_port = int(self.config.get('smtp_port', 25))
-        smtp_ssl = bool(self.config.get('smtp_ssl', True))
-        smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
-        if smtp_ssl:
-            smtp_connection.starttls()
-            smtp_connection.ehlo()
-        if self.config.get('smtp_username') or self.config.get('smtp_password'):
-            smtp_username = self.config.get('smtp_username')
-            smtp_password = kms_decrypt(self.config, self.logger, self.session, 'smtp_password')
-            smtp_connection.login(smtp_username, smtp_password)
-        smtp_connection.sendmail(message['From'], to_addrs, message.as_string())
-        smtp_connection.quit()
-
-    def set_mimetext_headers(self, message, subject, from_addr, to_addrs, cc_addrs, priority):
-        """Sets headers on Mimetext message"""
-
-        message['Subject'] = subject
-        message['From'] = from_addr
-        message['To'] = ', '.join(to_addrs)
-        if cc_addrs:
-            message['Cc'] = ', '.join(cc_addrs)
-
-        if priority and self.priority_header_is_valid(priority):
-            priority = PRIORITIES[str(priority)].copy()
-            for key in priority:
-                message[key] = priority[key]
-
-        return message
-
-    def get_mimetext_message(self, sqs_message, resources, to_addrs):
-        body = get_rendered_jinja(
-            to_addrs, sqs_message, resources, self.logger,
-            'template', 'default', self.config['templates_folders'])
-
-        if not body:
-            return None
-
-        email_format = sqs_message['action'].get('template_format', None)
-        if not email_format:
-            email_format = sqs_message['action'].get(
-                'template', 'default').endswith('html') and 'html' or 'plain'
-
-        message = self.set_mimetext_headers(
-            message=MIMEText(body, email_format, 'utf-8'),
-            subject=get_message_subject(sqs_message),
-            from_addr=sqs_message['action'].get('from', self.config['from_address']),
-            to_addrs=to_addrs,
-            cc_addrs=sqs_message['action'].get('cc', []),
-            priority=sqs_message['action'].get('priority_header', None),
-        )
-
-        return message
-
     def send_c7n_email(self, sqs_message, email_to_addrs, mimetext_msg):
         try:
             # if smtp_server is set in mailer.yml, send through smtp
-            smtp_server = self.config.get('smtp_server')
-            if smtp_server:
-                self.send_smtp_email(smtp_server, mimetext_msg, email_to_addrs)
+            if 'smtp_server' in self.config:
+                smtp_delivery = SmtpDelivery(config=self.config,
+                                             session=self.session,
+                                             logger=self.logger)
+                smtp_delivery.send_message(message=mimetext_msg, to_addrs=email_to_addrs)
             # if smtp_server isn't set in mailer.yml, use aws ses normally.
             else:
                 self.aws_ses.send_raw_email(RawMessage={'Data': mimetext_msg.as_string()})
@@ -328,36 +232,3 @@ class EmailDelivery(object):
             str(len(sqs_message['resources'])),
             sqs_message['action'].get('template', 'default'),
             email_to_addrs))
-
-    # https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html
-    def get_aws_username_from_event(self, event):
-        if event is None:
-            return None
-        identity = event.get('detail', {}).get('userIdentity', {})
-        if not identity:
-            self.logger.warning("Could not get recipient from event \n %s" % (
-                format_struct(event)))
-            return None
-        if identity['type'] == 'AssumedRole':
-            self.logger.debug(
-                'In some cases there is no ldap uid is associated with AssumedRole: %s',
-                identity['arn'])
-            self.logger.debug(
-                'We will try to assume that identity is in the AssumedRoleSessionName')
-            user = identity['arn'].rsplit('/', 1)[-1]
-            if user is None or user.startswith('i-') or user.startswith('awslambda'):
-                return None
-            if ':' in user:
-                user = user.split(':', 1)[-1]
-            return user
-        if identity['type'] == 'IAMUser' or identity['type'] == 'WebIdentityUser':
-            return identity['userName']
-        if identity['type'] == 'Root':
-            return None
-        # this conditional is left here as a last resort, it should
-        # be better documented with an example UserIdentity json
-        if ':' in identity['principalId']:
-            user_id = identity['principalId'].split(':', 1)[-1]
-        else:
-            user_id = identity['principalId']
-        return user_id

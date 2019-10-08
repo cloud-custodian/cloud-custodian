@@ -18,11 +18,13 @@ from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session
+from c7n.resources import account
 from jsonschema.exceptions import ValidationError
 
 import datetime
 from dateutil import parser
 import json
+import mock
 import time
 
 from .test_offhours import mock_datetime_now
@@ -81,6 +83,46 @@ class AccountTests(BaseTest):
             session_factory=session_factory, config=cfg)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_enable_encryption_by_default(self):
+        factory = self.replay_flight_data('test_account_ebs_encrypt')
+        p = self.load_policy({
+            'name': 'account',
+            'resource': 'account',
+            'filters': [{
+                'type': 'default-ebs-encryption',
+                'state': False}],
+            'actions': [{
+                'type': 'set-ebs-encryption',
+                'state': True,
+                'key': 'alias/aws/ebs'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(factory).client('ec2')
+        self.assertTrue(
+            client.get_ebs_encryption_by_default().get(
+                'EbsEncryptionByDefault'))
+
+    def test_disable_encryption_by_default(self):
+        factory = self.replay_flight_data('test_account_disable_ebs_encrypt')
+        p = self.load_policy({
+            'name': 'account',
+            'resource': 'account',
+            'filters': [{
+                'type': 'default-ebs-encryption',
+                'key': 'alias/aws/ebs',
+                'state': True}],
+            'actions': [{
+                'type': 'set-ebs-encryption',
+                'state': False}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(factory).client('ec2')
+        self.assertFalse(
+            client.get_ebs_encryption_by_default().get(
+                'EbsEncryptionByDefault'))
 
     def test_guard_duty_filter(self):
         factory = self.replay_flight_data('test_account_guard_duty_filter')
@@ -312,6 +354,23 @@ class AccountTests(BaseTest):
         with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
             resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_service_limit_poll_status(self):
+
+        client = mock.MagicMock()
+        client.describe_trusted_advisor_check_result.side_effect = [
+            {'result': {'status': 'not_available'}},
+            {'result': True}]
+        client.describe_trusted_advisor_check_refresh_statuses.return_value = {
+            'statuses': [{'status': 'success'}]}
+
+        def time_sleep(interval):
+            return
+
+        self.patch(account.time, 'sleep', time_sleep)
+        self.assertEqual(
+            account.ServiceLimit.get_check_result(client, account.ServiceLimit.check_id),
+            True)
 
     def test_service_limit(self):
         session_factory = self.replay_flight_data("test_account_service_limit")
@@ -733,6 +792,60 @@ class AccountTests(BaseTest):
             session_factory=session_factory,
         )
         self.assertEqual(len(p.run()), 1)
+
+    def test_glue_catalog_encrypted_filter(self):
+        session_factory = self.replay_flight_data("test_account_glue_encyption_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-security-config",
+                "resource": "account",
+                'filters': [{
+                    'type': 'glue-security-config',
+                    'CatalogEncryptionMode': 'SSE-KMS'},
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+    def test_glue_password_encryption_setting(self):
+        session_factory = self.replay_flight_data("test_account_glue_encyption_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-security-config",
+                "resource": "account",
+                'filters': [{
+                    'type': 'glue-security-config',
+                    'SseAwsKmsKeyId': 'alias/aws/glue'},
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+    def test_glue_connection_password_encryption(self):
+        session_factory = self.replay_flight_data("test_account_glue_connection_password_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-security-config",
+                "resource": "account",
+                'filters': [{
+                    'type': 'glue-security-config',
+                    'AwsKmsKeyId': 'alias/skunk/trails'},
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
 
 
 class AccountDataEvents(BaseTest):

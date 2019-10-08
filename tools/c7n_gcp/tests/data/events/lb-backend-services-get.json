@@ -1,0 +1,52 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "yauhen_shaliou@comelfo.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.21.63.2",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-03T16:11:50.661Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "v1.compute.backendServices.get",
+    "authorizationInfo": [
+      {
+        "permission": "compute.backendServices.get",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/custodian-test-project-0/global/backendServices/common-backend-service-0",
+          "type": "compute.backendServices"
+        }
+      }
+    ],
+    "resourceName": "projects/custodian-test-project-0/global/backendServices/common-backend-service-0",
+    "request": {
+      "@type": "type.googleapis.com/compute.backendServices.get"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "global"
+      ]
+    }
+  },
+  "insertId": "7ruf21decey",
+  "resource": {
+    "type": "gce_backend_service",
+    "labels": {
+      "backend_service_id": "",
+      "location": "global",
+      "project_id": "custodian-test-project-0"
+    }
+  },
+  "timestamp": "2019-05-03T16:11:50.614Z",
+  "severity": "INFO",
+  "logName": "projects/custodian-test-project-0/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2019-05-03T16:11:51.247938428Z"
+}

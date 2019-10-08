@@ -13,7 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
 import jmespath
 import json
 import six
@@ -22,14 +21,14 @@ from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
 from concurrent.futures import as_completed
 
-from c7n.actions import BaseAction, RemovePolicyBase
+from c7n.actions import BaseAction, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query
 from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, generate_arn
+from c7n.utils import local_session, type_schema
 
 ErrAccessDenied = "AccessDeniedException"
 
@@ -37,30 +36,16 @@ ErrAccessDenied = "AccessDeniedException"
 @resources.register('lambda')
 class AWSLambda(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'lambda'
-        type = 'function'
+        arn_type = 'function'
+        arn_separator = ":"
         enum_spec = ('list_functions', 'Functions', None)
         name = id = 'FunctionName'
-        filter_name = None
         date = 'LastModified'
         dimension = 'FunctionName'
         config_type = "AWS::Lambda::Function"
         universal_taggable = object()
-
-    @property
-    def generate_arn(self):
-        """ Generates generic arn if ID is not already arn format.
-        """
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                self.get_model().service,
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type=self.get_model().type,
-                separator=':')
-        return self._generate_arn
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -124,6 +109,7 @@ class ReservedConcurrency(ValueFilter):
     annotation_key = "c7n:FunctionInfo"
     value_key = '"c7n:FunctionInfo".Concurrency.ReservedConcurrentExecutions'
     schema = type_schema('reserved-concurrency', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('lambda:GetFunction',)
 
     def validate(self):
@@ -195,6 +181,7 @@ class LambdaEventSource(ValueFilter):
 
     annotation_key = "c7n:EventSources"
     schema = type_schema('event-source', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('lambda:GetPolicy',)
 
     def process(self, resources, event=None):
@@ -407,6 +394,26 @@ class Delete(BaseAction):
         self.log.debug("Deleted %d functions", len(functions))
 
 
+@AWSLambda.action_registry.register('modify-security-groups')
+class LambdaModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+
+    permissions = ("lambda:UpdateFunctionConfiguration",)
+
+    def process(self, functions):
+        client = local_session(self.manager.session_factory).client('lambda')
+        groups = super(LambdaModifyVpcSecurityGroups, self).get_groups(
+            functions)
+
+        for idx, i in enumerate(functions):
+            if 'VpcConfig' not in i:  # only continue if Lambda func is VPC-enabled
+                continue
+            try:
+                client.update_function_configuration(FunctionName=i['FunctionName'],
+                                            VpcConfig={'SecurityGroupIds': groups[idx]})
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
 @resources.register('lambda-layer')
 class LambdaLayerVersion(query.QueryResourceManager):
     """Note custodian models the lambda layer version.
@@ -430,15 +437,13 @@ class LambdaLayerVersion(query.QueryResourceManager):
 
     """
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'lambda'
-        type = 'function'
         enum_spec = ('list_layers', 'Layers', None)
         name = id = 'LayerName'
-        filter_name = None
         date = 'CreatedDate'
-        dimension = None
-        config_type = None
+        arn = "LayerVersionArn"
+        arn_type = "layer"
 
     def augment(self, resources):
         versions = {}

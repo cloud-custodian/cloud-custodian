@@ -28,6 +28,8 @@ import time
 import unittest
 import zipfile
 
+import mock
+
 from c7n.mu import (
     custodian_archive,
     LambdaFunction,
@@ -37,10 +39,13 @@ from c7n.mu import (
     CloudWatchLogSubscription,
     SNSSubscription,
     SQSSubscription,
+    CloudWatchEventSource
 )
+
 from c7n.policy import Policy
 from c7n.ufuncs import logsub
-from .common import BaseTest, event_data, functional, Bag, TestConfig as Config
+from .common import (
+    BaseTest, event_data, functional, Bag, ACCOUNT_ID, TestConfig as Config)
 from .data import helloworld
 
 
@@ -540,6 +545,44 @@ class PolicyLambdaProvision(BaseTest):
             },
         )
 
+    def test_cwe_security_hub_action(self):
+        factory = self.replay_flight_data('test_mu_cwe_sechub_action')
+        p = self.load_policy({
+            'name': 'sechub',
+            'resource': 'account',
+            'mode': {
+                'type': 'hub-action'}},
+            session_factory=factory,
+            config={'account_id': ACCOUNT_ID})
+        mu_policy = PolicyLambda(p)
+        events = mu_policy.get_events(factory)
+        self.assertEqual(len(events), 1)
+        hub_action = events.pop()
+        hub_action.cwe = cwe = mock.Mock(CloudWatchEventSource)
+        cwe.get.return_value = False
+        cwe.update.return_value = True
+        cwe.add.return_value = True
+
+        self.assertEqual(repr(hub_action), "<SecurityHub Action sechub>")
+        self.assertEqual(
+            hub_action._get_arn(),
+            "arn:aws:securityhub:us-east-1:644160558196:action/custom/sechub")
+        self.assertEqual(
+            hub_action.get(mu_policy.name), {'event': False, 'action': None})
+        hub_action.add(mu_policy)
+        self.assertEqual(
+            {'event': False,
+             'action': {
+                 'ActionTargetArn': ('arn:aws:securityhub:us-east-1:'
+                                     '644160558196:action/custom/sechub'),
+                 'Name': 'Account sechub', 'Description': 'sechub'}},
+            hub_action.get(mu_policy.name))
+        hub_action.update(mu_policy)
+        hub_action.remove(mu_policy)
+        self.assertEqual(
+            hub_action.get(mu_policy.name),
+            {'event': False, 'action': None})
+
     def test_cwe_schedule(self):
         session_factory = self.replay_flight_data("test_cwe_schedule", zdata=True)
         p = Policy(
@@ -811,29 +854,29 @@ class PolicyLambdaProvision(BaseTest):
 
 class PythonArchiveTest(unittest.TestCase):
 
-    def make_archive(self, *a, **kw):
-        archive = self.make_open_archive(*a, **kw)
+    def make_archive(self, modules=(), cache_file=None):
+        archive = self.make_open_archive(modules, cache_file=cache_file)
         archive.close()
         return archive
 
-    def make_open_archive(self, *a, **kw):
-        archive = PythonPackageArchive(*a, **kw)
+    def make_open_archive(self, modules=(), cache_file=None):
+        archive = PythonPackageArchive(modules=modules, cache_file=cache_file)
         self.addCleanup(archive.remove)
         return archive
 
-    def get_filenames(self, *a, **kw):
-        return self.make_archive(*a, **kw).get_filenames()
+    def get_filenames(self, modules=()):
+        return self.make_archive(modules).get_filenames()
 
     def test_handles_stdlib_modules(self):
-        filenames = self.get_filenames("webbrowser")
+        filenames = self.get_filenames(["webbrowser"])
         self.assertTrue("webbrowser.py" in filenames)
 
     def test_handles_third_party_modules(self):
-        filenames = self.get_filenames("botocore")
+        filenames = self.get_filenames(["botocore"])
         self.assertTrue("botocore/__init__.py" in filenames)
 
     def test_handles_packages(self):
-        filenames = self.get_filenames("c7n")
+        filenames = self.get_filenames(["c7n"])
         self.assertTrue("c7n/__init__.py" in filenames)
         self.assertTrue("c7n/resources/s3.py" in filenames)
         self.assertTrue("c7n/ufuncs/s3crypt.py" in filenames)
@@ -882,13 +925,13 @@ class PythonArchiveTest(unittest.TestCase):
 
         self.assertEqual(foo, 42)
 
-        filenames = self.get_filenames("namespace_package")
+        filenames = self.get_filenames(["namespace_package"])
         self.assertTrue("namespace_package/__init__.py" not in filenames)
         self.assertTrue("namespace_package/subpackage/__init__.py" in filenames)
         self.assertTrue(filenames[-1].endswith("-nspkg.pth"))
 
     def test_excludes_non_py_files(self):
-        filenames = self.get_filenames("ctypes")
+        filenames = self.get_filenames(["ctypes"])
         self.assertTrue("README.ctypes" not in filenames)
 
     def test_cant_get_bytes_when_open(self):
@@ -947,7 +990,7 @@ class PythonArchiveTest(unittest.TestCase):
             self.assertEqual(info.external_attr & world_readable, world_readable)
 
     def test_files_are_all_readable(self):
-        self.check_world_readable(self.make_archive("c7n"))
+        self.check_world_readable(self.make_archive(["c7n"]))
 
     def test_even_unreadable_files_become_readable(self):
         path = self.make_file()
@@ -963,6 +1006,17 @@ class PythonArchiveTest(unittest.TestCase):
         archive.add_contents(info, "foo.txt")
         archive.close()
         self.assertRaises(AssertionError, self.check_world_readable, archive)
+
+    def test_cache_zip_file(self):
+        archive = self.make_archive(cache_file=os.path.join(os.path.dirname(__file__),
+                                                            "data",
+                                                            "test.zip"))
+
+        self.assertTrue("cheese.txt" in archive.get_filenames())
+        self.assertTrue("cheese/is/yummy.txt" in archive.get_filenames())
+        with archive.get_reader() as reader:
+            self.assertEqual(b"So yummy!", reader.read("cheese.txt"))
+            self.assertEqual(b"True!", reader.read("cheese/is/yummy.txt"))
 
 
 class PycCase(unittest.TestCase):
@@ -1012,13 +1066,13 @@ class Constructor(PycCase):
         else:
             # ... we refuse it.
             with self.assertRaises(ValueError) as raised:
-                PythonPackageArchive("bar")
+                PythonPackageArchive(modules=["bar"])
             msg = raised.exception.args[0]
             self.assertTrue(msg.startswith("Could not find a *.py source file"))
             self.assertTrue(msg.endswith("bar.pyc"))
 
         # We readily ignore a *.pyc if a *.py exists.
-        archive = PythonPackageArchive("foo")
+        archive = PythonPackageArchive(modules=["foo"])
         archive.close()
         self.assertEqual(archive.get_filenames(), ["foo.py"])
         with archive.get_reader() as reader:

@@ -15,9 +15,9 @@
 from __future__ import print_function
 
 import click
-import yaml
 import os
 from c7n.credentials import assumed_session, SessionFactory
+from c7n.utils import yaml_dump
 
 ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
 
@@ -58,6 +58,9 @@ def main(role, ou, assume, profile, output, regions, active):
         for idx, _ in enumerate(path_parts):
             tags.append("path:/%s" % "/".join(path_parts[:idx + 1]))
 
+        for tag in list_tags_for_account(client, a['Id']):
+            tags.append("{}:{}".format(tag.get('Key'), tag.get('Value')))
+
         ainfo = {
             'account_id': a['Id'],
             'email': a['Email'],
@@ -65,14 +68,10 @@ def main(role, ou, assume, profile, output, regions, active):
             'tags': tags,
             'role': role.format(**a)}
         if regions:
-            ainfo['regions'] = regions
+            ainfo['regions'] = list(regions)
         results.append(ainfo)
 
-    print(
-        yaml.safe_dump(
-            {'accounts': results},
-            default_flow_style=False),
-        file=output)
+    print(yaml_dump({'accounts': results}), file=output)
 
 
 def get_session(role, session_name, profile):
@@ -137,6 +136,17 @@ def get_accounts_for_ou(client, ou, active, recursive=True):
                     results.append(a)
             else:
                 results.append(a)
+    return results
+
+
+def list_tags_for_account(client, id):
+    results = []
+
+    tags_pager = client.get_paginator('list_tags_for_resource')
+    for tag in tags_pager.paginate(
+        ResourceId=id).build_full_result().get(
+            'Tags', []):
+        results.append(tag)
     return results
 
 

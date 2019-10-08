@@ -1,0 +1,288 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 24 May 2019 18:12:28 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "227"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units",
+                        "name": "cloud-custodian-test-deployment-units",
+                        "location": "westus",
+                        "properties": {
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale?api-version=2018-02-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Fri, 24 May 2019 18:12:40 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1427"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                        "name": "cloud-custodian-test-autoscale",
+                        "type": "Microsoft.Web/serverfarms",
+                        "kind": "linux",
+                        "location": "West US",
+                        "properties": {
+                            "serverFarmId": 26304,
+                            "name": "cloud-custodian-test-autoscale",
+                            "workerSize": "Default",
+                            "workerSizeId": 0,
+                            "workerTierName": null,
+                            "numberOfWorkers": 1,
+                            "currentWorkerSize": "Default",
+                            "currentWorkerSizeId": 0,
+                            "currentNumberOfWorkers": 1,
+                            "status": "Ready",
+                            "webSpace": "cloud-custodian-test-deployment-units-WestUSwebspace",
+                            "subscription": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                            "adminSiteName": null,
+                            "hostingEnvironment": null,
+                            "hostingEnvironmentProfile": null,
+                            "maximumNumberOfWorkers": 3,
+                            "planName": "VirtualDedicatedPlan",
+                            "adminRuntimeSiteName": null,
+                            "computeMode": "Dedicated",
+                            "siteMode": null,
+                            "geoRegion": "West US",
+                            "perSiteScaling": false,
+                            "maximumElasticWorkerCount": 1,
+                            "numberOfSites": 0,
+                            "hostingEnvironmentId": null,
+                            "isSpot": false,
+                            "spotExpirationTime": null,
+                            "freeOfferExpirationTime": "2019-06-23T18:12:34.0133333",
+                            "tags": null,
+                            "kind": "linux",
+                            "resourceGroup": "cloud-custodian-test-deployment-units",
+                            "reserved": true,
+                            "isXenon": false,
+                            "hyperV": false,
+                            "mdmId": "waws-prod-bay-081_26304",
+                            "targetWorkerCount": 0,
+                            "targetWorkerSizeId": 0,
+                            "provisioningState": "Succeeded",
+                            "webSiteId": null
+                        },
+                        "sku": {
+                            "name": "B1",
+                            "tier": "Basic",
+                            "size": "B1",
+                            "family": "B",
+                            "capacity": 1
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default?api-version=2015-04-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 24 May 2019 18:12:51 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1346"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default",
+                        "name": "cloud_custodian_default",
+                        "type": "Microsoft.Insights/autoscaleSettings",
+                        "location": "West US",
+                        "tags": {
+                            "$type": "Microsoft.WindowsAzure.Management.Common.Storage.CasePreservedDictionary, Microsoft.WindowsAzure.Management.Common.Storage"
+                        },
+                        "properties": {
+                            "profiles": [
+                                {
+                                    "name": "Cloud Custodian auto created scale condition",
+                                    "capacity": {
+                                        "minimum": "1",
+                                        "maximum": "2",
+                                        "default": "1"
+                                    },
+                                    "rules": [
+                                        {
+                                            "metricTrigger": {
+                                                "metricName": "MemoryPercentage",
+                                                "metricNamespace": "",
+                                                "metricResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                                                "timeGrain": "PT1M",
+                                                "statistic": "Average",
+                                                "timeWindow": "PT10M",
+                                                "timeAggregation": "Average",
+                                                "operator": "GreaterThan",
+                                                "threshold": 80.0,
+                                                "dimensions": null
+                                            },
+                                            "scaleAction": {
+                                                "direction": "Increase",
+                                                "type": "ChangeCount",
+                                                "value": "1",
+                                                "cooldown": "PT5M"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ],
+                            "enabled": false,
+                            "name": "cloud_custodian_default",
+                            "targetResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                            "notifications": null
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default?api-version=2015-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 24 May 2019 18:12:52 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1346"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/autoscalesettings/cloud_custodian_default",
+                        "name": "cloud_custodian_default",
+                        "type": "Microsoft.Insights/autoscaleSettings",
+                        "location": "West US",
+                        "tags": {
+                            "$type": "Microsoft.WindowsAzure.Management.Common.Storage.CasePreservedDictionary, Microsoft.WindowsAzure.Management.Common.Storage"
+                        },
+                        "properties": {
+                            "profiles": [
+                                {
+                                    "name": "Cloud Custodian auto created scale condition",
+                                    "capacity": {
+                                        "minimum": "1",
+                                        "maximum": "2",
+                                        "default": "1"
+                                    },
+                                    "rules": [
+                                        {
+                                            "metricTrigger": {
+                                                "metricName": "MemoryPercentage",
+                                                "metricNamespace": "",
+                                                "metricResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                                                "timeGrain": "PT1M",
+                                                "statistic": "Average",
+                                                "timeWindow": "PT10M",
+                                                "timeAggregation": "Average",
+                                                "operator": "GreaterThan",
+                                                "threshold": 80.0,
+                                                "dimensions": null
+                                            },
+                                            "scaleAction": {
+                                                "direction": "Increase",
+                                                "type": "ChangeCount",
+                                                "value": "1",
+                                                "cooldown": "PT5M"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ],
+                            "enabled": false,
+                            "name": "cloud_custodian_default",
+                            "targetResourceUri": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Web/serverfarms/cloud-custodian-test-autoscale",
+                            "notifications": null
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -55,13 +55,16 @@ class LambdaInvoke(EventAction):
     schema = {
         'type': 'object',
         'required': ['type', 'function'],
+        'additionalProperties': False,
         'properties': {
             'type': {'enum': ['invoke-lambda']},
             'function': {'type': 'string'},
+            'region': {'type': 'string'},
             'async': {'type': 'boolean'},
             'qualifier': {'type': 'string'},
             'batch_size': {'type': 'integer'},
             'timeout': {'type': 'integer'},
+            'vars': {'type': 'object'},
         }
     }
 
@@ -75,7 +78,8 @@ class LambdaInvoke(EventAction):
         if self.data.get('async', True):
             params['InvocationType'] = 'Event'
 
-        config = Config(read_timeout=self.data.get('timeout', 90))
+        config = Config(read_timeout=self.data.get(
+            'timeout', 90), region_name=self.data.get('region', None))
         client = utils.local_session(
             self.manager.session_factory).client('lambda', config=config)
 

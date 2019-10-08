@@ -1,0 +1,18 @@
+{
+  "headers": {},
+  "body": {
+    "kind": "compute#operation",
+    "id": "3363351370872481828",
+    "id": "1111111111111111111",
+    "name": "operation-1560336074586-58b1e0d74baa3-04df733d-fbeb276b",
+    "operationType": "delete",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images/image-1",
+    "targetId": "1111111111111111111",
+    "status": "RUNNING",
+    "user": "kapilt@gmail.com",
+    "progress": 0,
+    "insertTime": "2019-06-12T03:41:15.245-07:00",
+    "startTime": "2019-06-12T03:41:15.255-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/operation-1560336074586-58b1e0d74baa3-04df733d-fbeb276b"
+  }
+}

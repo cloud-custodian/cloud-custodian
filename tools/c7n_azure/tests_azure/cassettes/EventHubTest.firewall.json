@@ -1,0 +1,118 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.EventHub/namespaces?api-version=2017-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "server-sb": [
+                        "Service-Bus-Resource-Provider/CH3"
+                    ],
+                    "date": [
+                        "Wed, 07 Aug 2019 23:30:25 GMT"
+                    ],
+                    "content-length": [
+                        "731"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard",
+                                    "tier": "Standard",
+                                    "capacity": 1
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_eventhub/providers/Microsoft.EventHub/namespaces/offkxd3qjwh6a-cctesteventhubns",
+                                "name": "offkxd3qjwh6a-cctesteventhubns",
+                                "type": "Microsoft.EventHub/Namespaces",
+                                "location": "West US 2",
+                                "tags": {},
+                                "properties": {
+                                    "isAutoInflateEnabled": false,
+                                    "maximumThroughputUnits": 0,
+                                    "kafkaEnabled": false,
+                                    "provisioningState": "Succeeded",
+                                    "metricId": "aa98974b-5d2a-4d98-a78a-382f3715d07e:offkxd3qjwh6a-cctesteventhubns",
+                                    "createdAt": "2019-08-07T22:27:21.56Z",
+                                    "updatedAt": "2019-08-07T22:28:10.517Z",
+                                    "serviceBusEndpoint": "https://offkxd3qjwh6a-cctesteventhubns.servicebus.windows.net:443/",
+                                    "status": "Active"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_eventhub/providers/Microsoft.EventHub/namespaces/offkxd3qjwh6a-cctesteventhubns/networkRuleSets/default?api-version=2017-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "server-sb": [
+                        "Service-Bus-Resource-Provider/CH3"
+                    ],
+                    "date": [
+                        "Wed, 07 Aug 2019 23:30:26 GMT"
+                    ],
+                    "content-length": [
+                        "435"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_eventhub/providers/Microsoft.EventHub/namespaces/offkxd3qjwh6a-cctesteventhubns/networkRuleSets/default",
+                        "name": "default",
+                        "type": "Microsoft.EventHub/Namespaces/NetworkRuleSets",
+                        "location": "West US 2",
+                        "properties": {
+                            "defaultAction": "Deny",
+                            "virtualNetworkRules": [],
+                            "ipRules": [
+                                {
+                                    "ipMask": "10.1.1.1",
+                                    "action": "Allow"
+                                },
+                                {
+                                    "ipMask": "11.0.0.0/24",
+                                    "action": "Allow"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

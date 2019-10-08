@@ -19,34 +19,31 @@ from botocore.paginate import Paginator
 from c7n.actions import BaseAction
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, RetryPageIterator
+from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
 from c7n.utils import local_session, type_schema, get_retry
 
 
 @resources.register('shield-protection')
 class ShieldProtection(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'shield'
         enum_spec = ('list_protections', 'Protections', None)
         id = 'Id'
         name = 'Name'
-        dimension = None
-        filter_name = None
         arn = False
 
 
 @resources.register('shield-attack')
 class ShieldAttack(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'shield'
         enum_spec = ('list_attacks', 'Attacks', None)
         detail_spec = (
             'describe_attack', 'AttackId', 'AttackId', 'Attack')
         name = id = 'AttackId'
         date = 'StartTime'
-        dimension = None
         filter_name = 'ResourceArns'
         filter_type = 'list'
         arn = False
@@ -67,7 +64,7 @@ def get_type_protections(client, model):
     except client.exceptions.ResourceNotFoundException:
         # shield is not enabled in the account, so all resources are not protected
         return []
-    return [p for p in protections if model.type in p['ResourceArn']]
+    return [p for p in protections if model.arn_type in p['ResourceArn']]
 
 
 ShieldRetry = get_retry(('ThrottlingException',))
@@ -88,8 +85,7 @@ class IsShieldProtected(Filter):
         state = self.data.get('state', False)
         results = []
 
-        for r in resources:
-            arn = self.manager.get_arn(r)
+        for arn, r in zip(self.manager.get_arns(resources), resources):
             r['c7n:ShieldProtected'] = shielded = arn in protected_resources
             if shielded and state:
                 results.append(r)
@@ -121,8 +117,7 @@ class SetShieldProtection(BaseAction):
         if self.data.get('sync', False):
             self.clear_stale(client, protections)
 
-        for r in resources:
-            arn = self.manager.get_arn(r)
+        for arn, r in zip(self.manager.get_arns(resources), resources):
             if state and arn in protected_resources:
                 continue
             if state is False and arn in protected_resources:
@@ -143,7 +138,7 @@ class SetShieldProtection(BaseAction):
         # Get all resources unfiltered
         resources = self.manager.get_resource_manager(
             self.manager.type).resources()
-        resource_arns = set(map(self.manager.get_arn, resources))
+        resource_arns = set(self.manager.get_arns(resources))
 
         pmap = {}
         # Only process stale resources in region for non global resources.

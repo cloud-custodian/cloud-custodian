@@ -9,12 +9,12 @@ LABEL name="c7n-org" \
 # Transfer Custodian source into container by directory
 # to minimize size.
 # Note: build root is the root of the checkout.
-ADD setup.py README.rst requirements.txt /src/
+ADD setup.py README.md requirements.txt /src/
 ADD c7n /src/c7n/
 ADD tools /src/tools/
 
 WORKDIR /src
-
+RUN adduser --disabled-login custodian
 RUN apt-get --yes update && apt-get --yes upgrade \
  && apt-get --yes install build-essential \
  && pip3 install -r requirements.txt  . \
@@ -26,7 +26,14 @@ RUN apt-get --yes update && apt-get --yes upgrade \
  && rm -Rf /var/cache/apt/ \
  && rm -Rf /var/lib/apt/lists/* \
  && rm -Rf /src/ \
- && rm -Rf /root/.cache/
+ && rm -Rf /root/.cache/ \
+ && mkdir /output \
+ && chown custodian: /output
 
+USER custodian
+WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
+VOLUME ["/home/custodian"]
 ENTRYPOINT ["/usr/local/bin/c7n-org"]
+CMD ["--help"]
+

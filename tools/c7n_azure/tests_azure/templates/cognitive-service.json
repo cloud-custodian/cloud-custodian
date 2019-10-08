@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "accounts_cctest_cog_serv_name": {
+            "defaultValue": "cctest-cog-serv",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/tabarlow/providers/Microsoft.CognitiveServices/accounts/cctest-cog-serv'.",
+            "type": "Microsoft.CognitiveServices/accounts",
+            "sku": {
+                "name": "F0"
+            },
+            "kind": "TextTranslation",
+            "name": "[parameters('accounts_cctest_cog_serv_name')]",
+            "apiVersion": "2016-02-01-preview",
+            "location": "global",
+            "scale": null,
+            "properties": {},
+            "dependsOn": []
+        }
+    ]
+}

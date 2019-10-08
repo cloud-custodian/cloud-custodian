@@ -52,7 +52,7 @@ class FunctionTest(BaseTest):
 
     def test_deploy_function(self):
         factory = self.replay_flight_data('mu-deploy')
-        manager = mu.CloudFunctionManager(factory)
+        manager = mu.CloudFunctionManager(factory, 'us-central1')
         func = self.get_function(factory=factory)
         manager.publish(func)
         func_info = manager.get(func.name)
@@ -94,7 +94,12 @@ class FunctionTest(BaseTest):
         self.addCleanup(shutil.rmtree, tmp_dir)
 
     def test_abstract_gcp_mode(self):
-        p = self.load_policy({'name': 'instance', 'resource': 'gcp.instance'})
+        # this will fetch a discovery
+        factory = self.replay_flight_data(
+            'mu-gcp-abstract', project_id='test-226520')
+        p = self.load_policy({
+            'name': 'instance', 'resource': 'gcp.instance'},
+            session_factory=factory)
         exec_mode = policy.FunctionMode(p)
         self.assertRaises(NotImplementedError, exec_mode.run)
         self.assertRaises(NotImplementedError, exec_mode.provision)

@@ -1,0 +1,263 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?$filter=resourceType%20eq%20%27Microsoft.KeyVault%2Fvaults%27&api-version=2015-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "514"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Aug 2019 21:00:08 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
+                                "name": "cckeyvault1c6ra5qqpkhceo",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys?api-version=7.0",
+                "body": "",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47\", resource=\"https://vault.azure.net\""
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "87"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Aug 2019 21:00:09 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Unauthorized",
+                            "message": "Request is missing a Bearer or PoP token."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys?api-version=7.0",
+                "body": "",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "816"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Aug 2019 21:00:09 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kid": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys/cctest1",
+                                "attributes": {
+                                    "enabled": true,
+                                    "nbf": 1566243128,
+                                    "exp": 1597866128,
+                                    "created": 1566243729,
+                                    "updated": 1566243729,
+                                    "recoveryLevel": "Purgeable"
+                                },
+                                "managed": true
+                            },
+                            {
+                                "kid": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys/cctest2",
+                                "attributes": {
+                                    "enabled": true,
+                                    "nbf": 1566243144,
+                                    "exp": 1597866144,
+                                    "created": 1566243744,
+                                    "updated": 1566243744,
+                                    "recoveryLevel": "Purgeable"
+                                },
+                                "managed": true
+                            },
+                            {
+                                "kid": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys/cctestec",
+                                "attributes": {
+                                    "enabled": true,
+                                    "created": 1566243707,
+                                    "updated": 1566243707,
+                                    "recoveryLevel": "Purgeable"
+                                }
+                            },
+                            {
+                                "kid": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys/cctestrsa",
+                                "attributes": {
+                                    "enabled": true,
+                                    "created": 1566243705,
+                                    "updated": 1566243705,
+                                    "recoveryLevel": "Purgeable"
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys/cctestec/?api-version=7.0",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "366"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Aug 2019 21:00:09 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "key": {
+                            "kid": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys/cctestec/5dfccde158124447b0ae6a8cb1689956",
+                            "kty": "EC",
+                            "key_ops": [
+                                "sign",
+                                "verify"
+                            ],
+                            "crv": "P-256",
+                            "x": "jx_Gb1Oe4AYCGKqpibVbhG5vfrmCZc8NiOe5JEGS4Mw",
+                            "y": "ebEVpiFJuIB05fbcf0Ebl9I30a6gZNb71BivmOP7yhc"
+                        },
+                        "attributes": {
+                            "enabled": true,
+                            "created": 1566243707,
+                            "updated": 1566243707,
+                            "recoveryLevel": "Purgeable"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys/cctestrsa/?api-version=7.0",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "656"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Aug 2019 21:00:10 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "key": {
+                            "kid": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/keys/cctestrsa/6883593658c340d1a4640cad13bb0581",
+                            "kty": "RSA",
+                            "key_ops": [
+                                "encrypt",
+                                "decrypt",
+                                "sign",
+                                "verify",
+                                "wrapKey",
+                                "unwrapKey"
+                            ],
+                            "n": "6xWHxxY2jPab8RWbRxdVTIIAkHU98e9aByM8fZJNzk8iwGSIhHsRHN1ajQyZ83zSbD4Dj0tXLSTx_LDI1J2cB-4Q_oZW3vjXbFJBx5hj8iqCx6MH7CTFZW1J5rOlsIDENh_w8MK0rSRdjm9cJnRVtlHtwKlDlvwpkkB5r4mJec9huO8uO1u-8HIbm9L3KpA-CVlo-new5oO6iDVRe9A8Mj4YSp6T0brrJs_05bYrlwY0JLJ5AYuykSz1IVui5YfCyIVKYYNMtq_micgDpEwfKQ_DbJpoMRcttFE4k_xormSFAIFKbTcmhG453JCI7rApfDh3NFVthGB9zWfS8TjKEQ",
+                            "e": "AQAB"
+                        },
+                        "attributes": {
+                            "enabled": true,
+                            "created": 1566243705,
+                            "updated": 1566243705,
+                            "recoveryLevel": "Purgeable"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

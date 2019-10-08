@@ -1,0 +1,110 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "227"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 24 May 2019 18:36:57 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units",
+                        "name": "cloud-custodian-test-deployment-units",
+                        "location": "westus",
+                        "properties": {
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/components/cloud-custodian-test?api-version=2015-05-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "access-control-expose-headers": [
+                        "Request-Context"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:920e14b1-13f3-461a-a4bb-b4fe6f1a4525"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 24 May 2019 18:37:03 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "content-length": [
+                        "893"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/microsoft.insights/components/cloud-custodian-test",
+                        "name": "cloud-custodian-test",
+                        "type": "microsoft.insights/components",
+                        "location": "westus2",
+                        "tags": {},
+                        "kind": "web",
+                        "etag": "\"0200ee3b-0000-0600-0000-5ce839cc0000\"",
+                        "properties": {
+                            "Ver": "v2",
+                            "ApplicationId": "cloud-custodian-test",
+                            "AppId": "5558a5ac-24f9-403e-a167-6c91731d948c",
+                            "Application_Type": "web",
+                            "Flow_Type": null,
+                            "Request_Source": "IbizaWebAppExtensionCreate",
+                            "InstrumentationKey": "d0b4dcfa-3759-4b15-81e5-411c77d74d58",
+                            "Name": "cloud-custodian-test",
+                            "CreationDate": "2019-05-24T18:37:00.2622959+00:00",
+                            "PackageId": null,
+                            "TenantId": "00000000-0000-0000-0000-000000000003",
+                            "HockeyAppId": null,
+                            "HockeyAppToken": null,
+                            "provisioningState": "Succeeded",
+                            "SamplingPercentage": null,
+                            "CustomMetricsOptedInType": null,
+                            "Retention": null
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -99,7 +99,7 @@
                 "StorageEncrypted": false,
                 "DBInstanceClass": "db.m3.medium",
                 "DbInstancePort": 0,
-		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:oneness",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:oneness",
                 "DBInstanceIdentifier": "oneness"
             },
 
@@ -206,9 +206,9 @@
                 "DBInstanceClass": "db.m3.medium",
                 "DbInstancePort": 0,
                 "DBInstanceIdentifier": "sbbdev",
-		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:sbbdev"
-            },
-            {
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:sbbdev"
+              },
+              {
                 "PubliclyAccessible": false,
                 "MasterUsername": "dbadmin",
                 "MonitoringInterval": 0,
@@ -305,7 +305,7 @@
                 "DBInstanceClass": "db.m3.medium",
                 "DbInstancePort": 0,
                 "DBInstanceIdentifier": "qapipfitread",
-		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:qapipfitread"
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:qapipfitread"
             },
 
             {
@@ -416,7 +416,7 @@
                 "DBInstanceClass": "db.m3.medium",
                 "DbInstancePort": 0,
                 "DBInstanceIdentifier": "sbbdevslave",
-		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:sbbdevslave"
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:sbbdevslave"
             },
 
             {
@@ -517,7 +517,7 @@
                 "DBInstanceClass": "db.m3.2xlarge",
                 "DbInstancePort": 0,
                 "DBInstanceIdentifier": "qpsoaread",
-		"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:qpsoaread"
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:qpsoaread"
             }
 
         ],

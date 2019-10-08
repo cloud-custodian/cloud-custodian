@@ -14,31 +14,71 @@
 
 import uuid
 
+from c7n_azure.provider import resources
+from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.utils import StringUtils, PortsRangeHelper
+from msrestazure.azure_exceptions import CloudError
+
 from c7n.actions import BaseAction
 from c7n.filters import Filter, FilterValidationError
 from c7n.filters.core import PolicyValidationError
 from c7n.utils import type_schema
 
-from c7n_azure.provider import resources
-from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.utils import StringUtils, PortsRangeHelper
-
-from msrestazure.azure_exceptions import CloudError
-
 
 @resources.register('networksecuritygroup')
 class NetworkSecurityGroup(ArmResourceManager):
-    class resource_type(object):
+    """Network Security Group Resource
+
+    :example:
+
+    This policy will deny access to all ports that are NOT 22, 23 or 24
+    for all Network Security Groups
+
+    .. code-block:: yaml
+
+          policies:
+           - name: close-inbound-except-22-24
+             resource: azure.networksecuritygroup
+             filters:
+              - type: ingress
+                exceptPorts: '22-24'
+                match: 'any'
+                access: 'Allow'
+             actions:
+              - type: close
+                exceptPorts: '22-24'
+                direction: 'Inbound'
+
+    :example:
+
+    This policy will find all NSGs with port 80 opened and port 443 closed,
+    then it will open port 443
+
+    .. code-block:: yaml
+
+         policies:
+           - name: close-egress-except-TCP
+             resource: azure.networksecuritygroup
+             filters:
+              - type: ingress
+                ports: '80'
+                access: 'Allow'
+              - type: ingress
+                ports: '443'
+                access: 'Deny'
+             actions:
+              - type: open
+                ports: '443'
+
+    """
+
+    class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Networking']
+
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('network_security_groups', 'list_all', None)
-        id = 'id'
-        name = 'name'
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup'
-        )
+        resource_type = 'Microsoft.Network/networkSecurityGroups'
 
 
 DIRECTION = 'direction'
@@ -47,6 +87,7 @@ MATCH = 'match'
 EXCEPT_PORTS = 'exceptPorts'
 IP_PROTOCOL = 'ipProtocol'
 ACCESS = 'access'
+PREFIX = 'prefix'
 
 ALLOW_OPERATION = 'Allow'
 DENY_OPERATION = 'Deny'
@@ -142,7 +183,8 @@ class NetworkSecurityGroupPortsAction(BaseAction):
             PORTS: {'type': 'string'},
             EXCEPT_PORTS: {'type': 'string'},
             IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP', '*']},
-            DIRECTION: {'type': 'string', 'enum': ['Inbound', 'Outbound']}
+            DIRECTION: {'type': 'string', 'enum': ['Inbound', 'Outbound']},
+            PREFIX: {'type': 'string', 'maxLength': 44}  # 80 symbols limit, guid takes 36
         },
         'required': ['type', DIRECTION]
     }
@@ -173,6 +215,7 @@ class NetworkSecurityGroupPortsAction(BaseAction):
 
         ip_protocol = self.data.get(IP_PROTOCOL, '*')
         direction = self.data[DIRECTION]
+        prefix = self.data.get(PREFIX, 'c7n-policy-')
         # Build a list of ports described in the action.
         ports = PortsRangeHelper.get_ports_set_from_string(self.data.get(PORTS, '0-65535'))
         except_ports = PortsRangeHelper.get_ports_set_from_string(self.data.get(EXCEPT_PORTS, ''))
@@ -198,7 +241,7 @@ class NetworkSecurityGroupPortsAction(BaseAction):
             lowest_priority = rules[0]['properties']['priority'] if len(rules) > 0 else 4096
 
             # Create new top-priority rule to allow/block ports from the action.
-            rule_name = 'c7n-policy-' + str(uuid.uuid1())
+            rule_name = prefix + str(uuid.uuid1())
             new_rule = {
                 'name': rule_name,
                 'properties': {

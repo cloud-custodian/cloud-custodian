@@ -1,0 +1,205 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters":  {
+        "storageAccountName": {
+          "type": "string",
+          "defaultValue": "[concat('cctstorage', uniqueString(resourceGroup().id))]"
+        }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "name": "[parameters('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
+      "location": "South Central US",
+      "tags": {},
+      "properties": {},
+      "resources": [
+        {
+            "type": "blobServices/containers",
+            "apiVersion": "2018-07-01",
+            "name": "default/containerone",
+            "dependsOn": [
+                "[parameters('StorageAccountName')]"
+            ],
+            "properties": {
+                "publicAccess": "Container"
+            }
+        },
+        {
+            "type": "blobServices/containers",
+            "apiVersion": "2018-07-01",
+            "name": "default/containertwo",
+            "dependsOn": [
+                "[parameters('StorageAccountName')]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        }
+    ]
+    },
+    {
+      "name": "[concat('cclgstorage', uniqueString(resourceGroup().id))]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
+      "location": "South Central US",
+      "tags": {},
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-07-01",
+      "name": "[concat('ccipstorage', uniqueString(resourceGroup().id))]",
+      "location": "southcentralus",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "Storage",
+      "properties": {
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [
+            {
+              "value": "3.1.1.1",
+              "action": "Allow"
+            },
+            {
+              "value": "1.2.2.128/25",
+              "action": "Allow"
+            }
+          ],
+          "defaultAction": "Deny"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2018-12-01",
+      "name": "cctstoragevnet1",
+      "location": "South Central US",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+              "10.4.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "testsubnet1",
+            "properties": {
+              "addressPrefix": "10.4.0.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage",
+                  "locations": [
+                    "South Central US",
+                    "North Central US",
+                    "Brazil South"
+                  ]
+                }
+              ],
+              "delegations": []
+            }
+          }
+        ],
+        "virtualNetworkPeerings": [],
+        "enableDdosProtection": false,
+        "enableVmProtection": false
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2018-12-01",
+      "name": "cctstoragevnet1/testsubnet1",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'cctstoragevnet1')]"
+      ],
+      "properties": {
+        "addressPrefix": "10.4.0.0/24",
+        "serviceEndpoints": [
+          {
+            "service": "Microsoft.Storage",
+            "locations": [
+              "South Central US",
+              "North Central US",
+              "Brazil South"
+            ]
+          }
+        ],
+        "delegations": []
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2018-12-01",
+      "name": "cctstoragevnet2",
+      "location": "South Central US",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+              "10.4.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "testsubnet2",
+            "properties": {
+              "addressPrefix": "10.4.0.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage",
+                  "locations": [
+                    "South Central US",
+                    "North Central US",
+                    "Brazil South"
+                  ]
+                }
+              ],
+              "delegations": []
+            }
+          }
+        ],
+        "virtualNetworkPeerings": [],
+        "enableDdosProtection": false,
+        "enableVmProtection": false
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2018-12-01",
+      "name": "cctstoragevnet2/testsubnet2",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'cctstoragevnet2')]"
+      ],
+      "properties": {
+        "addressPrefix": "10.4.0.0/24",
+        "serviceEndpoints": [
+          {
+            "service": "Microsoft.Storage",
+            "locations": [
+              "South Central US",
+              "North Central US",
+              "Brazil South"
+            ]
+          }
+        ],
+        "delegations": []
+      }
+    }
+  ],
+  "outputs": {  }
+}

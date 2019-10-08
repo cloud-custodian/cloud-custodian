@@ -15,10 +15,22 @@
 
 from .common import BaseTest
 
-from c7n.provider import clouds
+from c7n.provider import clouds, get_resource_class
 
 
 class ProviderTest(BaseTest):
+
+    def test_get_resource_class(self):
+        with self.assertRaises(KeyError) as ectx:
+            get_resource_class('aws.xyz')
+        self.assertIn("resource: xyz", str(ectx.exception))
+
+        with self.assertRaises(KeyError) as ectx:
+            get_resource_class('xyz.foo')
+        self.assertIn("provider: xyz", str(ectx.exception))
+
+        ec2 = get_resource_class('aws.ec2')
+        self.assertEqual(ec2.type, 'ec2')
 
     def test_available_clouds(self):
         # the other providers are currently distributed as separate

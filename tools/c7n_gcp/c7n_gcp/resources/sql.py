@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import jmespath
 import re
 
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
+from c7n_gcp.query import (
+    QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
+)
+from datetime import datetime
+from dateutil.parser import parse
 
 
 @resources.register('sql-instance')
@@ -70,38 +75,6 @@ class SqlInstanceStop(MethodAction):
                 'body': {'settings': {'activationPolicy': 'NEVER'}}}
 
 
-@resources.register('sql-database')
-class SqlDatabase(ChildResourceManager):
-
-    def _get_parent_resource_info(self, child_instance):
-        project = child_instance['project']
-        return {
-            'project_id': child_instance['project'],
-            'database_id': '{}:{}'.format(project, child_instance['instance'])
-        }
-
-    class resource_type(ChildTypeInfo):
-        service = 'sqladmin'
-        version = 'v1beta4'
-        component = 'databases'
-        enum_spec = ('list', 'items[]', None)
-        id = 'name'
-        parent_spec = {
-            'resource': 'sql-instance',
-            'child_enum_params': [
-                ('name', 'instance')
-            ]
-        }
-
-        @staticmethod
-        def get(client, resource_info):
-            return client.execute_command(
-                'get', {'project': resource_info['project'],
-                        'database': resource_info['name'],
-                        'instance': resource_info['instance']}
-            )
-
-
 @resources.register('sql-user')
 class SqlUser(ChildResourceManager):
 
@@ -132,15 +105,6 @@ class SqlInstanceChildWithSelfLink(ChildResourceManager):
                                     child_instance['selfLink']).group(1),
                 'database_id': child_instance['instance']}
 
-    @staticmethod
-    def _get_base_query_parameters(resource_info):
-        """
-        :param resource_info: a dictionary to get query parameters from
-        :return: project and instance extracted from resource_info
-        """
-        return {'project': resource_info['project_id'],
-                'instance': resource_info['database_id'].split(':')[1]}
-
 
 @resources.register('sql-backup-run')
 class SqlBackupRun(SqlInstanceChildWithSelfLink):
@@ -150,6 +114,7 @@ class SqlBackupRun(SqlInstanceChildWithSelfLink):
         version = 'v1beta4'
         component = 'backupRuns'
         enum_spec = ('list', 'items[]', None)
+        get_requires_event = True
         id = 'id'
         parent_spec = {
             'resource': 'sql-instance',
@@ -159,10 +124,27 @@ class SqlBackupRun(SqlInstanceChildWithSelfLink):
         }
 
         @staticmethod
-        def get(client, resource_info):
-            parameters = SqlInstanceChildWithSelfLink._get_base_query_parameters(resource_info)
-            parameters['id'] = resource_info['backup_run_id']
+        def get(client, event):
+            project = jmespath.search('protoPayload.response.targetProject', event)
+            instance = jmespath.search('protoPayload.response.targetId', event)
+            insert_time = jmespath.search('protoPayload.response.insertTime', event)
+            parameters = {'project': project,
+                          'instance': instance,
+                          'id': SqlBackupRun.resource_type._from_insert_time_to_id(insert_time)}
             return client.execute_command('get', parameters)
+
+        @staticmethod
+        def _from_insert_time_to_id(insert_time):
+            """
+            Backup Run id is not available in a log record directly.
+            Fortunately, as it is an integer timestamp representation,
+            it can be retrieved by converting raw insert_time value.
+
+            :param insert_time: a UTC ISO formatted date time string
+            :return: an integer number of microseconds since unix epoch
+            """
+            delta = parse(insert_time).replace(tzinfo=None) - datetime.utcfromtimestamp(0)
+            return int(delta.total_seconds()) * 1000 + int(delta.microseconds / 1000)
 
 
 @resources.register('sql-ssl-cert')
@@ -173,6 +155,7 @@ class SqlSslCert(SqlInstanceChildWithSelfLink):
         version = 'v1beta4'
         component = 'sslCerts'
         enum_spec = ('list', 'items[]', None)
+        get_requires_event = True
         id = 'sha1Fingerprint'
         parent_spec = {
             'resource': 'sql-instance',
@@ -182,7 +165,11 @@ class SqlSslCert(SqlInstanceChildWithSelfLink):
         }
 
         @staticmethod
-        def get(client, resource_info):
-            parameters = SqlInstanceChildWithSelfLink._get_base_query_parameters(resource_info)
-            parameters['sha1Fingerprint'] = resource_info['sha_1_fingerprint']
+        def get(client, event):
+            self_link = jmespath.search('protoPayload.response.clientCert.certInfo.selfLink', event)
+            self_link_re = '.*?/projects/(.*?)/instances/(.*?)/sslCerts/(.*)'
+            project, instance, sha_1_fingerprint = re.match(self_link_re, self_link).groups()
+            parameters = {'project': project,
+                          'instance': instance,
+                          'sha1Fingerprint': sha_1_fingerprint}
             return client.execute_command('get', parameters)

@@ -1,0 +1,64 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Insights/components/cloud-custodian-test?api-version=2015-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 13 Sep 2019 22:07:21 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:920e14b1-13f3-461a-a4bb-b4fe6f1a4525"
+                    ],
+                    "access-control-expose-headers": [
+                        "Request-Context"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "777"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/microsoft.insights/components/cloud-custodian-test",
+                        "name": "cloud-custodian-test",
+                        "type": "microsoft.insights/components",
+                        "location": "southcentralus",
+                        "tags": {},
+                        "kind": "web",
+                        "etag": "\"01007499-0000-0500-0000-5d7c10680000\"",
+                        "properties": {
+                            "Ver": "v2",
+                            "ApplicationId": "cloud-custodian-test",
+                            "AppId": "1d513b73-aaaa-416e-a1b9-33b3e8f963d8",
+                            "Application_Type": "web",
+                            "Flow_Type": null,
+                            "Request_Source": "IbizaWebAppExtensionCreate",
+                            "InstrumentationKey": "00000000-0000-0000-0000-000000000004",
+                            "Name": "cloud-custodian-test",
+                            "CreationDate": "2019-09-13T21:55:52.5766984+00:00",
+                            "TenantId": "00000000-0000-0000-0000-000000000003",
+                            "provisioningState": "Succeeded",
+                            "SamplingPercentage": null
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

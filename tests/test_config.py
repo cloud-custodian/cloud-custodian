@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from c7n.exceptions import PolicyValidationError
 from .common import BaseTest
 
 
@@ -54,6 +55,17 @@ class ConfigComplianceTest(BaseTest):
 
 
 class ConfigRuleTest(BaseTest):
+
+    def test_validate(self):
+        with self.assertRaises(PolicyValidationError) as ecm:
+            self.load_policy({
+                'name': 'rule',
+                'resource': 'ebs-snapshot',
+                'mode': {
+                    'role': 'arn:aws:iam',
+                    'type': 'config-rule'}})
+        self.assertIn('AWS Config does not support resource-type:ebs-snapshot',
+                      str(ecm.exception))
 
     def test_status(self):
         session_factory = self.replay_flight_data("test_config_rule_status")

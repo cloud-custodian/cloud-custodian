@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 
 
 class DataflowJobTest(BaseTest):
@@ -32,16 +32,20 @@ class DataflowJobTest(BaseTest):
 
     def test_job_get(self):
         project_id = 'cloud-custodian'
-        jod_id = "2019-03-06_07_01_49-7812926814622315875"
+        jod_id = "2019-05-16_04_24_18-6110555549864901093"
         factory = self.replay_flight_data(
             'dataflow-get-resource', project_id)
-        p = self.load_policy({'name': 'job', 'resource': 'gcp.dataflow-job'},
+        p = self.load_policy({'name': 'job',
+                              'resource': 'gcp.dataflow-job',
+                              'mode': {
+                                  'type': 'gcp-audit',
+                                  'methods': ['storage.buckets.update']}
+                              },
                              session_factory=factory)
-        resource = p.resource_manager.get_resource({
-            "project_id": project_id,
-            "job_id": jod_id,
-        })
-        self.assertEqual(resource['id'], jod_id)
-        self.assertEqual(resource['name'], 'test')
-        self.assertEqual(resource['projectId'], project_id)
-        self.assertEqual(resource['location'], 'us-central1')
+        exec_mode = p.get_execution_mode()
+        event = event_data('df-job-create.json')
+        resource = exec_mode.run(event, None)
+        self.assertEqual(resource[0]['id'], jod_id)
+        self.assertEqual(resource[0]['name'], 'test1')
+        self.assertEqual(resource[0]['projectId'], project_id)
+        self.assertEqual(resource[0]['location'], 'us-central1')

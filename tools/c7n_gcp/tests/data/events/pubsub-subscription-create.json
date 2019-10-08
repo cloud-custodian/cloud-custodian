@@ -1,0 +1,50 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.91",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0,gzip(gfe)",
+      "requestAttributes": {},
+      "destinationAttributes": {}
+    },
+    "serviceName": "pubsub.googleapis.com",
+    "methodName": "google.pubsub.v1.Subscriber.CreateSubscription",
+    "authorizationInfo": [
+      {
+        "resource": "projects/cloud-custodian/topics/custodian",
+        "permission": "pubsub.topics.attachSubscription",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "resourceName": "projects/cloud-custodian/subscriptions/custodian",
+    "request": {
+      "@type": "type.googleapis.com/google.pubsub.v1.Subscription",
+      "ackDeadlineSeconds": 10,
+      "name": "projects/cloud-custodian/subscriptions/custodian",
+      "messageRetentionDuration": "604800s"
+    },
+    "response": {
+      "messageRetentionDuration": "604800s",
+      "pushConfig": {},
+      "@type": "type.googleapis.com/google.pubsub.v1.Subscription",
+      "ackDeadlineSeconds": 10,
+      "name": "projects/cloud-custodian/subscriptions/custodian"
+    }
+  },
+  "insertId": "1vzqeatcofk",
+  "resource": {
+    "type": "pubsub_subscription",
+    "labels": {
+      "subscription_id": "projects/cloud-custodian/subscriptions/custodian",
+      "project_id": "cloud-custodian"
+    }
+  },
+  "timestamp": "2019-03-05T14:17:56.721374586Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-03-05T14:18:01.005189376Z"
+}

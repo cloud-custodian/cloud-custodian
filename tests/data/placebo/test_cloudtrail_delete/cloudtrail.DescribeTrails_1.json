@@ -1,0 +1,63 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "S3-DataEvents",
+                "S3BucketName": "custodian-skunk-trails",
+                "S3KeyPrefix": "DataEvents",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/S3-DataEvents",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true,
+                "IsOrganizationTrail": false
+            },
+            {
+                "Name": "delete-me",
+                "S3BucketName": "c7n-sagemaker-test",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/delete-me",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": false,
+                "IsOrganizationTrail": false
+            },
+            {
+                "Name": "orgTrail",
+                "S3BucketName": "c7n-vpc-flow-logs",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/orgTrail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": false,
+                "IsOrganizationTrail": true
+            },
+            {
+                "Name": "skunk-trails",
+                "S3BucketName": "custodian-skunk-trails",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/skunk-trails",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": false,
+                "IsOrganizationTrail": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "1d7322f5-af1c-416f-8112-3a9103e01398",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1d7322f5-af1c-416f-8112-3a9103e01398",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1279",
+                "date": "Wed, 31 Jul 2019 23:59:03 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,65 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/dnszones?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "499"
+                    ],
+                    "cache-control": [
+                        "private"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 01 Jul 2019 18:04:41 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59999"
+                    ],
+                    "content-length": [
+                        "576"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com",
+                                "name": "h7s6n7kl225j4.cloudcustodiantest.com",
+                                "type": "Microsoft.Network/dnszones",
+                                "etag": "00000002-0000-0000-7797-cd793630d501",
+                                "location": "global",
+                                "tags": {},
+                                "properties": {
+                                    "maxNumberOfRecordSets": 10000,
+                                    "maxNumberOfRecordsPerRecordSet": null,
+                                    "nameServers": [
+                                        "ns1-07.azure-dns.com.",
+                                        "ns2-07.azure-dns.net.",
+                                        "ns3-07.azure-dns.org.",
+                                        "ns4-07.azure-dns.info."
+                                    ],
+                                    "numberOfRecordSets": 3,
+                                    "zoneType": "Public"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

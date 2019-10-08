@@ -1,0 +1,19 @@
+{
+  "body": {}, 
+  "headers": {
+    "status": "200", 
+    "content-length": "3", 
+    "x-xss-protection": "0", 
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/europe-west2/keyRings?alt=json",
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Fri, 02 Aug 2019 10:01:06 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

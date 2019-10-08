@@ -1,0 +1,144 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?$filter=resourceType%20eq%20%27Microsoft.KeyVault%2Fvaults%27&api-version=2015-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "514"
+                    ],
+                    "date": [
+                        "Mon, 19 Aug 2019 20:59:57 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1c6ra5qqpkhceo",
+                                "name": "cckeyvault1c6ra5qqpkhceo",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "southcentralus",
+                                "tags": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/certificates?api-version=7.0",
+                "body": "",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47\", resource=\"https://vault.azure.net\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Aug 2019 20:59:58 GMT"
+                    ],
+                    "content-length": [
+                        "87"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Unauthorized",
+                            "message": "Request is missing a Bearer or PoP token."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/certificates?api-version=7.0",
+                "body": "",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 19 Aug 2019 20:59:58 GMT"
+                    ],
+                    "content-length": [
+                        "495"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/certificates/cctest1",
+                                "x5t": "PqWxMOXkyDs1PkY9PH7VVugNLGk",
+                                "attributes": {
+                                    "enabled": true,
+                                    "nbf": 1566243128,
+                                    "exp": 1597866128,
+                                    "created": 1566243729,
+                                    "updated": 1566243729
+                                },
+                                "subject": ""
+                            },
+                            {
+                                "id": "https://cckeyvault1c6ra5qqpkhceo.vault.azure.net/certificates/cctest2",
+                                "x5t": "Wkdnd04E5KA6im-ciOSYoHTl9mk",
+                                "attributes": {
+                                    "enabled": true,
+                                    "nbf": 1566243144,
+                                    "exp": 1597866144,
+                                    "created": 1566243744,
+                                    "updated": 1566243744
+                                },
+                                "subject": ""
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        }
+    ]
+}

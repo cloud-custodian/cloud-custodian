@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "f34c76c0-d1f0-432b-a8f7-0e45f24af808",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Fri, 12 Jul 2019 17:53:38 GMT",
+                "content-type": "application/json",
+                "content-length": "860",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "f34c76c0-d1f0-432b-a8f7-0e45f24af808"
+            },
+            "RetryAttempts": 0
+        },
+        "FunctionName": "resource-fixer",
+        "FunctionArn": "arn:aws:lambda:us-east-1:123412341234:function:resource-fixer",
+        "Runtime": "python3.7",
+        "Role": "arn:aws:iam::123412341234:role/resource-fixer-role",
+        "Handler": "lambda_function.lambda_handler",
+        "CodeSize": 2717,
+        "Description": "",
+        "Timeout": 603,
+        "MemorySize": 128,
+        "LastModified": "2019-07-12T17:53:37.637+0000",
+        "CodeSha256": "3hDkJfWqXvGPUnNMu/35S0SMIPSbz50bleO/Elz3Qcc=",
+        "Version": "$LATEST",
+        "VpcConfig": {
+            "SubnetIds": [
+                "subnet-4f7a0012",
+                "subnet-c490a4a0",
+                "subnet-978689dc"
+            ],
+            "SecurityGroupIds": [
+                "sg-01a19f602ecaf25f4",
+                "sg-0b650189861ce4f6c",
+                "sg-c573e6b3"
+            ],
+            "VpcId": "vpc-3d05f145"
+        },
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        },
+        "RevisionId": "91960333-cf28-4224-85ec-c397e84cbd8d"
+    }
+}

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from gcp_common import BaseTest
+from gcp_common import BaseTest, event_data
 
 
 class CloudBillingAccountTest(BaseTest):
@@ -36,10 +36,16 @@ class CloudBillingAccountTest(BaseTest):
             'cloudbilling-account-get')
 
         policy = self.load_policy(
-            {'name': 'billing-cloudbilling-account-dryrun',
-             'resource': 'gcp.cloudbilling-account'},
+            {'name': 'billing-cloudbilling-account-audit',
+             'resource': 'gcp.cloudbilling-account',
+             'mode': {
+                 'type': 'gcp-audit',
+                 'methods': ['AssignProjectToBillingAccount']
+             }},
             session_factory=session_factory)
 
-        billingaccount_resource = policy.resource_manager.get_resource(
-            {'name': billingaccount_resource_name})
-        self.assertEqual(billingaccount_resource['name'], billingaccount_resource_name)
+        exec_mode = policy.get_execution_mode()
+        event = event_data('cloudbilling-account-assign.json')
+
+        resources = exec_mode.run(event, None)
+        self.assertEqual(resources[0]['name'], billingaccount_resource_name)

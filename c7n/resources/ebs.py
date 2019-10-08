@@ -33,7 +33,7 @@ from c7n.filters.health import HealthEventFilter
 
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import Tag
 from c7n.utils import (
     camelResource,
@@ -52,18 +52,16 @@ log = logging.getLogger('custodian.ebs')
 @resources.register('ebs-snapshot')
 class Snapshot(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'ec2'
-        type = 'snapshot'
+        arn_type = 'snapshot'
         enum_spec = (
             'describe_snapshots', 'Snapshots', None)
-        detail_spec = None
         id = 'SnapshotId'
         filter_name = 'SnapshotIds'
         filter_type = 'list'
         name = 'SnapshotId'
         date = 'StartTime'
-        dimension = None
 
         default_report_fields = (
             'SnapshotId',
@@ -270,7 +268,7 @@ class SnapshotUnusedFilter(Filter):
     schema = type_schema('unused', value={'type': 'boolean'})
 
     def get_permissions(self):
-        return list(itertools.chain([
+        return list(itertools.chain(*[
             self.manager.get_resource_manager(m).get_permissions()
             for m in ('asg', 'launch-config', 'ami')]))
 
@@ -324,7 +322,7 @@ class SnapshotSkipAmiSnapshots(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: delete-stale-snapshots
+              - name: delete-ebs-stale-snapshots
                 resource: ebs-snapshot
                 filters:
                   - type: age
@@ -516,9 +514,9 @@ class CopySnapshot(BaseAction):
 @resources.register('ebs')
 class EBS(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'ec2'
-        type = 'volume'
+        arn_type = 'volume'
         enum_spec = ('describe_volumes', 'Volumes', None)
         name = id = 'VolumeId'
         filter_name = 'VolumeIds'
@@ -538,7 +536,6 @@ class EBS(QueryResourceManager):
 
 @EBS.action_registry.register('detach')
 class VolumeDetach(BaseAction):
-
     """
     Detach an EBS volume from an Instance.
 
@@ -550,7 +547,7 @@ class VolumeDetach(BaseAction):
      .. code-block:: yaml
 
              policies:
-               - name: instance-ebs-volumes
+               - name: detach-ebs-volumes
                  resource: ebs
                  filters:
                    - VolumeId :  volumeid
@@ -585,10 +582,13 @@ class AttachedInstanceFilter(ValueFilter):
               - name: instance-ebs-volumes
                 resource: ebs
                 filters:
-                  - instance
+                  - type: instance
+                    key: tag:Name
+                    value: OldManBySea
     """
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
+    schema_alias = False
 
     def get_permissions(self):
         return self.manager.get_resource_manager('ec2').get_permissions()
@@ -632,11 +632,14 @@ class FaultTolerantSnapshots(Filter):
     means that, in the event of a failure, the volume can be restored
     from a snapshot with (reasonable) data loss
 
-    - name: ebs-volume-tolerance
-    - resource: ebs
-    - filters: [{
-        'type': 'fault-tolerant',
-        'tolerant': True}]
+    .. code-block:: yaml
+
+      policies:
+       - name: ebs-volume-tolerance
+         resource: ebs
+         filters:
+           - type: fault-tolerant
+             tolerant: True
     """
     schema = type_schema('fault-tolerant', tolerant={'type': 'boolean'})
     check_id = 'H7IgTzjTYb'
@@ -663,6 +666,7 @@ class FaultTolerantSnapshots(Filter):
 @EBS.filter_registry.register('health-event')
 class HealthFilter(HealthEventFilter):
 
+    schema_alias = False
     schema = type_schema(
         'health-event',
         types={'type': 'array', 'items': {
@@ -1237,7 +1241,7 @@ class ModifyableVolume(Filter):
       - must wait at least 6hrs between modifications to the same volume.
       - volumes must have been attached after nov 1st, 2016.
 
-    See `custodian schema ebs.actions.modify` for examples.
+    See :ref:`modify action <aws.ebs.actions.modify>` for examples.
     """
 
     schema = type_schema('modifyable')
@@ -1299,7 +1303,10 @@ class ModifyableVolume(Filter):
         # Filter volumes that are currently under modification
         client = local_session(self.manager.session_factory).client('ec2')
         modifying = set()
-        for vol_set in chunks(list(results), 200):
+
+        # Re 197 - Max number of filters is 200, and we have to use
+        # three additional attribute filters.
+        for vol_set in chunks(list(results), 197):
             vol_ids = [v['VolumeId'] for v in vol_set]
             mutating = client.describe_volumes_modifications(
                 Filters=[
@@ -1374,7 +1381,7 @@ class ModifyVolume(BaseAction):
     .. code-block:: yaml
 
            policies:
-            - name: ebs-remove-piops
+            - name: ebs-upsize-piops
               resource: ebs
               filters:
                 - VolumeType: io1

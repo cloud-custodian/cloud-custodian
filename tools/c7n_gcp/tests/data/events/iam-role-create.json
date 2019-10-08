@@ -1,0 +1,73 @@
+{
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "status": {},
+      "authenticationInfo": {
+        "principalEmail": "custodian.gcp.test@gmail.com"
+      },
+      "requestMetadata": {
+        "callerIp": "188.163.232.130",
+        "callerSuppliedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:66.0) Gecko/20100101 Firefox/66.0,gzip(gfe)",
+        "requestAttributes": {
+          "time": "2019-06-03T11:12:52.644756356Z",
+          "auth": {}
+        },
+        "destinationAttributes": {}
+      },
+      "serviceName": "iam.googleapis.com",
+      "methodName": "google.iam.admin.v1.CreateRole",
+      "authorizationInfo": [
+        {
+          "resource": "projects/mythic-tribute-232915",
+          "permission": "iam.roles.create",
+          "granted": true,
+          "resourceAttributes": {}
+        }
+      ],
+      "resourceName": "projects/mythic-tribute-232915/roles/CustomRole1",
+      "serviceData": {
+        "@type": "type.googleapis.com/google.iam.admin.v1.AuditData",
+        "permissionDelta": {
+          "addedPermissions": [
+            "accessapproval.requests.get"
+          ]
+        }
+      },
+      "request": {
+        "role": {
+          "included_permissions": [
+            "accessapproval.requests.get"
+          ],
+          "title": "Custom Role test1",
+          "description": "Created on: 2019-06-03"
+        },
+        "@type": "type.googleapis.com/google.iam.admin.v1.CreateRoleRequest",
+        "role_id": "CustomRole1",
+        "parent": "projects/mythic-tribute-232915"
+      },
+      "response": {
+        "title": "Custom Role test1",
+        "included_permissions": [
+          "accessapproval.requests.get"
+        ],
+        "@type": "type.googleapis.com/google.iam.admin.v1.Role",
+        "description": "Created on: 2019-06-03",
+        "group_name": "custom",
+        "etag": "BwWKaXIHoic=",
+        "name": "projects/mythic-tribute-232915/roles/CustomRole1",
+        "group_title": "Custom"
+      }
+    },
+    "insertId": "17kpddqd4f1y",
+    "resource": {
+      "type": "iam_role",
+      "labels": {
+        "project_id": "mythic-tribute-232915",
+        "role_name": "projects/mythic-tribute-232915/roles/CustomRole1"
+      }
+    },
+    "timestamp": "2019-06-03T11:12:52.484722728Z",
+    "severity": "NOTICE",
+    "logName": "projects/mythic-tribute-232915/logs/cloudaudit.googleapis.com%2Factivity",
+    "receiveTimestamp": "2019-06-03T11:12:53.074278023Z"
+  }

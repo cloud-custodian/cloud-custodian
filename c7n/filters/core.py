@@ -23,6 +23,7 @@ import fnmatch
 import logging
 import operator
 import re
+import sys
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -110,7 +111,7 @@ OPERATORS = {
 VALUE_TYPES = [
     'age', 'integer', 'expiration', 'normalize', 'size',
     'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
-    'unique_size']
+    'unique_size', 'date']
 
 
 class FilterRegistry(PluginRegistry):
@@ -371,12 +372,13 @@ class ValueFilter(Filter):
             'key': {'type': 'string'},
             'value_type': {'$ref': '#/definitions/filters_common/value_types'},
             'default': {'type': 'object'},
+            'value_regex': {'type': 'string'},
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
         }
     }
-
+    schema_alias = True
     annotate = True
     required_keys = set(('value', 'key'))
 
@@ -404,7 +406,8 @@ class ValueFilter(Filter):
                 "`value` must be an integer in resource_count filter %s" % self.data)
 
         # I don't see how to support regex for this?
-        if self.data['op'] not in OPERATORS or self.data['op'] in {'regex', 'regex-case'}:
+        if (self.data['op'] not in OPERATORS or self.data['op'] in {'regex', 'regex-case'} or
+                'value_regex' in self.data):
             raise PolicyValidationError(
                 "Invalid operator in value filter %s" % self.data)
 
@@ -418,7 +421,11 @@ class ValueFilter(Filter):
         # the value filters because it operates on the full resource list
         if self.data.get('value_type') == 'resource_count':
             return self._validate_resource_count()
-
+        elif self.data.get('value_type') == 'date':
+            if not parse_date(self.data.get('value')):
+                raise PolicyValidationError(
+                    "value_type: date with invalid date value:%s",
+                    self.data.get('value', ''))
         if 'key' not in self.data and 'key' in self.required_keys:
             raise PolicyValidationError(
                 "Missing 'key' in value filter %s" % self.data)
@@ -438,6 +445,29 @@ class ValueFilter(Filter):
                 except re.error as e:
                     raise PolicyValidationError(
                         "Invalid regex: %s %s" % (e, self.data))
+        if 'value_regex' in self.data:
+            return self._validate_value_regex()
+
+        return self
+
+    def _validate_value_regex(self):
+        """Specific validation for `value_regex` type
+
+        The `value_regex` type works a little differently.  In
+        particular it doesn't support OPERATORS that perform
+        operations on a list of values, specifically 'intersect',
+        'contains', 'difference', 'in' and 'not-in'
+        """
+        # Sanity check that we can compile
+        try:
+            pattern = re.compile(self.data['value_regex'])
+            if pattern.groups != 1:
+                raise PolicyValidationError(
+                    "value_regex must have a single capturing group: %s" %
+                    self.data)
+        except re.error as e:
+            raise PolicyValidationError(
+                "Invalid value_regex: %s %s" % (e, self.data))
         return self
 
     def __call__(self, i):
@@ -483,6 +513,10 @@ class ValueFilter(Filter):
             r = self.expr[k].search(i)
         else:
             r = self.expr[k].search(i)
+
+        if 'value_regex' in self.data:
+            regex = ValueRegex(self.data['value_regex'])
+            r = regex.get_resource_value(r)
         return r
 
     def match(self, i):
@@ -539,7 +573,8 @@ class ValueFilter(Filter):
             return sentinel, value.strip().lower()
 
         elif self.vtype == 'expr':
-            return sentinel, self.get_resource_value(value, resource)
+            sentinel = self.get_resource_value(sentinel, resource)
+            return sentinel, value
 
         elif self.vtype == 'integer':
             try:
@@ -558,21 +593,15 @@ class ValueFilter(Filter):
                 return sentinel, 0
         elif self.vtype == 'swap':
             return value, sentinel
+        elif self.vtype == 'date':
+            return parse_date(sentinel), parse_date(value)
         elif self.vtype == 'age':
             if not isinstance(sentinel, datetime.datetime):
                 sentinel = datetime.datetime.now(tz=tzutc()) - timedelta(sentinel)
-            if isinstance(value, (str, int, float)):
-                try:
-                    value = datetime.datetime.fromtimestamp(float(value)).replace(tzinfo=tzutc())
-                except ValueError:
-                    pass
-            if not isinstance(value, datetime.datetime):
-                # EMR bug when testing ages in EMR. This is due to
-                # EMR not having more functionality.
-                try:
-                    value = parse(value, default=datetime.datetime.now(tz=tzutc()))
-                except (AttributeError, TypeError, ValueError):
-                    value = 0
+            value = parse_date(value)
+            if value is None:
+                # compatiblity
+                value = 0
             # Reverse the age comparison, we want to compare the value being
             # greater than the sentinel typically. Else the syntax for age
             # comparisons is intuitively wrong.
@@ -594,19 +623,18 @@ class ValueFilter(Filter):
         elif self.vtype == 'expiration':
             if not isinstance(sentinel, datetime.datetime):
                 sentinel = datetime.datetime.now(tz=tzutc()) + timedelta(sentinel)
-
-            if not isinstance(value, datetime.datetime):
-                try:
-                    value = parse(value, default=datetime.datetime.now(tz=tzutc()))
-                except (AttributeError, TypeError, ValueError):
-                    value = 0
-
+            value = parse_date(value)
+            if value is None:
+                value = 0
             return sentinel, value
         return sentinel, value
 
 
 class AgeFilter(Filter):
     """Automatically filter resources older than a given date.
+
+    **Deprecated** use a value filter with `value_type: age` which can be
+    done on any attribute.
     """
     threshold_date = None
 
@@ -651,9 +679,10 @@ class AgeFilter(Filter):
 
 
 class EventFilter(ValueFilter):
-    """Filter against a cloudwatch event associated to a resource type."""
+    """Filter a resource based on an event."""
 
     schema = type_schema('event', rinherit=ValueFilter.schema)
+    schema_alias = True
 
     def validate(self):
         if 'mode' not in self.manager.data:
@@ -668,3 +697,85 @@ class EventFilter(ValueFilter):
         if self(event):
             return resources
         return []
+
+
+def cast_tz(d, tz):
+    if sys.version_info.major == 2:
+        return d.replace(tzinfo=tz)
+    return d.astimezone(tz)
+
+
+def parse_date(v, tz=None):
+    if v is None:
+        return v
+
+    tz = tz or tzutc()
+
+    if isinstance(v, datetime.datetime):
+        if v.tzinfo is None:
+            return cast_tz(v, tz)
+        return v
+
+    if isinstance(v, six.string_types):
+        try:
+            return cast_tz(parse(v), tz)
+        except (AttributeError, TypeError, ValueError):
+            pass
+
+    if isinstance(v, (int, float) + six.string_types):
+        try:
+            v = cast_tz(datetime.datetime.fromtimestamp(float(v)), tz)
+        except ValueError:
+            pass
+
+    return isinstance(v, datetime.datetime) and v or None
+
+
+class ValueRegex(object):
+    """Allows filtering based on the output of a regex capture.
+    This is useful for parsing data that has a weird format.
+
+    Instead of comparing the contents of the 'resource value' with the 'value',
+    it will instead apply the regex to contents of the 'resource value', and compare
+    the result of the capture group defined in that regex with the 'value'.
+    Therefore you must have a single capture group defined in the regex.
+
+    If the regex doesn't find a match it will return 'None'
+
+    Example of getting a datetime object to make an 'expiration' comparison::
+
+    type: value
+    value_regex: ".*delete_after=([0-9]{4}-[0-9]{2}-[0-9]{2}).*"
+    key: "tag:company_mandated_metadata"
+    value_type: expiration
+    op: lte
+    value: 0
+    """
+
+    def __init__(self, expr):
+        self.expr = expr
+
+    def get_resource_value(self, resource):
+        if resource is None:
+            return resource
+        try:
+            capture = re.match(self.expr, resource)
+        except (ValueError, TypeError):
+            return None
+        if capture is None:  # regex didn't capture anything
+            return None
+        return capture.group(1)
+
+
+class StateTransitionFilter(Filter):
+    valid_origin_states = ()
+
+    def filter_resource_state(self, resources, event=None):
+        state_key = self.manager.get_model().state_key
+        states = self.valid_origin_states
+        orig_length = len(resources)
+        results = [r for r in resources if r[state_key] in states]
+        self.log.info("filtered %d of %d %s resources with  %s states" % (
+            len(results), orig_length, self.__class__.__name__, states))
+
+        return results

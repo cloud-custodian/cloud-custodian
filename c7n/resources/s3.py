@@ -65,13 +65,13 @@ except ImportError:
 
 from c7n.actions import (
     ActionRegistry, BaseAction, PutMetric, RemovePolicyBase)
-from c7n.actions.securityhub import PostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
 from c7n.manager import resources
 from c7n import query
+from c7n.resources.securityhub import PostFinding
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, filter_empty,
@@ -91,19 +91,21 @@ MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 @resources.register('s3')
 class S3(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 's3'
-        type = 'bucket'
+        arn_type = ''
         enum_spec = ('list_buckets', 'Buckets[]', None)
         detail_spec = ('list_objects', 'Bucket', 'Contents[]')
         name = id = 'Name'
-        filter_name = None
         date = 'CreationDate'
         dimension = 'BucketName'
         config_type = 'AWS::S3::Bucket'
 
     filter_registry = filters
     action_registry = actions
+
+    def get_arns(self, resources):
+        return ["arn:aws:s3:::{}".format(r["Name"]) for r in resources]
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -137,11 +139,20 @@ class DescribeS3(query.DescribeSource):
 
 class ConfigS3(query.ConfigSource):
 
+    def get_query_params(self, query):
+        q = super(ConfigS3, self).get_query_params(query)
+        if 'expr' in q:
+            q['expr'] = q['expr'].replace('select ', 'select awsRegion, ')
+        return q
+
     def load_resource(self, item):
         resource = super(ConfigS3, self).load_resource(item)
         cfg = item['supplementaryConfiguration']
-        if item['awsRegion'] != 'us-east-1':  # aka standard
+        # aka standard
+        if 'awsRegion' in item and item['awsRegion'] != 'us-east-1':
             resource['Location'] = {'LocationConstraint': item['awsRegion']}
+        else:
+            resource['Location'] = {}
 
         # owner is under acl per describe
         resource.pop('Owner', None)
@@ -208,7 +219,8 @@ class ConfigS3(query.ConfigSource):
         return
 
     def handle_BucketLoggingConfiguration(self, resource, item_value):
-        if item_value['destinationBucketName'] is None:
+        if ('destinationBucketName' not in item_value or
+                item_value['destinationBucketName'] is None):
             return {}
         resource[u'Logging'] = {
             'TargetBucket': item_value['destinationBucketName'],
@@ -224,7 +236,7 @@ class ConfigS3(query.ConfigSource):
                     ('Date', 'expirationDate'),
                     ('ExpiredObjectDeleteMarker', 'expiredObjectDeleteMarker'),
                     ('Days', 'expirationInDays')):
-                if r[ck] and r[ck] != -1:
+                if ck in r and r[ck] and r[ck] != -1:
                     expiry[ek] = r[ck]
             if expiry:
                 rr['Expiration'] = expiry
@@ -392,7 +404,7 @@ S3_CONFIG_SUPPLEMENT_NULL_MAP = {
 }
 
 S3_AUGMENT_TABLE = (
-    ('get_bucket_location', 'Location', None, None),
+    ('get_bucket_location', 'Location', {}, None),
     ('get_bucket_tagging', 'Tags', [], 'TagSet'),
     ('get_bucket_policy', 'Policy', None, 'Policy'),
     ('get_bucket_acl', 'Acl', None, None),
@@ -556,11 +568,12 @@ class S3Metrics(MetricsFilter):
     """
 
     def get_dimensions(self, resource):
-        return [
-            {'Name': 'BucketName',
-             'Value': resource['Name']},
-            {'Name': 'StorageType',
-             'Value': 'AllStorageTypes'}]
+        dims = [{'Name': 'BucketName', 'Value': resource['Name']}]
+        if (self.data['name'] == 'NumberOfObjects' and
+                'dimensions' not in self.data):
+            dims.append(
+                {'Name': 'StorageType', 'Value': 'AllStorageTypes'})
+        return dims
 
 
 @filters.register('cross-account')
@@ -652,17 +665,23 @@ class S3CrossAccountFilter(CrossAccountAccessFilter):
 class GlobalGrantsFilter(Filter):
     """Filters for all S3 buckets that have global-grants
 
+    *Note* by default this filter allows for read access
+    if the bucket has been configured as a website. This
+    can be disabled per the example below.
+
     :example:
 
     .. code-block:: yaml
 
-            policies:
-              - name: s3-delete-global-grants
-                resource: s3
-                filters:
-                  - type: global-grants
-                actions:
-                  - delete-global-grants
+       policies:
+         - name: remove-global-grants
+           resource: s3
+           filters:
+            - type: global-grants
+              allow_website: false
+           actions:
+            - delete-global-grants
+
     """
 
     schema = type_schema(
@@ -974,7 +993,7 @@ class BucketNotificationFilter(ValueFilter):
         required=['kind'],
         kind={'type': 'string', 'enum': ['lambda', 'sns', 'sqs']},
         rinherit=ValueFilter.schema)
-
+    schema_alias = False
     annotation_key = 'c7n:MatchedNotificationConfigurationIds'
 
     permissions = ('s3:GetBucketNotification',)
@@ -2311,7 +2330,7 @@ class DataEvents(Filter):
 class Inventory(ValueFilter):
     """Filter inventories for a bucket"""
     schema = type_schema('inventory', rinherit=ValueFilter.schema)
-
+    schema_alias = False
     permissions = ('s3:GetInventoryConfiguration',)
 
     def process(self, buckets, event=None):

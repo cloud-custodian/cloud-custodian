@@ -1,0 +1,154 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cloud-custodian-test-deployment-units?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 10 May 2019 19:53:32 GMT"
+                    ],
+                    "content-length": [
+                        "227"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units",
+                        "name": "cloud-custodian-test-deployment-units",
+                        "location": "westus",
+                        "properties": {
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182745?api-version=2018-07-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 10 May 2019 19:53:32 GMT"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Storage/locations/westus/asyncoperations/f5b9ee0a-68dc-4fd4-a9ca-7bdf2f280a85?monitor=true&api-version=2018-07-01"
+                    ],
+                    "content-length": [
+                        "0"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "text/plain; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/locations/westus/asyncoperations/f5b9ee0a-68dc-4fd4-a9ca-7bdf2f280a85?monitor=true&api-version=2018-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 10 May 2019 19:53:50 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "content-length": [
+                        "1131"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "Standard_LRS",
+                            "tier": "Standard"
+                        },
+                        "kind": "Storage",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-test-deployment-units/providers/Microsoft.Storage/storageAccounts/custodianaccount47182745",
+                        "name": "custodianaccount47182745",
+                        "type": "Microsoft.Storage/storageAccounts",
+                        "location": "westus",
+                        "tags": {},
+                        "properties": {
+                            "networkAcls": {
+                                "bypass": "AzureServices",
+                                "virtualNetworkRules": [],
+                                "ipRules": [],
+                                "defaultAction": "Allow"
+                            },
+                            "supportsHttpsTrafficOnly": false,
+                            "encryption": {
+                                "services": {
+                                    "file": {
+                                        "enabled": true,
+                                        "lastEnabledTime": "2019-05-10T19:53:32.8511883Z"
+                                    },
+                                    "blob": {
+                                        "enabled": true,
+                                        "lastEnabledTime": "2019-05-10T19:53:32.8511883Z"
+                                    }
+                                },
+                                "keySource": "Microsoft.Storage"
+                            },
+                            "provisioningState": "Succeeded",
+                            "creationTime": "2019-05-10T19:53:32.7574210Z",
+                            "primaryEndpoints": {
+                                "blob": "https://custodianaccount47182745.blob.core.windows.net/",
+                                "queue": "https://custodianaccount47182745.queue.core.windows.net/",
+                                "table": "https://custodianaccount47182745.table.core.windows.net/",
+                                "file": "https://custodianaccount47182745.file.core.windows.net/"
+                            },
+                            "primaryLocation": "westus",
+                            "statusOfPrimary": "available"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

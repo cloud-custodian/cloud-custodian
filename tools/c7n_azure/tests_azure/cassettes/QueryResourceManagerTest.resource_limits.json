@@ -1,0 +1,71 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "3538"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 06 Sep 2019 17:55:56 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian",
+                                "name": "cloud-custodian",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/storage-rg",
+                                "name": "storage-rg",
+                                "location": "westus2",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_emptyrg",
+                                "name": "test_emptyrg",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_webapp",
+                                "name": "test_webapp",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

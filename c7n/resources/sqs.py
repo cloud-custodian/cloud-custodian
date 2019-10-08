@@ -22,7 +22,7 @@ from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.utils import local_session
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.actions import BaseAction
 from c7n.utils import type_schema
 from c7n.tags import universal_augment, register_universal_tags
@@ -31,10 +31,9 @@ from c7n.tags import universal_augment, register_universal_tags
 @resources.register('sqs')
 class SQS(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'sqs'
-        type = None
-        # type = 'queue'
+        arn_type = ""
         enum_spec = ('list_queues', 'QueueUrls', None)
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
         id = 'QueueUrl'
@@ -131,8 +130,8 @@ class KmsFilter(KmsRelatedFilter):
         .. code-block:: yaml
 
             policies:
-                - name: efs-kms-key-filters
-                  resource: efs
+                - name: sqs-kms-key-filters
+                  resource: aws.sqs
                   filters:
                     - or:
                       - type: value
@@ -156,7 +155,7 @@ class RemovePolicyStatement(RemovePolicyBase):
     .. code-block:: yaml
 
            policies:
-              - name: sqs-cross-account
+              - name: remove-sqs-cross-account
                 resource: sqs
                 filters:
                   - type: cross-account

@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/glue",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/glue",
+                "TargetKeyId": "d12e743c-a297-447c-9c13-8f3c08f4161c"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "ab637f4d-bd7e-4e6f-9d68-fb51cad48d4a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ab637f4d-bd7e-4e6f-9d68-fb51cad48d4a",
+                "cache-control": "no-cache, no-store, must-revalidate, private",
+                "expires": "0",
+                "pragma": "no-cache",
+                "date": "Tue, 23 Jul 2019 01:20:06 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "194"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

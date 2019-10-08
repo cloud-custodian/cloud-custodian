@@ -17,24 +17,24 @@ from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.tags import universal_augment, register_universal_tags
+from c7n.filters import StateTransitionFilter
+from c7n import query
 
 
 @resources.register('glue-connection')
 class GlueConnection(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('get_connections', 'ConnectionList', None)
-        detail_spec = None
         id = name = 'Name'
         date = 'CreationTime'
-        dimension = None
-        filter_name = None
-        arn = False
+        arn_type = "connection"
 
     permissions = ('glue:GetConnections',)
 
@@ -58,7 +58,7 @@ class DeleteConnection(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: delete-jdbc-connections
@@ -87,17 +87,18 @@ class DeleteConnection(BaseAction):
 @resources.register('glue-dev-endpoint')
 class GlueDevEndpoint(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('get_dev_endpoints', 'DevEndpoints', None)
-        detail_spec = None
         id = name = 'EndpointName'
         date = 'CreatedTimestamp'
-        dimension = None
-        filter_name = None
-        arn = False
+        arn_type = "devEndpoint"
 
     permissions = ('glue:GetDevEndpoints',)
+    augment = universal_augment
+
+
+register_universal_tags(GlueDevEndpoint.filter_registry, GlueDevEndpoint.action_registry)
 
 
 @GlueDevEndpoint.action_registry.register('delete')
@@ -106,7 +107,7 @@ class DeleteDevEndpoint(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: delete-public-dev-endpoints
@@ -137,3 +138,143 @@ class DeleteDevEndpoint(BaseAction):
                     self.log.error(
                         "Exception deleting glue dev endpoint \n %s",
                         f.exception())
+
+
+@resources.register('glue-job')
+class GlueJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_jobs', 'Jobs', None)
+        id = name = 'Name'
+        date = 'CreatedOn'
+        arn_type = 'job'
+
+    permissions = ('glue:GetJobs',)
+    augment = universal_augment
+
+
+register_universal_tags(GlueJob.filter_registry, GlueJob.action_registry)
+
+
+@GlueJob.action_registry.register('delete')
+class DeleteJob(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteJob',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_job(JobName=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
+
+
+@resources.register('glue-crawler')
+class GlueCrawler(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_crawlers', 'Crawlers', None)
+        id = name = 'Name'
+        date = 'CreatedOn'
+        arn_type = 'crawler'
+        state_key = 'State'
+
+    permissions = ('glue:GetCrawlers',)
+    augment = universal_augment
+
+
+register_universal_tags(GlueCrawler.filter_registry, GlueCrawler.action_registry)
+
+
+@GlueCrawler.action_registry.register('delete')
+class DeleteCrawler(BaseAction, StateTransitionFilter):
+
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteCrawler',)
+    valid_origin_states = ('READY', 'FAILED')
+
+    def process(self, resources):
+        resources = self.filter_resource_state(resources)
+
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_crawler(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
+
+
+@resources.register('glue-database')
+class GlueDatabase(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_databases', 'DatabaseList', None)
+        id = name = 'Name'
+        date = 'CreatedOn'
+        arn_type = 'database'
+        state_key = 'State'
+
+
+@GlueDatabase.action_registry.register('delete')
+class DeleteDatabase(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteDatabase',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_database(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
+
+
+@resources.register('glue-table')
+class GlueTable(query.ChildResourceManager):
+
+    child_source = 'describe-table'
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        parent_spec = ('glue-database', 'DatabaseName', None)
+        enum_spec = ('get_tables', 'TableList', None)
+        name = 'Name'
+        date = 'CreatedOn'
+        arn_type = 'table'
+
+
+@query.sources.register('describe-table')
+class DescribeTable(query.ChildDescribeSource):
+
+    def get_query(self):
+        query = super(DescribeTable, self).get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        result = []
+        for parent_id, r in resources:
+            r['DatabaseName'] = parent_id
+            result.append(r)
+        return result
+
+
+@GlueTable.action_registry.register('delete')
+class DeleteTable(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteTable',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_table(DatabaseName=r['DatabaseName'], Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue

@@ -17,11 +17,10 @@ import re
 
 import six
 from azure.graphrbac import GraphRbacManagementClient
-from c7n_azure.actions import AzureBaseAction
+from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import Azure
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, DescribeSource
-from c7n_azure.session import Session
 from c7n_azure.utils import GraphHelper
 
 from c7n.filters import Filter
@@ -37,8 +36,73 @@ log = logging.getLogger('custodian.azure.access_control')
 
 @resources.register('roleassignment')
 class RoleAssignment(QueryResourceManager):
+    """Role assignments map role definitions to principals. The Azure
+    object only contains the unique ID of the principal, however we
+    attempt to augment the object with the prinicpal name, display name
+    and type from AAD.
 
-    class resource_type(object):
+    Augmenting with data from AAD requires executing account to have
+    permissions to read from the Microsoft AAD Graph. For Service Principal
+    Authorization the Service Principal must have the permissions to
+    `read all users' full profiles`. Azure CLI authentication will
+    provide the necessary permissions to run the policy locally.
+
+    :example:
+
+    Return role assignments with the `Owner role`.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: role-assignment-owner
+              resource: azure.roleassignment
+              filters:
+                - type: role
+                  key: properties.roleName
+                  op: eq
+                  value: Owner
+
+    :example:
+
+    Return assignments with the principal name custodian@example.com
+
+    .. code-block:: yaml
+
+         policies:
+           - name: assignment-by-principal-name
+             resource: azure.roleassignment
+             filters:
+                - type: value
+                  key: principalName
+                  op: eq
+                  value: custodian@example.com
+
+    :example:
+
+    Delete the assignment with principal name custodian@example.com.
+
+    **Note: The permissions required to run the
+    delete action requires delete permissions to Microsoft.Authorization.
+    The built-in role with the necessary permissions is Owner.**
+
+    .. code-block:: yaml
+
+         policies:
+           - name: delete-assignment-by-principal-name
+             resource: azure.roleassignment
+             filters:
+                - type: value
+                  key: principalName
+                  op: eq
+                  value: custodian@example.com
+             actions:
+                - type: delete
+
+    """
+
+    class resource_type(QueryResourceManager.resource_type):
+        doc_groups = ['Active Directory']
+
         service = 'azure.mgmt.authorization'
         client = 'AuthorizationManagementClient'
         enum_spec = ('role_assignments', 'list', None)
@@ -55,7 +119,7 @@ class RoleAssignment(QueryResourceManager):
         )
 
     def augment(self, resources):
-        s = Session(resource='https://graph.windows.net')
+        s = self.get_session().get_session_for_resource('https://graph.windows.net')
         graph_client = GraphRbacManagementClient(s.get_credentials(), s.get_tenant_id())
 
         object_ids = list(set(
@@ -77,8 +141,30 @@ class RoleAssignment(QueryResourceManager):
 
 @resources.register('roledefinition')
 class RoleDefinition(QueryResourceManager):
+    """Role definitions define sets of permissions that can be assigned
+    to an identity.
 
-    class resource_type(object):
+    :example:
+
+    Return role definitions that explicitly have the permission to read authorization objects (role
+    assignments, role definitions, etc). If a role definition inherits permissions
+    (e.g. by having * permissions) they are not returned in this filter.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: role-definition-permissions
+              resource: azure.roledefinition
+              filters:
+                - type: value
+                  key: properties.permissions[0].actions
+                  value: Microsoft.Authorization/*/read
+                  op: contains
+    """
+
+    class resource_type(QueryResourceManager.resource_type):
+        doc_groups = ['Active Directory']
+
         service = 'azure.mgmt.authorization'
         client = 'AuthorizationManagementClient'
         get_spec = ('role_definitions', 'get_by_id', None)
@@ -110,37 +196,63 @@ class DescribeSource(DescribeSource):
         return [r.serialize(True) for r in resources]
 
 
-def is_scope(scope, scope_type):
-    if not isinstance(scope, six.string_types):
-        return False
-
-    regex = ""
-    if scope_type == "subscription":
-        regex = r"^\/subscriptions\/[^\/]+$"
-    elif scope_type == "resource-group":
-        regex = r"^\/subscriptions\/([^\/]+)\/resourceGroups\/.*$"
-    else:
-        return False
-
-    return bool(re.match(regex, scope, flags=re.IGNORECASE))
-
-
 @RoleAssignment.filter_registry.register('role')
 class RoleFilter(RelatedResourceFilter):
     """Filters role assignments based on role definitions
 
-    :Example:
+    :example:
 
-        .. code-block:: yaml
+    Return role assignments with the `Owner role`.
 
-            policies:
-               - name: assignments-by-role-definition
-                 resource: azure.roleassignment
-                 filters:
-                    - type: role
-                      key: properties.roleName
-                      op: in
-                      value: Owner
+    .. code-block:: yaml
+
+        policies:
+           - name: assignments-by-role-definition
+             resource: azure.roleassignment
+             filters:
+                - type: role
+                  key: properties.roleName
+                  op: in
+                  value: Owner
+
+    :example:
+
+    Return all assignments with the `Owner role` that have access to virtual machines. For the
+    resource-access filter, the related resource can be any custodian supported azure
+    resource other than `azure.roleassignments` or `azure.roledefinitions`.
+
+    .. code-block:: yaml
+
+        policies:
+           - name: assignment-by-role-and-resource
+             resource: azure.roleassignment
+             filters:
+                - type: role
+                  key: properties.roleName
+                  op: eq
+                  value: Owner
+                - type: resource-access
+                  relatedResource: azure.vm
+
+    :example:
+
+    Return all assignments with the `Owner role` that have access to virtual machines in `westus2`:
+
+    .. code-block:: yaml
+
+        policies:
+           - name: assignment-by-role-and-resource-access
+             resource: azure.roleassignment
+             filters:
+                - type: role
+                  key: properties.roleName
+                  op: eq
+                  value: Owner
+                - type: resource-access
+                  relatedResource: azure.vm
+                  key: location
+                  op: eq
+                  value: westus2
     """
 
     schema = type_schema('role', rinherit=ValueFilter.schema)
@@ -154,16 +266,17 @@ class ResourceAccessFilter(RelatedResourceFilter):
     """Filters role assignments that have access to a certain
     type of azure resource.
 
-    :Example:
+    :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-               - name: assignments-by-azure-resource
-                 resource: azure.roleassignment
-                 filters:
-                    - type: resource-access
-                      relatedResource: azure.vm
+        policies:
+           - name: assignments-by-azure-resource
+             resource: azure.roleassignment
+             filters:
+                - type: resource-access
+                  relatedResource: azure.vm
+
     """
 
     schema = type_schema(
@@ -207,27 +320,87 @@ class ResourceAccessFilter(RelatedResourceFilter):
 
 @RoleAssignment.filter_registry.register('scope')
 class ScopeFilter(Filter):
-    """Filters role assignments that have subscription level scope access
+    """
+    Filter role assignments by assignment scope.
 
     :example:
 
+    Return all role assignments with the `Subscription` level scope access.
+
     .. code-block:: yaml
 
-            policies:
-              - name: assignments-with-subscription-scope
-                resource: azure.roleassignment
-                filters:
+        policies:
+           - name: assignments-subscription-scope
+             resource: azure.roleassignment
+             filters:
+                - type: scope
+                  value: subscription
+
+    :example:
+
+    Role assignments with scope other than `Subscription` or `Resource Group`.
+
+    .. code-block:: yaml
+
+        policies:
+           - name: assignments-other-level-scope
+             resource: azure.roleassignment
+             filters:
+                - not:
                   - type: scope
                     value: subscription
+                - not:
+                  - type: scope
+                    value: resource-group
+
+    :example:
+
+    Return all service principal role assignments with the `Subscription` level scope access.
+
+    .. code-block:: yaml
+
+        policies:
+           - name: service-principal-assignments-subscription-scope
+             resource: azure.roleassignment
+             filters:
+                - type: value
+                  key: aadType
+                  op: eq
+                  value: ServicePrincipal
+                - type: scope
+                  value: subscription
+
     """
+
+    SUBSCRIPTION_SCOPE = 'subscription'
+    RG_SCOPE = 'resource-group'
+    MG_SCOPE = 'management-group'
 
     schema = type_schema(
         'scope',
-        value={'type': 'string', 'enum': ['subscription', 'resource-group']})
+        value={'type': 'string', 'enum': [SUBSCRIPTION_SCOPE, RG_SCOPE, MG_SCOPE]})
 
     def process(self, data, event=None):
         scope_value = self.data.get('value', '')
-        return [d for d in data if is_scope(d["properties"]["scope"], scope_value)]
+        return [d for d in data if self.is_scope(d["properties"]["scope"], scope_value)]
+
+    def is_scope(self, scope, scope_type):
+        if not isinstance(scope, six.string_types):
+            return False
+
+        regex = ""
+        if scope_type == self.SUBSCRIPTION_SCOPE:
+            regex = r"^\/subscriptions\/[^\/]+$"
+        elif scope_type == self.RG_SCOPE:
+            regex = r"^\/subscriptions\/([^\/]+)\/resourceGroups\/[^\/]+$"
+        elif scope_type == self.MG_SCOPE:
+            regex = r"^\/providers\/Microsoft\.Management\/managementGroups/[^\/]+$"
+        else:
+            return False
+
+        match = re.match(regex, scope, flags=re.IGNORECASE)
+
+        return bool(match)
 
 
 @RoleAssignment.action_registry.register('delete')

@@ -21,7 +21,7 @@ import logging
 import six
 
 from collections import defaultdict
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     Filter, FilterRegistry, DefaultVpcBase, MetricsFilter, ValueFilter)
@@ -29,7 +29,7 @@ import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
 
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.utils import (
     local_session, chunks, type_schema, get_retry, set_annotation)
 
@@ -40,12 +40,11 @@ log = logging.getLogger('custodian.app-elb')
 
 @resources.register('app-elb')
 class AppELB(QueryResourceManager):
-    """Resource manager for v2 ELBs (AKA ALBs).
+    """Resource manager for v2 ELBs (AKA ALBs and NLBs).
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elbv2'
-        type = 'loadbalancer/app'
         enum_spec = ('describe_load_balancers', 'LoadBalancers', None)
         name = 'LoadBalancerName'
         id = 'LoadBalancerArn'
@@ -54,6 +53,9 @@ class AppELB(QueryResourceManager):
         dimension = "LoadBalancer"
         date = 'CreatedTime'
         config_type = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+        arn = "LoadBalancerArn"
+        # The suffix varies by type of loadbalancer (app vs net)
+        arn_type = 'loadbalancer/app'
 
     retry = staticmethod(get_retry(('Throttling',)))
 
@@ -63,9 +65,6 @@ class AppELB(QueryResourceManager):
         return ("elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeLoadBalancerAttributes",
                 "elasticloadbalancing:DescribeTags")
-
-    def get_arn(self, r):
-        return r[self.resource_type.id]
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -666,6 +665,7 @@ class AppELBListenerFilter(ValueFilter, AppELBListenerFilterBase):
 
     schema = type_schema(
         'listener', rinherit=ValueFilter.schema, matched={'type': 'boolean'})
+    schema_alias = False
     permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
 
     def validate(self):
@@ -760,6 +760,24 @@ class AppELBModifyListenerPolicy(BaseAction):
                     **args)
 
 
+@AppELB.action_registry.register('modify-security-groups')
+class AppELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+
+    permissions = ("elasticloadbalancing:SetSecurityGroups",)
+
+    def process(self, albs):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        groups = super(AppELBModifyVpcSecurityGroups, self).get_groups(albs)
+
+        for idx, i in enumerate(albs):
+            try:
+                client.set_security_groups(
+                    LoadBalancerArn=i['LoadBalancerArn'],
+                    SecurityGroups=groups[idx])
+            except client.exceptions.LoadBalancerNotFoundException:
+                continue
+
+
 @AppELB.filter_registry.register('healthcheck-protocol-mismatch')
 class AppELBHealthCheckProtocolMismatchFilter(Filter,
                                               AppELBTargetGroupFilterBase):
@@ -800,6 +818,7 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
     """Filter ALB based on matching target group value"""
 
     schema = type_schema('target-group', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ("elasticloadbalancing:DescribeTargetGroups",)
 
     def process(self, albs, event=None):
@@ -837,17 +856,12 @@ class AppELBTargetGroup(QueryResourceManager):
     """Resource manager for v2 ELB target groups.
     """
 
-    class resource_type(object):
-
+    class resource_type(TypeInfo):
         service = 'elbv2'
-        type = 'app-elb-target-group'
+        arn_type = 'target-group'
         enum_spec = ('describe_target_groups', 'TargetGroups', None)
         name = 'TargetGroupName'
         id = 'TargetGroupArn'
-        filter_name = None
-        filter_type = None
-        dimension = None
-        date = None
 
     filter_registry = FilterRegistry('app-elb-target-group.filters')
     action_registry = ActionRegistry('app-elb-target-group.actions')

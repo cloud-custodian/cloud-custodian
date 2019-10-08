@@ -30,6 +30,17 @@ class CodeCommit(BaseTest):
             "ssh://git-codecommit.us-east-2.amazonaws.com/v1/repos/custodian-config-repo",
         )
 
+    def test_get_repo_resources(self):
+        factory = self.replay_flight_data('test_codecommit_get')
+        p = self.load_policy({
+            'name': 'get-repos', 'resource': 'codecommit'},
+            session_factory=factory)
+        m = p.resource_manager
+        resources = m.get_resources(['fizzbuzz'])
+        self.assertEqual(len(resources), 1)
+        r = resources.pop()
+        self.assertEqual(r['repositoryName'], 'fizzbuzz')
+
     def test_delete_repos(self):
         factory = self.replay_flight_data("test_codecommit_delete")
         p = self.load_policy(

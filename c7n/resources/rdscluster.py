@@ -14,21 +14,21 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-import functools
 
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.filters import AgeFilter
+from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks,
-    get_retry, generate_arn)
+    type_schema, local_session, snapshot_identifier, chunks)
+
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -38,27 +38,14 @@ class RDSCluster(QueryResourceManager):
     """Resource manager for RDS clusters.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
 
         service = 'rds'
-        type = 'cluster'
+        arn_type = 'cluster'
+        arn_separator = ":"
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
-        filter_name = None
-        filter_type = None
         dimension = 'DBClusterIdentifier'
-        date = None
-
-    retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id,
-                resource_type=self.resource_type.type, separator=':')
-        return self._generate_arn
 
     def augment(self, dbs):
         return list(filter(None, _rds_cluster_tags(
@@ -69,6 +56,8 @@ class RDSCluster(QueryResourceManager):
 
 RDSCluster.filter_registry.register('tag-count', tags.TagCountFilter)
 RDSCluster.filter_registry.register('marked-for-op', tags.TagActionFilter)
+RDSCluster.filter_registry.register('offhour', OffHour)
+RDSCluster.filter_registry.register('onhour', OnHour)
 
 
 def _rds_cluster_tags(model, dbs, session_factory, generator, retry):
@@ -457,16 +446,13 @@ class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
 
         service = 'rds'
-        type = 'rds-cluster-snapshot'
+        arn_type = 'cluster-snapshot'
         enum_spec = (
             'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
         name = id = 'DBClusterSnapshotIdentifier'
-        filter_name = None
-        filter_type = None
-        dimension = None
         date = 'SnapshotCreateTime'
 
 
@@ -520,7 +506,7 @@ class RDSClusterSnapshotDelete(BaseAction):
     permissions = ('rds:DeleteDBClusterSnapshot',)
 
     def process(self, snapshots):
-        log.info("Deleting %d RDS cluster snapshots", len(snapshots))
+        self.log.info("Deleting %d RDS cluster snapshots", len(snapshots))
         client = local_session(self.manager.session_factory).client('rds')
         error = None
         with self.executor_factory(max_workers=2) as w:

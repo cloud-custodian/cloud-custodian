@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import json
 import logging
@@ -5,6 +6,8 @@ import os
 import re
 import subprocess
 import sys
+
+from c7n.mu import checksum
 
 logger = logging.getLogger('c7n_azure.dependency_manager')
 
@@ -37,15 +40,20 @@ class DependencyManager(object):
         for p in packages:
             res.extend([str(r) for r in next(d.requires() for d in dists if (p + ' ') in str(d))])
 
-        res = [t for t in res if not any((e in t) for e in excluded_packages + packages)]
+        # regex for the package version constraints
+        regex = "^[^<>~=]*"
+
+        # remove the excluded packages
+        res = [t for t in res if
+               not any(re.match(regex, t).group(0).lower() == e.lower()
+                       for e in excluded_packages + packages)]
 
         # boto3 is a dependency for both c7n and c7n_mailer.. Remove the duplicate from the list
         # because not all versions of pip can handle this.
         # use regex to get rid of duplicates excluding version number
-        regex = "^[^<>~=]*"
         for i, val in enumerate(res):
-            pname = re.match(regex, val)
-            if sum(pname[0].lower() in e.lower() for e in res) > 1:
+            pname = re.match(regex, val).group(0).lower()
+            if sum(pname == re.match(regex, e.lower()).group(0) for e in res) > 1:
                 logger.debug("removing duplicate dependency:" + val)
                 res.pop(i)
         return sorted(res)
@@ -113,35 +121,28 @@ class DependencyManager(object):
             wheel = Wheel(f)
             wheel.install(paths, ScriptMaker(None, None), lib_only=True)
 
-    @staticmethod
-    def _get_dir_hash(directory):
-        hash = hashlib.md5()
+        # Ensure there is no top level __init__.py
+        os.remove(os.path.join(install_folder, 'azure', '__init__.py'))
 
-        for root, _, files in os.walk(directory):
-            for names in files:
-                filepath = os.path.join(root, names)
-                with open(filepath, 'rb') as f:
-                    buf = f.read(65536)
-                    if not buf:
-                        break
-                    hash.update(buf)
-        return hash.hexdigest()
+    @staticmethod
+    def _get_file_hash(filepath):
+        hasher = hashlib.sha256()
+        with open(filepath, 'rb') as f:
+            return base64.b64encode(checksum(f, hasher)).decode('ascii')
 
     @staticmethod
     def _get_string_hash(string):
         return hashlib.md5(string.encode('utf-8')).hexdigest()
 
     @staticmethod
-    def check_cache(cache_folder, install_folder, packages):
-        metadata_file = os.path.join(cache_folder, 'metadata.json')
-
-        if not os.path.exists(metadata_file):
+    def check_cache(cache_metadata_file, cache_zip_file, packages):
+        if not os.path.exists(cache_metadata_file):
             return False
 
-        if not os.path.exists(install_folder):
+        if not os.path.exists(cache_zip_file):
             return False
 
-        with open(metadata_file, 'rt') as f:
+        with open(cache_metadata_file, 'rt') as f:
             try:
                 data = json.load(f)
             except Exception:
@@ -150,13 +151,12 @@ class DependencyManager(object):
         if DependencyManager._get_string_hash(' '.join(packages)) != data.get('packages_hash'):
             return False
 
-        if DependencyManager._get_dir_hash(install_folder) != data.get('install_hash'):
+        if DependencyManager._get_file_hash(cache_zip_file) != data.get('zip_hash'):
             return False
         return True
 
     @staticmethod
-    def create_cache_metadata(cache_folder, install_folder, packages):
-        metadata_file = os.path.join(cache_folder, 'metadata.json')
-        with open(metadata_file, 'wt+') as f:
+    def create_cache_metadata(cache_metadata_file, cache_zip_file, packages):
+        with open(cache_metadata_file, 'wt+') as f:
             json.dump({'packages_hash': DependencyManager._get_string_hash(' '.join(packages)),
-                       'install_hash': DependencyManager._get_dir_hash(install_folder)}, f)
+                       'zip_hash': DependencyManager._get_file_hash(cache_zip_file)}, f)

@@ -77,6 +77,37 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_vpc_post_finding(self):
+        # reusing extant test data
+        factory = self.replay_flight_data('test_vpc_flow_log_s3_dest')
+        p = self.load_policy({
+            'name': 'post-vpc-finding',
+            'resource': 'vpc',
+            'actions': [{
+                'type': 'post-finding',
+                'types': ['Effects/Custodian']}]},
+            session_factory=factory)
+        resources = p.resource_manager.resources()
+        post_finding = p.resource_manager.actions[0]
+        formatted = post_finding.format_resource(resources[0])
+        formatted['Details']['Other'].pop('Tags')
+        formatted['Details']['Other'].pop('CidrBlockAssociationSet')
+        self.assertEqual(
+            formatted,
+            {'Details': {'Other': {'CidrBlock': '10.0.42.0/24',
+                                   'DhcpOptionsId': 'dopt-24ff1940',
+                                   'InstanceTenancy': 'default',
+                                   'IsDefault': 'False',
+                                   'OwnerId': '644160558196',
+                                   'State': 'available',
+                                   'VpcId': 'vpc-f1516b97',
+                                   'c7n:resource-type': 'vpc'}},
+             'Id': 'arn:aws:ec2:us-east-1::vpc/vpc-f1516b97',
+             'Partition': 'aws',
+             'Region': 'us-east-1',
+             'Tags': {'Name': 'FancyTestVPC', 'tagfancykey': 'tagfanncyvalue'},
+             'Type': 'AwsEc2Vpc'})
+
     def test_flow_logs_s3_destination(self):
         factory = self.replay_flight_data('test_vpc_flow_log_s3_dest')
         p = self.load_policy({
@@ -162,6 +193,20 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["VpcId"], vpc_id1)
+
+    def test_eni_vpc_filter(self):
+        self.session_factory = self.replay_flight_data("test_eni_vpc_filter")
+        p = self.load_policy({
+            "name": "ec2-eni-vpc-filter",
+            "resource": "eni",
+            "filters": [{
+                'type': 'vpc',
+                'key': 'tag:Name',
+                'value': 'FlowLogTest'}]},
+            session_factory=self.session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["VpcId"], "vpc-d2d616b5")
 
     def test_attributes_filter_all(self):
         self.session_factory = self.replay_flight_data("test_vpc_attributes")
@@ -644,6 +689,41 @@ class NetworkInterfaceTest(BaseTest):
         self.assertEqual(
             [k for k in resources[0] if k.startswith("c7n")], ["c7n:MatchedFilters"]
         )
+
+    def test_interface_delete(self):
+        factory = self.replay_flight_data("test_network_interface_delete")
+        client = factory().client("ec2")
+        eni = "eni-d834cdcf"
+
+        p = self.load_policy(
+            {
+                "name": "eni-delete",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "NetworkInterfaceId",
+                        "value": eni,
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete",
+                    },
+                    {
+                        # ensure graceful handling of multiple delete attempts
+                        "type": "delete",
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        with self.assertRaises(client.exceptions.ClientError) as e:
+            client.describe_network_interfaces(NetworkInterfaceIds=[eni])
+        self.assertEqual(e.exception.response['Error']['Code'],
+            'InvalidNetworkInterfaceID.NotFound')
 
     @functional
     def test_interface_subnet(self):
@@ -1364,6 +1444,57 @@ class SecurityGroupTest(BaseTest):
             0
         ]
         self.assertEqual(group_info.get("IpPermissions", []), [])
+
+    def test_security_group_post_finding(self):
+        # reuse replay
+        factory = self.replay_flight_data('test_security_group_perm_cidr_kv')
+        p = self.load_policy({
+            'name': 'sg-ingress',
+            'resource': 'security-group',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId ='sg-6c7fa917'"}],
+            'actions': [{
+                'type': 'post-finding',
+                'types': ['Effects/Custodian']}]},
+            session_factory=factory)
+        resources = p.resource_manager.resources()
+        post_finding = p.resource_manager.actions[0]
+        formatted = post_finding.format_resource(resources[0])
+        for k in ('IpPermissions', 'IpPermissionsEgress', 'Tags'):
+            formatted['Details']['Other'].pop(k)
+        self.assertEqual(
+            formatted,
+            {'Details': {
+                'Other': {
+                    'Description': 'default VPC security group',
+                    'GroupId': 'sg-6c7fa917',
+                    'GroupName': 'default',
+                    'OwnerId': '644160558196',
+                    'VpcId': 'vpc-d2d616b5',
+                    'c7n:resource-type': 'security-group'}},
+             'Id': 'arn:aws:ec2:us-east-1::security-group/sg-6c7fa917',
+             'Partition': 'aws',
+             'Region': 'us-east-1',
+             'Tags': {'NetworkLocation': 'Private'},
+             'Type': 'AwsEc2SecurityGroup'})
+
+    def test_permission_cidr_kv(self):
+        factory = self.replay_flight_data('test_security_group_perm_cidr_kv')
+        p = self.load_policy({
+            'name': 'sg-ingress',
+            'resource': 'security-group',
+            'source': 'config',
+            'filters': [{
+                'type': 'egress',
+                'Cidr': '0.0.0.0/0',
+            }],
+            'query': [
+                {'clause': "resourceId ='sg-6c7fa917'"},
+            ]}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['GroupId'], 'sg-6c7fa917')
 
     def test_default_vpc(self):
         # preconditions, more than one vpc, each with at least one
@@ -2171,7 +2302,7 @@ class SecurityGroupTest(BaseTest):
 
     def test_egress_validation_error(self):
         self.assertRaises(
-            PolicyValidationError,
+            Exception,
             self.load_policy,
             {
                 "name": "sg-find2",
@@ -2459,6 +2590,42 @@ class FlowLogsTest(BaseTest):
         self.assertEqual(resources[0]['c7n:flow-logs'][0]['LogDestination'],
                          'arn:aws:s3:::c7n-vpc-flow-logs')
 
+    def test_vpc_set_flow_logs_validation(self):
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 'flow-set-validate-1',
+                'resource': 'vpc',
+                'actions': [{
+                    'type': 'set-flow-log',
+                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
+                }]})
+        self.assertIn(
+            "DeliverLogsPermissionArn missing", str(e.exception))
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 'flow-set-validate-2',
+                'resource': 'vpc',
+                'actions': [{
+                    'type': 'set-flow-log',
+                    'DeliverLogsPermissionArn': 'arn:aws:iam',
+                    'LogGroupName': '/cloudwatch/logs',
+                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
+                }]})
+        self.assertIn("Exactly one of", str(e.exception))
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 'flow-set-validate-3',
+                'resource': 'vpc',
+                'actions': [{
+                    'type': 'set-flow-log',
+                    'LogDestinationType': 's3',
+                    'DeliverLogsPermissionArn': 'arn:aws:iam',
+                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
+                }]})
+        self.assertIn(
+            "DeliverLogsPermissionArn is prohibited for destination-type:s3",
+            str(e.exception))
+
     def test_vpc_set_flow_logs_s3(self):
         session_factory = self.replay_flight_data("test_vpc_set_flow_logs_s3")
         p = self.load_policy(
@@ -2473,8 +2640,6 @@ class FlowLogsTest(BaseTest):
                         "type": "set-flow-log",
                         "LogDestinationType": "s3",
                         "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz",
-                        "DeliverLogsPermissionArn":
-                            "arn:aws:iam::644160558196:role/testing-vpc-flow-log-role",
                     }
                 ],
             },

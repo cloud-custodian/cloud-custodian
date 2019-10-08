@@ -14,6 +14,7 @@
 import logging
 
 from azure.mgmt.resource.resources.models import GenericResource, ResourceGroupPatchable
+from c7n_azure.utils import is_resource_group
 
 
 class TagHelper:
@@ -25,7 +26,7 @@ class TagHelper:
         client = tag_action.session.client('azure.mgmt.resource.ResourceManagementClient')
 
         # resource group type
-        if tag_action.manager.type == 'resourcegroup':
+        if is_resource_group(resource):
             params_patch = ResourceGroupPatchable(
                 tags=tags
             )
@@ -35,24 +36,18 @@ class TagHelper:
             )
         # other Azure resources
         else:
-            # generic armresource tagging isn't supported yet Github issue #2637
-            if tag_action.manager.type == 'armresource':
-                raise NotImplementedError('Cannot tag generic ARM resources.')
-
-            api_version = tag_action.session.resource_api_version(resource['id'])
-
             # deserialize the original object
             az_resource = GenericResource.deserialize(resource)
 
-            # create a GenericResource object with the required parameters
-            generic_resource = GenericResource(location=az_resource.location,
-                                               tags=tags,
-                                               properties=az_resource.properties,
-                                               kind=az_resource.kind,
-                                               managed_by=az_resource.managed_by,
-                                               identity=az_resource.identity)
+            if not tag_action.manager.tag_operation_enabled(az_resource.type):
+                raise NotImplementedError('Cannot tag resource with type {0}'
+                                          .format(az_resource.type))
+            api_version = tag_action.session.resource_api_version(resource['id'])
 
-            client.resources.update_by_id(resource['id'], api_version, generic_resource)
+            # create a PATCH object with only updates to tags
+            tags_patch = GenericResource(tags=tags)
+
+            client.resources.update_by_id(resource['id'], api_version, tags_patch)
 
     @staticmethod
     def remove_tags(tag_action, resource, tags_to_delete):
@@ -80,7 +75,6 @@ class TagHelper:
 
         # add or update tags
         for key in tags_to_add:
-
             # nothing to do if the tag and value already exists on the resource
             if key in tags:
                 if tags[key] != tags_to_add[key]:

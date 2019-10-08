@@ -1,274 +1,212 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Reservations": [
             {
-                "OwnerId": "619193117841", 
-                "ReservationId": "r-6de0fb9a", 
-                "Groups": [], 
+                "Groups": [],
                 "Instances": [
                     {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-07b4156579ea1d7ba",
+                        "InstanceId": "i-063c6794763254b51",
+                        "InstanceType": "t3.small",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2019,
+                            "month": 6,
+                            "day": 11,
+                            "hour": 20,
+                            "minute": 56,
+                            "second": 23,
+                            "microsecond": 0
+                        },
                         "Monitoring": {
                             "State": "disabled"
-                        }, 
-                        "PublicDnsName": "", 
-                        "KernelId": "aki-fc8f11cc", 
-                        "State": {
-                            "Code": 48, 
-                            "Name": "terminated"
-                        }, 
-                        "EbsOptimized": false, 
-                        "LaunchTime": {
-                            "hour": 14, 
-                            "__class__": "datetime", 
-                            "month": 11, 
-                            "second": 40, 
-                            "microsecond": 0, 
-                            "year": 2015, 
-                            "day": 24, 
-                            "minute": 40
-                        }, 
-                        "ProductCodes": [], 
-                        "Tags": [
-                            {
-                                "Value": "Packer Builder", 
-                                "Key": "Name"
-                            }
-                        ], 
-                        "InstanceId": "i-b2d2a876", 
-                        "ImageId": "ami-37501207", 
-                        "PrivateDnsName": "", 
-                        "KeyName": "packer 565476e7-2661-74e8-3a92-df2848e11888", 
-                        "SecurityGroups": [], 
-                        "ClientToken": "", 
-                        "InstanceType": "m3.medium", 
-                        "NetworkInterfaces": [], 
+                        },
                         "Placement": {
-                            "Tenancy": "default", 
-                            "GroupName": "", 
-                            "AvailabilityZone": "us-west-2a"
-                        }, 
-                        "Hypervisor": "xen", 
-                        "BlockDeviceMappings": [], 
-                        "Architecture": "x86_64", 
-                        "StateReason": {
-                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown", 
-                            "Code": "Client.UserInitiatedShutdown"
-                        }, 
-                        "RootDeviceName": "/dev/sda1", 
-                        "VirtualizationType": "paravirtual", 
-                        "RootDeviceType": "ebs", 
-                        "StateTransitionReason": "User initiated (2015-11-25 10:11:55 GMT)", 
-                        "AmiLaunchIndex": 0
-                    }
-                ]
-            }, 
-            {
-                "OwnerId": "619193117841", 
-                "ReservationId": "r-152e35e2", 
-                "Groups": [], 
-                "Instances": [
-                    {
-                        "Monitoring": {
-                            "State": "disabled"
-                        }, 
-                        "PublicDnsName": "", 
-                        "RootDeviceType": "ebs", 
+                            "AvailabilityZone": "us-east-1a",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-172-31-11-37.ec2.internal",
+                        "PrivateIpAddress": "172.31.11.37",
+                        "ProductCodes": [],
+                        "PublicDnsName": "ec2-100-26-36-220.compute-1.amazonaws.com",
+                        "PublicIpAddress": "100.26.36.220",
                         "State": {
-                            "Code": 48, 
-                            "Name": "terminated"
-                        }, 
-                        "EbsOptimized": true, 
-                        "LaunchTime": {
-                            "hour": 11, 
-                            "__class__": "datetime", 
-                            "month": 11, 
-                            "second": 14, 
-                            "microsecond": 0, 
-                            "year": 2015, 
-                            "day": 24, 
-                            "minute": 7
-                        }, 
-                        "ProductCodes": [], 
-                        "StateTransitionReason": "User initiated (2015-11-25 10:11:55 GMT)", 
-                        "InstanceId": "i-13413bd7", 
-                        "ImageId": "ami-ef65758e", 
-                        "PrivateDnsName": "", 
-                        "KeyName": "HazmatGreenField", 
-                        "SecurityGroups": [], 
-                        "ClientToken": "rWCNH1448363234434", 
-                        "InstanceType": "m4.xlarge", 
-                        "NetworkInterfaces": [], 
-                        "Placement": {
-                            "Tenancy": "default", 
-                            "GroupName": "", 
-                            "AvailabilityZone": "us-west-2a"
-                        }, 
-                        "Hypervisor": "xen", 
-                        "BlockDeviceMappings": [], 
-                        "Architecture": "x86_64", 
-                        "StateReason": {
-                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown", 
-                            "Code": "Client.UserInitiatedShutdown"
-                        }, 
-                        "RootDeviceName": "/dev/sda1", 
-                        "VirtualizationType": "hvm", 
-                        "Tags": [
-                            {
-                                "Value": "Spinnaker", 
-                                "Key": "Name"
-                            }
-                        ], 
-                        "AmiLaunchIndex": 0
-                    }
-                ]
-            }, 
-            {
-                "OwnerId": "619193117841", 
-                "ReservationId": "r-d123af7f", 
-                "Groups": [], 
-                "Instances": [
-                    {
-                        "Monitoring": {
-                            "State": "disabled"
-                        }, 
-                        "PublicDnsName": "", 
-                        "RootDeviceType": "ebs", 
-                        "State": {
-                            "Code": 80, 
-                            "Name": "stopped"
-                        }, 
-                        "EbsOptimized": false, 
-                        "LaunchTime": {
-                            "hour": 23, 
-                            "__class__": "datetime", 
-                            "month": 5, 
-                            "second": 19, 
-                            "microsecond": 0, 
-                            "year": 2016, 
-                            "day": 7, 
-                            "minute": 37
-                        }, 
-                        "PrivateIpAddress": "172.31.8.154", 
-                        "ProductCodes": [], 
-                        "VpcId": "vpc-399e3d52", 
-                        "StateTransitionReason": "User initiated (2016-05-08 00:11:52 GMT)", 
-                        "InstanceId": "i-1aebf7c0", 
-                        "ImageId": "ami-c229c0a2", 
-                        "PrivateDnsName": "ip-172-31-8-154.us-west-2.compute.internal", 
-                        "KeyName": "HazmatGreenField", 
-                        "SecurityGroups": [
-                            {
-                                "GroupName": "jlxc", 
-                                "GroupId": "sg-47b76f22"
-                            }, 
-                            {
-                                "GroupName": "default", 
-                                "GroupId": "sg-0a08e365"
-                            }
-                        ], 
-                        "ClientToken": "JlRpx1460611049040", 
-                        "SubnetId": "subnet-389e3d53", 
-                        "InstanceType": "m3.medium", 
-                        "NetworkInterfaces": [
-                            {
-                                "Status": "in-use", 
-                                "MacAddress": "0a:d4:67:1f:58:03", 
-                                "SourceDestCheck": true, 
-                                "VpcId": "vpc-399e3d52", 
-                                "Description": "", 
-                                "NetworkInterfaceId": "eni-68d48235", 
-                                "PrivateIpAddresses": [
-                                    {
-                                        "PrivateDnsName": "ip-172-31-8-154.us-west-2.compute.internal", 
-                                        "Primary": true, 
-                                        "PrivateIpAddress": "172.31.8.154"
-                                    }
-                                ], 
-                                "PrivateDnsName": "ip-172-31-8-154.us-west-2.compute.internal", 
-                                "Attachment": {
-                                    "Status": "attached", 
-                                    "DeviceIndex": 0, 
-                                    "DeleteOnTermination": true, 
-                                    "AttachmentId": "eni-attach-f1c55f38", 
-                                    "AttachTime": {
-                                        "hour": 5, 
-                                        "__class__": "datetime", 
-                                        "month": 4, 
-                                        "second": 29, 
-                                        "microsecond": 0, 
-                                        "year": 2016, 
-                                        "day": 14, 
-                                        "minute": 17
-                                    }
-                                }, 
-                                "Groups": [
-                                    {
-                                        "GroupName": "jlxc", 
-                                        "GroupId": "sg-47b76f22"
-                                    }, 
-                                    {
-                                        "GroupName": "default", 
-                                        "GroupId": "sg-0a08e365"
-                                    }
-                                ], 
-                                "SubnetId": "subnet-389e3d53", 
-                                "OwnerId": "619193117841", 
-                                "PrivateIpAddress": "172.31.8.154"
-                            }
-                        ], 
-                        "SourceDestCheck": true, 
-                        "Placement": {
-                            "Tenancy": "default", 
-                            "GroupName": "", 
-                            "AvailabilityZone": "us-west-2c"
-                        }, 
-                        "Hypervisor": "xen", 
+                            "Code": 16,
+                            "Name": "running"
+                        },
+                        "StateTransitionReason": "",
+                        "SubnetId": "subnet-914763e7",
+                        "VpcId": "vpc-d2d616b5",
+                        "Architecture": "x86_64",
                         "BlockDeviceMappings": [
                             {
-                                "DeviceName": "/dev/xvda", 
+                                "DeviceName": "/dev/sda1",
                                 "Ebs": {
-                                    "Status": "attached", 
-                                    "DeleteOnTermination": true, 
-                                    "VolumeId": "vol-2b047792", 
                                     "AttachTime": {
-                                        "hour": 5, 
-                                        "__class__": "datetime", 
-                                        "month": 4, 
-                                        "second": 29, 
-                                        "microsecond": 0, 
-                                        "year": 2016, 
-                                        "day": 14, 
-                                        "minute": 17
-                                    }
+                                        "__class__": "datetime",
+                                        "year": 2019,
+                                        "month": 6,
+                                        "day": 11,
+                                        "hour": 20,
+                                        "minute": 56,
+                                        "second": 23,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-0caf24c45a8aa4b11"
+                                }
+                            },
+                            {
+                                "DeviceName": "/dev/sdb",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2019,
+                                        "month": 6,
+                                        "day": 11,
+                                        "hour": 20,
+                                        "minute": 56,
+                                        "second": 23,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-0188a91cfcb95c342"
+                                }
+                            },
+                            {
+                                "DeviceName": "/dev/sdc",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2019,
+                                        "month": 6,
+                                        "day": 11,
+                                        "hour": 20,
+                                        "minute": 56,
+                                        "second": 23,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-05117418b3ad30481"
                                 }
                             }
-                        ], 
-                        "Architecture": "x86_64", 
-                        "StateReason": {
-                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown", 
-                            "Code": "Client.UserInitiatedShutdown"
-                        }, 
-                        "RootDeviceName": "/dev/xvda", 
-                        "VirtualizationType": "hvm", 
+                        ],
+                        "ClientToken": "",
+                        "EbsOptimized": true,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "NetworkInterfaces": [
+                            {
+                                "Association": {
+                                    "IpOwnerId": "amazon",
+                                    "PublicDnsName": "ec2-100-26-36-220.compute-1.amazonaws.com",
+                                    "PublicIp": "100.26.36.220"
+                                },
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2019,
+                                        "month": 6,
+                                        "day": 11,
+                                        "hour": 20,
+                                        "minute": 56,
+                                        "second": 23,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-0125cf6988c1ec962",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached"
+                                },
+                                "Description": "",
+                                "Groups": [
+                                    {
+                                        "GroupName": "default",
+                                        "GroupId": "sg-6c7fa917"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "0a:9f:f7:9f:2d:24",
+                                "NetworkInterfaceId": "eni-00eb9a1bebb7a0d0c",
+                                "OwnerId": "644160558196",
+                                "PrivateDnsName": "ip-172-31-11-37.ec2.internal",
+                                "PrivateIpAddress": "172.31.11.37",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Association": {
+                                            "IpOwnerId": "amazon",
+                                            "PublicDnsName": "ec2-100-26-36-220.compute-1.amazonaws.com",
+                                            "PublicIp": "100.26.36.220"
+                                        },
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-172-31-11-37.ec2.internal",
+                                        "PrivateIpAddress": "172.31.11.37"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-914763e7",
+                                "VpcId": "vpc-d2d616b5",
+                                "InterfaceType": "interface"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/sda1",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "default",
+                                "GroupId": "sg-6c7fa917"
+                            }
+                        ],
+                        "SourceDestCheck": true,
                         "Tags": [
                             {
-                                "Value": "Testing123", 
-                                "Key": "Testing"
-                            }, 
+                                "Key": "App",
+                                "Value": "DevX"
+                            },
                             {
-                                "Value": "CompileLambda", 
-                                "Key": "Name"
+                                "Key": "Stage",
+                                "Value": "Dev"
+                            },
+                            {
+                                "Key": "Name",
+                                "Value": "Foo"
                             }
-                        ], 
-                        "AmiLaunchIndex": 0
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 1,
+                            "ThreadsPerCore": 2
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        }
                     }
-                ]
+                ],
+                "OwnerId": "644160558196",
+                "ReservationId": "r-02b0823521eeb99df"
             }
-        ], 
+        ],
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "6bcf1fb2-d8fb-4844-8422-106e80951a6c"
+            "RequestId": "e36ef3d7-cdeb-4f48-92a4-70081f9748ed",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "7884",
+                "vary": "accept-encoding",
+                "date": "Tue, 11 Jun 2019 21:15:10 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
         }
     }
 }

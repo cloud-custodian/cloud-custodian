@@ -14,13 +14,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-import operator
 
-from c7n.actions import Action
+from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
 from .aws import shape_validate, Arn
@@ -31,14 +30,13 @@ log = logging.getLogger('c7n.resources.cloudtrail')
 @resources.register('cloudtrail')
 class CloudTrail(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudtrail'
         enum_spec = ('describe_trails', 'trailList', None)
         filter_name = 'trailNameList'
         filter_type = 'list'
         arn = id = 'TrailARN'
         name = 'Name'
-        dimension = None
         config_type = "AWS::CloudTrail::Trail"
 
 
@@ -55,10 +53,8 @@ class IsShadow(Filter):
     embedded = False
 
     def process(self, resources, event=None):
-        anded = lambda x: True # NOQA
-        op = self.data.get('state', True) and anded or operator.__not__
         rcount = len(resources)
-        trails = [t for t in resources if op(self.is_shadow(t))]
+        trails = [t for t in resources if (self.is_shadow(t) == self.data.get('state', True))]
         if len(trails) != rcount and self.embedded:
             self.log.info("implicitly filtering shadow trails %d -> %d",
                      rcount, len(trails))
@@ -67,8 +63,9 @@ class IsShadow(Filter):
     def is_shadow(self, t):
         if t.get('IsOrganizationTrail') and self.manager.config.account_id not in t['TrailARN']:
             return True
-        if t.get('IsMultiRegionTrail') and t['HomeRegion'] not in t['TrailARN']:
+        if t.get('IsMultiRegionTrail') and t['HomeRegion'] != self.manager.config.region:
             return True
+        return False
 
 
 @CloudTrail.filter_registry.register('status')
@@ -80,7 +77,7 @@ class Status(ValueFilter):
     .. code-block:: yaml
 
         policies:
-          - name: cloudtrail-not-active
+          - name: cloudtrail-check-status
             resource: aws.cloudtrail
             filters:
             - type: status
@@ -89,6 +86,7 @@ class Status(ValueFilter):
     """
 
     schema = type_schema('status', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('cloudtrail:GetTrailStatus',)
     annotation_key = 'c7n:TrailStatus'
 
@@ -176,7 +174,7 @@ class SetLogging(Action):
     .. code-block:: yaml
 
       policies:
-        - name: cloudtrail-not-active
+        - name: cloudtrail-set-active
           resource: aws.cloudtrail
           filters:
            - type: status
@@ -208,3 +206,38 @@ class SetLogging(Action):
                 client.start_logging(Name=r['Name'])
             else:
                 client.stop_logging(Name=r['Name'])
+
+
+@CloudTrail.action_registry.register('delete')
+class DeleteTrail(BaseAction):
+    """ Delete a cloud trail
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: delete-cloudtrail
+          resource: aws.cloudtrail
+          filters:
+           - type: value
+             key: Name
+             value: delete-me
+             op: eq
+          actions:
+           - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('cloudtrail:DeleteTrail',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('cloudtrail')
+        shadow_check = IsShadow({'state': False}, self.manager)
+        shadow_check.embedded = True
+        resources = shadow_check.process(resources)
+        for r in resources:
+            try:
+                client.delete_trail(Name=r['Name'])
+            except client.exceptions.TrailNotFoundException:
+                continue

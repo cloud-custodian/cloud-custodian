@@ -8,7 +8,7 @@ endif
 # You can set these variables from the command line.
 SPHINXBINS    ?= .tox/$(VIRTUALENV)/bin
 SRCDIR        ?= docs/source
-SPHINXOPTS    ?= -W
+SPHINXOPTS    ?=
 SPHINXBUILD   ?= $(SPHINXBINS)/sphinx-build
 PAPER         ?=
 BUILDDIR      ?= $(SRCDIR)/../build
@@ -59,12 +59,47 @@ clean:
 	rm -rf $(SRCDIR)/generated
 
 html:
-	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
-	$(SPHINXBINS)/sphinx-apidoc -H "Azure" -o $(SRCDIR)/generated/azure $(SRCDIR)/../../tools/c7n_azure/c7n_azure
-	$(SPHINXBINS)/sphinx-apidoc -H "GCP" -o $(SRCDIR)/generated/gcp $(SRCDIR)/../../tools/c7n_gcp/c7n_gcp
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+#	$(SPHINXBINS)/sphinx-apidoc -H "AWS" -o $(SRCDIR)/generated/aws $(SRCDIR)/../../c7n $(SRCDIR)/../../tests $(SRCDIR)/../../c7n/ipaddress.py
+#	$(SPHINXBINS)/sphinx-apidoc -H "Azure" -o $(SRCDIR)/generated/azure $(SRCDIR)/../../tools/c7n_azure/c7n_azure
+#	$(SPHINXBINS)/sphinx-apidoc -H "GCP" -o $(SRCDIR)/generated/gcp $(SRCDIR)/../../tools/c7n_gcp/c7n_gcp
+
+#
+# Copy readme files that are in the tree to avoid duplicating
+#	cp README.md $(SRCDIR)/overview.md
+	mkdir -p $(SRCDIR)/tools/assets
+	cp tools/c7n_org/README.md $(SRCDIR)/tools/c7n-org.md
+	cp tools/cask/readme.md $(SRCDIR)/tools/cask.md
+	cp tools/c7n_policystream/README.md $(SRCDIR)/tools/c7n-policystream.md
+	cp tools/c7n_mailer/README.md $(SRCDIR)/tools/c7n-mailer.md
+	cp tools/c7n_trailcreator/readme.md $(SRCDIR)/tools/c7n-trailcreator.md
+	cp tools/c7n_guardian/readme.md $(SRCDIR)/tools/c7n-guardian.md
+	cp tools/omnissm/README.md $(SRCDIR)/tools/omnissm.md
+	cp tools/omnissm/assets/omnissm.svg $(SRCDIR)/tools/assets/omnissm.svg
+	cp tools/c7n_salactus/README.md $(SRCDIR)/tools/c7n-salactus.md
+	cp tools/c7n_logexporter/README.md $(SRCDIR)/tools/c7n-logexporter.md
+
+	mkdir -p $(SRCDIR)/aws/resources
+	c7n-sphinxext --provider aws --output-dir $(SRCDIR)/aws/resources --group-by=resource_type.service
+	mkdir -p $(SRCDIR)/gcp/resources
+	c7n-sphinxext --provider gcp --output-dir $(SRCDIR)/gcp/resources --group-by=resource_type.service
+	mkdir -p $(SRCDIR)/azure/resources
+	c7n-sphinxext --provider azure --output-dir $(SRCDIR)/azure/resources --group-by=resource_type.doc_groups
+	$(SPHINXBUILD) -W -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+
+#
+# Remove the copies so folks dont accidentally edit the copy
+	rm $(SRCDIR)/tools/c7n-org.md
+	rm $(SRCDIR)/tools/c7n-policystream.md
+	rm $(SRCDIR)/tools/c7n-mailer.md
+	rm $(SRCDIR)/tools/c7n-trailcreator.md
+	rm $(SRCDIR)/tools/omnissm.md
+	rm $(SRCDIR)/tools/c7n-salactus.md
+	rm $(SRCDIR)/tools/c7n-logexporter.md
+	rm $(SRCDIR)/tools/c7n-guardian.md
+
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml

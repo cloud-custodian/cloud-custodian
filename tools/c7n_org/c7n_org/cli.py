@@ -22,11 +22,6 @@ import subprocess
 import six
 import sys
 
-# Try to set this early if offers any help against this OSX issue
-# https://bugs.python.org/issue33725
-# if sys.platform == 'darwin':
-#    os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
-
 import multiprocessing
 from concurrent.futures import (
     ProcessPoolExecutor,
@@ -43,15 +38,23 @@ from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import MainThreadExecutor
 from c7n.config import Config
 from c7n.policy import PolicyCollection
+from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set
 from c7n.resources import load_resources
-from c7n.manager import resources as resource_registry
 from c7n.utils import CONN_CACHE, dumps
 
 from c7n_org.utils import environ, account_tags
 from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('c7n_org')
+
+# Workaround OSX issue, note this exists for py2 but there
+# isn't anything we can do in that case.
+# https://bugs.python.org/issue33725
+if sys.platform == 'darwin' and (
+        sys.version_info.major > 3 and sys.version_info.minor > 4):
+    multiprocessing.set_start_method('spawn')
+
 
 WORKER_COUNT = int(
     os.environ.get('C7N_ORG_PARALLEL', multiprocessing.cpu_count() * 4))
@@ -194,9 +197,10 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     return accounts_config, custodian_config, executor
 
 
-def resolve_regions(regions, partition='aws'):
+def resolve_regions(regions):
     if 'all' in regions:
-        return boto3.Session().get_available_regions('ec2', partition)
+        client = boto3.client('ec2')
+        return [region['RegionName'] for region in client.describe_regions()['Regions']]
     if not regions:
         return ('us-east-1', 'us-west-2')
     return regions
@@ -371,8 +375,8 @@ def report(config, output, use, output_dir, accounts,
     prefix_fields = OrderedDict(
         (('Account', 'account'), ('Region', 'region'), ('Policy', 'policy')))
     config = Config.empty()
-    factory = resource_registry.get(list(resource_types)[0])
 
+    factory = get_resource_class(list(resource_types)[0])
     formatter = Formatter(
         factory.resource_type,
         extra_fields=field,
@@ -534,6 +538,9 @@ def run_account(account, region, policies_config, output_path,
             p.expand_variables(p.get_variables(account.get('vars', {})))
             p.validate()
 
+            if p.region and p.region != region:
+                continue
+
             log.debug(
                 "Running policy:%s account:%s region:%s",
                 p.name, account['name'], region)
@@ -542,6 +549,10 @@ def run_account(account, region, policies_config, output_path,
                 policy_counts[p.name] = resources and len(resources) or 0
                 if not resources:
                     continue
+                if not config.dryrun and p.execution_mode != 'pull':
+                    log.info("Ran account:%s region:%s policy:%s provisioned time:%0.2f",
+                             account['name'], region, p.name, time.time() - st)
+                    continue
                 log.info(
                     "Ran account:%s region:%s policy:%s matched:%d time:%0.2f",
                     account['name'], region, p.name, len(resources),
@@ -549,8 +560,8 @@ def run_account(account, region, policies_config, output_path,
             except ClientError as e:
                 success = False
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    log.warning('Access denied account:%s region:%s',
-                                account['name'], region)
+                    log.warning('Access denied api:%s policy:%s account:%s region:%s',
+                                e.operation_name, p.name, account['name'], region)
                     return policy_counts, success
                 log.error(
                     "Exception running policy:%s account:%s region:%s error:%s",

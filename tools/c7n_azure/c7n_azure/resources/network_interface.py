@@ -27,23 +27,59 @@ log = logging.getLogger('custodian.azure.networkinterface')
 
 @resources.register('networkinterface')
 class NetworkInterface(ArmResourceManager):
-    class resource_type(object):
+    """Network Interface Resource
+
+    :example:
+
+    This policy will get Network Interfaces that have `User` added routes.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: get-nic-with-user-routes
+            resource: azure.networkinterface
+            filters:
+              - type: effective-route-table
+                key: routes.value[].source
+                op: in
+                value_type: swap
+                value: User
+
+    """
+
+    class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Networking']
+
         service = 'azure.mgmt.network'
         client = 'NetworkManagementClient'
         enum_spec = ('network_interfaces', 'list_all', None)
-        id = 'id'
-        name = 'name'
-        default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup'
-        )
+        resource_type = 'Microsoft.Network/networkInterfaces'
 
 
 @NetworkInterface.filter_registry.register('effective-route-table')
 class EffectiveRouteTableFilter(ValueFilter):
-    schema = type_schema('effective-route-table', rinherit=ValueFilter.schema)
+    """Filters network interfaces by the Effective Route Table
 
+    :example:
+
+    This policy will get Network Interfaces that have VirtualNetworkGateway and VNet hops.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: virtual-network-gateway-hop
+            resource: azure.networkinterface
+            filters:
+              - type: effective-route-table
+                key: routes.value[?source == 'User'].nextHopType
+                op: difference
+                value:
+                  - Internet
+                  - None
+                  - VirtualAppliance
+    """
+    schema = type_schema('effective-route-table', rinherit=ValueFilter.schema)
+    schema_alias = False
     def process(self, resources, event=None):
 
         resources, _ = ThreadHelper.execute_in_parallel(

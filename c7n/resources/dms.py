@@ -16,7 +16,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource
+from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.utils import local_session, chunks, type_schema, get_retry
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.filters.kms import KmsRelatedFilter
@@ -27,18 +27,14 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 @resources.register('dms-instance')
 class ReplicationInstance(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'dms'
-        type = 'rep'
+        arn_type = 'rep'
         enum_spec = (
             'describe_replication_instances', 'ReplicationInstances', None)
         name = id = 'ReplicationInstanceIdentifier'
         arn = 'ReplicationInstanceArn'
         date = 'InstanceCreateTime'
-        dimension = None
-
-        # The api supports filtering which we handle via describe source.
-        filter_name = filter_type = None
 
     filters = FilterRegistry('dms-instance.filters')
     filters.register('marked-for-op', TagActionFilter)
@@ -54,15 +50,11 @@ class ReplicationInstance(QueryResourceManager):
 @resources.register('dms-endpoint')
 class DmsEndpoints(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'dms'
         enum_spec = ('describe_endpoints', 'Endpoints', None)
-        detail_spec = None
         arn = id = 'EndpointArn'
         name = 'EndpointIdentifier'
-        date = None
-        dimension = None
-        filter_name = None
 
 
 class InstanceDescribe(DescribeSource):
@@ -141,7 +133,7 @@ class ModifyReplicationInstance(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: enable-minor-version-upgrade
@@ -266,7 +258,7 @@ class InstanceMarkForOp(TagDelayedAction):
         .. code-block:: yaml
 
             policies:
-                - name: delete-single-az-dms
+                - name: delete-dms
                   resource: dms-instance
                   filters:
                     - MultiAZ: False
@@ -284,7 +276,7 @@ class ModifyDmsEndpoint(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
           policies:
             - name: dms-endpoint-modify
@@ -389,7 +381,7 @@ class DeleteDmsEndpoint(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
           policies:
             - name: dms-endpoint-no-ssl-delete

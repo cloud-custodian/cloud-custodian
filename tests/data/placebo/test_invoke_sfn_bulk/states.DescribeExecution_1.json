@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "executionArn": "arn:aws:states:us-east-1:644160558196:execution:Helloworld:4a863454-be66-4396-8633-2459380be901",
+        "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:Helloworld",
+        "name": "4a863454-be66-4396-8633-2459380be901",
+        "status": "SUCCEEDED",
+        "startDate": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 6,
+            "day": 24,
+            "hour": 12,
+            "minute": 38,
+            "second": 21,
+            "microsecond": 576000
+        },
+        "stopDate": {
+            "__class__": "datetime",
+            "year": 2019,
+            "month": 6,
+            "day": 24,
+            "hour": 12,
+            "minute": 38,
+            "second": 21,
+            "microsecond": 602000
+        },
+        "input": "{\n\"policy\": {\n\"name\": \"test-invoke-sfn-bulk\",\n\"resource\": \"step-machine\",\n\"actions\": [\n{\n\"type\": \"invoke-sfn\",\n\"bulk\": true,\n\"state-machine\": \"Helloworld\"\n}\n]\n},\n\"resources\": [\n\"arn:aws:states:us-east-1:644160558196:stateMachine:Helloworld\"\n]\n}",
+        "output": "\"Hello World!\"",
+        "ResponseMetadata": {
+            "RequestId": "7a8e0ec3-969e-11e9-8761-3d11d2a66834",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7a8e0ec3-969e-11e9-8761-3d11d2a66834",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "644"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

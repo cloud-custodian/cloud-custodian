@@ -31,23 +31,20 @@ from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExce
 from c7n.output import DEFAULT_NAMESPACE
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
-from c7n.provider import clouds
+from c7n.provider import clouds, get_resource_class
 from c7n import utils
 from c7n.version import version
 
 log = logging.getLogger('c7n.policy')
 
 
-def load(options, path, format='yaml', validate=True, vars=None):
+def load(options, path, format=None, validate=True, vars=None):
     # should we do os.path.expanduser here?
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
     load_resources()
     data = utils.load_file(path, format=format, vars=vars)
-
-    if format == 'json':
-        validate = False
 
     if isinstance(data, list):
         log.warning('yaml in invalid format. The "policies:" line is probably missing.')
@@ -90,17 +87,75 @@ class PolicyCollection(object):
     def __add__(self, other):
         return self.__class__(self.policies + other.policies, self.options)
 
-    def filter(self, policy_name=None, resource_type=None):
-        results = []
-        for policy in self.policies:
-            if resource_type:
-                if policy.resource_type != resource_type:
-                    continue
-            if policy_name:
-                if not fnmatch.fnmatch(policy.name, policy_name):
-                    continue
-            results.append(policy)
+    def filter(self, policy_patterns=[], resource_types=[]):
+        results = self.policies
+        results = self._filter_by_patterns(results, policy_patterns)
+        results = self._filter_by_resource_types(results, resource_types)
+        # next line brings the result set in the original order of self.policies
+        results = [x for x in self.policies if x in results]
         return PolicyCollection(results, self.options)
+
+    def _filter_by_patterns(self, policies, patterns):
+        """
+        Takes a list of policies and returns only those matching the given glob
+        patterns
+        """
+        if not patterns:
+            return policies
+
+        results = []
+        for pattern in patterns:
+            result = self._filter_by_pattern(policies, pattern)
+            results.extend(x for x in result if x not in results)
+        return results
+
+    def _filter_by_pattern(self, policies, pattern):
+        """
+        Takes a list of policies and returns only those matching the given glob
+        pattern
+        """
+        results = []
+        for policy in policies:
+            if fnmatch.fnmatch(policy.name, pattern):
+                results.append(policy)
+
+        if not results:
+            self.log.warning((
+                'Policy pattern "{}" '
+                'did not match any policies.').format(pattern))
+
+        return results
+
+    def _filter_by_resource_types(self, policies, resource_types):
+        """
+        Takes a list of policies and returns only those matching the given
+        resource types
+        """
+        if not resource_types:
+            return policies
+
+        results = []
+        for resource_type in resource_types:
+            result = self._filter_by_resource_type(policies, resource_type)
+            results.extend(x for x in result if x not in results)
+        return results
+
+    def _filter_by_resource_type(self, policies, resource_type):
+        """
+        Takes a list policies and returns only those matching the given resource
+        type
+        """
+        results = []
+        for policy in policies:
+            if policy.resource_type == resource_type:
+                results.append(policy)
+
+        if not results:
+            self.log.warning((
+                'Resource type "{}" '
+                'did not match any policies.').format(resource_type))
+
+        return results
 
     def __iter__(self):
         return iter(self.policies)
@@ -222,7 +277,7 @@ class PullMode(PolicyExecutionMode):
 
         with self.policy.ctx:
             self.policy.log.debug(
-                "Running policy %s resource: %s region:%s c7n:%s",
+                "Running policy:%s resource:%s region:%s c7n:%s",
                 self.policy.name, self.policy.resource_type,
                 self.policy.options.region or 'default',
                 version)
@@ -238,7 +293,7 @@ class PullMode(PolicyExecutionMode):
 
             rt = time.time() - s
             self.policy.log.info(
-                "policy: %s resource:%s region:%s count:%d time:%0.2f" % (
+                "policy:%s resource:%s region:%s count:%d time:%0.2f" % (
                     self.policy.name,
                     self.policy.resource_type,
                     self.policy.options.region,
@@ -263,9 +318,9 @@ class PullMode(PolicyExecutionMode):
                 with self.policy.ctx.tracer.subsegment('action:%s' % a.type):
                     results = a.process(resources)
                 self.policy.log.info(
-                    "policy: %s action: %s"
-                    " resources: %d"
-                    " execution_time: %0.2f" % (
+                    "policy:%s action:%s"
+                    " resources:%d"
+                    " execution_time:%0.2f" % (
                         self.policy.name, a.name,
                         len(resources), time.time() - s))
                 if results:
@@ -315,18 +370,18 @@ class PullMode(PolicyExecutionMode):
         now = datetime.now(self.policy.tz)
         if self.policy.start and self.policy.start > now:
             self.policy.log.info(
-                "Skipping policy %s start-date: %s is after current date: %s",
+                "Skipping policy:%s start-date:%s is after current-date:%s",
                 self.policy.name, self.policy.start, now)
             return False
         if self.policy.end and self.policy.end < now:
             self.policy.log.info(
-                "Skipping policy %s end-date: %s is before current date: %s",
+                "Skipping policy:%s end-date:%s is before current-date:%s",
                 self.policy.name, self.policy.end, now)
             return False
         if self.policy.region and (
                 self.policy.region != self.policy.options.region):
             self.policy.log.info(
-                "Skipping policy %s target-region: %s current-region: %s",
+                "Skipping policy:%s target-region:%s current-region:%s",
                 self.policy.name, self.policy.region,
                 self.policy.options.region)
             return False
@@ -365,11 +420,20 @@ class LambdaMode(ServerlessExecutionMode):
 
     def validate(self):
         super(LambdaMode, self).validate()
-        prefix = self.policy.data.get('function-prefix', 'custodian-')
+        prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
         if len(prefix + self.policy.name) > 64:
             raise PolicyValidationError(
                 "Custodian Lambda policies have a max length with prefix of 64"
                 " policy:%s prefix:%s" % (prefix, self.policy.name))
+        tags = self.policy.data['mode'].get('tags')
+        if not tags:
+            return
+        reserved_overlap = [t for t in tags if t.startswith('custodian-')]
+        if reserved_overlap:
+            log.warning((
+                'Custodian reserves policy lambda '
+                'tags starting with custodian - policy specifies %s' % (
+                    ', '.join(reserved_overlap))))
 
     def get_metrics(self, start, end, period):
         from c7n.mu import LambdaManager, PolicyLambda
@@ -401,7 +465,7 @@ class LambdaMode(ServerlessExecutionMode):
             self.policy.session_factory.region = region
             self.policy.session_factory.assume_role = member_role
             self.policy.log.info(
-                "Assuming member role: %s", member_role)
+                "Assuming member role:%s", member_role)
             return True
         return False
 
@@ -411,7 +475,7 @@ class LambdaMode(ServerlessExecutionMode):
         resource_ids = CloudWatchEvents.get_ids(event, mode)
         if resource_ids is None:
             raise ValueError("Unknown push event mode %s", self.data)
-        self.policy.log.info('Found resource ids: %s', resource_ids)
+        self.policy.log.info('Found resource ids:%s', resource_ids)
         # Handle multi-resource type events, like ec2 CreateTags
         resource_ids = self.policy.resource_manager.match_ids(resource_ids)
         if not resource_ids:
@@ -452,7 +516,7 @@ class LambdaMode(ServerlessExecutionMode):
 
         if not resources:
             self.policy.log.info(
-                "policy: %s resources: %s no resources matched" % (
+                "policy:%s resources:%s no resources matched" % (
                     self.policy.name, self.policy.resource_type))
             return
 
@@ -470,7 +534,7 @@ class LambdaMode(ServerlessExecutionMode):
 
             for action in self.policy.resource_manager.actions:
                 self.policy.log.info(
-                    "policy: %s invoking action: %s resources: %d",
+                    "policy:%s invoking action:%s resources:%d",
                     self.policy.name, action.name, len(resources))
                 if isinstance(action, EventAction):
                     results = action.process(resources, event)
@@ -481,6 +545,12 @@ class LambdaMode(ServerlessExecutionMode):
         return resources
 
     def provision(self):
+        # auto tag lambda policies with mode and version, we use the
+        # version in mugc to effect cleanups.
+        tags = self.policy.data['mode'].setdefault('tags', {})
+        tags['custodian-info'] = "mode=%s:version=%s" % (
+            self.policy.data['mode']['type'], version)
+
         from c7n import mu
         with self.policy.ctx:
             self.policy.log.info(
@@ -540,7 +610,7 @@ class PHDMode(LambdaMode):
             return
         if 'health-event' not in self.policy.resource_manager.filter_registry:
             raise PolicyValidationError(
-                "policy:%s phd event mode not supported for resource: %s" % (
+                "policy:%s phd event mode not supported for resource:%s" % (
                     self.policy.name, self.policy.resource_type))
 
     @staticmethod
@@ -635,7 +705,10 @@ class ASGInstanceState(LambdaMode):
 
 @execution.register('guard-duty')
 class GuardDutyMode(LambdaMode):
-    """Incident Response for AWS Guard Duty"""
+    """Incident Response for AWS Guard Duty.
+
+    This policy fires on guard duty events for the given resource type.
+    """
 
     schema = utils.type_schema('guard-duty', rinherit=LambdaMode.schema)
 
@@ -684,6 +757,13 @@ class ConfigRuleMode(LambdaMode):
 
     cfg_event = None
     schema = utils.type_schema('config-rule', rinherit=LambdaMode.schema)
+
+    def validate(self):
+        super(ConfigRuleMode, self).validate()
+        if not self.policy.resource_manager.resource_type.config_type:
+            raise PolicyValidationError(
+                "policy:%s AWS Config does not support resource-type:%s" % (
+                    self.policy.name, self.policy.resource_type))
 
     def resolve_resources(self, event):
         source = self.policy.resource_manager.get_source('config')
@@ -750,7 +830,7 @@ class Policy(object):
         self.resource_manager = self.load_resource_manager()
 
     def __repr__(self):
-        return "<Policy resource: %s name: %s region: %s>" % (
+        return "<Policy resource:%s name:%s region:%s>" % (
             self.resource_type, self.name, self.options.region)
 
     @property
@@ -957,18 +1037,7 @@ class Policy(object):
             fh.write(value)
 
     def load_resource_manager(self):
-        resource_type = self.data.get('resource')
-
-        provider = clouds.get(self.provider_name)
-        if provider is None:
-            raise ValueError(
-                "Invalid cloud provider: %s" % self.provider_name)
-
-        factory = provider.resources.get(
-            resource_type.rsplit('.', 1)[-1])
-        if not factory:
-            raise ValueError(
-                "Invalid resource type: %s" % resource_type)
+        factory = get_resource_class(self.data.get('resource'))
         return factory(self.ctx, self.data)
 
     def validate_policy_start_stop(self):
