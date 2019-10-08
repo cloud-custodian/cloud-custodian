@@ -7,16 +7,16 @@ Overview
 ########
 
 The Azure provider supports deploying policies into Azure Functions to run them 
-inexpensively in your subscription. Currently you can deploy timer 
+inexpensively in your subscription. Currently, you can deploy timer 
 triggered functions (azure-periodic) or Event Grid triggered functions 
-(azure-event-grid) depending on your needs.
+(azure-event-grid).
 
 The first deployment to an Azure Function will create the following resources 
 in your Azure subscription:
 
-- Resource Group: Holds all of the resources
+- Resource Group: Holds all the resources
 - Azure Storage: Serves as the backend data store for the Functions
-- Application Insights: Provides logging and metric track ing for the Functions
+- Application Insights: Provides logging and metric tracking for the Functions
 - App Service Plan: A Linux based consumption plan using the V2 runtime to support Python Functions
 - Function App: The Function that executes the given policy
 
@@ -28,10 +28,10 @@ Note: Python 3.6 or higher is required to deploy a policy to an Azure Function.
 Azure Modes
 ###########
 
-Custodian can run in numerous modes with the default being pull Mode.
+Custodian can run in numerous modes. The default mode is pull.
 
 - pull:
-    Default mode, which executes the policy local to where Custodian is run.
+    Default mode, which executes the policy locally to where Custodian is run.
 
   .. c7n-schema:: mode.pull
 
@@ -43,8 +43,8 @@ Custodian can run in numerous modes with the default being pull Mode.
   .. c7n-schema:: mode.azure-periodic
 
 - azure-event-grid:
-    Creates Event Grid triggered Azure Functions to run the policy in Custodian. This allows
-    you to apply your policies as soon as events occur. See `Azure Event Grid
+    Creates Event Grid triggered Azure Functions to run the policy in Custodian. This mode allows
+    you to apply your policies when events occur. See `Azure Event Grid
     <https://azure.microsoft.com/en-us/services/event-grid/>`_ for more details.
 
   .. c7n-schema:: mode.azure-event-grid
@@ -64,8 +64,8 @@ Functions can be deployed in either a dedicated Application Service Plan (Basic,
 More details on the different hosting models offered by Azure Functions can be found in the `Azure Functions documentation <https://docs.microsoft.com/en-us/azure/azure-functions/functions-scale>`_.
 By default, Custodian policies are run using the Consumption hosting model. (i.e. skuTier=dynamic)
 
-Note: Linux Consumption plans are not available in all regions. You will recieve an error when applying the 
-policy if use an unsupported location. 
+Note: Linux Consumption plans are not available in all regions. You will get an error when applying the 
+policy if you use an unsupported location. 
 
 You can enable auto scaling for your dedicated App Service Plan. The default auto scaling allows you
 to specify the minimum and maximum number of VMs underlying the Functions. The App Service Plan will 
@@ -73,10 +73,10 @@ be scaled up if the average RAM usage was more than 80% in the past 10 minutes.
 This option is disabled by default.
 
 The same shared resources from above can be used to service multiple Functions. This is done by
-specifying the resources names in the policy deployment, or by using the default names every time. 
+specifying the resources names in the policy deployment definition, or by using the default names every time. 
 When deploying a new policy using existing infrastructure, only the new Function will be created.
 
-The default set of parameters for Azure Storage, Application Insights and Application
+The default set of parameters for Azure Storage, Application Insights, and Application
 Service Plan will deploy the function successfully. To customize the deployment, the defaults 
 can be overwritten by setting the ``provision-options`` object on ``mode``. The following keys are 
 supported, with their default values shown:
@@ -102,20 +102,20 @@ supported, with their default values shown:
     - resourceGroupName (default: servicePlan name)
 
 The location allows you to choose the region to deploy the resource group and resources that will be
-provisioned. Application Insights has 20 available locations and thus can not always be in the same
-region as the other resources. Please see `Application Insights availability by region <https://azure.microsoft.com/en-us/global-infrastructure/services/?products=monitor>`_ for more details.
+provisioned. Application Insights has 20 available locations and thus may not always be in the same
+region as the other resources. For details, see `Application Insights availability by region <https://azure.microsoft.com/en-us/global-infrastructure/services/?products=monitor>`_.
 
-If the specified resources already exist in the subscription (discovered by resource group and 
-resource name), Custodian will not change the existing resource regardless of the parameters set by the policy.
+If the specified resources already exist in the subscription, discovered by resource group and 
+resource name, Custodian will not change the existing resource regardless of the parameters set by the policy.
 If a resource does not exist, it will be provisioned using the provided configuration.
 
 You can provide resource IDs to specify existing infrastructure, rather than matching resource group 
 and resource name. Please see the third example below for the correct formatting. Custodian verifies 
 that the resources defined by the given IDs exist before creating the Function. If the resource 
-is missing, it will return an error.
+is missing, Custodian will return an error.
 
-The following example shows how to deploy a policy to a timer triggered Function that runs every hour. 
-The defaults are accepted for Storage and Application Insights and custom values are provided for the 
+The following example shows how to deploy a policy to a timer-triggered Function that runs every hour. 
+The defaults are accepted for Storage and Application Insights, and custom values are provided for the 
 Service Plan. This policy deploys a dedicated Basic B1 App Service Plan with the default auto scaling 
 turned on. Based on the RAM consumption in the underlying VMs, the App Service Plan will be backed by 1-3 VMs.
 
@@ -234,21 +234,21 @@ the default Function location.
             value_type: swap
             value: "PowerState/running"
 
-More details on Blob Storage output are at :ref:`azure_bloboutput`
+More details on Blob Storage output can be found at :ref:`azure_bloboutput`
 
 
 Event Grid Functions
 ####################
 
-Currently, support for Event Grid Functions is at the subscription level. You can set the function to be 
+Currently, Event Grid Functions are only supported at the subscription level. You can set the function to be 
 triggered by write and/or delete events. When an Event Grid Function is deployed, Custodian creates an 
 Event Grid Subscription to trigger the new Function when any event occurs in the Subscription. Once triggered,
 Custodian only executes the policy if the event was caused by the resource provider and event type specified 
-by the policy.
+in the policy.
 
 In order to subscribe to an event, you need to provide the resource provider and the action, or provide the string
 of one of the `shortcuts <https://github.com/cloud-custodian/cloud-custodian/blob/master/tools/c7n_azure/c7n_azure/azure_events.py>`_. 
-For a list of all of the resource providers and their actions please see `Azure Resource Manager resource provider options <https://docs.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations>`_.
+For a list of all of the resource providers and their actions, see `Azure Resource Manager resource provider options <https://docs.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations>`_.
 
 The following example shows an Event Grid Function that runs when a value is written to Key Vault.
 
@@ -271,12 +271,12 @@ The following example shows an Event Grid Function that runs when a value is wri
 Advanced Authentication Options
 ###############################
 
-By default the Function is both deployed and executed with the credentials and subscription ID you have configured
-for the custodian CLI.  You may optionally provide environment variables to set the service principal that should be
-used when the function is executed. This allows you to target your policy towards a subscription ID different than 
-the one that the Function is deployed in.
+By default, the Function is both deployed and executed using the credentials and subscription ID you have configured
+for the Custodian CLI. To target your policy toward a subscription ID different than 
+the one that the Function is deployed in, you can provide environment variables to set the Service Principal that should be
+used when the function is executed.
 
-The following variables are used to overwrite the service principal configuration used when the Function is executed:
+The following variables are used to overwrite the Service Principal configuration used when the Function is executed:
 
 .. code-block:: bash
 
@@ -285,10 +285,10 @@ The following variables are used to overwrite the service principal configuratio
     AZURE_FUNCTION_CLIENT_SECRET
     AZURE_FUNCTION_SUBSCRIPTION_ID
 
-These will be used for Function execution, but the normal service principal credentials will still be
+These will be used for Function execution, but the normal Service Principal credentials will still be
 used for deployment.
 
-You may provide the service principal credentials for the function but omit the subscription ID if you wish.
+You may provide the Service Principal credentials for the function but omit the subscription ID if you wish.
 
 Management Groups Support
 #########################
@@ -307,16 +307,16 @@ The Management Group environment variable has the highest priority, so `AZURE_FU
 Timer triggered functions
 -------------------------
 
-When Management Groups option is used with periodic mode, Cloud Custodian deploys a single Azure Function App with multiple Azure Functions following single subscription per function rule.
+When the Management Groups option is used with periodic mode, Cloud Custodian deploys a single Azure Function App with multiple Azure Functions following the single-subscription-per-function rule.
 
 Event triggered functions
 -------------------------
 
-When Management Groups option is used with event mode, Cloud Custodian deploys single Azure Function. It creates Event Grid subscription for each Subscription in Management Group delivering events to a single Azure Storage Queue.
+When the Management Groups option is used with event mode, Cloud Custodian deploys a single Azure Function. It creates an Event Grid subscription for each Subscription in the Management Group delivering events to a single Azure Storage Queue.
 
 Permissions
 -----------
 
-Service Principal used at the Functions runtime required to have appropriate level of permission in each target subscription.
+The Service Principal used at the Functions runtime is required to have an appropriate level of permissions in each target subscription.
 
-Service Principal used to provision Azure Functions required to have permissions to access Management Groups. If SP doesn't have `MG Reader` permissions in any child subscription these subscriptions won't be a part of Cloud Custodian Azure Function deployment process.
+The Service Principal used to provision Azure Functions is required to have an appropriate level of permissions to access Management Groups. If the Service Principal doesn't have `MG Reader` permissions in any child subscription, these subscriptions won't be a part of the Cloud Custodian Azure Function deployment process.

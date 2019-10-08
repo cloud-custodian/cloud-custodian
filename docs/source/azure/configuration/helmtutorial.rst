@@ -39,14 +39,14 @@ the custodian output files of running policies.
 3. Create a Service Principal
 -----------------------------
 
-This service principal will be used as the identity for the container host. You could also use an existing service principal.
+This Service Principal will be used as the identity for the container host. You could also use an existing Service Principal.
 Remember to save the password to use as the client secret.
 
 .. code-block:: bash
 
     az ad sp create-for-rbac --name c7n-helm 
 
-This service principal will need the proper permissions to interact with the storage account and any other 
+This Service Principal will need the proper permissions to interact with the storage account and any other 
 azure resources that the Azure Container Host interacts with. This includes the resources that 
 policies will run against.
 
@@ -150,7 +150,7 @@ for information on filling out the environment variables.
           AZURE_SUBSCRIPTION_ID: "<Subscription ID>"
 
 Then deploy the chart with the following command. The client secret should come
-from creating the service principal and must be provided in a base64 encoded format.
+from creating the Service Principal and must be provided in a base64 encoded format.
 
 .. code-block:: bash
 
