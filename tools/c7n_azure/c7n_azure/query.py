@@ -18,6 +18,7 @@ from collections import Iterable
 import six
 from c7n_azure import constants
 from c7n_azure.actions.logic_app import LogicAppAction
+from azure.mgmt.resourcegraph.models import QueryRequest
 from c7n_azure.actions.notify import Notify
 from c7n_azure.filters import ParentFilter
 from c7n_azure.provider import resources
@@ -81,6 +82,34 @@ class DescribeSource(object):
 
     def get_resources(self, query):
         return self.query.filter(self.manager)
+
+    def get_permissions(self):
+        return ()
+
+    def augment(self, resources):
+        return resources
+
+
+@sources.register('resource-graph')
+class ResourceGraphSource(object):
+
+    def __init__(self, manager):
+        self.manager = manager
+
+    def validate(self):
+        pass
+
+    def get_resources(self, _):
+        session = self.manager.get_session()
+        client = session.client('azure.mgmt.resourcegraph.ResourceGraphClient')
+        query = QueryRequest(
+            query="where type =~ '%s'" % self.manager.resource_type.resource_type,
+            subscriptions=[session.get_subscription_id()]
+        )
+        res = client.resources(query)
+        cols = [c['name'] for c in res.data['columns']]
+        data = [dict(zip(cols, r)) for r in res.data['rows']]
+        return data
 
     def get_permissions(self):
         return ()
