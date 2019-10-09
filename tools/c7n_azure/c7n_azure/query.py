@@ -24,6 +24,7 @@ from c7n_azure.filters import ParentFilter
 from c7n_azure.provider import resources
 
 from c7n.actions import ActionRegistry
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources, MaxResourceLimit
@@ -80,6 +81,9 @@ class DescribeSource(object):
         self.manager = manager
         self.query = self.resource_query_factory(self.manager.session_factory)
 
+    def validate(self):
+        pass
+
     def get_resources(self, query):
         return self.query.filter(self.manager)
 
@@ -97,13 +101,25 @@ class ResourceGraphSource(object):
         self.manager = manager
 
     def validate(self):
-        pass
+        if not hasattr(self.manager.resource_type, 'resource_type'):
+            raise PolicyValidationError(
+                "%s is not supported with the Azure Resource Graph source."
+                % self.manager.data['resource'])
 
     def get_resources(self, _):
+        log.warning('The Azure Resource Graph source '
+                    'should not be used in production scenarios at this time.')
+
         session = self.manager.get_session()
         client = session.client('azure.mgmt.resourcegraph.ResourceGraphClient')
+
+        # empty scope will return all resource
+        query_scope = ""
+        if self.manager.resource_type.resource_type != 'armresource':
+            query_scope = "where type =~ '%s'" % self.manager.resource_type.resource_type
+
         query = QueryRequest(
-            query="where type =~ '%s'" % self.manager.resource_type.resource_type,
+            query=query_scope,
             subscriptions=[session.get_subscription_id()]
         )
         res = client.resources(query)
@@ -304,6 +320,9 @@ class QueryResourceManager(ResourceManager):
             klass = registry.get(resource)
             klass.action_registry.register('notify', Notify)
             klass.action_registry.register('logic-app', LogicAppAction)
+
+    def validate(self):
+        self.source.validate()
 
 
 @six.add_metaclass(QueryMeta)

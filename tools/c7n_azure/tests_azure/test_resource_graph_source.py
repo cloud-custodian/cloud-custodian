@@ -18,6 +18,8 @@ from six import string_types
 from tests_azure.azure_common import BaseTest, arm_template
 from dateutil.parser import parse
 
+from c7n.exceptions import PolicyValidationError
+
 
 class ResourceGraphSource(BaseTest):
 
@@ -28,6 +30,15 @@ class ResourceGraphSource(BaseTest):
             'source': 'resource-graph',
         }, validate=True)
         self.assertTrue(p)
+
+    def test_resource_graph_validate_unsupported_resources(self):
+        with self.assertRaises(PolicyValidationError):
+            p = self.load_policy({
+                'name': 'test-azure-storage-arm-source',
+                'resource': 'azure.keyvault-certificate',
+                'source': 'resource-graph',
+            })
+            self.assertTrue(p)
 
     @arm_template('storage.json')
     def test_resource_graph_and_arm_sources_storage_are_equivalent(self):
