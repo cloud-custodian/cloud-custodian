@@ -217,7 +217,7 @@ class Session(object):
         """ latest non-preview api version for resource """
 
         namespace = ResourceIdParser.get_namespace(resource_id)
-        resource_type = ResourceIdParser.get_resource_type(resource_id)
+        resource_type = ResourceIdParser.get_full_type(resource_id)
 
         cache_id = namespace + resource_type
 

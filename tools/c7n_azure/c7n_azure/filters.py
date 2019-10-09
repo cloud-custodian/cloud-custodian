@@ -792,10 +792,13 @@ class ResourceLockFilter(Filter):
                          client.management_locks.list_at_resource_group_level(
                     resource['name'])]
             else:
+                parent = resource.get('c7n:parent-id')
+                parent_resource_path = ResourceIdParser.get_resource_path(parent) if parent else ''
+
                 locks = [r.serialize(True) for r in client.management_locks.list_at_resource_level(
                     resource['resourceGroup'],
                     ResourceIdParser.get_namespace(resource['id']),
-                    ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
+                    parent_resource_path,
                     ResourceIdParser.get_resource_type(resource['id']),
                     resource['name'])]
 

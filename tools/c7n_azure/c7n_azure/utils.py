@@ -51,10 +51,7 @@ class ResourceIdParser(object):
 
     @staticmethod
     def get_namespace(resource_id):
-        parsed = parse_resource_id(resource_id)
-        if parsed.get('children'):
-            return '/'.join([parsed.get('namespace'), parsed.get('type')])
-        return parsed.get('namespace')
+        return parse_resource_id(resource_id).get('namespace')
 
     @staticmethod
     def get_subscription_id(resource_id):
@@ -70,14 +67,7 @@ class ResourceIdParser(object):
 
     @staticmethod
     def get_resource_type(resource_id):
-        parsed = parse_resource_id(resource_id)
-        # parse_resource_id returns dictionary with "child_type_#" to represent
-        # types sequence. "type" stores root type.
-        child_type_keys = [k for k in parsed.keys() if k.find("child_type_") != -1]
-        types = [parsed.get(k) for k in sorted(child_type_keys)]
-        if not types:
-            types.insert(0, parsed.get('type'))
-        return '/'.join(types)
+        return parse_resource_id(resource_id).get('resource_type')
 
     @staticmethod
     def get_resource_name(resource_id):
@@ -85,8 +75,19 @@ class ResourceIdParser(object):
 
     @staticmethod
     def get_full_type(resource_id):
-        return '/'.join([ResourceIdParser.get_namespace(resource_id),
-                         ResourceIdParser.get_resource_type(resource_id)])
+        parsed = parse_resource_id(resource_id)
+        # parse_resource_id returns dictionary with "child_type_#" to represent
+        # types sequence. "type" stores root type.
+        child_type_keys = [k for k in parsed.keys() if k.find("child_type_") != -1]
+        types = [parsed.get(k) for k in sorted(child_type_keys)]
+        types.insert(0, parsed.get('type'))
+
+        return '/'.join(types)
+
+    @staticmethod
+    def get_resource_path(resource_id):
+        return '/'.join([ResourceIdParser.get_resource_type(resource_id),
+                         ResourceIdParser.get_resource_name(resource_id)])
 
 
 def is_resource_group_id(rid):

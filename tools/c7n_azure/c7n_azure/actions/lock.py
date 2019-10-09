@@ -96,10 +96,13 @@ class LockAction(AzureBaseAction):
                 ManagementLockObject(level=self.lock_type, notes=lock_notes)
             )
         else:
+            parent = resource.get('c7n:parent-id')
+            parent_resource_path = ResourceIdParser.get_resource_path(parent) if parent else ''
+
             self.client.management_locks.create_or_update_at_resource_level(
                 resource['resourceGroup'],
                 ResourceIdParser.get_namespace(resource['id']),
-                ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
+                parent_resource_path,
                 ResourceIdParser.get_resource_type(resource['id']),
                 resource['name'],
                 lock_name,
