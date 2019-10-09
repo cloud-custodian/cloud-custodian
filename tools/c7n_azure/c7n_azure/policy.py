@@ -30,6 +30,7 @@ from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
 from c7n.actions import EventAction
+from c7n.exceptions import PolicyValidationError
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
 from c7n.utils import local_session
 
@@ -351,6 +352,20 @@ class AzureEventGridMode(AzureFunctionMode):
                                required=['events'],
                                rinherit=AzureFunctionMode.schema)
 
+    def __init__(self, policy):
+        super(AzureEventGridMode, self).__init__(policy)
+        self.subscribed_events = AzureEvents.get_event_operations(
+            self.policy.data['mode'].get('events'))
+
+    def validate(self):
+        super(AzureEventGridMode, self).validate()
+        resource_type = self.policy.resource_manager.resource_type.resource_type
+        for event in self.subscribed_events:
+            if resource_type.lower() not in event.lower():
+                raise PolicyValidationError(
+                    'The policy resource, {}, can not be triggered by the event, {}.'.format(
+                        resource_type, event))
+
     def provision(self):
         super(AzureEventGridMode, self).provision()
         session = local_session(self.policy.session_factory)
@@ -391,9 +406,8 @@ class AzureEventGridMode(AzureFunctionMode):
                                                                queue_name=queue_name)
 
         # filter specific events
-        subscribed_events = AzureEvents.get_event_operations(
-            self.policy.data['mode'].get('events'))
-        advance_filter = StringInAdvancedFilter(key='Data.OperationName', values=subscribed_events)
+        advance_filter = StringInAdvancedFilter(key='Data.OperationName',
+                                                values=self.subscribed_events)
         event_filter = EventSubscriptionFilter(advanced_filters=[advance_filter])
 
         for subscription_id in self.target_subscription_ids:

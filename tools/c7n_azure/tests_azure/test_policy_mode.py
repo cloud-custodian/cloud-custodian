@@ -14,12 +14,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from azure.mgmt.storage.models import StorageAccount
-from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, cassette_name
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode, AzureModeCommon
 from jsonschema import ValidationError
 from mock import mock, patch, Mock
+
+from c7n.exceptions import PolicyValidationError
+from .azure_common import BaseTest, DEFAULT_SUBSCRIPTION_ID, arm_template, cassette_name
 
 
 class AzurePolicyModeTest(BaseTest):
@@ -59,14 +61,61 @@ class AzurePolicyModeTest(BaseTest):
                         'type': FUNCTION_EVENT_TRIGGER_MODE,
                         'events': [
                             'VmWrite',
-                            'AppServicePlanWrite',
-                            'CognitiveServiceWrite',
-                            'CosmosDbWrite',
-                            'DataFactoryWrite',
-                            'DataLakeWrite'
+                            {
+                                'resourceProvider': 'Microsoft.Compute/virtualMachines/',
+                                'event': 'delete'
+                            },
+                            {
+                                'resourceProvider': 'Microsoft.Compute/virtualMachines/',
+                                'event': 'powerOff/action'
+                            },
+                            {
+                                'resourceProvider': 'Microsoft.Compute/virtualMachines/',
+                                'event': 'reimage/action'
+                            },
+                            {
+                                'resourceProvider': 'Microsoft.Compute/virtualMachines/',
+                                'event': 'redeploy/action'
+                            },
+                            {
+                                'resourceProvider': 'Microsoft.Compute/virtualMachines/',
+                                'event': 'start/action'
+                            }
                         ]
                     }
                 }, validate=True)
+
+    def test_azure_function_event_mode_incorrect_event_type(self):
+        with self.sign_out_patch():
+            with self.assertRaises(PolicyValidationError):
+                self.load_policy({
+                    'name': 'test-azure-serverless-mode',
+                    'resource': 'azure.vm',
+                    'mode': {
+                        'type': FUNCTION_EVENT_TRIGGER_MODE,
+                        'events': [
+                            'CosmosDbWrite',
+                        ]
+                    }
+                }, validate=True)
+
+    def test_azure_function_event_mode_child_event_type(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-azure-serverless-mode',
+                'resource': 'azure.networksecuritygroup',
+                'mode': {
+                    'type': FUNCTION_EVENT_TRIGGER_MODE,
+                    'events': [
+                        {
+                            'resourceProvider':
+                                'Microsoft.Network/networkSecurityGroups/securityRules',
+                            'event': 'write'
+                        }
+                    ]
+                }
+            }, validate=True)
+            self.assertTrue(p)
 
     def test_azure_function_periodic_mode_schema_validation(self):
         with self.sign_out_patch():
@@ -364,10 +413,10 @@ class AzurePolicyModeTest(BaseTest):
                 {'type': FUNCTION_EVENT_TRIGGER_MODE,
                  'events':
                      ['VmWrite',
-                        {
-                            'resourceProvider': 'Microsoft.Resources/subscriptions/resourceGroups',
-                            'event': 'write'
-                        }]},
+                      {
+                          'resourceProvider': 'Microsoft.Compute/virtualMachines',
+                          'event': 'powerOff/action'
+                      }]},
         })
 
         with mock.patch('c7n_azure.azure_events.AzureEventSubscription.create') as mock_create:
@@ -383,7 +432,7 @@ class AzurePolicyModeTest(BaseTest):
             self.assertEqual(event_filter.key, 'Data.OperationName')
             self.assertEqual(event_filter.values,
                              ['Microsoft.Compute/virtualMachines/write',
-                              'Microsoft.Resources/subscriptions/resourceGroups/write'])
+                              'Microsoft.Compute/virtualMachines/powerOff/action'])
             self.assertEqual(event_filter.operator_type, 'StringIn')
 
     def test_extract_properties(self):
