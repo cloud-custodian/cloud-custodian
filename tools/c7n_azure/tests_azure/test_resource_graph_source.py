@@ -11,13 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 from datetime import timedelta
 
+from six import string_types
 from tests_azure.azure_common import BaseTest, arm_template
 from dateutil.parser import parse
 
 
 class ResourceGraphSource(BaseTest):
+
+    def test_resource_graph_validate(self):
+        p = self.load_policy({
+            'name': 'test-azure-storage-arm-source',
+            'resource': 'azure.storage',
+            'source': 'resource-graph',
+        }, validate=True)
+        self.assertTrue(p)
 
     @arm_template('storage.json')
     def test_resource_graph_and_arm_sources_storage_are_equivalent(self):
@@ -32,7 +42,7 @@ class ResourceGraphSource(BaseTest):
                  'value': 'cctstorage*'}]
         })
 
-        resources_arm = p1.run()[0]
+        resources_arm = json.loads(json.dumps(p1.run()[0]))
 
         p2 = self.load_policy({
             'name': 'test-azure-storage-arm-source',
@@ -44,9 +54,9 @@ class ResourceGraphSource(BaseTest):
                  'op': 'glob',
                  'value_type': 'normalize',
                  'value': 'cctstorage*'}]
-        }, validate=True)
+        })
 
-        resources_resource_graph = p2.run()[0]
+        resources_resource_graph = json.loads(json.dumps(p2.run()[0]))
 
         self.assertTrue(resource_cmp(resources_arm, resources_resource_graph))
 
@@ -63,7 +73,7 @@ class ResourceGraphSource(BaseTest):
                  'value': 'cctestvm*'}]
         })
 
-        resources_arm = p1.run()[0]
+        resources_arm = json.loads(json.dumps(p1.run()[0]))
 
         p2 = self.load_policy({
             'name': 'test-azure-vm-arm-source',
@@ -75,9 +85,9 @@ class ResourceGraphSource(BaseTest):
                  'op': 'glob',
                  'value_type': 'normalize',
                  'value': 'cctestvm*'}]
-        }, validate=True)
+        })
 
-        resources_resource_graph = p2.run()[0]
+        resources_resource_graph = json.loads(json.dumps(p2.run()[0]))
 
         # ARM returns the vm child extension resources that is not return with the resource graph
         self.assertTrue(
@@ -96,13 +106,13 @@ def resource_cmp(res1, res2, ignore_properties=[]):
     if type(res1) != type(res2):
         return False
 
-    if type(res1) == dict:
+    if isinstance(res1, dict):
         for prop in res1:
             if prop not in ignore_properties and \
                     (prop not in res2 or not resource_cmp(res1[prop], res2[prop])):
                 return False
 
-    elif type(res1) == list:
+    elif isinstance(res1, list):
         if len(res1) != len(res2):
             return False
 
@@ -110,7 +120,7 @@ def resource_cmp(res1, res2, ignore_properties=[]):
             if not resource_cmp(item1, item2):
                 return False
 
-    elif type(res1) == str:
+    elif isinstance(res1, string_types):
         res1 = res1.lower()
         res2 = res2.lower()
 
