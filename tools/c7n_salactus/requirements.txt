@@ -7,7 +7,7 @@ click==7.0
 docutils>=0.12
 Flask>=1.0.2
 functools32==3.2.3-2
-futures==3.2.0
+futures==3.3.0
 ipaddress>=1.0.17
 itsdangerous==1.1.0
 Jinja2==2.10.1
@@ -26,4 +26,4 @@ Werkzeug>=0.14.1
 wsgiref==0.1.2
 procname==0.3
 msgpack-python>=0.4.8
-lz4==2.1.6
+lz4==2.2.1

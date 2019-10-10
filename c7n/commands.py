@@ -93,8 +93,8 @@ def policy_command(f):
 
         # filter by name and resource type
         policies = all_policies.filter(
-            getattr(options, 'policy_filter', None),
-            getattr(options, 'resource_type', None))
+            getattr(options, 'policy_filters', []),
+            getattr(options, 'resource_types', []))
 
         # provider initialization
         provider_policies = {}
@@ -154,14 +154,16 @@ def _load_vars(options):
 
 
 def _print_no_policies_warning(options, policies):
-    if options.policy_filter or options.resource_type:
+    if options.policy_filters or options.resource_types:
         log.warning("Warning: no policies matched the filters provided.")
 
         log.warning("Filters:")
-        if options.policy_filter:
-            log.warning("    Policy name filter (-p): " + options.policy_filter)
-        if options.resource_type:
-            log.warning("    Resource type filter (-t): " + options.resource_type)
+        if options.policy_filters:
+            log.warning("    Policy name filter (-p): {}".format(
+                ", ".join(options.policy_filters)))
+        if options.resource_types:
+            log.warning("    Resource type filter (-t): {}".format(
+                ", ".join(options.resource_types)))
 
         log.warning("Available policies:")
         for policy in policies:

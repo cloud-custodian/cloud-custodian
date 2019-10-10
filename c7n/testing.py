@@ -13,9 +13,11 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import json
 import datetime
+import functools
 import io
+import jmespath
+import json
 import logging
 import os
 import re
@@ -23,7 +25,7 @@ import shutil
 import tempfile
 import unittest
 
-
+import pytest
 import mock
 import six
 import yaml
@@ -34,31 +36,19 @@ from c7n.ctx import ExecutionContext
 from c7n.utils import reset_session_cache
 from c7n.config import Bag, Config
 
+
 C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
-
 skip_if_not_validating = unittest.skipIf(
-    not C7N_VALIDATE, reason="We are not validating schemas."
-)
+    not C7N_VALIDATE, reason="We are not validating schemas.")
+functional = pytest.mark.functional
 
 
-try:
-    import pytest
-
-    functional = pytest.mark.functional
-except ImportError:
-    functional = lambda func: func  # noqa E731
-
-
-class TestUtils(unittest.TestCase):
+class CustodianTestCore(object):
 
     custodian_schema = None
 
-    def tearDown(self):
-        self.cleanUp()
-
-    def cleanUp(self):
-        # Clear out thread local session cache
-        reset_session_cache()
+    def addCleanup(self, func, *args, **kw):
+        raise NotImplementedError("subclass required")
 
     def write_policy_file(self, policy, format="yaml"):
         """ Write a policy file to disk in the specified format.
@@ -204,6 +194,41 @@ class TestUtils(unittest.TestCase):
             # _formatMessage ensures the longMessage option is respected
             msg = self._formatMessage(msg, standardMsg)
             raise self.failureException(msg)
+
+    def assertJmes(self, expr, instance, expected):
+        value = jmespath.search(expr, instance)
+        self.assertEqual(value, expected)
+
+
+class _TestUtils(unittest.TestCase):
+    # used to expose unittest feature set as a pytest fixture
+    def test_utils(self):
+        """dummy method for py2.7 unittest"""
+
+
+class PyTestUtils(CustodianTestCore):
+    """Pytest compatibile testing utils intended for use as fixture."""
+    def __init__(self, request):
+        self.request = request
+
+        # Copy over asserts from unit test
+        t = _TestUtils('test_utils')
+        for n in dir(t):
+            if n.startswith('assert'):
+                setattr(self, n, getattr(t, n))
+
+    def addCleanup(self, func, *args, **kw):
+        self.request.addfinalizer(functools.partial(func, *args, **kw))
+
+
+class TestUtils(unittest.TestCase, CustodianTestCore):
+
+    def tearDown(self):
+        self.cleanUp()
+
+    def cleanUp(self):
+        # Clear out thread local session cache
+        reset_session_cache()
 
 
 class TextTestIO(io.StringIO):

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n_gcp.actions import SetIamPolicy
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -25,7 +26,18 @@ class Organization(QueryResourceManager):
         component = 'organizations'
         scope = 'global'
         enum_spec = ('search', 'organizations[]', {'body': {}})
-        id = "name"
+        id = 'name'
+
+
+@Organization.action_registry.register('set-iam-policy')
+class OrganizationSetIamPolicy(SetIamPolicy):
+    """
+    Overrides the base implementation to process Organization resources correctly.
+    """
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments
 
 
 @resources.register('folder')
@@ -38,7 +50,7 @@ class Folder(QueryResourceManager):
         component = 'folders'
         scope = 'global'
         enum_spec = ('list', 'folders', None)
-        id = "name"
+        id = 'name'
 
     def get_resource_query(self):
         if 'query' in self.data:
@@ -57,4 +69,15 @@ class Project(QueryResourceManager):
         component = 'projects'
         scope = 'global'
         enum_spec = ('list', 'projects', None)
-        id = "projectId"
+        id = 'projectId'
+
+
+@Project.action_registry.register('set-iam-policy')
+class ProjectSetIamPolicy(SetIamPolicy):
+    """
+    Overrides the base implementation to process Project resources correctly.
+    """
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments

@@ -29,9 +29,9 @@ from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
-from c7n.query import QueryResourceManager
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema, generate_arn
+from c7n.query import QueryResourceManager
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
@@ -39,7 +39,7 @@ from c7n.resources.securityhub import OtherResourcePostFinding
 filters = FilterRegistry('aws.account.actions')
 actions = ActionRegistry('aws.account.filters')
 
-
+retry = staticmethod(QueryResourceManager.retry)
 filters.register('missing', Missing)
 
 
@@ -1385,3 +1385,71 @@ class SetS3PublicBlock(BaseAction):
             client.put_public_access_block(
                 AccountId=r['account_id'],
                 PublicAccessBlockConfiguration=config)
+
+
+@filters.register('glue-security-config')
+class GlueEncryptionEnabled(MultiAttrFilter):
+    """Filter aws account by its glue encryption status and KMS key """
+
+    """:example:
+
+    .. yaml:
+
+      policies:
+        - name: glue-security-config
+          resource: aws.account
+          filters:
+            - type: glue-security-config
+                key: SseAwsKmsKeyId
+                value: alias/aws/glue
+
+    """
+    retry = staticmethod(QueryResourceManager.retry)
+
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['glue-security-config']},
+            'CatalogEncryptionMode': {'type': 'string'},
+            'SseAwsKmsKeyId': {'type': 'string'},
+            'ReturnConnectionPasswordEncrypted': {'type': 'boolean'},
+            'AwsKmsKeyId': {'type': 'string'}
+        }
+    }
+
+    annotation = "c7n:glue-security-config"
+    permissions = ('glue:GetDataCatalogEncryptionSettings',)
+
+    def validate(self):
+        attrs = set()
+        for key in self.data:
+            if key in ['CatalogEncryptionMode',
+                       'ReturnConnectionPasswordEncrypted',
+                       'SseAwsKmsKeyId',
+                       'AwsKmsKeyId']:
+                attrs.add(key)
+        self.multi_attrs = attrs
+        return super(GlueEncryptionEnabled, self).validate()
+
+    def get_target(self, resource):
+        if self.annotation in resource:
+            return resource[self.annotation]
+        client = local_session(self.manager.session_factory).client('glue')
+        encryption_setting = client.get_data_catalog_encryption_settings().get(
+            'DataCatalogEncryptionSettings')
+        resource[self.annotation] = encryption_setting.get('EncryptionAtRest')
+        resource[self.annotation].update(encryption_setting.get('ConnectionPasswordEncryption'))
+
+        for kmskey in self.data:
+            if not self.data[kmskey].startswith('alias'):
+                continue
+            key = resource[self.annotation].get(kmskey)
+            vfd = {'c7n:AliasName': self.data[kmskey]}
+            vf = KmsRelatedFilter(vfd, self.manager)
+            vf.RelatedIdsExpression = 'KmsKeyId'
+            vf.annotate = False
+            if not vf.process([{'KmsKeyId': key}]):
+                return []
+            resource[self.annotation][kmskey] = self.data[kmskey]
+        return resource[self.annotation]

@@ -70,7 +70,10 @@ def build_function_package(config, function_name, sub_id):
                 package.pkg.add_contents(function_path + '/msg-templates/%s' % t, fh.read())
 
     function_config = copy.deepcopy(config)
-    function_config['templates_folders'] = [function_path + '/msg-templates/']
+
+    functions_full_template_path = '/home/site/wwwroot/' + function_path + '/msg-templates/'
+    function_config['templates_folders'] = [functions_full_template_path]
+
     package.pkg.add_contents(
         function_path + '/config.json',
         contents=json.dumps(function_config))
