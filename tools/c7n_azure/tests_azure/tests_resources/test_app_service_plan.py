@@ -188,21 +188,25 @@ class AppServicePlanTest(BaseTest):
             'name': 'test-azure-appserviceplan-linux',
             'resource': 'azure.appserviceplan',
             'filters': [
+                {'resourceGroup': 'test_appserviceplan-linux'},
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'ne',
                  'value_type': 'normalize',
-                 'value': 'cctest-consumption-linux'}
+                 'value': 'cctest-appserviceplan-linux'}
             ],
             'actions': [
                 {'type': 'resize-plan',
                  'size': 'F1'}]
         }, validate=True)
-        p.run()
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
 
         logger.assert_any_call(
-            'Skipping cctest-consumption-linux, '
-            'because this App Service Plan is for Consumption Azure Functions.')
+            'Skipping {}, because this App Service Plan is for Consumption Azure Functions.'.format(
+                resources[0]['name']
+            ))
 
     @arm_template('appserviceplan.json')
     @cassette_name('window_plans')
