@@ -516,6 +516,16 @@ The mailer will transmit all messages found on the queue on each execution, and 
 sending 3 times in the event of a failure calling SendGrid.  After the retries the queue
 message will be discarded.
 
+In addition, SendGrid delivery on Azure supports using resource tags to send emails. For example, in the `to` field:
+
+```yaml
+to:
+  - tag:OwnerEmail
+```
+
+This will find the email address associated with the resource's `OwnerEmail` tag, and send an email to the specified address.
+If no tag is found, or the associated email address is invalid, no email will be sent. 
+
 #### Deploying Azure Functions
 
 The `--update-lambda` CLI option will also deploy Azure Functions if you have an Azure

@@ -27,7 +27,7 @@ class StorageGateway(QueryResourceManager):
         arn = id = 'GatewayARN'
         name = 'GatewayName'
 
-    augment = staticmethod(universal_augment)
+    augment = universal_augment
 
 
 register_universal_tags(

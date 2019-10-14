@@ -31,7 +31,7 @@ extra_dependencies = ["azure-functions"] if sys.version_info[0] >= 3 else []
 
 setup(
     name="c7n_azure",
-    version='0.6.0',
+    version='0.6.1',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -97,7 +97,7 @@ setup(
                       "jsonpickle",
                       "requests",
                       "PyJWT",
-                      "c7n",
+                      "c7n>=0.8.45.1",
                       "azure-cli-core",
                       "adal",
                       "backports.functools_lru_cache",
