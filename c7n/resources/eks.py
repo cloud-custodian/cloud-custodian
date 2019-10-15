@@ -34,13 +34,13 @@ class EKS(QueryResourceManager):
         id = name = 'name'
         date = 'createdAt'
 
-
     def augment(self, resources):
         for r in resources:
             if not 'tags' in r:
                 continue
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
         return resources
+
 
 @EKS.filter_registry.register('subnet')
 class EKSSubnetFilter(SubnetFilter):
