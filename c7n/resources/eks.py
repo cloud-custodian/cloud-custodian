@@ -35,8 +35,9 @@ class EKS(QueryResourceManager):
         date = 'createdAt'
 
     def augment(self, resources):
+        resources = super(EKS, self).augment(resources)
         for r in resources:
-            if not 'tags' in r:
+            if 'tags' not in r:
                 continue
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
         return resources
