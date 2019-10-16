@@ -1,0 +1,253 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2019-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "9646cbc2-f3ca-48c5-8ef5-315692c6c374",
+                        "10402a77-8b53-4eb8-9686-317610b2ff46",
+                        "a5557d86-b645-4374-b00a-8219d7b489bf",
+                        "90b929d5-e3f7-405e-a16e-04239da5654f",
+                        "c10eeec4-988c-4e7c-907f-b96f1fe32215"
+                    ],
+                    "date": [
+                        "Tue, 08 Oct 2019 05:54:00 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "22619"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "Storage",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
+                                "name": "cctstoragey6akyqpagdt3o",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "southcentralus",
+                                "tags": {},
+                                "properties": {
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": false,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "enabled": true,
+                                                "lastEnabledTime": "2019-10-08T00:29:01.6583180Z"
+                                            },
+                                            "blob": {
+                                                "enabled": true,
+                                                "lastEnabledTime": "2019-10-08T00:29:01.6583180Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2019-10-08T00:29:01.5958150Z",
+                                    "primaryEndpoints": {
+                                        "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                                        "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/",
+                                        "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                                        "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "southcentralus",
+                                    "statusOfPrimary": "available"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2019-04-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-user-quota-resets-after": [
+                        "00:00:05"
+                    ],
+                    "date": [
+                        "Tue, 08 Oct 2019 05:54:01 GMT"
+                    ],
+                    "x-ms-user-quota-remaining": [
+                        "14"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-tenant-resource-requests": [
+                        "14"
+                    ],
+                    "content-length": [
+                        "24838"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "totalRecords": 18,
+                        "count": 18,
+                        "data": {
+                            "columns": [
+                                {
+                                    "name": "type",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "id",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "sku",
+                                    "type": "object"
+                                },
+                                {
+                                    "name": "name",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "kind",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "plan",
+                                    "type": "object"
+                                },
+                                {
+                                    "name": "tags",
+                                    "type": "object"
+                                },
+                                {
+                                    "name": "location",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "properties",
+                                    "type": "object"
+                                },
+                                {
+                                    "name": "resourceGroup",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "subscriptionId",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "managedBy",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "identity",
+                                    "type": "object"
+                                },
+                                {
+                                    "name": "zones",
+                                    "type": "object"
+                                },
+                                {
+                                    "name": "tenantId",
+                                    "type": "string"
+                                }
+                            ],
+                            "rows": [
+                                [
+                                    "microsoft.storage/storageaccounts",
+                                    "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o",
+                                    {
+                                        "name": "Standard_LRS",
+                                        "tier": "Standard"
+                                    },
+                                    "cctstoragey6akyqpagdt3o",
+                                    "Storage",
+                                    null,
+                                    {},
+                                    "southcentralus",
+                                    {
+                                        "provisioningState": "Succeeded",
+                                        "privateEndpointConnections": [],
+                                        "encryption": {
+                                            "keySource": "Microsoft.Storage",
+                                            "services": {
+                                                "blob": {
+                                                    "enabled": true,
+                                                    "lastEnabledTime": "2019-10-08T00:29:01.6580000Z"
+                                                },
+                                                "file": {
+                                                    "enabled": true,
+                                                    "lastEnabledTime": "2019-10-08T00:29:01.6580000Z"
+                                                }
+                                            }
+                                        },
+                                        "supportsHttpsTrafficOnly": false,
+                                        "creationTime": "2019-10-08T00:29:01.5950000Z",
+                                        "primaryEndpoints": {
+                                            "blob": "https://cctstoragey6akyqpagdt3o.blob.core.windows.net/",
+                                            "file": "https://cctstoragey6akyqpagdt3o.file.core.windows.net/",
+                                            "table": "https://cctstoragey6akyqpagdt3o.table.core.windows.net/",
+                                            "queue": "https://cctstoragey6akyqpagdt3o.queue.core.windows.net/"
+                                        },
+                                        "statusOfPrimary": "available",
+                                        "primaryLocation": "southcentralus",
+                                        "networkAcls": {
+                                            "virtualNetworkRules": [],
+                                            "defaultAction": "Allow",
+                                            "ipRules": [],
+                                            "bypass": "AzureServices"
+                                        }
+                                    },
+                                    "test_storage",
+                                    "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "",
+                                    null,
+                                    null,
+                                    "72f988bf-86f1-41af-91ab-2d7cd011db47"
+                                ]
+                            ]
+                        },
+                        "facets": [],
+                        "resultTruncated": "false"
+                    }
+                }
+            }
+        }
+    ]
+}

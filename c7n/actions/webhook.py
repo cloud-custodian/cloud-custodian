@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-
 try:
     import certifi
 except ImportError:
@@ -169,4 +167,4 @@ class Webhook(EventAction):
         if not self.body:
             return None
 
-        return json.dumps(jmespath.search(self.body, resource)).encode('utf-8')
+        return utils.dumps(jmespath.search(self.body, resource)).encode('utf-8')
