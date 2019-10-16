@@ -23,7 +23,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
 
 
-class TagsTest(BaseTest):
+class ActionsAutotagUserTest(BaseTest):
 
     existing_tags = {'pre-existing-1': 'unmodified', 'pre-existing-2': 'unmodified'}
 

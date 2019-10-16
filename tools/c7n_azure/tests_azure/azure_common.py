@@ -22,7 +22,6 @@ from functools import wraps
 from time import sleep
 
 import msrest.polling
-from .azure_serializer import AzureSerializer
 from c7n_azure import utils, constants
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
@@ -37,6 +36,8 @@ from c7n.policy import ExecutionContext
 from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
+from c7n.utils import local_session
+from .azure_serializer import AzureSerializer
 
 load_resources()
 
@@ -398,11 +399,11 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
 
         # We always patch the date for recordings so URLs that involve dates match up
         if self.vcr_enabled:
-            self._utc_patch = patch.object(utils, 'utcnow', self.get_test_date)
+            self._utc_patch = patch.object(utils, 'utcnow', self._get_test_date)
             self._utc_patch.start()
             self.addCleanup(self._utc_patch.stop)
 
-            self._now_patch = patch.object(utils, 'now', self.get_test_date)
+            self._now_patch = patch.object(utils, 'now', self._get_test_date)
             self._now_patch.start()
             self.addCleanup(self._now_patch.stop)
 
@@ -432,7 +433,9 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
             self._subscription_patch.start()
             self.addCleanup(self._subscription_patch.stop)
 
-    def get_test_date(self, tz=None):
+        self.session = local_session(Session)
+
+    def _get_test_date(self, tz=None):
         header_date = self.cassette.responses[0]['headers'].get('date') \
             if self.cassette.responses else None
 

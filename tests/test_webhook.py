@@ -14,6 +14,8 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
+import json
 import mock
 
 from c7n.actions.webhook import Webhook
@@ -160,10 +162,33 @@ class WebhookTest(BaseTest):
 
         self.assertEqual("http://foo.com?foo=test_name", req['url'])
         self.assertEqual("POST", req['method'])
-        self.assertEqual(b'["test_name"]', req['body'])
+        self.assertEqual(b'[\n"test_name"\n]', req['body'])
         self.assertEqual(
             {"test": "header", "Content-Type": "application/json"},
             req['headers'])
+
+    @mock.patch('c7n.actions.webhook.urllib3.PoolManager.request')
+    def test_process_date_serializer(self, request_mock):
+        current = datetime.datetime.utcnow()
+        resources = [
+            {
+                "name": "test1",
+                "value": current
+            },
+        ]
+
+        data = {
+            "url": "http://foo.com",
+            "body": "resources[]",
+            'batch': True,
+        }
+
+        wh = Webhook(data=data, manager=self._get_manager())
+        wh.process(resources)
+        req1 = request_mock.call_args_list[0][1]
+        self.assertEqual(
+            json.loads(req1['body'])[0]['value'],
+            current.isoformat())
 
     @mock.patch('c7n.actions.webhook.urllib3.PoolManager.request')
     def test_process_no_batch(self, request_mock):

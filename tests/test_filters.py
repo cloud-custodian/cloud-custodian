@@ -381,6 +381,23 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i(parse_date('2019/04/01')), True)
         self.assertFilter(fdata, i(datetime.now().isoformat()), False)
 
+    def test_version(self):
+        fdata = {
+            "type": "value",
+            "key": "Version",
+            "op": "less-than",
+            "value_type": "version",
+            "value": "1.9.12",
+        }
+
+        def i(v):
+            return instance(Version=v)
+
+        self.assertFilter(fdata, i("1.32.1"), False)
+        self.assertFilter(fdata, i("1.9.13"), False)
+        self.assertFilter(fdata, i("1.9.11"), True)
+        self.assertFilter(fdata, i("1.1"), True)
+
     def test_expiration(self):
 
         now = datetime.now(tz=tz.tzutc())

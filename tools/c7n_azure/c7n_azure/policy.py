@@ -25,11 +25,14 @@ from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIG
                                  RESOURCE_GROUPS_TYPE)
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.resources.generic_arm_resource import GenericArmResource
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
 from c7n.actions import EventAction
+from c7n.exceptions import PolicyValidationError
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
 from c7n.utils import local_session
 
@@ -351,6 +354,31 @@ class AzureEventGridMode(AzureFunctionMode):
                                required=['events'],
                                rinherit=AzureFunctionMode.schema)
 
+    def __init__(self, policy):
+        super(AzureEventGridMode, self).__init__(policy)
+        self.subscribed_events = AzureEvents.get_event_operations(
+            self.policy.data['mode'].get('events'))
+
+    def validate(self):
+        super(AzureEventGridMode, self).validate()
+        self._validate_is_arm_resource()
+        self._validate_event_matches_resource()
+
+    def _validate_is_arm_resource(self):
+        if not isinstance(self.policy.resource_manager, ArmResourceManager):
+            raise PolicyValidationError(
+                'The policy resource, {}, is not supported in event grid mode.'.format(
+                    self.policy.data['resource']))
+
+    def _validate_event_matches_resource(self):
+        resource_type = self.policy.resource_manager.resource_type.resource_type
+        if resource_type is not GenericArmResource.resource_type.resource_type:
+            for event in self.subscribed_events:
+                if resource_type.lower() not in event.lower():
+                    raise PolicyValidationError(
+                        'The policy resource, {}, can not be triggered by the event, {}.'.format(
+                            resource_type, event))
+
     def provision(self):
         super(AzureEventGridMode, self).provision()
         session = local_session(self.policy.session_factory)
@@ -391,9 +419,8 @@ class AzureEventGridMode(AzureFunctionMode):
                                                                queue_name=queue_name)
 
         # filter specific events
-        subscribed_events = AzureEvents.get_event_operations(
-            self.policy.data['mode'].get('events'))
-        advance_filter = StringInAdvancedFilter(key='Data.OperationName', values=subscribed_events)
+        advance_filter = StringInAdvancedFilter(key='Data.OperationName',
+                                                values=self.subscribed_events)
         event_filter = EventSubscriptionFilter(advanced_filters=[advance_filter])
 
         for subscription_id in self.target_subscription_ids:

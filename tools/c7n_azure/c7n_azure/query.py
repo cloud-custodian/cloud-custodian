@@ -18,11 +18,13 @@ from collections import Iterable
 import six
 from c7n_azure import constants
 from c7n_azure.actions.logic_app import LogicAppAction
+from azure.mgmt.resourcegraph.models import QueryRequest
 from c7n_azure.actions.notify import Notify
 from c7n_azure.filters import ParentFilter
 from c7n_azure.provider import resources
 
 from c7n.actions import ActionRegistry
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources, MaxResourceLimit
@@ -79,8 +81,51 @@ class DescribeSource(object):
         self.manager = manager
         self.query = self.resource_query_factory(self.manager.session_factory)
 
+    def validate(self):
+        pass
+
     def get_resources(self, query):
         return self.query.filter(self.manager)
+
+    def get_permissions(self):
+        return ()
+
+    def augment(self, resources):
+        return resources
+
+
+@sources.register('resource-graph')
+class ResourceGraphSource(object):
+
+    def __init__(self, manager):
+        self.manager = manager
+
+    def validate(self):
+        if not hasattr(self.manager.resource_type, 'resource_type'):
+            raise PolicyValidationError(
+                "%s is not supported with the Azure Resource Graph source."
+                % self.manager.data['resource'])
+
+    def get_resources(self, _):
+        log.warning('The Azure Resource Graph source '
+                    'should not be used in production scenarios at this time.')
+
+        session = self.manager.get_session()
+        client = session.client('azure.mgmt.resourcegraph.ResourceGraphClient')
+
+        # empty scope will return all resource
+        query_scope = ""
+        if self.manager.resource_type.resource_type != 'armresource':
+            query_scope = "where type =~ '%s'" % self.manager.resource_type.resource_type
+
+        query = QueryRequest(
+            query=query_scope,
+            subscriptions=[session.get_subscription_id()]
+        )
+        res = client.resources(query)
+        cols = [c['name'] for c in res.data['columns']]
+        data = [dict(zip(cols, r)) for r in res.data['rows']]
+        return data
 
     def get_permissions(self):
         return ()
@@ -275,6 +320,9 @@ class QueryResourceManager(ResourceManager):
             klass = registry.get(resource)
             klass.action_registry.register('notify', Notify)
             klass.action_registry.register('logic-app', LogicAppAction)
+
+    def validate(self):
+        self.source.validate()
 
 
 @six.add_metaclass(QueryMeta)

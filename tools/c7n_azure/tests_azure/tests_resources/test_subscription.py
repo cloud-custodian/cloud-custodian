@@ -54,6 +54,11 @@ class SubscriptionTest(BaseTest):
             "/providers/Microsoft.Authorization/policyDefinitions/" \
             "404c3081-a854-4457-ae30-26a93ef643f9"
 
+        client = self.session.client('azure.mgmt.resource.policy.PolicyClient')
+        scope = '/subscriptions/{}'.format(self.session.get_subscription_id())
+
+        self.addCleanup(client.policy_assignments.delete, scope, 'cctestpolicy_sub')
+
         p = self.load_policy({
             'name': 'test-add-policy',
             'resource': 'azure.subscription',
@@ -76,21 +81,7 @@ class SubscriptionTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
 
-        p = self.load_policy({
-            'name': 'test-cleanup-add-policy',
-            'resource': 'azure.policyassignments',
-            'filters': [
-                {'type': 'value',
-                 'key': 'properties.displayName',
-                 'op': 'eq',
-                 'value': 'cctestpolicy_sub'}
-            ],
-            'actions': [
-                {'type': 'delete'}
-            ]
-        })
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
+        policy = client.policy_assignments.get(scope, 'cctestpolicy_sub')
+
+        self.assertEqual('cctestpolicy_sub', policy.name)
