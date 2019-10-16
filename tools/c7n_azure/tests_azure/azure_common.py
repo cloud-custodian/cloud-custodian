@@ -22,7 +22,6 @@ from functools import wraps
 from time import sleep
 
 import msrest.polling
-from .azure_serializer import AzureSerializer
 from c7n_azure import utils, constants
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
@@ -37,6 +36,8 @@ from c7n.policy import ExecutionContext
 from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
+from c7n.utils import local_session
+from .azure_serializer import AzureSerializer
 
 load_resources()
 
@@ -431,6 +432,8 @@ class BaseTest(TestUtils, AzureVCRBaseTest):
                                              return_value=DEFAULT_SUBSCRIPTION_ID)
             self._subscription_patch.start()
             self.addCleanup(self._subscription_patch.stop)
+
+        self.session = local_session(Session)
 
     def _get_test_date(self, tz=None):
         header_date = self.cassette.responses[0]['headers'].get('date') \

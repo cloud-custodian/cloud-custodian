@@ -25,6 +25,8 @@ from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIG
                                  RESOURCE_GROUPS_TYPE)
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.resources.generic_arm_resource import GenericArmResource
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
 
@@ -359,12 +361,23 @@ class AzureEventGridMode(AzureFunctionMode):
 
     def validate(self):
         super(AzureEventGridMode, self).validate()
+        self._validate_is_arm_resource()
+        self._validate_event_matches_resource()
+
+    def _validate_is_arm_resource(self):
+        if not isinstance(self.policy.resource_manager, ArmResourceManager):
+            raise PolicyValidationError(
+                'The policy resource, {}, is not supported in event grid mode.'.format(
+                    self.policy.data['resource']))
+
+    def _validate_event_matches_resource(self):
         resource_type = self.policy.resource_manager.resource_type.resource_type
-        for event in self.subscribed_events:
-            if resource_type.lower() not in event.lower():
-                raise PolicyValidationError(
-                    'The policy resource, {}, can not be triggered by the event, {}.'.format(
-                        resource_type, event))
+        if resource_type is not GenericArmResource.resource_type.resource_type:
+            for event in self.subscribed_events:
+                if resource_type.lower() not in event.lower():
+                    raise PolicyValidationError(
+                        'The policy resource, {}, can not be triggered by the event, {}.'.format(
+                            resource_type, event))
 
     def provision(self):
         super(AzureEventGridMode, self).provision()

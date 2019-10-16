@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from setuptools import setup, find_packages
+import sys
+import os
 
-# read the contents of your README file
+
 description = ""
 if os.path.exists('readme.md'):
     description = open('readme.md', 'r').read()
 
-
 setup(
-    name="c7n_kube",
-    version='0.1.1',
-    description="Cloud Custodian - Kubernetes Provider",
+    name="c7n_azure",
+    version='0.6.1',
+    description="Cloud Custodian - Azure Support",
     long_description=description,
     long_description_content_type='text/markdown',
     classifiers=[
@@ -36,10 +36,12 @@ setup(
     packages=find_packages(),
     entry_points={
         "custodian.resources": [
-            'kube = c7n_kube.entry:initialize_kube']
+            'azure = c7n_azure.entry:initialize_azure']
     },
+    python_requires=">=3.6",
     install_requires=[
-        "c7n>=0.8.45.0",
-        "kubernetes>=9.0.0"
+      {% for dep in pinned_packages %}
+        "{{ dep }}",
+      {% endfor %}
     ]
 )
