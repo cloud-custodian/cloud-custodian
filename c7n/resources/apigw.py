@@ -23,7 +23,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
 from c7n.tags import register_universal_tags
-from c7n.utils import generate_arn
+from c7n.utils import generate_arn, type_schema
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -196,6 +196,37 @@ class UpdateApi(BaseAction):
 
 
 register_universal_tags(RestApi.filter_registry, RestApi.action_registry, compatibility=False)
+
+
+@RestApi.action_registry.register('delete')
+class DeleteApi(BaseAction):
+    """Delete a REST API.
+
+    :example:
+
+    contrived example to delete rest api
+
+    .. code-block:: yaml
+
+       policies:
+         - name: apigw-delete
+           resource: rest-api
+           filters:
+             - description: empty
+           actions:
+             - type: delete
+    """
+    permissions = ('apigateway:Delete',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for r in resources:
+            try:
+                client.delete_rest_api(restApiId=r['id'])
+            except client.exceptions.NotFoundException:
+                continue
 
 
 @resources.register('rest-stage')

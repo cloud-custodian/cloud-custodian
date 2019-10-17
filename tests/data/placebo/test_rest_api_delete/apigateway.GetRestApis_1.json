@@ -1,0 +1,82 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "9da286e1-2e9d-4f74-83a1-82c07a01507a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 17 Oct 2019 17:50:32 GMT",
+                "content-type": "application/json",
+                "content-length": "1005",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "9da286e1-2e9d-4f74-83a1-82c07a01507a",
+                "x-amz-apigw-id": "Bt98UKAwIAMEctw="
+            },
+            "RetryAttempts": 0
+        },
+        "items": [
+            {
+                "id": "6b1g7ewn9g",
+                "name": "demoauth1",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 8,
+                    "day": 5,
+                    "hour": 6,
+                    "minute": 38,
+                    "second": 29,
+                    "microsecond": 0
+                },
+                "version": "1.0",
+                "binaryMediaTypes": [
+                    "application/octet-stream",
+                    "application/x-tar",
+                    "application/zip",
+                    "audio/basic",
+                    "audio/ogg",
+                    "audio/mp4",
+                    "audio/mpeg",
+                    "audio/wav",
+                    "audio/webm",
+                    "image/png",
+                    "image/jpg",
+                    "image/jpeg",
+                    "image/gif",
+                    "video/ogg",
+                    "video/mpeg",
+                    "video/webm"
+                ],
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "EDGE"
+                    ]
+                }
+            },
+            {
+                "id": "7keylcvgkk",
+                "name": "c7n-test-2",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 5,
+                    "day": 9,
+                    "hour": 19,
+                    "minute": 29,
+                    "second": 22,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "PRIVATE"
+                    ]
+                },
+                "tags": {
+                    "target-tag": "pratyush"
+                }
+            }
+        ]
+    }
+}

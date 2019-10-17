@@ -118,6 +118,18 @@ class TestRestApi(BaseTest):
             {'Env': 'Dev',
             'custodian_cleanup': 'Resource does not meet policy: update@2019/09/11'})
 
+    def test_rest_api_delete(self):
+        session_factory = self.replay_flight_data('test_rest_api_delete')
+        p = self.load_policy({
+            'name': 'tag-rest-api',
+            'resource': 'rest-api',
+            'filters': [{'tag:target-tag': 'pratyush'}],
+            "actions": [{"type": "delete"}]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        self.assertTrue(resources[0]['name'],'c7n-test-2')
+
 
 class TestRestResource(BaseTest):
 
