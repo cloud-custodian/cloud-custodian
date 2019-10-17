@@ -150,8 +150,38 @@ class DiskSnapshot(MethodAction):
     schema = type_schema('snapshot')
     method_spec = {'op': 'createSnapshot'}
     path_param_re = re.compile(
-        '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
-    attr_filter = ('status', ('RUNNING',))
+        '.*?/projects/(.*?)/zones/(.*?)/disks/(.*)')
+    attr_filter = ('status', ('RUNNING', 'READY'))
+
+    def get_resource_params(self, m, r):
+        project, zone, resourceId = self.path_param_re.match(r['selfLink']).groups()
+        return {
+            'project': project,
+            'zone': zone,
+            'disk': resourceId,
+            'body': {
+                'name': resourceId,
+                'labels': r.get('labels', {}),
+            }
+        }
+
+
+@Disk.action_registry.register('delete')
+class DiskDelete(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    path_param_re = re.compile(
+        '.*?/projects/(.*?)/zones/(.*?)/disks/(.*)')
+    attr_filter = ('status', ('RUNNING', 'READY'))
+
+    def get_resource_params(self, m, r):
+        project, zone, resourceId = self.path_param_re.match(r['selfLink']).groups()
+        return {
+            'project': project,
+            'zone': zone,
+            'disk': resourceId,
+        }
 
 
 @resources.register('snapshot')
