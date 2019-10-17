@@ -128,7 +128,7 @@ class TestRestApi(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 1)
-        self.assertTrue(resources[0]['name'],'c7n-test-2')
+        self.assertTrue(resources[0]['name'], 'c7n-test-2')
 
 
 class TestRestResource(BaseTest):
