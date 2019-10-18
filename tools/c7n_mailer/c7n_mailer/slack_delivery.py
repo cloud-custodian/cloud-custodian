@@ -200,7 +200,7 @@ class SlackDelivery(object):
                 response.status_code, response.text)
             return
 
-        if response.headers['content-type'] == 'text/html':
+        if 'text/html' in response.headers['content-type']:
             if response.text != 'ok':
                 self.logger.info("Error in sending Slack message. Status:%s, response:%s",
                                 response.status_code, response.text)
