@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from botocore.exceptions import ClientError
+import time
 
 from .common import BaseTest
 
@@ -128,7 +129,11 @@ class TestRestApi(BaseTest):
             session_factory=session_factory)
         resources = p.run()
         self.assertTrue(len(resources), 1)
-        self.assertTrue(resources[0]['name'], 'c7n-test-2')
+        self.assertTrue(resources[0]['id'], 'am0c2fyskg')
+        client = session_factory().client("apigateway")
+        with self.assertRaises(ClientError) as e:
+            client.delete_rest_api(restApiId='am0c2fyskg')
+        self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
 
 
 class TestRestResource(BaseTest):

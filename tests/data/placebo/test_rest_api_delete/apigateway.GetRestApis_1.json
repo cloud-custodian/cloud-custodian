@@ -2,15 +2,15 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "9da286e1-2e9d-4f74-83a1-82c07a01507a",
+            "RequestId": "ec070591-8160-4e22-a536-aa94c69629fa",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "date": "Thu, 17 Oct 2019 17:50:32 GMT",
+                "date": "Fri, 18 Oct 2019 15:39:06 GMT",
                 "content-type": "application/json",
-                "content-length": "1005",
+                "content-length": "1022",
                 "connection": "keep-alive",
-                "x-amzn-requestid": "9da286e1-2e9d-4f74-83a1-82c07a01507a",
-                "x-amz-apigw-id": "Bt98UKAwIAMEctw="
+                "x-amzn-requestid": "ec070591-8160-4e22-a536-aa94c69629fa",
+                "x-amz-apigw-id": "Bw9oEJ-bIAMEb-A="
             },
             "RetryAttempts": 0
         },
@@ -55,22 +55,23 @@
                 }
             },
             {
-                "id": "7keylcvgkk",
+                "id": "am0c2fyskg",
                 "name": "c7n-test-2",
                 "createdDate": {
                     "__class__": "datetime",
                     "year": 2019,
-                    "month": 5,
-                    "day": 9,
-                    "hour": 19,
-                    "minute": 29,
-                    "second": 22,
+                    "month": 10,
+                    "day": 18,
+                    "hour": 11,
+                    "minute": 38,
+                    "second": 30,
                     "microsecond": 0
                 },
+                "version": "1.0",
                 "apiKeySource": "HEADER",
                 "endpointConfiguration": {
                     "types": [
-                        "PRIVATE"
+                        "REGIONAL"
                     ]
                 },
                 "tags": {

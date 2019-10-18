@@ -1,0 +1,23 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "Invalid API identifier specified 644160558196:am0c2fyskg",
+            "Code": "NotFoundException"
+        },
+        "ResponseMetadata": {
+            "RequestId": "4128996d-0a75-427c-b659-0ccbda4ed8ed",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "date": "Fri, 18 Oct 2019 15:39:06 GMT",
+                "content-type": "application/json",
+                "content-length": "71",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "4128996d-0a75-427c-b659-0ccbda4ed8ed",
+                "x-amzn-errortype": "NotFoundException",
+                "x-amz-apigw-id": "Bw9oMIRSoAMEd3Q="
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
