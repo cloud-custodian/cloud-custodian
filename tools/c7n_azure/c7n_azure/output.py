@@ -52,11 +52,12 @@ class AzureStorageOutput(DirectoryOutput):
 
     DEFAULT_BLOB_FOLDER_PREFIX = '{policy_name}/{now:%Y/%m/%d/%H/}'
 
+    log = logging.getLogger('custodian.azure.output.AzureStorageOutput')
+
     def __init__(self, ctx, config=None):
         self.ctx = ctx
         self.config = config
 
-        self.log = logging.getLogger('custodian.output')
         self.root_dir = tempfile.mkdtemp()
         self.output_dir = self.get_output_path(self.ctx.options.output_dir)
         self.blob_service, self.container, self.file_prefix = \
@@ -93,9 +94,8 @@ class AzureStorageOutput(DirectoryOutput):
                         self.log.error("Access Error: Storage Blob Data Contributor Role "
                                        "is required to write to Azure Blob Storage.")
                     else:
-                        self.log.error("Error writing output. "
-                                       "Confirm output storage URL is correct. \n" +
-                                   str(e))
+                        self.log.exception("Error writing output. "
+                                           "Confirm output storage URL is correct.")
 
                 self.log.debug("%s uploaded" % blob_name)
 
@@ -137,6 +137,7 @@ class MetricsOutput(Metrics):
                 'ResType': self.ctx.policy.resource_type,
                 'SubscriptionId': self.subscription_id,
                 'ExecutionId': self.ctx.execution_id,
+                'ExecutionMode': self.ctx.policy.execution_mode,
                 'Unit': unit
             }
         }
@@ -154,11 +155,12 @@ class MetricsOutput(Metrics):
 
 
 class AppInsightsLogHandler(LoggingHandler):
-    def __init__(self, instrumentation_key, policy_name, subscription_id, execution_id):
+    def __init__(self, instrumentation_key, policy_name, subscription_id, execution_id, res_type):
         super(AppInsightsLogHandler, self).__init__(instrumentation_key)
         self.policy_name = policy_name
         self.subscription_id = subscription_id
         self.execution_id = execution_id
+        self.resource_type = res_type
 
     def emit(self, record):
         properties = {
@@ -169,8 +171,12 @@ class AppInsightsLogHandler(LoggingHandler):
             'Level': record.levelname,
             'Policy': self.policy_name,
             'SubscriptionId': self.subscription_id,
+            'ResType': self.resource_type,
             'ExecutionId': self.execution_id
         }
+
+        if hasattr(record, 'properties'):
+            properties.update(record.properties)
 
         if record.exc_info:
             self.client.track_exception(*record.exc_info, properties=properties)
@@ -190,4 +196,5 @@ class AppInsightsLogOutput(LogOutput):
         return AppInsightsLogHandler(self.instrumentation_key,
                                      self.ctx.policy.name,
                                      self.subscription_id,
-                                     self.ctx.execution_id)
+                                     self.ctx.execution_id,
+                                     self.ctx.policy.resource_type)

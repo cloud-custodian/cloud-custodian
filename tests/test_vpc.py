@@ -2590,6 +2590,42 @@ class FlowLogsTest(BaseTest):
         self.assertEqual(resources[0]['c7n:flow-logs'][0]['LogDestination'],
                          'arn:aws:s3:::c7n-vpc-flow-logs')
 
+    def test_vpc_set_flow_logs_validation(self):
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 'flow-set-validate-1',
+                'resource': 'vpc',
+                'actions': [{
+                    'type': 'set-flow-log',
+                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
+                }]})
+        self.assertIn(
+            "DeliverLogsPermissionArn missing", str(e.exception))
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 'flow-set-validate-2',
+                'resource': 'vpc',
+                'actions': [{
+                    'type': 'set-flow-log',
+                    'DeliverLogsPermissionArn': 'arn:aws:iam',
+                    'LogGroupName': '/cloudwatch/logs',
+                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
+                }]})
+        self.assertIn("Exactly one of", str(e.exception))
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 'flow-set-validate-3',
+                'resource': 'vpc',
+                'actions': [{
+                    'type': 'set-flow-log',
+                    'LogDestinationType': 's3',
+                    'DeliverLogsPermissionArn': 'arn:aws:iam',
+                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
+                }]})
+        self.assertIn(
+            "DeliverLogsPermissionArn is prohibited for destination-type:s3",
+            str(e.exception))
+
     def test_vpc_set_flow_logs_s3(self):
         session_factory = self.replay_flight_data("test_vpc_set_flow_logs_s3")
         p = self.load_policy(
@@ -2604,8 +2640,6 @@ class FlowLogsTest(BaseTest):
                         "type": "set-flow-log",
                         "LogDestinationType": "s3",
                         "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz",
-                        "DeliverLogsPermissionArn":
-                            "arn:aws:iam::644160558196:role/testing-vpc-flow-log-role",
                     }
                 ],
             },

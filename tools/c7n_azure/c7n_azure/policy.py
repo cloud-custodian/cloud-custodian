@@ -15,22 +15,26 @@
 import logging
 import re
 import sys
+import time
 
 import six
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
+from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
+from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE,
+                                 RESOURCE_GROUPS_TYPE)
+from c7n_azure.function_package import FunctionPackage
+from c7n_azure.functionapp_utils import FunctionAppUtilities
+from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.resources.generic_arm_resource import GenericArmResource
+from c7n_azure.storage_utils import StorageUtilities
+from c7n_azure.utils import ResourceIdParser, StringUtils
 
 from c7n import utils
 from c7n.actions import EventAction
+from c7n.exceptions import PolicyValidationError
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
 from c7n.utils import local_session
-from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
-from c7n_azure.function_package import FunctionPackage
-from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE,
-                                 FUNCTION_TIME_TRIGGER_MODE)
-from c7n_azure.functionapp_utils import FunctionAppUtilities
-from c7n_azure.storage_utils import StorageUtilities
-from c7n_azure.utils import ResourceIdParser, StringUtils
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -99,10 +103,10 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     default_storage_name = "custodian"
 
-    def __init__(self, policy):
+    log = logging.getLogger('custodian.azure.policy.AzureFunctionMode')
 
+    def __init__(self, policy):
         self.policy = policy
-        self.log = logging.getLogger('custodian.azure.AzureFunctionMode')
         self.policy_name = self.policy.data['name'].replace(' ', '-').lower()
         self.function_params = None
         self.function_app = None
@@ -241,7 +245,9 @@ class AzureModeCommon:
         """
         expected_type = policy.resource_manager.resource_type.resource_type
 
-        if expected_type == 'Microsoft.Resources/subscriptions/resourceGroups':
+        if expected_type == 'armresource':
+            return event['subject']
+        elif expected_type == RESOURCE_GROUPS_TYPE:
             extract_regex = '/subscriptions/[^/]+/resourceGroups/[^/]+'
         else:
             types = expected_type.split('/')
@@ -254,6 +260,7 @@ class AzureModeCommon:
 
     @staticmethod
     def run_for_event(policy, event=None):
+        s = time.time()
 
         resources = policy.resource_manager.get_resources(
             [AzureModeCommon.extract_resource_id(policy, event)])
@@ -261,20 +268,24 @@ class AzureModeCommon:
         resources = policy.resource_manager.filter_resources(
             resources, event)
 
-        if not resources:
-            policy.log.info(
-                "policy: %s resources: %s no resources found" % (
-                    policy.name, policy.resource_type))
-            return
-
         with policy.ctx:
+            rt = time.time() - s
+
             policy.ctx.metrics.put_metric(
                 'ResourceCount', len(resources), 'Count', Scope="Policy",
                 buffer=False)
-
+            policy.ctx.metrics.put_metric(
+                "ResourceTime", rt, "Seconds", Scope="Policy")
             policy._write_file(
                 'resources.json', utils.dumps(resources, indent=2))
 
+            if not resources:
+                policy.log.info(
+                    "policy: %s resources: %s no resources found" % (
+                        policy.name, policy.resource_type))
+                return
+
+            at = time.time()
             for action in policy.resource_manager.actions:
                 policy.log.info(
                     "policy: %s invoking action: %s resources: %d",
@@ -286,6 +297,8 @@ class AzureModeCommon:
                 policy._write_file(
                     "action-%s" % action.name, utils.dumps(results))
 
+        policy.ctx.metrics.put_metric(
+            "ActionTime", time.time() - at, "Seconds", Scope="Policy")
         return resources
 
 
@@ -293,8 +306,19 @@ class AzureModeCommon:
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
     """A policy that runs/execute s in azure functions at specified
     time intervals."""
+    # Based on NCRONTAB used by Azure Functions:
+    # https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer
+    schedule_regex = (r'^\s?([0-5]?[0-9]|\,|(\*\/)|\-)+ '
+                      r'(\*|[0-5]?[0-9]|\,|\/|\-)+ '
+                      r'(\*|[0-9]|(1[0-9])|(2[0-3])|\,|\/|\-)+ '
+                      r'(\*|[1-9]|([1-2][0-9])|(3[0-1])|\,|\*\/|\-)+ '
+                      r'([Jj](an|anuary)|[Ff](eb|ebruary)|[Mm](ar|arch)|[Aa](pr|pril)|[Mm]ay|'
+                      r'[Jj](un|une)|[Jj](ul|uly)|[Aa](ug|ugust)|[Ss](ep|eptember)|[Oo](ct'
+                      r'|ctober)|[Nn](ov|ovember)|[Dd](ec|ecember)|\,|\*\/|[1-9]|(1[0-2])|\*)+ '
+                      r'([Mm](on|onday)|[Tt](u|ue|ues|uesday)|[Ww](ed|ednesday)|[Tt](hu|hursday)|'
+                      r'[Ff](ri|riday)|[Ss](at|aturday)|[Ss](un|unday)|[0-6]|\,|\*|\-)+\s?$')
     schema = utils.type_schema(FUNCTION_TIME_TRIGGER_MODE,
-                               schedule={'type': 'string'},
+                               schedule={'type': 'string', 'pattern': schedule_regex},
                                rinherit=AzureFunctionMode.schema)
 
     def provision(self):
@@ -317,17 +341,43 @@ class AzureEventGridMode(AzureFunctionMode):
     azure event."""
 
     schema = utils.type_schema(FUNCTION_EVENT_TRIGGER_MODE,
-                               events={'type': 'array', 'items': {
-                                   'oneOf': [
-                                       {'type': 'string'},
-                                       {'type': 'object',
-                                        'required': ['resourceProvider', 'event'],
-                                        'properties': {
-                                            'resourceProvider': {'type': 'string'},
-                                            'event': {'type': 'string'}}}]
-                               }},
+                               events={'type': 'array',
+                                    'maxItems': 5,
+                                    'items': {
+                                        'oneOf': [
+                                            {'type': 'string'},
+                                            {'type': 'object',
+                                                'required': ['resourceProvider', 'event'],
+                                                'properties': {
+                                                    'resourceProvider': {'type': 'string'},
+                                                    'event': {'type': 'string'}}}]}},
                                required=['events'],
                                rinherit=AzureFunctionMode.schema)
+
+    def __init__(self, policy):
+        super(AzureEventGridMode, self).__init__(policy)
+        self.subscribed_events = AzureEvents.get_event_operations(
+            self.policy.data['mode'].get('events'))
+
+    def validate(self):
+        super(AzureEventGridMode, self).validate()
+        self._validate_is_arm_resource()
+        self._validate_event_matches_resource()
+
+    def _validate_is_arm_resource(self):
+        if not isinstance(self.policy.resource_manager, ArmResourceManager):
+            raise PolicyValidationError(
+                'The policy resource, {}, is not supported in event grid mode.'.format(
+                    self.policy.data['resource']))
+
+    def _validate_event_matches_resource(self):
+        resource_type = self.policy.resource_manager.resource_type.resource_type
+        if resource_type is not GenericArmResource.resource_type.resource_type:
+            for event in self.subscribed_events:
+                if resource_type.lower() not in event.lower():
+                    raise PolicyValidationError(
+                        'The policy resource, {}, can not be triggered by the event, {}.'.format(
+                            resource_type, event))
 
     def provision(self):
         super(AzureEventGridMode, self).provision()
@@ -359,8 +409,8 @@ class AzureEventGridMode(AzureFunctionMode):
             StorageUtilities.create_queue_from_storage_account(storage_account, queue_name, session)
             self.log.info("Storage queue creation succeeded")
             return storage_account
-        except Exception as e:
-            self.log.error('Queue creation failed with error: %s' % e)
+        except Exception:
+            self.log.exception('Queue creation failed')
             raise SystemExit
 
     def _create_event_subscription(self, storage_account, queue_name, session):
@@ -369,9 +419,8 @@ class AzureEventGridMode(AzureFunctionMode):
                                                                queue_name=queue_name)
 
         # filter specific events
-        subscribed_events = AzureEvents.get_event_operations(
-            self.policy.data['mode'].get('events'))
-        advance_filter = StringInAdvancedFilter(key='Data.OperationName', values=subscribed_events)
+        advance_filter = StringInAdvancedFilter(key='Data.OperationName',
+                                                values=self.subscribed_events)
         event_filter = EventSubscriptionFilter(advanced_filters=[advance_filter])
 
         for subscription_id in self.target_subscription_ids:
@@ -380,6 +429,6 @@ class AzureEventGridMode(AzureFunctionMode):
                                               subscription_id, session, event_filter)
                 self.log.info('Event grid subscription creation succeeded: subscription_id=%s' %
                               subscription_id)
-            except Exception as e:
-                self.log.error('Event Subscription creation failed with error: %s' % e)
+            except Exception:
+                self.log.exception('Event Subscription creation failed')
                 raise SystemExit

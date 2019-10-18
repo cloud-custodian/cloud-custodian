@@ -763,14 +763,14 @@ def get_exports(client, bucket, prefix, latest=True):
 
 
 @cli.command()
-@click.option('--group', required=True)
-@click.option('--bucket', required=True)
-@click.option('--prefix')
+@click.option('--group', required=True, help="log group to export to s3.")
+@click.option('--bucket', required=True, help="s3 bucket name export to.")
+@click.option('--prefix', help="name of the tag to filter with using get_object_tagging API.")
 @click.option('--start', required=True, help="export logs from this date")
-@click.option('--end')
+@click.option('--end', help="export logs before this date")
 @click.option('--role', help="sts role to assume for log group access")
 @click.option('--poll-period', type=float, default=300)
-@click.option('-r', '--region', multiple=False)
+@click.option('-r', '--region', multiple=False, help='aws region to use.')
 # @click.option('--bucket-role', help="role to scan destination bucket")
 # @click.option('--stream-prefix)
 @lambdafan

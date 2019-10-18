@@ -24,13 +24,6 @@ class AzureEvents(object):
     """A mapping of resource types to events."""
 
     azure_events = {
-        'RoleAssignmentWrite': {
-            'resource_provider': 'Microsoft.Authorization/roleAssignments',
-            'event': 'write'},
-
-        'RoleDefinitionW': {
-            'resource_provider': 'Microsoft.Authorization/roleDefinitions',
-            'event': 'write'},
 
         'AppServicePlanWrite': {
             'resource_provider': 'Microsoft.Web/serverFarms',

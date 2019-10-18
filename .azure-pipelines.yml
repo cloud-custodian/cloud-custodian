@@ -110,7 +110,7 @@ jobs:
         TOXENV: py36
       Python37:
         python.version: '3.7'
-        TOXENV: py37
+        TOXENV: py37-windows
     maxParallel: 3
 
   steps:

@@ -16,6 +16,7 @@ Actions to perform on Azure resources
 """
 import abc
 import logging
+import sys
 
 import six
 from c7n_azure import constants
@@ -57,24 +58,40 @@ class AzureBaseAction(BaseAction):
             chunk_size=self.chunk_size
         )
 
+    def _log_modified_resource(self, resource, message):
+        template = "Action '{}' modified '{}' in resource group '{}'."
+        name = resource.get('name', 'unknown')
+        rg = resource.get('resourceGroup', 'unknown')
+
+        if message:
+            template += ' ' + message
+
+        self.log.info(template.format(self.type, name, rg),
+                      extra=self._get_action_log_metadata(resource))
+
+    def _get_action_log_metadata(self, resource):
+        rid = resource.get('id')
+        return {'properties': {'resource_id': rid, 'action': self.type}}
+
     def _process_resources(self, resources, event):
         self._prepare_processing()
 
         for r in resources:
             try:
-                self._process_resource(r)
+                message = self._process_resource(r)
+                self._log_modified_resource(r, message)
             except Exception as e:
+                # only executes during test runs
+                if "pytest" in sys.modules:
+                    raise e
                 if isinstance(e, CloudError):
-                    self.log.error("Failed to process resource.\n"
-                                   "Type: {0}.\n"
-                                   "Name: {1}.\n"
-                                   "Error: {2}\n"
-                                   "Message: {3}".format(r['type'], r['name'], e, e.message))
+                    self.log.error("{0} failed for '{1}'. {2}".format(
+                        self.type, r['name'], e.message),
+                        extra=self._get_action_log_metadata(r))
                 else:
-                    self.log.error("Failed to process resource.\n"
-                                   "Type: {0}.\n"
-                                   "Name: {1}.\n"
-                                   "Error: {2}".format(r['type'], r['name'], e))
+                    self.log.exception("{0} failed for '{1}'.".format(
+                        self.type, r['name']),
+                        extra=self._get_action_log_metadata(r))
 
     def _prepare_processing(self):
         pass
@@ -93,12 +110,20 @@ class AzureEventAction(EventAction, AzureBaseAction):
 
         for r in resources:
             try:
-                self._process_resource(r, event)
-            except CloudError as e:
-                self.log.error("Failed to process resource.\n"
-                               "Type: {0}.\n"
-                               "Name: {1}.\n"
-                               "Error: {2}".format(r['type'], r['name'], e))
+                message = self._process_resource(r, event)
+                self._log_modified_resource(r, message)
+            except Exception as e:
+                # only executes during test runs
+                if "pytest" in sys.modules:
+                    raise e
+                if isinstance(e, CloudError):
+                    self.log.error("{0} failed for '{1}'. {2}".format(
+                        self.type, r['name'], e.message),
+                        extra=self._get_action_log_metadata(r))
+                else:
+                    self.log.exception("{0} failed for '{1}'.".format(
+                        self.type, r['name']),
+                        extra=self._get_action_log_metadata(r))
 
     @abc.abstractmethod
     def _process_resource(self, resource, event):

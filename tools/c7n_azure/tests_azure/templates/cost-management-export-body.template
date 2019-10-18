@@ -1,0 +1,28 @@
+{
+    \"properties\": {
+        \"schedule\": {
+            \"recurrence\": \"Daily\",
+            \"recurrencePeriod\": {
+                \"from\": \"$(date --iso-8601=minutes)\",
+                \"to\": \"2050-02-01T08:00:00.000Z\"
+            },
+            \"status\": \"Active\"
+        },
+        \"format\": \"Csv\",
+        \"definition\": {
+            \"dataset\": {
+                \"granularity\": \"Daily\",
+                \"grouping\": []
+            },
+            \"timeframe\": \"MonthToDate\",
+            \"type\": \"Usage\"
+        },
+        \"deliveryInfo\": {
+            \"destination\": {
+                \"resourceId\": \"${storage_id}\",
+                \"container\": \"test\",
+                \"rootFolderPath\": \"test\"
+            }
+        }
+    }
+}

@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "Regions": [
+            {
+                "Endpoint": "ec2.eu-west-2.amazonaws.com",
+                "RegionName": "eu-west-2",
+                "OptInStatus": "opt-in-not-required"
+            },
+            {
+                "Endpoint": "ec2.eu-west-1.amazonaws.com",
+                "RegionName": "eu-west-1",
+                "OptInStatus": "opt-in-not-required"
+            },
+            {
+                "Endpoint": "ec2.us-east-1.amazonaws.com",
+                "RegionName": "us-east-1",
+                "OptInStatus": "opt-in-not-required"
+            },
+            {
+                "Endpoint": "ec2.us-east-2.amazonaws.com",
+                "RegionName": "us-east-2",
+                "OptInStatus": "opt-in-not-required"
+            },
+            {
+                "Endpoint": "ec2.us-west-2.amazonaws.com",
+                "RegionName": "us-west-2",
+                "OptInStatus": "opt-in-not-required"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "888d6a44-3acb-418c-bf0a-fb0f0f65f95d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "3655",
+                "vary": "accept-encoding",
+                "date": "Mon, 30 Sep 2019 13:22:31 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

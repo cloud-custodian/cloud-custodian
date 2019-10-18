@@ -46,6 +46,7 @@ class ContainerService(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'properties.agentPoolProfiles[].[name, vmSize, count]'
         )
         resource_type = 'Microsoft.ContainerService/containerServices'

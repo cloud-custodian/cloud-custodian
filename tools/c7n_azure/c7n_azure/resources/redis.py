@@ -48,6 +48,8 @@ class Redis(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'resourceGroup'
+            'resourceGroup',
+            'properties.redisVersion',
+            'properties.sku.[name, family, capacity]'
         )
         resource_type = 'Microsoft.Cache/Redis'

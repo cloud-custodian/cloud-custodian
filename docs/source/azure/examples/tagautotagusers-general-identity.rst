@@ -10,7 +10,7 @@ General notes:
   for all unknown and unsupported resources.
 - In non-event mode (periodic function or local execution), the action will look in Azure 
   Activity Logs up to 90 days prior to execution to find the user email (default). It will attempt 
-  to identify the first user or service principal that performed the 'write' operation for each resource.
+  to identify the first user or Service Principal that performed the 'write' operation for each resource.
 - In event mode, the action will use the data from the event to determine the user or principal
   that performed the action. The **days** option is not applicable in this mode.
 - **Note**: Resource Groups aren't a part of ``armresource`` type, so tags needs to be added separately.

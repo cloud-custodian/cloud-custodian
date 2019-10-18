@@ -27,9 +27,6 @@ from googleapiclient.errors import HttpError
 log = logging.getLogger('c7n_gcp.mu')
 
 
-DEFAULT_REGION = 'us-central1'
-
-
 def custodian_archive(packages=None):
     if not packages:
         packages = []
@@ -57,7 +54,7 @@ def custodian_archive(packages=None):
 
 class CloudFunctionManager(object):
 
-    def __init__(self, session_factory, region="us-central1"):
+    def __init__(self, session_factory, region):
         self.session_factory = session_factory
         self.session = local_session(session_factory)
         self.client = self.session.client(
@@ -482,9 +479,10 @@ class PeriodicEvent(EventSource):
     https://cloud.google.com/appengine/docs/standard/python/config/cronref
     """
 
-    def __init__(self, session, data):
+    def __init__(self, session, data, region):
         self.session = session
         self.data = data
+        self.region = region
 
     @property
     def target_type(self):
@@ -515,7 +513,7 @@ class PeriodicEvent(EventSource):
             'create', {
                 'parent': 'projects/{}/locations/{}'.format(
                     self.session.get_default_project(),
-                    self.data.get('region', DEFAULT_REGION)),
+                    self.region),
                 'body': job})
 
     def remove(self, func):
@@ -560,7 +558,7 @@ class PeriodicEvent(EventSource):
         job = {
             'name': "projects/{}/locations/{}/jobs/{}".format(
                 self.session.get_default_project(),
-                self.data.get('region', DEFAULT_REGION),
+                self.region,
                 self.data.get('name', '{}{}'.format(self.prefix, func.name))),
             'schedule': self.data['schedule'],
             'timeZone': self.data.get('tz', 'Etc/UTC')}
@@ -568,7 +566,7 @@ class PeriodicEvent(EventSource):
         if self.target_type == 'http':
             job['httpTarget'] = {
                 'uri': 'https://{}-{}.cloudfunctions.net/{}'.format(
-                    self.data.get('region', DEFAULT_REGION),
+                    self.region,
                     self.session.get_default_project(),
                     func.name)
             }

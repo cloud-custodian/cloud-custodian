@@ -1,0 +1,49 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_logic-app/providers/Microsoft.Logic/workflows/cclogicappc129bfa71a47/triggers/manual/listCallbackUrl?api-version=2016-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 13 Sep 2019 22:39:41 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "510"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": "https://prod-02.centralus.logic.azure.com:443/workflows/c9a5bf67f812441d9010d3cc764e290b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=4qHxHwiDHiuS6AELGPcm0kQMl3pFIBMFHo1VwVBGpeE",
+                        "method": "POST",
+                        "basePath": "https://prod-02.centralus.logic.azure.com/workflows/c9a5bf67f812441d9010d3cc764e290b/triggers/manual/paths/invoke",
+                        "queries": {
+                            "api-version": "2016-06-01",
+                            "sp": "/triggers/manual/run",
+                            "sv": "1.0",
+                            "sig": "4qHxHwiDHiuS6AELGPcm0kQMl3pFIBMFHo1VwVBGpeE"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

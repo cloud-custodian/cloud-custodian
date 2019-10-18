@@ -1,4 +1,4 @@
-# 2019 Microsoft Corporation
+# Copyright 2019 Microsoft Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,3 +39,10 @@ class DnsZone(ArmResourceManager):
         client = 'DnsManagementClient'
         enum_spec = ('zones', 'list', {})
         resource_type = 'Microsoft.Network/dnszones'
+        default_report_fields = (
+            'name',
+            'location',
+            'resourceGroup',
+            'properties.numberOfRecordSets',
+            'properties.nameServers'
+        )

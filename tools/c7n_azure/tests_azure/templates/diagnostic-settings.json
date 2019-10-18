@@ -1,0 +1,110 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "loadbalancer_name":"cctestdiagnostic_loadbalancer",
+        "public_ip_loadbalancer_name":"cctestdiagnostic_loadbalancer_public_ip",
+        "storage_account_name": "[concat('diagnostic', variables('suffix'))]",
+        "diagnosticSettingName": "ccdiagnosticsettingtest"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            },
+            "resources": [
+              {
+                "type": "providers/diagnosticSettings",
+                "name": "[concat('Microsoft.Insights/', variables('diagnosticSettingName'))]",
+                "dependsOn": [
+                  "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_account_name'))]",
+                  "[resourceId('Microsoft.Network/loadBalancers', variables('loadbalancer_name'))]"
+                ],
+                "apiVersion": "2017-05-01-preview",
+                "properties": {
+                  "name": "[variables('diagnosticSettingName')]",
+                  "eventHubAuthorizationRuleId": null,
+                  "eventHubName": null,
+                  "workspaceId": null,
+                  "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_account_name'))]",
+                  "logs": [
+                    {
+                      "category": "LoadBalancerProbeHealthStatus",
+                      "enabled": true,
+                      "retentionPolicy": {
+                        "days": 0,
+                        "enabled": false
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "name": "[variables('loadbalancer_name')]",
+            "apiVersion": "2018-01-01",
+            "location": "southcentralus",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "resourceGuid": "187cfdaf-ac1c-4bcb-aa0c-43be41b033a3",
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerFrontEnd",
+                        "etag": "W/\"26c9f7aa-3d3a-410c-94a4-f82777fccfb7\"",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('public_ip_loadbalancer_name'))]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [],
+                "loadBalancingRules": [],
+                "probes": [],
+                "inboundNatRules": [],
+                "outboundNatRules": [],
+                "inboundNatPools": []
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('public_ip_loadbalancer_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            },
+            "name": "[variables('public_ip_loadbalancer_name')]",
+            "apiVersion": "2018-01-01",
+            "location": "southcentralus",
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "resourceGuid": "7d538191-6484-485f-bbc3-61feb13fbee6",
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4,
+                "ipTags": []
+            },
+            "dependsOn": []
+        },
+        {
+          "name": "[variables('storage_account_name')]",
+          "type": "Microsoft.Storage/storageAccounts",
+          "apiVersion": "2016-01-01",
+          "sku": {
+            "name": "Standard_LRS"
+          },
+          "kind": "Storage",
+          "location": "South Central US",
+          "tags": {},
+          "properties": {}
+        }
+    ]
+}

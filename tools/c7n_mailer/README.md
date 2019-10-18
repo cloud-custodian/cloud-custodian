@@ -480,7 +480,7 @@ Requires:
 The mailer supports an Azure Storage Queue transport and SendGrid delivery on Azure.
 Configuration for this scenario requires only minor changes from AWS deployments.
 
-You will need to grant `Queue Data Contributor` role on the Queue for the identity
+You will need to grant `Storage Queue Data Contributor` role on the Queue for the identity
 mailer is running under.
 
 The notify action in your policy will reflect transport type `asq` with the URL
@@ -515,6 +515,16 @@ sendgrid_api_key: SENDGRID_API_KEY
 The mailer will transmit all messages found on the queue on each execution, and will retry
 sending 3 times in the event of a failure calling SendGrid.  After the retries the queue
 message will be discarded.
+
+In addition, SendGrid delivery on Azure supports using resource tags to send emails. For example, in the `to` field:
+
+```yaml
+to:
+  - tag:OwnerEmail
+```
+
+This will find the email address associated with the resource's `OwnerEmail` tag, and send an email to the specified address.
+If no tag is found, or the associated email address is invalid, no email will be sent. 
 
 #### Deploying Azure Functions
 

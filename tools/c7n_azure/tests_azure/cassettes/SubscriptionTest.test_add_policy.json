@@ -1,0 +1,236 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2016-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 09 Oct 2019 16:53:38 GMT"
+                    ],
+                    "content-length": [
+                        "326"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "displayName": "aaros-custodiandev",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Internal_2014-09-01",
+                            "quotaId": "Internal_2014-09-01",
+                            "spendingLimit": "Off"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments?api-version=2018-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 09 Oct 2019 16:53:38 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/cctestpolicy_sub?api-version=2018-03-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "604"
+                    ],
+                    "date": [
+                        "Wed, 09 Oct 2019 16:53:39 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "A0",
+                            "tier": "Free"
+                        },
+                        "properties": {
+                            "displayName": "cctestpolicy_sub",
+                            "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/404c3081-a854-4457-ae30-26a93ef643f9",
+                            "scope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                            "metadata": {
+                                "createdBy": "cc851160-f3f3-4d8a-860f-7f1dcfe1b2f7",
+                                "createdOn": "2019-10-09T16:53:39.8522027Z",
+                                "updatedBy": null,
+                                "updatedOn": null
+                            }
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/cctestpolicy_sub",
+                        "type": "Microsoft.Authorization/policyAssignments",
+                        "name": "cctestpolicy_sub"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/cctestpolicy_sub?api-version=2018-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 09 Oct 2019 16:53:39 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "604"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "A0",
+                            "tier": "Free"
+                        },
+                        "properties": {
+                            "displayName": "cctestpolicy_sub",
+                            "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/404c3081-a854-4457-ae30-26a93ef643f9",
+                            "scope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                            "metadata": {
+                                "createdBy": "cc851160-f3f3-4d8a-860f-7f1dcfe1b2f7",
+                                "createdOn": "2019-10-09T16:53:39.8522027Z",
+                                "updatedBy": null,
+                                "updatedOn": null
+                            }
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/cctestpolicy_sub",
+                        "type": "Microsoft.Authorization/policyAssignments",
+                        "name": "cctestpolicy_sub"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/cctestpolicy_sub?api-version=2018-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "14999"
+                    ],
+                    "date": [
+                        "Wed, 09 Oct 2019 16:53:40 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "604"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "sku": {
+                            "name": "A0",
+                            "tier": "Free"
+                        },
+                        "properties": {
+                            "displayName": "cctestpolicy_sub",
+                            "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/404c3081-a854-4457-ae30-26a93ef643f9",
+                            "scope": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                            "metadata": {
+                                "createdBy": "cc851160-f3f3-4d8a-860f-7f1dcfe1b2f7",
+                                "createdOn": "2019-10-09T16:53:39.8522027Z",
+                                "updatedBy": null,
+                                "updatedOn": null
+                            }
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Authorization/policyAssignments/cctestpolicy_sub",
+                        "type": "Microsoft.Authorization/policyAssignments",
+                        "name": "cctestpolicy_sub"
+                    }
+                }
+            }
+        }
+    ]
+}

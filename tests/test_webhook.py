@@ -14,11 +14,14 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
+import json
 import mock
 
 from c7n.actions.webhook import Webhook
 from jsonschema.exceptions import ValidationError
 from .common import BaseTest
+import os
 
 
 class WebhookTest(BaseTest):
@@ -146,7 +149,7 @@ class WebhookTest(BaseTest):
             "body": "resources[].name",
             "body-size": 10,
             "headers": {
-                "test": "`header`"
+                "test": "'header'"
             },
             "query-params": {
                 "foo": "resources[0].name"
@@ -159,10 +162,33 @@ class WebhookTest(BaseTest):
 
         self.assertEqual("http://foo.com?foo=test_name", req['url'])
         self.assertEqual("POST", req['method'])
-        self.assertEqual(b'["test_name"]', req['body'])
+        self.assertEqual(b'[\n"test_name"\n]', req['body'])
         self.assertEqual(
             {"test": "header", "Content-Type": "application/json"},
             req['headers'])
+
+    @mock.patch('c7n.actions.webhook.urllib3.PoolManager.request')
+    def test_process_date_serializer(self, request_mock):
+        current = datetime.datetime.utcnow()
+        resources = [
+            {
+                "name": "test1",
+                "value": current
+            },
+        ]
+
+        data = {
+            "url": "http://foo.com",
+            "body": "resources[]",
+            'batch': True,
+        }
+
+        wh = Webhook(data=data, manager=self._get_manager())
+        wh.process(resources)
+        req1 = request_mock.call_args_list[0][1]
+        self.assertEqual(
+            json.loads(req1['body'])[0]['value'],
+            current.isoformat())
 
     @mock.patch('c7n.actions.webhook.urllib3.PoolManager.request')
     def test_process_no_batch(self, request_mock):
@@ -250,6 +276,33 @@ class WebhookTest(BaseTest):
 
         self.assertEqual("http://foo.com?policy=webhook_policy", req1['url'])
         self.assertEqual("http://foo.com?policy=webhook_policy", req2['url'])
+
+    @mock.patch('c7n.actions.webhook.urllib3.ProxyManager.request')
+    @mock.patch('c7n.actions.webhook.urllib3.PoolManager.request')
+    def test_process_with_http_proxy(self, pool_request_mock, proxy_request_mock):
+        with mock.patch.dict(os.environ,
+                             {'HTTP_PROXY': 'http://mock.http.proxy.server:8000'},
+                             clear=True):
+            resources = [
+                {
+                    "name": "test_name",
+                    "value": "test_value"
+                }
+            ]
+
+            data = {
+                "url": "http://foo.com"
+            }
+
+            wh = Webhook(data=data, manager=self._get_manager())
+            wh.process(resources)
+            proxy_req = proxy_request_mock.call_args[1]
+
+            self.assertEqual("http://foo.com", proxy_req['url'])
+            self.assertEqual("POST", proxy_req['method'])
+
+            self.assertEqual(1, proxy_request_mock.call_count)
+            self.assertEqual(0, pool_request_mock.call_count)
 
     def _get_manager(self):
         """The tests don't require real resource data
