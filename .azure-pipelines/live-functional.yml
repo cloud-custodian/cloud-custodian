@@ -124,6 +124,7 @@ stages:
             inputs:
               command: buildAndPush
               Dockerfile: tools/c7n_mailer/Dockerfile
+              buildContext: $(Build.Repository.LocalPath)
               containerRegistry: dockerServiceConnection
               repository: cloudcustodian/mailer
               tags: |
