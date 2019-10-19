@@ -55,7 +55,8 @@ def load(options, path, format=None, validate=True, vars=None):
         return None
 
     if validate:
-        from c7n.schema import validate
+        from c7n.schema import validate, StructureParser
+        StructureParser().validate(data)
         errors = validate(data)
         if errors:
             raise PolicyValidationError(
