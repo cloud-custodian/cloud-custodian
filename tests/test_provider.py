@@ -15,10 +15,19 @@
 
 from .common import BaseTest
 
-from c7n.provider import clouds, get_resource_class
-
+from c7n.provider import clouds, get_resource_class, import_resource_classes
+from c7n.resources.resource_map import ResourceMap
 
 class ProviderTest(BaseTest):
+
+    def test_import_resource_classes(self):
+        rtypes = import_resource_classes(
+            ResourceMap, ('aws.ec2', 'aws.app-elb'))
+        self.assertEqual(len(rtypes), 2)
+        self.assertEqual([r.type for r in rtypes], ['ec2', 'app-elb'])
+
+#    def test_import_resource_classes_wildcard(self):
+#        rtypes = import_resource_classes(ResourceMap, ('*',))
 
     def test_get_resource_class(self):
         with self.assertRaises(KeyError) as ectx:

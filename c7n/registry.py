@@ -100,6 +100,9 @@ class PluginRegistry(object):
             raise KeyError(name)
         return v
 
+    def __len__(self):
+        return len(self._factories)
+
     def get(self, name):
         factory = self._factories.get(name)
 

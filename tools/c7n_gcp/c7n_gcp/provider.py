@@ -18,6 +18,8 @@ from c7n.provider import Provider, clouds
 from .client import Session
 from functools import partial
 
+from c7n_gcp.resources.resource_map import ResourceMap
+
 
 @clouds.register('gcp')
 class GoogleCloud(Provider):
@@ -25,6 +27,7 @@ class GoogleCloud(Provider):
     display_name = 'GCP'
     resource_prefix = 'gcp'
     resources = PluginRegistry('%s.resources' % resource_prefix)
+    resource_map = ResourceMap
 
     def initialize(self, options):
         return options

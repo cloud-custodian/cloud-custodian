@@ -21,82 +21,39 @@ import os
 
 LOADED = False
 
+from c7n.provider import clouds
 
-def load_resources():
 
+def load_resources(resource_types=('*',)):
+    print('loaded')
+    load_providers(resource_types)
+    for p in clouds.values():
+        p.get_resource_types(resource_types)
+
+
+def load_providers(resource_types):
     global LOADED
     if LOADED:
         return
 
-    import c7n.resources.account
-    import c7n.resources.acm
-    import c7n.resources.ami
-    import c7n.resources.apigw
-    import c7n.resources.appelb
-    import c7n.resources.asg
-    import c7n.resources.awslambda
-    import c7n.resources.backup
-    import c7n.resources.batch
-    import c7n.resources.cfn
-    import c7n.resources.cloudfront
-    import c7n.resources.cloudsearch
-    import c7n.resources.cloudtrail
-    import c7n.resources.code
-    import c7n.resources.cognito
-    import c7n.resources.config
-    import c7n.resources.cw
-    import c7n.resources.directory
-    import c7n.resources.directconnect
-    import c7n.resources.dlm
-    import c7n.resources.dms
-    import c7n.resources.dynamodb
-    import c7n.resources.datapipeline
-    import c7n.resources.ebs
-    import c7n.resources.ec2
-    import c7n.resources.ecr
-    import c7n.resources.ecs
-    import c7n.resources.efs
-    import c7n.resources.elasticache
-    import c7n.resources.elasticbeanstalk
-    import c7n.resources.elasticsearch
-    import c7n.resources.elb
-    import c7n.resources.eks
-    import c7n.resources.emr
-    import c7n.resources.gamelift
-    import c7n.resources.glacier
-    import c7n.resources.glue
-    import c7n.resources.health
-    import c7n.resources.hsm
-    import c7n.resources.iam
-    import c7n.resources.iot
-    import c7n.resources.kafka
-    import c7n.resources.kinesis
-    import c7n.resources.kms
-    import c7n.resources.lightsail
-    import c7n.resources.ml
-    import c7n.resources.mq
-    import c7n.resources.opsworks
-    import c7n.resources.rds
-    import c7n.resources.rdsparamgroup
-    import c7n.resources.rdscluster
-    import c7n.resources.redshift
-    import c7n.resources.route53
-    import c7n.resources.s3
-    import c7n.resources.sagemaker
-    import c7n.resources.secretsmanager
-    import c7n.resources.sfn
-    import c7n.resources.shield
-    import c7n.resources.simpledb
-    import c7n.resources.snowball
-    import c7n.resources.sns
-    import c7n.resources.storagegw
-    import c7n.resources.sqs
-    import c7n.resources.ssm
-    import c7n.resources.support
-    import c7n.resources.vpc
-    import c7n.resources.waf
-    import c7n.resources.fsx
-    import c7n.resources.workspaces  # NOQA
+    # Even though we're lazy loading resources we still need to import
+    # those that are making available generic filters/actions
+    if '*' in resource_types or any([r.startswith('aws.') for r in resource_types]):
+        import c7n.resources.securityhub
+        import c7n.resources.sfn # NOQA
+
+    # Conditionally import known resource providers.
+    if '*' in resource_types or any([r.startswith('azure.') for r in resource_types]):
+        from c7n_azure.entry import initialize_azure
+        initialize_azure()
+
+    if '*' in resource_types or any([r.startswith('gcp.') for r in resource_types]):
+        from c7n_gcp.entry import initialize_gcp
+        initialize_gcp()
+
+    if '*' in resource_types or any([r.startswith('k8s.') for r in resource_types]):
+        from c7n_kube.entry import initialize_kube
+        initialize_kube()
 
     # Load external plugins (private sdks etc)
     #
@@ -104,28 +61,12 @@ def load_resources():
     # to avoid the runtime costs in serverless
     # environments of scanning the entire python
     # path for entry points.
-    from c7n.manager import resources
+    #
+    # **Note** this is unsupported and may go away in future.
+    from c7n.manager import resources as resource_registry
     if 'C7N_EXTPLUGINS' in os.environ:
-        resources.load_plugins()
-    else:
-        try:
-            from c7n_azure.entry import initialize_azure
-            initialize_azure()
-        except ImportError:
-            pass
+        resource_registry.load_plugins()
 
-        try:
-            from c7n_gcp.entry import initialize_gcp
-            initialize_gcp()
-        except ImportError:
-            pass
-
-        try:
-            from c7n_kube.entry import initialize_kube
-            initialize_kube()
-        except ImportError:
-            pass
-
-    resources.notify(resources.EVENT_FINAL)
-
+    resource_registry.notify(resource_registry.EVENT_FINAL)
     LOADED = True
+
