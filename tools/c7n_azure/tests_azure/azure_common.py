@@ -22,6 +22,7 @@ from functools import wraps
 from time import sleep
 
 import msrest.polling
+
 from c7n_azure import utils, constants
 from c7n_azure.session import Session
 from c7n_azure.utils import ThreadHelper
@@ -33,13 +34,13 @@ from vcr_unittest import VCRTestCase
 
 from c7n.config import Config, Bag
 from c7n.policy import ExecutionContext
-from c7n.resources import load_resources
 from c7n.schema import generate
 from c7n.testing import TestUtils
 from c7n.utils import local_session
 from .azure_serializer import AzureSerializer
 
-load_resources()
+# ensure the azure provider is loaded
+from c7n_azure import provider # noqa
 
 BASE_FOLDER = os.path.dirname(__file__)
 C7N_SCHEMA = generate()

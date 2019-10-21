@@ -316,8 +316,7 @@ class QueryResourceManager(ResourceManager):
 
     @staticmethod
     def register_actions_and_filters(registry, resource_class):
-        if 'notify' not in resource_class.action_registry:
-            resource_class.action_registry.register('notify', Notify)
+        resource_class.action_registry.register('notify', Notify)
         if 'logic-app' not in resource_class.action_registry:
             resource_class.action_registry.register('logic-app', LogicAppAction)
 

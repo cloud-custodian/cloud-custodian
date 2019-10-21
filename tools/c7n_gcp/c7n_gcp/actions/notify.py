@@ -72,11 +72,6 @@ class Notify(BaseNotify):
     }
     schema_alias = True
 
-    @staticmethod
-    def register_resource(registry, resource_class):
-        if 'notify' not in resource_class.action_registry:
-            resource_class.action_registry.register('notify', Notify)
-
     def process(self, resources, event=None):
         session = utils.local_session(self.manager.session_factory)
         client = session.client('pubsub', 'v1', 'projects.topics')
@@ -108,6 +103,10 @@ class Notify(BaseNotify):
                 }
             }
         })
+
+    @classmethod
+    def register_resource(cls, registry, resource_class):
+        resource_class.action_registry.register('notify', Notify)
 
 
 gcp_resources.subscribe(Notify.register_resource)
