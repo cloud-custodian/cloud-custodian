@@ -31,7 +31,8 @@ import six
 import yaml
 
 from c7n import policy
-from c7n.schema import generate, validate as schema_validate
+from c7n.schema import StructureParser, generate, validate as schema_validate
+from c7n.resources import load_resources
 from c7n.ctx import ExecutionContext
 from c7n.utils import reset_session_cache
 from c7n.config import Bag, Config
@@ -91,10 +92,13 @@ class CustodianTestCore(object):
         output_dir=None,
         cache=False,
     ):
+
+        pdata = {'policies': [data]}
+        load_resources(StructureParser().get_resource_types(pdata))
+
         if validate:
-            if not self.custodian_schema:
-                self.custodian_schema = generate()
-            errors = schema_validate({"policies": [data]}, self.custodian_schema)
+            custodian_schema = generate()
+            errors = schema_validate(pdata, custodian_schema)
             if errors:
                 raise errors[0]
 

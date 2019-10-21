@@ -315,11 +315,11 @@ class QueryResourceManager(ResourceManager):
         return [r.serialize(True) for r in data]
 
     @staticmethod
-    def register_actions_and_filters(registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.action_registry.register('notify', Notify)
-            klass.action_registry.register('logic-app', LogicAppAction)
+    def register_actions_and_filters(registry, resource_class):
+        if 'notify' not in resource_class.action_registry:
+            resource_class.action_registry.register('notify', Notify)
+        if 'logic-app' not in resource_class.action_registry:
+            resource_class.action_registry.register('logic-app', LogicAppAction)
 
     def validate(self):
         self.source.validate()
@@ -382,16 +382,15 @@ class ChildResourceManager(QueryResourceManager):
                         "value which could not be iterated.")
 
     @staticmethod
-    def register_child_specific(registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            if issubclass(klass, ChildResourceManager):
+    def register_child_specific(registry, resource_class):
+        if not issubclass(resource_class, ChildResourceManager):
+            return
 
-                # If Child Resource doesn't annotate parent, there is no way to filter based on
-                # parent properties.
-                if klass.resource_type.annotate_parent:
-                    klass.filter_registry.register('parent', ParentFilter)
+        # If Child Resource doesn't annotate parent, there is no way to filter based on
+        # parent properties.
+        if resource_class.resource_type.annotate_parent:
+            resource_class.filter_registry.register('parent', ParentFilter)
 
 
-resources.subscribe(resources.EVENT_FINAL, QueryResourceManager.register_actions_and_filters)
-resources.subscribe(resources.EVENT_FINAL, ChildResourceManager.register_child_specific)
+resources.subscribe(QueryResourceManager.register_actions_and_filters)
+resources.subscribe(ChildResourceManager.register_child_specific)

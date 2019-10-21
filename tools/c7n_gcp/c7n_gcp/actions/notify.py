@@ -73,10 +73,9 @@ class Notify(BaseNotify):
     schema_alias = True
 
     @staticmethod
-    def register_notify_action(registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.action_registry.register('notify', Notify)
+    def register_resource(registry, resource_class):
+        if 'notify' not in resource_class.action_registry:
+            resource_class.action_registry.register('notify', Notify)
 
     def process(self, resources, event=None):
         session = utils.local_session(self.manager.session_factory)
@@ -111,5 +110,4 @@ class Notify(BaseNotify):
         })
 
 
-gcp_resources.subscribe(
-    gcp_resources.EVENT_FINAL, Notify.register_notify_action)
+gcp_resources.subscribe(Notify.register_resource)

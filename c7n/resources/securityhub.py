@@ -79,15 +79,11 @@ class SecurityHubFindingFilter(Filter):
 
         SecurityHub Findings Filter
         """
-        for rtype, resource_manager in registry.items():
-            if not resource_manager.has_arn():
-                continue
-            if 'post-finding' in resource_manager.action_registry:
-                continue
-            resource_class.filter_registry.register('finding', klass)
-
-
-resources.subscribe(resources.EVENT_REGISTER, SecurityHubFindingFilter.register_resources)
+        if 'post-finding' not in resource_class.action_registry:
+            return
+        if not resource_class.has_arn():
+            return
+        resource_class.filter_registry.register('finding', klass)
 
 
 @execution.register('hub-action')
@@ -578,15 +574,11 @@ class OtherResourcePostFinding(PostFinding):
         return other
 
     @classmethod
-    def register_resource(klass, registry, event):
-        for rtype, resource_manager in registry.items():
-            if not resource_manager.has_arn():
-                continue
-            if 'post-finding' in resource_manager.action_registry:
-                continue
-            resource_manager.action_registry.register('post-finding', klass)
+    def register_resource(klass, registry, resource_class):
+        if 'post-finding' not in resource_class.action_registry:
+            resource_class.action_registry.register('post-finding', klass)
 
 
-AWS.resources.subscribe(
-    AWS.resources.EVENT_FINAL,
-    OtherResourcePostFinding.register_resource)
+AWS.resources.subscribe(OtherResourcePostFinding.register_resource)
+AWS.resources.subscribe(SecurityHubFindingFilter.register_resources)
+

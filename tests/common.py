@@ -34,8 +34,6 @@ logging.getLogger("placebo.pill").setLevel(logging.DEBUG)
 logging.getLogger("botocore").setLevel(logging.WARNING)
 
 
-load_resources()
-
 ACCOUNT_ID = "644160558196"
 
 

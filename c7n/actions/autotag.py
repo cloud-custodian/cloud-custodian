@@ -146,12 +146,12 @@ class AutoTagUser(EventAction):
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
 
+    @classmethod
+    def register_resource(cls, registry, resource_class):
+        if 'auto-tag-user' in resource_class.action_registry:
+            return
+        if resource_class.action_registry.get('tag'):
+            resource_class.action_registry.register('auto-tag-user', AutoTagUser)
 
-def register_action_tag_user(registry, _):
-    for resource in registry.keys():
-        klass = registry.get(resource)
-        if klass.action_registry.get('tag') and not klass.action_registry.get('auto-tag-user'):
-            klass.action_registry.register('auto-tag-user', AutoTagUser)
 
-
-resources.subscribe(resources.EVENT_FINAL, register_action_tag_user)
+resources.subscribe(AutoTagUser.register_resource)

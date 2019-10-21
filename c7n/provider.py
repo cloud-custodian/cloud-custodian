@@ -81,7 +81,7 @@ def import_resource_classes(resource_map, resource_types):
     for r in rmods:
         mod_map[r] = importlib.import_module(r)
 
-    return [getattr(mod_map[rmodule], rclass) for
+    return [getattr(mod_map[rmodule], rclass, None) for
             rmodule, rclass in [
                 resource_map[r].rsplit('.', 1) for r in resource_types]]
 

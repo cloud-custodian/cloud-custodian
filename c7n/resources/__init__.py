@@ -1,4 +1,5 @@
 # Copyright 2015-2017 Capital One Services, LLC
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,57 +17,55 @@
 #
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import time
-import os
-
-LOADED = False
-
 from c7n.provider import clouds
+
+LOADED = set()
 
 
 def load_resources(resource_types=('*',)):
-    print('loaded')
-    load_providers(resource_types)
-    for p in clouds.values():
-        p.get_resource_types(resource_types)
+    pmap = {}
+    for r in resource_types:
+        parts = r.split('.', 1)
+        pmap.setdefault(parts[0], []).append(r)
+
+    load_providers(set(pmap))
+
+    for pname, p in clouds.items():
+        if '*' in pmap:
+            p.get_resource_types(('*',))
+        elif pname in pmap:
+            p.get_resource_types(pmap[pname])
 
 
-def load_providers(resource_types):
+def should_load_provider(name, provider_types):
     global LOADED
-    if LOADED:
-        return
+    if (name not in LOADED and
+        ('*' in provider_types or
+         name in provider_types)):
+        return True
+    return False
+
+
+def load_providers(provider_types):
+    global LOADED
 
     # Even though we're lazy loading resources we still need to import
     # those that are making available generic filters/actions
-    if '*' in resource_types or any([r.startswith('aws.') for r in resource_types]):
+    if should_load_provider('aws', provider_types):
         import c7n.resources.securityhub
-        import c7n.resources.sfn # NOQA
+        import c7n.resources.sfn
+        import c7n.resources.ssm # NOQA
 
-    # Conditionally import known resource providers.
-    if '*' in resource_types or any([r.startswith('azure.') for r in resource_types]):
+    if should_load_provider('azure', provider_types):
         from c7n_azure.entry import initialize_azure
         initialize_azure()
 
-    if '*' in resource_types or any([r.startswith('gcp.') for r in resource_types]):
+    if should_load_provider('gcp', provider_types):
         from c7n_gcp.entry import initialize_gcp
         initialize_gcp()
 
-    if '*' in resource_types or any([r.startswith('k8s.') for r in resource_types]):
+    if should_load_provider('k8s', provider_types):
         from c7n_kube.entry import initialize_kube
         initialize_kube()
 
-    # Load external plugins (private sdks etc)
-    #
-    # We default to loading known cloud providers
-    # to avoid the runtime costs in serverless
-    # environments of scanning the entire python
-    # path for entry points.
-    #
-    # **Note** this is unsupported and may go away in future.
-    from c7n.manager import resources as resource_registry
-    if 'C7N_EXTPLUGINS' in os.environ:
-        resource_registry.load_plugins()
-
-    resource_registry.notify(resource_registry.EVENT_FINAL)
-    LOADED = True
-
+    LOADED.update(provider_types)
