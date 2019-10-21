@@ -1,4 +1,4 @@
-               .. _securitygroupsdetectremediate:
+.. _securitygroupsaddpermission:
 
 Security Groups - add permission
 =================================================

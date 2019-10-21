@@ -1316,16 +1316,19 @@ class AddPermissions(BaseAction):
             method = getattr(client, 'authorize_security_group_%s' % label)
 
             for i in self.data.get('Cidr', []):
-                method(GroupId=r['GroupId'], IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
-                                                             'ToPort': to_port, 'IpRanges': [{'CidrIp': i}]}])
+                method(GroupId=r['GroupId'],
+                       IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
+                                       'ToPort': to_port, 'IpRanges': [{'CidrIp': i}]}])
             for i in self.data.get('GroupId', []):
-                method(GroupId=r['GroupId'], IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
-                                                             'ToPort': to_port,
-                                                             'UserIdGroupPairs': [{'GroupId': i}]}])
+                method(GroupId=r['GroupId'],
+                       IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
+                                       'ToPort': to_port,
+                                       'UserIdGroupPairs': [{'GroupId': i}]}])
             for i in self.data.get('CidrIpv6', []):
-                method(GroupId=r['GroupId'], IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
-                                                             'ToPort': to_port, 'Ipv6Ranges': [{'CidrIpv6': i}]
-                                                             }])
+                method(GroupId=r['GroupId'],
+                       IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
+                                       'ToPort': to_port, 'Ipv6Ranges': [{'CidrIpv6': i}]
+                                       }])
 
 
 @SecurityGroup.action_registry.register('post-finding')
@@ -2137,4 +2140,3 @@ class CreateFlowLogs(BaseAction):
                     e.response['Error']['Message'])
             else:
                 raise
-
