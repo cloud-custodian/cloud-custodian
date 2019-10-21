@@ -43,16 +43,18 @@ def load(options, path, format=None, validate=True, vars=None):
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
-    load_resources()
+    from c7n.schema import validate, StructureParser
     data = utils.load_file(path, format=format, vars=vars)
+
+    structure = StructureParser()
+    structure.validate(data)
+    load_resources(structure.get_resource_types(data))
 
     if isinstance(data, list):
         log.warning('yaml in invalid format. The "policies:" line is probably missing.')
         return None
 
     if validate:
-        from c7n.schema import validate, StructureParser
-        StructureParser().validate(data)
         errors = validate(data)
         if errors:
             raise PolicyValidationError(
