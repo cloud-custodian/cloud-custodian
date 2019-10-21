@@ -75,15 +75,18 @@ def import_resource_classes(resource_map, resource_types):
     rmods = set()
 
     for r in resource_types:
+        if r not in resource_map:
+            continue
         rmodule, rclass = resource_map[r].rsplit('.', 1)
         rmods.add(rmodule)
 
-    for r in rmods:
-        mod_map[r] = importlib.import_module(r)
+    for rmodule in rmods:
+        mod_map[rmodule] = importlib.import_module(rmodule)
 
     return [getattr(mod_map[rmodule], rclass, None) for
             rmodule, rclass in [
-                resource_map[r].rsplit('.', 1) for r in resource_types]]
+                resource_map[r].rsplit('.', 1) for r in resource_types
+                if r in resource_map]]
 
 
 # nosetests seems to think this function is a test
