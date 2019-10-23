@@ -465,6 +465,9 @@ class StructureParser(object):
                     ', '.join(self.allowed_keys),
                     ', '.join(extra))))
 
+        if 'policies' not in data:
+            raise PolicyValidationError("`policies` list missing")
+
         pdata = data.get('policies', [])
         if not isinstance(pdata, list):
             raise PolicyValidationError((

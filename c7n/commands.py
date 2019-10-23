@@ -27,10 +27,10 @@ import six
 import yaml
 from yaml.constructor import ConstructorError
 
-from c7n.exceptions import ClientError
+from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.schema import ElementSchema, generate
+from c7n.schema import ElementSchema, StructureParser, generate
 from c7n.utils import dumps, load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
 from c7n import provider
@@ -78,7 +78,11 @@ def policy_command(f):
                     fp, str(e)))
                 errors += 1
                 continue
-
+            except PolicyValidationError as e:
+                log.error('invalid policy file: {} error: {}'.format(
+                    fp, str(e)))
+                errors += 1
+                continue
             if collection is None:
                 log.debug('Loaded file {}. Contained no policies.'.format(fp))
             else:
@@ -204,6 +208,7 @@ def validate(options):
 
     used_policy_names = set()
     schm = schema.generate()
+    structure = StructureParser()
     errors = []
 
     for config_file in options.configs:
@@ -221,6 +226,12 @@ def validate(options):
                 log.error("The config file must end in .json, .yml or .yaml.")
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
 
+        try:
+            structure.validate(data)
+        except PolicyValidationError as e:
+            log.error("Configuration invalid: {}".format(config_file))
+            log.error("%s" % e)
+            continue
         errors += schema.validate(data, schm)
         conf_policy_names = {
             p.get('name', 'unknown') for p in data.get('policies', ())}

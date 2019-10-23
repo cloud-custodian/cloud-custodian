@@ -42,6 +42,13 @@ class StructureParserTest(BaseTest):
         self.assertTrue(str(ecm.exception).startswith(
             'Policy file top level data structure'))
 
+    def test_policies_missing(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({})
+        self.assertTrue(str(ecm.exception).startswith(
+            "`policies` list missing"))
+
     def test_policies_not_list(self):
         p = StructureParser()
         with self.assertRaises(PolicyValidationError) as ecm:
