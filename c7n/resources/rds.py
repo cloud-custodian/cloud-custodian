@@ -1037,14 +1037,10 @@ class RDSSnapshotAge(AgeFilter):
         'age', days={'type': 'number'},
         op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
-    date_attribute = 'dummy'
+    date_attribute = 'SnapshotCreateTime'
 
     def get_resource_date(self, i):
-        v = i.get('SnapshotCreateTime')
-        if v:
-            return v
-        else:
-            return None
+        return i.get('SnapshotCreateTime')
 
 
 @RDSSnapshot.action_registry.register('restore')
