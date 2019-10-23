@@ -1039,6 +1039,9 @@ class RDSSnapshotAge(AgeFilter):
 
     date_attribute = 'SnapshotCreateTime'
 
+    def get_resource_date(self, i):
+        return i.get('SnapshotCreateTime')
+
 
 @RDSSnapshot.action_registry.register('restore')
 class RestoreInstance(BaseAction):
