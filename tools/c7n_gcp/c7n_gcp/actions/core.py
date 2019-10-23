@@ -41,7 +41,7 @@ class MethodAction(Action):
     attr_filter = ()
 
     # error codes that can be safely ignored
-    ignore_errors_codes = ()
+    ignore_error_codes = ()
 
     def validate(self):
         if not self.method_spec:
