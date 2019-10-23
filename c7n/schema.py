@@ -35,6 +35,7 @@ import logging
 from jsonschema import Draft4Validator as Validator
 from jsonschema.exceptions import best_match
 
+from c7n.exceptions import PolicyValidationError
 from c7n.policy import execution
 from c7n.provider import clouds
 from c7n.resources import load_resources
@@ -439,6 +440,53 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
         vocabulary["mode"][mode_name] = cls
 
     return vocabulary
+
+
+class StructureParser(object):
+    """Provide fast validation and inspection of a policy file.
+
+    Intent is to provide more humane validation for top level errors
+    instead of printing full schema as error message.
+    """
+    allowed_keys = set(('vars', 'policies'))
+
+    def validate(self, data):
+        if not isinstance(data, dict):
+            raise PolicyValidationError((
+                "Policy file top level data structure "
+                "should be a mapping/dict, instead found:%s""") % (
+                    type(data).__name__))
+        dkeys = set(data.keys())
+
+        extra = dkeys.difference(self.allowed_keys)
+        if extra:
+            raise PolicyValidationError((
+                'Policy files top level keys are %s, found extra: %s' % (
+                    ', '.join(self.allowed_keys),
+                    ', '.join(extra))))
+
+        if 'policies' not in data:
+            raise PolicyValidationError("`policies` list missing")
+
+        pdata = data.get('policies', [])
+        if not isinstance(pdata, list):
+            raise PolicyValidationError((
+                '`policies` key should be an array/list found: %s' % (
+                    type(pdata).__name__)))
+        for p in pdata:
+            if not isinstance(p, dict):
+                raise PolicyValidationError((
+                    'policy must be a dictionary/mapping found:%s policy:\n %s' % (
+                        type(p).__name__, json.dumps(p, indent=2))))
+
+    def get_resource_types(self, data):
+        resources = set()
+        for p in data.get('policies', []):
+            rtype = p['resource']
+            if '.' not in rtype:
+                rtype = 'aws.%s' % rtype
+            resources.add(rtype)
+        return resources
 
 
 class ElementSchema(object):

@@ -50,17 +50,18 @@ def load(options, path, format=None, validate=True, vars=None):
         log.warning('yaml in invalid format. The "policies:" line is probably missing.')
         return None
 
-    # Test for empty policy file
-    if not data or data.get('policies') is None:
-        return None
-
     if validate:
-        from c7n.schema import validate
+        from c7n.schema import validate, StructureParser
+        StructureParser().validate(data)
         errors = validate(data)
         if errors:
             raise PolicyValidationError(
                 "Failed to validate policy %s \n %s" % (
                     errors[1], errors[0]))
+
+    # Test for empty policy file
+    if not data or data.get('policies') is None:
+        return None
 
     collection = PolicyCollection.from_data(data, options)
     if validate:

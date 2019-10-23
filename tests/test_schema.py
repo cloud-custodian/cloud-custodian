@@ -18,12 +18,57 @@ import sys
 from json import dumps
 from jsonschema.exceptions import best_match
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter
 from c7n.manager import resources
 from c7n.schema import (
-    ElementSchema, resource_vocabulary, Validator, validate,
+    StructureParser, ElementSchema, resource_vocabulary, Validator, validate,
     generate, specific_error, policy_error_scope)
 from .common import BaseTest
+
+
+class StructureParserTest(BaseTest):
+
+    def test_extra_keys(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'accounts': []})
+        self.assertTrue(str(ecm.exception).startswith('Policy files top level keys'))
+
+    def test_bad_top_level_datastruct(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate([])
+        self.assertTrue(str(ecm.exception).startswith(
+            'Policy file top level data structure'))
+
+    def test_policies_missing(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({})
+        self.assertTrue(str(ecm.exception).startswith(
+            "`policies` list missing"))
+
+    def test_policies_not_list(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': {}})
+        self.assertTrue(str(ecm.exception).startswith(
+            "`policies` key should be an array/list"))
+
+    def test_policy_not_mapping(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [[]]})
+        self.assertTrue(str(ecm.exception).startswith(
+            'policy must be a dictionary/mapping found:list'))
+
+    def test_get_resource_types(self):
+        p = StructureParser()
+        self.assertEqual(
+            p.get_resource_types({'policies': [
+                {'resource': 'ec2'}, {'resource': 'gcp.instance'}]}),
+            set(('aws.ec2', 'gcp.instance')))
 
 
 class SchemaTest(BaseTest):
