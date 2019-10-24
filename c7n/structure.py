@@ -102,4 +102,3 @@ class StructureParser(object):
                 rtype = 'aws.%s' % rtype
             resources.add(rtype)
         return resources
-
