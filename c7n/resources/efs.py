@@ -18,7 +18,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
-from c7n.tags import universal_augment, register_universal_tags
+from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
 
 
@@ -36,15 +36,9 @@ class ElasticFileSystem(QueryResourceManager):
         arn_service = 'elasticfilesystem'
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
+        universal_taggable = True
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(ElasticFileSystem, self).augment(resources))
-
-
-register_universal_tags(
-    ElasticFileSystem.filter_registry,
-    ElasticFileSystem.action_registry)
+    augment = universal_augment
 
 
 @resources.register('efs-mount-target')

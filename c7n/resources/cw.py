@@ -23,7 +23,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
-from c7n.tags import universal_augment, register_universal_tags
+from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry
 
 
@@ -159,6 +159,7 @@ class LogGroup(QueryResourceManager):
         filter_type = 'scalar'
         dimension = 'LogGroupName'
         date = 'creationTime'
+        universal_taggable = True
 
     def augment(self, resources):
         resources = universal_augment(self, resources)
@@ -170,9 +171,6 @@ class LogGroup(QueryResourceManager):
         # log group arn in resource describe has ':*' suffix, not all
         # apis can use that form, so normalize to standard arn.
         return [r['arn'][:-2] for r in resources]
-
-
-register_universal_tags(LogGroup.filter_registry, LogGroup.action_registry)
 
 
 @LogGroup.action_registry.register('retention')

@@ -722,7 +722,7 @@ class TypeInfo(object):
     # arn resource attribute, when describe format has arn
     arn = None
 
-    # type, used for arn construction
+    # type, used for arn construction, also required for universal tag augment
     arn_type = None
 
     # how arn type is separated from rest of arn
