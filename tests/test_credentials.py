@@ -17,7 +17,7 @@ import os
 from botocore.exceptions import ClientError
 import placebo
 
-from c7n.credentials import SessionFactory, assumed_session
+from c7n.credentials import SessionFactory, assumed_session, get_sts_client
 from c7n.version import version
 from c7n.utils import local_session
 
@@ -32,6 +32,17 @@ class Credential(BaseTest):
         self.assertTrue(
             session._session.user_agent().startswith("CloudCustodian/%s" % version)
         )
+
+    def test_regional_sts(self):
+        factory = self.replay_flight_data('test_credential_sts_regional')
+        client = get_sts_client(factory(), region='us-east-2')
+        # unfortunately we have to poke at boto3 client internals to verify
+        self.assertEqual(client._client_config.region_name, 'us-east-2')
+        self.assertEqual(client._endpoint.host,
+                         'https://sts.us-east-2.amazonaws.com')
+        self.assertEqual(
+            client.get_caller_identity()['Arn'],
+            'arn:aws:iam::644160558196:user/kapil')
 
     def test_assumed_session(self):
         factory = self.replay_flight_data("test_credential_sts")
