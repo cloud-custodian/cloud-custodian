@@ -601,7 +601,7 @@ class RedshiftSnapshot(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'redshift'
-        arn_type = 'redshift-snapshot'
+        arn_type = 'snapshot'
         arn_separator = ':'
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
         name = id = 'SnapshotIdentifier'

@@ -353,17 +353,18 @@ class TestRedshiftSnapshot(BaseTest):
                     {
                         "type": "value",
                         "key": "SnapshotIdentifier",
-                        "value": "c7n-snapshot",
+                        "value": "c7n-test-snapshot",
                     }
                 ],
                 "actions": [{"type": "mark-for-op", "days": 30, "op": "delete"}],
             },
-            session_factory=factory,
+            session_factory=factory, config={'account_id': '644160558196'}
         )
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        arn = p.resource_manager.generate_arn(resources[0]["SnapshotIdentifier"])
+        arn = p.resource_manager.generate_arn(
+            resources[0]['ClusterIdentifier'] + '/' + resources[0]['SnapshotIdentifier'])
         tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
         tag_map = {t["Tag"]["Key"] for t in tags}
         self.assertTrue("maid_status" in tag_map)
@@ -379,17 +380,18 @@ class TestRedshiftSnapshot(BaseTest):
                     {
                         "type": "value",
                         "key": "SnapshotIdentifier",
-                        "value": "c7n-snapshot",
+                        "value": "c7n-test-snapshot",
                     }
                 ],
                 "actions": [{"type": "unmark"}],
             },
-            session_factory=factory,
+            session_factory=factory, config={'account_id': '644160558196'}
         )
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        arn = p.resource_manager.generate_arn(resources[0]["SnapshotIdentifier"])
+        arn = p.resource_manager.generate_arn(
+            resources[0]['ClusterIdentifier'] + '/' + resources[0]['SnapshotIdentifier'])
         tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
         tag_map = {t["Tag"]["Key"] for t in tags}
         self.assertFalse("maid_status" in tag_map)
