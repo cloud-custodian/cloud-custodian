@@ -4,21 +4,29 @@
         "TaggedResources": [
             {
                 "Tag": {
+                    "Key": "name",
+                    "Value": "pratyush"
+                },
+                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:c7n-test-pratyush/c7n-test-snapshot",
+                "ResourceType": "snapshot"
+            },
+            {
+                "Tag": {
                     "Key": "maid_status",
-                    "Value": "Resource does not meet policy: delete@2019/11/25"
+                    "Value": "Resource does not meet policy: delete@2019/11/26"
                 },
                 "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:c7n-test-pratyush/c7n-test-snapshot",
                 "ResourceType": "snapshot"
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "a1c3147a-f841-11e9-861f-8745ccfb9ef8",
+            "RequestId": "dab88cf0-f85f-11e9-938c-a555593cc961",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "a1c3147a-f841-11e9-861f-8745ccfb9ef8",
+                "x-amzn-requestid": "dab88cf0-f85f-11e9-938c-a555593cc961",
                 "content-type": "text/xml",
-                "content-length": "651",
-                "date": "Sat, 26 Oct 2019 22:40:37 GMT"
+                "content-length": "955",
+                "date": "Sun, 27 Oct 2019 02:16:58 GMT"
             },
             "RetryAttempts": 0
         }

@@ -9,11 +9,11 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 10,
-                    "day": 26,
-                    "hour": 19,
-                    "minute": 52,
-                    "second": 10,
-                    "microsecond": 668000
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 23,
+                    "second": 46,
+                    "microsecond": 873000
                 },
                 "Status": "available",
                 "Port": 5439,
@@ -22,11 +22,11 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 10,
-                    "day": 26,
-                    "hour": 19,
-                    "minute": 26,
-                    "second": 13,
-                    "microsecond": 825000
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 16,
+                    "second": 33,
+                    "microsecond": 196000
                 },
                 "MasterUsername": "awsuser",
                 "ClusterVersion": "1.0",
@@ -41,38 +41,43 @@
                 "TotalBackupSizeInMegaBytes": 22.0,
                 "ActualIncrementalBackupSizeInMegaBytes": 13.0,
                 "BackupProgressInMegaBytes": 13.0,
-                "CurrentBackupRateInMegaBytesPerSecond": 13.7276,
+                "CurrentBackupRateInMegaBytesPerSecond": 12.4402,
                 "EstimatedSecondsToCompletion": 0,
-                "ElapsedTimeInSeconds": 0,
-                "Tags": [],
+                "ElapsedTimeInSeconds": 1,
+                "Tags": [
+                    {
+                        "Key": "name",
+                        "Value": "pratyush"
+                    }
+                ],
                 "RestorableNodeTypes": [
                     "dc2.large"
                 ],
                 "EnhancedVpcRouting": false,
                 "MaintenanceTrackName": "current",
-                "ManualSnapshotRetentionPeriod": 3,
-                "ManualSnapshotRemainingDays": 2,
+                "ManualSnapshotRetentionPeriod": 2,
+                "ManualSnapshotRemainingDays": 1,
                 "SnapshotRetentionStartTime": {
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 10,
-                    "day": 26,
-                    "hour": 19,
-                    "minute": 52,
-                    "second": 11,
-                    "microsecond": 615000
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 23,
+                    "second": 47,
+                    "microsecond": 918000
                 }
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "9d0e3f33-f841-11e9-96e4-b3c68d958158",
+            "RequestId": "da14d348-f85f-11e9-8769-914ca8b37075",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "9d0e3f33-f841-11e9-96e4-b3c68d958158",
+                "x-amzn-requestid": "da14d348-f85f-11e9-8769-914ca8b37075",
                 "content-type": "text/xml",
-                "content-length": "2106",
+                "content-length": "2218",
                 "vary": "Accept-Encoding",
-                "date": "Sat, 26 Oct 2019 22:40:29 GMT"
+                "date": "Sun, 27 Oct 2019 02:16:57 GMT"
             },
             "RetryAttempts": 0
         }

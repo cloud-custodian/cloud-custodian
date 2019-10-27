@@ -9,11 +9,11 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 10,
-                    "day": 26,
-                    "hour": 19,
-                    "minute": 52,
-                    "second": 10,
-                    "microsecond": 668000
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 23,
+                    "second": 46,
+                    "microsecond": 873000
                 },
                 "Status": "available",
                 "Port": 5439,
@@ -22,11 +22,11 @@
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 10,
-                    "day": 26,
-                    "hour": 19,
-                    "minute": 26,
-                    "second": 13,
-                    "microsecond": 825000
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 16,
+                    "second": 33,
+                    "microsecond": 196000
                 },
                 "MasterUsername": "awsuser",
                 "ClusterVersion": "1.0",
@@ -41,13 +41,17 @@
                 "TotalBackupSizeInMegaBytes": 22.0,
                 "ActualIncrementalBackupSizeInMegaBytes": 13.0,
                 "BackupProgressInMegaBytes": 13.0,
-                "CurrentBackupRateInMegaBytesPerSecond": 13.7276,
+                "CurrentBackupRateInMegaBytesPerSecond": 12.4402,
                 "EstimatedSecondsToCompletion": 0,
-                "ElapsedTimeInSeconds": 0,
+                "ElapsedTimeInSeconds": 1,
                 "Tags": [
                     {
+                        "Key": "name",
+                        "Value": "pratyush"
+                    },
+                    {
                         "Key": "maid_status",
-                        "Value": "Resource does not meet policy: delete@2019/11/25"
+                        "Value": "Resource does not meet policy: delete@2019/11/26"
                     }
                 ],
                 "RestorableNodeTypes": [
@@ -55,29 +59,29 @@
                 ],
                 "EnhancedVpcRouting": false,
                 "MaintenanceTrackName": "current",
-                "ManualSnapshotRetentionPeriod": 3,
-                "ManualSnapshotRemainingDays": 2,
+                "ManualSnapshotRetentionPeriod": 2,
+                "ManualSnapshotRemainingDays": 1,
                 "SnapshotRetentionStartTime": {
                     "__class__": "datetime",
                     "year": 2019,
                     "month": 10,
-                    "day": 26,
-                    "hour": 19,
-                    "minute": 52,
-                    "second": 11,
-                    "microsecond": 615000
+                    "day": 27,
+                    "hour": 1,
+                    "minute": 23,
+                    "second": 47,
+                    "microsecond": 918000
                 }
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "16adf5fb-f842-11e9-9bd7-fdfdf6444a2c",
+            "RequestId": "ba9b0ba1-f861-11e9-861f-8745ccfb9ef8",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "16adf5fb-f842-11e9-9bd7-fdfdf6444a2c",
+                "x-amzn-requestid": "ba9b0ba1-f861-11e9-861f-8745ccfb9ef8",
                 "content-type": "text/xml",
-                "content-length": "2265",
+                "content-length": "2362",
                 "vary": "Accept-Encoding",
-                "date": "Sat, 26 Oct 2019 22:43:54 GMT"
+                "date": "Sun, 27 Oct 2019 02:30:23 GMT"
             },
             "RetryAttempts": 0
         }
