@@ -46,10 +46,6 @@
                 "ElapsedTimeInSeconds": 1,
                 "Tags": [
                     {
-                        "Key": "name",
-                        "Value": "pratyush"
-                    },
-                    {
                         "Key": "maid_status",
                         "Value": "Resource does not meet policy: delete@2019/11/26"
                     }
@@ -74,14 +70,14 @@
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "ba9b0ba1-f861-11e9-861f-8745ccfb9ef8",
+            "RequestId": "8057e834-f869-11e9-8769-914ca8b37075",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "ba9b0ba1-f861-11e9-861f-8745ccfb9ef8",
+                "x-amzn-requestid": "8057e834-f869-11e9-8769-914ca8b37075",
                 "content-type": "text/xml",
-                "content-length": "2362",
+                "content-length": "2265",
                 "vary": "Accept-Encoding",
-                "date": "Sun, 27 Oct 2019 02:30:23 GMT"
+                "date": "Sun, 27 Oct 2019 03:26:01 GMT"
             },
             "RetryAttempts": 0
         }

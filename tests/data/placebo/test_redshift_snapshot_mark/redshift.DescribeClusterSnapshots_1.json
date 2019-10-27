@@ -44,12 +44,7 @@
                 "CurrentBackupRateInMegaBytesPerSecond": 12.4402,
                 "EstimatedSecondsToCompletion": 0,
                 "ElapsedTimeInSeconds": 1,
-                "Tags": [
-                    {
-                        "Key": "name",
-                        "Value": "pratyush"
-                    }
-                ],
+                "Tags": [],
                 "RestorableNodeTypes": [
                     "dc2.large"
                 ],
@@ -70,14 +65,14 @@
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "da14d348-f85f-11e9-8769-914ca8b37075",
+            "RequestId": "592f578f-f869-11e9-9da1-1b363167c356",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "da14d348-f85f-11e9-8769-914ca8b37075",
+                "x-amzn-requestid": "592f578f-f869-11e9-9da1-1b363167c356",
                 "content-type": "text/xml",
-                "content-length": "2218",
+                "content-length": "2106",
                 "vary": "Accept-Encoding",
-                "date": "Sun, 27 Oct 2019 02:16:57 GMT"
+                "date": "Sun, 27 Oct 2019 03:24:55 GMT"
             },
             "RetryAttempts": 0
         }
