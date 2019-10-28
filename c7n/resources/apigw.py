@@ -22,7 +22,6 @@ from c7n.filters import FilterRegistry, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.tags import register_universal_tags
 from c7n.utils import generate_arn, type_schema
 
 
@@ -131,6 +130,7 @@ class RestApi(query.QueryResourceManager):
         date = 'createdDate'
         dimension = 'GatewayName'
         config_type = "AWS::ApiGateway::RestApi"
+        universal_taggable = object()
 
     @property
     def generate_arn(self):
@@ -146,6 +146,23 @@ class RestApi(query.QueryResourceManager):
                 region=self.config.region,
                 resource_type=self.resource_type.arn_type)
         return self._generate_arn
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return ApiDescribeSource(self)
+        return super(RestApi, self).get_source(source_type)
+
+
+class ApiDescribeSource(query.DescribeSource):
+
+    def augment(self, resources):
+        for r in resources:
+            tags = r.setdefault('Tags', [])
+            for k, v in r.pop('tags', {}).items():
+                tags.append({
+                    'Key': k,
+                    'Value': v})
+        return resources
 
 
 @RestApi.filter_registry.register('cross-account')
@@ -193,9 +210,6 @@ class UpdateApi(BaseAction):
             client.update_rest_api(
                 restApiId=r['id'],
                 patchOperations=self.data['patch'])
-
-
-register_universal_tags(RestApi.filter_registry, RestApi.action_registry, compatibility=False)
 
 
 @RestApi.action_registry.register('delete')

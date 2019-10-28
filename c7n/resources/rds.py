@@ -66,7 +66,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n import tags
-from c7n.tags import universal_augment, register_universal_tags
+from c7n.tags import universal_augment
 
 from c7n.utils import (
     local_session, type_schema, get_retry, chunks, snapshot_identifier)
@@ -97,7 +97,7 @@ class RDS(QueryResourceManager):
         dimension = 'DBInstanceIdentifier'
         config_type = 'AWS::RDS::DBInstance'
         arn = 'DBInstanceArn'
-
+        universal_taggable = True
         default_report_fields = (
             'DBInstanceIdentifier',
             'DBName',
@@ -136,11 +136,6 @@ class ConfigRDS(ConfigSource):
         resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
           for t in item['supplementaryConfiguration']['Tags']]
         return resource
-
-
-register_universal_tags(
-    RDS.filter_registry,
-    RDS.action_registry)
 
 
 def _db_instance_eligible_for_backup(resource):
@@ -958,6 +953,7 @@ class RDSSnapshot(QueryResourceManager):
         date = 'SnapshotCreateTime'
         config_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
+        universal_taggable = True
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -983,11 +979,6 @@ class ConfigRDSSnapshot(ConfigSource):
           for t in item['supplementaryConfiguration']['Tags']]
         # TODO: Load DBSnapshotAttributes into annotation
         return resource
-
-
-register_universal_tags(
-    RDSSnapshot.filter_registry,
-    RDSSnapshot.action_registry)
 
 
 @RDSSnapshot.filter_registry.register('onhour')

@@ -109,6 +109,7 @@ class PolicyMeta(BaseTest):
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
         # resource augmentation, scan resources to ensure
+        missing = []
         for k, v in manager.resources.items():
             if not getattr(v.resource_type, "universal_taggable", None):
                 continue
@@ -116,9 +117,28 @@ class PolicyMeta(BaseTest):
                 v.augment.__name__ == "universal_augment" and
                 getattr(v.resource_type, "detail_spec", None)
             ):
-                self.fail(
-                    "%s resource has universal augment masking resource augment" % k
-                )
+                missing.append(k)
+
+        if missing:
+            self.fail(
+                "%s resource has universal augment masking resource augment" % (
+                    ', '.join(missing))
+            )
+
+    def test_resource_universal_taggable_arn_type(self):
+        missing = []
+        for k, v in manager.resources.items():
+            if not getattr(v, 'augment', None):
+                continue
+            if (
+                v.augment.__name__ == "universal_augment" and
+                    v.resource_type.arn_type is None
+            ):
+                missing.append(k)
+
+        if missing:
+            self.fail("%s universal taggable resource missing arn_type" % (
+                ', '.join(missing)))
 
     def test_resource_shadow_source_augment(self):
         shadowed = []

@@ -16,7 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
-from c7n.tags import universal_augment, register_universal_tags
+from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session
 
 
@@ -51,10 +51,6 @@ class DescribeCertificate(DescribeSource):
         return universal_augment(
             self.manager,
             super(DescribeCertificate, self).augment(resources))
-
-
-register_universal_tags(
-    Certificate.filter_registry, Certificate.action_registry, compatibility=False)
 
 
 @Certificate.action_registry.register('delete')
