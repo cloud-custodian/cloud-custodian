@@ -1,25 +1,17 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "TaggedResources": [
-            {
-                "ResourceType": "snapshot", 
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:c7n/c7n-snapshot", 
-                "Tag": {
-                    "Value": "testvalue", 
-                    "Key": "testkey"
-                }
-            }
-        ], 
+        "TaggedResources": [],
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "8b1d2a3f-7b85-11e6-9dd1-d733c704429d", 
+            "RequestId": "80e386cf-f869-11e9-abdb-03e5065dbdc3",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "8b1d2a3f-7b85-11e6-9dd1-d733c704429d", 
-                "date": "Thu, 15 Sep 2016 20:46:57 GMT", 
-                "content-length": "589", 
-                "content-type": "text/xml"
-            }
+                "x-amzn-requestid": "80e386cf-f869-11e9-abdb-03e5065dbdc3",
+                "content-type": "text/xml",
+                "content-length": "278",
+                "date": "Sun, 27 Oct 2019 03:26:02 GMT"
+            },
+            "RetryAttempts": 0
         }
     }
 }
