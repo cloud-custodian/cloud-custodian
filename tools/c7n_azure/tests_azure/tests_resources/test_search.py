@@ -17,16 +17,6 @@ from ..azure_common import BaseTest, arm_template
 
 
 class SearchTest(BaseTest):
-    def setUp(self):
-        super(SearchTest, self).setUp()
-
-    def test_search_schema_validate(self):
-        with self.sign_out_patch():
-            p = self.load_policy({
-                'name': 'test-search',
-                'resource': 'azure.search'
-            }, validate=True)
-            self.assertTrue(p)
 
     @arm_template('search.json')
     def test_find_by_name(self):
@@ -42,3 +32,4 @@ class SearchTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['properties']['replicaCount'], 1)
