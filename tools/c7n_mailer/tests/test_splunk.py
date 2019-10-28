@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-import botocore.vendored.requests as requests
+import requests
 from logging import Logger
 from mock import Mock, call, patch
 import pytest

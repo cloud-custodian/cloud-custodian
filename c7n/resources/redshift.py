@@ -601,15 +601,19 @@ class RedshiftSnapshot(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'redshift'
-        arn_type = 'redshift-snapshot'
+        arn_type = 'snapshot'
         arn_separator = ':'
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
         name = id = 'SnapshotIdentifier'
         date = 'SnapshotCreateTime'
         config_type = "AWS::Redshift::ClusterSnapshot"
+        universal_taggable = True
 
-
-RedshiftSnapshot.filter_registry.register('marked-for-op', tags.TagActionFilter)
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(r['ClusterIdentifier'] + '/' + r[self.get_model().id]))
+        return arns
 
 
 @RedshiftSnapshot.filter_registry.register('age')
@@ -702,91 +706,6 @@ class RedshiftSnapshotDelete(BaseAction):
             c.delete_cluster_snapshot(
                 SnapshotIdentifier=s['SnapshotIdentifier'],
                 SnapshotClusterIdentifier=s['ClusterIdentifier'])
-
-
-@RedshiftSnapshot.action_registry.register('mark-for-op')
-class RedshiftSnapshotTagDelayedAction(tags.TagDelayedAction):
-    """Action to create a delayed actions to be performed on a redshift snapshot
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: redshift-snapshot-expiring
-                resource: redshift-snapshot
-                filters:
-                  - "tag:custodian_cleanup": absent
-                  - type: age
-                    days: 14
-                    op: eq
-                actions:
-                  - type: mark-for-op
-                    tag: custodian_cleanup
-                    msg: "Snapshot expiring: {op}@{action_date}"
-                    op: delete
-                    days: 7
-    """
-
-
-@RedshiftSnapshot.action_registry.register('tag')
-class RedshiftSnapshotTag(tags.Tag):
-    """Action to add tag/tags to a redshift snapshot
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: redshift-required-tags
-                resource: redshift-snapshot
-                filters:
-                  - "tag:RequiredTag1": absent
-                actions:
-                  - type: tag
-                    key: RequiredTag1
-                    value: RequiredValue1
-    """
-
-    concurrency = 2
-    batch_size = 5
-    permissions = ('redshift:CreateTags',)
-
-    def process_resource_set(self, client, resources, tags):
-        for r in resources:
-            arn = self.manager.generate_arn(
-                r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
-            client.create_tags(ResourceName=arn, Tags=tags)
-
-
-@RedshiftSnapshot.action_registry.register('unmark')
-@RedshiftSnapshot.action_registry.register('remove-tag')
-class RedshiftSnapshotRemoveTag(tags.RemoveTag):
-    """Action to remove tag/tags from a redshift snapshot
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: redshift-remove-tags
-                resource: redshift-snapshot
-                filters:
-                  - "tag:UnusedTag1": present
-                actions:
-                  - type: remove-tag
-                    tags: ["UnusedTag1"]
-    """
-
-    concurrency = 2
-    batch_size = 5
-    permissions = ('redshift:DeleteTags',)
-
-    def process_resource_set(self, client, resources, tag_keys):
-        for r in resources:
-            arn = self.manager.generate_arn(
-                r['ClusterIdentifier'] + '/' + r['SnapshotIdentifier'])
-            client.delete_tags(ResourceName=arn, TagKeys=tag_keys)
 
 
 @RedshiftSnapshot.action_registry.register('revoke-access')

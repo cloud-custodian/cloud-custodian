@@ -935,6 +935,7 @@ class RoleDelete(BaseAction):
 @Policy.filter_registry.register('used')
 class UsedIamPolicies(Filter):
     """Filter IAM policies that are being used
+    (either attached to some roles or used as a permissions boundary).
 
     :example:
 
@@ -951,12 +952,14 @@ class UsedIamPolicies(Filter):
     permissions = ('iam:ListPolicies',)
 
     def process(self, resources, event=None):
-        return [r for r in resources if r['AttachmentCount'] > 0]
+        return [r for r in resources if
+                r['AttachmentCount'] > 0 or r.get('PermissionsBoundaryUsageCount', 0) > 0]
 
 
 @Policy.filter_registry.register('unused')
 class UnusedIamPolicies(Filter):
     """Filter IAM policies that are not being used
+    (neither attached to any roles nor used as a permissions boundary).
 
     :example:
 
@@ -973,7 +976,8 @@ class UnusedIamPolicies(Filter):
     permissions = ('iam:ListPolicies',)
 
     def process(self, resources, event=None):
-        return [r for r in resources if r['AttachmentCount'] == 0]
+        return [r for r in resources if
+                r['AttachmentCount'] == 0 and r.get('PermissionsBoundaryUsageCount', 0) == 0]
 
 
 @Policy.filter_registry.register('has-allow-all')

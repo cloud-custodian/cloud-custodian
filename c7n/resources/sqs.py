@@ -25,7 +25,7 @@ from c7n.utils import local_session
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.actions import BaseAction
 from c7n.utils import type_schema
-from c7n.tags import universal_augment, register_universal_tags
+from c7n.tags import universal_augment
 
 
 @resources.register('sqs')
@@ -43,7 +43,7 @@ class SQS(QueryResourceManager):
         name = 'QueueUrl'
         date = 'CreatedTimestamp'
         dimension = 'QueueName'
-
+        universal_taggable = object()
         default_report_fields = (
             'QueueArn',
             'CreatedTimestamp',
@@ -86,10 +86,6 @@ class SQS(QueryResourceManager):
         with self.executor_factory(max_workers=2) as w:
             return universal_augment(
                 self, list(filter(None, w.map(_augment, resources))))
-
-
-register_universal_tags(
-    SQS.filter_registry, SQS.action_registry, compatibility=False)
 
 
 @SQS.filter_registry.register('metrics')

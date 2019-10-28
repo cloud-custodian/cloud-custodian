@@ -81,7 +81,6 @@ def register_universal_tags(filters, actions, compatibility=True):
 def universal_augment(self, resources):
     # Resource Tagging API Support
     # https://docs.aws.amazon.com/awsconsolehelpdocs/latest/gsg/supported-resources.html
-
     # Bail on empty set
     if not resources:
         return resources

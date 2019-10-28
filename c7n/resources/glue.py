@@ -21,7 +21,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
-from c7n.tags import universal_augment, register_universal_tags
+from c7n.tags import universal_augment
 from c7n.filters import StateTransitionFilter
 from c7n import query
 
@@ -93,12 +93,10 @@ class GlueDevEndpoint(QueryResourceManager):
         id = name = 'EndpointName'
         date = 'CreatedTimestamp'
         arn_type = "devEndpoint"
+        universal_taggable = True
 
     permissions = ('glue:GetDevEndpoints',)
     augment = universal_augment
-
-
-register_universal_tags(GlueDevEndpoint.filter_registry, GlueDevEndpoint.action_registry)
 
 
 @GlueDevEndpoint.action_registry.register('delete')
@@ -149,12 +147,10 @@ class GlueJob(QueryResourceManager):
         id = name = 'Name'
         date = 'CreatedOn'
         arn_type = 'job'
+        universal_taggable = True
 
     permissions = ('glue:GetJobs',)
     augment = universal_augment
-
-
-register_universal_tags(GlueJob.filter_registry, GlueJob.action_registry)
 
 
 @GlueJob.action_registry.register('delete')
@@ -182,12 +178,10 @@ class GlueCrawler(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'crawler'
         state_key = 'State'
+        universal_taggable = True
 
     permissions = ('glue:GetCrawlers',)
     augment = universal_augment
-
-
-register_universal_tags(GlueCrawler.filter_registry, GlueCrawler.action_registry)
 
 
 @GlueCrawler.action_registry.register('delete')
