@@ -363,9 +363,8 @@ class TestRedshiftSnapshot(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        arn = p.resource_manager.generate_arn(
-            resources[0]['ClusterIdentifier'] + '/' + resources[0]['SnapshotIdentifier'])
-        tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
+        arn = p.resource_manager.get_arns(resources)
+        tags = client.describe_tags(ResourceName=arn[0])["TaggedResources"]
         tag_map = {t["Tag"]["Key"] for t in tags}
         self.assertTrue("maid_status" in tag_map)
 
@@ -390,9 +389,8 @@ class TestRedshiftSnapshot(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        arn = p.resource_manager.generate_arn(
-            resources[0]['ClusterIdentifier'] + '/' + resources[0]['SnapshotIdentifier'])
-        tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
+        arn = p.resource_manager.get_arns(resources)
+        tags = client.describe_tags(ResourceName=arn[0])["TaggedResources"]
         tag_map = {t["Tag"]["Key"] for t in tags}
         self.assertFalse("maid_status" in tag_map)
 
