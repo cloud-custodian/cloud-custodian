@@ -10,7 +10,7 @@
             "type": "Microsoft.Search/searchServices",
             "name": "[variables('name')]",
             "apiVersion": "2015-08-19",
-            "location": "Central US",
+            "location": "[resourceGroup().location]",
             "sku": {
                 "name": "free"
             },
