@@ -15,17 +15,31 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import re
+import math
 
 from concurrent.futures import as_completed
 from datetime import timedelta, datetime
 from statistics import mean
 
+from c7n.actions import Action
+from c7n.exceptions import PolicyExecutionError
 from c7n.filters import ValueFilter
 from c7n.filters.metrics import MetricsFilter
-from c7n.actions import Action
+from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, get_retry
+
+
+@resources.register('service-quota-request')
+class ServiceQuotaRequest(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'service-quotas'
+        enum_spec = ('list_requested_service_quota_change_history', 'RequestedQuotas', None)
+        id = 'Id'
+        arn = None
+        name = None
 
 
 @resources.register('service-quota')
@@ -194,17 +208,6 @@ class UsageFilter(MetricsFilter):
 
 @ServiceQuota.filter_registry.register('history')
 class History(ValueFilter):
-    """
-    Filter on historical requests for service quota increases
-
-    .. code-block:: yaml
-
-        policies:
-            - name: service-quota-increase-history-filter
-              resource: aws.service-quota
-              filters:
-                - type: history
-    """
 
     schema = type_schema('history')
 
@@ -240,10 +243,219 @@ class History(ValueFilter):
         return results
 
 
+@ServiceQuota.filter_registry.register('request-history')
+class RequestHistoryFilter(RelatedResourceFilter):
+    """
+    Filter on historical requests for service quota increases
+
+    .. code-block:: yaml
+
+        policies:
+            - name: service-quota-increase-history-filter
+              resource: aws.service-quota
+              filters:
+                - type: request-history
+                  key: status
+                  value: CASE_CLOSED
+    """
+
+    RelatedResource = 'c7n.resources.quotas.ServiceQuotaRequest'
+    RelatedIdsExpression = 'QuotaCode'
+    AnnotationKey = 'ServiceQuotaChangeHistory'
+
+    schema = type_schema(
+        'request-history', rinherit=ValueFilter.schema
+    )
+
+    permissions = ('servicequota:ListRequestedServiceQuotaChangeHistory',)
+
+    def get_related(self, resources):
+        resource_manager = self.get_resource_manager()
+        related_ids = self.get_related_ids(resources)
+        related = resource_manager.resources()
+        result = {}
+        for r in related:
+            result.setdefault(r[self.RelatedIdsExpression], [])
+            if r[self.RelatedIdsExpression] in related_ids:
+                result[r[self.RelatedIdsExpression]].append(r)
+        return result
+
+    def _add_annotations(self, related_ids, resource):
+        resources = self.get_related([resource])
+        a_resources = resources.get(resource[self.RelatedIdsExpression], [])
+        akey = 'c7n:%s' % self.AnnotationKey
+        resource[akey] = a_resources
+
+
 @ServiceQuota.action_registry.register('request-increase')
 class Increase(Action):
+    """
+    Request a limit increase for a service quota
 
-    schema = type_schema('increase')
+    .. code-block:: yaml
+
+        policies:
+          - name: request-limit-increase
+            resource: aws.service-quota
+            filters:
+              - type: value
+                key: QuotaCode
+                value: L-foo
+            actions:
+              - type: increase
+                multiplier: 1.2
+    """
+
+    schema = type_schema('request-increase', multiplier={'type': 'number', 'minimum': 1.0})
 
     def process(self, resources):
-        pass
+        client = local_session(self.manager.session_factory).client('service-quotas')
+        multiplier = self.data.get('multiplier', 1.2)
+        error = None
+        for r in resources:
+            count = math.floor(multiplier * r['Value'])
+            if not r['Adjustable']:
+                continue
+            try:
+                client.request_service_quota_increase(
+                    ServiceCode=r['ServiceCode'],
+                    QuotaCode=r['QuotaCode'],
+                    DesiredValue=count
+                )
+            except client.exceptions.QuotaExceededException as e:
+                error = e
+                self.log.error('Requested:%s exceeds quota limit for %s' % (count, r['QuotaCode']))
+                continue
+            except (client.exceptions.AccessDeniedException,
+                    client.exceptions.DependencyAccessDeniedException,):
+                raise PolicyExecutionError('Access Denied to increase quota: %s' % r['QuotaCode'])
+            except (client.exceptions.NoSuchResourceException,
+                    client.exceptions.InvalidResourceStateException,
+                    client.exceptions.ResourceAlreadyExistsException,) as e:
+                error = e
+                continue
+        if error:
+            raise PolicyExecutionError from error
+
+
+@ServiceQuota.action_registry.register('add-to-template')
+class AddToTemplate(Action):
+    """
+    Adds service quota requests to template
+
+    If no regions are specified, defaults to the current region
+
+    Multiplier defaults to 1.2
+
+    .. code-block:: yaml
+        policies:
+            - name: put-request-increase-in-template
+              resource: aws.service-quota
+              description: puts a quota increase request in template
+              filters:
+                - type: value
+                  key: ServiceCode
+                  value: ec2
+                - type: value
+                  key: QuotaName
+                  value: *.On-Demand instances.*
+                  op: regex
+              actions:
+                - type: add-to-template
+                  regions:
+                    - us-east-1
+                    - us-west-2
+                  multiplier: 1.2
+    """
+
+    all_regions = [
+        'ap-northeast-1', 'ap-northeast-2', 'ap-south-1', 'ap-southeast-1', 'ap-southeast-2',
+        'ca-central-1',
+        'eu-central-1', 'eu-north-1', 'eu-west-1', 'eu-west-2', 'eu-west-3',
+        'sa-east-1',
+        'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2'
+    ]
+
+    schema = type_schema(
+        'add-to-template',
+        multiplier={'type': 'number'},
+        regions={
+            'type': 'array',
+            'items': {
+                'type': 'string', 'enum': all_regions
+            }
+        },
+        **{'required': ['multiplier']}
+    )
+
+    def process_resources(self, resources, op):
+        session = local_session(self.manager.session_factory, region='us-east-1')
+        client = session.client('service-quotas')
+
+        regions = self.data.get('regions', [self.manager.session_factory.region])
+
+        multiplier = self.data.get('multiplier', 1.2)
+
+        for r in resources:
+            if not r['Adjustable']:
+                continue
+            kwargs = {
+                'ServiceCode': r['ServiceCode'],
+                'QuotaCode': r['QuotaCode'],
+            }
+            for region in regions:
+                kwargs['AwsRegion'] = region,
+                if self.data['type'] == 'add-to-template':
+                    kwargs['DesiredValue'] = math.floor(multiplier * r['value'])
+                try:
+                    getattr(client, op)(**kwargs)
+                except client.exceptions.AWSServiceAccessNotEnabledException:
+                    raise PolicyExecutionError(
+                        'Service Quota Template not associated with organization.')
+                except client.exceptions.NoAvailableOrganizationException:
+                    raise PolicyExecutionError('Account is not associated with an organization')
+                except (client.exceptions.AccessDeniedException,
+                        client.exceptions.DependencyAccessDeniedException,
+                        client.exceptions.NoSuchResource):
+                    continue
+
+    def process(self, resources):
+        op = 'put_service_quota_increase_request_into_template'
+        self.process_resources(resources, op)
+
+
+@ServiceQuota.action_registry.register('remove-from-template')
+class RemoveFromTemplate(AddToTemplate):
+    """
+    Removes service quota requests from template
+
+    If no regions are specified, defaults to the current region
+
+    .. code-block:: yaml
+
+        policies:
+            - name: remove-service-quota-request-from-template
+              resource: aws.service-quota
+              description: remove quota increase request from template
+              filters:
+                - type: in-template
+              actions:
+                - type: remove-from-template
+                  regions:
+                    - us-east-1
+                    - us-west-2
+    """
+
+    schema = type_schema(
+        'remove-from-template',
+        regions={
+            'type': 'array',
+            'items': {
+                'type': 'string', 'enum': AddToTemplate.all_regions
+            }
+        }
+    )
+
+    def process(self, resources):
+        op = 'delete_service_quota_increase_request_from_template'
+        self.process_resources(resources, op)
