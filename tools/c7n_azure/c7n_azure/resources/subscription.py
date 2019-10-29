@@ -26,14 +26,44 @@ from c7n.manager import ResourceManager
 from c7n.utils import local_session, type_schema
 
 from c7n_azure.provider import resources
-from c7n_azure.query import QueryMeta
+from c7n_azure.query import QueryMeta, TypeInfo
 
 
 @resources.register('subscription')
 @six.add_metaclass(QueryMeta)
 class Subscription(ResourceManager):
+    """Subscription Resource
 
-    class resource_type(object):
+    :example:
+
+    This policy creates Azure Policy scoped to the current subscription if doesn't exist.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-policy-sample
+            resource: azure.subscription
+            filters:
+              - type: missing
+                policy:
+                  resource: azure.policyassignments
+                  filters:
+                    - type: value
+                      key: properties.displayName
+                      op: eq
+                      value_type: normalize
+                      value: dn_sample_policy
+            actions:
+              - type: add-policy
+                name: sample_policy
+                display_name: dn_sample_policy
+                definition_name: "Audit use of classic storage accounts"
+
+    """
+
+    class resource_type(TypeInfo):
+        doc_groups = ['Subscription']
+
         id = 'subscriptionId'
         name = 'displayName'
         filter_name = None

@@ -249,7 +249,7 @@ class SchemaTest(CliTest):
             '$ref': '#/definitions/filters_common/value_from'
         }
         result = ElementSchema.schema(generate()['definitions'], test_schema)
-        self.assertEquals(result, ValuesFrom.schema)
+        self.assertEqual(result, ValuesFrom.schema)
 
     def test_schema_multi_expand(self):
         test_schema = {
@@ -289,14 +289,14 @@ class SchemaTest(CliTest):
         })
 
         result = yaml_dump(ElementSchema.schema(generate()['definitions'], test_schema))
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_schema_expand_not_found(self):
         test_schema = {
             '$ref': '#/definitions/filters_common/invalid_schema'
         }
         result = ElementSchema.schema(generate()['definitions'], test_schema)
-        self.assertEquals(result, None)
+        self.assertEqual(result, None)
 
 
 class ReportTest(CliTest):
@@ -682,7 +682,8 @@ class MiscTest(CliTest):
         # Doesn't do anything, but should exit 0
         temp_dir = self.get_temp_dir()
         yaml_file = self.write_policy_file({})
-        self.run_and_expect_success(["custodian", "run", "-s", temp_dir, yaml_file])
+        self.run_and_expect_failure(
+            ["custodian", "run", "-s", temp_dir, yaml_file], 1)
 
     def test_nonexistent_policy_file(self):
         temp_dir = self.get_temp_dir()

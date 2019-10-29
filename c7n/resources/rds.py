@@ -57,7 +57,6 @@ from concurrent.futures import as_completed
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
-from c7n.actions.securityhub import OtherResourcePostFinding
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
@@ -67,11 +66,12 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n import tags
-from c7n.tags import universal_augment, register_universal_tags
+from c7n.tags import universal_augment
 
 from c7n.utils import (
     local_session, type_schema, get_retry, chunks, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
+from c7n.resources.securityhub import OtherResourcePostFinding
 
 log = logging.getLogger('custodian.rds')
 
@@ -97,7 +97,7 @@ class RDS(QueryResourceManager):
         dimension = 'DBInstanceIdentifier'
         config_type = 'AWS::RDS::DBInstance'
         arn = 'DBInstanceArn'
-
+        universal_taggable = True
         default_report_fields = (
             'DBInstanceIdentifier',
             'DBName',
@@ -136,11 +136,6 @@ class ConfigRDS(ConfigSource):
         resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
           for t in item['supplementaryConfiguration']['Tags']]
         return resource
-
-
-register_universal_tags(
-    RDS.filter_registry,
-    RDS.action_registry)
 
 
 def _db_instance_eligible_for_backup(resource):
@@ -285,7 +280,7 @@ class SubnetFilter(net_filters.SubnetFilter):
 @filters.register('vpc')
 class VpcFilter(net_filters.VpcFilter):
 
-    RelatedIdsExpression = "DBSubnetGroup.Subnets[].VpcId"
+    RelatedIdsExpression = "DBSubnetGroup.VpcId"
 
 
 filters.register('network-location', net_filters.NetworkLocation)
@@ -745,7 +740,7 @@ class ResizeInstance(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: rds-snapshot-retention
+              - name: rds-resize-up
                 resource: rds
                 filters:
                   - type: metrics
@@ -766,7 +761,7 @@ class ResizeInstance(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: rds-snapshot-retention
+              - name: rds-resize-down
                 resource: rds
                 filters:
                   - type: metrics
@@ -958,6 +953,7 @@ class RDSSnapshot(QueryResourceManager):
         date = 'SnapshotCreateTime'
         config_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
+        universal_taggable = True
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -983,11 +979,6 @@ class ConfigRDSSnapshot(ConfigSource):
           for t in item['supplementaryConfiguration']['Tags']]
         # TODO: Load DBSnapshotAttributes into annotation
         return resource
-
-
-register_universal_tags(
-    RDSSnapshot.filter_registry,
-    RDSSnapshot.action_registry)
 
 
 @RDSSnapshot.filter_registry.register('onhour')
@@ -1038,6 +1029,9 @@ class RDSSnapshotAge(AgeFilter):
         op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
+
+    def get_resource_date(self, i):
+        return i.get('SnapshotCreateTime')
 
 
 @RDSSnapshot.action_registry.register('restore')
@@ -1343,6 +1337,7 @@ class RDSSnapshotDelete(BaseAction):
 class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     permissions = ('rds:ModifyDBInstance', 'rds:ModifyDBCluster')
+    vpc_expr = 'DBSubnetGroup.VpcId'
 
     def process(self, rds_instances):
         replication_group_map = {}
@@ -1413,7 +1408,7 @@ class RDSSubnetGroupDeleteAction(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: rds-subnet-group-delete-unused
+              - name: rds-subnet-group-delete
                 resource: rds-subnet-group
                 filters:
                   - Instances: []

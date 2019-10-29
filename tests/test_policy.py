@@ -23,10 +23,12 @@ import tempfile
 from c7n import policy, manager
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
+from c7n.resources import aws
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
+from c7n.version import version
 
 from .common import BaseTest, event_data, Bag, TestConfig as Config
 
@@ -107,6 +109,7 @@ class PolicyMeta(BaseTest):
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
         # resource augmentation, scan resources to ensure
+        missing = []
         for k, v in manager.resources.items():
             if not getattr(v.resource_type, "universal_taggable", None):
                 continue
@@ -114,9 +117,28 @@ class PolicyMeta(BaseTest):
                 v.augment.__name__ == "universal_augment" and
                 getattr(v.resource_type, "detail_spec", None)
             ):
-                self.fail(
-                    "%s resource has universal augment masking resource augment" % k
-                )
+                missing.append(k)
+
+        if missing:
+            self.fail(
+                "%s resource has universal augment masking resource augment" % (
+                    ', '.join(missing))
+            )
+
+    def test_resource_universal_taggable_arn_type(self):
+        missing = []
+        for k, v in manager.resources.items():
+            if not getattr(v, 'augment', None):
+                continue
+            if (
+                v.augment.__name__ == "universal_augment" and
+                    v.resource_type.arn_type is None
+            ):
+                missing.append(k)
+
+        if missing:
+            self.fail("%s universal taggable resource missing arn_type" % (
+                ', '.join(missing)))
 
     def test_resource_shadow_source_augment(self):
         shadowed = []
@@ -155,7 +177,8 @@ class PolicyMeta(BaseTest):
             if arn_gen:
                 overrides.add(k)
 
-        overrides = overrides.difference(set(('account', 's3', 'hostedzone', 'log-group')))
+        overrides = overrides.difference(set(
+            ('account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot')))
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -223,7 +246,7 @@ class PolicyMeta(BaseTest):
         names = self._visit_filters_and_actions(visitor)
         if names:
             self.fail(
-                "missing additionalProperties: Fallse on actions/filters\n %s" % (
+                "missing additionalProperties: False on actions/filters\n %s" % (
                     " \n".join(names)))
 
     def test_filter_action_type(self):
@@ -360,6 +383,7 @@ class TestPolicyCollection(BaseTest):
         original = policy.PolicyCollection.from_data(
             {"policies": [{"name": "foo", "resource": "ec2"}]}, cfg
         )
+
         collection = AWS().initialize_policies(original, cfg)
         self.assertEqual(
             sorted([p.options.region for p in collection]),
@@ -367,6 +391,9 @@ class TestPolicyCollection(BaseTest):
         )
 
     def test_policy_account_expand(self):
+        factory = self.replay_flight_data('test_aws_policy_region_expand')
+        self.patch(aws, '_profile_session', factory())
+
         original = policy.PolicyCollection.from_data(
             {"policies": [{"name": "foo", "resource": "account"}]},
             Config.empty(regions=["us-east-1", "us-west-2"]),
@@ -398,6 +425,9 @@ class TestPolicyCollection(BaseTest):
              ('foo', 'us-west-2')])
 
     def test_policy_region_expand_global(self):
+        factory = self.replay_flight_data('test_aws_policy_global_expand')
+        self.patch(aws, '_profile_session', factory())
+
         original = policy.PolicyCollection.from_data(
             {
                 "policies": [
@@ -553,7 +583,7 @@ class TestPolicy(BaseTest):
             repr(policy).startswith("<Policy resource:ec2 name:ec2-utilization")
         )
 
-    def test_policy_name_filtering(self):
+    def test_policy_name_and_resource_type_filtering(self):
 
         collection = self.load_policy_set(
             {
@@ -578,17 +608,59 @@ class TestPolicy(BaseTest):
         self.assertTrue("s3-remediate" in collection)
 
         self.assertEqual(
-            [p.name for p in collection.filter("s3*")],
+            [p.name for p in collection.filter(["s3*"])],
             ["s3-remediate", "s3-global-grants"],
         )
 
         self.assertEqual(
-            [p.name for p in collection.filter("ec2*")],
+            [p.name for p in collection.filter(["ec2*"])],
             [
                 "ec2-tag-compliance-stop",
                 "ec2-tag-compliance-kill",
                 "ec2-tag-compliance-remove",
             ],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(["ec2*", "s3*"])],
+            [p.name for p in collection],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(resource_types=["ec2"])],
+            [
+                "ec2-tag-compliance-stop",
+                "ec2-tag-compliance-kill",
+                "ec2-tag-compliance-remove",
+            ],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(resource_types=["ec2", "s3"])],
+            [p.name for p in collection],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(["ec2*", "s3*"], ["ec2", "s3"])],
+            [p.name for p in collection],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(["ec2*", "s3*"], ["s3"])],
+            [
+                "s3-remediate",
+                "s3-global-grants",
+            ],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(["asdf12"])],
+            [],
+        )
+
+        self.assertEqual(
+            [p.name for p in collection.filter(resource_types=["asdf12"])],
+            [],
         )
 
     def test_file_not_found(self):
@@ -919,6 +991,51 @@ class PolicyExecutionModeTest(BaseTest):
         self.assertRaises(
             NotImplementedError, policy.PolicyExecutionMode({}).get_logs, 1, 2
         )
+
+
+class LambdaModeTest(BaseTest):
+
+    def test_tags_validation(self):
+        log_file = self.capture_logging('c7n.policy', level=logging.INFO)
+        self.load_policy({
+            'name': 'foobar',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'config-rule',
+                'tags': {
+                    'custodian-mode': 'xyz',
+                    'xyz': 'bar'}
+            }},
+            validate=True)
+        lines = log_file.getvalue().strip().split('\n')
+        self.assertEqual(
+            lines[0],
+            ('Custodian reserves policy lambda tags starting with '
+             'custodian - policy specifies custodian-mode'))
+
+    def test_tags_injection(self):
+        p = self.load_policy({
+            'name': 'foobar',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'config-rule',
+                'tags': {
+                    'xyz': 'bar'}
+            }},
+            validate=True)
+
+        from c7n import mu
+        policy_lambda = []
+
+        def publish(self, func, alias=None, role=None, s3_uri=None):
+            policy_lambda.append(func)
+
+        self.patch(mu.LambdaManager, 'publish', publish)
+
+        p.provision()
+        self.assertEqual(
+            policy_lambda[0].tags['custodian-info'],
+            'mode=config-rule:version=%s' % version)
 
 
 class PullModeTest(BaseTest):

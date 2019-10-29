@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"configuration\":{\"handler\":\"custodian_policy.run\",\"role\":\"arn:aws:iam::644160558196:role/CloudCustodianRole\",\"functionName\":\"custodian-aws\",\"tracingConfig\":{\"mode\":\"PassThrough\"},\"runtime\":\"python3.7\",\"description\":\"This is cool.\\n\",\"codeSize\":565654.0,\"version\":\"$LATEST\",\"timeout\":60.0,\"revisionId\":\"0af8c6c4-600c-45f3-a736-5b8a69178b27\",\"codeSha256\":\"JYHKcozfPOsktrIdQ0Hjqq5OiOGVY+BV94QbfbZNuHc\\u003d\",\"memorySize\":512.0,\"vpcConfig\":{\"securityGroupIds\":[],\"subnetIds\":[]},\"layers\":[],\"lastModified\":\"2019-07-11T02:08:43.442+0000\",\"functionArn\":\"arn:aws:lambda:us-east-1:644160558196:function:custodian-aws\"},\"supplementaryConfiguration\":{\"Policy\":\"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Id\\\":\\\"default\\\",\\\"Statement\\\":[{\\\"Sid\\\":\\\"custodian-aws\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"events.amazonaws.com\\\"},\\\"Action\\\":\\\"lambda:InvokeFunction\\\",\\\"Resource\\\":\\\"arn:aws:lambda:us-east-1:644160558196:function:custodian-aws\\\",\\\"Condition\\\":{\\\"ArnLike\\\":{\\\"AWS:SourceArn\\\":\\\"arn:aws:events:us-east-1:644160558196:rule/custodian-aws\\\"}}},{\\\"Sid\\\":\\\"AWSEvents_custodian-aws_custodian-aws\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"Service\\\":\\\"events.amazonaws.com\\\"},\\\"Action\\\":\\\"lambda:InvokeFunction\\\",\\\"Resource\\\":\\\"arn:aws:lambda:us-east-1:644160558196:function:custodian-aws\\\",\\\"Condition\\\":{\\\"ArnLike\\\":{\\\"AWS:SourceArn\\\":\\\"arn:aws:events:us-east-1:644160558196:rule/custodian-aws\\\"}}}]}\",\"Tags\":{}}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "5482e2e7-5bba-47e6-b8b1-7fc3ffc18ccc",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "5482e2e7-5bba-47e6-b8b1-7fc3ffc18ccc",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1726",
+                "date": "Mon, 29 Jul 2019 20:40:44 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

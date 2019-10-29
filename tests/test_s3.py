@@ -115,6 +115,28 @@ def generateBucketContents(s3, bucket, contents=None):
 
 class BucketMetrics(BaseTest):
 
+    def test_metrics_dims(self):
+        factory = self.replay_flight_data('test_s3_metrics_user_dims')
+        p = self.load_policy({
+            'name': 's3',
+            'resource': 's3',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId = 'c7n-ssm-build'"}],
+            'filters': [{
+                'type': 'metrics',
+                'name': 'BucketSizeBytes',
+                'dimensions': {
+                    'StorageType': 'StandardStorage'},
+                'days': 7,
+                'value': 100,
+                'op': 'gte'}]},
+            session_factory=factory,
+            config={'region': 'us-east-2'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n.metrics', resources[0])
+
     def test_metrics(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
@@ -727,7 +749,7 @@ class S3ConfigSource(ConfigTest):
     def test_normalize(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         augments = list(s3.S3_AUGMENT_TABLE)
-        augments.remove(("get_bucket_location", "Location", None, None))
+        augments.remove(("get_bucket_location", "Location", {}, None))
         self.patch(s3, "S3_AUGMENT_TABLE", augments)
 
         bname = "custodian-test-data-23"
@@ -867,7 +889,7 @@ class S3ConfigSource(ConfigTest):
         results = self.wait_for_config(session, queue_url, bname)
         resource_b = s3.ConfigS3(manager).load_resource(results[0])
         self.maxDiff = None
-
+        self.assertEqual(s3.get_region(resource_b), 'us-east-1')
         for k in ("Logging", "Policy", "Versioning", "Name", "Website"):
             self.assertEqual(resource_a[k], resource_b[k])
 
@@ -881,6 +903,7 @@ class S3ConfigSource(ConfigTest):
         p = self.load_policy({"name": "s3cfg", "resource": "s3"})
         source = p.resource_manager.get_source("config")
         resource = source.load_resource(event)
+        self.assertEqual(s3.get_region(resource), 'us-east-1')
         self.assertEqual(
             resource["Notification"],
             {
@@ -1062,6 +1085,7 @@ class S3ConfigSource(ConfigTest):
             {"Planet": "Earth", "Verbose": "Game"},
             {t["Key"]: t["Value"] for t in resource.pop("Tags")},
         )
+        self.assertEqual(s3.get_region(resource), 'us-east-2')
         self.assertEqual(
             resource,
             {
@@ -1127,7 +1151,7 @@ class S3ConfigSource(ConfigTest):
                     2017, 9, 15, 2, 5, 40, tzinfo=tzutc()
                 ),
                 u"Lifecycle": None,
-                u"Location": None,
+                u"Location": {},
                 u"Logging": None,
                 u"Name": u"c7n-fire-logs",
                 u"Notification": {},

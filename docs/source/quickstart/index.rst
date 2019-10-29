@@ -16,11 +16,33 @@ See also the readme in the GitHub repository.
 Install Cloud Custodian
 -----------------------
 
+Cloud Custodian is a Python application and supports Python 2 and 3 on Linux and 
+Windows.
+
+We recommend using Python 3.6 or higher.
+
+Linux and Mac OS
++++++++++++++++++++++++++++
+
 To install Cloud Custodian, just run::
 
   $ python3 -m venv custodian
   $ source custodian/bin/activate
-  (custodian) $ pip install c7n
+  (custodian) $ pip install c7n       #Install AWS package
+  (custodian) $ pip install c7n_azure #Install Azure package
+  (custodian) $ pip install c7n_gcp   #Install GCP Package
+
+Windows (CMD/PowerShell)
++++++++++++++++++++++++++++
+
+To install Cloud Custodian, just run::
+
+  $ python3 -m venv custodian
+  $ ./custodian/Scripts/activate
+  (custodian) $ pip install c7n       #Install AWS package
+  (custodian) $ pip install c7n_azure #Install Azure package
+  (custodian) $ pip install c7n_gcp   #Install GCP Package
+
 
 .. _explore-cc:
 

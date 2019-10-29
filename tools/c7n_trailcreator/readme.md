@@ -1,4 +1,4 @@
-# AWS Retroactive Tagging Resource Creators
+# c7n-trailcreator:  Retroactive Resource Creator Tagging
 
 This script will process cloudtrail records to create a sqlite db of
 resources and their creators, and then use that sqlitedb to tag

@@ -32,7 +32,6 @@ from botocore.exceptions import ClientError
 
 
 from c7n.actions import BaseAction
-from c7n.actions.securityhub import OtherResourcePostFinding
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.filters.multiattr import MultiAttrFilter
@@ -44,6 +43,7 @@ from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
 from c7n.utils import local_session, type_schema, chunks, filter_empty, QueryParser
 
 from c7n.resources.aws import Arn
+from c7n.resources.securityhub import OtherResourcePostFinding
 
 
 @resources.register('iam-group')
@@ -188,6 +188,55 @@ class UserRemoveTag(RemoveTag):
 
 User.action_registry.register('mark-for-op', TagDelayedAction)
 User.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+@User.action_registry.register('set-groups')
+class SetGroups(BaseAction):
+    """Set a specific IAM user as added/removed from a group
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-user-add-remove
+          resource: iam-user
+          filters:
+            - type: value
+              key: UserName
+              value: Bob
+          actions:
+            - type: set-groups
+              state: remove
+              group: Admin
+
+    """
+    schema = type_schema(
+        'set-groups',
+        state={'enum': ['add', 'remove']},
+        group={'type': 'string'},
+        required=['state', 'group']
+    )
+
+    permissions = ('iam:AddUserToGroup', 'iam:RemoveUserFromGroup',)
+
+    def validate(self):
+        if self.data.get('group') == '':
+            raise PolicyValidationError('group cannot be empty on %s'
+                % (self.manager.data))
+
+    def process(self, resources):
+        group_name = self.data['group']
+        state = self.data['state']
+        client = local_session(self.manager.session_factory).client('iam')
+        op_map = {
+            'add': client.add_user_to_group,
+            'remove': client.remove_user_from_group
+        }
+        for r in resources:
+            try:
+                op_map[state](GroupName=group_name, UserName=r['UserName'])
+            except client.exceptions.NoSuchEntityException:
+                continue
 
 
 @resources.register('iam-policy')
@@ -360,10 +409,13 @@ class ServiceUsage(Filter):
 
         job_resource_map = {}
         for arn, r in zip(self.manager.get_arns(resources), resources):
-            jid = self.manager.retry(
-                client.generate_service_last_accessed_details,
-                Arn=arn)['JobId']
-            job_resource_map[jid] = r
+            try:
+                jid = self.manager.retry(
+                    client.generate_service_last_accessed_details,
+                    Arn=arn)['JobId']
+                job_resource_map[jid] = r
+            except client.exceptions.NoSuchEntityException:
+                continue
 
         conf = dict(self.data)
         conf.pop('match-operator')
@@ -779,6 +831,9 @@ class SetPolicy(BaseAction):
               value: my-iam-policy
           actions:
             - type: set-policy
+              state: detached
+              arn: "*"
+            - type: set-policy
               state: attached
               arn: arn:aws:iam::123456789012:policy/my-iam-policy
 
@@ -791,23 +846,38 @@ class SetPolicy(BaseAction):
 
     permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy',)
 
+    def validate(self):
+        if self.data.get('state') == 'attached' and self.data.get('arn') == "*":
+            raise PolicyValidationError(
+                '* operator is not supported for state: attached on %s' % (self.manager.data))
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         policy_arn = self.data['arn']
         state = self.data['state']
-
         for r in resources:
             if state == 'attached':
                 client.attach_role_policy(
                     RoleName=r['RoleName'],
                     PolicyArn=policy_arn)
-            elif state == 'detached':
+            elif state == 'detached' and policy_arn != "*":
                 try:
                     client.detach_role_policy(
                         RoleName=r['RoleName'],
                         PolicyArn=policy_arn)
                 except client.exceptions.NoSuchEntityException:
-                    pass
+                    continue
+            elif state == 'detached' and policy_arn == "*":
+                try:
+                    self.detach_all_policies(client, r)
+                except client.exceptions.NoSuchEntityException:
+                    continue
+
+    def detach_all_policies(self, client, resource):
+        attached_policy = client.list_attached_role_policies(RoleName=resource['RoleName'])
+        policy_arns = [p.get('PolicyArn') for p in attached_policy['AttachedPolicies']]
+        for parn in policy_arns:
+            client.detach_role_policy(RoleName=resource['RoleName'], PolicyArn=parn)
 
 
 @Role.action_registry.register('delete')
@@ -827,21 +897,26 @@ class RoleDelete(BaseAction):
               match-operator: all
               LastAuthenticated: null
           actions:
-            - delete
+            - type: delete
+              force: true
 
     """
-    schema = type_schema('delete')
+    schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('iam:DeleteRole',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         error = None
+        if self.data.get('force', False):
+            policy_setter = self.manager.action_registry['set-policy'](
+                {'state': 'detached', 'arn': '*'}, self.manager)
+            policy_setter.process(resources)
         for r in resources:
             try:
                 client.delete_role(RoleName=r['RoleName'])
             except client.exceptions.DeleteConflictException as e:
                 self.log.warning(
-                    "Role:%s cannot be deleted, must remove role from instance profile first"
+                    "Role:%s cannot be deleted, set force to detach policy and delete"
                     % r['Arn'])
                 error = e
             except client.exceptions.NoSuchEntityException:
@@ -860,6 +935,7 @@ class RoleDelete(BaseAction):
 @Policy.filter_registry.register('used')
 class UsedIamPolicies(Filter):
     """Filter IAM policies that are being used
+    (either attached to some roles or used as a permissions boundary).
 
     :example:
 
@@ -876,12 +952,14 @@ class UsedIamPolicies(Filter):
     permissions = ('iam:ListPolicies',)
 
     def process(self, resources, event=None):
-        return [r for r in resources if r['AttachmentCount'] > 0]
+        return [r for r in resources if
+                r['AttachmentCount'] > 0 or r.get('PermissionsBoundaryUsageCount', 0) > 0]
 
 
 @Policy.filter_registry.register('unused')
 class UnusedIamPolicies(Filter):
     """Filter IAM policies that are not being used
+    (neither attached to any roles nor used as a permissions boundary).
 
     :example:
 
@@ -898,7 +976,8 @@ class UnusedIamPolicies(Filter):
     permissions = ('iam:ListPolicies',)
 
     def process(self, resources, event=None):
-        return [r for r in resources if r['AttachmentCount'] == 0]
+        return [r for r in resources if
+                r['AttachmentCount'] == 0 and r.get('PermissionsBoundaryUsageCount', 0) == 0]
 
 
 @Policy.filter_registry.register('has-allow-all')

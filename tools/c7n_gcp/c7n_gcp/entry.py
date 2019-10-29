@@ -14,9 +14,11 @@
 
 import logging
 
-import c7n_gcp.policy
-
 # This is an alphabetically sorted import list
+import c7n_gcp.actions
+import c7n_gcp.filters
+import c7n_gcp.output
+import c7n_gcp.policy
 import c7n_gcp.resources.appengine
 import c7n_gcp.resources.bigquery
 import c7n_gcp.resources.build
@@ -28,6 +30,7 @@ import c7n_gcp.resources.dns
 import c7n_gcp.resources.function
 import c7n_gcp.resources.gke
 import c7n_gcp.resources.iam
+import c7n_gcp.resources.kms
 import c7n_gcp.resources.loadbalancer
 import c7n_gcp.resources.logging
 import c7n_gcp.resources.mlengine

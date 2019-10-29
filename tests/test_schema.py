@@ -14,15 +14,103 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import mock
+import sys
 from json import dumps
 from jsonschema.exceptions import best_match
 
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter
 from c7n.manager import resources
 from c7n.schema import (
-    ElementSchema, resource_vocabulary, Validator, validate,
+    StructureParser, ElementSchema, resource_vocabulary, Validator, validate,
     generate, specific_error, policy_error_scope)
 from .common import BaseTest
+
+
+class StructureParserTest(BaseTest):
+
+    def test_extra_keys(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'accounts': []})
+        self.assertTrue(str(ecm.exception).startswith('Policy files top level keys'))
+
+    def test_bad_top_level_datastruct(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate([])
+        self.assertTrue(str(ecm.exception).startswith(
+            'Policy file top level data structure'))
+
+    def test_policies_missing(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({})
+        self.assertTrue(str(ecm.exception).startswith(
+            "`policies` list missing"))
+
+    def test_policies_not_list(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': {}})
+        self.assertTrue(str(ecm.exception).startswith(
+            "`policies` key should be an array/list"))
+
+    def test_policy_missing_required(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [{'resource': 'aws.ec2'}]})
+        self.assertTrue(str(ecm.exception).startswith(
+            "policy missing required keys"))
+
+    def test_policy_extra_key(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [{
+                'name': 'foo', 'extra': 1, 'resource': 'aws.ec2'}]})
+        self.assertEqual(str(ecm.exception),
+            "policy:foo has unknown keys: extra")
+
+    def test_invalid_action(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [{
+                'name': 'foo', 'resource': 'ec2', 'actions': {}}]})
+        self.assertTrue(str(ecm.exception).startswith(
+            'policy:foo must use a list for actions found:dict'))
+
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [{
+                'name': 'foo', 'resource': 'ec2', 'actions': [[]]}]})
+        self.assertTrue(str(ecm.exception).startswith(
+            'policy:foo action must be a mapping/dict found:list'))
+
+    def test_invalid_filter(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [{
+                'name': 'foo', 'resource': 'ec2', 'filters': {}}]})
+        self.assertTrue(str(ecm.exception).startswith(
+            'policy:foo must use a list for filters found:dict'))
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [{
+                'name': 'foo', 'resource': 'ec2', 'filters': [[]]}]})
+        self.assertTrue(str(ecm.exception).startswith(
+            'policy:foo filter must be a mapping/dict found:list'))
+
+    def test_policy_not_mapping(self):
+        p = StructureParser()
+        with self.assertRaises(PolicyValidationError) as ecm:
+            p.validate({'policies': [[]]})
+        self.assertTrue(str(ecm.exception).startswith(
+            'policy must be a dictionary/mapping found:list'))
+
+    def test_get_resource_types(self):
+        p = StructureParser()
+        self.assertEqual(
+            p.get_resource_types({'policies': [
+                {'resource': 'ec2'}, {'resource': 'gcp.instance'}]}),
+            set(('aws.ec2', 'gcp.instance')))
 
 
 class SchemaTest(BaseTest):
@@ -89,6 +177,30 @@ class SchemaTest(BaseTest):
         err, policy = result
         self.assertTrue("'asdf' is not of type 'boolean'" in str(err).replace("u'", "'"))
         self.assertEqual(policy, 'policy-ec2')
+
+    def test_semantic_error_common_filter_provider_prefixed(self):
+        data = {
+            'policies': [{
+                'name': 'test',
+                'resource': 's3',
+                'filters': [{
+                    'type': 'metrics',
+                    'name': 'BucketSizeBytes',
+                    'dimensions': [{
+                        'StorageType': 'StandardStorage'}],
+                    'days': 7,
+                    'value': 100,
+                    'op': 'gte'}]}]}
+        errors = list(self.validator.iter_errors(data))
+        self.assertEqual(len(errors), 1)
+        error = specific_error(errors[0])
+        # the repr unicode situation on py2.7 makes this harder to do
+        # an exact match
+        if sys.version_info.major == 2:
+            return self.assertIn('StorageType', str(error))
+        self.assertIn(
+            "[{'StorageType': 'StandardStorage'}] is not of type 'object'",
+            str(error))
 
     def test_semantic_mode_error(self):
         data = {
@@ -244,6 +356,13 @@ class SchemaTest(BaseTest):
         }
         errors = list(self.validator.iter_errors(data))
         self.assertEqual(errors, [])
+
+    def test_bool_operator_child_validation(self):
+        data = {'policies': [
+            {'name': 'test', 'resource': 'ec2', 'filters': [
+                {'or': [{'type': 'imagex', 'key': 'tag:Foo', 'value': 'a'}]}]}]}
+        errors = list(self.validator.iter_errors(data))
+        self.assertTrue(errors)
 
     def test_value_filter_short_form(self):
         data = {

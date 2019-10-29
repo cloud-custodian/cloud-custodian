@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "OpsItemId": "oi-9be57440dcb3",
+        "ResponseMetadata": {
+            "RequestId": "a45a9060-189d-40d2-aefd-d19b2f01b394",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a45a9060-189d-40d2-aefd-d19b2f01b394",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "31",
+                "date": "Sat, 13 Jul 2019 14:05:05 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

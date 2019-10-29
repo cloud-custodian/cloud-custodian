@@ -1,0 +1,36 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 23 Apr 2019 12:51:58 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "11039",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations?alt=json"
+  },
+  "body": {
+    "locations": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1",
+        "labels": {
+          "cloud.googleapis.com/location": "us-central1",
+          "cloud.googleapis.com/country": "US",
+          "cloud.googleapis.com/region": "us-central1"
+        },
+        "metadata": {
+          "@type": "type.googleapis.com/google.cloud.kms.v1.LocationMetadata",
+          "hsmAvailable": true
+        },
+        "locationId": "us-central1",
+        "displayName": "Iowa"
+      }
+    ]
+  }
+}

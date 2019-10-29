@@ -1,0 +1,58 @@
+{
+  "body": {
+    "name": "test1", 
+    "projectId": "cloud-custodian", 
+    "labels": {
+      "goog-dataflow-provided-template-version": "2019-04-24-00_rc00", 
+      "goog-dataflow-provided-template-name": "bulk_compress_gcs_files"
+    }, 
+    "createTime": "2019-05-16T11:24:20.035531Z", 
+    "environment": {
+      "userAgent": {
+        "version": "2.10.0", 
+        "name": "Apache Beam SDK for Java", 
+        "os.version": "4.3.5-smp-818.18.0.0", 
+        "os.arch": "amd64", 
+        "java.version": "1.8.0_181-google-v7", 
+        "legacy.environment.major.version": "7", 
+        "container.version": "beam-2.10.0", 
+        "fnapi.environment.major.version": "7", 
+        "os.name": "Linux", 
+        "java.vendor": "Google Inc."
+      }, 
+      "version": {
+        "major": "7", 
+        "job_type": "JAVA_BATCH_AUTOSCALING"
+      }
+    }, 
+    "jobMetadata": {
+      "sdkVersion": {
+        "versionDisplayName": "Apache Beam SDK for Java", 
+        "version": "2.10.0", 
+        "sdkSupportStatus": "STALE"
+      }
+    }, 
+    "currentStateTime": "2019-05-16T11:24:53.099306Z", 
+    "startTime": "2019-05-16T11:24:20.035531Z", 
+    "type": "JOB_TYPE_BATCH", 
+    "id": "2019-05-16_04_24_18-6110555549864901093", 
+    "currentState": "JOB_STATE_FAILED", 
+    "location": "us-central1"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1193", 
+    "x-xss-protection": "0", 
+    "content-location": "https://dataflow.googleapis.com/v1b3/projects/cloud-custodian/jobs/2019-05-16_04_24_18-6110555549864901093?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Thu, 16 May 2019 12:08:45 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

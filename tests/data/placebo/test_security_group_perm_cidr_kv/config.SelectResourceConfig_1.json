@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"configuration\":{\"groupName\":\"default\",\"groupId\":\"sg-6c7fa917\",\"vpcId\":\"vpc-d2d616b5\",\"ipPermissionsEgress\":[{\"ipRanges\":[\"0.0.0.0/0\"],\"prefixListIds\":[],\"userIdGroupPairs\":[],\"ipProtocol\":\"-1\",\"ipv4Ranges\":[{\"cidrIp\":\"0.0.0.0/0\"}],\"ipv6Ranges\":[]}],\"description\":\"default VPC security group\",\"ownerId\":\"644160558196\",\"ipPermissions\":[{\"ipRanges\":[\"108.56.181.242/32\"],\"prefixListIds\":[],\"userIdGroupPairs\":[{\"groupId\":\"sg-6c7fa917\",\"userId\":\"644160558196\"}],\"ipProtocol\":\"-1\",\"ipv4Ranges\":[{\"cidrIp\":\"108.56.181.242/32\"}],\"ipv6Ranges\":[]}],\"tags\":[{\"value\":\"Private\",\"key\":\"NetworkLocation\"}]},\"supplementaryConfiguration\":{}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "d8c9d736-cc72-4645-9a4d-6e4117578134",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d8c9d736-cc72-4645-9a4d-6e4117578134",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "824",
+                "date": "Wed, 26 Jun 2019 03:23:45 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

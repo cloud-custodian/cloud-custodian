@@ -152,7 +152,7 @@ class RemoveLaunchPermissions(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: ami-remove-launch-permissions
+              - name: ami-stop-share-old
                 resource: ami
                 filters:
                   - type: image-age

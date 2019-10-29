@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
+from c7n.utils import type_schema, local_session
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -33,8 +33,9 @@ class LoadBalancingAddress(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'region': resource_info['region'],
-                'address': resource_info['name']})
+                'region': resource_info['location'],
+                'address': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-url-map')
@@ -53,7 +54,8 @@ class LoadBalancingUrlMap(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'urlMap': resource_info['name']})
+                'urlMap': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-target-tcp-proxy')
@@ -72,7 +74,8 @@ class LoadBalancingTargetTcpProxy(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'targetTcpProxy': resource_info['name']})
+                'targetTcpProxy': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-target-ssl-proxy')
@@ -91,7 +94,8 @@ class LoadBalancingTargetSslProxy(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'targetSslProxy': resource_info['name']})
+                'targetSslProxy': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-ssl-policy')
@@ -110,7 +114,38 @@ class LoadBalancingSslPolicy(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'sslPolicy': resource_info['name']})
+                'sslPolicy': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
+
+
+@LoadBalancingSslPolicy.action_registry.register('delete')
+class LoadBalancingSslPolicyDelete(MethodAction):
+    """The action is used for Load Balancing SSL Policies delete.
+    GCP action is https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies/delete.
+
+    Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-load-balancing-ssl-policies-delete
+            resource: gcp.loadbalancer-ssl-policy
+            filters:
+              - type: value
+                key: minTlsVersion
+                op: ne
+                value: TLS_1_2
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.source.query.session_factory).get_default_project()
+        return {
+            'project': project,
+            'sslPolicy': resource['name']}
 
 
 @resources.register('loadbalancer-ssl-certificate')
@@ -129,7 +164,7 @@ class LoadBalancingSslCertificate(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'sslCertificate': resource_info['name']})
+                'sslCertificate': resource_info['ssl_certificate_name']})
 
 
 @resources.register('loadbalancer-target-https-proxy')
@@ -148,7 +183,8 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'targetHttpsProxy': resource_info['name']})
+                'targetHttpsProxy': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-backend-bucket')
@@ -167,7 +203,38 @@ class LoadBalancingBackendBucket(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'backendBucket': resource_info['name']})
+                'backendBucket': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
+
+
+@LoadBalancingBackendBucket.action_registry.register('delete')
+class LoadBalancingBackendBucketDelete(MethodAction):
+    """The action is used for Load Balancing Backend Buckets delete.
+    GCP action is https://cloud.google.com/compute/docs/reference/rest/v1/backendBuckets/delete.
+
+    Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-loadbalancer-backend-buckets-delete
+            resource: gcp.loadbalancer-backend-bucket
+            filters:
+              - type: value
+                key: bucketName
+                op: eq
+                value: custodian-bucket-0
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.source.query.session_factory).get_default_project()
+        return {
+            'project': project,
+            'backendBucket': resource['name']}
 
 
 @resources.register('loadbalancer-https-health-check')
@@ -186,7 +253,8 @@ class LoadBalancingHttpsHealthCheck(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'httpsHealthCheck': resource_info['name']})
+                'httpsHealthCheck': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-http-health-check')
@@ -205,7 +273,8 @@ class LoadBalancingHttpHealthCheck(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'httpHealthCheck': resource_info['name']})
+                'httpHealthCheck': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-health-check')
@@ -224,7 +293,8 @@ class LoadBalancingHealthCheck(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'healthCheck': resource_info['name']})
+                'healthCheck': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-target-http-proxy')
@@ -243,7 +313,8 @@ class LoadBalancingTargetHttpProxy(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'targetHttpProxy': resource_info['name']})
+                'targetHttpProxy': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-backend-service')
@@ -262,7 +333,8 @@ class LoadBalancingBackendService(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'backendService': resource_info['name']})
+                'backendService': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-target-instance')
@@ -281,8 +353,9 @@ class LoadBalancingTargetInstance(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'zone': resource_info['zone'].rsplit('/', 1)[-1],
-                'targetInstance': resource_info['name']})
+                'zone': resource_info['zone'],
+                'targetInstance': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-target-pool')
@@ -301,8 +374,9 @@ class LoadBalancingTargetPool(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'region': resource_info['region'].rsplit('/', 1)[-1],
-                'targetPool': resource_info['name']})
+                'region': resource_info['zone'],
+                'targetPool': resource_info[
+                    'resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-forwarding-rule')
@@ -321,8 +395,8 @@ class LoadBalancingForwardingRule(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'region': resource_info['region'].rsplit('/', 1)[-1],
-                'forwardingRule': resource_info['name']})
+                'region': resource_info['region'],
+                'forwardingRule': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-global-forwarding-rule')
@@ -341,7 +415,7 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'forwardingRule': resource_info['name']})
+                'forwardingRule': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
 
 @resources.register('loadbalancer-global-address')
@@ -360,4 +434,4 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command('get', {
                 'project': resource_info['project_id'],
-                'address': resource_info['name']})
+                'address': resource_info['resourceName'].rsplit('/', 1)[-1]})

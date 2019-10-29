@@ -14,7 +14,7 @@
 
 from azure.graphrbac import GraphRbacManagementClient
 from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.filters import FirewallRulesFilter
+from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.session import Session
 
@@ -26,7 +26,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 import logging
 
-from netaddr import IPNetwork
+from netaddr import IPSet
 
 log = logging.getLogger('custodian.azure.keyvault')
 
@@ -34,7 +34,79 @@ log = logging.getLogger('custodian.azure.keyvault')
 @resources.register('keyvault')
 class KeyVault(ArmResourceManager):
 
+    """Key Vault Resource
+
+    :example:
+
+    This policy will find all KeyVaults with 10 or less API Hits over the last 72 hours
+
+    .. code-block:: yaml
+
+        policies:
+          - name: inactive-keyvaults
+            resource: azure.keyvault
+            filters:
+              - type: metric
+                metric: ServiceApiHit
+                op: ge
+                aggregation: total
+                threshold: 10
+                timeframe: 72
+
+    :example:
+
+    This policy will find all KeyVaults where Service Principals that
+    have access permissions that exceed `read-only`.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: policy
+              description:
+                Ensure only authorized people have an access
+              resource: azure.keyvault
+              filters:
+                - not:
+                  - type: whitelist
+                    key: principalName
+                    users:
+                      - account1@sample.com
+                      - account2@sample.com
+                    permissions:
+                      keys:
+                        - get
+                      secrets:
+                        - get
+                      certificates:
+                        - get
+
+    :example:
+
+    This policy will find all KeyVaults and add get and list permissions for keys.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: policy
+              description:
+                Add get and list permissions to keys access policy
+              resource: azure.keyvault
+              actions:
+                - type: update-access-policy
+                  operation: add
+                  access-policies:
+                    - tenant-id: 00000000-0000-0000-0000-000000000000
+                      object-id: 11111111-1111-1111-1111-111111111111
+                      permissions:
+                        keys:
+                          - get
+                          - list
+
+    """
+
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Security']
+
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
         enum_spec = ('vaults', 'list', None)
@@ -55,17 +127,58 @@ class KeyVaultFirewallRulesFilter(FirewallRulesFilter):
     def _query_rules(self, resource):
 
         if 'properties' not in resource:
-            client = self.manager.get_client()
-            vault = client.vaults.get(resource['resourceGroup'], resource['name'])
+            vault = self.client.vaults.get(resource['resourceGroup'], resource['name'])
             resource['properties'] = vault.properties.serialize()
 
         if 'networkAcls' not in resource['properties']:
+            return IPSet(['0.0.0.0/0'])
+
+        if resource['properties']['networkAcls']['defaultAction'] == 'Deny':
+            ip_rules = resource['properties']['networkAcls']['ipRules']
+            resource_rules = IPSet([r['value'] for r in ip_rules])
+        else:
+            resource_rules = IPSet(['0.0.0.0/0'])
+
+        return resource_rules
+
+
+@KeyVault.filter_registry.register('firewall-bypass')
+class KeyVaultFirewallBypassFilter(FirewallBypassFilter):
+    """
+    Filters resources by the firewall bypass rules.
+
+    :example:
+
+    This policy will find all KeyVaults with enabled Azure Services bypass rules
+
+    .. code-block:: yaml
+
+        policies:
+          - name: keyvault-bypass
+            resource: azure.keyvault
+            filters:
+              - type: firewall-bypass
+                mode: equal
+                list:
+                    - AzureServices
+    """
+    schema = FirewallBypassFilter.schema(['AzureServices'])
+
+    def _query_bypass(self, resource):
+
+        if 'properties' not in resource:
+            vault = self.client.vaults.get(resource['resourceGroup'], resource['name'])
+            resource['properties'] = vault.properties.serialize()
+
+        # Remove spaces from the string for the comparision
+        if 'networkAcls' not in resource['properties']:
             return []
 
-        ip_rules = resource['properties']['networkAcls']['ipRules']
+        if resource['properties']['networkAcls']['defaultAction'] == 'Allow':
+            return ['AzureServices']
 
-        resource_rules = set([IPNetwork(r['value']) for r in ip_rules])
-        return resource_rules
+        bypass_string = resource['properties']['networkAcls'].get('bypass', '').replace(' ', '')
+        return list(filter(None, bypass_string.split(',')))
 
 
 @KeyVault.filter_registry.register('whitelist')
@@ -182,6 +295,7 @@ class KeyVaultUpdateAccessPolicyAction(AzureBaseAction):
                           keys:
                             - Get
                             - List
+
     """
 
     schema = type_schema('update-access-policy',

@@ -1,0 +1,52 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "yauhen_shaliou@comelfo.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.21.63.2",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-03T16:15:14.648Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "v1.compute.targetInstances.get",
+    "authorizationInfo": [
+      {
+        "permission": "compute.targetInstances.get",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/custodian-test-project-0/zones/us-central1-c/targetInstances/custodian-target-instance-1",
+          "type": "compute.targetInstances"
+        }
+      }
+    ],
+    "resourceName": "projects/custodian-test-project-0/zones/us-central1-c/targetInstances/custodian-target-instance-1",
+    "request": {
+      "@type": "type.googleapis.com/compute.targetInstances.get"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1-c"
+      ]
+    }
+  },
+  "insertId": "4q0a9vdbbo0",
+  "resource": {
+    "type": "gce_target_http_instance",
+    "labels": {
+      "target_http_instance_id": "",
+      "zone": "us-central1-c",
+      "project_id": "custodian-test-project-0"
+    }
+  },
+  "timestamp": "2019-05-03T16:15:14.573Z",
+  "severity": "INFO",
+  "logName": "projects/custodian-test-project-0/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2019-05-03T16:15:15.395260504Z"
+}

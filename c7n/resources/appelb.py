@@ -21,7 +21,7 @@ import logging
 import six
 
 from collections import defaultdict
-from c7n.actions import ActionRegistry, BaseAction
+from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     Filter, FilterRegistry, DefaultVpcBase, MetricsFilter, ValueFilter)
@@ -758,6 +758,24 @@ class AppELBModifyListenerPolicy(BaseAction):
                 client.modify_listener(
                     ListenerArn=matched_listener['ListenerArn'],
                     **args)
+
+
+@AppELB.action_registry.register('modify-security-groups')
+class AppELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
+
+    permissions = ("elasticloadbalancing:SetSecurityGroups",)
+
+    def process(self, albs):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        groups = super(AppELBModifyVpcSecurityGroups, self).get_groups(albs)
+
+        for idx, i in enumerate(albs):
+            try:
+                client.set_security_groups(
+                    LoadBalancerArn=i['LoadBalancerArn'],
+                    SecurityGroups=groups[idx])
+            except client.exceptions.LoadBalancerNotFoundException:
+                continue
 
 
 @AppELB.filter_registry.register('healthcheck-protocol-mismatch')

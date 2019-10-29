@@ -31,29 +31,29 @@ Additionally some filters and actions may generate their own metrics.
 In order to enable metrics output, the boolean metrics
 flag needs to be specified when running Cloud Custodian::
 
-  $ custodian run -s <output_directory> --metrics-enabled aws <policyfile>.yml
+  $ custodian run -s <output_directory> --metrics aws <policyfile>.yml
 
 You can also consolidate metrics into a single account by specifying the ``master``
 location in the cli. Note that this is only applicable when using the ``--assume`` option
 in the cli or when using c7n-org. By default, metrics will be sent to the same account
 that is being executed against::
 
-  $ custodian run -s <output_directory> --metrics-enabled aws://master
+  $ custodian run -s <output_directory> --metrics aws://master
 
 Additionally, to use a different namespace other than the default ``CloudMaid``, you can
 add the following query parameter to the metrics flag::
 
-  $ custodian run -s <output_directory> --metrics-enabled aws://?namespace=foo
+  $ custodian run -s <output_directory> --metrics aws://?namespace=foo
 
 This will create a new namespace, ``foo`` in CloudWatch Metrics. You can also combine
 these two options to emit metrics into a custom namespace in a central account::
 
-  $ custodian run -s <output_directory> --metrics-enabled aws://master?namespace=foo
+  $ custodian run -s <output_directory> --metrics aws://master?namespace=foo
 
 Finally, to send metrics to a specific region, use the ``region`` query parameter to
 specify a region::
 
-  $ custodian run -s <output_directory> --metrics-enabled aws://?region=us-west-2
+  $ custodian run -s <output_directory> --metrics aws://?region=us-west-2
 
 When running the metrics in a centralized account or when centralizing to a specific
 region, additional account and region dimensions will be included.
@@ -76,6 +76,27 @@ be informed of an operations issue.
 
 If S3 output is also enabled, then it is also recommended to set a log group
 archival policy and to use the S3 logs as permanent/audit archive.
+
+You can also aggregate your logs within a single region or account using the same url formatting as is used for metrics.
+
+To send your logs to a region in the master account use::
+
+  $ custodian run --log-group=aws://master/<log-group-name>?region=<region> <policyfile>.yml 
+
+This will set up a stream for every region/account you run custodian against within the specified log group. 
+
+The default log stream format looks like this:
+
+  $ account_id/region/policy_name
+
+If you want to override this then you can pass the the log stream parameter like this:
+
+  $ custodian run --log-group="aws://master/<log-group-name>?region=<region>&stream=custodian_{region}_{account}_{policy} <policyfile>.yml"
+
+it currently accepts these variables:
+  {account}: the account where the check was executed.
+  {region}: the region where the check was executed.
+  {policy}: the name of the policy that was executed.
 
 
 S3 Logs & Records

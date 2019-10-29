@@ -1,0 +1,36 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serverName": {
+            "defaultValue": "[concat('cctestpostgresqlserver', uniqueString(resourceGroup().id))]",
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2017-12-01",
+            "type": "Microsoft.DBforPostgreSQL/servers",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('serverName')]",
+            "properties": {
+                "version": "10",
+                "administratorLogin": "custodian",
+                "administratorLoginPassword": "Cust0dianPassw0rd",
+                "createMode": "Default"
+            },
+            "resources": [
+                {
+                    "name": "[concat(parameters('serverName'), '/cctestdb')]",
+                    "type": "Microsoft.DBforPostgreSQL/servers/databases",
+                    "apiVersion": "2017-12-01",
+                    "properties": {},
+                    "dependsOn": [
+                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('serverName'))]"
+                    ]
+                }
+            ]
+        }
+    ]
+}

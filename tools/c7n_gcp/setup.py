@@ -12,12 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from setuptools import setup, find_packages
+
+description = ""
+if os.path.exists('readme.md'):
+    description = open('readme.md', 'r').read()
 
 setup(
     name="c7n_gcp",
-    version='0.3.1',
-    description="Cloud Custodian - Multi Account",
+    version='0.3.6',
+    description="Cloud Custodian - Google Cloud Provider",
+    long_description=description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
@@ -30,7 +37,7 @@ setup(
             'gcp = c7n_gcp.entry:initialize_gcp']
     },
     install_requires=[
-        "c7n", "click",
+        "c7n>=0.8.45.0", "click",
         "ratelimiter", "retrying",
         "google-api-python-client>=1.7.3",
         "google-auth-httplib2>=0.0.3",

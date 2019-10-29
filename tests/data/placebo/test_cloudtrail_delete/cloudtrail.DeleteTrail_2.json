@@ -1,0 +1,21 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Unknown trail: arn:aws:cloudtrail:us-east-1:644160558196:trail/delete-me for the user: 644160558196",
+            "Code": "TrailNotFoundException"
+        },
+        "ResponseMetadata": {
+            "RequestId": "8cd9c101-bc05-44b9-8603-c66e45f51e5d",
+            "HTTPStatusCode": 400,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8cd9c101-bc05-44b9-8603-c66e45f51e5d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "147",
+                "date": "Wed, 31 Jul 2019 23:59:07 GMT",
+                "connection": "close"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

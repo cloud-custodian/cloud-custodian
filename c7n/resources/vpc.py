@@ -28,7 +28,9 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
+from c7n.resources.securityhub import OtherResourcePostFinding
+from c7n.utils import (
+    chunks, local_session, type_schema, get_retry, parse_cidr)
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -177,7 +179,7 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-sg
                 resource: vpc
                 filters:
                   - type: security-group
@@ -211,7 +213,7 @@ class VpcSubnetFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-subnet
                 resource: vpc
                 filters:
                   - type: subnet
@@ -245,7 +247,7 @@ class VpcNatGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-nat
                 resource: vpc
                 filters:
                   - type: nat-gateway
@@ -279,7 +281,7 @@ class VpcInternetGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-igw
                 resource: vpc
                 filters:
                   - type: internet-gateway
@@ -425,6 +427,15 @@ class DhcpOptionsFilter(Filter):
         if not self.data.get('present', True):
             found = not found
         return found
+
+
+@Vpc.action_registry.register('post-finding')
+class VpcPostFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        fr = super(VpcPostFinding, self).format_resource(r)
+        fr['Type'] = 'AwsEc2Vpc'
+        return fr
 
 
 @resources.register('subnet')
@@ -1009,13 +1020,18 @@ class SGPermission(Filter):
         return found
 
     def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
+
         found = None
         ip_perms = perm.get(range_type, [])
         if not ip_perms:
             return False
 
         match_range = self.data[cidr_key]
-        match_range['key'] = cidr_type
+
+        if isinstance(match_range, dict):
+            match_range['key'] = cidr_type
+        else:
+            match_range = {cidr_type: match_range}
 
         vf = ValueFilter(match_range, self.manager)
         vf.annotate = False
@@ -1123,10 +1139,17 @@ class SGPermission(Filter):
 
 
 SGPermissionSchema = {
-    'IpProtocol': {'enum': [-1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+    'match-operator': {'type': 'string', 'enum': ['or', 'and']},
+    'Ports': {'type': 'array', 'items': {'type': 'integer'}},
+    'SelfReference': {'type': 'boolean'},
     'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
-    'FromPort': {'type': 'integer'},
-    'ToPort': {'type': 'integer'},
+    'IpProtocol': {'enum': ["-1", -1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+    'FromPort': {'oneOf': [
+        {'$ref': '#/definitions/filters/value'},
+        {'type': 'integer'}]},
+    'ToPort': {'oneOf': [
+        {'$ref': '#/definitions/filters/value'},
+        {'type': 'integer'}]},
     'UserIdGroupPairs': {},
     'IpRanges': {},
     'PrefixListIds': {},
@@ -1143,12 +1166,7 @@ class IPPermission(SGPermission):
     schema = {
         'type': 'object',
         'additionalProperties': False,
-        'properties': {
-            'type': {'enum': ['ingress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
-            'SelfReference': {'type': 'boolean'}
-        },
+        'properties': {'type': {'enum': ['ingress']}},
         'required': ['type']}
     schema['properties'].update(SGPermissionSchema)
 
@@ -1160,11 +1178,7 @@ class IPPermissionEgress(SGPermission):
     schema = {
         'type': 'object',
         'additionalProperties': False,
-        'properties': {
-            'type': {'enum': ['egress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'SelfReference': {'type': 'boolean'}
-        },
+        'properties': {'type': {'enum': ['egress']}},
         'required': ['type']}
     schema['properties'].update(SGPermissionSchema)
 
@@ -1251,6 +1265,15 @@ class RemovePermissions(BaseAction):
                 method(GroupId=r['GroupId'], IpPermissions=groups)
 
 
+@SecurityGroup.action_registry.register('post-finding')
+class SecurityGroupPostFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        fr = super(SecurityGroupPostFinding, self).format_resource(r)
+        fr['Type'] = 'AwsEc2SecurityGroup'
+        return fr
+
+
 @resources.register('eni')
 class NetworkInterface(query.QueryResourceManager):
 
@@ -1329,7 +1352,7 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
 @NetworkInterface.filter_registry.register('vpc')
 class InterfaceVpcFilter(net_filters.VpcFilter):
 
-    RelatedIdsExpress = "VpcId"
+    RelatedIdsExpression = "VpcId"
 
 
 @NetworkInterface.action_registry.register('modify-security-groups')
@@ -1966,20 +1989,39 @@ class CreateFlowLogs(BaseAction):
         'eni': 'NetworkInterface'
     }
 
+    SchemaValidation = {
+        's3': {
+            'required': ['LogDestination'],
+            'absent': ['LogGroupName', 'DeliverLogsPermissionArn']
+        },
+        'cloud-watch-logs': {
+            'required': ['DeliverLogsPermissionArn'],
+            'one-of': ['LogGroupName', 'LogDestination'],
+        }
+    }
+
     def validate(self):
         self.state = self.data.get('state', True)
-        if self.state:
-            if not self.data.get('DeliverLogsPermissionArn'):
+        if not self.state:
+            return
+        destination_type = self.data.get(
+            'LogDestinationType', 'cloud-watch-logs')
+        dvalidation = self.SchemaValidation[destination_type]
+        for r in dvalidation.get('required', ()):
+            if not self.data.get(r):
                 raise PolicyValidationError(
-                    'DeliverLogsPermissionArn required when '
-                    'creating flow-logs on %s' % (self.manager.data,))
-            if (not self.data.get('LogGroupName') and not self.data.get('LogDestination')):
+                    'Required %s missing for destination-type:%s' % (
+                        r, destination_type))
+        for r in dvalidation.get('absent', ()):
+            if r in self.data:
                 raise PolicyValidationError(
-                    'Either LogGroupName or LogDestination required')
-            if (self.data.get('LogDestinationType') == 's3' and
-               not self.data.get('LogDestination')):
-                raise PolicyValidationError(
-                    'LogDestination required when LogDestinationType is s3')
+                    '%s is prohibited for destination-type:%s' % (
+                        r, destination_type))
+        if ('one-of' in dvalidation and
+                sum([1 for k in dvalidation['one-of'] if k in self.data]) != 1):
+            raise PolicyValidationError(
+                "Destination:%s Exactly one of %s required" % (
+                    destination_type, ", ".join(dvalidation['one-of'])))
         return self
 
     def delete_flow_logs(self, client, rids):

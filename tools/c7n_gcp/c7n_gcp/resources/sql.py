@@ -15,14 +15,11 @@
 import jmespath
 import re
 
-from googleapiclient.errors import HttpError
-
-from c7n.query import sources
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
-    QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo, DescribeSource
+    QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 )
 from datetime import datetime
 from dateutil.parser import parse
@@ -76,55 +73,6 @@ class SqlInstanceStop(MethodAction):
         return {'project': project,
                 'instance': instance,
                 'body': {'settings': {'activationPolicy': 'NEVER'}}}
-
-
-@sources.register('sql-database-describe-gcp')
-class SqlDatabaseDescribeSource(DescribeSource):
-
-    def get_resources(self, query):
-        try:
-            return super(SqlDatabaseDescribeSource, self).get_resources(query)
-        except HttpError as e:
-            if e.resp.status != 400:
-                raise
-
-        return []
-
-
-@resources.register('sql-database')
-class SqlDatabase(ChildResourceManager):
-
-    @property
-    def source_type(self):
-        return self.data.get('source', 'sql-database-describe-gcp')
-
-    def _get_parent_resource_info(self, child_instance):
-        project = child_instance['project']
-        return {
-            'project_id': child_instance['project'],
-            'database_id': '{}:{}'.format(project, child_instance['instance'])
-        }
-
-    class resource_type(ChildTypeInfo):
-        service = 'sqladmin'
-        version = 'v1beta4'
-        component = 'databases'
-        enum_spec = ('list', 'items[]', None)
-        id = 'name'
-        parent_spec = {
-            'resource': 'sql-instance',
-            'child_enum_params': [
-                ('name', 'instance')
-            ]
-        }
-
-        @staticmethod
-        def get(client, resource_info):
-            return client.execute_command(
-                'get', {'project': resource_info['project'],
-                        'database': resource_info['name'],
-                        'instance': resource_info['instance']}
-            )
 
 
 @resources.register('sql-user')

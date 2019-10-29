@@ -1,0 +1,69 @@
+
+# Image information for the Pod, default to the latest cloud custodian image
+image:
+  repository:  cloudcustodian/c7n
+  tag: latest
+  pullPolicy: Always
+
+# Default values for environment variables. These are
+# overrided by the values provided in subscriptionHost.environment
+defaultEnvironment:
+  AZURE_TENANT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Default values for environment variables that are
+# stored as Secrets instead of directly passed 
+# environment variables
+defaultSecretEnvironment: {}
+
+# Provide 1 or more sets of environment variables
+# Each one will create a new deployment, each 
+# targetting a subscription
+subscriptionHosts:
+
+  # All configuration for the Azure Container Host 
+  # can be provided through environement variables.
+  - name: "example-host"
+    environment:
+      AZURE_SUBSCRIPTION_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      AZURE_CLIENT_ID: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      AZURE_CONTAINER_POLICY_URI: "https://storageAccount.blob.core.windows.net/policyContainerName"
+      AZURE_CONTAINER_QUEUE_NAME: "example-event-queue"
+      AZURE_CONTAINER_STORAGE_RESOURCE_ID: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/resourceGroupName/providers/Microsoft.Storage/storageAccounts/storageAccount"
+    secretEnvironment: 
+      AZURE_CLIENT_SECRET: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Optional Custodian Mailer deployed as a CronJob
+mailer:
+
+  # A mailer will be deployed only if this is true
+  enabled: false
+
+  # How frequently to run the mailer
+  schedule: "*/10 * * * *"
+
+  # Image information for the mailer pod
+  image:
+    repository: cloudcustodian/mailer
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  # Environment Variables for the mailer
+  environment: {}
+
+  # Secret Environment Variables for the mailer
+  secretEnvironment: {}
+
+  # Mailer configuration
+  config:
+    queue_url: "asq://storageaccountname.queue.core.windows.net/queuename"
+    from_address: "person@email.com"
+
+    # SendGrid API key OR SMTP settings
+    # sendgrid_api_key:
+    #   type: azure.keyvault
+    #   secret: https://your-vault.vault.azure.net/secrets/your-sendgrid-api-key
+    # smtp_server: ""
+    # smtp_username: ""
+    # smtp_password:
+    #   type: azure.keyvault
+    #   secret: https://your-vault.vault.azure.net/secrets/your-smtp-password

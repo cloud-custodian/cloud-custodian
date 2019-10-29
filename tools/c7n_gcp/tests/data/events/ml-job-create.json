@@ -1,0 +1,90 @@
+{
+    "protoPayload": {
+      "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+      "authenticationInfo": {
+        "principalEmail": "c7n.test@gmail.com"
+      },
+      "requestMetadata": {
+        "callerIp": "217.20.186.33",
+        "callerSuppliedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:67.0) Gecko/20100101 Firefox/67.0,gzip(gfe)",
+        "requestAttributes": {
+          "time": "2019-07-01T11:31:54.907Z",
+          "auth": {}
+        },
+        "destinationAttributes": {}
+      },
+      "serviceName": "ml.googleapis.com",
+      "methodName": "google.cloud.ml.v1.JobService.CreateJob",
+      "authorizationInfo": [
+        {
+          "resource": "projects/second-impact-244209",
+          "permission": "ml.jobs.create",
+          "granted": true,
+          "resourceAttributes": {}
+        }
+      ],
+      "resourceName": "projects/second-impact-244209",
+      "request": {
+        "parent": "projects/second-impact-244209",
+        "@type": "type.googleapis.com/google.cloud.ml.v1.CreateJobRequest",
+        "job": {
+          "jobId": "test_job",
+          "trainingInput": {
+            "masterConfig": {
+              "imageUri": "gcr.io/cloud-ml-algos/linear_learner_cpu:latest"
+            },
+            "scaleTier": "BASIC",
+            "jobDir": "gs://c7n-test-data",
+            "region": "us-central1",
+            "args": [
+              "--preprocess",
+              "--training_data_path=gs://c7n-test-data/test.csv",
+              "--validation_split=0.2",
+              "--model_type=regression",
+              "--learning_rate=0.001",
+              "--batch_size=100",
+              "--eval_frequency_secs=100",
+              "--optimizer_type=ftrl"
+            ]
+          }
+        }
+      },
+      "response": {
+        "etag": "oEXzsXrEiiE=",
+        "trainingInput": {
+          "jobDir": "gs://c7n-test-data",
+          "region": "us-central1",
+          "args": [
+            "--preprocess",
+            "--training_data_path=gs://c7n-test-data/test.csv",
+            "--validation_split=0.2",
+            "--model_type=regression",
+            "--learning_rate=0.001",
+            "--batch_size=100",
+            "--eval_frequency_secs=100",
+            "--optimizer_type=ftrl"
+          ],
+          "masterConfig": {
+            "imageUri": "gcr.io/cloud-ml-algos/linear_learner_cpu:latest"
+          }
+        },
+        "createTime": "2019-07-01T11:31:55Z",
+        "state": "QUEUED",
+        "jobId": "test_job",
+        "@type": "type.googleapis.com/google.cloud.ml.v1.Job"
+      }
+    },
+    "insertId": "7ia3ouc1u9",
+    "resource": {
+      "type": "audited_resource",
+      "labels": {
+        "method": "google.cloud.ml.v1.JobService.CreateJob",
+        "project_id": "second-impact-244209",
+        "service": "ml.googleapis.com"
+      }
+    },
+    "timestamp": "2019-07-01T11:31:54.896Z",
+    "severity": "NOTICE",
+    "logName": "projects/second-impact-244209/logs/cloudaudit.googleapis.com%2Factivity",
+    "receiveTimestamp": "2019-07-01T11:31:56.037251712Z"
+  }

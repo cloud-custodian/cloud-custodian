@@ -1,0 +1,51 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "yauhen_shaliou@comelfo.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.21.63.2",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-03T15:48:08.107Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "compute.googleapis.com",
+    "methodName": "v1.compute.httpHealthChecks.get",
+    "authorizationInfo": [
+      {
+        "permission": "compute.httpHealthChecks.get",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "compute",
+          "name": "projects/custodian-test-project-0/global/httpHealthChecks/custodian-http-health-check",
+          "type": "compute.httpHealthChecks"
+        }
+      }
+    ],
+    "resourceName": "projects/custodian-test-project-0/global/httpHealthChecks/custodian-http-health-check",
+    "request": {
+      "@type": "type.googleapis.com/compute.httpHealthChecks.get"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "global"
+      ]
+    }
+  },
+  "insertId": "-t4p4xkd1qa4",
+  "resource": {
+    "type": "gce_health_check",
+    "labels": {
+      "health_check_id": "",
+      "project_id": "custodian-test-project-0"
+    }
+  },
+  "timestamp": "2019-05-03T15:48:08.052Z",
+  "severity": "INFO",
+  "logName": "projects/custodian-test-project-0/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2019-05-03T15:48:08.382095445Z"
+}

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
-
+import functools
 from botocore.exceptions import ClientError
 
 from concurrent.futures import as_completed
@@ -22,6 +22,7 @@ from c7n.filters import FilterRegistry, ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
+from c7n.utils import generate_arn, type_schema
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -122,13 +123,46 @@ class RestApi(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'apigateway'
-        arn_type = 'restapis'
+        arn_type = '/restapis'
         enum_spec = ('get_rest_apis', 'items', None)
         id = 'id'
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
         config_type = "AWS::ApiGateway::RestApi"
+        universal_taggable = object()
+
+    @property
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:apigateway:us-east-1::/restapis/rest-api-id
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.resource_type.service,
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type)
+        return self._generate_arn
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return ApiDescribeSource(self)
+        return super(RestApi, self).get_source(source_type)
+
+
+class ApiDescribeSource(query.DescribeSource):
+
+    def augment(self, resources):
+        for r in resources:
+            tags = r.setdefault('Tags', [])
+            for k, v in r.pop('tags', {}).items():
+                tags.append({
+                    'Key': k,
+                    'Value': v})
+        return resources
 
 
 @RestApi.filter_registry.register('cross-account')
@@ -176,6 +210,37 @@ class UpdateApi(BaseAction):
             client.update_rest_api(
                 restApiId=r['id'],
                 patchOperations=self.data['patch'])
+
+
+@RestApi.action_registry.register('delete')
+class DeleteApi(BaseAction):
+    """Delete a REST API.
+
+    :example:
+
+    contrived example to delete rest api
+
+    .. code-block:: yaml
+
+       policies:
+         - name: apigw-delete
+           resource: rest-api
+           filters:
+             - description: empty
+           actions:
+             - type: delete
+    """
+    permissions = ('apigateway:Delete',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for r in resources:
+            try:
+                client.delete_rest_api(restApiId=r['id'])
+            except client.exceptions.NotFoundException:
+                continue
 
 
 @resources.register('rest-stage')

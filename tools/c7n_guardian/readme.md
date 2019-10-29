@@ -1,5 +1,5 @@
 
-# Automated Setup for AWS Guard Duty
+# c7n-guardian: Automated multi-account Guard Duty setup
 
 Amazon Guard Duty provides for machine learning based threat
 intelligence and detection on resources in your aws accounts. This
@@ -12,14 +12,14 @@ The following cli will enable guard duty on all accounts tagged
 dev. The master guard duty account can be specified by name or account
 id. Running enable multiple times will idempotently converge.
 
-```
+```shell
 $ c7n-guardian enable --config accounts.yml --master 120312301231 --tags dev
 ```
 
 The accounts config file is similiar to c7n-org, with the addition of the
 account email.
 
-```
+```shell
 $ cat accounts.yml
 
 accounts:
@@ -42,7 +42,7 @@ accounts:
 
 The cli also has support for disabling and reporting on accounts
 
-```
+```shell
 $ c7n-guardian --help
 Usage: c7n-guardian [OPTIONS] COMMAND [ARGS]...
 
@@ -68,14 +68,15 @@ addition to credential sourcing supported by the aws sdk.
 
 ## Using custodian policies for remediation
 
-Here's some example policies that will provision a custodian lambda that
-receives the guard duty notifications and performs some basic remediation
-on the alerted resources, respectively stopping an ec2 instance, and removing
-an access key. You have the full access to custodian's actions and filters
-for doing additional activities in response to events.
+Here's some example policies that will provision a custodian lambda
+that receives the guard duty notifications and performs some basic
+remediation on the alerted resources, respectively stopping an ec2
+instance, and removing an access key. You have the full access to
+custodian's actions and filters for doing additional activities in
+response to events.
+
 
 ```yaml
-
 policies:
 
  - name: ec2-guard-remediate

@@ -1,0 +1,13 @@
+policies:
+  - name: azure-notify
+    resource: azure.resourcegroup
+    actions:
+      - type: notify
+        template: default
+        priority_header: '2'
+        subject: Hello from C7N Mailer
+        to:
+          - ${username}
+        transport:
+          type: asq
+          queue: https://${storage_name}.queue.core.windows.net/${queue_name}

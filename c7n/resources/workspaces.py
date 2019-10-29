@@ -20,7 +20,7 @@ import itertools
 from c7n.filters import ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import universal_augment, register_universal_tags
+from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, chunks
 
 
@@ -32,12 +32,10 @@ class Workspace(QueryResourceManager):
         enum_spec = ('describe_workspaces', 'Workspaces', None)
         arn_type = 'workspace'
         name = id = dimension = 'WorkspaceId'
+        universal_taggable = True
 
     def augment(self, resources):
         return universal_augment(self, resources)
-
-
-register_universal_tags(Workspace.filter_registry, Workspace.action_registry)
 
 
 @Workspace.filter_registry.register('connection-status')

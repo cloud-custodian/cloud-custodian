@@ -1,0 +1,195 @@
+{
+    "status_code": 200, 
+    "data": {
+        "LoadBalancerDescriptions": [
+            {
+                "Subnets": [
+                    "subnet-xxxxxx"
+                ], 
+                "CanonicalHostedZoneNameID": "XXXXXXXXXXXXXX", 
+                "VPCId": "vpc-xxxxxxxx", 
+                "ListenerDescriptions": [
+                    {
+                        "Listener": {
+                            "InstancePort": 8080, 
+                            "LoadBalancerPort": 443,
+                            "Protocol": "HTTPS", 
+                            "InstanceProtocol": "HTTP"
+                        }, 
+                        "PolicyNames": [
+                            "ELBSecurityPolicy-2015-05"
+                        ]
+                    }
+                ], 
+                "HealthCheck": {
+                    "HealthyThreshold": 2, 
+                    "Interval": 10, 
+                    "Target": "HTTPS:8080/health", 
+                    "Timeout": 5, 
+                    "UnhealthyThreshold": 2
+                }, 
+                "BackendServerDescriptions": [], 
+                "Instances": [
+                ], 
+                "DNSName": "test-elb-nonzero-metrics.us-east-1.elb.amazonaws.com", 
+                "SecurityGroups": [
+                    "sg-xxxxxxxx"
+                ], 
+                "Policies": {
+                    "LBCookieStickinessPolicies": [], 
+                    "AppCookieStickinessPolicies": [], 
+                    "OtherPolicies": [
+                        "ELBSecurityPolicy-2015-05"
+                    ]
+                }, 
+                "LoadBalancerName": "test-elb-nonzero-metrics", 
+                "CreatedTime": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 0, 
+                    "microsecond": 440000, 
+                    "year": 2015, 
+                    "day": 15, 
+                    "minute": 44
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1c", 
+                    "us-east-1b"
+                ], 
+                "Scheme": "internal", 
+                "SourceSecurityGroup": {
+                    "OwnerAlias": "644160558196", 
+                    "GroupName": "test-security-group-name"
+                }
+            },
+            {
+                "Subnets": [
+                    "subnet-xxxxxx"
+                ], 
+                "CanonicalHostedZoneNameID": "XXXXXXXXXXXXXX", 
+                "VPCId": "vpc-xxxxxxxx", 
+                "ListenerDescriptions": [
+                    {
+                        "Listener": {
+                            "InstancePort": 8080, 
+                            "LoadBalancerPort": 443,
+                            "Protocol": "HTTPS", 
+                            "InstanceProtocol": "HTTP"
+                        }, 
+                        "PolicyNames": [
+                            "ELBSecurityPolicy-2015-05"
+                        ]
+                    }
+                ], 
+                "HealthCheck": {
+                    "HealthyThreshold": 2, 
+                    "Interval": 10, 
+                    "Target": "HTTPS:8080/health", 
+                    "Timeout": 5, 
+                    "UnhealthyThreshold": 2
+                }, 
+                "BackendServerDescriptions": [], 
+                "Instances": [
+                ], 
+                "DNSName": "test-elb-zero-metrics.us-east-1.elb.amazonaws.com", 
+                "SecurityGroups": [
+                    "sg-xxxxxxxx"
+                ], 
+                "Policies": {
+                    "LBCookieStickinessPolicies": [], 
+                    "AppCookieStickinessPolicies": [], 
+                    "OtherPolicies": [
+                        "ELBSecurityPolicy-2015-05"
+                    ]
+                }, 
+                "LoadBalancerName": "test-elb-zero-metrics", 
+                "CreatedTime": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 0, 
+                    "microsecond": 440000, 
+                    "year": 2015, 
+                    "day": 15, 
+                    "minute": 44
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1c", 
+                    "us-east-1b"
+                ], 
+                "Scheme": "internal", 
+                "SourceSecurityGroup": {
+                    "OwnerAlias": "644160558196", 
+                    "GroupName": "test-security-group-name"
+                }
+            },
+            {
+                "Subnets": [
+                    "subnet-xxxxxx"
+                ], 
+                "CanonicalHostedZoneNameID": "XXXXXXXXXXXXXX", 
+                "VPCId": "vpc-xxxxxxxx", 
+                "ListenerDescriptions": [
+                    {
+                        "Listener": {
+                            "InstancePort": 8080, 
+                            "LoadBalancerPort": 443,
+                            "Protocol": "HTTPS", 
+                            "InstanceProtocol": "HTTP"
+                        }, 
+                        "PolicyNames": [
+                            "ELBSecurityPolicy-2015-05"
+                        ]
+                    }
+                ], 
+                "HealthCheck": {
+                    "HealthyThreshold": 2, 
+                    "Interval": 10, 
+                    "Target": "HTTPS:8080/health", 
+                    "Timeout": 5, 
+                    "UnhealthyThreshold": 2
+                }, 
+                "BackendServerDescriptions": [], 
+                "Instances": [
+                ], 
+                "DNSName": "test-elb-missing-metrics.us-east-1.elb.amazonaws.com", 
+                "SecurityGroups": [
+                    "sg-xxxxxxxx"
+                ], 
+                "Policies": {
+                    "LBCookieStickinessPolicies": [], 
+                    "AppCookieStickinessPolicies": [], 
+                    "OtherPolicies": [
+                        "ELBSecurityPolicy-2015-05"
+                    ]
+                }, 
+                "LoadBalancerName": "test-elb-missing-metrics", 
+                "CreatedTime": {
+                    "hour": 0, 
+                    "__class__": "datetime", 
+                    "month": 1, 
+                    "second": 0, 
+                    "microsecond": 440000, 
+                    "year": 2015, 
+                    "day": 15, 
+                    "minute": 44
+                }, 
+                "AvailabilityZones": [
+                    "us-east-1c", 
+                    "us-east-1b"
+                ], 
+                "Scheme": "internal", 
+                "SourceSecurityGroup": {
+                    "OwnerAlias": "644160558196", 
+                    "GroupName": "test-security-group-name"
+                }
+            }
+       ], 
+        "ResponseMetadata": {
+            "HTTPStatusCode": 200, 
+            "RequestId": "b9fb7c09-e006-11e5-9f33-e1979ffe2fbb"
+        }
+    }
+
+}

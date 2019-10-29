@@ -60,12 +60,14 @@ class PluginRegistry(object):
         self._subscribers[event].append(func)
 
     def register(self, name, klass=None, condition=True,
-                 condition_message="Missing dependency for {}"):
+                 condition_message="Missing dependency for {}",
+                 aliases=None):
         if not condition and klass:
             return klass
         # invoked as function
         if klass:
             klass.type = name
+            klass.type_aliases = aliases
             self._factories[name] = klass
             self.notify(self.EVENT_REGISTER, klass)
             return klass
@@ -76,6 +78,7 @@ class PluginRegistry(object):
                 return klass
             self._factories[name] = klass
             klass.type = name
+            klass.type_aliases = aliases
             self.notify(self.EVENT_REGISTER, klass)
             return klass
         return _register_class
@@ -95,7 +98,14 @@ class PluginRegistry(object):
         return self.get(name)
 
     def get(self, name):
-        return self._factories.get(name)
+        factory = self._factories.get(name)
+
+        if factory:
+            return factory
+
+        return next((v for k, v in self._factories.items()
+                     if v.type_aliases and name in v.type_aliases),
+                    None)
 
     def keys(self):
         return self._factories.keys()

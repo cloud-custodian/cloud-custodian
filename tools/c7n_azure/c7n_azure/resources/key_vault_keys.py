@@ -28,10 +28,68 @@ from c7n_azure.utils import ThreadHelper, ResourceIdParser, generate_key_vault_u
 log = logging.getLogger('custodian.azure.keyvault.keys')
 
 
-@resources.register('keyvault-keys')
+@resources.register('keyvault-key', aliases=['keyvault-keys'])
 class KeyVaultKeys(ChildResourceManager):
+    """Key Vault Key Resource
+
+    :example:
+
+    This policy will find all Keys in `keyvault_test` and `keyvault_prod` KeyVaults
+
+    .. code-block:: yaml
+
+        policies:
+          - name: keyvault-keys
+            description:
+              List all keys from 'keyvault_test' and 'keyvault_prod' vaults
+            resource: azure.keyvault-key
+            filters:
+              - type: keyvault
+                vaults:
+                  - keyvault_test
+                  - keyvault_prod
+
+    :example:
+
+    This policy will find all Keys in all KeyVaults that are older than 30 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: keyvault-keys
+            description:
+              List all keys that are older than 30 days
+            resource: azure.keyvault-key
+            filters:
+              - type: value
+                key: attributes.created
+                value_type: age
+                op: gt
+                value: 30
+
+    :example:
+
+    If your company wants to enforce usage of HSM-backed keys in the KeyVaults,
+    you can use this policy to find all Keys in all KeyVaults not backed by an HSM module.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: keyvault-keys
+            description:
+              List all non-HSM keys
+            resource: azure.keyvault-key
+            filters:
+              - not:
+                 - type: key-type
+                   key-types:
+                     - RSA-HSM, EC-HSM
+
+    """
 
     class resource_type(ChildTypeInfo):
+        doc_groups = ['Security']
+
         resource = constants.RESOURCE_VAULT
         service = 'azure.keyvault'
         client = 'KeyVaultClient'
@@ -40,9 +98,24 @@ class KeyVaultKeys(ChildResourceManager):
         parent_manager_name = 'keyvault'
         raise_on_exception = False
 
+        id = 'kid'
+
+        default_report_fields = (
+            'kid',
+            'attributes.enabled',
+            'attributes.exp',
+            'attributes.recoveryLevel'
+        )
+
         @classmethod
         def extra_args(cls, parent_resource):
             return {'vault_base_url': generate_key_vault_url(parent_resource['name'])}
+
+    def augment(self, resources):
+        resources = super(KeyVaultKeys, self).augment(resources)
+        # When KeyVault contains certificates, it creates corresponding key and secret objects to
+        # store cert data. They are managed by KeyVault it is not possible to do any actions.
+        return [r for r in resources if not r.get('managed')]
 
 
 @KeyVaultKeys.filter_registry.register('keyvault')

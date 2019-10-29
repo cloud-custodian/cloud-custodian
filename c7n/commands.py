@@ -27,10 +27,10 @@ import six
 import yaml
 from yaml.constructor import ConstructorError
 
-from c7n.exceptions import ClientError
+from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.schema import ElementSchema, generate
+from c7n.schema import ElementSchema, StructureParser, generate
 from c7n.utils import dumps, load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
 from c7n import provider
@@ -78,7 +78,11 @@ def policy_command(f):
                     fp, str(e)))
                 errors += 1
                 continue
-
+            except PolicyValidationError as e:
+                log.error('invalid policy file: {} error: {}'.format(
+                    fp, str(e)))
+                errors += 1
+                continue
             if collection is None:
                 log.debug('Loaded file {}. Contained no policies.'.format(fp))
             else:
@@ -93,8 +97,8 @@ def policy_command(f):
 
         # filter by name and resource type
         policies = all_policies.filter(
-            getattr(options, 'policy_filter', None),
-            getattr(options, 'resource_type', None))
+            getattr(options, 'policy_filters', []),
+            getattr(options, 'resource_types', []))
 
         # provider initialization
         provider_policies = {}
@@ -154,14 +158,16 @@ def _load_vars(options):
 
 
 def _print_no_policies_warning(options, policies):
-    if options.policy_filter or options.resource_type:
+    if options.policy_filters or options.resource_types:
         log.warning("Warning: no policies matched the filters provided.")
 
         log.warning("Filters:")
-        if options.policy_filter:
-            log.warning("    Policy name filter (-p): " + options.policy_filter)
-        if options.resource_type:
-            log.warning("    Resource type filter (-t): " + options.resource_type)
+        if options.policy_filters:
+            log.warning("    Policy name filter (-p): {}".format(
+                ", ".join(options.policy_filters)))
+        if options.resource_types:
+            log.warning("    Resource type filter (-t): {}".format(
+                ", ".join(options.resource_types)))
 
         log.warning("Available policies:")
         for policy in policies:
@@ -202,6 +208,7 @@ def validate(options):
 
     used_policy_names = set()
     schm = schema.generate()
+    structure = StructureParser()
     errors = []
 
     for config_file in options.configs:
@@ -219,6 +226,12 @@ def validate(options):
                 log.error("The config file must end in .json, .yml or .yaml.")
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
 
+        try:
+            structure.validate(data)
+        except PolicyValidationError as e:
+            log.error("Configuration invalid: {}".format(config_file))
+            log.error("%s" % e)
+            continue
         errors += schema.validate(data, schm)
         conf_policy_names = {
             p.get('name', 'unknown') for p in data.get('policies', ())}
@@ -574,5 +587,8 @@ def version_cmd(options):
     except Exception:  # pragma: no cover
         print("Platform:  ", sys.platform)
     print("Using venv: ", hasattr(sys, 'real_prefix'))
+
+    in_container = os.path.exists('/.dockerenv')
+    print("Docker: %s" % str(bool(in_container)))
     print("PYTHONPATH: ")
     pp.pprint(sys.path)

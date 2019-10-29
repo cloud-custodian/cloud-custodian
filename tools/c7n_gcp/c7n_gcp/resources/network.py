@@ -22,7 +22,8 @@ from c7n.utils import type_schema
 
 @resources.register('vpc')
 class Network(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/networks
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -33,7 +34,8 @@ class Network(QueryResourceManager):
 
 @resources.register('subnet')
 class Subnet(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/subnetworks
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -108,7 +110,8 @@ class SetGcpPrivateAccess(SubnetAction):
 
 @resources.register('firewall')
 class Firewall(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/firewalls
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -124,7 +127,8 @@ class Firewall(QueryResourceManager):
 
 @resources.register('router')
 class Router(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/routers
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -140,9 +144,39 @@ class Router(QueryResourceManager):
                         'router': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
 
+@Router.action_registry.register('delete')
+class DeleteRouter(MethodAction):
+    """`Deletes <https://cloud.google.com/compute/docs/reference/rest/v1/routers/delete>`_ a router
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-network-unattached-routers
+            description: Deletes unattached Cloud Routers
+            resource: gcp.router
+            filters:
+               - type: value
+                 key: interfaces
+                 value: absent
+            actions:
+               - delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    path_param_re = re.compile('.*?/projects/(.*?)/regions/(.*?)/routers/(.*)')
+
+    def get_resource_params(self, m, r):
+        project, region, router = self.path_param_re.match(r['selfLink']).groups()
+        return {'project': project, 'region': region, 'router': router}
+
+
 @resources.register('route')
 class Route(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/routes
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -159,7 +193,8 @@ class Route(QueryResourceManager):
 
 @resources.register('interconnect')
 class Interconnect(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/interconnects
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'
@@ -176,7 +211,8 @@ class Interconnect(QueryResourceManager):
 
 @resources.register('interconnect-attachment')
 class InterconnectAttachment(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/interconnectAttachments
+    """
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'

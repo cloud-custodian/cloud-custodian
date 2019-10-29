@@ -1,4 +1,4 @@
-# OmniSSM
+# OmniSSM - EC2 Systems Manager Automation
 
 [![GoDoc](https://godoc.org/github.com/capitalone/cloud-custodian/tools/omnissm?status.svg)](https://godoc.org/github.com/capitalone/cloud-custodian/tools/omnissm)
 
@@ -32,7 +32,7 @@ We provide a few bits of automation tooling to enable seamless hybrid mode.
 
 ![(OmniSSM)](assets/omnissm.svg)
 
-# Client Configuration
+## Client Configuration
 
 The OmniSSM agent is configured by environment variables as well as a YAML configuration file and command-line flags. OmniSSM checks for the file `omnissm.yaml` in either `/etc/omnissm/` or the current directory at runtime.
 
@@ -46,13 +46,13 @@ Parameters:
 
 Either the register endpoints map, or the single register endpoint override must be set.
 
-# Links
+## Links
 
 - Hybrid SSM Manual Install https://amzn.to/2Hlu9o2
 - EC2 Instance Identity Documents https://amzn.to/2qLuGt9
 - Google Instance Identity https://bit.ly/2HQexKc
 
-# Todo
+## Todo
 
 - scale testing
 - test with large cfg messages

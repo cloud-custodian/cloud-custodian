@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import copy
+import logging
 import json
 import os
 
@@ -23,6 +24,8 @@ from c7n.mu import (
     LambdaManager,
     PythonPackageArchive)
 
+
+log = logging.getLogger('custodian-mailer')
 
 entry_source = """\
 import logging
@@ -91,5 +94,6 @@ def provision(config, session_factory):
 
     archive = get_archive(config)
     func = LambdaFunction(func_config, archive)
+    log.info("Provisioning mailer lambda %s" % (session_factory().region_name))
     manager = LambdaManager(session_factory)
     manager.publish(func)

@@ -322,7 +322,7 @@ class SnapshotSkipAmiSnapshots(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: delete-stale-snapshots
+              - name: delete-ebs-stale-snapshots
                 resource: ebs-snapshot
                 filters:
                   - type: age
@@ -547,7 +547,7 @@ class VolumeDetach(BaseAction):
      .. code-block:: yaml
 
              policies:
-               - name: instance-ebs-volumes
+               - name: detach-ebs-volumes
                  resource: ebs
                  filters:
                    - VolumeId :  volumeid
@@ -582,7 +582,9 @@ class AttachedInstanceFilter(ValueFilter):
               - name: instance-ebs-volumes
                 resource: ebs
                 filters:
-                  - instance
+                  - type: instance
+                    key: tag:Name
+                    value: OldManBySea
     """
 
     schema = type_schema('instance', rinherit=ValueFilter.schema)
@@ -1301,7 +1303,10 @@ class ModifyableVolume(Filter):
         # Filter volumes that are currently under modification
         client = local_session(self.manager.session_factory).client('ec2')
         modifying = set()
-        for vol_set in chunks(list(results), 200):
+
+        # Re 197 - Max number of filters is 200, and we have to use
+        # three additional attribute filters.
+        for vol_set in chunks(list(results), 197):
             vol_ids = [v['VolumeId'] for v in vol_set]
             mutating = client.describe_volumes_modifications(
                 Filters=[
@@ -1376,7 +1381,7 @@ class ModifyVolume(BaseAction):
     .. code-block:: yaml
 
            policies:
-            - name: ebs-remove-piops
+            - name: ebs-upsize-piops
               resource: ebs
               filters:
                 - VolumeType: io1

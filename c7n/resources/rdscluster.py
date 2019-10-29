@@ -41,122 +41,19 @@ class RDSCluster(QueryResourceManager):
     class resource_type(TypeInfo):
 
         service = 'rds'
+        arn = 'DBClusterArn'
         arn_type = 'cluster'
         arn_separator = ":"
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
         dimension = 'DBClusterIdentifier'
+        universal_taggable = True
 
-    def augment(self, dbs):
-        return list(filter(None, _rds_cluster_tags(
-            self.get_model(),
-            dbs, self.session_factory,
-            self.generate_arn, self.retry)))
+    augment = tags.universal_augment
 
 
-RDSCluster.filter_registry.register('tag-count', tags.TagCountFilter)
-RDSCluster.filter_registry.register('marked-for-op', tags.TagActionFilter)
 RDSCluster.filter_registry.register('offhour', OffHour)
 RDSCluster.filter_registry.register('onhour', OnHour)
-
-
-def _rds_cluster_tags(model, dbs, session_factory, generator, retry):
-    """Augment rds clusters with their respective tags."""
-    client = local_session(session_factory).client('rds')
-
-    def process_tags(db):
-        try:
-            db['Tags'] = retry(
-                client.list_tags_for_resource,
-                ResourceName=generator(db[model.id]))['TagList']
-            return db
-        except client.exceptions.DBClusterNotFoundFault:
-            return None
-
-    # Rds maintains a low api call limit, so this can take some time :-(
-    return list(filter(None, map(process_tags, dbs)))
-
-
-@RDSCluster.action_registry.register('mark-for-op')
-class TagDelayedAction(tags.TagDelayedAction):
-    """Mark a RDS cluster for specific custodian action
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: mark-for-delete
-                resource: rds-cluster
-                filters:
-                  - type: value
-                    key: default-vpc
-                    value: True
-                actions:
-                  - type: mark-for-op
-                    op: delete
-                    days: 7
-    """
-
-
-@RDSCluster.action_registry.register('tag')
-@RDSCluster.action_registry.register('mark')
-class Tag(tags.Tag):
-    """Mark/tag a RDS cluster with a key/value
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: rds-cluster-owner-tag
-                resource: rds-cluster
-                filters:
-                  - "tag:OwnerName": absent
-                actions:
-                  - type: tag
-                    key: OwnerName
-                    value: OwnerName
-    """
-
-    concurrency = 2
-    batch_size = 5
-    permissions = ('rds:AddTagsToResource',)
-
-    def process_resource_set(self, client, dbs, ts):
-        for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
-            client.add_tags_to_resource(ResourceName=arn, Tags=ts)
-
-
-@RDSCluster.action_registry.register('remove-tag')
-@RDSCluster.action_registry.register('unmark')
-class RemoveTag(tags.RemoveTag):
-    """Removes a tag or set of tags from RDS clusters
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: rds-unmark-cluster
-                resource: rds-cluster
-                filters:
-                  - "tag:ExpiredTag": present
-                actions:
-                  - type: unmark
-                    tags: ["ExpiredTag"]
-    """
-
-    concurrency = 2
-    batch_size = 5
-    permissions = ('rds:RemoveTagsFromResource',)
-
-    def process_resource_set(self, client, dbs, tag_keys):
-        for db in dbs:
-            client.remove_tags_from_resource(
-                ResourceName=self.manager.generate_arn(db['DBClusterIdentifier']),
-                TagKeys=tag_keys)
 
 
 @RDSCluster.filter_registry.register('security-group')
@@ -450,10 +347,15 @@ class RDSClusterSnapshot(QueryResourceManager):
 
         service = 'rds'
         arn_type = 'cluster-snapshot'
+        arn_separator = ':'
+        arn = 'DBClusterSnapshotArn'
         enum_spec = (
             'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
         name = id = 'DBClusterSnapshotIdentifier'
         date = 'SnapshotCreateTime'
+        universal_tagging = object()
+
+    augment = tags.universal_augment
 
 
 @RDSClusterSnapshot.filter_registry.register('age')

@@ -71,7 +71,8 @@ class HandleTest(BaseTest):
              'cache': '',
              'regions': (),
              'cache_period': 0,
-             'log_group': None})
+             'log_group': None,
+             'metrics': None})
 
     def test_dispatch_log_event(self):
         self.patch(handler, 'policy_config', {'policies': []})

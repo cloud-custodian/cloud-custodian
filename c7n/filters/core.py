@@ -27,6 +27,7 @@ import sys
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
+from distutils import version
 import jmespath
 import six
 
@@ -111,7 +112,7 @@ OPERATORS = {
 VALUE_TYPES = [
     'age', 'integer', 'expiration', 'normalize', 'size',
     'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
-    'unique_size', 'date']
+    'unique_size', 'date', 'version']
 
 
 class FilterRegistry(PluginRegistry):
@@ -355,6 +356,16 @@ class AnnotationSweeper(object):
             self.resource_map[rid].update(self.ra_map[rid])
 
 
+# The default LooseVersion will fail on comparing present strings, used
+# in the value as shorthand for certain options.
+class ComparableVersion(version.LooseVersion):
+    def __eq__(self, other):
+        try:
+            return super(ComparableVersion, self).__eq__(other)
+        except TypeError:
+            return False
+
+
 class ValueFilter(Filter):
     """Generic value filter using jmespath
     """
@@ -573,7 +584,8 @@ class ValueFilter(Filter):
             return sentinel, value.strip().lower()
 
         elif self.vtype == 'expr':
-            return sentinel, self.get_resource_value(value, resource)
+            sentinel = self.get_resource_value(sentinel, resource)
+            return sentinel, value
 
         elif self.vtype == 'integer':
             try:
@@ -626,6 +638,13 @@ class ValueFilter(Filter):
             if value is None:
                 value = 0
             return sentinel, value
+
+        # Allows for comparing version numbers, for things that you expect a minimum version number.
+        elif self.vtype == 'version':
+            s = ComparableVersion(sentinel)
+            v = ComparableVersion(value)
+            return s, v
+
         return sentinel, value
 
 

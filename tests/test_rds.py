@@ -928,7 +928,7 @@ class RDSSnapshotTest(BaseTest):
         def brooklyn(delay):
             return
 
-        output = self.capture_logging("c7n.worker", level=logging.DEBUG)
+        output = self.capture_logging("c7n.retry", level=logging.DEBUG)
         self.patch(time, "sleep", brooklyn)
         self.change_environment(AWS_DEFAULT_REGION="us-east-1")
         p = self.load_policy(
@@ -1253,6 +1253,36 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(len(resources[0]["VpcSecurityGroups"]), 1)
         self.assertEqual(len(clean_resources[0]["VpcSecurityGroups"]), 2)
         self.assertEqual(len(clean_resources), 4)
+
+    def test_rds_filter_by_vpcid(self):
+        #
+        # Test conditions:
+        # Purpose of test is only to validate checking vpc filtered ID with DBSubnetGroup.VpcId
+        # Uses the add_security_group data--should match 4 DB instances (all in the filtered VPC)
+        # Checks that the expected VPC is present
+
+        session_factory = self.replay_flight_data("test_rds_add_security_group")
+        p = self.load_policy(
+            {
+                "name": "filter-by-vpcid",
+                "resource": "rds",
+                "filters": [
+                    {
+                        "type": "vpc",
+                        "key": "VpcId",
+                        "value": "vpc-09b75e60",
+                        "op": "eq",
+                    },
+                ],
+                "actions": [{"type": "modify-security-groups", "add": "sg-6360920a"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 4)
+        self.assertEqual("vpc-09b75e60", resources[0]["DBSubnetGroup"]["VpcId"])
 
 
 class TestHealthEventsFilter(BaseTest):

@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "OpsItemSummaries": [],
+        "ResponseMetadata": {
+            "RequestId": "df345e95-fb3d-406e-b557-7bd18676d56d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "df345e95-fb3d-406e-b557-7bd18676d56d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "23",
+                "date": "Sat, 13 Jul 2019 14:05:05 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
