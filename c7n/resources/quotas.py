@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import re
@@ -23,7 +24,7 @@ from statistics import mean
 
 from c7n.actions import Action
 from c7n.exceptions import PolicyExecutionError
-from c7n.filters import ValueFilter
+from c7n.filters import Filter, ValueFilter
 from c7n.filters.metrics import MetricsFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources
@@ -206,43 +207,6 @@ class UsageFilter(MetricsFilter):
         return result
 
 
-@ServiceQuota.filter_registry.register('history')
-class History(ValueFilter):
-
-    schema = type_schema('history')
-
-    permissions = ('servicequota:ListRequestedServiceQuotaChangeHistory',)
-    annotation_key = 'c7n:ServiceQuotaChangeHistory'
-
-    def process(self, resources, event):
-        client = local_session(self.manager.session_factory).client('service-quotas')
-        token = None
-        results = []
-        history = []
-        while True:
-            res = client.list_requested_service_quota_change_history()
-            token = res.get('NextToken')
-            history.extend(res['RequestedQuotas'])
-            if token is None:
-                break
-
-        service_request_map = {}
-        for h in history:
-            service_request_map.setdefault(h['ServiceCode'], {})
-            service_request_map[h['ServiceCode']].setdefault(h['QuotaCode'], [])
-            service_request_map[h['ServiceCode']][h['QuotaCode']].append(h)
-
-        for r in resources:
-            service = r['ServiceCode']
-            quota = r['QuotaCode']
-            if service in service_request_map and quota in service_request_map[service]:
-                r.setdefault(self.annotation_key, [])
-                r[self.annotation_key] = service_request_map[service][quota]
-                results.append(r)
-
-        return results
-
-
 @ServiceQuota.filter_registry.register('request-history')
 class RequestHistoryFilter(RelatedResourceFilter):
     """
@@ -255,8 +219,11 @@ class RequestHistoryFilter(RelatedResourceFilter):
               resource: aws.service-quota
               filters:
                 - type: request-history
-                  key: status
+                  key: '[].Status'
                   value: CASE_CLOSED
+                  value_type: swap
+                  op: in
+
     """
 
     RelatedResource = 'c7n.resources.quotas.ServiceQuotaRequest'
@@ -459,3 +426,36 @@ class RemoveFromTemplate(AddToTemplate):
     def process(self, resources):
         op = 'delete_service_quota_increase_request_from_template'
         self.process_resources(resources, op)
+
+
+@ServiceQuota.filter_registry.register('service-quota-in-template')
+class InTemplateFilter(Filter):
+    """
+    Filter if a service quota is in template
+    """
+
+    schema = type_schema(
+        'service-quota-in-template',
+        quota={'type': 'string'},
+        **{'properties': {'required': ['quota']}}
+    )
+
+    def process(self, resources, event):
+        client = local_session(self.manager.session_factory, region='us-east-1').client('service-quotas') # noqa
+        results = []
+        requests = []
+        token = ''
+        while True:
+            if token:
+                res = client.list_service_quota_increase_requests_in_template(NextToken=token)
+            else:
+                res = client.list_service_quota_increase_requests_in_template()
+            r = res['ServiceQuotaIncreaseRequestInTemplateList']
+            requests.extend(r)
+            if res['NextToken']:
+                token = res['NextToken']
+        quotas = [r['QuotaCode'] for r in requests]
+        for r in resources:
+            if r['QuotaCode'] in quotas:
+                results.append(r)
+        return results
