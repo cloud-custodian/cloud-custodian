@@ -1888,12 +1888,17 @@ class LaunchTemplate(query.QueryResourceManager):
     def get_asg_templates(self, asgs):
         templates = {}
         for a in asgs:
-            if 'LaunchTemplate' not in a:
+            t = None
+            if 'LaunchTemplate' in a:
+                t = a['LaunchTemplate']
+            elif 'MixedInstancesPolicy' in a:
+                t = a['MixedInstancesPolicy'][
+                    'LaunchTemplate']['LaunchTemplateSpecification']
+            if t is None:
                 continue
-            t = a['LaunchTemplate']
             templates.setdefault(
-                (t['LaunchTemplateId'], t['Version']), []).append(
-                    a['AutoScalingGroupName'])
+                (t['LaunchTemplateId'],
+                 t['Version']), []).append(a['AutoScalingGroupName'])
         return templates
 
 
