@@ -38,6 +38,20 @@ class LoadBalancingAddress(QueryResourceManager):
                     'resourceName'].rsplit('/', 1)[-1]})
 
 
+@LoadBalancingAddress.action_registry.register('delete')
+class LoadBalancingAddressDelete(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    attr_filter = ('status', ('RESERVED',))
+
+    def get_resource_params(self, model, resource):
+        project = local_session(self.manager.source.query.session_factory).get_default_project()
+        return {
+            'project': project,
+            'region': resource['region'].rsplit('/', 1)[-1],
+            'address': resource['name']}
+
+
 @resources.register('loadbalancer-url-map')
 class LoadBalancingUrlMap(QueryResourceManager):
     """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/urlMaps

@@ -47,6 +47,27 @@ class LoadBalancingAddressTest(BaseTest):
         self.assertEqual(instances[0]['kind'], 'compute#address')
         self.assertEqual(instances[0]['address'], '35.202.198.74')
 
+    def test_loadbalancer_address_delete(self):
+        region = 'us-central1'
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('lb-addresses-delete',
+                                          project_id=project_id)
+        policy = self.load_policy(
+            {'name': 'delete-address',
+             'resource': 'gcp.loadbalancer-address',
+             'actions': ['delete']
+             }, session_factory=factory)
+
+        resources = policy.run()
+        self.assertEqual(resources[0]['name'], 'new322')
+
+        client = policy.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'region': region})
+
+        self.assertEqual(len(result['items']["regions/{}".format(region)]['addresses']), 0)
+
 
 class LoadBalancingUrlMapTest(BaseTest):
 
