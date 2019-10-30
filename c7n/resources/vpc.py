@@ -1143,7 +1143,12 @@ SGPermissionSchema = {
     'Ports': {'type': 'array', 'items': {'type': 'integer'}},
     'SelfReference': {'type': 'boolean'},
     'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
-    'IpProtocol': {'enum': ["-1", -1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+    'IpProtocol': {
+        'oneOf': [
+            {'enum': ["-1", -1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+            {'$ref': '#/definitions/filters/value'}
+        ]
+    },
     'FromPort': {'oneOf': [
         {'$ref': '#/definitions/filters/value'},
         {'type': 'integer'}]},
