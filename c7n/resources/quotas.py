@@ -46,6 +46,8 @@ class ServiceQuotaRequest(QueryResourceManager):
 @resources.register('service-quota')
 class ServiceQuota(QueryResourceManager):
 
+    batch_size = 100
+
     class resource_type(TypeInfo):
         service = 'service-quotas'
         enum_spec = ('list_services', 'Services', None)
@@ -63,6 +65,7 @@ class ServiceQuota(QueryResourceManager):
             token = None
             kwargs = {
                 'ServiceCode': s['ServiceCode'],
+                'MaxResults': self.batch_size
             }
             while True:
                 if token:
@@ -115,11 +118,11 @@ class UsageFilter(MetricsFilter):
               resource: aws.service-quota
               filters:
                 - UsageMetric: present
-                - type: usage-metric
+                - type: usage
                   limit: 19
     """
 
-    schema = type_schema('usage-metric', limit={'type': 'integer'})
+    schema = type_schema('usage', limit={'type': 'integer'})
 
     permisisons = ('cloudwatch:GetMetricStatistics',)
 
@@ -359,7 +362,7 @@ class AddToTemplate(Action):
         session = local_session(self.manager.session_factory, region='us-east-1')
         client = session.client('service-quotas')
 
-        regions = self.data.get('regions', [self.manager.session_factory.region])
+        regions = self.data.get('regions', [self.manager.region])
 
         multiplier = self.data.get('multiplier', 1.2)
 
@@ -371,9 +374,9 @@ class AddToTemplate(Action):
                 'QuotaCode': r['QuotaCode'],
             }
             for region in regions:
-                kwargs['AwsRegion'] = region,
+                kwargs['AwsRegion'] = region
                 if self.data['type'] == 'add-to-template':
-                    kwargs['DesiredValue'] = math.floor(multiplier * r['value'])
+                    kwargs['DesiredValue'] = math.floor(multiplier * r['Value'])
                 try:
                     getattr(client, op)(**kwargs)
                 except client.exceptions.AWSServiceAccessNotEnabledException:
@@ -383,7 +386,7 @@ class AddToTemplate(Action):
                     raise PolicyExecutionError('Account is not associated with an organization')
                 except (client.exceptions.AccessDeniedException,
                         client.exceptions.DependencyAccessDeniedException,
-                        client.exceptions.NoSuchResource):
+                        client.exceptions.NoSuchResourceException):
                     continue
 
     def process(self, resources):
@@ -428,20 +431,30 @@ class RemoveFromTemplate(AddToTemplate):
         self.process_resources(resources, op)
 
 
-@ServiceQuota.filter_registry.register('service-quota-in-template')
+@ServiceQuota.filter_registry.register('in-template')
 class InTemplateFilter(Filter):
     """
     Filter if a service quota is in template
+
+    .. code-block:: yaml
+
+        policies:
+          - name: in-template-check
+            resource: aws.service-quota
+            filters:
+              - type: in-template
     """
 
     schema = type_schema(
-        'service-quota-in-template',
+        'in-template',
         quota={'type': 'string'},
         **{'properties': {'required': ['quota']}}
     )
 
     def process(self, resources, event):
-        client = local_session(self.manager.session_factory, region='us-east-1').client('service-quotas') # noqa
+        client = local_session(
+            self.manager.session_factory, region='us-east-1'
+        ).client('service-quotas')
         results = []
         requests = []
         token = ''
@@ -452,8 +465,10 @@ class InTemplateFilter(Filter):
                 res = client.list_service_quota_increase_requests_in_template()
             r = res['ServiceQuotaIncreaseRequestInTemplateList']
             requests.extend(r)
-            if res['NextToken']:
+            if res.get('NextToken'):
                 token = res['NextToken']
+            else:
+                break
         quotas = [r['QuotaCode'] for r in requests]
         for r in resources:
             if r['QuotaCode'] in quotas:
