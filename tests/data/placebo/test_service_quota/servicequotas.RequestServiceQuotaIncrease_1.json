@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "RequestedQuota": {
+            "Id": "154e8327b21642efa3d81d488380c934TzKIpj1h",
+            "ServiceCode": "ec2",
+            "ServiceName": "Amazon Elastic Compute Cloud (Amazon EC2)",
+            "QuotaCode": "L-355B2B67",
+            "QuotaName": "Running On-Demand c3.large instances",
+            "DesiredValue": 36.0,
+            "Status": "PENDING",
+            "Created": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 10,
+                "day": 31,
+                "hour": 10,
+                "minute": 41,
+                "second": 21,
+                "microsecond": 761000
+            },
+            "Requester": "{\"accountId\":\"644160558196\",\"callerArn\":\"arn:aws:iam::644160558196:user/Sonny\"}",
+            "QuotaArn": "arn:aws:servicequotas:us-east-1:644160558196:ec2/L-355B2B67",
+            "GlobalQuota": false,
+            "Unit": "None"
+        },
+        "ResponseMetadata": {
+            "RequestId": "7157fd1a-880f-44e8-b856-da004a1e0eff",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 31 Oct 2019 17:41:21 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "497",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "7157fd1a-880f-44e8-b856-da004a1e0eff"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,100 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextToken": "UFQB2LoYZQiYpPhwO3IbFU0cJkpRfGroIFWECM9XHrgT4dy1ZTJFW6Z89sCbNCUqVVrIWk1fH49LFXogKh04YeXD+Ds3PxR972tOyDrFaUpj6ZzNJ/P4/2ybN2IJd/Q77XGG1/5tVgG6hYcKXBI6U7OsaiO0GIBoCtwXI5lPsWExZxLgwgS7Y7hZJqB0FSyCbiRT9n+tnBSUY0HwAIkM2hZvXAlbyW/XMyvod2j1pA+1j1AkbGrB2Z3QniH2Y/HX53H265SprLUWFBnMJb5O",
+        "Services": [
+            {
+                "ServiceCode": "acm",
+                "ServiceName": "AWS Certificate Manager (ACM)"
+            },
+            {
+                "ServiceCode": "acm-pca",
+                "ServiceName": "AWS Certificate Manager Private Certificate Authority (ACM PCA)"
+            },
+            {
+                "ServiceCode": "amplify",
+                "ServiceName": "AWS Amplify"
+            },
+            {
+                "ServiceCode": "apigateway",
+                "ServiceName": "Amazon API Gateway"
+            },
+            {
+                "ServiceCode": "application-autoscaling",
+                "ServiceName": "Application Auto Scaling"
+            },
+            {
+                "ServiceCode": "appmesh",
+                "ServiceName": "AWS App Mesh"
+            },
+            {
+                "ServiceCode": "appstream2",
+                "ServiceName": "Amazon AppStream 2.0"
+            },
+            {
+                "ServiceCode": "appsync",
+                "ServiceName": "AWS AppSync"
+            },
+            {
+                "ServiceCode": "athena",
+                "ServiceName": "Amazon Athena"
+            },
+            {
+                "ServiceCode": "autoscaling",
+                "ServiceName": "Amazon EC2 Auto Scaling"
+            },
+            {
+                "ServiceCode": "autoscaling-plans",
+                "ServiceName": "AWS Auto Scaling Plans"
+            },
+            {
+                "ServiceCode": "batch",
+                "ServiceName": "AWS Batch"
+            },
+            {
+                "ServiceCode": "chatbot",
+                "ServiceName": "AWS Chatbot"
+            },
+            {
+                "ServiceCode": "cloud9",
+                "ServiceName": "AWS Cloud9"
+            },
+            {
+                "ServiceCode": "cloudformation",
+                "ServiceName": "AWS CloudFormation"
+            },
+            {
+                "ServiceCode": "cloudhsm",
+                "ServiceName": "AWS CloudHSM"
+            },
+            {
+                "ServiceCode": "cloudsearch",
+                "ServiceName": "Amazon CloudSearch"
+            },
+            {
+                "ServiceCode": "codebuild",
+                "ServiceName": "AWS CodeBuild"
+            },
+            {
+                "ServiceCode": "codecommit",
+                "ServiceName": "AWS CodeCommit"
+            },
+            {
+                "ServiceCode": "codedeploy",
+                "ServiceName": "AWS CodeDeploy"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "2292521a-3dcb-4277-8d0f-331aa73ba274",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 31 Oct 2019 17:52:30 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1578",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "2292521a-3dcb-4277-8d0f-331aa73ba274"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

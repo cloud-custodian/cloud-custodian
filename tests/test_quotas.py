@@ -20,7 +20,7 @@ from .common import BaseTest
 
 class TestQuotas(BaseTest):
     def test_service_quota_request_history_filter(self):
-        session_factory = self.replay_flight_data('test_service_quota_request_history_filter')
+        session_factory = self.replay_flight_data('test_service_quota')
         policy = yaml_load("""
         name: service-quota-history-filter
         resource: aws.service-quota
@@ -39,7 +39,7 @@ class TestQuotas(BaseTest):
         self.assertTrue(resources)
 
     def test_service_quota_request_increase(self):
-        session_factory = self.replay_flight_data('test_service_quota_increase_request_action')
+        session_factory = self.replay_flight_data('test_service_quota')
         policy = yaml_load("""
         name: service-quota-request-increase
         resource: aws.service-quota
@@ -60,7 +60,7 @@ class TestQuotas(BaseTest):
         self.assertTrue(changes)
 
     def test_usage_metric_filter(self):
-        session_factory = self.replay_flight_data('test_service_quota_usage_metric_filter')
+        session_factory = self.replay_flight_data('test_service_quota')
         policy = yaml_load("""
         name: service-quota-usage-metric
         resource: aws.service-quota
@@ -74,7 +74,7 @@ class TestQuotas(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_put_request_in_template(self):
-        session_factory = self.replay_flight_data('test_service_quota_add_to_template')
+        session_factory = self.replay_flight_data('test_service_quota')
         policy = yaml_load("""
         name: put-service-quota-request-in-template
         resource: aws.service-quota
@@ -96,7 +96,7 @@ class TestQuotas(BaseTest):
         self.assertTrue(quotas)
 
     def test_remove_request_from_template(self):
-        session_factory = self.replay_flight_data('test_service_quota_remove_from_template')
+        session_factory = self.replay_flight_data('test_service_quota')
         policy = yaml_load("""
         name: remove-service-quota-request-from-template
         resource: aws.service-quota

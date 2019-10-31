@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Quotas": [],
+        "ResponseMetadata": {
+            "RequestId": "2a6db6cb-204c-46d6-b4c7-21bec8ef6d3c",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 31 Oct 2019 17:52:31 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "13",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "2a6db6cb-204c-46d6-b4c7-21bec8ef6d3c"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
