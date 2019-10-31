@@ -359,6 +359,12 @@ class AddToTemplate(Action):
     )
 
     def process_resources(self, resources, op):
+        # Use us-east-1 to make the request to get around the error:
+        # TemplatesNotAvailableInRegionException
+        # The Service Quotas template is not available in the Region where you
+        # are making the request. Please make the request in us-east-1.
+        # https://docs.aws.amazon.com/servicequotas/2019-06-24/apireference/API_PutServiceQuotaIncreaseRequestIntoTemplate.html
+
         session = local_session(self.manager.session_factory, region='us-east-1')
         client = session.client('service-quotas')
 
