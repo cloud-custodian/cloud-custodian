@@ -277,6 +277,7 @@ class Increase(Action):
     """
 
     schema = type_schema('request-increase', multiplier={'type': 'number', 'minimum': 1.0})
+    permissions = ('servicequota:RequestServiceQuotaIncrease',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('service-quotas')
@@ -357,6 +358,7 @@ class AddToTemplate(Action):
         },
         **{'required': ['multiplier']}
     )
+    permissions = ('servicequota:PutServiceQuotaIncreaseRequestIntoTemplate',)
 
     def process_resources(self, resources, op):
         # Use us-east-1 to make the request to get around the error:
@@ -432,6 +434,8 @@ class RemoveFromTemplate(AddToTemplate):
         }
     )
 
+    permissions = ('servicequota:DeleteServiceQuotaIncreaseRequestFromTemplate',)
+
     def process(self, resources):
         op = 'delete_service_quota_increase_request_from_template'
         self.process_resources(resources, op)
@@ -456,6 +460,7 @@ class InTemplateFilter(Filter):
         quota={'type': 'string'},
         **{'properties': {'required': ['quota']}}
     )
+    permissions = ('servicequota:ListServiceQuotaIncreaseRequestsInTemplate',)
 
     def process(self, resources, event):
         client = local_session(
