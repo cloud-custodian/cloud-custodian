@@ -18,6 +18,8 @@ from dateutil import tz as tzutil
 
 from .common import BaseTest
 
+from c7n.resources.asg import LaunchInfo
+
 
 class LaunchConfigTest(BaseTest):
 
@@ -71,6 +73,45 @@ class TestUserData(BaseTest):
         )
         resources = policy.run()
         self.assertGreater(len(resources), 0)
+
+
+class AutoScalingTemplateTest(BaseTest):
+
+    def test_asg_mixed_instance_templates(self):
+        d = {
+            "AutoScalingGroupName": "devx",
+            "MixedInstancesPolicy": {
+                "LaunchTemplate": {
+                    "LaunchTemplateSpecification": {
+                        "LaunchTemplateId": "lt-0877401c93c294001",
+                        "LaunchTemplateName": "test",
+                        "Version": "4"},
+                    "Overrides": [{"InstanceType": "t1.micro"},
+                                  {"InstanceType": "t2.small"}]
+                },
+                "InstancesDistribution": {
+                    "OnDemandAllocationStrategy": "prioritized",
+                    "OnDemandBaseCapacity": 1,
+                    "OnDemandPercentageAboveBaseCapacity": 0,
+                    "SpotAllocationStrategy": "capacity-optimized"
+                }
+            },
+            "MinSize": 1,
+            "MaxSize": 1,
+            "DesiredCapacity": 1,
+            "DefaultCooldown": 300,
+            "AvailabilityZones": ["us-east-1d", "us-east-1e"],
+            "HealthCheckType": "EC2",
+            "HealthCheckGracePeriod": 300,
+            "VPCZoneIdentifier": "subnet-3a334610,subnet-e3b194de"}
+
+        p = self.load_policy({"name": "mixed-instance", "resource": "asg"})
+        self.assertEqual(
+            list(p.resource_manager.get_resource_manager(
+                'launch-template-version').get_asg_templates([d]).keys()),
+            [("lt-0877401c93c294001", "4")])
+        self.assertEqual(
+            LaunchInfo(p.resource_manager).get_launch_id(d), ("lt-0877401c93c294001", "4"))
 
 
 class AutoScalingTest(BaseTest):
