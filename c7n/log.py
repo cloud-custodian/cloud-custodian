@@ -82,7 +82,7 @@ class CloudWatchLogHandler(logging.Handler):
         # Logging module internally is tracking all handlers, for final
         # cleanup atexit, custodian is a bit more explicitly scoping shutdown to
         # each policy, so use a sentinel value to avoid deadlocks.
-        self.shutdown = False
+        self.shutdown = True
         retry = get_retry(('ThrottlingException',))
         try:
             client = self.session_factory().client('logs')
@@ -113,6 +113,7 @@ class CloudWatchLogHandler(logging.Handler):
 
         msg = self.format_message(message)
         if not self.transport:
+            self.shutdown = False
             self.start_transports()
         self.buf.append(msg)
         self.flush_buffers(
