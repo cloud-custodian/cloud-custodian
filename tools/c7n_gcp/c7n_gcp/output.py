@@ -74,8 +74,8 @@ class StackDriverMetrics(Metrics):
 
     def __init__(self, ctx, config=None):
         super(StackDriverMetrics, self).__init__(ctx, config)
-        self.project_id = local_session(
-            self.ctx.session_factory).get_default_project()
+        self.project_id = local_session(self.ctx.session_factory).get_default_project()
+        self.write_metrics_project_id = self.config.get('project_id', self.project_id)
 
     def initialize(self):
         """One time initialization of metrics descriptors.
@@ -132,7 +132,7 @@ class StackDriverMetrics(Metrics):
     def _put_metrics(self, ns, metrics):
         session = local_session(self.ctx.session_factory)
         client = session.client('monitoring', 'v3', 'projects.timeSeries')
-        params = {'name': "projects/{}".format(self.project_id),
+        params = {'name': "projects/{}".format(self.write_metrics_project_id),
                   'body': {'timeSeries': metrics}}
         client.execute_command('create', params)
 
