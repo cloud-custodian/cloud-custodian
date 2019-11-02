@@ -262,6 +262,21 @@ class RestStage(query.ChildResourceManager):
             return DescribeRestStage(self)
         return super(RestStage, self).get_source(source_type)
 
+    @property
+    def generate_arn(self):
+        self._generate_arn = functools.partial(
+            generate_arn,
+            self.resource_type.service,
+            region=self.config.region)
+        return self._generate_arn
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn('/restapis/' + r['restApiId'] +
+             '/stages/' + r[self.get_model().id]))
+        return arns
+
 
 @query.sources.register('describe-rest-stage')
 class DescribeRestStage(query.ChildDescribeSource):

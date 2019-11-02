@@ -374,3 +374,32 @@ class TestRestStage(BaseTest):
                 restApiId=resources[0]["restApiId"], stageName=resources[0]["stageName"]
             )
         self.assertEqual(e.exception.response['Error']['Code'], 'NotFoundException')
+
+    def test_rest_stage_tag_untag_mark(self):
+        session_factory = self.replay_flight_data('test_rest_stage_tag_untag_mark')
+        client = session_factory().client("apigateway")
+        tags = client.get_tags(
+            resourceArn='arn:aws:apigateway:us-east-1::/restapis/l5paassc1h/stages/test')
+        self.assertEqual(tags.get('tags', {}),
+            {'target-tag': 'pratyush'})
+        p = self.load_policy({
+            'name': 'tag-rest-stage',
+            'resource': 'rest-stage',
+            'filters': [{'tag:target-tag': 'pratyush'}],
+            "actions": [
+                {'type': 'tag',
+                'tags': {'Env': 'Dev'}},
+                {'type': 'remove-tag',
+                'tags': ['target-tag']},
+                {'type': 'mark-for-op', 'tag': 'custodian_cleanup',
+                'op': 'update',
+                'days': 2}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        tags = client.get_tags(
+            resourceArn='arn:aws:apigateway:us-east-1::/restapis/l5paassc1h/stages/test')
+        self.assertEqual(tags.get('tags', {}),
+            {'Env': 'Dev',
+            'custodian_cleanup': 'Resource does not meet policy: update@2019/11/04'})

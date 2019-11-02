@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "FailedResourcesMap": {},
+        "ResponseMetadata": {
+            "RequestId": "f9713b71-1902-4755-afa6-15ec42474cc2",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f9713b71-1902-4755-afa6-15ec42474cc2",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "25",
+                "date": "Sat, 02 Nov 2019 15:19:01 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
