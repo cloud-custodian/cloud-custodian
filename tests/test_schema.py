@@ -285,6 +285,22 @@ class SchemaTest(BaseTest):
         self.assertIsInstance(resp[0], ValidationError)
         self.assertIsInstance(resp[1], ValidationError)
 
+    def test_semantic_error_with_nested_resource_key(self):
+        data = {
+            'policies': [{
+                'name': 'team-tag-ebs-snapshot-audit',
+                'resource': 'ebs-snapshot',
+                'actions': [
+                    {'type': 'copy-related-tag',
+                     'resource': 'ebs',
+                     'skip_missing': True,
+                     'key': 'VolumeId',
+                     'tags': 'Team'}]}]}
+        errors = list(self.validator.iter_errors(data))
+        self.assertEqual(len(errors), 1)
+        error = specific_error(errors[0])
+        self.assertTrue('Team' in error.message)
+
     def test_vars_and_tags(self):
         data = {
             "vars": {"alpha": 1, "beta": 2},

@@ -231,11 +231,13 @@ class CloudWatchLogOutput(LogOutput):
 
     def __init__(self, ctx, config=None):
         super(CloudWatchLogOutput, self).__init__(ctx, config)
-        if self.config.get('netloc') == 'master':
-            self.log_group = self.config.get('path').strip("/")
+        if self.config['netloc'] == 'master' or not self.config['netloc']:
+            self.log_group = self.config['path'].strip('/')
         else:
-            self.log_group = self.config.get('netloc')
-        self.region = self.config.get('region')
+            # join netloc to path for casual usages of aws://log/group/name
+            self.log_group = ("%s/%s" % (
+                self.config['netloc'], self.config['path'].strip('/'))).strip('/')
+        self.region = self.config.get('region', ctx.options.region)
         self.destination = (
             self.config.scheme == 'aws' and
             self.config.get('netloc') == 'master') and 'master' or None
@@ -251,27 +253,18 @@ class CloudWatchLogOutput(LogOutput):
             log_stream = self.config.get('stream').format(
                 region=self.ctx.options.region,
                 account=self.ctx.options.account_id,
-                policy=self.ctx.policy.name
-            )
+                policy=self.ctx.policy.name,
+                now=datetime.datetime.utcnow())
         return log_stream
 
     def get_handler(self):
         log_stream = self.construct_stream_name()
-        if self.destination == 'master':
-            handler = CloudWatchLogHandler(
-                log_group=self.log_group,
-                log_stream=log_stream,
-                session_factory=lambda x=None: self.ctx.session_factory(
-                    assume=False,
-                    region=self.region
-                )
-            )
-        else:
-            handler = CloudWatchLogHandler(
-                log_group=self.log_group,
-                log_stream=log_stream,
-                session_factory=lambda x=None: self.ctx.session_factory(region=self.region))
-        return handler
+        params = dict(
+            log_group=self.log_group, log_stream=log_stream,
+            session_factory=(
+                lambda x=None: self.ctx.session_factory(
+                    region=self.region, assume=self.destination != 'master')))
+        return CloudWatchLogHandler(**params)
 
     def __repr__(self):
         return "<%s to group:%s stream:%s>" % (

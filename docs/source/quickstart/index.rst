@@ -155,7 +155,7 @@ different clouds, check out the cloud provider specific pages:
 
 - :ref:`AWS <aws-gettingstarted>`
 - :ref:`Azure <azure_gettingstarted>`
-- GCP <tbd>
+- :ref:`GCP <gcp_gettingstarted>`
 
 For details, see :ref:`usage`.
 
