@@ -83,13 +83,13 @@ setup(
                       "azure-cosmos",
                       "azure-graphrbac",
                       "azure-keyvault",
-                      "azure-storage-blob",
+                      "azure-storage-blob~=2.1",
                       # azure-cosmosdb-table has incompatible dependency ~=1.1
                       # Remove this when fixed:
                       # https://github.com/Azure/azure-cosmos-table-python/issues/39
                       "azure-storage-common~=2.0",
-                      "azure-storage-queue",
-                      "azure-storage-file",
+                      "azure-storage-queue~=2.1",
+                      "azure-storage-file~=2.1",
                       "azure-cosmosdb-table",
                       "applicationinsights",
                       "apscheduler",
