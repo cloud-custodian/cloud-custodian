@@ -1216,9 +1216,13 @@ class PropagateTags(Action):
             instances = [self.instance_map[i] for i in instance_ids]
             self.prune_instance_tags(client, asg, tag_set, instances)
         if not self.manager.config.dryrun:
-            client.create_tags(
-                Resources=instance_ids,
-                Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+            try:
+                client.create_tags(
+                    Resources=instance_ids,
+                    Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
+                    pass
         return len(instance_ids)
 
     def prune_instance_tags(self, client, asg, tag_set, instances):
