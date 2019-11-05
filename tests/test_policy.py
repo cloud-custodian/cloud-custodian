@@ -178,7 +178,8 @@ class PolicyMeta(BaseTest):
                 overrides.add(k)
 
         overrides = overrides.difference(set(
-            ('account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot')))
+            ('account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
+             'rest-stage')))
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
