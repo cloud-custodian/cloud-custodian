@@ -546,7 +546,8 @@ class PostItem(Action):
             self.manager.type,
             self.manager.config.region,
             self.manager.config.account_id)).encode('utf8')
-        dedup = hashlib.md5(dedup).hexdigest()
+        # size restrictions on this value is 4-20, digest is 32
+        dedup = hashlib.md5(dedup).hexdigest()[:20]
 
         i = dict(
             Title=title,
