@@ -73,6 +73,7 @@ setup(
                       "azure-mgmt-resourcegraph",
                       "azure-mgmt-resource==2.1.0",
                       "azure-mgmt-rdbms",
+                      "azure-mgmt-search",
                       "azure-mgmt-sql",
                       "azure-mgmt-storage",
                       "azure-mgmt-subscription",

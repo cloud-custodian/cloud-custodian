@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "name": "[concat('cctestsearch', variables('suffix'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Search/searchServices",
+            "name": "[variables('name')]",
+            "apiVersion": "2015-08-19",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "free"
+            },
+            "properties": {
+                "replicaCount": 1,
+                "partitionCount": 1,
+                "hostingMode": "default"
+            }
+        }
+    ]
+}
