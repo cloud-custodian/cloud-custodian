@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "3e9d412f-9b88-4198-939d-9a36d9417269",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Sat, 02 Nov 2019 15:19:00 GMT",
+                "content-type": "application/json",
+                "content-length": "35",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "3e9d412f-9b88-4198-939d-9a36d9417269",
+                "x-amz-apigw-id": "CiWvuK12IAMEbOg="
+            },
+            "RetryAttempts": 0
+        },
+        "tags": {
+            "target-tag": "pratyush"
+        }
+    }
+}

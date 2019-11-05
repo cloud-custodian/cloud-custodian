@@ -26,7 +26,7 @@ setup(
     install_requires=[
         "boto3>=1.9.228",
         "botocore>=1.12.228",
-        "python-dateutil>=2.6,<3.0.0",
+        "python-dateutil>=2.6,<2.8.1",
         "PyYAML>=4.2b4",
         "jsonschema",
         "jsonpatch>=1.21",
