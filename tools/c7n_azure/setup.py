@@ -66,7 +66,7 @@ setup(
                       "azure-mgmt-eventhub",
                       "azure-mgmt-hdinsight",
                       "azure-mgmt-iothub",
-                      "azure-mgmt-keyvault",
+                      "azure-mgmt-keyvault==1.1.0",
                       "azure-mgmt-managementgroups",
                       "azure-mgmt-network>=4.0.0",
                       "azure-mgmt-redis",
@@ -82,7 +82,7 @@ setup(
                       "azure-mgmt-logic",
                       "azure-cosmos",
                       "azure-graphrbac",
-                      "azure-keyvault",
+                      "azure-keyvault==1.1.0",
                       "azure-storage-blob~=2.1",
                       # azure-cosmosdb-table has incompatible dependency ~=1.1
                       # Remove this when fixed:
