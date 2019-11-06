@@ -174,9 +174,22 @@ def get_session(role, session_name, profile, region):
         return SessionFactory(region, profile)()
 
 
-def expand_regions(regions, partition='aws'):
+def expand_regions(regions, accounts_config, partition='aws'):
     if 'all' in regions:
         regions = boto3.Session().get_available_regions('ec2')
+    elif 'config' in regions:
+        # Build list of regions from conf file
+        # During enable_region it will only process the
+        # Correct region for each account
+        regions = []
+        for account in accounts_config['accounts']:
+            if 'regions' in account:
+                for region in account['regions']:
+                    if region not in regions:
+                        regions.append(region)
+            else:
+                log.error("Region was not found in config file for %s", account['account_id'])
+
     return regions
 
 
@@ -190,19 +203,33 @@ def expand_regions(regions, partition='aws'):
 @click.option('--message', help='Welcome Message for member accounts')
 @click.option(
     '-r', '--region',
-    default=['all'], help='Region to enable (default: all)',
+    default=['all'],
+    help='Region to enable [<aws_region>|config|all] (default: all). \
+        "config" will pull regions for each account from the config file',
     multiple=True)
 def enable(config, master, tags, accounts, debug, message, region):
-    """enable guard duty on a set of accounts"""
+    """ Enable guard duty on a set of accounts
+    """
     accounts_config, master_info, executor = guardian_init(
         config, debug, master, accounts, tags)
-    regions = expand_regions(region)
+    regions = expand_regions(region, accounts_config)
     for r in regions:
         log.info("Processing Region:%s", r)
-        enable_region(master_info, accounts_config, executor, message, r)
+        if 'config' in region:
+            # Build custom list of accounts for this region
+            tmp_accounts_config = {}
+            tmp_accounts_config['accounts'] = []
+            for a in accounts_config['accounts']:
+                if r in a['regions']:
+                    tmp_accounts_config['accounts'].append(a)
+            enable_region(master_info, tmp_accounts_config, executor, message, r)
+        else:
+            enable_region(master_info, accounts_config, executor, message, r)
 
 
 def enable_region(master_info, accounts_config, executor, message, region):
+    """ Enable guardduty for all accounts in a region
+    """
     master_session = get_session(
         master_info.get('role'), 'c7n-guardian',
         master_info.get('profile'),
@@ -218,17 +245,19 @@ def enable_region(master_info, accounts_config, executor, message, region):
 
     # Find active members
     active_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Enabled'}
+                  if m['RelationshipStatus'] == 'Enabled'}
+
     # Find invited members
     invited_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Invited'}
+                   if m['RelationshipStatus'] == 'Invited'}
 
     # Find extant members not currently enabled
     suspended_ids = {m['AccountId'] for m in extant_members
-        if m['RelationshipStatus'] == 'Disabled'}
+                     if m['RelationshipStatus'] == 'Disabled'}
+
     # Filter by accounts under consideration per config and cli flags
     suspended_ids = {a['account_id'] for a in accounts_config['accounts']
-        if a['account_id'] in suspended_ids}
+                     if a['account_id'] in suspended_ids}
 
     if suspended_ids:
         unprocessed = master_client.start_monitoring_members(
@@ -241,9 +270,9 @@ def enable_region(master_info, accounts_config, executor, message, region):
         log.info("Region: %s Restarted monitoring on %d accounts",
                  region, len(suspended_ids))
 
-    members = [{'AccountId': account['account_id'], 'Email': account['email']}
-               for account in accounts_config['accounts']
-               if account['account_id'] not in extant_ids]
+    members = [{'AccountId': a['account_id'], 'Email': a['email']}
+               for a in accounts_config['accounts']
+               if a['account_id'] not in extant_ids]
 
     if not members:
         if not suspended_ids and not invited_ids:

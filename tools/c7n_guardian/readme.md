@@ -40,6 +40,24 @@ accounts:
 
 ```
 
+Optionally you can include the region in the yaml instead of declaring
+them on the CLI.  To use this option the cli input should be ``` --region config ```
+
+```shell
+$ cat accounts.yml
+
+accounts:
+  - name: guard-duty-master
+    email: guard-duty-master@example.com
+    account_id: "2020202020202"
+    role: "arn:aws:iam::2020202020202:role/CustodianGuardDuty"
+    regions:
+      - us-east-1
+      - us-east-2
+    tags:
+      - prod
+```
+
 The cli also has support for disabling and reporting on accounts
 
 ```shell
