@@ -71,7 +71,7 @@ setup(
                       "azure-mgmt-network>=4.0.0",
                       "azure-mgmt-redis",
                       "azure-mgmt-resourcegraph",
-                      "azure-mgmt-resource==2.1.0",
+                      "azure-mgmt-resource~=4.0.0",
                       "azure-mgmt-rdbms",
                       "azure-mgmt-search",
                       "azure-mgmt-sql",

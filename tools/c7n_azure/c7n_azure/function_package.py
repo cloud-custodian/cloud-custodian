@@ -160,6 +160,7 @@ class FunctionPackage(object):
         cache_zip_file = os.path.join(self.cache_folder, 'cache.zip')
         cache_metadata_file = os.path.join(self.cache_folder, 'metadata.json')
         packages = DependencyManager.get_dependency_packages_list(modules, excluded_packages)
+        packages_root = os.path.join('.python_packages', 'lib', 'python3.6', 'site-packages')
 
         if not DependencyManager.check_cache(cache_metadata_file, cache_zip_file, packages):
             cache_pkg = AzurePythonPackageArchive()
@@ -182,7 +183,7 @@ class FunctionPackage(object):
             for root, _, files in os.walk(wheels_install_folder):
                 arc_prefix = os.path.relpath(root, wheels_install_folder)
                 for f in files:
-                    dest_path = os.path.join(arc_prefix, f)
+                    dest_path = os.path.join(packages_root, arc_prefix, f)
 
                     if f.endswith('.pyc') or f.endswith('.c'):
                         continue
