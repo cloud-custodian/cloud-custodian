@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n.utils import type_schema
+
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -37,6 +40,16 @@ class PubSubTopic(QueryResourceManager):
                 'get', {'topic': resource_info['topic_id']})
 
 
+@PubSubTopic.action_registry.register('delete')
+class DeletePubSubTopic(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, m, r):
+        return {'topic': r['name']}
+
+
 @resources.register('pubsub-subscription')
 class PubSubSubscription(QueryResourceManager):
     """GCP resource: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions
@@ -55,6 +68,16 @@ class PubSubSubscription(QueryResourceManager):
                 'get', {'subscription': resource_info['subscription_id']})
 
 
+@PubSubSubscription.action_registry.register('delete')
+class DeletePubSubSubscription(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, m, r):
+        return {'subscription': r['name']}
+
+
 @resources.register('pubsub-snapshot')
 class PubSubSnapshot(QueryResourceManager):
     """GCP resource: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.snapshots
@@ -66,3 +89,13 @@ class PubSubSnapshot(QueryResourceManager):
         enum_spec = ('list', 'snapshots[]', None)
         scope_template = 'projects/{}'
         id = 'name'
+
+
+@PubSubSnapshot.action_registry.register('delete')
+class DeletePubSubSnapshot(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, m, r):
+        return {'snapshot': r['name']}
