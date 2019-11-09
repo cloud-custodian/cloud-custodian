@@ -27,6 +27,7 @@ from c7n_azure.provisioning.storage_account import StorageAccountUnit
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
+from msrest.exceptions import HttpOperationError
 from msrestazure.azure_exceptions import CloudError
 
 from c7n.utils import local_session
@@ -205,7 +206,7 @@ class FunctionAppUtilities(object):
                     function_params.function_app_resource_group_name,
                     function_params.function_app_name
                 )
-            except CloudError as e:
+            except (HttpOperationError, CloudError) as e:
                 # This appears to be a bug in the API
                 # Success can be either 200 or 204, which is
                 # unexpected and gets rethrown as a CloudError
