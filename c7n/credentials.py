@@ -26,8 +26,10 @@ from c7n.version import version
 from c7n.utils import get_retry
 
 
-# 0.8.45.1 compatibility with global only sts endpoints, out of caution, remove in 0.8.46.1
-USE_STS_GLOBAL = os.environ.get('C7N_USE_STS_GLOBAL', '').lower() in ('yes', 'true')
+# we still have some issues (see #5023) to work through to switch to
+# default regional endpoints, for now its opt-in.
+USE_STS_REGIONAL = os.environ.get(
+    'C7N_USE_STS_REGIONAL', '').lower() in ('yes', 'true')
 
 
 class SessionFactory(object):
@@ -137,7 +139,7 @@ def get_sts_client(session, region):
 
     For the list of regional endpoints, see https://amzn.to/2ohJgtR
     """
-    if region and not USE_STS_GLOBAL:
+    if region and USE_STS_REGIONAL:
         endpoint_url = "https://sts.{}.amazonaws.com".format(region)
         region_name = region
     else:

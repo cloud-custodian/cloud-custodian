@@ -17,6 +17,7 @@ import os
 from botocore.exceptions import ClientError
 import placebo
 
+from c7n import credentials
 from c7n.credentials import SessionFactory, assumed_session, get_sts_client
 from c7n.version import version
 from c7n.utils import local_session
@@ -35,6 +36,8 @@ class Credential(BaseTest):
 
     def test_regional_sts(self):
         factory = self.replay_flight_data('test_credential_sts_regional')
+
+        self.patch(credentials, 'USE_STS_REGIONAL', True)
         client = get_sts_client(factory(), region='us-east-2')
         # unfortunately we have to poke at boto3 client internals to verify
         self.assertEqual(client._client_config.region_name, 'us-east-2')
