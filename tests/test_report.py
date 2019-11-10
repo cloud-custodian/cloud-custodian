@@ -13,8 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import unittest
-
 from c7n.reports.csvout import Formatter
 from .common import BaseTest, load_data
 

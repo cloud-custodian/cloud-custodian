@@ -22,7 +22,6 @@ import uuid
 from functools import partial
 
 from c7n.schema import generate
-from c7n.resources import load_resources
 from c7n.config import Bag, Config
 
 from c7n.testing import TestUtils, TextTestIO, functional # NOQA
