@@ -558,6 +558,15 @@ class PolicyLambdaProvision(BaseTest):
         events = mu_policy.get_events(factory)
         self.assertEqual(len(events), 1)
         hub_action = events.pop()
+        self.assertEqual(
+            json.loads(hub_action.cwe.render_event_pattern()),
+            {'resources': [
+                'arn:aws:securityhub:us-east-1:644160558196:action/custom/sechub'],
+             'source': ['aws.securityhub'],
+             'detail-type': [
+                 'Security Hub Findings - Custom Action', 'Security Hub Insight Results'
+            ]})
+
         hub_action.cwe = cwe = mock.Mock(CloudWatchEventSource)
         cwe.get.return_value = False
         cwe.update.return_value = True

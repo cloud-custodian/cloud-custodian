@@ -1007,7 +1007,12 @@ class CloudWatchEventSource(object):
 
     def render_event_pattern(self):
         event_type = self.data.get('type')
+        pattern = self.data.get('pattern')
+
         payload = {}
+        if pattern:
+            payload.update(pattern)
+
         if event_type == 'cloudtrail':
             payload['detail-type'] = ['AWS API Call via CloudTrail']
             self.resolve_cloudtrail_payload(payload)
@@ -1148,8 +1153,11 @@ class SecurityHubAction(object):
     def __init__(self, policy, session_factory):
         self.policy = policy
         self.session_factory = session_factory
+
+        cwe_data = self.policy.data['mode']
+        cwe_data['pattern'] = {'resources': [self._get_arn()]}
         self.cwe = CloudWatchEventSource(
-            self.policy.data['mode'], session_factory)
+            cwe_data, session_factory)
 
     def __repr__(self):
         return "<SecurityHub Action %s>" % self.policy.name
