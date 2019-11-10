@@ -25,7 +25,6 @@ import logging
 from c7n.actions import Action
 from c7n.filters import Filter
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
-from c7n.manager import resources
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
     local_session, type_schema,
@@ -581,4 +580,3 @@ class OtherResourcePostFinding(PostFinding):
 
 AWS.resources.subscribe(OtherResourcePostFinding.register_resource)
 AWS.resources.subscribe(SecurityHubFindingFilter.register_resources)
-
