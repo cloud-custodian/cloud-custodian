@@ -9,7 +9,7 @@ def read(fname):
 
 setup(
     name="c7n",
-    version='0.8.45.2',
+    version='0.8.45.3',
     description="Cloud Custodian - Policy Rules Engine",
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
