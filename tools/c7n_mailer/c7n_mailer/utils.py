@@ -44,6 +44,7 @@ def get_jinja_env(template_folders):
     env.globals['resource_tag'] = get_resource_tag_value
     env.globals['get_resource_tag_value'] = get_resource_tag_value
     env.globals['search'] = jmespath.search
+    env.globals['list_to_dict'] = list_to_dict
     env.loader = jinja2.FileSystemLoader(template_folders)
     return env
 
@@ -426,3 +427,10 @@ def get_aws_username_from_event(logger, event):
     else:
         user_id = identity['principalId']
     return user_id
+
+
+def list_to_dict(resource, resource_key='Tags', key='Key', value='Value'):
+    """Convert list of dicts into a flat dict."""
+    if resource_key:
+        return {r[key]: r[value] for r in resource.get(resource_key, [])}
+    return {r[key]: r[value] for r in resource}
