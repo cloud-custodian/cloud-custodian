@@ -21,7 +21,7 @@ if os.path.exists('readme.md'):
 
 setup(
     name="c7n_gcp",
-    version='0.3.6',
+    version='0.3.7',
     description="Cloud Custodian - Google Cloud Provider",
     long_description=description,
     long_description_content_type='text/markdown',

@@ -21,7 +21,7 @@ if os.path.exists('README.md'):
 
 setup(
     name="c7n_org",
-    version='0.5.5',
+    version='0.5.6',
     description="Cloud Custodian - Multi Account",
     classifiers=[
         "Topic :: System :: Systems Administration",
