@@ -34,7 +34,7 @@ from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
 from c7n.utils import local_session, type_schema, chunks, get_retry
 
-from .ec2 import deserialize_user_data
+from .ec2 import deserialize_user_data, extract_instance_id
 
 
 @resources.register('asg')
@@ -1216,9 +1216,19 @@ class PropagateTags(Action):
             instances = [self.instance_map[i] for i in instance_ids]
             self.prune_instance_tags(client, asg, tag_set, instances)
         if not self.manager.config.dryrun:
-            client.create_tags(
-                Resources=instance_ids,
-                Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+            while instance_ids:
+                try:
+                    client.create_tags(
+                        Resources=instance_ids,
+                        Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+                    break
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
+                        bad_instance = extract_instance_id(e)
+                        if bad_instance:
+                            instance_ids.remove(bad_instance)
+                            continue
+                        raise
         return len(instance_ids)
 
     def prune_instance_tags(self, client, asg, tag_set, instances):
