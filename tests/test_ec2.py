@@ -1671,3 +1671,20 @@ class TestReservedInstance(BaseTest):
             'resource': 'aws.ec2-reserved'}, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestCreateTags(BaseTest):
+
+    def test_instance_notfound_extract(self):
+        self.assertEqual(
+            ec2.extract_instance_id(
+                ("An error occurred (InvalidInstanceID.NotFound) when calling "
+                    "the CreateTags operation: The instance 'i-abc123' "
+                    "does not exist.")),
+            'i-abc123')
+        self.assertRaises(
+            ValueError,
+            ec2.extract_instance_id,
+            ("An error occurred (InvalidInstanceID.NotFound) when calling "
+                "the CreateTags operation: The instance "
+                "does not exist."))
