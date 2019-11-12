@@ -66,7 +66,7 @@ class ECRTag(tags.Tag):
 @ECR.action_registry.register('set-scanning')
 class ECRSetScanning(Action):
 
-    permissions = ('ecr:SetImageScanninConfigurationg',)
+    permissions = ('ecr:PutImageScanningConfiguration',)
     schema = type_schema(
         'set-scanning',
         state={'type': 'boolean', 'default': True})
@@ -88,7 +88,7 @@ class ECRSetScanning(Action):
 @ECR.action_registry.register('set-immutability')
 class ECRSetImmutability(Action):
 
-    permissions = ('ecr:SetImageTagImmutability',)
+    permissions = ('ecr:PutImageTagMutability',)
     schema = type_schema(
         'set-immutability',
         state={'type': 'boolean', 'default': True})
