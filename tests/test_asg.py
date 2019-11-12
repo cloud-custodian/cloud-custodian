@@ -18,7 +18,7 @@ from dateutil import tz as tzutil
 
 from .common import BaseTest
 
-from c7n.resources.asg import LaunchInfo
+from c7n.resources.asg import LaunchInfo, PropagateTags
 
 
 class LaunchConfigTest(BaseTest):
@@ -284,6 +284,31 @@ class AutoScalingTest(BaseTest):
         tag_map = self.get_ec2_tags(ec2, instance_id)
         self.assertTrue("CustomerId" in tag_map)
         self.assertFalse("Home" in tag_map)
+
+    def test_asg_propagate_tag_extract_instance(self):
+        factory = self.replay_flight_data("test_asg_propagate_tag_extract_instance")
+        session = factory()
+        ec2 = session.client("ec2")
+        tag_map = self.get_ec2_tags(ec2, 'i-0c5208890f171b2f1')
+        self.assertFalse("Owner" in tag_map)
+        p = self.load_policy(
+            {
+                "name": "asg-propagate-tag",
+                "resource": "asg",
+                "filters": [{"tag:Owner": "not-null"}],
+                "actions": [
+                    {
+                        "type": "propagate-tags",
+                        "tags": ["Owner"],
+                    },
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        tag_map = self.get_ec2_tags(ec2, 'i-0c5208890f171b2f1')
+        self.assertTrue("Owner" in tag_map)
 
     def test_asg_remove_tag(self):
         factory = self.replay_flight_data("test_asg_remove_tag")

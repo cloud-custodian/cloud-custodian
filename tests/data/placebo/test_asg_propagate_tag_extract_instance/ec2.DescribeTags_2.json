@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Owner",
+                "ResourceId": "i-0c5208890f171b2f1",
+                "ResourceType": "instance",
+                "Value": "test"
+            },
+            {
+                "Key": "aws:autoscaling:groupName",
+                "ResourceId": "i-0c5208890f171b2f1",
+                "ResourceType": "instance",
+                "Value": "devx"
+            },
+            {
+                "Key": "aws:ec2:fleet-id",
+                "ResourceId": "i-0c5208890f171b2f1",
+                "ResourceType": "instance",
+                "Value": "fleet-18d66dff-ab55-af79-2632-01a8e54f39f9"
+            },
+            {
+                "Key": "aws:ec2launchtemplate:id",
+                "ResourceId": "i-0c5208890f171b2f1",
+                "ResourceType": "instance",
+                "Value": "lt-0877401c93c294001"
+            },
+            {
+                "Key": "aws:ec2launchtemplate:version",
+                "ResourceId": "i-0c5208890f171b2f1",
+                "ResourceType": "instance",
+                "Value": "4"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "9fe7761e-6232-4101-8343-c012468995a7",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "1345",
+                "date": "Tue, 12 Nov 2019 04:28:03 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
