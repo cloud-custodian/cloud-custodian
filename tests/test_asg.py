@@ -18,7 +18,7 @@ from dateutil import tz as tzutil
 
 from .common import BaseTest
 
-from c7n.resources.asg import LaunchInfo, PropagateTags
+from c7n.resources.asg import LaunchInfo
 
 
 class LaunchConfigTest(BaseTest):
