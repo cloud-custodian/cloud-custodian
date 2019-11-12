@@ -37,12 +37,8 @@ class LockActionTest(BaseTest):
                     resource['name'],
                     resource['lock'])
             else:
-                self.client.management_locks.delete_at_resource_level(
-                    resource['resourceGroup'],
-                    ResourceIdParser.get_namespace(resource['id']),
-                    ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
-                    ResourceIdParser.get_resource_type(resource['id']),
-                    resource['name'],
+                self.client.management_locks.delete_by_scope(
+                    resource['id'],
                     resource['lock']
                 )
 

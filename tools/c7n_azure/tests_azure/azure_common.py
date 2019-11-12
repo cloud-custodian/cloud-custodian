@@ -207,6 +207,10 @@ class AzureVCRBaseTest(VCRTestCase):
         r1_path = AzureVCRBaseTest._replace_subscription_id(r1.path)
         r2_path = AzureVCRBaseTest._replace_subscription_id(r2.path)
 
+        # Some APIs (e.g. lock) that receive scope seems to replace / with %2F
+        r1_path = r1_path.replace('%2F', '/').lower()
+        r2_path = r2_path.replace('%2F', '/').lower()
+
         r1_path = r1_path.replace('//', '/').lower()
         r2_path = r2_path.replace('//', '/').lower()
 

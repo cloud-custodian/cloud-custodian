@@ -50,7 +50,7 @@ class ActionsMarkForOpTest(BaseTest):
 
         tags = tools.get_tags_parameter(update_resource_tags)
 
-        date = (utils.now() + datetime.timedelta(days=self.DAYS)).strftime('%Y/%m/%d')
+        date = (utils.utcnow() + datetime.timedelta(days=self.DAYS)).strftime('%Y/%m/%d')
         expected_value = TagDelayedAction.default_template.format(op='stop', action_date=date)
         expected_tags = self.existing_tags.copy()
         expected_tags.update({'custodian_status': expected_value})
