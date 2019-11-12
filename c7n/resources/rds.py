@@ -215,7 +215,7 @@ def _get_available_engine_upgrades(client, major=False):
 
     Example::
 
-      >>> _get_engine_upgrades(client)
+      >>> _get_available_engine_upgrades(client)
       {
          'oracle-se2': {'12.1.0.2.v2': '12.1.0.2.v5',
                         '12.1.0.2.v3': '12.1.0.2.v5'},
@@ -226,18 +226,20 @@ def _get_available_engine_upgrades(client, major=False):
       }
     """
     results = {}
-    engine_versions = client.describe_db_engine_versions()['DBEngineVersions']
-    for v in engine_versions:
-        if not v['Engine'] in results:
-            results[v['Engine']] = {}
-        if 'ValidUpgradeTarget' not in v or len(v['ValidUpgradeTarget']) == 0:
-            continue
-        for t in v['ValidUpgradeTarget']:
-            if not major and t['IsMajorVersionUpgrade']:
+    paginator = client.get_paginator('describe_db_engine_versions')
+    for page in paginator.paginate():
+        engine_versions = page['DBEngineVersions']
+        for v in engine_versions:
+            if not v['Engine'] in results:
+                results[v['Engine']] = {}
+            if 'ValidUpgradeTarget' not in v or len(v['ValidUpgradeTarget']) == 0:
                 continue
-            if LooseVersion(t['EngineVersion']) > LooseVersion(
-                    results[v['Engine']].get(v['EngineVersion'], '0.0.0')):
-                results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
+            for t in v['ValidUpgradeTarget']:
+                if not major and t['IsMajorVersionUpgrade']:
+                    continue
+                if LooseVersion(t['EngineVersion']) > LooseVersion(
+                        results[v['Engine']].get(v['EngineVersion'], '0.0.0')):
+                    results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
     return results
 
 
