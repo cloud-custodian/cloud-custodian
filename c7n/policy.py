@@ -597,7 +597,6 @@ class PHDMode(LambdaMode):
 
     schema = utils.type_schema(
         'phd',
-        required=['events'],
         events={'type': 'array', 'items': {'type': 'string'}},
         categories={'type': 'array', 'items': {
             'enum': ['issue', 'accountNotification', 'scheduledChange']}},
