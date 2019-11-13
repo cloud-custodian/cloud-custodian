@@ -95,7 +95,7 @@ class ECRSetImmutability(Action):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecr')
-        s = self.data.get('state', True) and 'IMMUTABLE' or 'MUTABLE'
+        s = 'IMMUTABLE' if self.data.get('state', True) else 'MUTABLE'
         for r in resources:
             try:
                 client.put_image_tag_mutability(
