@@ -14,7 +14,7 @@
 
 from azure.mgmt.resource.locks.models import ManagementLockObject
 from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.utils import ResourceIdParser, is_resource_group
+from c7n_azure.utils import is_resource_group
 
 from c7n.utils import type_schema
 
@@ -96,12 +96,8 @@ class LockAction(AzureBaseAction):
                 ManagementLockObject(level=self.lock_type, notes=lock_notes)
             )
         else:
-            self.client.management_locks.create_or_update_at_resource_level(
-                resource['resourceGroup'],
-                ResourceIdParser.get_namespace(resource['id']),
-                ResourceIdParser.get_resource_name(resource.get('c7n:parent-id')) or '',
-                ResourceIdParser.get_resource_type(resource['id']),
-                resource['name'],
+            self.client.management_locks.create_or_update_by_scope(
+                resource['id'],
                 lock_name,
                 ManagementLockObject(level=self.lock_type, notes=lock_notes)
             )

@@ -41,6 +41,11 @@ except Exception:
     Profile = None
     CLIError = ImportError  # Assign an exception that never happens because of Auth problems
 
+try:
+    from functools import lru_cache
+except ImportError:
+    from backports.functools_lru_cache import lru_cache
+
 
 log = logging.getLogger('custodian.azure.session')
 
@@ -162,6 +167,7 @@ class Session(object):
             authorization_file=self.authorization_file,
             resource=resource)
 
+    @lru_cache()
     def client(self, client):
         self._initialize_session()
         service_name, client_name = client.rsplit('.', 1)

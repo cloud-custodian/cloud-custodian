@@ -101,6 +101,11 @@ class DeliveryStream(QueryResourceManager):
         name = id = 'DeliveryStreamName'
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
+        universal_taggable = object()
+
+    def augment(self, resources):
+        return universal_augment(
+            self, super(DeliveryStream, self).augment(resources))
 
 
 @DeliveryStream.action_registry.register('delete')
@@ -218,6 +223,12 @@ class AnalyticsApp(QueryResourceManager):
                        'ApplicationName', 'ApplicationDetail')
         name = "ApplicationName"
         arn = id = "ApplicationARN"
+        arn_type = 'application'
+        universal_taggable = object()
+
+    def augment(self, resources):
+        return universal_augment(
+            self, super(AnalyticsApp, self).augment(resources))
 
 
 @AnalyticsApp.action_registry.register('delete')

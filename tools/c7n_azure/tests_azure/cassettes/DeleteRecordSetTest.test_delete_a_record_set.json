@@ -17,14 +17,14 @@
                     "cache-control": [
                         "private"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
-                        "59999"
-                    ],
                     "date": [
-                        "Wed, 03 Jul 2019 18:23:34 GMT"
+                        "Tue, 12 Nov 2019 00:47:25 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-resource-requests": [
                         "499"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59999"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -40,7 +40,7 @@
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com",
                                 "name": "h7s6n7kl225j4.cloudcustodiantest.com",
                                 "type": "Microsoft.Network/dnszones",
-                                "etag": "00000002-0000-0000-7e82-883dc231d501",
+                                "etag": "00000002-0000-0000-0282-5b75c895d501",
                                 "location": "global",
                                 "tags": {},
                                 "properties": {
@@ -77,14 +77,14 @@
                     "cache-control": [
                         "private"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
-                        "59996"
-                    ],
                     "date": [
-                        "Wed, 03 Jul 2019 18:23:34 GMT"
+                        "Tue, 12 Nov 2019 00:47:25 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-resource-requests": [
                         "499"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59996"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -100,7 +100,7 @@
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/NS/@",
                                 "name": "@",
                                 "type": "Microsoft.Network/dnszones/NS",
-                                "etag": "6f6405de-a959-4535-982d-2a8f4bc43bfc",
+                                "etag": "4a34baf3-1864-4af6-adb1-51b90b32823c",
                                 "properties": {
                                     "fqdn": "h7s6n7kl225j4.cloudcustodiantest.com.",
                                     "TTL": 172800,
@@ -126,7 +126,7 @@
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/SOA/@",
                                 "name": "@",
                                 "type": "Microsoft.Network/dnszones/SOA",
-                                "etag": "a29ed6c2-76be-4e54-8ca4-8695d37a82ca",
+                                "etag": "10b28560-9227-4aa8-89be-b079e5bdfdc2",
                                 "properties": {
                                     "fqdn": "h7s6n7kl225j4.cloudcustodiantest.com.",
                                     "TTL": 3600,
@@ -147,7 +147,7 @@
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/A/deleteme",
                                 "name": "deleteme",
                                 "type": "Microsoft.Network/dnszones/A",
-                                "etag": "1d343fee-ec23-419b-80e6-a252b1e3bdb3",
+                                "etag": "5c9ecdd3-419a-4ade-8a71-6672b0e96a67",
                                 "properties": {
                                     "fqdn": "deleteme.h7s6n7kl225j4.cloudcustodiantest.com.",
                                     "TTL": 3600,
@@ -164,7 +164,7 @@
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/A/www",
                                 "name": "www",
                                 "type": "Microsoft.Network/dnszones/A",
-                                "etag": "57c95b8c-cb9e-4c71-9622-aadeedadaad8",
+                                "etag": "0cea3c9f-bb3e-4143-9cc5-f52c95a7a4fb",
                                 "properties": {
                                     "fqdn": "www.h7s6n7kl225j4.cloudcustodiantest.com.",
                                     "TTL": 3600,
@@ -188,7 +188,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network%2Fdnszones?api-version=2018-05-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network?api-version=2019-08-01",
                 "body": null,
                 "headers": {}
             },
@@ -199,48 +199,32 @@
                 },
                 "headers": {
                     "cache-control": [
-                        "private"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
-                        "59999"
+                        "no-cache"
                     ],
                     "date": [
-                        "Wed, 03 Jul 2019 18:23:35 GMT"
+                        "Tue, 12 Nov 2019 00:47:26 GMT"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "499"
+                    "content-length": [
+                        "68390"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
-                    ],
-                    "content-length": [
-                        "576"
                     ]
                 },
                 "body": {
                     "data": {
-                        "value": [
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network",
+                        "namespace": "Microsoft.Network",
+                        "authorizations": [],
+                        "resourceTypes": [
                             {
-                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com",
-                                "name": "h7s6n7kl225j4.cloudcustodiantest.com",
-                                "type": "Microsoft.Network/dnszones",
-                                "etag": "00000002-0000-0000-7e82-883dc231d501",
-                                "location": "global",
-                                "tags": {},
-                                "properties": {
-                                    "maxNumberOfRecordSets": 10000,
-                                    "maxNumberOfRecordsPerRecordSet": null,
-                                    "nameServers": [
-                                        "ns1-07.azure-dns.com.",
-                                        "ns2-07.azure-dns.net.",
-                                        "ns3-07.azure-dns.org.",
-                                        "ns4-07.azure-dns.info."
-                                    ],
-                                    "numberOfRecordSets": 4,
-                                    "zoneType": "Public"
-                                }
-                            }
-                        ]
+                                "resourceType": "dnszones/A",
+                                "apiVersions": [
+                                    "2018-05-01"
+                                ]
+                            }                        ],
+                        "registrationState": "Registered",
+                        "registrationPolicy": "RegistrationRequired"
                     }
                 }
             }
@@ -262,13 +246,13 @@
                         "private"
                     ],
                     "date": [
-                        "Wed, 03 Jul 2019 18:23:34 GMT"
-                    ],
-                    "content-length": [
-                        "0"
+                        "Tue, 12 Nov 2019 00:47:26 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-resource-requests": [
                         "11999"
+                    ],
+                    "content-length": [
+                        "0"
                     ]
                 },
                 "body": {
@@ -292,14 +276,14 @@
                     "cache-control": [
                         "private"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
-                        "59997"
-                    ],
                     "date": [
-                        "Wed, 03 Jul 2019 18:23:35 GMT"
+                        "Tue, 12 Nov 2019 00:47:26 GMT"
                     ],
                     "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "499"
+                        "498"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59993"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -315,7 +299,7 @@
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/NS/@",
                                 "name": "@",
                                 "type": "Microsoft.Network/dnszones/NS",
-                                "etag": "6f6405de-a959-4535-982d-2a8f4bc43bfc",
+                                "etag": "4a34baf3-1864-4af6-adb1-51b90b32823c",
                                 "properties": {
                                     "fqdn": "h7s6n7kl225j4.cloudcustodiantest.com.",
                                     "TTL": 172800,
@@ -341,7 +325,7 @@
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/SOA/@",
                                 "name": "@",
                                 "type": "Microsoft.Network/dnszones/SOA",
-                                "etag": "a29ed6c2-76be-4e54-8ca4-8695d37a82ca",
+                                "etag": "10b28560-9227-4aa8-89be-b079e5bdfdc2",
                                 "properties": {
                                     "fqdn": "h7s6n7kl225j4.cloudcustodiantest.com.",
                                     "TTL": 3600,
@@ -362,7 +346,7 @@
                                 "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/A/www",
                                 "name": "www",
                                 "type": "Microsoft.Network/dnszones/A",
-                                "etag": "57c95b8c-cb9e-4c71-9622-aadeedadaad8",
+                                "etag": "0cea3c9f-bb3e-4143-9cc5-f52c95a7a4fb",
                                 "properties": {
                                     "fqdn": "www.h7s6n7kl225j4.cloudcustodiantest.com.",
                                     "TTL": 3600,
@@ -399,17 +383,17 @@
                     "cache-control": [
                         "private"
                     ],
-                    "etag": [
-                        "898c904f-54fc-4272-b76d-21f119a89b4f"
+                    "date": [
+                        "Tue, 12 Nov 2019 00:47:26 GMT"
                     ],
                     "content-length": [
                         "456"
                     ],
-                    "date": [
-                        "Wed, 03 Jul 2019 18:23:36 GMT"
-                    ],
                     "x-ms-ratelimit-remaining-subscription-resource-requests": [
                         "11999"
+                    ],
+                    "etag": [
+                        "c523ca0d-e7a4-47ae-9e6e-f4c0c28de132"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
@@ -420,7 +404,7 @@
                         "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/A/deleteme",
                         "name": "deleteme",
                         "type": "Microsoft.Network/dnszones/A",
-                        "etag": "898c904f-54fc-4272-b76d-21f119a89b4f",
+                        "etag": "c523ca0d-e7a4-47ae-9e6e-f4c0c28de132",
                         "properties": {
                             "fqdn": "deleteme.h7s6n7kl225j4.cloudcustodiantest.com.",
                             "TTL": 3600,

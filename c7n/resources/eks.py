@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
+from c7n import tags
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
@@ -59,6 +60,41 @@ class EKSSGFilter(SecurityGroupFilter):
 class EKSVpcFilter(VpcFilter):
 
     RelatedIdsExpression = 'resourcesVpcConfig.vpcId'
+
+
+@EKS.action_registry.register('tag')
+class EKSTag(tags.Tag):
+
+    permissions = ('eks:TagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        for r in resource_set:
+            try:
+                self.manager.retry(
+                    client.tag_resource,
+                    resourceArn=r['arn'],
+                    tags={t['Key']: t['Value'] for t in tags})
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+EKS.filter_registry.register('marked-for-op', tags.TagActionFilter)
+EKS.action_registry.register('mark-for-op', tags.TagDelayedAction)
+
+
+@EKS.action_registry.register('remove-tag')
+class EKSRemoveTag(tags.RemoveTag):
+
+    permissions = ('eks:UntagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        for r in resource_set:
+            try:
+                self.manager.retry(
+                    client.untag_resource,
+                    resourceArn=r['arn'], tagKeys=tags)
+            except client.exceptions.ResourceNotFoundException:
+                continue
 
 
 @EKS.action_registry.register('update-config')

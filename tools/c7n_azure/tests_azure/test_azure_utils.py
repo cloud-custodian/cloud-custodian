@@ -54,7 +54,7 @@ class UtilsTest(BaseTest):
 
     def test_get_namespace(self):
         self.assertEqual(ResourceIdParser.get_namespace(RESOURCE_ID), "Microsoft.Compute")
-        self.assertEqual(ResourceIdParser.get_namespace(RESOURCE_ID_CHILD), "Microsoft.Sql/servers")
+        self.assertEqual(ResourceIdParser.get_namespace(RESOURCE_ID_CHILD), "Microsoft.Sql")
 
     def test_get_resource_group(self):
         self.assertEqual(ResourceIdParser.get_resource_group(RESOURCE_ID), "rgtest")
@@ -62,7 +62,7 @@ class UtilsTest(BaseTest):
     def test_get_resource_type(self):
 
         self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID), "virtualMachines")
-        self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID_CHILD), "databases")
+        self.assertEqual(ResourceIdParser.get_resource_type(RESOURCE_ID_CHILD), "servers/databases")
 
     def test_get_full_type(self):
         self.assertEqual(ResourceIdParser.get_full_type(RESOURCE_ID),

@@ -256,6 +256,7 @@ class RestStage(query.ChildResourceManager):
         date = 'createdDate'
         universal_taggable = True
         config_type = "AWS::ApiGateway::Stage"
+        arn_type = 'stages'
 
     def get_source(self, source_type):
         if source_type == 'describe-rest-stage':

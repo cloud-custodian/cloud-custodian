@@ -299,7 +299,7 @@ class ArmResourceTest(BaseTest):
                                      'resource': 'azure.armresource'}]})
 
         rg_id = '/subscriptions/{0}/resourceGroups/test_vm'\
-                .format(rm.get_session().get_subscription_id())
+                .format(self.session.get_subscription_id())
         ids = ['{0}/providers/Microsoft.Compute/virtualMachines/cctestvm'.format(rg_id),
                rg_id]
         resources = rm.get_resources(ids)

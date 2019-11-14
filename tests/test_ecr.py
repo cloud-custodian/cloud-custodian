@@ -33,6 +33,42 @@ class TestECR(BaseTest):
         client.create_repository(repositoryName=name)
         self.addCleanup(client.delete_repository, repositoryName=name)
 
+    def test_ecr_set_scanning(self):
+        factory = self.replay_flight_data('test_ecr_set_scanning')
+        p = self.load_policy({
+            'name': 'ecr-set-scanning',
+            'resource': 'aws.ecr',
+            'filters': [
+                {'repositoryName': 'testrepo'},
+                {'imageScanningConfiguration.scanOnPush': False}],
+            'actions': ['set-scanning']}, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['repositoryName'], 'testrepo')
+        client = factory().client('ecr')
+        repo = client.describe_repositories(repositoryNames=['testrepo'])[
+            'repositories'][0]
+        self.assertJmes(
+            'imageScanningConfiguration.scanOnPush', repo, True)
+
+    def test_ecr_set_immutability(self):
+        factory = self.replay_flight_data('test_ecr_set_immutability')
+        p = self.load_policy({
+            'name': 'ecr-set-immutability',
+            'resource': 'aws.ecr',
+            'filters': [
+                {'repositoryName': 'testrepo'},
+                {'imageTagMutability': 'MUTABLE'}],
+            'actions': [{'type': 'set-immutability'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['repositoryName'], 'testrepo')
+        client = factory().client('ecr')
+        repo = client.describe_repositories(repositoryNames=['testrepo'])[
+            'repositories'][0]
+        self.assertEqual(repo['imageTagMutability'], 'IMMUTABLE')
+
     def test_ecr_lifecycle_policy(self):
         session_factory = self.replay_flight_data('test_ecr_lifecycle_update')
         rule = {

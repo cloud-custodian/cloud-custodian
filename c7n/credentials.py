@@ -143,7 +143,7 @@ def get_sts_client(session, region):
         endpoint_url = "https://sts.{}.amazonaws.com".format(region)
         region_name = region
     else:
-        endpoint_url = "https://sts.amazonaws.com"
+        endpoint_url = None
         region_name = None
     return session.client(
         'sts', endpoint_url=endpoint_url, region_name=region_name)
