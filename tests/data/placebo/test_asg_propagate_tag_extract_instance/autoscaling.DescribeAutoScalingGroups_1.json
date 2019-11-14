@@ -3,42 +3,6 @@
     "data": {
         "AutoScalingGroups": [
             {
-                "AutoScalingGroupName": "c7n-image-age-test",
-                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:9edc8896-61e5-4e7a-b4ab-62b41ea7064d:autoScalingGroupName/c7n-image-age-test",
-                "LaunchConfigurationName": "test-offhours",
-                "MinSize": 0,
-                "MaxSize": 0,
-                "DesiredCapacity": 0,
-                "DefaultCooldown": 300,
-                "AvailabilityZones": [
-                    "us-east-1a"
-                ],
-                "LoadBalancerNames": [],
-                "TargetGroupARNs": [],
-                "HealthCheckType": "EC2",
-                "HealthCheckGracePeriod": 300,
-                "Instances": [],
-                "CreatedTime": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 11,
-                    "day": 4,
-                    "hour": 2,
-                    "minute": 49,
-                    "second": 1,
-                    "microsecond": 105000
-                },
-                "SuspendedProcesses": [],
-                "VPCZoneIdentifier": "subnet-914763e7",
-                "EnabledMetrics": [],
-                "Tags": [],
-                "TerminationPolicies": [
-                    "Default"
-                ],
-                "NewInstancesProtectedFromScaleIn": false,
-                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
-            },
-            {
                 "AutoScalingGroupName": "devx",
                 "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:94c763b0-e6ce-49ee-a7e9-d014090fad73:autoScalingGroupName/devx",
                 "MixedInstancesPolicy": {
