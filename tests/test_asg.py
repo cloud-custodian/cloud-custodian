@@ -295,9 +295,8 @@ class AutoScalingTest(BaseTest):
         # i-06e730980933e2d72 doesn't exist
         instance_ids = ['i-037e000a277bbc1ab', 'i-06e730980933e2d72']
         with retry_remaining_instances(instance_ids, tag_map, ec2) as ids:
-            ec2.create_tags(
-                    Resources=ids,
-                    Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()]) 
+            ec2.create_tags(Resources=ids,
+                    Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
         tag_check = self.get_ec2_tags(ec2, 'i-037e000a277bbc1ab')
         self.assertTrue("c7n-test" in tag_check)
 

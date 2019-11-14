@@ -1200,25 +1200,11 @@ class PropagateTags(Action):
             instance_count = sum(list(w.map(self.process_asg, asgs)))
             self.log.info("Applied tags to %d instances" % instance_count)
 
-    @contextmanager
-    def retry_remaining_instances(self, instances):
-        client = local_session(self.manager.session_factory).client('ec2')
-        try:
-            client.describe_instances(InstanceIds=instances)
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
-                bad_instance = extract_instance_id(e)
-                if bad_instance:
-                    instances.remove(bad_instance)
-        finally:
-            yield instances
-
     def process_asg(self, asg):
         client = local_session(self.manager.session_factory).client('ec2')
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         tag_map = {t['Key']: t['Value'] for t in asg.get('Tags', [])
                    if t['PropagateAtLaunch'] and not t['Key'].startswith('aws:')}
-
         if self.data.get('tags'):
             tag_map = {
                 k: v for k, v in tag_map.items()
@@ -1229,11 +1215,10 @@ class PropagateTags(Action):
             instances = [self.instance_map[i] for i in instance_ids]
             self.prune_instance_tags(client, asg, tag_set, instances)
         if not self.manager.config.dryrun:
-            with self.retry_remaining_instances(instance_ids):
-                if instance_ids:
-                    client.create_tags(
-                        Resources=instance_ids,
-                        Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+            with retry_remaining_instances(instance_ids, tag_map, client) as ids:
+                client.create_tags(
+                    Resources=ids,
+                    Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
         return len(instance_ids)
 
     def prune_instance_tags(self, client, asg, tag_set, instances):
@@ -1282,6 +1267,21 @@ class PropagateTags(Action):
         return {i['InstanceId']: i for i in
                 self.manager.get_resource_manager(
                     'ec2').get_resources(instance_ids)}
+
+
+@contextmanager
+def retry_remaining_instances(instances, tag_map, client):
+    try:
+        client.create_tags(
+            Resources=instances,
+            Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'InvalidInstanceID.NotFound':
+            bad_instance = extract_instance_id(e)
+            if bad_instance:
+                instances.remove(bad_instance)
+    finally:
+        yield instances
 
 
 @ASG.action_registry.register('rename-tag')
