@@ -63,6 +63,49 @@ class ECRTag(tags.Tag):
                 pass
 
 
+@ECR.action_registry.register('set-scanning')
+class ECRSetScanning(Action):
+
+    permissions = ('ecr:PutImageScanningConfiguration',)
+    schema = type_schema(
+        'set-scanning',
+        state={'type': 'boolean', 'default': True})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecr')
+        s = self.data.get('state', True)
+        for r in resources:
+            try:
+                client.put_image_scanning_configuration(
+                    registryId=r['registryId'],
+                    repositoryName=r['repositoryName'],
+                    imageScanningConfiguration={
+                        'scanOnPush': s})
+            except client.exceptions.RepositoryNotFoundException:
+                continue
+
+
+@ECR.action_registry.register('set-immutability')
+class ECRSetImmutability(Action):
+
+    permissions = ('ecr:PutImageTagMutability',)
+    schema = type_schema(
+        'set-immutability',
+        state={'type': 'boolean', 'default': True})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecr')
+        s = 'IMMUTABLE' if self.data.get('state', True) else 'MUTABLE'
+        for r in resources:
+            try:
+                client.put_image_tag_mutability(
+                    registryId=r['registryId'],
+                    repositoryName=r['repositoryName'],
+                    imageTagMutability=s)
+            except client.exceptions.RepositoryNotFoundException:
+                continue
+
+
 @ECR.action_registry.register('remove-tag')
 class ECRRemoveTags(tags.RemoveTag):
 
