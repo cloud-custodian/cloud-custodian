@@ -289,7 +289,7 @@ class AutoScalingTest(BaseTest):
         factory = self.replay_flight_data("test_asg_propagate_tag_extract_instance")
         session = factory()
         ec2 = session.client("ec2")
-        tag_map = self.get_ec2_tags(ec2, 'i-0c5208890f171b2f1')
+        tag_map = self.get_ec2_tags(ec2, 'i-06e730980933e2d72')
         self.assertFalse("Owner" in tag_map)
         p = self.load_policy(
             {
@@ -307,7 +307,7 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        tag_map = self.get_ec2_tags(ec2, 'i-0c5208890f171b2f1')
+        tag_map = self.get_ec2_tags(ec2, 'i-06e730980933e2d72')
         self.assertTrue("Owner" in tag_map)
 
     def test_asg_remove_tag(self):
