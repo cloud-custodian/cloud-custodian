@@ -4,42 +4,48 @@
         "Tags": [
             {
                 "Key": "Owner",
-                "ResourceId": "i-06e730980933e2d72",
+                "ResourceId": "i-037e000a277bbc1ab",
                 "ResourceType": "instance",
                 "Value": "test"
             },
             {
                 "Key": "aws:autoscaling:groupName",
-                "ResourceId": "i-06e730980933e2d72",
+                "ResourceId": "i-037e000a277bbc1ab",
                 "ResourceType": "instance",
                 "Value": "devx"
             },
             {
                 "Key": "aws:ec2:fleet-id",
-                "ResourceId": "i-06e730980933e2d72",
+                "ResourceId": "i-037e000a277bbc1ab",
                 "ResourceType": "instance",
-                "Value": "fleet-1876cfdf-815d-a751-84b0-098aa4fa7560"
+                "Value": "fleet-b2de65fd-0b75-2559-86b8-89a088fc565d"
             },
             {
                 "Key": "aws:ec2launchtemplate:id",
-                "ResourceId": "i-06e730980933e2d72",
+                "ResourceId": "i-037e000a277bbc1ab",
                 "ResourceType": "instance",
                 "Value": "lt-0877401c93c294001"
             },
             {
                 "Key": "aws:ec2launchtemplate:version",
-                "ResourceId": "i-06e730980933e2d72",
+                "ResourceId": "i-037e000a277bbc1ab",
                 "ResourceType": "instance",
                 "Value": "4"
+            },
+            {
+                "Key": "c7n-test",
+                "ResourceId": "i-037e000a277bbc1ab",
+                "ResourceType": "instance",
+                "Value": "tag-propagate"
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "88cb6cb4-3821-4936-b8b1-dc5dde1e57cf",
+            "RequestId": "eee8ddad-278f-404f-ae95-3f7f9e754b98",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
                 "content-type": "text/xml;charset=UTF-8",
-                "content-length": "1345",
-                "date": "Thu, 14 Nov 2019 17:36:12 GMT",
+                "content-length": "1556",
+                "date": "Thu, 14 Nov 2019 22:41:26 GMT",
                 "server": "AmazonEC2"
             },
             "RetryAttempts": 0

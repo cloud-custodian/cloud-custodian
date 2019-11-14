@@ -18,7 +18,7 @@ from dateutil import tz as tzutil
 
 from .common import BaseTest
 
-from c7n.resources.asg import LaunchInfo
+from c7n.resources.asg import LaunchInfo, retry_remaining_instances
 
 
 class LaunchConfigTest(BaseTest):
@@ -289,26 +289,17 @@ class AutoScalingTest(BaseTest):
         factory = self.replay_flight_data("test_asg_propagate_tag_extract_instance")
         session = factory()
         ec2 = session.client("ec2")
-        tag_map = self.get_ec2_tags(ec2, 'i-06e730980933e2d72')
-        self.assertFalse("Owner" in tag_map)
-        p = self.load_policy(
-            {
-                "name": "asg-propagate-tag",
-                "resource": "asg",
-                "filters": [{"tag:Owner": "not-null"}],
-                "actions": [
-                    {
-                        "type": "propagate-tags",
-                        "tags": ["Owner"],
-                    },
-                ],
-            },
-            session_factory=factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        tag_map = self.get_ec2_tags(ec2, 'i-06e730980933e2d72')
-        self.assertTrue("Owner" in tag_map)
+        tag_map = {'c7n-test': 'tag-propagate'}
+        tag = self.get_ec2_tags(ec2, 'i-037e000a277bbc1ab')
+        self.assertFalse("c7n-test" in tag)
+        # i-06e730980933e2d72 doesn't exist
+        instance_ids = ['i-037e000a277bbc1ab', 'i-06e730980933e2d72']
+        with retry_remaining_instances(instance_ids, tag_map, ec2) as ids:
+            ec2.create_tags(
+                    Resources=ids,
+                    Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()]) 
+        tag_check = self.get_ec2_tags(ec2, 'i-037e000a277bbc1ab')
+        self.assertTrue("c7n-test" in tag_check)
 
     def test_asg_remove_tag(self):
         factory = self.replay_flight_data("test_asg_remove_tag")

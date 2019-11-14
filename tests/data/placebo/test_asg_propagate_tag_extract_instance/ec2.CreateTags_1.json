@@ -1,13 +1,17 @@
 {
-    "status_code": 200,
+    "status_code": 400,
     "data": {
+        "Error": {
+            "Code": "InvalidInstanceID.NotFound",
+            "Message": "The instance ID 'i-06e730980933e2d72' does not exist"
+        },
         "ResponseMetadata": {
-            "RequestId": "7437f01a-24d0-4b49-aafe-5f5d536a5185",
-            "HTTPStatusCode": 200,
+            "RequestId": "470117f5-5974-44ba-9a78-f9dceeb8891b",
+            "HTTPStatusCode": 400,
             "HTTPHeaders": {
-                "content-type": "text/xml;charset=UTF-8",
-                "content-length": "221",
-                "date": "Thu, 14 Nov 2019 17:36:11 GMT",
+                "transfer-encoding": "chunked",
+                "date": "Thu, 14 Nov 2019 22:41:25 GMT",
+                "connection": "close",
                 "server": "AmazonEC2"
             },
             "RetryAttempts": 0

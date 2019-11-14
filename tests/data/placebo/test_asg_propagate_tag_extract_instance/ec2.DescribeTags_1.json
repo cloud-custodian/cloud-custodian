@@ -3,37 +3,43 @@
     "data": {
         "Tags": [
             {
+                "Key": "Owner",
+                "ResourceId": "i-037e000a277bbc1ab",
+                "ResourceType": "instance",
+                "Value": "test"
+            },
+            {
                 "Key": "aws:autoscaling:groupName",
-                "ResourceId": "i-06e730980933e2d72",
+                "ResourceId": "i-037e000a277bbc1ab",
                 "ResourceType": "instance",
                 "Value": "devx"
             },
             {
                 "Key": "aws:ec2:fleet-id",
-                "ResourceId": "i-06e730980933e2d72",
+                "ResourceId": "i-037e000a277bbc1ab",
                 "ResourceType": "instance",
-                "Value": "fleet-1876cfdf-815d-a751-84b0-098aa4fa7560"
+                "Value": "fleet-b2de65fd-0b75-2559-86b8-89a088fc565d"
             },
             {
                 "Key": "aws:ec2launchtemplate:id",
-                "ResourceId": "i-06e730980933e2d72",
+                "ResourceId": "i-037e000a277bbc1ab",
                 "ResourceType": "instance",
                 "Value": "lt-0877401c93c294001"
             },
             {
                 "Key": "aws:ec2launchtemplate:version",
-                "ResourceId": "i-06e730980933e2d72",
+                "ResourceId": "i-037e000a277bbc1ab",
                 "ResourceType": "instance",
                 "Value": "4"
             }
         ],
         "ResponseMetadata": {
-            "RequestId": "d82955f7-debd-442b-99b7-4a0fdc079d77",
+            "RequestId": "3ace7bb8-8e92-48bf-aa8b-559239e60799",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
                 "content-type": "text/xml;charset=UTF-8",
-                "content-length": "1146",
-                "date": "Thu, 14 Nov 2019 17:36:06 GMT",
+                "content-length": "1345",
+                "date": "Thu, 14 Nov 2019 22:41:25 GMT",
                 "server": "AmazonEC2"
             },
             "RetryAttempts": 0
