@@ -69,7 +69,7 @@ class ActionEffectFilter(Filter):
         client = local_session(self.manager.session_factory).client('iam')
         manager = IamPermissionsManager(client)
         # Filter where they match the given conditions.
-        return filter(lambda r: self.match(r, manager), resources)
+        return list(filter(lambda r: self.match(r, manager), resources))
 
 class RoleActionEffectFilter(ActionEffectFilter):
 

@@ -1417,7 +1417,7 @@ class AllUserPolicies(ValueFilter):
             if 'AttachedPolicyArns' not in mapping:
                 aps = client.list_attached_user_policies(
                     UserName=u['UserName'])['AttachedPolicies']
-                mapping['AttachedPolicyArns'] = map(lambda x: x['PolicyArn'], aps)
+                mapping['AttachedPolicyArns'] = list(map(lambda x: x['PolicyArn'], aps))
             if 'InlinePolicyNames' not in mapping:
                 ipns = client.list_user_policies(
                     UserName=u['UserName'])['PolicyNames']
