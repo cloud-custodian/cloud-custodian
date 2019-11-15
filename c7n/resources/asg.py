@@ -1272,16 +1272,15 @@ class PropagateTags(Action):
 @contextmanager
 def retry_remaining_instances(instances, tag_map, client):
     try:
-        client.create_tags(
-            Resources=instances,
-            Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+        yield instances
     except ClientError as e:
         if e.response['Error']['Code'] == 'InvalidInstanceID.NotFound':
             bad_instance = extract_instance_id(e)
             if bad_instance:
                 instances.remove(bad_instance)
-    finally:
-        yield instances
+            client.create_tags(
+                Resources=instances,
+                Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
 
 
 @ASG.action_registry.register('rename-tag')
