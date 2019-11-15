@@ -256,7 +256,8 @@ class CosmosDBTest(BaseTest):
 
         self.sleep_in_live_mode()
 
-        client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
+        client = local_session(Session).client(
+            'azure.mgmt.cosmosdb.CosmosDBManagementClient')
         cosmos_account = client.database_accounts.get('test_cosmosdb', account_name)
         self.assertTrue('test-store-throughput' in cosmos_account.tags)
 
@@ -528,7 +529,8 @@ class CosmosDBFirewallActionTest(BaseTest):
 class CosmosDBThroughputActionsTest(BaseTest):
     def setUp(self, *args, **kwargs):
         super(CosmosDBThroughputActionsTest, self).setUp(*args, **kwargs)
-        self.client = local_session(Session).client('azure.mgmt.cosmosdb.CosmosDB')
+        self.client = local_session(Session).client(
+            'azure.mgmt.cosmosdb.CosmosDBManagementClient')
         sub_id = local_session(Session).get_subscription_id()[-12:]
         account_name = "cctestcosmosdb%s" % sub_id
         key = CosmosDBChildResource.get_cosmos_key(
