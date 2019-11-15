@@ -286,7 +286,7 @@ class AutoScalingTest(BaseTest):
         self.assertFalse("Home" in tag_map)
 
     def test_asg_propagate_tag_extract_instance(self):
-        factory = self.record_flight_data("test_asg_propagate_tag_extract_instance")
+        factory = self.replay_flight_data("test_asg_propagate_tag_extract_instance")
         session = factory()
         ec2 = session.client("ec2")
         tag_map = {'c7n-test': 'tag-propagate'}
