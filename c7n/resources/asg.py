@@ -1278,9 +1278,9 @@ def retry_remaining_instances(instances, tag_map, client):
             bad_instance = extract_instance_id(e)
             if bad_instance:
                 instances.remove(bad_instance)
-            client.create_tags(
-                Resources=instances,
-                Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+                client.create_tags(
+                    Resources=instances,
+                    Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
 
 
 @ASG.action_registry.register('rename-tag')
