@@ -25,7 +25,7 @@ class Bag(dict):
             return self[k]
         except KeyError:
             raise AttributeError(k)
-            
+
     def __setattr__(self, k, v):
         self[k] = v
 
