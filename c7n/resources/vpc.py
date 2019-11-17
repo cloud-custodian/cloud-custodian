@@ -1319,7 +1319,7 @@ class AddPermissions(BaseAction):
         client = local_session(self.manager.session_factory).client('ec2')
         for r in resources:
             method = getattr(client, 'authorize_security_group_%s' % label)
-
+        try:
             for i in self.data.get('Cidr', []):
                 method(GroupId=r['GroupId'],
                        IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
@@ -1334,6 +1334,10 @@ class AddPermissions(BaseAction):
                        IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
                                        'ToPort': to_port, 'Ipv6Ranges': [{'CidrIpv6': i}]
                                        }])
+
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'InvalidPermission.Duplicate':
+                raise e
 
 
 @SecurityGroup.action_registry.register('post-finding')
