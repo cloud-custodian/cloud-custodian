@@ -15,6 +15,7 @@ import argparse
 import itertools
 import json
 import os
+import re
 import logging
 import sys
 
@@ -54,9 +55,18 @@ def region_gc(options, region, policy_config, policies):
 
     remove = []
     current_policies = [p.name for p in policies]
+    pattern = re.compile(options.policy_regex)
     for f in funcs:
-        pn = f['FunctionName'].split('-', 1)[1]
-        if pn not in current_policies:
+        if not pattern.match(f['FunctionName']):
+            continue
+        match = False
+        for pn in current_policies:
+            if f['FunctionName'].endswith(pn):
+                match = True
+        if options.present:
+            if match:
+                remove.append(f)
+        elif not match:
             remove.append(f)
 
     for n in remove:
@@ -146,6 +156,9 @@ def setup_parser():
         '-c', '--config', dest="config_files", nargs="*", action='append',
         help="Policy configuration files(s)", default=[])
     parser.add_argument(
+        "--present", action="store_true", default=False,
+        help='Target policies present in config files for removal instead of skipping them.')
+    parser.add_argument(
         '-r', '--region', action='append', dest='regions', metavar='REGION',
         help="AWS Region to target. Can be used multiple times, also supports `all`")
     parser.add_argument('--dryrun', action="store_true", default=False)
@@ -155,6 +168,9 @@ def setup_parser():
     parser.add_argument(
         "--prefix", default="custodian-",
         help="The Lambda name prefix to use for clean-up")
+    parser.add_argument(
+        "--policy-regex", default="^custodian-.*",
+        help="The policy must match the regex")
     parser.add_argument("-p", "--policies", default=None, dest='policy_filter',
                         help="Only use named/matched policies")
     parser.add_argument(
