@@ -14,6 +14,8 @@
 
 import re
 
+from datetime import datetime
+
 from c7n.utils import type_schema
 
 from c7n_gcp.actions import MethodAction
@@ -146,22 +148,51 @@ class Disk(QueryResourceManager):
 
 @Disk.action_registry.register('snapshot')
 class DiskSnapshot(MethodAction):
+    """
+    `Snapshots <https://cloud.google.com/compute/docs/reference/rest/v1/disks/createSnapshot>`_
+    disk.
 
-    schema = type_schema('snapshot')
+    The `name_format` specifies name of snapshot in python `format string <https://pyformat.info/>`
+
+    Inside format string there are defined variables:
+      - `now`: current time
+      - `disk`: whole disk resource
+
+    Default name format is `{disk.name}`
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-disk-snapshot
+            resource: gcp.disk
+            filters:
+              - type: value
+                key: name
+                value: disk-7
+            actions:
+              - type: snapshot
+                name_format: "{disk[name]:.50}-{now:%Y-%m-%d}"
+    """
+    schema = type_schema('snapshot', name_format={'type': 'string'})
     method_spec = {'op': 'createSnapshot'}
     path_param_re = re.compile(
         '.*?/projects/(.*?)/zones/(.*?)/disks/(.*)')
     attr_filter = ('status', ('RUNNING', 'READY'))
 
-    def get_resource_params(self, m, r):
-        project, zone, resourceId = self.path_param_re.match(r['selfLink']).groups()
+    def get_resource_params(self, model, resource):
+        project, zone, resourceId = self.path_param_re.match(resource['selfLink']).groups()
+        name_format = self.data.get('name_format', '{disk[name]}')
+        name = name_format.format(disk=resource, now=datetime.now())
+
         return {
             'project': project,
             'zone': zone,
             'disk': resourceId,
             'body': {
-                'name': resourceId,
-                'labels': r.get('labels', {}),
+                'name': name,
+                'labels': resource.get('labels', {}),
             }
         }
 

@@ -128,6 +128,18 @@ class DiskTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_disk_snapshot_add_date(self):
+        factory = self.replay_flight_data('disk-snapshot', project_id='custodian-1291')
+        p = self.load_policy(
+            {'name': 'all-images',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'name': 'c7n-jenkins'}],
+             'actions': [{'type': 'snapshot', 'name_format': "{disk[name]:.50}-{now:%Y-%m-%d}"}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_disk_delete(self):
         project_id = 'custodian-1291'
         resource_name = 'c7n-jenkins'
