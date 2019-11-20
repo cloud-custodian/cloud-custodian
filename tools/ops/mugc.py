@@ -169,7 +169,7 @@ def setup_parser():
         "--prefix", default="custodian-",
         help="The Lambda name prefix to use for clean-up")
     parser.add_argument(
-        "--policy-regex", default="^custodian-.*",
+        "--policy-regex",
         help="The policy must match the regex")
     parser.add_argument("-p", "--policies", default=None, dest='policy_filter',
                         help="Only use named/matched policies")
@@ -195,6 +195,9 @@ def main():
     logging.getLogger('botocore').setLevel(logging.ERROR)
     logging.getLogger('urllib3').setLevel(logging.ERROR)
     logging.getLogger('c7n.cache').setLevel(logging.WARNING)
+
+    if not options.policy_regex:
+        options.policy_regex = f"^{options.prefix}.*"
 
     if not options.regions:
         options.regions = [os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')]
