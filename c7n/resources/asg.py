@@ -33,7 +33,6 @@ from c7n.manager import resources
 from c7n import query
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
 from c7n.utils import local_session, type_schema, chunks, get_retry
-from contextlib import contextmanager
 from .ec2 import deserialize_user_data, extract_instance_id
 
 
@@ -1275,12 +1274,12 @@ class RetryCreateTag(object):
         self.client = client
         self.tag_map = tag_map
         self.instances = instances
-    
+
     def __enter__(self):
         return self.instances
 
     def __exit__(self, *exec_info):
-        if exec_info:
+        if exec_info and exec_info[1]:
             if exec_info[1].response['Error']['Code'] == 'InvalidInstanceID.NotFound':
                 bad_instance = extract_instance_id(exec_info[1])
                 if bad_instance:
@@ -1298,7 +1297,7 @@ class RetryCreateTag(object):
                             self.instances.remove(bad_instance)
                             continue
                     return None
-                      
+
 
 @ASG.action_registry.register('rename-tag')
 class RenameTag(Action):
