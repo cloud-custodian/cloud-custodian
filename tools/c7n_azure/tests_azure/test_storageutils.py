@@ -13,16 +13,17 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import pytest
 from azure.common import AzureHttpError
 from azure.mgmt.storage.models import StorageAccountListKeysResult, StorageAccountKey
 from azure.storage.common import TokenCredential
-from .azure_common import BaseTest, arm_template, requires_arm_polling
 from c7n_azure.session import Session
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser
 from mock import patch
 
 from c7n.utils import local_session
+from .azure_common import BaseTest, arm_template, requires_arm_polling
 
 
 @requires_arm_polling
@@ -103,6 +104,7 @@ class StorageUtilsTest(BaseTest):
         self.assertTrue(result)
 
     @arm_template('storage.json')
+    @pytest.mark.skiplive
     def test_cycle_queue_message_by_uri(self):
         account = self.setup_account()
         url = "https://" + account.name + ".queue.core.windows.net/testcyclemessage"
