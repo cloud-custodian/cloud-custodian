@@ -1213,7 +1213,7 @@ class PropagateTags(Action):
         if self.data.get('trim', False):
             instances = [self.instance_map[i] for i in instance_ids]
             self.prune_instance_tags(client, asg, tag_set, instances)
-        if not self.manager.config.dryrun:
+        if not self.manager.config.dryrun and instance_ids:
             with RetryCreateTag(instance_ids, tag_map, client):
                 client.create_tags(
                     Resources=instance_ids,

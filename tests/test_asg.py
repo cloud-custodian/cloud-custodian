@@ -292,7 +292,7 @@ class AutoScalingTest(BaseTest):
         tag_map = {'c7n-test': 'tag-propagate'}
         tag = self.get_ec2_tags(ec2, 'i-0cee2d12c4de66ec8')
         self.assertFalse("c7n-test" in tag)
-        # i-06e730980933e2d72 doesn't exist
+        # i-06e730980933e2d72 and i-0727ec64d6df988f9 do not exist
         instance_ids = ['i-0727ec64d6df988f9', 'i-06e730980933e2d72', 'i-0cee2d12c4de66ec8']
         with RetryCreateTag(instance_ids, tag_map, ec2) as ids:
             ec2.create_tags(Resources=ids,
