@@ -74,7 +74,10 @@ CONFIG_SCHEMA = {
             'properties': {
                 'name': {'type': 'string'},
                 'email': {'type': 'string'},
-                'account_id': {'type': 'string'},
+                'account_id': {
+                    'type': 'string',
+                    'pattern': '^[0-9]{12}$',
+                    'minLength': 12, 'maxLength': 12},
                 'profile': {'type': 'string', 'minLength': 3},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'regions': {'type': 'array', 'items': {'type': 'string'}},
