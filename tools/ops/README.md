@@ -11,6 +11,18 @@ The only required argument is `-c`: a list of config (policy) files.
 $ python tools/ops/mugc.py -c policies.yml
 ```
 
+The policy file must be like:
+
+```
+policies:
+  - name: delete
+    resource: ebs
+```
+
+**You can't choose which CloudCustodian lambda will be delete**
+
+**TIP: Launch always before --dryrun command**
+
 mugc also suports the following args:
 
 ```
