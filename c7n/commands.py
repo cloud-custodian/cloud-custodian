@@ -231,6 +231,7 @@ def validate(options):
         except PolicyValidationError as e:
             log.error("Configuration invalid: {}".format(config_file))
             log.error("%s" % e)
+            errors.append(e)
             continue
         errors += schema.validate(data, schm)
         conf_policy_names = {
