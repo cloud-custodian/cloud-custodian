@@ -18,7 +18,7 @@ from dateutil import tz as tzutil
 
 from .common import BaseTest
 
-from c7n.resources.asg import LaunchInfo, retry_remaining_instances
+from c7n.resources.asg import LaunchInfo, RetryCreateTag
 
 
 class LaunchConfigTest(BaseTest):
@@ -290,14 +290,14 @@ class AutoScalingTest(BaseTest):
         session = factory()
         ec2 = session.client("ec2")
         tag_map = {'c7n-test': 'tag-propagate'}
-        tag = self.get_ec2_tags(ec2, 'i-0727ec64d6df988f9')
+        tag = self.get_ec2_tags(ec2, 'i-0cee2d12c4de66ec8')
         self.assertFalse("c7n-test" in tag)
         # i-06e730980933e2d72 doesn't exist
-        instance_ids = ['i-0727ec64d6df988f9', 'i-06e730980933e2d72']
-        with retry_remaining_instances(instance_ids, tag_map, ec2) as ids:
+        instance_ids = ['i-0727ec64d6df988f9', 'i-06e730980933e2d72', 'i-0cee2d12c4de66ec8']
+        with RetryCreateTag(instance_ids, tag_map, ec2) as ids:
             ec2.create_tags(Resources=ids,
                     Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
-        tag_check = self.get_ec2_tags(ec2, 'i-0727ec64d6df988f9')
+        tag_check = self.get_ec2_tags(ec2, 'i-0cee2d12c4de66ec8')
         self.assertTrue("c7n-test" in tag_check)
 
     def test_asg_remove_tag(self):

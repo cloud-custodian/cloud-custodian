@@ -1215,9 +1215,9 @@ class PropagateTags(Action):
             instances = [self.instance_map[i] for i in instance_ids]
             self.prune_instance_tags(client, asg, tag_set, instances)
         if not self.manager.config.dryrun:
-            with retry_remaining_instances(instance_ids, tag_map, client) as ids:
+            with RetryCreateTag(instance_ids, tag_map, client):
                 client.create_tags(
-                    Resources=ids,
+                    Resources=instance_ids,
                     Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
         return len(instance_ids)
 
@@ -1269,19 +1269,36 @@ class PropagateTags(Action):
                     'ec2').get_resources(instance_ids)}
 
 
-@contextmanager
-def retry_remaining_instances(instances, tag_map, client):
-    try:
-        yield instances
-    except ClientError as e:
-        if e.response['Error']['Code'] == 'InvalidInstanceID.NotFound':
-            bad_instance = extract_instance_id(e)
-            if bad_instance:
-                instances.remove(bad_instance)
-                client.create_tags(
-                    Resources=instances,
-                    Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+class RetryCreateTag(object):
 
+    def __init__(self, instances, tag_map, client):
+        self.client = client
+        self.tag_map = tag_map
+        self.instances = instances
+    
+    def __enter__(self):
+        return self.instances
+
+    def __exit__(self, *exec_info):
+        if exec_info:
+            if exec_info[1].response['Error']['Code'] == 'InvalidInstanceID.NotFound':
+                bad_instance = extract_instance_id(exec_info[1])
+                if bad_instance:
+                    self.instances.remove(bad_instance)
+            while self.instances:
+                try:
+                    self.client.create_tags(
+                        Resources=self.instances,
+                        Tags=[{'Key': k, 'Value': v} for k, v in self.tag_map.items()])
+                    return True
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'InvalidInstanceID.NotFound':
+                        bad_instance = extract_instance_id(e)
+                        if bad_instance:
+                            self.instances.remove(bad_instance)
+                            continue
+                    return None
+                      
 
 @ASG.action_registry.register('rename-tag')
 class RenameTag(Action):
