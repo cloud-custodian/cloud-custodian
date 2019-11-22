@@ -61,7 +61,7 @@ WORKER_COUNT = int(
 
 
 CONFIG_SCHEMA = {
-    '$schema': 'http://json-schema.org/schema#',
+    '$schema': 'http://json-schema.org/draft-07/schema',
     'id': 'http://schema.cloudcustodian.io/v0/orgrunner.json',
     'definitions': {
         'account': {
