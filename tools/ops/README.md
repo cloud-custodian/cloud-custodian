@@ -19,7 +19,9 @@ policies:
     resource: ebs
 ```
 
-**You can't choose which CloudCustodian lambda will be delete**
+If you want to delete a specific Lambda Function you must put `--prefix` argument.
+
+**You can't choose which CloudCustodian lambda will be delete from the config policy passed as required argument**
 
 **TIP: Launch always before --dryrun command**
 
