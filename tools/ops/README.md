@@ -19,7 +19,7 @@ policies:
     resource: ebs
 ```
 
-If you want to delete a specific Lambda Function you must put `--prefix` argument.
+If you want to delete a specific Lambda Function you can use both `--prefix` argument or `--policy-regex` argument. 
 
 **You can't choose which CloudCustodian lambda will be delete from the config policy passed as required argument**
 
