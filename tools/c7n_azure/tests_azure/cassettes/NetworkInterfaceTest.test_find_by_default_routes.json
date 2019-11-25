@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/networkInterfaces?api-version=2018-12-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/networkInterfaces?api-version=2019-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -14,21 +14,21 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
-                    "date": [
-                        "Thu, 02 May 2019 19:32:52 GMT"
-                    ],
                     "content-length": [
-                        "10064"
-                    ],
-                    "x-ms-original-request-ids": [
-                        "b18a5f1e-82c6-4114-ae1f-c5e9a90fe946",
-                        "0b715d35-e98b-4f96-af85-ca553ce59780"
+                        "2953"
                     ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "211dafb9-93db-4c4c-85da-d74f9a915537",
+                        "770012d6-c9b8-46ac-b409-531ea41e7c4b"
+                    ],
+                    "date": [
+                        "Mon, 25 Nov 2019 19:11:31 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ]
                 },
                 "body": {
@@ -37,16 +37,16 @@
                             {
                                 "name": "cctestnic",
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_network_interface/providers/Microsoft.Network/networkInterfaces/cctestnic",
-                                "etag": "W/\"3a3e02ed-9bd1-4084-bc73-101ddfa91ca5\"",
+                                "etag": "W/\"b3d40af0-d267-4138-a91b-eb86e3d34711\"",
                                 "location": "eastus",
                                 "properties": {
                                     "provisioningState": "Succeeded",
-                                    "resourceGuid": "a1f9dce5-7219-47a6-a478-ba8a8cb21d51",
+                                    "resourceGuid": "382ac9ec-cd9c-48d4-a1c5-162ee506dcae",
                                     "ipConfigurations": [
                                         {
                                             "name": "ipconfig1",
                                             "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_network_interface/providers/Microsoft.Network/networkInterfaces/cctestnic/ipConfigurations/ipconfig1",
-                                            "etag": "W/\"3a3e02ed-9bd1-4084-bc73-101ddfa91ca5\"",
+                                            "etag": "W/\"b3d40af0-d267-4138-a91b-eb86e3d34711\"",
                                             "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
                                             "properties": {
                                                 "provisioningState": "Succeeded",
@@ -63,7 +63,7 @@
                                     "dnsSettings": {
                                         "dnsServers": [],
                                         "appliedDnsServers": [],
-                                        "internalDomainNameSuffix": "om4nwplwvpoubjpyboqqysbvne.bx.internal.cloudapp.net"
+                                        "internalDomainNameSuffix": "jl1wkh35iy2uhlzr0xb5hx4ata.bx.internal.cloudapp.net"
                                     },
                                     "enableAcceleratedNetworking": false,
                                     "enableIPForwarding": false,
@@ -73,203 +73,18 @@
                                 "type": "Microsoft.Network/networkInterfaces"
                             },
                             {
-                                "name": "k8s-agent-C02B7042-nic-0",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-C02B7042-nic-0",
-                                "etag": "W/\"e0af135a-65df-45f7-9962-e2f1a7d9b719\"",
-                                "location": "southcentralus",
-                                "properties": {
-                                    "provisioningState": "Succeeded",
-                                    "resourceGuid": "306213e4-7761-4649-853f-298f79b1262a",
-                                    "ipConfigurations": [
-                                        {
-                                            "name": "ipconfig1",
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-C02B7042-nic-0/ipConfigurations/ipconfig1",
-                                            "etag": "W/\"e0af135a-65df-45f7-9962-e2f1a7d9b719\"",
-                                            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-                                            "properties": {
-                                                "provisioningState": "Succeeded",
-                                                "privateIPAddress": "10.240.0.5",
-                                                "privateIPAllocationMethod": "Dynamic",
-                                                "subnet": {
-                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/virtualNetworks/k8s-vnet-C02B7042/subnets/k8s-subnet"
-                                                },
-                                                "primary": true,
-                                                "privateIPAddressVersion": "IPv4"
-                                            }
-                                        }
-                                    ],
-                                    "dnsSettings": {
-                                        "dnsServers": [],
-                                        "appliedDnsServers": [],
-                                        "internalDomainNameSuffix": "tgl4nmwjjeeuzcmuroowrvnxog.jx.internal.cloudapp.net"
-                                    },
-                                    "macAddress": "00-0D-3A-74-E9-D1",
-                                    "enableAcceleratedNetworking": false,
-                                    "enableIPForwarding": true,
-                                    "primary": true,
-                                    "virtualMachine": {
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-C02B7042-0"
-                                    },
-                                    "hostedWorkloads": [],
-                                    "tapConfigurations": []
-                                },
-                                "type": "Microsoft.Network/networkInterfaces"
-                            },
-                            {
-                                "name": "k8s-agent-C02B7042-nic-1",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-C02B7042-nic-1",
-                                "etag": "W/\"7636138f-c8fc-4393-9a1f-ac0831ca5f6c\"",
-                                "location": "southcentralus",
-                                "properties": {
-                                    "provisioningState": "Succeeded",
-                                    "resourceGuid": "9056514f-4ef2-410a-bf6f-c9d21d63a115",
-                                    "ipConfigurations": [
-                                        {
-                                            "name": "ipconfig1",
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-C02B7042-nic-1/ipConfigurations/ipconfig1",
-                                            "etag": "W/\"7636138f-c8fc-4393-9a1f-ac0831ca5f6c\"",
-                                            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-                                            "properties": {
-                                                "provisioningState": "Succeeded",
-                                                "privateIPAddress": "10.240.0.6",
-                                                "privateIPAllocationMethod": "Dynamic",
-                                                "subnet": {
-                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/virtualNetworks/k8s-vnet-C02B7042/subnets/k8s-subnet"
-                                                },
-                                                "primary": true,
-                                                "privateIPAddressVersion": "IPv4"
-                                            }
-                                        }
-                                    ],
-                                    "dnsSettings": {
-                                        "dnsServers": [],
-                                        "appliedDnsServers": [],
-                                        "internalDomainNameSuffix": "tgl4nmwjjeeuzcmuroowrvnxog.jx.internal.cloudapp.net"
-                                    },
-                                    "macAddress": "00-0D-3A-74-E8-27",
-                                    "enableAcceleratedNetworking": false,
-                                    "enableIPForwarding": true,
-                                    "primary": true,
-                                    "virtualMachine": {
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-C02B7042-1"
-                                    },
-                                    "hostedWorkloads": [],
-                                    "tapConfigurations": []
-                                },
-                                "type": "Microsoft.Network/networkInterfaces"
-                            },
-                            {
-                                "name": "k8s-agent-C02B7042-nic-2",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-C02B7042-nic-2",
-                                "etag": "W/\"7a94215a-6e3a-41b6-b12a-1f0a58e1e61a\"",
-                                "location": "southcentralus",
-                                "properties": {
-                                    "provisioningState": "Succeeded",
-                                    "resourceGuid": "01c5a5dc-c251-46c2-8c35-dd01f9bcb6a7",
-                                    "ipConfigurations": [
-                                        {
-                                            "name": "ipconfig1",
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-agent-C02B7042-nic-2/ipConfigurations/ipconfig1",
-                                            "etag": "W/\"7a94215a-6e3a-41b6-b12a-1f0a58e1e61a\"",
-                                            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-                                            "properties": {
-                                                "provisioningState": "Succeeded",
-                                                "privateIPAddress": "10.240.0.4",
-                                                "privateIPAllocationMethod": "Dynamic",
-                                                "subnet": {
-                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/virtualNetworks/k8s-vnet-C02B7042/subnets/k8s-subnet"
-                                                },
-                                                "primary": true,
-                                                "privateIPAddressVersion": "IPv4"
-                                            }
-                                        }
-                                    ],
-                                    "dnsSettings": {
-                                        "dnsServers": [],
-                                        "appliedDnsServers": [],
-                                        "internalDomainNameSuffix": "tgl4nmwjjeeuzcmuroowrvnxog.jx.internal.cloudapp.net"
-                                    },
-                                    "macAddress": "00-0D-3A-74-E0-D4",
-                                    "enableAcceleratedNetworking": false,
-                                    "enableIPForwarding": true,
-                                    "primary": true,
-                                    "virtualMachine": {
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-agent-C02B7042-2"
-                                    },
-                                    "hostedWorkloads": [],
-                                    "tapConfigurations": []
-                                },
-                                "type": "Microsoft.Network/networkInterfaces"
-                            },
-                            {
-                                "name": "k8s-master-C02B7042-nic-0",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-C02B7042-nic-0",
-                                "etag": "W/\"1efa6b82-b428-46c9-8f37-b1b0018efba7\"",
-                                "location": "southcentralus",
-                                "properties": {
-                                    "provisioningState": "Succeeded",
-                                    "resourceGuid": "f039dc36-d132-4160-bfe1-14a3367acf8e",
-                                    "ipConfigurations": [
-                                        {
-                                            "name": "ipconfig1",
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/networkInterfaces/k8s-master-C02B7042-nic-0/ipConfigurations/ipconfig1",
-                                            "etag": "W/\"1efa6b82-b428-46c9-8f37-b1b0018efba7\"",
-                                            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-                                            "properties": {
-                                                "provisioningState": "Succeeded",
-                                                "privateIPAddress": "10.240.255.5",
-                                                "privateIPAllocationMethod": "Static",
-                                                "subnet": {
-                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/virtualNetworks/k8s-vnet-C02B7042/subnets/k8s-subnet"
-                                                },
-                                                "primary": true,
-                                                "privateIPAddressVersion": "IPv4",
-                                                "loadBalancerBackendAddressPools": [
-                                                    {
-                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/backendAddressPools/k8s-master-pool-C02B7042"
-                                                    },
-                                                    {
-                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-internal-lb-C02B7042/backendAddressPools/k8s-master-pool-C02B7042"
-                                                    }
-                                                ],
-                                                "loadBalancerInboundNatRules": [
-                                                    {
-                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Network/loadBalancers/k8s-master-lb-C02B7042/inboundNatRules/SSH-k8s-master-C02B7042-0"
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ],
-                                    "dnsSettings": {
-                                        "dnsServers": [],
-                                        "appliedDnsServers": [],
-                                        "internalDomainNameSuffix": "tgl4nmwjjeeuzcmuroowrvnxog.jx.internal.cloudapp.net"
-                                    },
-                                    "macAddress": "00-0D-3A-74-E5-AB",
-                                    "enableAcceleratedNetworking": false,
-                                    "enableIPForwarding": true,
-                                    "primary": true,
-                                    "virtualMachine": {
-                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_containerservice/providers/Microsoft.Compute/virtualMachines/k8s-master-C02B7042-0"
-                                    },
-                                    "hostedWorkloads": [],
-                                    "tapConfigurations": []
-                                },
-                                "type": "Microsoft.Network/networkInterfaces"
-                            },
-                            {
                                 "name": "myVMNic",
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic",
-                                "etag": "W/\"b873d527-be3a-46a4-bc11-c3b99ed5818e\"",
+                                "etag": "W/\"52417afa-b08a-4c32-b910-c26fd6577046\"",
                                 "location": "southcentralus",
                                 "properties": {
                                     "provisioningState": "Succeeded",
-                                    "resourceGuid": "e2410fbc-e314-4fde-b715-0a7494966146",
+                                    "resourceGuid": "8186cc94-419e-4f55-8359-10ccb53cdca3",
                                     "ipConfigurations": [
                                         {
                                             "name": "ipconfig1",
                                             "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic/ipConfigurations/ipconfig1",
-                                            "etag": "W/\"b873d527-be3a-46a4-bc11-c3b99ed5818e\"",
+                                            "etag": "W/\"52417afa-b08a-4c32-b910-c26fd6577046\"",
                                             "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
                                             "properties": {
                                                 "provisioningState": "Succeeded",
@@ -289,9 +104,9 @@
                                     "dnsSettings": {
                                         "dnsServers": [],
                                         "appliedDnsServers": [],
-                                        "internalDomainNameSuffix": "exgiii3jsope1igjcag5igqlkc.jx.internal.cloudapp.net"
+                                        "internalDomainNameSuffix": "z3rekmuctr2u1b3ro5dvchk3jd.jx.internal.cloudapp.net"
                                     },
-                                    "macAddress": "00-0D-3A-70-33-10",
+                                    "macAddress": "00-0D-3A-73-CF-2E",
                                     "enableAcceleratedNetworking": false,
                                     "enableIPForwarding": false,
                                     "primary": true,
@@ -311,7 +126,47 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic/effectiveRouteTable?api-version=2018-12-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic/effectiveRouteTable?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "4d4b3f24-1ec9-4bcf-b1ec-07c716b18684"
+                    ],
+                    "date": [
+                        "Mon, 25 Nov 2019 19:11:52 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "content-length": [
+                        "4"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Network/locations/southcentralus/operationResults/2bb2b4f9-6bf8-491a-8345-45ea65dcf8e4?api-version=2019-09-01"
+                    ]
+                },
+                "body": {
+                    "data": null
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operationResults/2bb2b4f9-6bf8-491a-8345-45ea65dcf8e4?api-version=2019-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -321,23 +176,23 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "location": [
-                        "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operationResults/f1d152fe-1b29-431b-95a0-f5147dec289f?api-version=2018-12-01"
+                    "cache-control": [
+                        "no-cache"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-writes": [
-                        "1199"
+                    "x-ms-arm-service-request-id": [
+                        "4d4b3f24-1ec9-4bcf-b1ec-07c716b18684"
+                    ],
+                    "date": [
+                        "Mon, 25 Nov 2019 19:15:25 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Thu, 02 May 2019 19:33:00 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                    "location": [
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Network/locations/southcentralus/operationResults/2bb2b4f9-6bf8-491a-8345-45ea65dcf8e4?api-version=2019-09-01"
                     ],
                     "content-length": [
-                        "1427"
+                        "1643"
                     ]
                 },
                 "body": {
@@ -347,61 +202,66 @@
                                 "disableBgpRoutePropagation": false,
                                 "source": "Default",
                                 "state": "Active",
+                                "hasBgpOverride": false,
                                 "addressPrefix": [
                                     "10.0.0.0/16"
                                 ],
                                 "nextHopType": "VnetLocal",
-                                "nextHopIpAddress": []
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
                             },
                             {
                                 "disableBgpRoutePropagation": false,
                                 "source": "Default",
                                 "state": "Active",
+                                "hasBgpOverride": false,
                                 "addressPrefix": [
                                     "0.0.0.0/0"
                                 ],
                                 "nextHopType": "Internet",
-                                "nextHopIpAddress": []
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
                             },
                             {
                                 "disableBgpRoutePropagation": false,
                                 "source": "Default",
                                 "state": "Active",
+                                "hasBgpOverride": false,
                                 "addressPrefix": [
                                     "10.0.0.0/8"
                                 ],
                                 "nextHopType": "None",
-                                "nextHopIpAddress": []
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
                             },
                             {
                                 "disableBgpRoutePropagation": false,
                                 "source": "Default",
                                 "state": "Active",
+                                "hasBgpOverride": false,
                                 "addressPrefix": [
                                     "100.64.0.0/10"
                                 ],
                                 "nextHopType": "None",
-                                "nextHopIpAddress": []
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
                             },
                             {
                                 "disableBgpRoutePropagation": false,
                                 "source": "Default",
                                 "state": "Active",
-                                "addressPrefix": [
-                                    "172.16.0.0/12"
-                                ],
-                                "nextHopType": "None",
-                                "nextHopIpAddress": []
-                            },
-                            {
-                                "disableBgpRoutePropagation": false,
-                                "source": "Default",
-                                "state": "Active",
+                                "hasBgpOverride": false,
                                 "addressPrefix": [
                                     "192.168.0.0/16"
                                 ],
                                 "nextHopType": "None",
-                                "nextHopIpAddress": []
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
                             }
                         ]
                     }
