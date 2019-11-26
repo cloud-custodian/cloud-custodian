@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .azure_common import BaseTest
+from .common import BaseTest
 
-from c7n_azure.lookup import Lookup
+from c7n.lookup import Lookup
 
 
 class LookupTest(BaseTest):
