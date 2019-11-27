@@ -245,7 +245,7 @@ tools here
 
 - **_TrailDB_:** Cloudtrail indexing and time series generation for dashboarding.
 
-- **_LogExporter_:** Cloud watch log exporting to s3
+- [**_LogExporter_:**](https://cloudcustodian.io/docs/tools/c7n-logexporter.html) Cloud watch log exporting to s3
 
 - **_Index_:** Indexing of custodian metrics and outputs for dashboarding
 
