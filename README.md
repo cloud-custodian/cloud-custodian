@@ -237,17 +237,21 @@ tools here
 
 - [**_PolicyStream_:**](https://cloudcustodian.io/docs/tools/c7n-policystream.html) Git history as stream of logical policy changes.
 
-- **_Salactus_:** Scale out s3 scanning.
+- [**_Salactus_:**](https://cloudcustodian.io/docs/tools/c7n-salactus.html) Scale out s3 scanning.
 
 - [**_Mailer_:**](https://cloudcustodian.io/docs/tools/c7n-mailer.html) A reference implementation of sending messages to users to notify them.
 
-- [**_Trail Creator_**](https://cloudcustodian.io/docs/tools/c7n-trailcreator.html) Retroactive tagging of resources creators from CloudTrail
+- [**_Trail Creator_:**](https://cloudcustodian.io/docs/tools/c7n-trailcreator.html) Retroactive tagging of resources creators from CloudTrail
 
 - **_TrailDB_:** Cloudtrail indexing and time series generation for dashboarding.
 
-- **_LogExporter_:** Cloud watch log exporting to s3
+- [**_LogExporter_:**](https://cloudcustodian.io/docs/tools/c7n-logexporter.html) Cloud watch log exporting to s3
 
-- **_Index_:** Indexing of custodian metrics and outputs for dashboarding
+- [**_Cask_:**](https://cloudcustodian.io/docs/tools/cask.html) Easy custodian exec via docker
+
+- [**_Guardian_:**](https://cloudcustodian.io/docs/tools/c7n-guardian.html) Automated multi-account Guard Duty setup
+
+- [**_Omni SSM_:**](https://cloudcustodian.io/docs/tools/omnissm.html) EC2 Systems Manager Automation
 
 - **_Sentry_:** Cloudwatch Log parsing for python tracebacks to integrate with
     <https://sentry.io/welcome/>
