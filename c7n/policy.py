@@ -597,7 +597,6 @@ class PHDMode(LambdaMode):
 
     schema = utils.type_schema(
         'phd',
-        required=['events'],
         events={'type': 'array', 'items': {'type': 'string'}},
         categories={'type': 'array', 'items': {
             'enum': ['issue', 'accountNotification', 'scheduledChange']}},
@@ -612,6 +611,10 @@ class PHDMode(LambdaMode):
         if 'health-event' not in self.policy.resource_manager.filter_registry:
             raise PolicyValidationError(
                 "policy:%s phd event mode not supported for resource:%s" % (
+                    self.policy.name, self.policy.resource_type))
+        if 'events' not in self.policy.data['mode']:
+            raise PolicyValidationError(
+                'policy:%s phd event mode requires events for resource:%s' % (
                     self.policy.name, self.policy.resource_type))
 
     @staticmethod
