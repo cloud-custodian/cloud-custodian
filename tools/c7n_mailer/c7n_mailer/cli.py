@@ -32,6 +32,8 @@ SECURED_STRING_SCHEMA = {
 }
 
 CONFIG_SCHEMA = {
+    '$schema': 'http://json-schema.org/draft-07/schema',
+    'id': 'https://schema.cloudcustodian.io/v0/mailer.json',
     'type': 'object',
     'additionalProperties': False,
     'required': ['queue_url'],

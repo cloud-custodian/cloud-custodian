@@ -32,6 +32,7 @@ import mock
 
 from c7n.mu import (
     custodian_archive,
+    generate_requirements,
     LambdaFunction,
     LambdaManager,
     PolicyLambda,
@@ -50,6 +51,16 @@ from .data import helloworld
 
 
 ROLE = "arn:aws:iam::644160558196:role/custodian-mu"
+
+
+def test_generate_requirements():
+    lines = generate_requirements(
+        'boto3', ignore=('docutils', 's3transfer'))
+    packages = []
+    for l in lines.split('\n'):
+        pkg_name, version = l.split('==')
+        packages.append(pkg_name)
+    assert packages == ['botocore', 'jmespath']
 
 
 class Publish(BaseTest):

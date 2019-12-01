@@ -10,7 +10,7 @@ jobs:
 
 - job: 'Lint'
   pool:
-    vmImage: 'Ubuntu-16.04'
+    vmImage: 'Ubuntu-18.04'
   steps:
     - checkout: self
       fetchDepth: 1
@@ -29,7 +29,7 @@ jobs:
 
 - job: 'Docs'
   pool:
-    vmImage: 'Ubuntu-16.04'
+    vmImage: 'Ubuntu-18.04'
   steps:
   - checkout: self
     fetchDepth: 1
@@ -51,7 +51,7 @@ jobs:
 
 - job: 'Test'
   pool:
-    vmImage: 'Ubuntu-16.04'
+    vmImage: 'Ubuntu-18.04'
   strategy:
     matrix:
       Python27:
@@ -63,7 +63,10 @@ jobs:
       Python37:
         python.version: '3.7'
         TOXENV: py37
-    maxParallel: 3
+      Python38:
+        python.version: '3.8'
+        TOXENV: py38
+    maxParallel: 4
 
   steps:
   - checkout: self
@@ -154,7 +157,7 @@ jobs:
 - job: 'CustodianCask'
   displayName: 'Container Cask'
   pool:
-    vmImage: 'Ubuntu-16.04'
+    vmImage: 'Ubuntu-18.04'
 
   steps:
   - task: GoTool@0

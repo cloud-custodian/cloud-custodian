@@ -33,6 +33,15 @@ import zipfile
 
 from concurrent.futures import ThreadPoolExecutor
 
+# We use this for freezing dependencies for serverless environments
+# that support service side building.
+# Its also used for release engineering on our pypi uploads
+try:
+    import importlib_metadata as pkgmd
+except ImportError:
+    pkgmd = None
+
+
 # Static event mapping to help simplify cwe rules creation
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
@@ -267,6 +276,44 @@ def checksum(fh, hasher, blocksize=65536):
         hasher.update(buf)
         buf = fh.read(blocksize)
     return hasher.digest()
+
+
+def generate_requirements(package, ignore=()):
+    """Generate frozen requirements file for the given package.
+    """
+    if pkgmd is None:
+        raise ImportError("importlib_metadata missing")
+    deps = []
+    deps = _package_deps(package, ignore=ignore)
+    lines = []
+
+    for d in sorted(deps):
+        lines.append(
+            '%s==%s' % (d, pkgmd.distribution(d).version))
+    return '\n'.join(lines)
+
+
+def _package_deps(package, deps=None, ignore=()):
+    """Recursive gather package's named transitive dependencies"""
+    if deps is None:
+        deps = []
+    pdeps = pkgmd.requires(package) or ()
+    for r in pdeps:
+        # skip optional deps
+        if ';' in r:
+            continue
+        for idx, c in enumerate(r):
+            if not c.isalnum() and c not in ('-', '_', '.'):
+                break
+        if idx + 1 == len(r):
+            idx += 1
+        pkg_name = r[:idx]
+        if pkg_name in ignore:
+            continue
+        if pkg_name not in deps:
+            deps.append(pkg_name)
+            _package_deps(pkg_name, deps, ignore)
+    return deps
 
 
 def custodian_archive(packages=None):

@@ -47,10 +47,6 @@ class ExecutorBase(object):
             )
 
 
-class ProcessExecutorTest(ExecutorBase, unittest.TestCase):
-    executor_factory = executor.ProcessPoolExecutor
-
-
 class ThreadExecutorTest(ExecutorBase, unittest.TestCase):
     executor_factory = executor.ThreadPoolExecutor
 

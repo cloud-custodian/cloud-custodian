@@ -3,11 +3,11 @@ botocore>=1.12.228
 docutils>=0.12
 jmespath>=0.9.0
 vcversioner==2.16.0.0
-Jinja2==2.10.1
+Jinja2==2.10.3
 jsonschema>=2.5.1
 ruamel.yaml>=0.16.5
 six>=1.12.0
-datadog==0.30.0
+datadog==0.32.0
 sendgrid==6.1.0
-redis==3.3.8
+redis==3.3.11
 ldap3==2.6

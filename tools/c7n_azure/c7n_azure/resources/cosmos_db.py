@@ -79,7 +79,7 @@ class CosmosDB(ArmResourceManager):
         doc_groups = ['Databases']
 
         service = 'azure.mgmt.cosmosdb'
-        client = 'CosmosDB'
+        client = 'CosmosDBManagementClient'
         enum_spec = ('database_accounts', 'list', None)
         default_report_fields = (
             'name',
