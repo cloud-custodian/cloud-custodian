@@ -612,6 +612,10 @@ class PHDMode(LambdaMode):
             raise PolicyValidationError(
                 "policy:%s phd event mode not supported for resource:%s" % (
                     self.policy.name, self.policy.resource_type))
+        if 'events' not in self.policy.data:
+            raise PolicyValidationError(
+                'policy:%s phd event mode requires events for resource:%s' % (
+                    self.policy.name, self.policy.resource_type))
 
     @staticmethod
     def process_event_arns(client, event_arns):
