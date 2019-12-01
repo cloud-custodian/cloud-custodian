@@ -256,6 +256,8 @@ tools here
 - **_Sentry_:** Cloudwatch Log parsing for python tracebacks to integrate with
     <https://sentry.io/welcome/>
 
+- [**_Mugc_:**](https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/ops#mugc) A utility used to clean up Cloud Custodian Lambda policies that are deployed in an AWS environment.
+
 Contributing
 ------------
 
@@ -267,3 +269,4 @@ Code of Conduct
 
 This project adheres to the [Open Code of Conduct](https://developer.capitalone.com/resources/code-of-conduct). By
 participating, you are expected to honor this code.
+
