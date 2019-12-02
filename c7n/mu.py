@@ -38,7 +38,7 @@ from concurrent.futures import ThreadPoolExecutor
 # Its also used for release engineering on our pypi uploads
 try:
     import importlib_metadata as pkgmd
-except ImportError:
+except (ImportError, FileNotFoundError):
     pkgmd = None
 
 
