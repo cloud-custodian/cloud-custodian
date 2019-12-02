@@ -30,7 +30,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import Time
 from c7n.utils import type_schema
-from c7n_azure.lookup import Lookup
+from c7n.lookup import Lookup
 
 
 class Tag(AzureBaseAction):

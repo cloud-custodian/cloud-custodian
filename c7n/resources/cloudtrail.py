@@ -19,7 +19,8 @@ from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.tags import universal_augment
+from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
 from .aws import shape_validate, Arn
@@ -38,6 +39,18 @@ class CloudTrail(QueryResourceManager):
         arn = id = 'TrailARN'
         name = 'Name'
         config_type = "AWS::CloudTrail::Trail"
+        universal_taggable = object()
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeTrail(self)
+        return super(CloudTrail, self).get_source(source_type)
+
+
+class DescribeTrail(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 
 @CloudTrail.filter_registry.register('is-shadow')

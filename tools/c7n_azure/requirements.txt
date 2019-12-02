@@ -1,6 +1,6 @@
-vcrpy==2.1.0
+vcrpy==2.1.1
 vcrpy_unittest==0.1.7
-backports.functools_lru_cache==1.5
+backports.functools_lru_cache==1.6.1
 pywin32<226; sys_platform == 'win32'
 azure-functions; python_version >= '3.6'
 parameterized
