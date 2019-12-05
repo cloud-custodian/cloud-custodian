@@ -108,9 +108,8 @@ select records.awsregion as region,
        records.sourceipaddress as sourceIPAddress,
        records.useridentity.type as userType,
        records.useridentity.arn as userArn,
-       records.useridentity.usermame as userName,
-       records.useridentity.invokedy as invokedBy,
-       records.useridentity.sourceipaddress as userIPAddress,
+       records.useridentity.username as userName,
+       records.useridentity.invokedby as invokedBy,
        records.requestparameters as requestParameters,
        records.responseelements as responseElements
 from "{athena_db}"."{table}" as records
@@ -137,6 +136,17 @@ from s3object[*].Records[*] as records
 where records."errorCode" is null
   and records."eventName" in ({events})
 """
+
+
+def format_bytes(size):
+    # 2**10 = 1024
+    power = 2**10
+    n = 0
+    labels = {0: 'b', 1: 'Kb', 2: 'Mb', 3: 'Gb', 4: 'Tb'}
+    while size > power:
+        size /= power
+        n += 1
+    return '%0.2f %s' % (size, labels[n])
 
 
 def format_record(r):
@@ -177,7 +187,7 @@ def format_record(r):
         r['eventTime'],
         r['eventName'],
         r['eventSource'],
-        r.get('userAgenot', ''),
+        r.get('userAgent', ''),
         r['sourceIPAddress'],
         uid,
         rinfo['resource']['resource'],
@@ -246,12 +256,17 @@ def process_select_set(s3, trail_bucket, object_set):
     return {'stats': dict(stats), 'records': resource_records}
 
 
-def process_athena_query(athena, workgroup, athena_db, table,
-                         poll_period=30, year=None, month=None, day=None):
+def process_athena_query(athena, workgroup, athena_db, table, athena_output,
+                         db_path, query_id=None, account_id=None, poll_period=30,
+                         year=None, month=None, day=None):
     q = TRAIL_ATHENA_QUERY.format(
         athena_db=athena_db,
         table=table,
         events="'%s'" % "', '".join({k[1] for k in resource_map}))
+
+    if account_id:
+        q += "and records.recipientaccountid = '{}'".format(
+            account_id=account_id)
 
     date_format, date_value = None, None
     if year:
@@ -261,34 +276,65 @@ def process_athena_query(athena, workgroup, athena_db, table,
     if day:
         date_format, date_value = "%Y/%m/%d", month.strftime("%Y/%m/%d")
     if date_format:
-        q = q + (" AND date_format(from_iso8601_timestamp(events.eventtime), "
+        q = q + (" AND date_format(from_iso8601_timestamp(records.eventtime), "
                  "'{date_format}') = '{date_value}'").format(
             date_format=date_format,
             date_value=date_value)
 
-    query_id = athena.start_query_execution(
-        QueryString=q, WorkGroup=workgroup).get('QueryExecutionId')
+    if query_id is None:
+        query_id = athena.start_query_execution(
+            ResultConfiguration={'OutputLocation': athena_output,
+                                 # use workload configuration to override.
+                                 'EncryptionConfiguration': {
+                                     'EncryptionOption': 'SSE_S3'}},
+            QueryString=q,
+            WorkGroup=workgroup).get('QueryExecutionId')
     stats = Counter()
 
     log.info("Athena query:%s", query_id)
 
     while True:
         qexec = athena.get_query_execution(QueryExecutionId=query_id).get('QueryExecution')
-        stats['QueryExecutionTime'] = qexec['Statistics']['EngineExecutionTimeInMillis'] / 1000.0
-        stats['DataScannedInBytes'] = qexec['Statistics']['EngineExecutionTimeInMillis']
-        log.debug("Polling athena query progress scanned:%s qexec:%0.2fs",
-                  stats['DataScannedInBytes'], stats['QueryExecutionTime'])
+        if qexec.get('Statistics'):
+            stats['QueryExecutionTime'] = qexec['Statistics'][
+                'EngineExecutionTimeInMillis'] / 1000.0
+            stats['DataScannedInBytes'] = qexec['Statistics'][
+                'DataScannedInBytes']
+            log.info(
+                "Polling athena query progress scanned:%s qexec:%0.2fs",
+                format_bytes(
+                    stats['DataScannedInBytes']), stats['QueryExecutionTime'])
+        if qexec.get('Status', {}).get('State') == 'FAILED':
+            raise ValueError("Athena Query Failure: {}".format(
+                qexec['Status']['StateChangeReason']))
         if qexec.get('Status', {}).get('State') != 'SUCCEEDED':
+            log.debug("Next query result poll in %0.2f seconds" % (
+                float(poll_period)))
             time.sleep(poll_period)
             continue
         break
 
-    results = []
+    db = TrailDB(db_path)
     pager = athena.get_paginator('get_query_results')
-    for page in pager(QueryExecutionId=query_id).paginate():
+
+    for page in pager.paginate(QueryExecutionId=query_id):
+        headers = None
+        results = []
         for row in page.get('ResultSet', {}).get('Rows', ()):
-            results.append(format_record(row))
-    return {'stats': dict(stats), 'records': results}
+            if headers is None:
+                headers = [h['VarCharValue'] for h in row['Data']]
+                continue
+            values = [c.get('VarCharValue', '') for c in row['Data']]
+            record = dict(zip(headers, values))
+            record['requestParameters'] = json.loads(record['requestParameters'])
+            record['responseElements'] = json.loads(record['responseElements'])
+            results.append(format_record(record))
+        stats['RecordCount'] += len(results)
+        log.info('processing athena result page %d records' % len(results))
+        db.insert(results)
+        db.flush()
+    log.info("Athena Processed %d records" % stats['RecordCount'])
+    return {'stats': dict(stats)}
 
 
 class TrailDB(object):
@@ -584,33 +630,53 @@ def load(bucket, prefix, account, region, resource_map, db, day, month, year,
 
 
 @cli.command('load-athena')
-@click.option('--account', required=True, help="Account to process trail records for")
+@click.option('--account', default=None, help=(
+    "Account to process trail records for, default"
+    " is all accounts in the trail data"))
 @click.option('--region', required=True, help="Region to process trail records for")
 @click.option('--resource-map', required=True,
             help="Resource map of events and id selectors", type=click.File())
-@click.option('--workgroup', required=True, default="default", help="Athena Workgroup")
-@click.option('--athena-db', required=True, help="Athena DB")
+@click.option('--workgroup', default="primary",
+              help="Athena Workgroup (default: primary)")
+@click.option('--table', required=True, help="Cloud Trail Athena Table")
+@click.option('--athena-db', default="default", help="Athena DB")
+@click.option('--athena-output', help="Athena S3 Output Location")
+@click.option('--query-id', help="Process results of a previous Athena query")
 @click.option('--db', required=True, help="Output DB path (sqlite)")
 @click.option("--day", help="Only process trail events for the given day")
 @click.option("--month", help="Only process trail events for the given month")
 @click.option("--year", help="Only process trail events for the given year")
 @click.option("--assume", help="Assume role for trail bucket access")
 @click.option("--profile", help="AWS cli profile for trail bucket access")
-@click.option('--region', required=True, help="Aws region to process")
-def load_athena(table, workgroup, athena_db, resource_map, db,
-                day, month, year, assume, profile, region):
+def load_athena(table, workgroup, athena_db, athena_output, resource_map,
+                db, query_id, day, month, year, account,
+                assume, profile, region):
     """Ingest cloudtrail events from athena into resource owner db.
+
+    The athena db/tables should be created per the schema documented here.
+    https://docs.aws.amazon.com/athena/latest/ug/cloudtrail-logs.html
     """
     load_resource_map(resource_map)
     session_factory = SessionFactory(region=region, profile=profile, assume_role=assume)
+    session = session_factory()
+    if athena_output is None:
+        athena_account_id = session.client(
+            'sts').get_caller_identity()['Account']
+        athena_output = "s3://aws-athena-query-results-{}-{}".format(
+            athena_account_id, session.region_name)
+
     process_athena_query(
         session_factory().client('athena'),
         workgroup,
         athena_db,
         table,
-        year=year,
-        month=month,
-        day=day)
+        db_path=db,
+        athena_output=athena_output,
+        query_id=query_id,
+        account_id=account,
+        year=year and parse(year) or None,
+        month=month and parse(month) or None,
+        day=day and parse(day) or None)
 
 
 @cli.command()
@@ -691,14 +757,18 @@ def tag_org_account(account, region, db, creator_tag, user_suffix, dryrun, type)
 @click.option('--user-suffix', help="Ignore users without the given suffix")
 @click.option('--dryrun', is_flag=True)
 @click.option('--type', multiple=True, help="Only process resources of type")
-def tag(assume, region, db, creator_tag, user_suffix, dryrun, summary=True, type=()):
+@click.option("--profile", help="AWS cli profile for resource tagging")
+def tag(assume, region, db, creator_tag, user_suffix, dryrun,
+        summary=True, profile=None, type=()):
     """Tag resources with their creator.
     """
     trail_db = TrailDB(db)
     load_resources()
 
     with temp_dir() as output_dir:
-        config = ExecConfig.empty(output_dir=output_dir, assume=assume, region=region)
+        config = ExecConfig.empty(
+            output_dir=output_dir, assume=assume,
+            region=region, profile=profile)
         factory = aws.AWS().get_session_factory(config)
         account_id = local_session(factory).client('sts').get_caller_identity().get('Account')
         config['account_id'] = account_id
