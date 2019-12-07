@@ -629,7 +629,7 @@ class PHDMode(LambdaMode):
 
     def resolve_resources(self, event):
         session = utils.local_session(self.policy.resource_manager.session_factory)
-        health = session.client('health')
+        health = session.client('health', region_name='us-east-1')
         he_arn = event['detail']['eventArn']
         resource_arns = self.process_event_arns(health, [he_arn])
 
