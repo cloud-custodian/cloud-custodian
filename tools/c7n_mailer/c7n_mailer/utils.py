@@ -155,9 +155,15 @@ def get_resource_tag_value(resource, k):
     return ''
 
 
+def strip_prefix(value, prefix):
+    if value.startswith(prefix):
+        return value[len(prefix):]
+    return value
+
+
 def resource_format(resource, resource_type):
     if resource_type.startswith('aws.'):
-        resource_type = resource_type.lstrip('aws.')
+        resource_type = strip_prefix(resource_type, 'aws.')
     if resource_type == 'ec2':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         return "%s %s %s %s %s %s" % (

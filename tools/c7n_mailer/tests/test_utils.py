@@ -15,6 +15,17 @@ class FormatStruct(unittest.TestCase):
         self.assertEqual(expected, actual)
 
 
+class StripPrefix(unittest.TestCase):
+
+    def test_strip_prefix(self):
+        self.assertEqual(utils.strip_prefix('aws.internet-gateway', 'aws.'), 'internet-gateway')
+        self.assertEqual(utils.strip_prefix('aws.s3', 'aws.'), 's3')
+        self.assertEqual(utils.strip_prefix('aws.webserver', 'aws.'), 'webserver')
+        self.assertEqual(utils.strip_prefix('nothing', 'aws.'), 'nothing')
+        self.assertEqual(utils.strip_prefix('azure.azserver', 'azure.'), 'azserver')
+        self.assertEqual(utils.strip_prefix('', 'aws.'), '')
+
+
 class ResourceFormat(unittest.TestCase):
 
     def test_efs(self):
@@ -44,6 +55,12 @@ class ResourceFormat(unittest.TestCase):
                 {'InternetGatewayId': 'igw-x', 'Attachments': []},
                 'aws.internet-gateway'),
             'id: igw-x  attachments: 0')
+
+    def test_s3(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'Name': 'bucket-x'}, 'aws.s3'),
+            'bucket-x')
 
     def test_alb(self):
         self.assertEqual(
