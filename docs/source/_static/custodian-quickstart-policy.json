@@ -7,7 +7,8 @@
           "ec2:CreateTags",
           "ec2:DeleteTags",
           "ec2:DescribeInstances",
-          "ec2:TerminateInstances"
+          "ec2:TerminateInstances",
+          "ec2:DescribeVolumes"
         ],
         "Effect": "Allow",
         "Resource": "*"
