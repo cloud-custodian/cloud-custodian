@@ -107,7 +107,7 @@ class RelatedResourceFilter(ValueFilter):
         if self.data.get('filters'):
             filtered = related_manager.filter_resources(items)
         else:
-            filtered = filter(self.match, items)
+            filtered = list(filter(self.match, items))
 
 
         if found:
