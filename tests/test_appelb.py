@@ -379,6 +379,19 @@ class AppELBTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_appelb_waf_any(self):
+        factory = self.replay_flight_data("test_appelb_waf")
+        p = self.load_policy({
+            "name": "appelb-waf",
+            "resource": "app-elb",
+            "filters": [
+                {"type": "waf-enabled", "state": False}]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LoadBalancerName'], 'testing')
+
     def test_appelb_waf(self):
         factory = self.replay_flight_data("test_appelb_waf")
 
