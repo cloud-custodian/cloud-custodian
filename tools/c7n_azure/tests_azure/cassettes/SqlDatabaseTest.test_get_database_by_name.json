@@ -111,8 +111,8 @@
                             },
                             {
                                 "sku": {
-                                    "name": "Premium",
-                                    "tier": "Premium",
+                                    "name": "Standard",
+                                    "tier": "Standard",
                                     "capacity": 125
                                 },
                                 "kind": "v12.0,user",
@@ -131,8 +131,8 @@
                                     "readScale": "Enabled",
                                     "readReplicaCount": 1,
                                     "currentSku": {
-                                        "name": "Premium",
-                                        "tier": "Premium",
+                                        "name": "Standard",
+                                        "tier": "Standard",
                                         "capacity": 125
                                     }
                                 },

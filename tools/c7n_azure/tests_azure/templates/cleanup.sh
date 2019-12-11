@@ -34,6 +34,12 @@ delete_resource() {
         curl -X DELETE -H "Authorization: Bearer ${token}" ${url}
     elif [[ "$fileName" == "locked.json" ]]; then
         az lock delete --name cctestlockfilter --resource-group $rgName
+        az lock delete --name rglock --resource-group $rgName
+        sqlid=$(az sql server list -g test_locked --query [0].id --output tsv)
+        az lock delete --ids "${sqlid}/providers/Microsoft.Authorization/locks/sqllock"
+        dbid=$(az sql db list --ids $sqlid --query [0].id --output tsv)
+        az lock delete --ids "${dbid}/providers/Microsoft.Authorization/locks/dblock"
+        sleep 10s
     fi
 
     az group delete --name $rgName --yes --output None
