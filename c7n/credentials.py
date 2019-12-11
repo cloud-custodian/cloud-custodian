@@ -96,7 +96,7 @@ def credential_helper_session(command, session_name, region=None):
         if region:
             env['CUSTODIAN_CREDENTIALS_REGION'] = region
         raw_response = subprocess.check_output(command, shell=True, env=env).strip()
-        parsed = json.loads(raw_response)
+        parsed = json.loads(str(raw_response))
         credentials = parsed['Credentials']
 
         return dict(
