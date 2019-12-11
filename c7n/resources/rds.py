@@ -51,7 +51,7 @@ import operator
 import re
 from decimal import Decimal as D, ROUND_HALF_UP
 
-from distutils.version import LooseVersion
+from c7n.filters.core import ComparableVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
@@ -237,7 +237,7 @@ def _get_available_engine_upgrades(client, major=False):
             for t in v['ValidUpgradeTarget']:
                 if not major and t['IsMajorVersionUpgrade']:
                     continue
-                if LooseVersion(t['EngineVersion']) > LooseVersion(
+                if ComparableVersion(t['EngineVersion']) > ComparableVersion(
                         results[v['Engine']].get(v['EngineVersion'], '0.0.0')):
                     results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
     return results
