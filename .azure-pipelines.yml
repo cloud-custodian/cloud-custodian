@@ -89,7 +89,7 @@ jobs:
 
   - script: |
       coverage xml && \
-      bash <(curl -s https://codecov.io/bash) -Z \
+      bash <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/4983e44223dad1a7b9291eaee166a54fd6e0b15f/codecov) -Z \
        -X gcov -X coveragepy -X search -X xcode -X gcovout -X fix \
        -f coverage.xml
     displayName: 'Publish Code Coverage'
