@@ -33,7 +33,7 @@ class Glacier(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'glacier'
         enum_spec = ('list_vaults', 'VaultList', None)
-        id = "VaultName"
+        name = id = "VaultName"
         arn = "VaultARN"
         arn_type = 'vaults'
         universal_taggable = True
