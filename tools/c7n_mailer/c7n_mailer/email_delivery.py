@@ -16,6 +16,7 @@ from itertools import chain
 import six
 from c7n_mailer.smtp_delivery import SmtpDelivery
 from c7n_mailer.utils_email import is_email, get_mimetext_message
+import c7n_mailer.azure_mailer.sendgrid_delivery as sendgrid
 
 from .ldap_lookup import LdapLookup
 from .utils import (
@@ -213,6 +214,11 @@ class EmailDelivery(object):
                                              logger=self.logger)
                 smtp_delivery.send_message(message=mimetext_msg, to_addrs=email_to_addrs)
             # if smtp_server isn't set in mailer.yml, use aws ses normally.
+            if 'sendgrid' in self.config:
+                sendgrid_delivery = sendgrid.SendGridDelivery(config=self.config,
+                                                             session=self.session,
+                                                             logger=self.logger)
+                sendgrid_delivery.sengrid_handler(sqs_message, email_to_addrs)
             else:
                 self.aws_ses.send_raw_email(RawMessage={'Data': mimetext_msg.as_string()})
         except Exception as error:
