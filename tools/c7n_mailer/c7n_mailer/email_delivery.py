@@ -214,7 +214,7 @@ class EmailDelivery(object):
                                              logger=self.logger)
                 smtp_delivery.send_message(message=mimetext_msg, to_addrs=email_to_addrs)
             # if smtp_server isn't set in mailer.yml, use aws ses normally.
-            if 'sendgrid' in self.config:
+            if 'sendgrid_api_key' in self.config:
                 sendgrid_delivery = sendgrid.SendGridDelivery(config=self.config,
                                                              session=self.session,
                                                              logger=self.logger)
