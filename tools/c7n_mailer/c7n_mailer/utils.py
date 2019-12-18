@@ -397,7 +397,7 @@ def resource_format(resource, resource_type):
         return "%s" % (
             resource['Name'])
     elif resource_type == 'user-pool':
-        return "%s"% (
+        return "%s" % (
             resource['Name'])
     else:
         return "%s" % format_struct(resource)
