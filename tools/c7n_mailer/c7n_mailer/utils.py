@@ -349,9 +349,56 @@ def resource_format(resource, resource_type):
             resource['InternetGatewayId'],
             len(resource['Attachments']))
     elif resource_type == 'lambda':
-        return "Name: %s  RunTime: %s  \n" % (
+        return "Name: %s  RunTime: %s" % (
             resource['FunctionName'],
             resource['Runtime'])
+    elif resource_type == 'acm-certificate':
+        return "%s %s status: %s" % (
+            resource['DomainName'],
+            resource['Subject'],
+            resource['Status'])
+    elif resource_type == 'app-elb-target-group':
+        return "%s %s" % (
+            resource['TargetGroupName'],
+            resource.get('VpcId', 'NO VPC!'))
+    elif resource_type == 'eks':
+        return "%s status: %s" % (
+            resource['name'],
+            resource['status'])
+    elif resource_type == 'elasticsearch':
+        return "%s" % (
+            resource['DomainName'])
+    elif resource_type == 'firehose':
+        return "%s status: %s" % (
+            resource['DeliveryStreamName'],
+            resource['DeliveryStreamStatus'])
+    elif resource_type == 'kms-key':
+        tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
+        return "%s %s %s keystate: %s" % (
+            resource['KeyId'],
+            tag_map.get('Name', ''),
+            resource.get('Description', ''),
+            resource.get('KeyState', ''))
+    elif resource_type == 'rds-cluster':
+        return "%s %s %s %s" % (
+            resource['DBClusterIdentifier'],
+            "%s-%s" % (
+                resource['Engine'], resource['EngineVersion']),
+            resource['AllocatedStorage'],
+            resource['Status'])
+    elif resource_type == 'secrets-manager':
+        return "%s" % (
+            resource['Name'])
+    elif resource_type == 'sns':
+        return "%s %s" % (
+            resource['TopicArn'],
+            resource.get('DisplayName', ''))
+    elif resource_type == 'ssm-parameter':
+        return "%s" % (
+            resource['Name'])
+    elif resource_type == 'user-pool':
+        return "%s"% (
+            resource['Name'])
     else:
         return "%s" % format_struct(resource)
 
