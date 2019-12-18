@@ -372,6 +372,10 @@ def resource_format(resource, resource_type):
         return "%s status: %s" % (
             resource['DeliveryStreamName'],
             resource['DeliveryStreamStatus'])
+    elif resource_type == 'kms':
+        return "%s %s" % (
+            resource['AliasName'],
+            resource['TargetKeyId'])
     elif resource_type == 'kms-key':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         return "%s %s %s keystate: %s" % (
