@@ -88,7 +88,7 @@ jobs:
     displayName: 'Tox'
 
   - script: |
-      coverage xml && \
+      ./.tox/$TOXENV/bin/coverage xml && \
       bash <(curl -s https://codecov.io/bash) -Z \
        -X gcov -X coveragepy -X search -X xcode -X gcovout -X fix \
        -f coverage.xml
