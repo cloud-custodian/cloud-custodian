@@ -142,8 +142,8 @@ class SetRedshiftLogging(BaseAction):
                 resource: redshift
                 filters:
                   - type: logging
-                     key: LoggingEnabled
-                     value: false
+                    key: LoggingEnabled
+                    value: false
                 actions:
                   - type: set-logging
                     bucket: redshiftlogtest
