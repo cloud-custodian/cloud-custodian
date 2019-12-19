@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoggingEnabled": false,
+        "BucketName": "redshiftlogtest",
+        "S3KeyPrefix": "redshiftlogs/",
+        "ResponseMetadata": {
+            "RequestId": "874ce34d-2281-11ea-b6af-7126da6f11af",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "874ce34d-2281-11ea-b6af-7126da6f11af",
+                "content-type": "text/xml",
+                "content-length": "396",
+                "date": "Thu, 19 Dec 2019 17:03:50 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

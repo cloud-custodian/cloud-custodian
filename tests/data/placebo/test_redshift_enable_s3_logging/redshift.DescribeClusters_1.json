@@ -1,0 +1,203 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "ClusterIdentifier": "test-logging-enabled-test",
+                "NodeType": "dc2.large",
+                "ClusterStatus": "available",
+                "ClusterAvailabilityStatus": "Available",
+                "MasterUsername": "test",
+                "DBName": "test",
+                "Endpoint": {
+                    "Address": "test-logging-enabled-test.c8nrfsdwmajf.us-east-1.redshift.amazonaws.com",
+                    "Port": 5439
+                },
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 19,
+                    "hour": 16,
+                    "minute": 5,
+                    "second": 57,
+                    "microsecond": 550000
+                },
+                "AutomatedSnapshotRetentionPeriod": 1,
+                "ManualSnapshotRetentionPeriod": -1,
+                "ClusterSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-b1cccccb",
+                        "Status": "active"
+                    }
+                ],
+                "ClusterParameterGroups": [
+                    {
+                        "ParameterGroupName": "default.redshift-1.0",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "ClusterSubnetGroupName": "non-prod",
+                "VpcId": "vpc-beccccda",
+                "AvailabilityZone": "us-east-1b",
+                "PreferredMaintenanceWindow": "wed:05:30-wed:06:00",
+                "PendingModifiedValues": {},
+                "ClusterVersion": "1.0",
+                "AllowVersionUpgrade": true,
+                "NumberOfNodes": 1,
+                "PubliclyAccessible": false,
+                "Encrypted": true,
+                "ClusterPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCdpIMjGiizhBbYaSGmlpBeeiLYAN/NQQjdsWM/RIAbUFgKI2L54dxDI6MoSNGYWa3Qv66mAPZlOanFa5ZK9vmjX81kZSpFsUEhz+2wJd739sZZUbmQZmKUb4FqbxFsRYW9xHG+xSfmFUha0FKjJPwKN+9zq20VRKay658VQgLVvRdwwdnG3WjfF7UCBVjXLCSWzhABZp7dpFAJzMC9W/7Qbf7EWTk+2MRNPE4zo0Og96NDTfE69dn5rVyg9iQQsTl0gbMZZXF25SSwTJbakWiS+zGNDd6FJax/iYn7WQzr+w0DRygiP6DcrCab8DdtQgCeeFlJKxWMewJbPoj+WIFZ Amazon-Redshift\n",
+                "ClusterNodes": [
+                    {
+                        "NodeRole": "SHARED",
+                        "PrivateIPAddress": "10.128.113.99",
+                        "PublicIPAddress": "34.202.150.8"
+                    }
+                ],
+                "ClusterRevisionNumber": "11420",
+                "Tags": [
+                    {
+                        "Key": "CreatorsPrincipleId",
+                        "Value": "AROAIP6CCCCCCYXKU3EFM"
+                    },
+                    {
+                        "Key": "c7n_tag_compliance",
+                        "Value": "Resource does not meet policy: delete@2019/12/19 1804 UTC"
+                    },
+                    {
+                        "Key": "CreatorName",
+                        "Value": "testuser"
+                    }
+                ],
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789000:key/b9d43f89-4ebe-cccc-cccc-fe3cc9cddbf2",
+                "EnhancedVpcRouting": false,
+                "IamRoles": [
+                    {
+                        "IamRoleArn": "arn:aws:iam::123456789000:role/redshift-s3-readonly",
+                        "ApplyStatus": "in-sync"
+                    }
+                ],
+                "MaintenanceTrackName": "current",
+                "DeferredMaintenanceWindows": [],
+                "NextMaintenanceWindowStartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 25,
+                    "hour": 5,
+                    "minute": 30,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            },
+            {
+                "ClusterIdentifier": "testing-logging",
+                "NodeType": "dc2.large",
+                "ClusterStatus": "available",
+                "ClusterAvailabilityStatus": "Available",
+                "MasterUsername": "admin",
+                "DBName": "dev",
+                "Endpoint": {
+                    "Address": "testing-logging.c8nrvccccajf.us-east-1.redshift.amazonaws.com",
+                    "Port": 5439
+                },
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 19,
+                    "hour": 16,
+                    "minute": 6,
+                    "second": 20,
+                    "microsecond": 311000
+                },
+                "AutomatedSnapshotRetentionPeriod": 1,
+                "ManualSnapshotRetentionPeriod": -1,
+                "ClusterSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-7ccc7e0d",
+                        "Status": "active"
+                    }
+                ],
+                "ClusterParameterGroups": [
+                    {
+                        "ParameterGroupName": "default.redshift-1.0",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "ClusterSubnetGroupName": "non-prod",
+                "VpcId": "vpc-beccccda",
+                "AvailabilityZone": "us-east-1a",
+                "PreferredMaintenanceWindow": "wed:03:00-wed:03:30",
+                "PendingModifiedValues": {},
+                "ClusterVersion": "1.0",
+                "AllowVersionUpgrade": true,
+                "NumberOfNodes": 1,
+                "PubliclyAccessible": false,
+                "Encrypted": true,
+                "ClusterPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDWZ0ZNTz+29VtY0fVG504fySjpIGgP2Oa9tODlHZS91g+5HBRwemliRrnb7QwEjJ1h+YNVit1K7l71XbAHDUIjZ+6rCRsi1Gc8IyDedU4qxpxfeEjMCSYNL8tQIaeHSzENaxbCfaglRRTqxPi1ifgZak3umkdotLSiYrDY/o+6eeQmhftX0DfY8LfRQJH4P04rUZgsbYUQog/PpletT/Z21AbC/egizYHT9WljXq6GXTPdeKQdfp/PdTbBy83JeBRlAIzLahcfjhHB2GzhtqGMnisVtQ6j0ACnnzIvLN1bznSC9IX7YrJFFNGG8BrQQtJnbbc96loRtNlNpukEB1K3 Amazon-Redshift\n",
+                "ClusterNodes": [
+                    {
+                        "NodeRole": "SHARED",
+                        "PrivateIPAddress": "10.128.115.91",
+                        "PublicIPAddress": "34.192.100.118"
+                    }
+                ],
+                "ClusterRevisionNumber": "11420",
+                "Tags": [
+                    {
+                        "Key": "ResourceContact",
+                        "Value": "Cloud@Company.com"
+                    },
+                    {
+                        "Key": "CreatorsPrincipleId",
+                        "Value": "AROAIP6CCCCCCYXKU3EFM"
+                    },
+                    {
+                        "Key": "c7n_tag_compliance",
+                        "Value": "Resource does not meet policy: delete@2019/12/19 1803 UTC"
+                    },
+                    {
+                        "Key": "CreatorName",
+                        "Value": "sssseedddddtala"
+                    }
+                ],
+                "KmsKeyId": "arn:aws:kms:us-east-1:123456789000:key/b9d43f89-4ebe-cccc-cccc-fe3cc9cddbf2",
+                "EnhancedVpcRouting": false,
+                "IamRoles": [
+                    {
+                        "IamRoleArn": "arn:aws:iam::123456789000:role/redshift-s3-readonly",
+                        "ApplyStatus": "in-sync"
+                    }
+                ],
+                "MaintenanceTrackName": "current",
+                "DeferredMaintenanceWindows": [],
+                "NextMaintenanceWindowStartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 25,
+                    "hour": 3,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "8763ee48-2281-11ea-9939-5fccefa818c0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "8763ee48-2281-11ea-9939-5fccefa818c0",
+                "content-type": "text/xml",
+                "content-length": "7509",
+                "vary": "Accept-Encoding",
+                "date": "Thu, 19 Dec 2019 17:03:50 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

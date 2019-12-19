@@ -528,9 +528,111 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
 
         resources = p.run()
         clean_resources = clean_p.run()
-
         self.assertEqual(len(resources), 1)
         self.assertIn("test-sg-fail", resources[0]["ClusterIdentifier"])
         self.assertEqual(len(resources[0]["VpcSecurityGroups"]), 1)
         self.assertEqual(len(clean_resources[0]["VpcSecurityGroups"]), 2)
         self.assertEqual(len(clean_resources), 2)
+
+
+class TestRedshiftLogging(BaseTest):
+
+    annotation_key = 'c7n:logging'
+
+    def test_enable_s3_logging(self):
+        session_factory = self.replay_flight_data("test_redshift_enable_s3_logging")
+        policy = self.load_policy(
+            {
+                "name": "test-enable-s3-logging",
+                "resource": "redshift",
+                "filters": [
+                    {"type": "logging", "key": "LoggingEnabled", "value": False}
+                ],
+                "actions": [
+                    {
+                        "type": "set-logging",
+                        "bucket": "redshiftlogtest",
+                        "prefix": "redshiftlogs",
+                        "state": "enabled",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        client = session_factory().client("redshift")
+        for redshift in resources:
+            redshift_id = redshift["ClusterIdentifier"]
+            try:
+                result = client.describe_logging_status(
+                    ClusterIdentifier=redshift_id)
+                result.pop('ResponseMetadata')
+            except client.exceptions.ClusterNotFound:
+                continue
+        self.assertTrue(result["LoggingEnabled"])
+        self.assertEqual(
+            result["BucketName"], "redshiftlogtest"
+        )
+        self.assertEqual(
+            result["S3KeyPrefix"], "redshiftlogs/"
+        )
+
+    def test_disable_s3_logging(self):
+        session_factory = self.replay_flight_data("test_redshift_disable_s3_logging")
+        policy = self.load_policy(
+            {
+                "name": "test-disable-s3-logging",
+                "resource": "redshift",
+                "filters": [
+                    {"type": "logging", "key": "LoggingEnabled", "value": True}
+                ],
+                "actions": [
+                    {
+                        "type": "set-logging",
+                        "state": "disabled",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        client = session_factory().client("redshift")
+        for redshift in resources:
+            redshift_id = redshift["ClusterIdentifier"]
+            try:
+                result = client.describe_logging_status(
+                    ClusterIdentifier=redshift_id)
+                result.pop('ResponseMetadata')
+            except client.exceptions.ClusterNotFound:
+                continue
+        self.assertFalse(result["LoggingEnabled"])
+
+
+class TestRedshiftLoggingBucket(BaseTest):
+    """ replicate
+        - name: redshift-logging-to-bucket-test
+          resource: redshift
+          filters:
+            - type: logging
+              key: BucketName
+              value: "redshiftlogstest"
+    """
+    def test_logging_to_bucket(self):
+        session_factory = self.replay_flight_data("test_redshift_logging_filter")
+        policy = self.load_policy(
+            {
+                "name": "redshift-logging-to-bucket-test",
+                "resource": "redshift",
+                "filters": [{"type": "logging", "key": "BucketName", "value": "redshiftlogtest"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertGreater(
+            len(resources), 0, "Test should find redshiftlogs logging " "to redshiftlogs"
+        )
