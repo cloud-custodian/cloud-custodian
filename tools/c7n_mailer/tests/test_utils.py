@@ -74,6 +74,81 @@ class ResourceFormat(unittest.TestCase):
             'loadbalancer/app/dev/1234567890'
             '  zones: 0  scheme: internal')
 
+    def test_acm_certificate(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'DomainName': 'domain-x', 'Subject': 'CN=domain-x', 'Status': 'ISSUED'}, 
+                'acm-certificate'),
+            'domain-x CN=domain-x status: ISSUED')
+
+    def test_app_elb_target_group(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'TargetGroupName': 'tg-x', 'VpcId': 'vpcid349a'}, 'app-elb-target-group'),
+            'tg-x vpcid349a')
+
+    def test_eks(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'name': 'eks-x', 'status': 'ACTIVE'}, 'eks'),
+            'eks-x status: ACTIVE')
+
+    def test_elasticsearch(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'DomainName': 'es-x'}, 'elasticsearch'),
+            'es-x')
+
+    def test_firehose(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'DeliveryStreamName': 'fh-x', 'DeliveryStreamStatus': 'ACTIVE'}, 'firehose'),
+            'fh-x status: ACTIVE')
+
+    def test_kms(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'AliasName': 'alias-x', 'TargetKeyId': 'tki-1234'}, 'kms'),
+            'alias-x tki-1234')
+
+    def test_kms_key(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'KeyId': 'keyid-x', 'Description': 'desc', 'KeyState': 'Enabled',
+                 'Tags': [{'Key': 'Name', 'Value': 'kms-key-name'}]}, 'kms-key'),
+            'keyid-x kms-key-name desc keystate: Enabled')
+
+    def test_rds_cluster(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'DBClusterIdentifier': 'dbclusterid-x', 'Engine': 'dbengine', 
+                'EngineVersion': '1.0', 'AllocatedStorage': '1', 'Status': 'available'}, 
+                'rds-cluster'),
+            'dbclusterid-x dbengine-1.0 1 available')
+
+    def test_secrets_manager(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'Name': 'sm-x'}, 'secrets-manager'),
+            'sm-x')
+
+    def test_sns(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'TopicArn': 'arn-x', 'DisplayName': 'name-1234'}, 'sns'),
+            'arn-x name-1234')
+
+    def test_ssm_parameter(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'Name': 'ssm-parameter-x'}, 'ssm-parameter'),
+            'ssm-parameter-x')
+
+    def test_user_pool(self):
+        self.assertEqual(
+            utils.resource_format(
+                {'Name': 'user-pool-x'}, 'user-pool'),
+            'user-pool-x')
 
 class GetAwsUsernameFromEvent(unittest.TestCase):
 
