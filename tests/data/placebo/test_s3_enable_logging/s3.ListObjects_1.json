@@ -1,26 +1,26 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "MaxKeys": 1000, 
-        "Prefix": "", 
-        "Name": "superduper-and-magic", 
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "Uw2IzVDAkOwOoMajYzRUXh5677qnXT8vnWSElJvBEH6SJdUBtoeo6DzsjBYkY5sd", 
-            "RequestId": "C5BA34E91A612ECC", 
+            "RequestId": "1F7533BB910D5DC5",
+            "HostId": "H0thnkdUZv0kwEoLnd9EOCQ7XF/bQZXQ5vEkHZhGHYWFTcLDpUJMci54WlX8ZoxBoFeX4V/SxYk=",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-bucket-region": "us-east-1", 
-                "x-amz-id-2": "Uw2IzVDAkOwOoMajYzRUXh5677qnXT8vnWSElJvBEH6SJdUBtoeo6DzsjBYkY5sd", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "C5BA34E91A612ECC", 
-                "date": "Thu, 18 Jan 2018 09:46:39 GMT", 
-                "content-type": "application/xml"
-            }
-        }, 
-        "Marker": "", 
-        "EncodingType": "url", 
-        "IsTruncated": false
+                "x-amz-id-2": "H0thnkdUZv0kwEoLnd9EOCQ7XF/bQZXQ5vEkHZhGHYWFTcLDpUJMci54WlX8ZoxBoFeX4V/SxYk=",
+                "x-amz-request-id": "1F7533BB910D5DC5",
+                "date": "Fri, 20 Dec 2019 23:00:56 GMT",
+                "x-amz-bucket-region": "us-east-1",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "IsTruncated": false,
+        "Marker": "",
+        "Name": "superduper-and-magic",
+        "Prefix": "",
+        "MaxKeys": 1000,
+        "EncodingType": "url"
     }
 }

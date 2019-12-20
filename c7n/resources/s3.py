@@ -1021,6 +1021,96 @@ class BucketNotificationFilter(ValueFilter):
         return found
 
 
+@filters.register('bucket-logging')
+class BucketLoggingFilter(Filter):
+    """Filter based on bucket logging configuration.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: add-bucket-logging
+                resource: s3
+                filters:
+                  - type: bucket-logging
+                    op: disabled
+                actions:
+                  - type: toggle-logging
+                    target_bucket: "{account_id}-{region}-s3-logs"
+                    target_prefix: "{source_bucket_name}/"
+
+            policies:
+              - name: update-incorrect-or-missing-logging
+                resource: s3
+                filters:
+                  - type: bucket-logging
+                    op: not-equal
+                    target_bucket: "{account_id}-{region}-s3-logs"
+                    target_prefix: "{account}/{source_bucket_name}/"
+                actions:
+                  - type: toggle-logging
+                    update: true
+                    target_bucket: "{account_id}-{region}-s3-logs"
+                    target_prefix: "{account}/{source_bucket_name}/"
+    """
+
+    schema = type_schema(
+        'bucket-logging',
+        op={'enum': ['enabled', 'disabled', 'equal', 'not-equal', 'eq', 'ne']},
+        required=['op'],
+        target_bucket={'type': 'string'},
+        target_prefix={'type': 'string'})
+    schema_alias = False
+
+    permissions = ("s3:GetBucketLogging", "iam:ListAccountAliases")
+    account_name = None
+
+    def account_name(self):
+        if not self.account_name:
+            session = local_session(self.manager.session_factory)
+            self.account_name = get_account_alias_from_sts(session)
+        return self.account_name
+
+    def process(self, buckets, event=None):
+        return list(filter(None, map(self.process_bucket, buckets)))
+
+    def process_bucket(self, b):
+        if self.match_bucket(b):
+            return b
+
+    def match_bucket(self, b):
+        op = self.data.get('op')
+
+        logging = b.get('Logging', {})
+        if op == 'disabled':
+            return logging == {}
+        elif op == 'enabled':
+            return logging != {}
+
+        variables = {
+            'account_id': self.manager.config.account_id,
+            'account': self.account_name(),
+            'region': self.manager.config.region,
+            'source_bucket_name': b['Name'],
+            'target_bucket_name': self.data.get('target_bucket'),
+            'target_prefix': self.data.get('target_prefix'),
+        }
+        data = format_string_values(self.data, **variables)
+        target_bucket = data.get('target_bucket')
+        target_prefix = data.get('target_prefix', b['Name'] + '/')
+
+        target_config = {
+            "TargetBucket": target_bucket,
+            "TargetPrefix": target_prefix
+        } if target_bucket else {}
+
+        if op in ('not-equal', 'ne'):
+            return logging != target_config
+        else:
+            return logging == target_config
+
+
 @actions.register('delete-bucket-notification')
 class DeleteBucketNotification(BucketActionBase):
     """Action to delete S3 bucket notification configurations"""
@@ -1296,11 +1386,26 @@ class ToggleLogging(BucketActionBase):
                 actions:
                   - type: toggle-logging
                     target_bucket: log-bucket
-                    target_prefix: logs123
+                    target_prefix: logs123/
+
+            policies:
+              - name: s3-force-standard-logging
+                resource: s3
+                filters:
+                  - type: bucket-logging
+                    op: not-equal
+                    target_bucket: "{account_id}-{region}-s3-logs"
+                    target_prefix: "{account}/{source_bucket_name}/"
+                actions:
+                  - type: toggle-logging
+                    update: true
+                    target_bucket: "{account_id}-{region}-s3-logs"
+                    target_prefix: "{account}/{source_bucket_name}/"
     """
     schema = type_schema(
         'toggle-logging',
         enabled={'type': 'boolean'},
+        update={'type': 'boolean'},
         target_bucket={'type': 'string'},
         target_prefix={'type': 'string'})
 
@@ -1316,6 +1421,7 @@ class ToggleLogging(BucketActionBase):
 
     def process(self, resources):
         enabled = self.data.get('enabled', True)
+        update = self.data.get('update', False)
 
         # Account name for variable expansion
         session = local_session(self.manager.session_factory)
@@ -1323,9 +1429,10 @@ class ToggleLogging(BucketActionBase):
 
         for r in resources:
             client = bucket_client(session, r)
+            log.warning("Bucket logging: {}".format(r.get('Logging')))
             is_logging = bool(r.get('Logging'))
 
-            if enabled and not is_logging:
+            if enabled and (not is_logging or update):
                 variables = {
                     'account_id': self.manager.config.account_id,
                     'account': account_name,
