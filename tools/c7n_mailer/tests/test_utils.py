@@ -77,7 +77,7 @@ class ResourceFormat(unittest.TestCase):
     def test_acm_certificate(self):
         self.assertEqual(
             utils.resource_format(
-                {'DomainName': 'domain-x', 'Subject': 'CN=domain-x', 'Status': 'ISSUED'}, 
+                {'DomainName': 'domain-x', 'Subject': 'CN=domain-x', 'Status': 'ISSUED'},
                 'acm-certificate'),
             'domain-x CN=domain-x status: ISSUED')
 
@@ -121,8 +121,8 @@ class ResourceFormat(unittest.TestCase):
     def test_rds_cluster(self):
         self.assertEqual(
             utils.resource_format(
-                {'DBClusterIdentifier': 'dbclusterid-x', 'Engine': 'dbengine', 
-                'EngineVersion': '1.0', 'AllocatedStorage': '1', 'Status': 'available'}, 
+                {'DBClusterIdentifier': 'dbclusterid-x', 'Engine': 'dbengine',
+                'EngineVersion': '1.0', 'AllocatedStorage': '1', 'Status': 'available'},
                 'rds-cluster'),
             'dbclusterid-x dbengine-1.0 1 available')
 
@@ -149,6 +149,7 @@ class ResourceFormat(unittest.TestCase):
             utils.resource_format(
                 {'Name': 'user-pool-x'}, 'user-pool'),
             'user-pool-x')
+
 
 class GetAwsUsernameFromEvent(unittest.TestCase):
 
