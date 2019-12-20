@@ -2,16 +2,16 @@
     "status_code": 200,
     "data": {
         "LoggingEnabled": false,
-        "BucketName": "redshiftlogtest",
-        "S3KeyPrefix": "redshiftlogs/",
+        "BucketName": "redshiftlogtest2",
+        "S3KeyPrefix": "redshift/",
         "ResponseMetadata": {
-            "RequestId": "8783d1d9-2281-11ea-b6af-7126da6f11af",
+            "RequestId": "5ea0e06c-2362-11ea-b6af-7126da6f11af",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "8783d1d9-2281-11ea-b6af-7126da6f11af",
+                "x-amzn-requestid": "5ea0e06c-2362-11ea-b6af-7126da6f11af",
                 "content-type": "text/xml",
-                "content-length": "424",
-                "date": "Thu, 19 Dec 2019 17:03:50 GMT"
+                "content-length": "421",
+                "date": "Fri, 20 Dec 2019 19:53:18 GMT"
             },
             "RetryAttempts": 0
         }

@@ -546,12 +546,13 @@ class TestRedshiftLogging(BaseTest):
                 "name": "test-enable-s3-logging",
                 "resource": "redshift",
                 "filters": [
-                    {"type": "logging", "key": "LoggingEnabled", "value": False}
+                    {"type": "logging", "key": "LoggingEnabled", "value": False},
+                    {"ClusterIdentifier": "test-logging-disabled"}
                 ],
                 "actions": [
                     {
                         "type": "set-logging",
-                        "bucket": "redshiftlogtest",
+                        "bucket": "redshiftlogtest2",
                         "prefix": "redshiftlogs",
                         "state": "enabled",
                     }
@@ -561,18 +562,19 @@ class TestRedshiftLogging(BaseTest):
         )
 
         resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterIdentifier'], 'test-logging-disabled')
+
         client = session_factory().client("redshift")
-        for redshift in resources:
-            redshift_id = redshift["ClusterIdentifier"]
-            try:
-                result = client.describe_logging_status(
-                    ClusterIdentifier=redshift_id)
-                result.pop('ResponseMetadata')
-            except client.exceptions.ClusterNotFound:
-                continue
+
+        redshift_id = resources[0]['ClusterIdentifier']
+        result = client.describe_logging_status(
+            ClusterIdentifier=redshift_id)
+        result.pop('ResponseMetadata')
+
         self.assertTrue(result["LoggingEnabled"])
         self.assertEqual(
-            result["BucketName"], "redshiftlogtest"
+            result["BucketName"], "redshiftlogtest2"
         )
         self.assertEqual(
             result["S3KeyPrefix"], "redshiftlogs/"
@@ -585,7 +587,8 @@ class TestRedshiftLogging(BaseTest):
                 "name": "test-disable-s3-logging",
                 "resource": "redshift",
                 "filters": [
-                    {"type": "logging", "key": "LoggingEnabled", "value": True}
+                    {"type": "logging", "key": "LoggingEnabled", "value": True},
+                    {"ClusterIdentifier": "test-logging-enabled"}
                 ],
                 "actions": [
                     {
@@ -599,40 +602,14 @@ class TestRedshiftLogging(BaseTest):
 
         resources = policy.run()
 
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ClusterIdentifier'], 'test-logging-enabled')
+
         client = session_factory().client("redshift")
-        for redshift in resources:
-            redshift_id = redshift["ClusterIdentifier"]
-            try:
-                result = client.describe_logging_status(
-                    ClusterIdentifier=redshift_id)
-                result.pop('ResponseMetadata')
-            except client.exceptions.ClusterNotFound:
-                continue
+
+        redshift_id = resources[0]['ClusterIdentifier']
+        result = client.describe_logging_status(
+            ClusterIdentifier=redshift_id)
+        result.pop('ResponseMetadata')
+
         self.assertFalse(result["LoggingEnabled"])
-
-
-class TestRedshiftLoggingBucket(BaseTest):
-    """ replicate
-        - name: redshift-logging-to-bucket-test
-          resource: redshift
-          filters:
-            - type: logging
-              key: BucketName
-              value: "redshiftlogstest"
-    """
-    def test_logging_to_bucket(self):
-        session_factory = self.replay_flight_data("test_redshift_logging_filter")
-        policy = self.load_policy(
-            {
-                "name": "redshift-logging-to-bucket-test",
-                "resource": "redshift",
-                "filters": [{"type": "logging", "key": "BucketName", "value": "redshiftlogtest"}],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = policy.run()
-
-        self.assertGreater(
-            len(resources), 0, "Test should find redshiftlogs logging " "to redshiftlogs"
-        )
