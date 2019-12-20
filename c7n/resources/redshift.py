@@ -75,15 +75,10 @@ class DefaultVpc(DefaultVpcBase):
         return (redshift.get('VpcId') and
                 self.match(redshift.get('VpcId')) or False)
 
-###########################################################################
-###########################################################################
-###########################################################################
-
 
 @Redshift.filter_registry.register('logging')
 class LoggingFilter(ValueFilter):
-    """ Matches Redshift Clusters that are logging to S3.
-        bucket and prefix are optional
+    """ Checks Redshift logging status and attributes.
 
     :example:
 
@@ -162,7 +157,7 @@ class SetRedshiftLogging(BaseAction):
 
     def validate(self):
         if self.data.get('state') == 'enabled':
-            if 'bucket' not in self.data or 'prefix' not in self.data:
+            if 'bucket' not in self.data:
                 raise PolicyValidationError((
                     "redshift logging enablement requires `bucket` "
                     "and `prefix` specification on %s" % (self.manager.data,)))
@@ -175,8 +170,8 @@ class SetRedshiftLogging(BaseAction):
 
             if self.data.get('state') == 'enabled':
 
-                prefix = self.data.get('prefix', None)
-                bucketname = self.data.get('bucket', None)
+                prefix = self.data.get('prefix')
+                bucketname = self.data.get('bucket')
 
                 self.manager.retry(
                     client.enable_logging,
