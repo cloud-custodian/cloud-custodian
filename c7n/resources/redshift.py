@@ -152,8 +152,11 @@ class SetRedshiftLogging(BaseAction):
         prefix={'type': 'string'},
         required=('state',))
 
-    permissions = ("redshift:EnableLogging", "redshift:DisableLogging",
-            "redshift:DescribeLoggingStatus")
+    def get_permissions(self):
+        perms = ('redshift:EnableLogging',)
+        if self.data['state'] == 'disabled':
+            return ('redshift:DisableLogging',)
+        return perms
 
     def validate(self):
         if self.data.get('state') == 'enabled':
