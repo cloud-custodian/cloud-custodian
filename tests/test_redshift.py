@@ -600,6 +600,7 @@ class TestRedshiftLogging(BaseTest):
             session_factory=session_factory,
         )
 
+        self.assertIn('redshift:DisableLogging', policy.get_permissions())
         resources = policy.run()
 
         self.assertEqual(len(resources), 1)
