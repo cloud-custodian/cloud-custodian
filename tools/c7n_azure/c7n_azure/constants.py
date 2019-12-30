@@ -111,9 +111,12 @@ FUNCTION_HOST_CONFIG = {
         "healthCheckThreshold": 6,
         "counterThreshold": 0.80
     },
-    "functionTimeout": "00:05:00",
+    "functionTimeout": "00:10:00",
     "logging": {
-        "fileLoggingMode": "debugOnly"
+        "fileLoggingMode": "always",
+        "logLevel": {
+            "default": "Debug"
+        }
     },
     "extensions": {
         "http": {

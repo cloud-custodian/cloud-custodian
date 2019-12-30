@@ -104,6 +104,50 @@ class InstanceTest(BaseTest):
                      'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
         self.assertEqual(result['items'][0]['status'], 'STOPPING')
 
+    def test_label_instance(self):
+        project_id = 'team-saasops'
+        factory = self.replay_flight_data('instance-label', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'ilabel',
+             'resource': 'gcp.instance',
+             'filters': [{'name': 'test-ingwar'}],
+             'actions': [{'type': 'set-labels',
+                          'labels': {'test_label': 'test_value'}}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = test-ingwar',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
+
+    def test_mark_for_op_instance(self):
+        project_id = 'team-saasops'
+        factory = self.replay_flight_data('instance-label', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'ilabel',
+             'resource': 'gcp.instance',
+             'filters': [{'type': 'marked-for-op',
+                          'op': 'stop'}],
+             'actions': [{'type': 'mark-for-op',
+                          'op': 'start'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = test-ingwar',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertTrue(result['items'][0]['labels']['custodian_status']
+                        .startswith("resource_policy-start"))
+
 
 class DiskTest(BaseTest):
 
@@ -124,6 +168,18 @@ class DiskTest(BaseTest):
              'filters': [
                  {'name': 'c7n-jenkins'}],
              'actions': ['snapshot']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_disk_snapshot_add_date(self):
+        factory = self.replay_flight_data('disk-snapshot', project_id='custodian-1291')
+        p = self.load_policy(
+            {'name': 'all-images',
+             'resource': 'gcp.disk',
+             'filters': [
+                 {'name': 'c7n-jenkins'}],
+             'actions': [{'type': 'snapshot', 'name_format': "{disk[name]:.50}-{now:%Y-%m-%d}"}]},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -150,6 +206,27 @@ class DiskTest(BaseTest):
                      'zone': zone})
 
         self.assertEqual(len(result['items']["zones/{}".format(zone)]['disks']), 0)
+
+    def test_label_disk(self):
+        project_id = 'team-saasops'
+        factory = self.replay_flight_data('disk-label', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'disk-label',
+             'resource': 'gcp.disk',
+             'filters': [{'name': 'test-ingwar'}],
+             'actions': [{'type': 'set-labels',
+                          'labels': {'test_label': 'test_value'}}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = test-ingwar',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
 
 
 class SnapshotTest(BaseTest):

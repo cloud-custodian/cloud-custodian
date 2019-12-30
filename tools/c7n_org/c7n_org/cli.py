@@ -61,7 +61,7 @@ WORKER_COUNT = int(
 
 
 CONFIG_SCHEMA = {
-    '$schema': 'http://json-schema.org/schema#',
+    '$schema': 'http://json-schema.org/draft-07/schema',
     'id': 'http://schema.cloudcustodian.io/v0/orgrunner.json',
     'definitions': {
         'account': {
@@ -74,7 +74,10 @@ CONFIG_SCHEMA = {
             'properties': {
                 'name': {'type': 'string'},
                 'email': {'type': 'string'},
-                'account_id': {'type': 'string'},
+                'account_id': {
+                    'type': 'string',
+                    'pattern': '^[0-9]{12}$',
+                    'minLength': 12, 'maxLength': 12},
                 'profile': {'type': 'string', 'minLength': 3},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'regions': {'type': 'array', 'items': {'type': 'string'}},
@@ -451,6 +454,8 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
     if len(script_args) == 1 and " " in script_args[0]:
         script_args = script_args[0].split()
 
+    success = True
+
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
@@ -466,6 +471,7 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
                 log.warning(
                     "Error running script in %s @ %s exception: %s",
                     a['name'], r, f.exception())
+                success = False
             exit_code = f.result()
             if exit_code == 0:
                 log.info(
@@ -475,6 +481,10 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
                 log.info(
                     "error running script on account:%s region:%s script: `%s`",
                     a['name'], r, " ".join(script_args))
+                success = False
+
+    if not success:
+        sys.exit(1)
 
 
 def accounts_iterator(config):

@@ -1161,6 +1161,19 @@ class PullModeTest(BaseTest):
         self.assertEqual(pull_mode.is_runnable(), True)
 
 
+class PhdModeTest(BaseTest):
+
+    def test_validation(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'xyz', 'resource': 'ec2',
+             'mode': {'type': 'phd'}})
+        self.load_policy(
+            {'name': 'abc', 'resource': 'account',
+             'mode': {'type': 'phd'}})
+
+
 class GuardModeTest(BaseTest):
 
     def test_unsupported_resource(self):

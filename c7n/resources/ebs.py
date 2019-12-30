@@ -1150,25 +1150,54 @@ class CreateSnapshot(BaseAction):
                   - Attachments: []
                   - State: available
                 actions:
-                  - snapshot
+                  - type: snapshot
+                    copy-tags:
+                      - Name
     """
-    permissions = ('ec2:CreateSnapshot',)
-    schema = type_schema('snapshot')
+    schema = type_schema(
+        'snapshot',
+        **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
+           'copy-volume-tags': {'type': 'boolean'}})
+    permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
+
+    def validate(self):
+        if self.data.get('copy-tags') and 'copy-volume-tags' in self.data:
+            raise PolicyValidationError(
+                "Can specify copy-tags or copy-volume-tags, not both")
 
     def process(self, volumes):
         client = local_session(self.manager.session_factory).client('ec2')
         retry = get_retry(['Throttled'], max_attempts=5)
         for vol in volumes:
             vol_id = vol['VolumeId']
-            retry(self.process_volume, client=client, volume=vol_id)
+            tags = [{
+                'ResourceType': 'snapshot',
+                'Tags': self.get_snapshot_tags(vol)
+            }]
+            retry(self.process_volume, client=client, volume=vol_id, tags=tags)
 
-    def process_volume(self, client, volume):
+    def process_volume(self, client, volume, tags):
         try:
-            client.create_snapshot(VolumeId=volume)
+            client.create_snapshot(VolumeId=volume, TagSpecifications=tags)
         except ClientError as e:
             if e.response['Error']['Code'] == 'InvalidVolume.NotFound':
                 return
             raise
+
+    def get_snapshot_tags(self, resource):
+        tags = [
+            {'Key': 'custodian_snapshot', 'Value': ''}]
+        copy_keys = self.data.get('copy-tags', [])
+        copy_tags = []
+        if copy_keys:
+            for t in resource.get('Tags', []):
+                if t['Key'] in copy_keys:
+                    copy_tags.append(t)
+            tags.extend(copy_tags)
+            return tags
+        if self.data.get('copy-volume-tags', True):
+            tags.extend(resource.get('Tags', []))
+        return tags
 
 
 @EBS.action_registry.register('delete')

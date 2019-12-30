@@ -66,21 +66,21 @@ class MethodAction(Action):
     def process(self, resources):
         if self.attr_filter:
             resources = self.filter_resources(resources)
-        m = self.manager.get_model()
+        model = self.manager.get_model()
         session = local_session(self.manager.session_factory)
-        client = self.get_client(session, m)
+        client = self.get_client(session, model)
         for resource_set in chunks(resources, self.chunk_size):
-            self.process_resource_set(client, m, resource_set)
+            self.process_resource_set(client, model, resource_set)
 
     def process_resource_set(self, client, model, resources):
-        op_name = self.method_spec['op']
         result_key = self.method_spec.get('result_key')
         annotation_key = self.method_spec.get('annotation_key')
-        for r in resources:
-            params = self.get_resource_params(model, r)
+        for resource in resources:
+            op_name = self.get_operation_name(model, resource)
+            params = self.get_resource_params(model, resource)
             result = self.invoke_api(client, op_name, params)
             if result_key and annotation_key:
-                r[annotation_key] = result.get(result_key)
+                resource[annotation_key] = result.get(result_key)
 
     def invoke_api(self, client, op_name, params):
         try:
@@ -90,7 +90,10 @@ class MethodAction(Action):
                 return e
             raise
 
-    def get_resource_params(self, m, r):
+    def get_operation_name(self, model, resource):
+        return self.method_spec['op']
+
+    def get_resource_params(self, model, resource):
         raise NotImplementedError("subclass responsibility")
 
     def get_client(self, session, model):

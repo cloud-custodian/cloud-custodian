@@ -15,7 +15,8 @@ import pygit2
 import click
 
 from datetime import datetime, timedelta
-from dateutil.tz import tzoffset
+from dateutil.tz import tzoffset, tzutc
+from dateutil.parser import parse as parse_date
 
 
 def commit_date(commit):
@@ -25,15 +26,29 @@ def commit_date(commit):
 
 aliases = {
     'c7n': 'core',
+    'cli': 'core',
     'c7n_mailer': 'tools',
     'mailer': 'tools',
     'utils': 'core',
     'cask': 'tools',
     'test': 'tests',
+    'docker': 'core',
     'dockerfile': 'tools',
+    'asg': 'aws',
+    'build': 'tests',
+    'aws lambda policy': 'aws',
+    'tags': 'aws',
+    'notify': 'core',
+    'sechub': 'aws',
+    'sns': 'aws',
+    'actions': 'aws',
+    'serverless': 'core',
+    'packaging': 'tests',
+    '0': 'release',
+    'dep': 'core',
     'ci': 'tests'}
 
-skip = set(('release',))
+skip = set(('release', 'merge'))
 
 
 @click.command()
@@ -43,8 +58,12 @@ skip = set(('release',))
 def main(path, output, since):
     repo = pygit2.Repository(path)
     if since:
-        since = repo.lookup_reference('refs/tags/%s' % since)
-        since = commit_date(since.peel())
+        try:
+            since = repo.lookup_reference('refs/tags/%s' % since)
+        except KeyError:
+            since = parse_date(since).astimezone(tzutc())
+        else:
+            since = commit_date(since.peel())
 
     groups = {}
     count = 0
@@ -72,10 +91,18 @@ def main(path, output, since):
         if '\n' in message:
             message = message.split('\n')[0]
 
+        found = False
+        for s in skip:
+            if category.startswith(s):
+                found = True
+                continue
+        if found:
+            continue
         groups.setdefault(category, []).append(message)
         count += 1
 
     import pprint
+    print('total commits %d' % count)
     pprint.pprint(dict([(k, len(groups[k])) for k in groups]))
 
     with open(output, 'w') as fh:

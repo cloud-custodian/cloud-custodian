@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from azure.mgmt.web import models
+from c7n.lookup import Lookup
 from c7n_azure.actions.base import AzureBaseAction
-from c7n_azure.lookup import Lookup
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
