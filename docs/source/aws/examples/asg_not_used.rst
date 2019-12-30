@@ -19,19 +19,18 @@ AMI - ASG Garbage Collector
     comments: |
       Mark any unused ASG checking it every day.
     filters:
-      - and:
-        - type: value
-          key: MinSize
-          value: 1
-          op: less-than
-        - type: value
-          key: DesiredCapacity
-          value: 1
-          op: less-than
+      - type: value
+        key: MinSize
+        value: 1
+        op: less-than
+      - type: value
+        key: DesiredCapacity
+        value: 1
+        op: less-than
     actions:
-        - type: mark-for-op
-          op: delete
-          days: 30
+      - type: mark-for-op
+        op: delete
+        days: 30
   - name: asg-unmark-as-unused
     resource: asg
     mode:
