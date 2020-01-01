@@ -284,18 +284,18 @@ class PostFinding(Action):
     schema = type_schema(
         "post-finding",
         required=["types"],
-        title={"type": "string"},
-        description={'type': 'string'},
+        title={"type": "string", 'default': 'policy.name'},
+        description={'type': 'string', 'default': 'policy.description, or if not defined in policy then policy.name'},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         confidence={"type": "number", "min": 0, "max": 100},
         criticality={"type": "number", "min": 0, "max": 100},
         # Cross region aggregation
-        region={'type': 'string', 'description': 'cross-region aggregation target'},
+        region={'type': 'string', 'description': 'cross-region aggregation target', 'default': 'current region'},
         recommendation={"type": "string"},
         recommendation_url={"type": "string"},
         fields={"type": "object"},
-        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10},
+        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10, 'default': 1},
         types={
             "type": "array",
             "minItems": 1,
