@@ -55,7 +55,8 @@ def get_archive(config):
         'requests', 'urllib3', 'idna', 'chardet', 'certifi',
         # used by splunk; also dependencies of c7n itself
         'jsonpointer', 'jsonpatch',
-        'sendgrid'])
+        # sendgrid dependencies
+        'sendgrid', 'python_http_client'])
 
     for d in set(config['templates_folders']):
         if not os.path.exists(d):
