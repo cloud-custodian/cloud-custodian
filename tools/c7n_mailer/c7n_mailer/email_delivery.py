@@ -218,7 +218,7 @@ class EmailDelivery(object):
                 sendgrid_delivery = sendgrid.SendGridDelivery(config=self.config,
                                                              session=self.session,
                                                              logger=self.logger)
-                sendgrid_delivery.sengrid_handler(sqs_message, email_to_addrs)
+                sendgrid_delivery.sendgrid_handler(sqs_message, email_to_addrs)
             else:
                 self.aws_ses.send_raw_email(RawMessage={'Data': mimetext_msg.as_string()})
         except Exception as error:
