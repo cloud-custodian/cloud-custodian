@@ -29,6 +29,15 @@ class RegistryTest(unittest.TestCase):
         self.assertEqual(list(registry.values()), [klass])
         registry.unregister('dust')
 
+    def test_registry_getitem_keyerror(self):
+        registry = PluginRegistry('dummy')
+        try:
+            registry['xyz']
+        except KeyError:
+            pass
+        else:
+            self.fail('should have raised keyerror')
+
     def test_event_subscriber(self):
 
         observed = []

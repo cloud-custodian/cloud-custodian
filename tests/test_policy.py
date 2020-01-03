@@ -63,6 +63,12 @@ class DummyResource(manager.ResourceManager):
 
 class PolicyMeta(BaseTest):
 
+    def test_policy_missing_provider_session(self):
+        self.assertRaises(
+            RuntimeError,
+            policy.get_session_factory,
+            'nosuchthing', Bag())
+
     def test_policy_detail_spec_permissions(self):
         policy = self.load_policy(
             {"name": "kinesis-delete", "resource": "kinesis", "actions": ["delete"]}
