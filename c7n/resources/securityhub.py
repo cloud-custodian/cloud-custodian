@@ -292,8 +292,7 @@ class PostFinding(Action):
         confidence={"type": "number", "min": 0, "max": 100},
         criticality={"type": "number", "min": 0, "max": 100},
         # Cross region aggregation
-        region={'type': 'string', 'description': 'cross-region aggregation target',
-            'default': 'current region'},
+        region={'type': 'string', 'description': 'cross-region aggregation target'},
         recommendation={"type": "string"},
         recommendation_url={"type": "string"},
         fields={"type": "object"},
