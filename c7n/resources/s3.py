@@ -1429,7 +1429,6 @@ class ToggleLogging(BucketActionBase):
 
         for r in resources:
             client = bucket_client(session, r)
-            log.warning("Bucket logging: {}".format(r.get('Logging')))
             is_logging = bool(r.get('Logging'))
 
             if enabled and (not is_logging or update):
