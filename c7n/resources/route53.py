@@ -142,15 +142,11 @@ class Route53Domain(QueryResourceManager):
 
     def augment(self, domains):
         client = local_session(self.session_factory).client('route53domains')
-
-        def _list_tags(d):
-            tags = client.list_tags_for_domain(
+        for d in domains:
+            d['Tags'] = self.retry(
+                client.list_tags_for_domain,
                 DomainName=d['DomainName'])['TagList']
-            d['Tags'] = tags
-            return d
-
-        with self.executor_factory(max_workers=1) as w:
-            return list(filter(None, w.map(_list_tags, domains)))
+        return domains
 
 
 @Route53Domain.action_registry.register('tag')
