@@ -72,5 +72,81 @@ so these modes work for resources that security hub doesn't natively support.
 
 https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cloudwatch-events.html
 
+The Amazon Security Finding Format is documented at https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html
 
+.. list-table:: Mapping data in Cloud Custodian into the Amazon Security Finding Format (ASFF)
+   :widths: 40 20 40
+   :header-rows: 1
 
+   * - Cloud Custodian
+     - ASFF Attribute
+     - Rationale
+   * - derived from execution context: account_id
+     - AwsAccountId
+     - Direct
+   * - metadata.json policy.actions.compliance_status
+     - Confidence
+     - User supplied value in policy configuration
+   * - metadata.json policy.actions.confidence 
+     - Confidence
+     - User supplied value in policy configuration
+   * - metadata.json policy.actions.criticality
+     - Criticality
+     - User supplied value in policy configuration
+   * - derived value: current_time aka Now
+     - CreatedAt 
+     - Timestamp when the finding record was composed for the first time
+   * - metadata.json policy.actions.description
+     - Description
+     - User supplied value in policy configuration
+   * - metadata.json policy.name
+     - GeneratorId
+     - Policy is equivilent to a Rule
+   * - digest of region, account_id, policy contents, and Resource Arn/Id 
+     - Id
+     - Enforces uniqueness by combinding policy attributes with resource attributes
+   * - metadata.json policy.resource_type
+     - ProductFields.resource
+     - Direct
+   * - fixed value: CloudCustodian
+     - ProductFields.ProviderName
+     - Name of project
+   * - derived value from executable: version
+     - ProductFields.ProviderVersioN
+     - Direct
+   * - fixed value: ACTIVE
+     - RecordState
+     - Always ACTIVE at Create/Update time
+   * - metadata.json policy.actions.recommendation
+     - Recommendation.Text
+     - User supplied value in policy configuration
+   * - metadata.json policy.actions.recommendation_url
+     - Recommendation.Url
+     - User supplied value in policy configuration
+   * - resources.json attributes
+     - Resources.Details.${Type}.*
+     - Direct Mapping from columns in Describe output
+   * - resources.json Arn
+     - Resources.Id
+     - Direct
+   * - resource.json Tags
+     - Resources.Tags
+     - Direct
+   * - metadata.json policy.resource_type
+     - Resources.Type
+     - Direct
+   * - Hardcoded Fixed Value: "2018-10-08"
+     - SchemaVersion
+     - Only Valid value
+   * - metadata.json policy.actions.severity_normalized
+     - Severity.Normalized
+     - User supplied value in policy configuration
+   * - metadata.json policy.name
+     - Title
+     - Primary Identifer
+   * - metadata.json policy.actions.types
+     - Types
+     - User supplied value in policy configuration
+   * - derived value: current_time aka Now
+     - UpdatedAt
+     - Timestamp when the finding record update is composed

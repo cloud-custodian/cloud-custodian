@@ -244,7 +244,8 @@ class PostFinding(Action):
     """Report a finding to AWS Security Hub.
 
     Custodian acts as a finding provider, allowing users to craft
-    policies that report to the AWS SecurityHub.
+    policies that report to the AWS SecurityHub in the AWS Security Finding Format documented at
+    https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html
 
     For resources that are taggable, we will tag the resource with an identifier
     such that further findings generate updates.
