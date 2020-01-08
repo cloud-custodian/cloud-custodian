@@ -36,8 +36,8 @@ from c7n.query import QueryResourceManager
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
 
-filters = FilterRegistry('aws.account.actions')
-actions = ActionRegistry('aws.account.filters')
+filters = FilterRegistry('aws.account.filters')
+actions = ActionRegistry('aws.account.actions')
 
 retry = staticmethod(QueryResourceManager.retry)
 filters.register('missing', Missing)

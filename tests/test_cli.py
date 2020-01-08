@@ -115,6 +115,11 @@ class VersionTest(CliTest):
 
 class ValidateTest(CliTest):
 
+    def test_invalidate_structure_exit(self):
+        invalid_policies = {"policies": [{"name": "foo"}]}
+        yaml_file = self.write_policy_file(invalid_policies)
+        self.run_and_expect_failure(["custodian", "validate", yaml_file], 1)
+
     def test_validate(self):
         invalid_policies = {
             "policies": [

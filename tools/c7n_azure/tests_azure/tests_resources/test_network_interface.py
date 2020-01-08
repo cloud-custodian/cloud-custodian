@@ -13,9 +13,10 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from ..azure_common import BaseTest, arm_template
+from ..azure_common import BaseTest, arm_template, requires_arm_polling
 
 
+@requires_arm_polling
 class NetworkInterfaceTest(BaseTest):
     def setUp(self):
         super(NetworkInterfaceTest, self).setUp()

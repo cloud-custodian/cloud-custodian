@@ -14,6 +14,8 @@
 
 import re
 
+from datetime import datetime
+
 from c7n.utils import type_schema
 
 from c7n_gcp.actions import MethodAction
@@ -33,6 +35,7 @@ class Instance(QueryResourceManager):
         enum_spec = ('aggregatedList', 'items.*.instances[]', None)
         scope = 'project'
         id = 'name'
+        labels = True
 
         @staticmethod
         def get(client, resource_info):
@@ -43,6 +46,17 @@ class Instance(QueryResourceManager):
                         'zone': resource_info['zone'],
                         'instance': resource_info[
                             'resourceName'].rsplit('/', 1)[-1]})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
+            project, zone, instance = path_param_re.match(
+                resource['selfLink']).groups()
+            return {'project': project, 'zone': zone, 'instance': instance,
+                    'body': {
+                        'labels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
 
 
 @Instance.filter_registry.register('offhour')
@@ -62,8 +76,8 @@ class InstanceOnHour(OnHour):
 class InstanceAction(MethodAction):
 
     def get_resource_params(self, model, resource):
-        project, zone, instance = self.path_param_re.match(
-            resource['selfLink']).groups()
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
+        project, zone, instance = path_param_re.match(resource['selfLink']).groups()
         return {'project': project, 'zone': zone, 'instance': instance}
 
 
@@ -72,8 +86,6 @@ class Start(InstanceAction):
 
     schema = type_schema('start')
     method_spec = {'op': 'start'}
-    path_param_re = re.compile(
-        '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
     attr_filter = ('status', ('TERMINATED',))
 
 
@@ -82,8 +94,6 @@ class Stop(InstanceAction):
 
     schema = type_schema('stop')
     method_spec = {'op': 'stop'}
-    path_param_re = re.compile(
-        '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
     attr_filter = ('status', ('RUNNING',))
 
 
@@ -92,8 +102,6 @@ class Delete(InstanceAction):
 
     schema = type_schema('delete')
     method_spec = {'op': 'delete'}
-    path_param_re = re.compile(
-        '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
 
 
 @resources.register('image')
@@ -135,6 +143,7 @@ class Disk(QueryResourceManager):
         scope = 'zone'
         enum_spec = ('aggregatedList', 'items.*.disks[]', None)
         id = 'name'
+        labels = True
 
         @staticmethod
         def get(client, resource_info):
@@ -143,25 +152,65 @@ class Disk(QueryResourceManager):
                         'zone': resource_info['zone'],
                         'resourceId': resource_info['disk_id']})
 
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/disks/(.*)')
+            project, zone, instance = path_param_re.match(
+                resource['selfLink']).groups()
+            return {'project': project, 'zone': zone, 'resource': instance,
+                    'body': {
+                        'labels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
 
 @Disk.action_registry.register('snapshot')
 class DiskSnapshot(MethodAction):
+    """
+    `Snapshots <https://cloud.google.com/compute/docs/reference/rest/v1/disks/createSnapshot>`_
+    disk.
 
-    schema = type_schema('snapshot')
+    The `name_format` specifies name of snapshot in python `format string <https://pyformat.info/>`
+
+    Inside format string there are defined variables:
+      - `now`: current time
+      - `disk`: whole disk resource
+
+    Default name format is `{disk.name}`
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-disk-snapshot
+            resource: gcp.disk
+            filters:
+              - type: value
+                key: name
+                value: disk-7
+            actions:
+              - type: snapshot
+                name_format: "{disk[name]:.50}-{now:%Y-%m-%d}"
+    """
+    schema = type_schema('snapshot', name_format={'type': 'string'})
     method_spec = {'op': 'createSnapshot'}
     path_param_re = re.compile(
         '.*?/projects/(.*?)/zones/(.*?)/disks/(.*)')
     attr_filter = ('status', ('RUNNING', 'READY'))
 
-    def get_resource_params(self, m, r):
-        project, zone, resourceId = self.path_param_re.match(r['selfLink']).groups()
+    def get_resource_params(self, model, resource):
+        project, zone, resourceId = self.path_param_re.match(resource['selfLink']).groups()
+        name_format = self.data.get('name_format', '{disk[name]}')
+        name = name_format.format(disk=resource, now=datetime.now())
+
         return {
             'project': project,
             'zone': zone,
             'disk': resourceId,
             'body': {
-                'name': resourceId,
-                'labels': r.get('labels', {}),
+                'name': name,
+                'labels': resource.get('labels', {}),
             }
         }
 

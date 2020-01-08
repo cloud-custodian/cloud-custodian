@@ -29,11 +29,23 @@ class SpannerInstance(QueryResourceManager):
         scope_template = 'projects/{}'
         id = 'name'
 
+        labels = True
+        labels_op = 'patch'
+
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'name': resource_info['resourceName']}
             )
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            return {'name': resource['name'],
+                    'body': {
+                        'instance': {
+                            'labels': all_labels
+                        },
+                        'field_mask': ', '.join(['labels'])}}
 
 
 @SpannerInstance.action_registry.register('delete')

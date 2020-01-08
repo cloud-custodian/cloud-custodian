@@ -12,15 +12,30 @@ from c7n_org import cli as org
 ACCOUNTS_AWS_DEFAULT = yaml.safe_dump({
     'accounts': [
         {'name': 'dev',
-         'account_id': 'foobar',
+         'account_id': '112233445566',
          'tags': ['red', 'black'],
          'role': 'arn:aws:iam:{account_id}::/role/foobar'},
         {'name': 'qa',
-         'account_id': 'barfoo',
+         'account_id': '002244668899',
          'tags': ['red', 'green'],
          'role': 'arn:aws:iam:{account_id}::/role/foobar'},
     ],
 }, default_flow_style=False)
+
+ACCOUNTS_AZURE = {
+    'subscriptions': [{
+        'subscription_id': 'ea42f556-5106-4743-99b0-c129bfa71a47',
+        'name': 'devx',
+    }]
+}
+
+ACCOUNTS_GCP = {
+    'projects': [{
+        'project_id': 'custodian-1291',
+        'name': 'devy'
+    }],
+}
+
 
 POLICIES_AWS_DEFAULT = yaml.safe_dump({
     'policies': [
@@ -59,6 +74,42 @@ class OrgTest(TestUtils):
         cache_path = os.path.join(root, 'cache')
         os.makedirs(cache_path)
         return root
+
+    def test_validate_azure_provider(self):
+        run_dir = self.setup_run_dir(
+            accounts=ACCOUNTS_AZURE,
+            policies={'policies': [{
+                'name': 'vms',
+                'resource': 'azure.vm'}]
+            })
+        logger = mock.MagicMock()
+        run_account = mock.MagicMock()
+        run_account.return_value = ({}, True)
+        self.patch(org, 'logging', logger)
+        self.patch(org, 'run_account', run_account)
+        self.change_cwd(run_dir)
+        runner = CliRunner()
+        result = runner.invoke(
+            org.cli,
+            ['run', '-c', 'accounts.yml', '-u', 'policies.yml',
+             '--debug', '-s', 'output', '--cache-path', 'cache'],
+            catch_exceptions=False)
+        self.assertEqual(result.exit_code, 0)
+
+    def test_validate_gcp_provider(self):
+        run_dir = self.setup_run_dir(
+            accounts=ACCOUNTS_GCP,
+            policies={
+                'policies': [{
+                    'resource': 'gcp.instance',
+                    'name': 'instances'}]
+            })
+        logger = mock.MagicMock()
+        run_account = mock.MagicMock()
+        run_account.return_value = ({}, True)
+        self.patch(org, 'logging', logger)
+        self.patch(org, 'run_account', run_account)
+        self.change_cwd(run_dir)
 
     def test_cli_run_aws(self):
         run_dir = self.setup_run_dir()

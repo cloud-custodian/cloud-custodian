@@ -23,7 +23,7 @@ from c7n.utils import local_session
 
 class AzureBaseActionTest(BaseTest):
     def test_return_success(self):
-        action = TestAction()
+        action = SampleAction()
         action.process([{'id': '1'}, {'id': '2'}], None)
 
         self.assertEqual(2, action.log.info.call_count)
@@ -37,7 +37,7 @@ class AzureBaseActionTest(BaseTest):
             extra={'properties': {'resource_id': '2', 'action': 'test'}})
 
     def test_return_success_message(self):
-        action = TestAction()
+        action = SampleAction()
         action.process([
             {'id': '1', 'name': 'one', 'message': 'foo', 'resourceGroup': 'rg'},
             {'id': '2', 'name': 'two', 'message': 'bar'}],
@@ -55,7 +55,7 @@ class AzureBaseActionTest(BaseTest):
 
     @patch('sys.modules', return_value=[])
     def test_resource_failed(self, _):
-        action = TestAction()
+        action = SampleAction()
         action.process([
             {'id': '1', 'exception': Exception('foo'), 'name': 'bar', 'type': 'vm'},
             {'id': '2'}],
@@ -71,7 +71,7 @@ class AzureBaseActionTest(BaseTest):
 
     @patch('sys.modules', return_value=[])
     def test_resource_failed_event(self, _):
-        action = TestEventAction()
+        action = SampleEventAction()
         action.process([
             {'id': '1', 'exception': Exception('foo'), 'name': 'bar', 'type': 'vm'},
             {'id': '2'}],
@@ -86,7 +86,8 @@ class AzureBaseActionTest(BaseTest):
             extra={'properties': {'resource_id': '2', 'action': 'test'}})
 
 
-class TestAction(AzureBaseAction):
+class SampleAction(AzureBaseAction):
+
     def __init__(self):
         self.client = MagicMock()
         self.manager = MagicMock()
@@ -105,7 +106,8 @@ class TestAction(AzureBaseAction):
             return message
 
 
-class TestEventAction(AzureEventAction):
+class SampleEventAction(AzureEventAction):
+
     def __init__(self):
         self.client = MagicMock()
         self.manager = MagicMock()

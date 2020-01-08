@@ -98,6 +98,7 @@ class FlowLogFilter(Filter):
            'destination': {'type': 'string'},
            'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
+           'log-format': {'type': 'string'},
            'log-group': {'type': 'string'}})
 
     permissions = ('ec2:DescribeFlowLogs',)
@@ -117,6 +118,7 @@ class FlowLogFilter(Filter):
 
         enabled = self.data.get('enabled', False)
         log_group = self.data.get('log-group')
+        log_format = self.data.get('log-format')
         traffic_type = self.data.get('traffic-type')
         destination_type = self.data.get('destination-type')
         destination = self.data.get('destination')
@@ -153,11 +155,12 @@ class FlowLogFilter(Filter):
                         traffic_type is None) or op(
                         fl['TrafficType'],
                         traffic_type.upper())
-                    log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
-
+                    log_group_match = (log_group is None) or op(fl.get('LogGroupName'), log_group)
+                    log_format_match = (log_format is None) or op(fl.get('LogFormat'), log_format)
                     # combine all conditions to check if flow log matches the spec
                     fl_match = (status_match and traffic_type_match and dest_match and
-                                log_group_match and dest_type_match and delivery_status_match)
+                                log_format_match and log_group_match and
+                                dest_type_match and delivery_status_match)
                     fl_matches.append(fl_match)
 
                 if set_op == 'or':
@@ -1980,6 +1983,7 @@ class CreateFlowLogs(BaseAction):
             'DeliverLogsPermissionArn': {'type': 'string'},
             'LogGroupName': {'type': 'string'},
             'LogDestination': {'type': 'string'},
+            'LogFormat': {'type': 'string'},
             'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
             'TrafficType': {
                 'type': 'string',

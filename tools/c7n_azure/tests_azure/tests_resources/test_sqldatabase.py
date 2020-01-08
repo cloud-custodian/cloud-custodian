@@ -55,24 +55,12 @@ class SqlDatabaseTest(BaseTest):
                     'key': 'name',
                     'op': 'eq',
                     'value': 'cctestdb'
-                }
-            ]
-        })
-
-        resources = p.run()
-        self._assert_found_only_test_database(resources)
-
-    @arm_template('sqlserver.json')
-    def test_find_databases_with_premium_sku(self):
-        p = self.load_policy({
-            'name': 'test-find-databases-with-premium-sku',
-            'resource': 'azure.sqldatabase',
-            'filters': [
+                },
                 {
                     'type': 'value',
                     'key': 'sku.tier',
                     'op': 'eq',
-                    'value': 'Premium'
+                    'value': 'Standard'
                 }
             ]
         })

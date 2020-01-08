@@ -597,7 +597,6 @@ class PHDMode(LambdaMode):
 
     schema = utils.type_schema(
         'phd',
-        required=['events'],
         events={'type': 'array', 'items': {'type': 'string'}},
         categories={'type': 'array', 'items': {
             'enum': ['issue', 'accountNotification', 'scheduledChange']}},
@@ -613,6 +612,10 @@ class PHDMode(LambdaMode):
             raise PolicyValidationError(
                 "policy:%s phd event mode not supported for resource:%s" % (
                     self.policy.name, self.policy.resource_type))
+        if 'events' not in self.policy.data['mode']:
+            raise PolicyValidationError(
+                'policy:%s phd event mode requires events for resource:%s' % (
+                    self.policy.name, self.policy.resource_type))
 
     @staticmethod
     def process_event_arns(client, event_arns):
@@ -626,7 +629,7 @@ class PHDMode(LambdaMode):
 
     def resolve_resources(self, event):
         session = utils.local_session(self.policy.resource_manager.session_factory)
-        health = session.client('health')
+        health = session.client('health', region_name='us-east-1')
         he_arn = event['detail']['eventArn']
         resource_arns = self.process_event_arns(health, [he_arn])
 
