@@ -1,21 +1,16 @@
 AMI - ASG Garbage Collector
 ====================================
+ASG garbage collector which mean that:
+
+Check if an ASG has minSize = 0 and DesiredCapacity = 0
+Mark the ASG as ops to delete.
+If value won't change delete ASG.
 
 .. code-block:: yaml
 
 
   - name: asg-mark-as-unused
     resource: asg
-    mode:
-      type: periodic
-      schedule: "rate(24 hours)"
-      role: c7n_cloud_custodian_role
-      tags:
-        env: env
-        role: role
-        service: service
-        owner: owner
-        team: team
     comments: |
       Mark any unused ASG checking it every day.
     filters:
@@ -29,20 +24,10 @@ AMI - ASG Garbage Collector
         op: less-than
     actions:
       - type: mark-for-op
-        op: delete
+        op: notify
         days: 30
   - name: asg-unmark-as-unused
     resource: asg
-    mode:
-      type: periodic
-      schedule: "rate(12 hours)"
-      role: c7n_cloud_custodian_role
-      tags:
-        env: env
-        role: role
-        service: service
-        owner: owner
-        team: team
     comments: |
       Unmark any ASG which has a value upper than 0.
     filters:
@@ -55,22 +40,12 @@ AMI - ASG Garbage Collector
       - unmark
   - name: asg-slack-alert
     resource: asg
-    mode:
-      type: periodic
-      schedule: "rate(10 minutes)"
-      role: c7n_cloud_custodian_role
-      tags:
-        env: env
-        role: role
-        service: service
-        owner: owner
-        team: team
     comments: |
       Alert for ASG which have MinSize < 0 and DesiredCapacity < 0
     filters:
       - "tag:maid_status": not-null
       - type: marked-for-op
-        op: delete
+        op: notify
     actions:
       - type: notify
         slack_template: slack
