@@ -228,6 +228,8 @@ def _get_available_engine_upgrades(client, major=False):
     results = {}
     paginator = client.get_paginator('describe_db_engine_versions')
     for page in paginator.paginate():
+        # DBEngineVersions is an ordered list, based on all data seen so far.
+        # it is not explicitly called out as such.
         engine_versions = page['DBEngineVersions']
         for v in engine_versions:
             if not v['Engine'] in results:
@@ -237,9 +239,10 @@ def _get_available_engine_upgrades(client, major=False):
             for t in v['ValidUpgradeTarget']:
                 if not major and t['IsMajorVersionUpgrade']:
                     continue
-                if ComparableVersion(t['EngineVersion']) > ComparableVersion(
-                        results[v['Engine']].get(v['EngineVersion'], '0.0.0')):
-                    results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
+                target_version = t['EngineVersion']
+                latest_version = results[v['Engine']].get(v['EngineVersion'], '0.0.0')
+                if ComparableVersion(target_version) > ComparableVersion(latest_version):
+                    results[v['Engine']][v['EngineVersion']] = target_version
     return results
 
 
