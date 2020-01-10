@@ -1222,7 +1222,7 @@ class Delete(BaseAction):
 
 @SecurityGroup.action_registry.register('set-permissions')
 class SetPermissions(BaseAction):
-    """Action to update ingress/egress rule(s) from a security group
+    """Action to update ingress/egress rule(s) of a security group
 
     :example:
 

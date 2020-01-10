@@ -1,6 +1,6 @@
 .. _securitygroupsaddpermission:
 
-Security Groups - add permission
+Security Groups - set permission
 =================================================
 
 The following example policy will automatically create a CloudWatch Event Rule
@@ -13,10 +13,10 @@ User defined rule is added to the filtered results.
 .. code-block:: yaml
 
    policies:
-     - name: sg-add-permission
+     - name: sg-set-permission
        resource: security-group
        description: |
-         Add rule to a security group. Filter any security group that allows 0.0.0.0/0 or ::/0 (IPv6) ingress
+         Modify rule to a security group. Filter any security group that allows 0.0.0.0/0 or ::/0 (IPv6) ingress
          on port 22, remove the rule and add user defined sg rule
        mode:
            type: cloudtrail
@@ -38,11 +38,10 @@ User defined rule is added to the filtered results.
                   Ports: [22]
                   CidrV6: "::/0"
        actions:
-        - type: remove-permissions
+        - type: set-permissions
           ingress: matched
-        - type: add-permissions
           PermissionType: "ingress"
           IpProtocol: "TCP"
           FromPort: 22
           ToPort: 22
-          Cidr: ["2.2.2.2/32","1.1.1.1/32"]
+          Cidr: ["1.1.1.1/32","2.2.2.2/32","3.3.3.3/32"]
