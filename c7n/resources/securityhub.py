@@ -307,6 +307,10 @@ class PostFinding(Action):
             "type": "string",
             "enum": ["PASSED", "WARNING", "FAILED", "NOT_AVAILABLE"],
         },
+        record_state={
+            "type": "string", 'default': 'ACTIVE',
+            "enum": ["ACTIVE", "ARCHIVED"],
+        },
     )
 
     NEW_FINDING = 'New'
@@ -464,7 +468,9 @@ class PostFinding(Action):
             finding["Criticality"] = self.data["criticality"]
         if "compliance_status" in self.data:
             finding["Compliance"] = {"Status": self.data["compliance_status"]}
-
+        if "record_state" in self.data:
+            finding["RecordState"] = self.data["record_state"]
+        
         fields = {
             'resource': policy.resource_type,
             'ProviderName': 'CloudCustodian',
