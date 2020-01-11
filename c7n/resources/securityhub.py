@@ -470,7 +470,7 @@ class PostFinding(Action):
             finding["Compliance"] = {"Status": self.data["compliance_status"]}
         if "record_state" in self.data:
             finding["RecordState"] = self.data["record_state"]
-        
+
         fields = {
             'resource': policy.resource_type,
             'ProviderName': 'CloudCustodian',
