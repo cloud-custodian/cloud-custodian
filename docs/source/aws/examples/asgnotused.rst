@@ -3,8 +3,8 @@ AMI - ASG Garbage Collector
 ASG garbage collector which mean that:
 
 Check if an ASG has minSize = 0 and DesiredCapacity = 0
-Mark the ASG as ops to delete.
-If value won't change delete ASG.
+Mark the ASG as ops to alert.
+If value won't change cloudCustodian will send an alert with ASGs.
 
 .. code-block:: yaml
 
