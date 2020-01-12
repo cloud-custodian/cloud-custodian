@@ -55,12 +55,13 @@ ROLE = "arn:aws:iam::644160558196:role/custodian-mu"
 
 def test_generate_requirements():
     lines = generate_requirements(
-        'boto3', ignore=('docutils', 's3transfer'))
+        'boto3', ignore=('docutils', 's3transfer', 'six'))
     packages = []
     for l in lines.split('\n'):
         pkg_name, version = l.split('==')
         packages.append(pkg_name)
-    assert packages == ['botocore', 'jmespath']
+    assert set(packages) == set([
+        'botocore', 'jmespath', 'urllib3', 'python-dateutil'])
 
 
 class Publish(BaseTest):
