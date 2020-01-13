@@ -114,8 +114,8 @@ def credential_helper_session(command, session_name, region=None):
                 expiry_time=credentials['Expiration'])
         except subprocess.CalledProcessError:
             raise CredentialHelperExited()
-        except (AttributeError, TypeError, ValueError):
-            raise CredentialHelperExited()
+        except (AttributeError, TypeError, ValueError, json.decoder.JSONDecodeError):
+            raise UnableToParseCredentialOutput()
 
     session_credentials = RefreshableCredentials.create_from_metadata(
         metadata=fetch_credentials(),
