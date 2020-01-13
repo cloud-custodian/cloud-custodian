@@ -1,0 +1,30 @@
+{
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "RequestId": "0de5f922-853b-11e8-bbb4-01cec64ca309",
+            "HTTPHeaders": {
+                "content-length": "180",
+                "via": "1.1 c98d7e6e93b112ec502ea071393fbbed.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "OOK_LXO4hMnFenWjS0id9qWnJuLaA_EdJyPgyGLr_1kmslLWQn30gg==",
+                "x-amz-apigw-id": "J4GbFF6FIAMFqMg=",
+                "x-cache": "Miss from cloudfront",
+                "content-type": "application/json",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "0de5f922-853b-11e8-bbb4-01cec64ca309",
+                "x-amzn-trace-id": "Root=1-5b465113-0c6308b421df89666c7add1c;Sampled=0",
+                "date": "Wed, 11 Jul 2018 18:48:51 GMT"
+            },
+            "HTTPStatusCode": 200
+        },
+        "Invitations": [
+            {
+                "RelationshipStatus": "Invited",
+                "AccountId": "601425634627",
+                "InvitationId": "eab2454717bdfcb9fb0510fa7a765675",
+                "InvitedAt": "2018-07-11T18:15:31.451Z"
+            }
+        ]
+    },
+    "status_code": 200
+}

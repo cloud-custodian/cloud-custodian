@@ -95,8 +95,10 @@ def load_resources():
     import c7n.resources.support
     import c7n.resources.vpc
     import c7n.resources.waf
+    import c7n.resources.guardduty
     import c7n.resources.fsx
     import c7n.resources.workspaces  # NOQA
+
 
     # Load external plugins (private sdks etc)
     #

@@ -1,0 +1,25 @@
+{
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "RequestId": "d78f24f2-853a-11e8-9313-29297158275b",
+            "HTTPHeaders": {
+                "content-length": "52",
+                "via": "1.1 c98d7e6e93b112ec502ea071393fbbed.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "msrx7zdw_1yZDmBUuBlZQMDSEVV4h98q5GGzWlV5iN3RzNzSmMSw9Q==",
+                "x-amz-apigw-id": "J4GM1EQeoAMFfpg=",
+                "x-cache": "Miss from cloudfront",
+                "content-type": "application/json",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "d78f24f2-853a-11e8-9313-29297158275b",
+                "x-amzn-trace-id": "Root=1-5b4650b8-1e3a693687e3bddc808b5507;Sampled=0",
+                "date": "Wed, 11 Jul 2018 18:47:20 GMT"
+            },
+            "HTTPStatusCode": 200
+        },
+        "DetectorIds": [
+            "22b2413945ac7d1fd2cb78c92956a737"
+        ]
+    },
+    "status_code": 200
+}
