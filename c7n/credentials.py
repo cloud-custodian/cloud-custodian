@@ -81,6 +81,12 @@ class SessionFactory(object):
     def set_subscribers(self, subscribers):
         self._subscribers = subscribers
 
+class UnableToParseCredentialOutput(Exception):
+    pass
+
+class CredentialHelperExited(Exception):
+    pass
+
 def credential_helper_session(command, session_name, region=None):
     """Role assumption / fetching, using a credential helper.
 
@@ -95,15 +101,21 @@ def credential_helper_session(command, session_name, region=None):
         env['CUSTODIAN_SESSION_NAME'] = session_name
         if region:
             env['CUSTODIAN_CREDENTIALS_REGION'] = region
-        raw_response = subprocess.check_output(command, shell=True, env=env).strip()
-        parsed = json.loads(str(raw_response))
-        credentials = parsed['Credentials']
+        try:
+            raw_response = subprocess.check_output(command, shell=True, env=env).strip()
+            parseable_string = raw_response.decode('utf-8')
+            parsed = json.loads(parseable_string)
+            credentials = parsed['Credentials']
 
-        return dict(
-            access_key=credentials['AccessKeyId'],
-            secret_key=credentials['SecretAccessKey'],
-            token=credentials['SessionToken'],
-            expiry_time=credentials['Expiration'])
+            return dict(
+                access_key=credentials['AccessKeyId'],
+                secret_key=credentials['SecretAccessKey'],
+                token=credentials['SessionToken'],
+                expiry_time=credentials['Expiration'])
+        except subprocess.CalledProcessError:
+            raise CredentialHelperExited()
+        except (AttributeError, TypeError, ValueError):
+            raise CredentialHelperExited()
 
     session_credentials = RefreshableCredentials.create_from_metadata(
         metadata=fetch_credentials(),
