@@ -1030,7 +1030,7 @@ class BucketLoggingFilter(Filter):
     .. code-block:: yaml
 
             policies:
-              - name: add-bucket-logging
+              - name: add-bucket-logging-if-missing
                 resource: s3
                 filters:
                   - type: bucket-logging
@@ -1050,7 +1050,6 @@ class BucketLoggingFilter(Filter):
                     target_prefix: "{account}/{source_bucket_name}/"
                 actions:
                   - type: toggle-logging
-                    update: true
                     target_bucket: "{account_id}-{region}-s3-logs"
                     target_prefix: "{account}/{source_bucket_name}/"
     """
@@ -1062,15 +1061,9 @@ class BucketLoggingFilter(Filter):
         target_bucket={'type': 'string'},
         target_prefix={'type': 'string'})
     schema_alias = False
-
-    permissions = ("s3:GetBucketLogging", "iam:ListAccountAliases")
     account_name = None
 
-    def account_name(self):
-        if not self.account_name:
-            session = local_session(self.manager.session_factory)
-            self.account_name = get_account_alias_from_sts(session)
-        return self.account_name
+    permissions = ("s3:GetBucketLogging", "iam:ListAccountAliases")
 
     def process(self, buckets, event=None):
         return list(filter(None, map(self.process_bucket, buckets)))
@@ -1088,9 +1081,13 @@ class BucketLoggingFilter(Filter):
         elif op == 'enabled':
             return logging != {}
 
+        if self.account_name is None:
+            session = local_session(self.manager.session_factory)
+            self.account_name = get_account_alias_from_sts(session)
+
         variables = {
             'account_id': self.manager.config.account_id,
-            'account': self.account_name(),
+            'account': self.account_name,
             'region': self.manager.config.region,
             'source_bucket_name': b['Name'],
             'target_bucket_name': self.data.get('target_bucket'),
@@ -1405,7 +1402,6 @@ class ToggleLogging(BucketActionBase):
     schema = type_schema(
         'toggle-logging',
         enabled={'type': 'boolean'},
-        update={'type': 'boolean'},
         target_bucket={'type': 'string'},
         target_prefix={'type': 'string'})
 
@@ -1421,7 +1417,6 @@ class ToggleLogging(BucketActionBase):
 
     def process(self, resources):
         enabled = self.data.get('enabled', True)
-        update = self.data.get('update', False)
 
         # Account name for variable expansion
         session = local_session(self.manager.session_factory)
@@ -1431,7 +1426,7 @@ class ToggleLogging(BucketActionBase):
             client = bucket_client(session, r)
             is_logging = bool(r.get('Logging'))
 
-            if enabled and (not is_logging or update):
+            if enabled:
                 variables = {
                     'account_id': self.manager.config.account_id,
                     'account': account_name,
@@ -1441,18 +1436,19 @@ class ToggleLogging(BucketActionBase):
                     'target_prefix': self.data.get('target_prefix'),
                 }
                 data = format_string_values(self.data, **variables)
-                target_prefix = data.get('target_prefix', r['Name'] + '/')
-                client.put_bucket_logging(
-                    Bucket=r['Name'],
-                    BucketLoggingStatus={
-                        'LoggingEnabled': {
-                            'TargetBucket': data.get('target_bucket'),
-                            'TargetPrefix': target_prefix}})
-                continue
+                config = {
+                    'TargetBucket': data.get('target_bucket'),
+                    'TargetPrefix': data.get('target_prefix', r['Name'] + '/')
+                }
+                if not is_logging or r.get('Logging') != config:
+                    client.put_bucket_logging(
+                        Bucket=r['Name'],
+                        BucketLoggingStatus={'LoggingEnabled': config}
+                    )
+
             elif not enabled and is_logging:
                 client.put_bucket_logging(
                     Bucket=r['Name'], BucketLoggingStatus={})
-                continue
 
 
 @actions.register('attach-encrypt')
