@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+
 from gcp_common import BaseTest, event_data
 
 
@@ -106,6 +108,28 @@ class LogProjectMetricTest(BaseTest):
         event = event_data('log-create-project-metric.json')
         resource = exec_mode.run(event, None)
         self.assertEqual(resource[0]['name'], metric_name)
+
+    def test_log_project_metric_delete(self):
+        project_id = 'mitrop-custodian'
+        factory = self.replay_flight_data('log-project-metric-delete', project_id=project_id)
+
+        p = self.load_policy(
+            {'name': 'delete-log-project-metric',
+             'resource': 'gcp.log-project-metric',
+             'actions': ['delete']},
+            session_factory=factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(3)
+
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'parent': 'projects/{}'.format(project_id)})
+
+        self.assertEqual(result.get('metrics', None), None)
 
 
 class LogExclusionTest(BaseTest):
