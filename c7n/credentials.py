@@ -81,10 +81,14 @@ class SessionFactory(object):
     def set_subscribers(self, subscribers):
         self._subscribers = subscribers
 
-class UnableToParseCredentialOutput(Exception):
+
+class CredentialHelperError(Exception):
     pass
 
-class CredentialHelperExited(Exception):
+class UnableToParseCredentialOutput(CredentialHelperError):
+    pass
+
+class CredentialHelperExited(CredentialHelperError):
     pass
 
 def credential_helper_session(command, session_name, region=None):
@@ -112,10 +116,10 @@ def credential_helper_session(command, session_name, region=None):
                 secret_key=credentials['SecretAccessKey'],
                 token=credentials['SessionToken'],
                 expiry_time=credentials['Expiration'])
-        except subprocess.CalledProcessError:
-            raise CredentialHelperExited()
+        except subprocess.CalledProcessError as e:
+            raise CredentialHelperExited("Credential Helper Exited Abnormally with status code %d" % e.returncode)
         except (AttributeError, TypeError, ValueError, json.decoder.JSONDecodeError):
-            raise UnableToParseCredentialOutput()
+            raise UnableToParseCredentialOutput("Unable to parse input:\n%s" % parseable_string)
 
     session_credentials = RefreshableCredentials.create_from_metadata(
         metadata=fetch_credentials(),
