@@ -1801,7 +1801,6 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "toggle-logging",
-                        "update": True,
                         "target_bucket": bname,
                         "target_prefix": "{account_id}/{source_bucket_name}/",
                     }
