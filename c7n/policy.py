@@ -405,7 +405,8 @@ class LambdaMode(ServerlessExecutionMode):
             # Lambda passthrough config
             'layers': {'type': 'array', 'items': {'type': 'string'}},
             'concurrency': {'type': 'integer'},
-            'runtime': {'enum': ['python2.7', 'python3.6', 'python3.7']},
+            'runtime': {'enum': ['python2.7', 'python3.6',
+                                 'python3.7', 'python3.8']},
             'role': {'type': 'string'},
             'timeout': {'type': 'number'},
             'memory': {'type': 'number'},
