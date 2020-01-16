@@ -1395,7 +1395,6 @@ class ToggleLogging(BucketActionBase):
                     target_prefix: "{account}/{source_bucket_name}/"
                 actions:
                   - type: toggle-logging
-                    update: true
                     target_bucket: "{account_id}-{region}-s3-logs"
                     target_prefix: "{account}/{source_bucket_name}/"
     """
