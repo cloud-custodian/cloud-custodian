@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "EndpointGroup": {
+            "EndpointGroupArn": "arn:aws:globalaccelerator::644160558196:accelerator/1460ad64-e386-41e4-9715-d8bcc665963e/listener/56de20d3/endpoint-group/db9a1ad66002",
+            "EndpointGroupRegion": "us-east-1",
+            "EndpointDescriptions": [
+                {
+                    "EndpointId": "eipalloc-0b0cb213820a08ae6",
+                    "Weight": 100,
+                    "HealthState": "UNHEALTHY"
+                }
+            ],
+            "TrafficDialPercentage": 100.0,
+            "HealthCheckPort": 80,
+            "HealthCheckProtocol": "TCP",
+            "HealthCheckIntervalSeconds": 30,
+            "ThresholdCount": 3
+        },
+        "ResponseMetadata": {
+            "RequestId": "6f9ee7a4-f557-453f-b064-acb55591bbf7",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Fri, 18 Jan 2019 18:53:05 GMT",
+                "x-amzn-requestid": "6f9ee7a4-f557-453f-b064-acb55591bbf7",
+                "content-length": "447",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

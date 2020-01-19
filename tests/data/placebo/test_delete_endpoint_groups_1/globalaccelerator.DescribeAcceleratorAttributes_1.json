@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "AcceleratorAttributes": {
+            "FlowLogsEnabled": true,
+            "FlowLogsS3Bucket": "test-for-global-accelerator-bucket/test-custodian",
+            "FlowLogsS3Prefix": "us-west-2"
+        },
+        "ResponseMetadata": {
+            "RequestId": "bcc43812-0310-446f-9f93-ca7363c57244",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/x-amz-json-1.1",
+                "date": "Fri, 18 Jan 2019 16:37:37 GMT",
+                "x-amzn-requestid": "bcc43812-0310-446f-9f93-ca7363c57244",
+                "content-length": "152",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
