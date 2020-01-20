@@ -28,7 +28,7 @@ class BackupTest(BaseTest):
         plan = resources.pop()
         self.assertEqual(
             plan['Tags'],
-            [{'Name': 'App', 'Value': 'Backups'}])
+            [{'Key': 'App', 'Value': 'Backups'}])
         self.assertTrue('Rules' in plan)
 
         self.assertEqual(
