@@ -74,9 +74,11 @@ class UnicodeWriter:
 class VarsSubstitutionError(Exception):
     pass
 
+
 class SkipMissingVarsInFormat(dict):
-    def __missing__(self,key):
-        return '{'+key+'}'
+    def __missing__(self, key):
+        return '{' + key + '}'
+
 
 def load_file(path, format=None, vars=None):
     if format is None:
