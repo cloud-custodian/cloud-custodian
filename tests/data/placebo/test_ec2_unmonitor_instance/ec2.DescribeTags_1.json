@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [],
+        "ResponseMetadata": {
+            "RequestId": "a9fa5747-31a9-4fad-b74d-6e61a0a77ff0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "212",
+                "date": "Thu, 23 Jan 2020 21:33:57 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
