@@ -898,6 +898,139 @@ class SsmStatus(ValueFilter):
             r[self.annotation] = info_map.get(r['InstanceId'], {})
 
 
+@filters.register('monitoring-status')
+class MonitoringStatus(ValueFilter):
+    """Filters EC2 Instances to get detailed monitoring status
+
+    Filtering relies on on valid values of monitoring statuses :
+    'disabled'|'disabling'|'enabled'|'pending'
+    (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_instances)
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-detailed-monitoring-activation
+            resource: ec2
+            filters:
+              - type: monitoring-status
+                key: State
+                value: disabled
+            actions:
+              - type: enable-monitoring
+    References
+
+     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.html
+    """
+    valid_values = ['disabled', 'disabling', 'enabled', 'pending']
+
+    schema = type_schema(
+        'monitoring-status',
+        rinherit=ValueFilter.schema,
+        value={'enum': valid_values},
+        required=('value',))
+    permissions = list('ec2:DescirbeInstances')
+
+    def process(self, resources, event=None):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        return [r for r in resources
+                if self.check_monitoring_status(client, r, self.data.get('value'))]
+
+    def check_monitoring_status(self, client, inst, value):
+        resp = client.describe_instances(
+            InstanceIds=[inst['InstanceId']]
+        )
+        if (resp['Reservations'][0]['Instances'][0]['Monitoring']['State'] == value and
+                resp['Reservations'][0]['Instances'][0]['State']['Name']
+                not in ['terminated', 'shutting-down']):
+            return True
+        return False
+
+
+@actions.register('enable-monitoring')
+class MonitorInstances(BaseAction, StateTransitionFilter):
+    """Action on EC2 Instances to enable detailed monitoring
+
+    The differents states of detailed monitoring status are :
+    'disabled'|'disabling'|'enabled'|'pending'
+    (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_instances)
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-detailed-monitoring-activation
+            resource: ec2
+            filters:
+              - type: monitoring-status
+                key: State
+                value: disabled
+            actions:
+              - type: enable-monitoring
+    References
+
+     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.html
+    """
+    schema = type_schema('enable-monitoring')
+    permissions = list('ec2:MonitorInstances')
+
+    def process(self, resources, event=None):
+        if not len(resources):
+            return
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        self.enable_monitoring(client, resources)
+
+    def enable_monitoring(self, client, resources):
+        client.monitor_instances(
+            InstanceIds=[inst['InstanceId'] for inst in resources]
+        )
+
+
+@actions.register('disable-monitoring')
+class UnmonitoringInstances(BaseAction, StateTransitionFilter):
+    """Action on EC2 Instances to disable detailed monitoring
+
+    The differents states of detailed monitoring status are :
+    'disabled'|'disabling'|'enabled'|'pending'
+    (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_instances)
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-detailed-monitoring-deactivation
+            resource: ec2
+            filters:
+              - type: monitoring-status
+                key: State
+                value: enabled
+            actions:
+              - type: disable-monitoring
+    References
+
+     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.html
+    """
+    schema = type_schema('disable-monitoring')
+    permissions = list('ec2:UnmonitorInstances')
+
+    def process(self, resources, event=None):
+        if not len(resources):
+            return
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        self.disable_monitoring(client, resources)
+
+    def disable_monitoring(self, client, resources):
+        client.unmonitor_instances(
+            InstanceIds=[inst['InstanceId'] for inst in resources]
+        )
+
+
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
     def format_resource(self, r):
@@ -994,7 +1127,7 @@ class Start(BaseAction, StateTransitionFilter):
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
         retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
-                     'Client.RequestLimitExceeded', 'Server.InsufficientInstanceCapacity'),
+                     'Client.RequestLimitExceeded'),
         retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
         while instance_ids:
@@ -1443,7 +1576,10 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
     """
 
     schema = type_schema('autorecover-alarm')
-    permissions = ('cloudwatch:PutMetricAlarm',)
+    permissions = ('ec2:DescribeInstanceStatus',
+                   'ec2:RecoverInstances',
+                   'ec2:DescribeInstanceRecoveryAttribute')
+
     valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
     filter_asg_membership = ValueFilter({
         'key': 'tag:aws:autoscaling:groupName',
