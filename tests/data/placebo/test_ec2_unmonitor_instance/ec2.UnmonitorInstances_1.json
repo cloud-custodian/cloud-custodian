@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceMonitorings": [
+            {
+                "InstanceId": "i-0eb74be2f5d348118",
+                "Monitoring": {
+                    "State": "disabling"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "1730973c-3f61-4fb8-9751-462b8822bb5c",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "430",
+                "date": "Thu, 23 Jan 2020 21:33:57 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

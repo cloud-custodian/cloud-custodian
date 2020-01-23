@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceMonitorings": [
+            {
+                "InstanceId": "i-0eb74be2f5d348118",
+                "Monitoring": {
+                    "State": "pending"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "302f665c-55e5-4fc5-b21c-976a9051ef6b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "content-length": "424",
+                "date": "Thu, 23 Jan 2020 21:13:51 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
