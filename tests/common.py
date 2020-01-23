@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import gzip
 import json
 import logging
 import os
@@ -159,8 +160,10 @@ def event_data(name, event_type="cwe"):
 
 
 def load_data(file_name, state=None, **kw):
+
+    fopen = file_name.endswith('gz') and gzip.open or open
     data = json.loads(
-        open(os.path.join(os.path.dirname(__file__), "data", file_name)).read()
+        fopen(os.path.join(os.path.dirname(__file__), "data", file_name)).read()
     )
     if state:
         data.update(state)

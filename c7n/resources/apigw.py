@@ -45,6 +45,9 @@ class RestAccount(ResourceManager):
 
     @classmethod
     def get_permissions(cls):
+        # this resource is not query manager based as its a pseudo
+        # resource. in that it always exists, it represents the
+        # service's account settings.
         return ('apigateway:GET',)
 
     @classmethod
@@ -131,6 +134,7 @@ class RestApi(query.QueryResourceManager):
         dimension = 'GatewayName'
         config_type = "AWS::ApiGateway::RestApi"
         universal_taggable = object()
+        permissions_enum = ('apigateway:GET',)
 
     @property
     def generate_arn(self):
@@ -230,7 +234,7 @@ class DeleteApi(BaseAction):
            actions:
              - type: delete
     """
-    permissions = ('apigateway:Delete',)
+    permissions = ('apigateway:DELETE',)
     schema = type_schema('delete')
 
     def process(self, resources):
@@ -257,6 +261,7 @@ class RestStage(query.ChildResourceManager):
         universal_taggable = True
         config_type = "AWS::ApiGateway::Stage"
         arn_type = 'stages'
+        permissions_enum = ('apigateway:GET',)
 
     def get_source(self, source_type):
         if source_type == 'describe-rest-stage':
@@ -355,7 +360,7 @@ class DeleteStage(BaseAction):
             actions:
               - type: delete
     """
-    permissions = ('apigateway:Delete',)
+    permissions = ('apigateway:DELETE',)
     schema = utils.type_schema('delete')
 
     def process(self, resources):
@@ -381,6 +386,7 @@ class RestResource(query.ChildResourceManager):
         enum_spec = ('get_resources', 'items', None)
         id = 'id'
         name = 'path'
+        permissions_enum = ('apigateway:GET',)
 
 
 @query.sources.register('describe-rest-resource')
@@ -408,6 +414,7 @@ class RestApiVpcLink(query.QueryResourceManager):
         enum_spec = ('get_vpc_links', 'items', None)
         id = 'id'
         name = 'name'
+        permissions_enum = ('apigateway:GET',)
 
 
 @RestResource.filter_registry.register('rest-integration')
@@ -570,7 +577,7 @@ class DeleteRestIntegration(BaseAction):
             actions:
               - type: delete-integration
     """
-    permissions = ('apigateway:Delete',)
+    permissions = ('apigateway:DELETE',)
     schema = utils.type_schema('delete-integration')
 
     def process(self, resources):

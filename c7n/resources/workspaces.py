@@ -70,7 +70,7 @@ class WorkspaceConnectionStatusFilter(ValueFilter):
 
     schema = type_schema('connection-status', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ('workspaces:DescribeConnectionStatus',)
+    permissions = ('workspaces:DescribeWorkspacesConnectionStatus',)
     annotation_key = 'c7n:ConnectionStatus'
 
     def get_connection_status(self, client, workspace_ids):

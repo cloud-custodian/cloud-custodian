@@ -138,6 +138,16 @@ class Arn(namedtuple('_Arn', (
 
     __slots__ = ()
 
+    def __repr__(self):
+        return "<arn:%s:%s:%s:%s:%s%s%s>" % (
+            self.partition,
+            self.service,
+            self.region,
+            self.account_id,
+            self.resource_type,
+            self.separator,
+            self.resource)
+
     @classmethod
     def parse(cls, arn):
         parts = arn.split(':', 5)

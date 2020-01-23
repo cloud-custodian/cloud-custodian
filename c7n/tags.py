@@ -829,7 +829,7 @@ class UniversalTag(Tag):
 
     batch_size = 20
     concurrency = 1
-    permissions = ('resourcegroupstaggingapi:TagResources',)
+    permissions = ('tag:TagResources',)
 
     def process(self, resources):
         self.id_key = self.manager.get_model().id
@@ -870,7 +870,7 @@ class UniversalUntag(RemoveTag):
 
     batch_size = 20
     concurrency = 1
-    permissions = ('resourcegroupstaggingapi:UntagResources',)
+    permissions = ('tag:UntagResources',)
 
     def get_client(self):
         return utils.local_session(

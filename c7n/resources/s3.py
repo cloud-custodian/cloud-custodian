@@ -118,7 +118,7 @@ class S3(query.QueryResourceManager):
     @classmethod
     def get_permissions(cls):
         perms = ["s3:ListAllMyBuckets"]
-        perms.extend([n[0] for n in S3_AUGMENT_TABLE])
+        perms.extend([n[-1] for n in S3_AUGMENT_TABLE])
         return perms
 
 
@@ -404,16 +404,19 @@ S3_CONFIG_SUPPLEMENT_NULL_MAP = {
 }
 
 S3_AUGMENT_TABLE = (
-    ('get_bucket_location', 'Location', {}, None),
-    ('get_bucket_tagging', 'Tags', [], 'TagSet'),
-    ('get_bucket_policy', 'Policy', None, 'Policy'),
-    ('get_bucket_acl', 'Acl', None, None),
-    ('get_bucket_replication', 'Replication', None, None),
-    ('get_bucket_versioning', 'Versioning', None, None),
-    ('get_bucket_website', 'Website', None, None),
-    ('get_bucket_logging', 'Logging', None, 'LoggingEnabled'),
-    ('get_bucket_notification_configuration', 'Notification', None, None),
-    ('get_bucket_lifecycle_configuration', 'Lifecycle', None, None),
+    ('get_bucket_location', 'Location', {}, None, 's3:GetBucketLocation'),
+    ('get_bucket_tagging', 'Tags', [], 'TagSet', 's3:GetBucketTagging'),
+    ('get_bucket_policy', 'Policy', None, 'Policy', 's3:GetBucketPolicy'),
+    ('get_bucket_acl', 'Acl', None, None, 's3:GetBucketAcl'),
+    ('get_bucket_replication',
+     'Replication', None, None, 's3:GetReplicationConfiguration'),
+    ('get_bucket_versioning', 'Versioning', None, None, 's3:GetBucketVersioning'),
+    ('get_bucket_website', 'Website', None, None, 's3:GetBucketWebsite'),
+    ('get_bucket_logging', 'Logging', None, 'LoggingEnabled', 's3:GetBucketLogging'),
+    ('get_bucket_notification_configuration',
+     'Notification', None, None, 's3:GetBucketNotification'),
+    ('get_bucket_lifecycle_configuration',
+     'Lifecycle', None, None, 's3:GetLifecycleConfiguration'),
     #        ('get_bucket_cors', 'Cors'),
 )
 
@@ -429,7 +432,8 @@ def assemble_bucket(item):
     # Bucket Location, Current Client Location, Default Location
     b_location = c_location = location = "us-east-1"
     methods = list(S3_AUGMENT_TABLE)
-    for m, k, default, select in methods:
+    for minfo in methods:
+        m, k, default, select = minfo[:4]
         try:
             method = getattr(c, m)
             v = method(Bucket=b['Name'])
@@ -2858,7 +2862,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
                          key={'type': 'string'})
 
-    permissions = ('s3:GetBucketEncryption', 's3:DescribeKey')
+    permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey')
 
     def process(self, buckets, event=None):
         self.resolve_keys(buckets)
@@ -2982,7 +2986,7 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
     }
 
     permissions = ('s3:PutEncryptionConfiguration', 's3:GetEncryptionConfiguration',
-                   'kms:ListAliases', 's3:DescribeKey')
+                   'kms:ListAliases', 'kms:DescribeKey')
 
     def process(self, buckets):
         if self.data.get('enabled', True):

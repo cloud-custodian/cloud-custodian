@@ -41,6 +41,7 @@ class RDSParamGroup(QueryResourceManager):
         enum_spec = ('describe_db_parameter_groups', 'DBParameterGroups', None)
         name = id = 'DBParameterGroupName'
         dimension = 'DBParameterGroupName'
+        permissions_enum = ('rds:DescribeDBParameterGroups',)
 
     filter_registry = pg_filters
     action_registry = pg_actions
@@ -62,6 +63,7 @@ class RDSClusterParamGroup(QueryResourceManager):
         enum_spec = ('describe_db_cluster_parameter_groups', 'DBClusterParameterGroups', None)
         name = id = 'DBClusterParameterGroupName'
         dimension = 'DBClusterParameterGroupName'
+        permissions_enum = ('rds:DescribeDBClusterParameterGroups',)
 
     filter_registry = pg_cluster_filters
     action_registry = pg_cluster_actions

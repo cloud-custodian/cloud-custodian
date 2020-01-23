@@ -749,7 +749,8 @@ class S3ConfigSource(ConfigTest):
     def test_normalize(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         augments = list(s3.S3_AUGMENT_TABLE)
-        augments.remove(("get_bucket_location", "Location", {}, None))
+        augments.remove((
+            "get_bucket_location", "Location", {}, None, 's3:GetBucketLocation'))
         self.patch(s3, "S3_AUGMENT_TABLE", augments)
 
         bname = "custodian-test-data-23"

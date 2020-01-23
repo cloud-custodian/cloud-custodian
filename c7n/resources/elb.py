@@ -52,7 +52,7 @@ class ELB(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'elb'
         arn_type = 'loadbalancer'
-        arn_service = 'elasticloadbalancing'
+        permission_prefix = arn_service = 'elasticloadbalancing'
         enum_spec = ('describe_load_balancers',
                      'LoadBalancerDescriptions', None)
         id = 'LoadBalancerName'

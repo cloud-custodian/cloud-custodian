@@ -994,7 +994,7 @@ class Start(BaseAction, StateTransitionFilter):
     def process_instance_set(self, client, instances, itype, izone):
         # Setup retry with insufficient capacity as well
         retryable = ('InsufficientInstanceCapacity', 'RequestLimitExceeded',
-                     'Client.RequestLimitExceeded'),
+                     'Client.RequestLimitExceeded', 'Server.InsufficientInstanceCapacity'),
         retry = utils.get_retry(retryable, max_attempts=5)
         instance_ids = [i['InstanceId'] for i in instances]
         while instance_ids:
@@ -1443,10 +1443,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
     """
 
     schema = type_schema('autorecover-alarm')
-    permissions = ('ec2:DescribeInstanceStatus',
-                   'ec2:RecoverInstances',
-                   'ec2:DescribeInstanceRecoveryAttribute')
-
+    permissions = ('cloudwatch:PutMetricAlarm',)
     valid_origin_states = ('running', 'stopped', 'pending', 'stopping')
     filter_asg_membership = ValueFilter({
         'key': 'tag:aws:autoscaling:groupName',

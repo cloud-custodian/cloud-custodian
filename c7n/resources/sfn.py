@@ -27,6 +27,7 @@ class StepFunction(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'stepfunctions'
+        permission_prefix = 'states'
         enum_spec = ('list_state_machines', 'stateMachines', None)
         arn = id = 'stateMachineArn'
         arn_type = 'stateMachine'
@@ -82,7 +83,7 @@ class InvokeStepFunction(Action):
            'bulk': {'type': 'boolean'},
            'policy': {'type': 'boolean'}})
     schema_alias = True
-    permissions = ('stepfunctions:StartExecution',)
+    permissions = ('states:StartExecution',)
 
     def process(self, resources):
         client = local_session(
@@ -143,7 +144,7 @@ class TagStepFunction(Tag):
                     value: target-tag-value
     """
 
-    permissions = ('stepfunctions:TagResource',)
+    permissions = ('states:TagResource',)
 
     def process_resource_set(self, client, resources, tags):
 
@@ -172,7 +173,7 @@ class UnTagStepFunction(RemoveTag):
                     tags: ["test"]
     """
 
-    permissions = ('stepfunctions:UntagResource',)
+    permissions = ('states:UntagResource',)
 
     def process_resource_set(self, client, resources, tag_keys):
 

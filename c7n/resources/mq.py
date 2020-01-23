@@ -37,6 +37,8 @@ class MessageBroker(QueryResourceManager):
         dimension = 'Broker'
         metrics_namespace = 'AWS/AmazonMQ'
 
+    permissions = ('mq:ListTags',)
+
     def augment(self, resources):
         super(MessageBroker, self).augment(resources)
         for r in resources:
@@ -107,7 +109,7 @@ class TagMessageBroker(Tag):
                     value: target-tag-value
     """
 
-    permissions = ('mq:TagMessageBroker',)
+    permissions = ('mq:CreateTags',)
 
     def process_resource_set(self, client, mq, new_tags):
         for r in mq:
@@ -137,7 +139,7 @@ class UntagMessageBroker(RemoveTag):
                     tags: ["OutdatedTag"]
     """
 
-    permissions = ('mq:UntagMessageBroker',)
+    permissions = ('mq:DeleteTags',)
 
     def process_resource_set(self, client, mq, tags):
         for r in mq:

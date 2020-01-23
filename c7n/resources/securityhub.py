@@ -24,7 +24,7 @@ import logging
 
 from c7n.actions import Action
 from c7n.filters import Filter
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.manager import resources
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
@@ -198,17 +198,47 @@ class SecurityHub(LambdaMode):
     def resolve_import_finding(self, event):
         return self.resolve_findings(event['detail']['findings'])
 
-    def resolve_resources(self, event):
-        # For centralized setups in a hub aggregator account
-        self.assume_member(event)
+    def run(self, event, lambda_context):
+        self.setup_exec_environment(event)
+        resource_sets = self.get_resource_sets(event)
+        result_sets = {}
+        for (account_id, region), rarns in resource_sets.items():
+            self.assume_member({'account': account_id, 'region': region})
+            resources = self.resolve_resources(event)
+            rset = result_sets.setdefault((account_id, region), [])
+            if resources:
+                rset.extend(self.run_resource_set(event, resources))
+        return result_sets
 
+    def get_resource_sets(self, event):
+        # return a mapping of (account_id, region): [resource_arns]
+        # per the finding in the event.
+        resource_arns = self.get_resource_arns(event)
+        # Group resources by account_id, region for role assumes
+        resource_sets = {}
+        for rarn in resource_arns:
+            resource_sets.setdefault((rarn.account_id, rarn.region), []).append(rarn)
+        # Warn if not configured for member-role and have multiple accounts resources.
+        if (not self.policy.data['mode'].get('member-role') and
+                set((self.policy.options.account_id,)) != {
+                    rarn.account_id for rarn in resource_arns}):
+            msg = ('hub-mode not configured for multi-account member-role '
+                   'but multiple resource accounts found')
+            self.policy.log.warning(msg)
+            raise PolicyExecutionError(msg)
+        return resource_sets
+
+    def get_resource_arns(self, event):
         event_type = event['detail-type']
         arn_resolver = getattr(self, self.handlers[event_type])
         arns = arn_resolver(event)
-
         # Lazy import to avoid aws sdk runtime dep in core
         from c7n.resources.aws import Arn
-        resource_map = {Arn.parse(r) for r in arns}
+        return {Arn.parse(r) for r in arns}
+
+    def resolve_resources(self, event):
+        # For centralized setups in a hub aggregator account
+        resource_map = self.get_resource_arns(event)
 
         # sanity check on finding resources matching policy resource
         # type's service.
@@ -220,6 +250,9 @@ class SecurityHub(LambdaMode):
             resource_arns = [
                 r for r in resource_map
                 if r.service == self.policy.resource_manager.resource_type.service]
+            if not resource_arns:
+                log.info("mode:security-hub no matching resources arns")
+                return []
             resources = self.policy.resource_manager.get_resources(
                 [r.resource for r in resource_arns])
         else:
@@ -244,7 +277,8 @@ class PostFinding(Action):
     """Report a finding to AWS Security Hub.
 
     Custodian acts as a finding provider, allowing users to craft
-    policies that report to the AWS SecurityHub.
+    policies that report to the AWS SecurityHub in the AWS Security Finding Format documented at
+    https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html
 
     For resources that are taggable, we will tag the resource with an identifier
     such that further findings generate updates.
@@ -284,8 +318,9 @@ class PostFinding(Action):
     schema = type_schema(
         "post-finding",
         required=["types"],
-        title={"type": "string"},
-        description={'type': 'string'},
+        title={"type": "string", 'default': 'policy.name'},
+        description={'type': 'string', 'default':
+            'policy.description, or if not defined in policy then policy.name'},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         confidence={"type": "number", "min": 0, "max": 100},
@@ -295,7 +330,7 @@ class PostFinding(Action):
         recommendation={"type": "string"},
         recommendation_url={"type": "string"},
         fields={"type": "object"},
-        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10},
+        batch_size={'type': 'integer', 'minimum': 1, 'maximum': 10, 'default': 1},
         types={
             "type": "array",
             "minItems": 1,
@@ -304,6 +339,10 @@ class PostFinding(Action):
         compliance_status={
             "type": "string",
             "enum": ["PASSED", "WARNING", "FAILED", "NOT_AVAILABLE"],
+        },
+        record_state={
+            "type": "string", 'default': 'ACTIVE',
+            "enum": ["ACTIVE", "ARCHIVED"],
         },
     )
 
@@ -462,6 +501,8 @@ class PostFinding(Action):
             finding["Criticality"] = self.data["criticality"]
         if "compliance_status" in self.data:
             finding["Compliance"] = {"Status": self.data["compliance_status"]}
+        if "record_state" in self.data:
+            finding["RecordState"] = self.data["record_state"]
 
         fields = {
             'resource': policy.resource_type,

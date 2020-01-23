@@ -33,7 +33,7 @@ class ElasticFileSystem(QueryResourceManager):
         date = 'CreationTime'
         dimension = 'FileSystemId'
         arn_type = 'file-system'
-        arn_service = 'elasticfilesystem'
+        permission_prefix = arn_service = 'elasticfilesystem'
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
         universal_taggable = True
@@ -48,6 +48,7 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         service = 'efs'
         parent_spec = ('efs', 'FileSystemId', None)
         enum_spec = ('describe_mount_targets', 'MountTargets', None)
+        permission_prefix = 'elasticfilesystem'
         name = id = 'MountTargetId'
         filter_name = 'MountTargetId'
         filter_type = 'scalar'
@@ -117,9 +118,9 @@ class KmsFilter(KmsRelatedFilter):
 class Delete(Action):
 
     schema = type_schema('delete')
-    permissions = ('efs:DescribeMountTargets',
-                   'efs:DeleteMountTargets',
-                   'efs:DeleteFileSystem')
+    permissions = ('elasticfilesystem:DescribeMountTargets',
+                   'elasticfilesystem:DeleteMountTarget',
+                   'elasticfilesystem:DeleteFileSystem')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('efs')

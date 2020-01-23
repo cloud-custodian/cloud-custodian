@@ -95,7 +95,10 @@ class PluginRegistry(object):
         return key in self._factories
 
     def __getitem__(self, name):
-        return self.get(name)
+        v = self.get(name)
+        if v is None:
+            raise KeyError(name)
+        return v
 
     def get(self, name):
         factory = self._factories.get(name)

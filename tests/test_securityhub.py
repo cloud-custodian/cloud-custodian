@@ -16,7 +16,7 @@ from jsonschema.exceptions import ValidationError
 from c7n.exceptions import PolicyValidationError
 from .common import BaseTest, event_data
 
-
+import logging
 import time
 
 LambdaFindingId = "us-east-2/644160558196/81cc9d38b8f8ebfd260ecc81585b4bc9/9f5932aa97900b5164502f41ae393d23" # NOQA
@@ -78,6 +78,36 @@ class SecurityHubMode(BaseTest):
                 'arn:aws:iam::644160558196:user/david.shepherd2',
                 'arn:aws:iam::644160558196:user/david.yun',
                 'arn:aws:iam::644160558196:user/kapil']))
+
+    def test_resolve_multi_account_resource_sets(self):
+        factory = self.replay_flight_data(
+            'test_security_hub_multi_account_mode')
+        policy = self.load_policy({
+            'name': 'lambda-remediate',
+            'resource': 'aws.lambda',
+            'mode': {
+                'type': 'hub-action',
+                'role': 'CustodianPolicyExecution',
+                'member-role': 'arn:aws:iam::{account_id}:role/CustodianGuardDuty'
+            }},
+            config={'region': 'us-east-2',
+                    'account_id': '519413311747'},
+            session_factory=factory)
+        hub = policy.get_execution_mode()
+        event = event_data('event-securityhub-lambda-cross.json')
+        partition_resources = hub.get_resource_sets(event)
+        self.assertEqual(
+            {p: list(map(repr, v)) for p, v in partition_resources.items()},
+            {('644160558196', 'us-east-1'): [
+                ("<arn:aws:lambda:us-east-1:644160558196:function:"
+                 "custodian-enterprise-ec2-instances-no-elastic-ip-isolate>")
+            ]})
+        output = self.capture_logging(policy.log.name, level=logging.INFO)
+        results = hub.run(event, {})
+        self.assertIn('Assuming member role:arn:aws:iam::644160558196', output.getvalue())
+        self.assertEqual(
+            results[('644160558196', 'us-east-1')][0]['FunctionName'],
+            'custodian-enterprise-ec2-instances-no-elastic-ip-isolate')
 
 
 class SecurityHubTest(BaseTest):

@@ -477,6 +477,38 @@ class IamUserTest(BaseTest):
         users = client.list_users(PathPrefix="/test/").get("Users", [])
         self.assertEqual(users, [])
 
+    def test_iam_user_access_key_multi_chain(self):
+        factory = self.replay_flight_data(
+            'test_iam_user_access_key_multi_chain')
+        p = self.load_policy({
+            'name': 'key-chain',
+            'resource': 'iam-user',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId = 'AIDAIFSHVFT46NXYGWMEI'"}],
+            'filters': [
+                {'type': 'access-key',
+                 'key': 'Status',
+                 'value': 'Active'},
+                {'type': 'access-key',
+                 'match-operator': 'and',
+                 'value_type': 'age',
+                 'key': 'CreateDate',
+                 'op': 'greater-than',
+                 'value': 400},
+            ],
+            'actions': [
+                {'type': 'remove-keys',
+                 'matched': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:AccessKeys']), 2)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
+        self.assertEqual(
+            resources[0]['c7n:matched-keys'][0]['AccessKeyId'],
+            'AKIAI5PSD5WUP3AO2OPA')
+
     def test_iam_user_access_key_multi(self):
         factory = self.replay_flight_data('test_iam_user_access_key_multi')
         p = self.load_policy({
@@ -493,7 +525,7 @@ class IamUserTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
         self.assertEqual(
-            resources[0]['c7n:matched-keys'][0]['c7n:matched-type'], 'access')
+            resources[0]['c7n:matched-keys'][0]['c7n:match-type'], 'access')
 
     def test_iam_user_delete_some_access(self):
         # TODO: this test could use a rewrite

@@ -21,7 +21,7 @@ if os.path.exists('readme.md'):
 
 setup(
     name="c7n_trailcreator",
-    version='0.1.4',
+    version='0.1.5',
     description="Cloud Custodian - Retroactive Tag Resource Creators from CloudTrail",
     long_description=long_description,
     long_description_content_type="text/markdown",

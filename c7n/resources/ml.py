@@ -33,6 +33,7 @@ class MLModel(QueryResourceManager):
         # need to specify request-mode dimension as well
         # dimension = 'MLModelId'
         arn_type = "mlmodel"
+        permissions_enum = ('machinelearning:DescribeMLModels',)
 
 
 @MLModel.action_registry.register('delete')

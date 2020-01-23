@@ -48,6 +48,7 @@ class RDSCluster(QueryResourceManager):
         name = id = 'DBClusterIdentifier'
         dimension = 'DBClusterIdentifier'
         universal_taggable = True
+        permissions_enum = ('rds:DescribeDBClusters',)
 
     augment = tags.universal_augment
 
@@ -354,6 +355,7 @@ class RDSClusterSnapshot(QueryResourceManager):
         name = id = 'DBClusterSnapshotIdentifier'
         date = 'SnapshotCreateTime'
         universal_tagging = object()
+        permissions_enum = ('rds:DescribeDBClusterSnapshots',)
 
     augment = tags.universal_augment
 
