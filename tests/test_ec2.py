@@ -1687,7 +1687,12 @@ class TestMonitoringInstance(BaseTest):
                     'value': 'disabled'
                 }
             ],
-            'actions': [{ 'type': 'enable-monitoring' }]}, session_factory=factory)
+            'actions': [
+                {
+                    'type': 'enable-monitoring'
+                }
+            ]
+        }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -1697,7 +1702,6 @@ class TestMonitoringInstance(BaseTest):
         self.assertIn(
             instance[0]['Monitoring']['State'].lower(), ["enabled", "pending"]
         )
-
 
     def test_unmonitor_instance(self):
         factory = self.replay_flight_data('test_ec2_unmonitor_instance')
@@ -1711,7 +1715,12 @@ class TestMonitoringInstance(BaseTest):
                     'value': 'enabled'
                 }
             ],
-            'actions': [{ 'type': 'disable-monitoring' }]}, session_factory=factory)
+            'actions': [
+                {
+                    'type': 'disable-monitoring'
+                }
+            ]
+        }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
