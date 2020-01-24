@@ -10,23 +10,6 @@ import placebo
 import shutil
 import boto3
 
-parser = argparse.ArgumentParser('Policy Tester')
-parser.add_argument('--assume', dest='assume_role', help='Role to assume')
-subparsers = parser.add_subparsers(dest='command', help='Execution mode')
-subparsers.required=True
-
-record_parser = subparsers.add_parser('record')
-record_parser.add_argument('--cache', type=str, default='cache', help='Cache dir to write to')
-record_parser.add_argument('policy', type=argparse.FileType('r'), help='Policy file to consume')
-record_parser.add_argument('name', type=str, help='Name of the policy')
-
-test_parser = subparsers.add_parser('replay')
-test_parser.add_argument('--cache', type=str, default='cache' help='Cache dir to consume')
-test_parser.add_argument('policy', type=argparse.FileType('r'), help='Policy file to consume')
-test_parser.add_argument('name', type=str, help='Name of the policy')
-
-args = parser.parse_args()
-
 class TestPolicy(tests.zpill.PillTest):
     def __init__(self, policy, cache, assume_role=None):
         self.policy = policy
@@ -75,10 +58,31 @@ def get_policy(policies, name):
 
     return None
 
-policy = get_policy(yaml.safe_load(args.policy), args.name)
-if policy is None:
-    print("Policy not found!")
+def main():
+    parser = argparse.ArgumentParser('Policy Tester')
+    parser.add_argument('--assume', dest='assume_role', help='Role to assume')
+    subparsers = parser.add_subparsers(dest='command', help='Execution mode')
+    subparsers.required=True
 
-replay = args.command == 'replay'
-runner = TestPolicy(policy, args.cache, args.assume_role)
-runner.run(replay=replay)
+    record_parser = subparsers.add_parser('record')
+    record_parser.add_argument('--cache', type=str, default='cache', help='Cache dir to write to')
+    record_parser.add_argument('policy', type=argparse.FileType('r'), help='Policy file to consume')
+    record_parser.add_argument('name', type=str, help='Name of the policy')
+
+    test_parser = subparsers.add_parser('replay')
+    test_parser.add_argument('--cache', type=str, default='cache', help='Cache dir to consume')
+    test_parser.add_argument('policy', type=argparse.FileType('r'), help='Policy file to consume')
+    test_parser.add_argument('name', type=str, help='Name of the policy')
+
+    args = parser.parse_args()
+
+    policy = get_policy(yaml.safe_load(args.policy), args.name)
+    if policy is None:
+        print("Policy not found!")
+
+    replay = args.command == 'replay'
+    runner = TestPolicy(policy, args.cache, args.assume_role)
+    runner.run(replay=replay)
+
+if __name__ == '__main__':
+    main()
