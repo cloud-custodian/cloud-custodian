@@ -143,9 +143,19 @@ There are several ways to get a list of possible keys for each resource.
 
       filters:
          - type: value
-           key: FunctionName                ─▶ The value from the describe call
+           key: FunctionName                ─▶ The value from the describe call, or resources.json
            op: regex                        ─▶ Special operator
-           value: (custodian|c7n)_\w+       ─▶ Regex string
+           value: '(custodian|c7n)_\w+'     ─▶ Regex string: match all values beginning with custodian_ or c7n_
+
+         - type: value
+           key: name                        ─▶ The value from the describe call, or resources.json
+           op: regex                        ─▶ Special operator
+           value: '^.*c7n.*$'               ─▶ Regex string: match all values containing c7n
+
+         - type: value
+           key: name                        ─▶ The value from the describe call, or resources.json
+           op: regex                        ─▶ Special operator
+           value: '^((?!c7n).)*$'           ─▶ Regex string: match all values not containing c7n
 
   1. These operators are implemented using ``re.match``. If a filter isn't working as expected take a look at the `re`__ documentation.
 
