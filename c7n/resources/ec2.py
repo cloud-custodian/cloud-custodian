@@ -918,6 +918,7 @@ class MonitorInstances(BaseAction, StateTransitionFilter):
             actions:
               - type: set-monitoring
                 state: enable
+
     References
 
      https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.html
@@ -933,7 +934,6 @@ class MonitorInstances(BaseAction, StateTransitionFilter):
             'enable': self.enable_monitoring,
             'disable': self.disable_monitoring
         }
-        print(self.data)
         for instances_set in utils.chunks(resources, 20):
             actions[self.data.get('state')](client, instances_set)
 
@@ -943,8 +943,8 @@ class MonitorInstances(BaseAction, StateTransitionFilter):
                 InstanceIds=[inst['InstanceId'] for inst in resources]
             )
         except ClientError as e:
-            if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
-                pass
+            if e.response['Error']['Code'] != 'InvalidInstanceId.NotFound':
+                raise
 
     def disable_monitoring(self, client, resources):
         try:
@@ -952,8 +952,8 @@ class MonitorInstances(BaseAction, StateTransitionFilter):
                 InstanceIds=[inst['InstanceId'] for inst in resources]
             )
         except ClientError as e:
-            if e.response['Error']['Code'] == 'InvalidInstanceId.NotFound':
-                pass
+            if e.response['Error']['Code'] != 'InvalidInstanceId.NotFound':
+                raise
 
 
 @EC2.action_registry.register("post-finding")
