@@ -1682,14 +1682,13 @@ class TestMonitoringInstance(BaseTest):
             'resource': 'aws.ec2',
             'filters': [
                 {
-                    'type': 'monitoring-status',
-                    'key': 'State',
-                    'value': 'disabled'
+                    'Monitoring.State': 'disabled'
                 }
             ],
             'actions': [
                 {
-                    'type': 'enable-monitoring'
+                    'type': 'set-monitoring',
+                    'state': 'enable'
                 }
             ]
         }, session_factory=factory)
@@ -1710,14 +1709,13 @@ class TestMonitoringInstance(BaseTest):
             'resource': 'aws.ec2',
             'filters': [
                 {
-                    'type': 'monitoring-status',
-                    'key': 'State',
-                    'value': 'enabled'
+                    'Monitoring.State': 'enabled'
                 }
             ],
             'actions': [
                 {
-                    'type': 'disable-monitoring'
+                    'type': 'set-monitoring',
+                    'state': 'disable'
                 }
             ]
         }, session_factory=factory)
