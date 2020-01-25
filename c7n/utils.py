@@ -119,7 +119,7 @@ def loads(body):
 
 def dumps(data, fh=None, indent=0):
     if fh:
-        return json.dump(data, fh, cls=DateTimeEncoder, indent=indent)
+        return fh.write(str.encode(json.dumps(data, cls=DateTimeEncoder, indent=indent), 'utf-8'))
     else:
         return json.dumps(data, cls=DateTimeEncoder, indent=indent)
 
