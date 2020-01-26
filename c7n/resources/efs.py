@@ -21,6 +21,7 @@ from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
+from .aws import shape_validate
 
 
 @resources.register('efs')
@@ -148,13 +149,14 @@ class ConfigureLifecycle(BaseAction):
 
       .. code-block:: yaml
 
-      - name: efs-apply-lifecycle
-        resource: efs
-        actions:
-          - type: configure-lifecycle-policy
-            state: enable
-            rule:
-                - 'TransitionToIA': 'AFTER_7_DAYS'
+            policies:
+              - name: efs-apply-lifecycle
+                resource: efs
+                actions:
+                  - type: configure-lifecycle-policy
+                    state: enable
+                    rule:
+                      - 'TransitionToIA': 'AFTER_7_DAYS'
 
     """
     schema = type_schema(
@@ -164,6 +166,7 @@ class ConfigureLifecycle(BaseAction):
         required=['state'])
 
     permissions = ('elasticfilesystem:PutLifecycleConfiguration',)
+    shape = 'PutLifecycleConfigurationRequest'
 
     def validate(self):
         if self.data.get('state') == 'enable' and 'rule' not in self.data:
@@ -172,6 +175,11 @@ class ConfigureLifecycle(BaseAction):
         if self.data.get('state') == 'disable' and 'rule' in self.data:
             raise PolicyValidationError(
                 'rule is not required to disable lifecycle configuration %s' % (self.manager.data))
+        if self.data.get('rule'):
+            attrs = {}
+            attrs['LifecyclePolicies'] = self.data['rule']
+            attrs['FileSystemId'] = 'PolicyValidator'
+            return shape_validate(attrs, self.shape, 'efs')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('efs')
