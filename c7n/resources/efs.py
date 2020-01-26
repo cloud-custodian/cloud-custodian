@@ -153,7 +153,7 @@ class ConfigureLifecycle(BaseAction):
         actions:
           - type: configure-lifecycle-policy
             state: enable
-            rules:
+            rule:
                 - 'TransitionToIA': 'AFTER_7_DAYS'
 
     """
