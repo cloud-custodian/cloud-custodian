@@ -151,7 +151,7 @@ class ConfigureLifecycle(BaseAction):
       - name: efs-apply-lifecycle
         resource: efs
         actions:
-          - type: configure-lifecycle
+          - type: configure-lifecycle-policy
             state: enable
             rules:
                 - 'TransitionToIA': 'AFTER_7_DAYS'
