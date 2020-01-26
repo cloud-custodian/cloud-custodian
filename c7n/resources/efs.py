@@ -142,7 +142,21 @@ class Delete(Action):
 
 @ElasticFileSystem.action_registry.register('configure-lifecycle-policy')
 class ConfigureLifecycle(BaseAction):
+    """Enable/disable lifecycle policy for efs.
 
+    :example:
+
+      .. code-block:: yaml
+
+      - name: efs-apply-lifecycle
+        resource: efs
+        actions:
+          - type: configure-lifecycle
+            state: enable
+            rules:
+                - 'TransitionToIA': 'AFTER_7_DAYS'
+
+    """
     schema = type_schema(
         'configure-lifecycle-policy',
         state={'enum': ['enable', 'disable']},
