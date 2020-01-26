@@ -13,7 +13,8 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from c7n.actions import Action
+from c7n.actions import Action, BaseAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
@@ -137,3 +138,34 @@ class Delete(Action):
             for t in client.describe_mount_targets(
                     FileSystemId=r['FileSystemId'])['MountTargets']:
                 client.delete_mount_target(MountTargetId=t['MountTargetId'])
+
+
+@ElasticFileSystem.action_registry.register('configure-lifecycle-policy')
+class ConfigureLifecycle(BaseAction):
+
+    schema = type_schema(
+        'configure-lifecycle-policy',
+        state={'enum': ['enable', 'disable']},
+        rule={'type': 'array'},
+        required=['state'])
+
+    permissions = ('elasticfilesystem:PutLifecycleConfiguration',)
+
+    def validate(self):
+        if self.data.get('state') == 'enable' and 'rule' not in self.data:
+            raise PolicyValidationError(
+                'rule is required to enable lifecycle configuration %s' % (self.manager.data))
+        if self.data.get('state') == 'disable' and 'rule' in self.data:
+            raise PolicyValidationError(
+                'rule is not required to disable lifecycle configuration %s' % (self.manager.data))
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('efs')
+        op_map = {'enable': self.data.get('rule'), 'disable': []}
+        for r in resources:
+            try:
+                client.put_lifecycle_configuration(
+                    FileSystemId=r['FileSystemId'],
+                    LifecyclePolicies=op_map.get(self.data.get('state')))
+            except client.exceptions.FileSystemNotFound:
+                continue
