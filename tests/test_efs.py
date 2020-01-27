@@ -41,7 +41,6 @@ class ElasticFileSystem(BaseTest):
                 "resource": "efs",
                 "filters": [{"FileSystemId": fs_id}, {"tag:Name": "Somewhere"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
