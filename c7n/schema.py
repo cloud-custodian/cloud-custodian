@@ -32,7 +32,7 @@ import json
 import inspect
 import logging
 
-from jsonschema import Draft4Validator as Validator
+from jsonschema import Draft4Validator as JsonSchemaValidator
 from jsonschema.exceptions import best_match
 
 from c7n.policy import execution
@@ -46,9 +46,9 @@ from c7n.structure import StructureParser # noqa
 def validate(data, schema=None):
     if schema is None:
         schema = generate()
-        Validator.check_schema(schema)
+        JsonSchemaValidator.check_schema(schema)
 
-    validator = Validator(schema)
+    validator = JsonSchemaValidator(schema)
     errors = list(validator.iter_errors(data))
     if not errors:
         return check_unique(data) or []
@@ -265,10 +265,16 @@ def generate(resource_types=()):
     resource_refs = []
     for cloud_name, cloud_type in clouds.items():
         for type_name, resource_type in cloud_type.resources.items():
-            if resource_types and type_name not in resource_types:
-                continue
-
             r_type_name = "%s.%s" % (cloud_name, type_name)
+            if resource_types and r_type_name not in resource_types:
+                if not resource_type.type_aliases:
+                    continue
+                # atm only azure is using type aliases.
+                elif not set([
+                        "%s.%s" % (cloud_name, ralias) for ralias
+                        in resource_type.type_aliases]).intersection(
+                            resource_types):
+                    continue
 
             aliases = []
             if resource_type.type_aliases:

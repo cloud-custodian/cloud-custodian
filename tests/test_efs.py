@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, functional, TestConfig as Config
+from .common import BaseTest, functional
 
 import uuid
 import time
@@ -41,7 +41,6 @@ class ElasticFileSystem(BaseTest):
                 "resource": "efs",
                 "filters": [{"FileSystemId": fs_id}, {"tag:Name": "Somewhere"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()

@@ -169,13 +169,12 @@ class PostFinding(MethodAction):
         return request
 
     @classmethod
-    def register_resource(klass, registry, event):
-        for rtype, resource_manager in registry.items():
-            if resource_manager.resource_type.service not in ResourceNameAdapters:
-                continue
-            elif 'post-finding' in resource_manager.action_registry:
-                continue
-            resource_manager.action_registry.register('post-finding', klass)
+    def register_resource(klass, registry, resource_class):
+        if resource_class.resource_type.service not in ResourceNameAdapters:
+            return
+        if 'post-finding' in resource_class.action_registry:
+            return
+        resource_class.action_registry.register('post-finding', klass)
 
 
 # CSCC uses its own notion of resource id, if we want our findings on
@@ -231,5 +230,4 @@ ResourceNameAdapters = {
     'storage': name_storage,
 }
 
-gcp_resources.subscribe(
-    gcp_resources.EVENT_FINAL, PostFinding.register_resource)
+gcp_resources.subscribe(PostFinding.register_resource)

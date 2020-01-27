@@ -19,7 +19,7 @@ import json
 import mock
 
 from c7n.actions.webhook import Webhook
-from jsonschema.exceptions import ValidationError
+from c7n.exceptions import PolicyValidationError
 from .common import BaseTest
 import os
 
@@ -69,7 +69,7 @@ class WebhookTest(BaseTest):
             ],
         }
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(PolicyValidationError):
             self.load_policy(data=policy, validate=True)
 
         # Bad method
@@ -85,7 +85,7 @@ class WebhookTest(BaseTest):
             ],
         }
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(PolicyValidationError):
             self.load_policy(data=policy, validate=True)
 
     @mock.patch('c7n.actions.webhook.urllib3.PoolManager.request')

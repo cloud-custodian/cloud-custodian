@@ -14,12 +14,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .azure_common import BaseTest, arm_template
-from jsonschema.exceptions import ValidationError
+from c7n.exceptions import PolicyValidationError
 
 
 class DiagnosticSettingsFilterTest(BaseTest):
 
     def test_diagnostic_settings_schema_validate(self):
+
         with self.sign_out_patch():
             p = self.load_policy({
                 'name': 'test-diagnostic-settings',
@@ -33,7 +34,7 @@ class DiagnosticSettingsFilterTest(BaseTest):
                         'value': True
                     }
                 ]
-            }, validate=True)
+            }, validate=False)
             self.assertTrue(p)
 
     @arm_template('diagnostic-settings.json')
@@ -106,4 +107,5 @@ class DiagnosticSettingsFilterTest(BaseTest):
                 }
             ]
         }
-        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+        self.assertRaises(
+            PolicyValidationError, self.load_policy, policy, validate=True)

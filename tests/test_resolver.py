@@ -21,9 +21,10 @@ import vcr
 from six.moves.urllib.request import urlopen
 from six import binary_type
 
-from .common import BaseTest, ACCOUNT_ID, Bag, TestConfig as Config
+from .common import BaseTest, ACCOUNT_ID, Bag
 from .test_s3 import destroyBucket
 
+from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
 
 
