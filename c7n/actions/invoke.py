@@ -69,7 +69,7 @@ class LambdaInvoke(EventAction):
     }
 
     permissions = ('lambda:InvokeFunction',
-               'iam:GetAccountAliases',)
+               'iam:ListAccountAliases',)
 
     def process(self, resources, event=None):
         params = dict(FunctionName=self.data['function'])
