@@ -155,35 +155,35 @@ class ConfigureLifecycle(BaseAction):
                 actions:
                   - type: configure-lifecycle-policy
                     state: enable
-                    rule:
+                    rules:
                       - 'TransitionToIA': 'AFTER_7_DAYS'
 
     """
     schema = type_schema(
         'configure-lifecycle-policy',
         state={'enum': ['enable', 'disable']},
-        rule={'type': 'array'},
+        rules={'type': 'array'},
         required=['state'])
 
     permissions = ('elasticfilesystem:PutLifecycleConfiguration',)
     shape = 'PutLifecycleConfigurationRequest'
 
     def validate(self):
-        if self.data.get('state') == 'enable' and 'rule' not in self.data:
+        if self.data.get('state') == 'enable' and 'rules' not in self.data:
             raise PolicyValidationError(
-                'rule is required to enable lifecycle configuration %s' % (self.manager.data))
-        if self.data.get('state') == 'disable' and 'rule' in self.data:
+                'rules are required to enable lifecycle configuration %s' % (self.manager.data))
+        if self.data.get('state') == 'disable' and 'rules' in self.data:
             raise PolicyValidationError(
-                'rule is not required to disable lifecycle configuration %s' % (self.manager.data))
-        if self.data.get('rule'):
+                'rules are not required to disable lifecycle configuration %s' % (self.manager.data))
+        if self.data.get('rules'):
             attrs = {}
-            attrs['LifecyclePolicies'] = self.data['rule']
+            attrs['LifecyclePolicies'] = self.data['rules']
             attrs['FileSystemId'] = 'PolicyValidator'
             return shape_validate(attrs, self.shape, 'efs')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('efs')
-        op_map = {'enable': self.data.get('rule'), 'disable': []}
+        op_map = {'enable': self.data.get('rules'), 'disable': []}
         for r in resources:
             try:
                 client.put_lifecycle_configuration(

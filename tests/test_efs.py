@@ -139,7 +139,7 @@ class ElasticFileSystem(BaseTest):
                     {
                         "type": "configure-lifecycle-policy",
                         "state": "enable",
-                        "rule": [{'TransitionToIA': 'AFTER_7_DAYS'}],
+                        "rules": [{'TransitionToIA': 'AFTER_7_DAYS'}],
                     }
                 ]
             },
