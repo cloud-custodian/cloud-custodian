@@ -1671,3 +1671,60 @@ class TestReservedInstance(BaseTest):
             'resource': 'aws.ec2-reserved'}, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestMonitoringInstance(BaseTest):
+
+    def test_monitor_instance(self):
+        factory = self.replay_flight_data('test_ec2_monitor_instance')
+        p = self.load_policy({
+            'name': 'ec2-monitor-instance',
+            'resource': 'aws.ec2',
+            'filters': [
+                {
+                    'Monitoring.State': 'disabled'
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'set-monitoring',
+                    'state': 'enable'
+                }
+            ]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        instance = utils.query_instances(
+            factory(), InstanceIds=[resources[0]['InstanceId']]
+        )
+        self.assertIn(
+            instance[0]['Monitoring']['State'].lower(), ["enabled", "pending"]
+        )
+
+    def test_unmonitor_instance(self):
+        factory = self.replay_flight_data('test_ec2_unmonitor_instance')
+        p = self.load_policy({
+            'name': 'ec2-unmonitor-instance',
+            'resource': 'aws.ec2',
+            'filters': [
+                {
+                    'Monitoring.State': 'enabled'
+                }
+            ],
+            'actions': [
+                {
+                    'type': 'set-monitoring',
+                    'state': 'disable'
+                }
+            ]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        instance = utils.query_instances(
+            factory(), InstanceIds=[resources[0]['InstanceId']]
+        )
+        self.assertIn(
+            instance[0]['Monitoring']['State'].lower(), ['disabled', 'disabling']
+        )
