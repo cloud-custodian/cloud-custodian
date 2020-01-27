@@ -12,15 +12,7 @@ def patch(replay):
     process_set = c7n.filters.core.Not.process_set
     def _process_set(self, resources, event):
         results = process_set(self, resources, event)
-        if results:
-            key = None
-            keys = results[0].keys()
-            if 'Arn' in keys:
-                key = 'Arn'
-            elif 'GroupId' in keys:
-                key = 'GroupId'
-            results = sorted(results, key=lambda x: x[key])
-        return results
+        return sorted(results, key=lambda x: x[self.manager.resource_type.id])
     c7n.filters.core.Not.process_set = _process_set
 
     if replay:
