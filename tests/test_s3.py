@@ -39,7 +39,6 @@ from .common import (
     event_data,
     skip_if_not_validating,
     functional,
-    TestConfig as Config,
 )
 
 
@@ -2083,7 +2082,7 @@ class S3Test(BaseTest):
                 "filters": [{"Name": bname}],
                 "actions": [{"type": "attach-encrypt", "role": role}],
             },
-            config=Config.empty(region="us-west-2"),
+            config=dict(region="us-west-2"),
             session_factory=session_factory,
         )
 

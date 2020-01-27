@@ -31,7 +31,7 @@ class StructureParser(object):
          'tags', 'max-resources', 'source', 'query',
          'filters', 'actions', 'source', 'tags',
          # legacy keys subject to deprecation.
-         'region', 'start', 'end', 'max-resources-percent',
+         'region', 'start', 'end', 'tz', 'max-resources-percent',
          'comments', 'comment'))
 
     def validate(self, data):

@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from c7n.resources.elasticache import _cluster_eligible_for_snapshot
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class TestElastiCacheCluster(BaseTest):
@@ -118,7 +118,7 @@ class TestElastiCacheCluster(BaseTest):
                     }
                 ],
             },
-            config=Config.empty(region="us-east-2"),
+            config=dict(region="us-east-2"),
             session_factory=factory,
         )
         resources = p.run()
@@ -150,7 +150,7 @@ class TestElastiCacheCluster(BaseTest):
                 "resource": "cache-snapshot",
                 "actions": [{"type": "copy-cluster-tags", "tags": ["tagkey"]}],
             },
-            Config.empty(region="us-east-1"),
+            config=dict(region="us-east-1"),
             session_factory=session_factory,
         )
 

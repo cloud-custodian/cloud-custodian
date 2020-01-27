@@ -898,6 +898,64 @@ class SsmStatus(ValueFilter):
             r[self.annotation] = info_map.get(r['InstanceId'], {})
 
 
+@actions.register('set-monitoring')
+class MonitorInstances(BaseAction, StateTransitionFilter):
+    """Action on EC2 Instances to enable/disable detailed monitoring
+
+    The differents states of detailed monitoring status are :
+    'disabled'|'disabling'|'enabled'|'pending'
+    (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_instances)
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-detailed-monitoring-activation
+            resource: ec2
+            filters:
+              - Monitoring.State: disabled
+            actions:
+              - type: set-monitoring
+                state: enable
+
+    References
+
+     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.html
+    """
+    schema = type_schema('set-monitoring',
+        **{'state': {'enum': ['enable', 'disable']}})
+    permissions = ('ec2:MonitorInstances', 'ec2:UnmonitorInstances')
+
+    def process(self, resources, event=None):
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        actions = {
+            'enable': self.enable_monitoring,
+            'disable': self.disable_monitoring
+        }
+        for instances_set in utils.chunks(resources, 20):
+            actions[self.data.get('state')](client, instances_set)
+
+    def enable_monitoring(self, client, resources):
+        try:
+            client.monitor_instances(
+                InstanceIds=[inst['InstanceId'] for inst in resources]
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'InvalidInstanceId.NotFound':
+                raise
+
+    def disable_monitoring(self, client, resources):
+        try:
+            client.unmonitor_instances(
+                InstanceIds=[inst['InstanceId'] for inst in resources]
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'InvalidInstanceId.NotFound':
+                raise
+
+
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
     def format_resource(self, r):

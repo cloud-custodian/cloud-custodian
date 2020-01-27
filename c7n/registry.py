@@ -52,12 +52,12 @@ class PluginRegistry(object):
     def __init__(self, plugin_type):
         self.plugin_type = plugin_type
         self._factories = {}
-        self._subscribers = {x: [] for x in self.EVENTS}
+        self._subscribers = []
 
-    def subscribe(self, event, func):
-        if event not in self.EVENTS:
-            raise ValueError('Invalid event')
-        self._subscribers[event].append(func)
+    def subscribe(self, func):
+        self._subscribers.append(func)
+        for p in self.values():
+            func(self, p)
 
     def register(self, name, klass=None, condition=True,
                  condition_message="Missing dependency for {}",
@@ -69,7 +69,7 @@ class PluginRegistry(object):
             klass.type = name
             klass.type_aliases = aliases
             self._factories[name] = klass
-            self.notify(self.EVENT_REGISTER, klass)
+            self.notify(klass)
             return klass
 
         # invoked as class decorator
@@ -79,7 +79,7 @@ class PluginRegistry(object):
             self._factories[name] = klass
             klass.type = name
             klass.type_aliases = aliases
-            self.notify(self.EVENT_REGISTER, klass)
+            self.notify(klass)
             return klass
         return _register_class
 
@@ -87,8 +87,8 @@ class PluginRegistry(object):
         if name in self._factories:
             del self._factories[name]
 
-    def notify(self, event, key=None):
-        for subscriber in self._subscribers[event]:
+    def notify(self, key=None):
+        for subscriber in self._subscribers:
             subscriber(self, key)
 
     def __contains__(self, key):
@@ -99,6 +99,9 @@ class PluginRegistry(object):
         if v is None:
             raise KeyError(name)
         return v
+
+    def __len__(self):
+        return len(self._factories)
 
     def get(self, name):
         factory = self._factories.get(name)

@@ -118,4 +118,4 @@ class HealthEventFilter(Filter):
             resource_class.filter_registry.register('health-event', klass)
 
 
-resources.subscribe(resources.EVENT_REGISTER, HealthEventFilter.register_resources)
+resources.subscribe(HealthEventFilter.register_resources)

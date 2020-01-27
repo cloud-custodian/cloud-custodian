@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from c7n.provider import clouds
+from c7n.provider import clouds, Provider
 
 from collections import Counter, namedtuple
 import contextlib
@@ -36,6 +36,8 @@ from c7n.credentials import SessionFactory
 from c7n.config import Bag
 from c7n.exceptions import PolicyValidationError
 from c7n.log import CloudWatchLogHandler
+
+from .resource_map import ResourceMap
 
 # Import output registries aws provider extends.
 from c7n.output import (
@@ -500,12 +502,14 @@ class S3Output(DirectoryOutput):
 
 
 @clouds.register('aws')
-class AWS(object):
+class AWS(Provider):
 
     display_name = 'AWS'
     resource_prefix = 'aws'
     # legacy path for older plugins
     resources = PluginRegistry('resources')
+    # import paths for resources
+    resource_map = ResourceMap
 
     def initialize(self, options):
         """

@@ -119,7 +119,7 @@ def _report_options(p):
         '--days', type=float, default=1,
         help="Number of days of history to consider")
     p.add_argument(
-        '--raw', type=argparse.FileType('wb'),
+        '--raw', type=argparse.FileType('w'),
         help="Store raw json of collected records to given file path")
     p.add_argument(
         '--field', action='append', default=[], type=_key_val_pair,
