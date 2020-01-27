@@ -162,7 +162,9 @@ class ConfigureLifecycle(BaseAction):
     schema = type_schema(
         'configure-lifecycle-policy',
         state={'enum': ['enable', 'disable']},
-        rules={'type': 'array'},
+        rules= {
+            'type': 'array',
+            'items': {'type': 'object'}},
         required=['state'])
 
     permissions = ('elasticfilesystem:PutLifecycleConfiguration',)
