@@ -174,7 +174,7 @@ class ConfigureLifecycle(BaseAction):
                 'rules are required to enable lifecycle configuration %s' % (self.manager.data))
         if self.data.get('state') == 'disable' and 'rules' in self.data:
             raise PolicyValidationError(
-                'rules are not required to disable lifecycle configuration %s' % (self.manager.data))
+                'rules not required to disable lifecycle configuration %s' % (self.manager.data))
         if self.data.get('rules'):
             attrs = {}
             attrs['LifecyclePolicies'] = self.data['rules']
