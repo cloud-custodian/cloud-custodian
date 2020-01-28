@@ -74,6 +74,27 @@ class ResourceFormat(unittest.TestCase):
             'loadbalancer/app/dev/1234567890'
             '  zones: 0  scheme: internal')
 
+    def test_cloudtrail(self):
+        self.assertEqual(
+            utils.resource_format(
+                {
+                    "Name": "trail-x",
+                    "S3BucketName": "trail-x-bucket",
+                    "IncludeGlobalServiceEvents": True,
+                    "IsMultiRegionTrail": False,
+                    "HomeRegion": "eu-west-2",
+                    "TrailARN": "arn:aws:cloudtrail:eu-west-2:123456789012:trail/trail-x",
+                    "LogFileValidationEnabled": True,
+                    "HasCustomEventSelectors": False,
+                    "HasInsightSelectors": False,
+                    "IsOrganizationTrail": False,
+                    "Tags": [],
+                },
+                "aws.cloudtrail",
+            ),
+            "trail-x",
+        )
+
 
 class GetAwsUsernameFromEvent(unittest.TestCase):
 

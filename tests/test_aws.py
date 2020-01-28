@@ -77,6 +77,8 @@ class ArnResolverTest(BaseTest):
 
     def test_arn_resolver(self):
         for value, expected in self.table:
+            # load the resource types to enable resolution.
+            aws.AWS.get_resource_types(("aws.%s" % expected,))
             arn = aws.Arn.parse(value)
             result = aws.ArnResolver.resolve_type(arn)
             self.assertEqual(result, expected)

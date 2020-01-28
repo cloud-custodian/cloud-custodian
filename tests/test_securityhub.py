@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from jsonschema.exceptions import ValidationError
 from c7n.exceptions import PolicyValidationError
 from .common import BaseTest, event_data
 
@@ -113,7 +112,6 @@ class SecurityHubMode(BaseTest):
 class SecurityHubTest(BaseTest):
 
     def test_custom_classifier(self):
-
         templ = {
             'name': 's3',
             'resource': 's3',
@@ -125,7 +123,8 @@ class SecurityHubTest(BaseTest):
         templ['actions'][0]['types'] = ['Effects/CustomB/CustomA/CustomD']
         self.assertRaises(PolicyValidationError, self.load_policy, templ)
         templ['actions'][0]['types'] = []
-        self.assertRaises(ValidationError, self.load_policy, templ, validate=True)
+        self.assertRaises(
+            PolicyValidationError, self.load_policy, templ, validate=True)
 
     def test_s3_bucket_arn(self):
         policy = self.load_policy({
@@ -677,7 +676,5 @@ class SecurityHubTest(BaseTest):
                 "Type": "Other",
                 "Id": "arn:aws:rds:us-east-1:101010101111:db:testme",
                 "Tags": {
-                    "workload-type": "other"
-                }
-            }
-        )
+                    "workload-type": "other"}
+            })

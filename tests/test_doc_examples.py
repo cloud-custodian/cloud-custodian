@@ -11,18 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import atexit
-import json
 import itertools
 import os
 import sys
-import tempfile
 
 import pytest
 
 from c7n.config import Config
-from c7n.policy import load, PolicyCollection
+from c7n.loader import PolicyLoader
 from c7n.provider import clouds
+from c7n.resources import load_resources
 from c7n.utils import yaml_load
 
 from .common import BaseTest  # NOQA - loads providers for individual module testing
@@ -89,18 +87,15 @@ skip_condition = not (
 
 
 @pytest.mark.skipif(skip_condition, reason="Doc tests must be explicitly enabled with C7N_DOC_TEST")
-@pytest.mark.parametrize("provider_name,provider", list(clouds.items()))
-def test_doc_examples(provider_name, provider):
-
+@pytest.mark.parametrize("provider_name", ('aws', 'azure', 'gcp', 'k8s'))
+def test_doc_examples(provider_name):
+    load_resources()
+    loader = PolicyLoader(Config.empty())
+    provider = clouds.get(provider_name)
     policies, duplicate_names = get_doc_policies(provider.resources)
 
-    with tempfile.NamedTemporaryFile(suffix='.json', delete=False) as fh:
-        atexit.register(os.unlink, fh.name)
-
-        fh.write(json.dumps({'policies': list(policies.values())}).encode('utf8'))
-        fh.flush()
-        collection = load(Config.empty(), fh.name)
-        assert isinstance(collection, PolicyCollection)
+    for p in policies.values():
+        loader.load_data({'policies': [p]}, 'memory://')
 
     assert not duplicate_names
 

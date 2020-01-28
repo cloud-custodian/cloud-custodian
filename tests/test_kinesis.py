@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class Kinesis(BaseTest):
@@ -28,7 +28,6 @@ class Kinesis(BaseTest):
                     {"type": "value", "value_type": "size", "value": 3, "key": "Shards"}
                 ],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()

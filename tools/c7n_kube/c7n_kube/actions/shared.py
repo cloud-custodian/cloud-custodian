@@ -20,4 +20,4 @@ SHARED_ACTIONS = (DeleteResource, LabelAction, PatchResource)
 
 
 for action in SHARED_ACTIONS:
-    kube_resources.subscribe(kube_resources.EVENT_REGISTER, action.register_resources)
+    kube_resources.subscribe(action.register_resources)

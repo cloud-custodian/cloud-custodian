@@ -17,8 +17,9 @@ import datetime
 from collections import namedtuple
 
 from ..azure_common import BaseTest, arm_template, cassette_name
-from jsonschema.exceptions import ValidationError
 from mock import patch
+
+from c7n.exceptions import PolicyValidationError
 
 
 class CostManagementExportTest(BaseTest):
@@ -35,7 +36,7 @@ class CostManagementExportTest(BaseTest):
                                          actions=[{'type': 'execute'}],
                                          validate=True))
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(PolicyValidationError):
             self._get_policy(filters=[{'type': 'last-execution', 'age': -1}],
                              validate=True)
 

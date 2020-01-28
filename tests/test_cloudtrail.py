@@ -15,7 +15,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class CloudTrail(BaseTest):
@@ -146,7 +146,6 @@ class CloudTrail(BaseTest):
                     }]
                 }]
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()

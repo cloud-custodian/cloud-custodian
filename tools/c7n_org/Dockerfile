@@ -20,6 +20,7 @@ RUN apt-get --yes update && apt-get --yes upgrade \
  && pip3 install -r requirements.txt  . \
  && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
  && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
+ && pip3 install -r tools/c7n_kube/requirements.txt tools/c7n_kube \
  && pip3 install tools/c7n_org \
  && apt-get --yes remove build-essential \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \

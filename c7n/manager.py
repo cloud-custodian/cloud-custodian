@@ -20,6 +20,7 @@ from c7n import cache
 from c7n.executor import ThreadPoolExecutor
 from c7n.provider import clouds
 from c7n.registry import PluginRegistry
+from c7n.resources import load_resources
 try:
     from c7n.resources.aws import AWS
     resources = AWS.resources
@@ -83,6 +84,8 @@ class ResourceManager(object):
         else:
             provider_name = self.ctx.policy.provider_name
 
+        # check and load
+        load_resources(('%s.%s' % (provider_name, resource_type),))
         provider_resources = clouds[provider_name].resources
         klass = provider_resources.get(resource_type)
         if klass is None:
