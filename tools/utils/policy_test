@@ -3,7 +3,7 @@ import os
 import argparse
 import json
 import yaml
-import tests.common
+import c7n.tests.common
 import c7n.filters.core
 import c7n.testing
 import c7n.utils
