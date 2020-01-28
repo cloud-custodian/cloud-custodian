@@ -24,7 +24,7 @@ class CloudHSMCluster(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'cloudhsmv2'
         arn_type = 'cluster'
-        arn_service = 'cloudhsm'
+        permission_prefix = arn_service = 'cloudhsm'
         enum_spec = ('describe_clusters', 'Clusters', None)
         id = name = 'ClusterId'
         filter_name = 'Filters'
@@ -54,7 +54,7 @@ class Tag(Tag):
                     value: OwnerName
     """
 
-    permissions = ('cloudhsmv2:TagResource',)
+    permissions = ('cloudhsm:TagResource',)
 
     def process_resource_set(self, client, clusters, tags):
         for c in clusters:
@@ -82,7 +82,7 @@ class RemoveTag(RemoveTag):
                     tags: [OldTagKey1, OldTagKey2]
     """
 
-    permissions = ('cloudhsmv2:UntagResource',)
+    permissions = ('cloudhsm:UntagResource',)
 
     def process_resource_set(self, client, clusters, tag_keys):
         for c in clusters:

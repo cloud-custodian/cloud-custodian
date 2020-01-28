@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, functional, event_data, TestConfig as Config
+from .common import BaseTest, functional, event_data
 
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
@@ -102,7 +102,7 @@ class VpcTest(BaseTest):
                                    'State': 'available',
                                    'VpcId': 'vpc-f1516b97',
                                    'c7n:resource-type': 'vpc'}},
-             'Id': 'arn:aws:ec2:us-east-1::vpc/vpc-f1516b97',
+             'Id': 'arn:aws:ec2:us-east-1:644160558196:vpc/vpc-f1516b97',
              'Partition': 'aws',
              'Region': 'us-east-1',
              'Tags': {'Name': 'FancyTestVPC', 'tagfancykey': 'tagfanncyvalue'},
@@ -970,7 +970,6 @@ class PeeringConnectionTest(BaseTest):
                 "resource": "peering-connection",
                 "filters": [{"type": "cross-account"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -1473,7 +1472,7 @@ class SecurityGroupTest(BaseTest):
                     'OwnerId': '644160558196',
                     'VpcId': 'vpc-d2d616b5',
                     'c7n:resource-type': 'security-group'}},
-             'Id': 'arn:aws:ec2:us-east-1::security-group/sg-6c7fa917',
+             'Id': 'arn:aws:ec2:us-east-1:644160558196:security-group/sg-6c7fa917',
              'Partition': 'aws',
              'Region': 'us-east-1',
              'Tags': {'NetworkLocation': 'Private'},

@@ -14,9 +14,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from ..azure_common import BaseTest, arm_template, cassette_name
-from jsonschema.exceptions import ValidationError
 from mock import patch
 from c7n_azure.resources.generic_arm_resource import GenericArmResource
+from c7n.exceptions import PolicyValidationError
 
 
 class ArmResourceTest(BaseTest):
@@ -163,7 +163,8 @@ class ArmResourceTest(BaseTest):
                  'op': 'lt',
                  'threshold': 0}],
         }
-        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+        self.assertRaises(
+            PolicyValidationError, self.load_policy, policy, validate=True)
 
     def test_metric_filter_invalid_missing_op(self):
         policy = {
@@ -180,7 +181,8 @@ class ArmResourceTest(BaseTest):
                  'aggregation': 'total',
                  'threshold': 0}],
         }
-        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+        self.assertRaises(
+            PolicyValidationError, self.load_policy, policy, validate=True)
 
     def test_metric_filter_invalid_missing_threshold(self):
         policy = {
@@ -197,7 +199,8 @@ class ArmResourceTest(BaseTest):
                  'aggregation': 'total',
                  'op': 'lt'}],
         }
-        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+        self.assertRaises(
+            PolicyValidationError, self.load_policy, policy, validate=True)
 
     fake_arm_resources = [
         {

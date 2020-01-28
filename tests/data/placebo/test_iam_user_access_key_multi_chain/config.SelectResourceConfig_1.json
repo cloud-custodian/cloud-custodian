@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"configuration\":{\"path\":\"/\",\"attachedManagedPolicies\":[],\"groupList\":[\"Admins\"],\"userPolicyList\":[],\"userName\":\"faizan.ahmed\",\"arn\":\"arn:aws:iam::644160558196:user/faizan.ahmed\",\"userId\":\"AIDAIFSHVFT46NXYGWMEI\",\"createDate\":\"2018-08-20T14:19:28.000Z\",\"tags\":[{\"value\":\"Samson.Shi\",\"key\":\"Owner\"}]},\"supplementaryConfiguration\":{}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "861b256c-426b-41de-b335-a82947fefcf1",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "861b256c-426b-41de-b335-a82947fefcf1",
+                "strict-transport-security": "max-age=86400",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "528",
+                "date": "Tue, 21 Jan 2020 20:33:46 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

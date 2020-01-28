@@ -243,7 +243,7 @@ class SetQueryLogging(BaseAction):
         'route53:CreateQueryLoggingConfig',
         'route53:DeleteQueryLoggingConfig',
         'logs:DescribeLogGroups',
-        'logs:CreateLogGroups',
+        'logs:CreateLogGroup',
         'logs:GetResourcePolicy',
         'logs:PutResourcePolicy')
 
@@ -279,7 +279,7 @@ class SetQueryLogging(BaseAction):
             perms.extend(('logs:GetResourcePolicy', 'logs:PutResourcePolicy'))
         if self.data.get('state', True):
             perms.append('route53:CreateQueryLoggingConfig')
-            perms.append('logs:CreateLogGroups')
+            perms.append('logs:CreateLogGroup')
             perms.append('logs:DescribeLogGroups')
             perms.append('tag:GetResources')
         else:

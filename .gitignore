@@ -1,6 +1,7 @@
 *.pyc
 *.egg-info/
 *.swp
+c7n/version.py
 src/
 deps/
 include/

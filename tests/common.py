@@ -13,16 +13,13 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import gzip
 import json
 import logging
 import os
 import unittest
 import uuid
-from functools import partial
-
-from c7n.schema import generate
-from c7n.resources import load_resources
-from c7n.config import Bag, Config
+from c7n.config import Bag
 
 from c7n.testing import TestUtils, TextTestIO, functional # NOQA
 
@@ -33,27 +30,15 @@ logging.getLogger("placebo.pill").setLevel(logging.DEBUG)
 logging.getLogger("botocore").setLevel(logging.WARNING)
 
 
-load_resources()
-
+# Custodian Test Account. This is used only for testing.
+# Access is available for community project maintainers.
 ACCOUNT_ID = "644160558196"
 
-
-C7N_SCHEMA = generate()
 C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
 
 skip_if_not_validating = unittest.skipIf(
     not C7N_VALIDATE, reason="We are not validating schemas."
 )
-
-
-class TestConfig(Config):
-    config_args = {
-        "metrics_enabled": False,
-        "account_id": ACCOUNT_ID,
-        "output_dir": "s3://test-example/foo",
-    }
-
-    empty = staticmethod(partial(Config.empty, **config_args))
 
 
 # Set this so that if we run nose directly the tests will not fail
@@ -63,11 +48,18 @@ if "AWS_DEFAULT_REGION" not in os.environ:
 
 class BaseTest(TestUtils, PillTest):
 
-    custodian_schema = C7N_SCHEMA
+    # custodian_schema = C7N_SCHEMA
 
     @property
     def account_id(self):
         return ACCOUNT_ID
+
+    def _get_policy_config(self, **kw):
+        if 'account_id' not in kw:
+            kw['account_id'] = self.account_id
+        if 'region' not in kw:
+            kw['region'] = 'us-east-1'
+        return super(BaseTest, self)._get_policy_config(**kw)
 
 
 class ConfigTest(BaseTest):
@@ -159,8 +151,10 @@ def event_data(name, event_type="cwe"):
 
 
 def load_data(file_name, state=None, **kw):
+
+    fopen = file_name.endswith('gz') and gzip.open or open
     data = json.loads(
-        open(os.path.join(os.path.dirname(__file__), "data", file_name)).read()
+        fopen(os.path.join(os.path.dirname(__file__), "data", file_name)).read()
     )
     if state:
         data.update(state)

@@ -279,9 +279,8 @@ def resource_format(resource, resource_type):
             resource['account_id'],
             resource['account_name'])
     elif resource_type == 'cloudtrail':
-        return " %s %s" % (
-            resource['account_id'],
-            resource['account_name'])
+        return "%s" % (
+            resource['Name'])
     elif resource_type == 'vpc':
         return "%s " % (
             resource['VpcId'])

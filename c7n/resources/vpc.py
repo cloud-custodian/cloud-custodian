@@ -328,7 +328,7 @@ class AttributesFilter(Filter):
         'vpc-attributes',
         dnshostnames={'type': 'boolean'},
         dnssupport={'type': 'boolean'})
-    permissions = ('ec2:DescribeVpcAttributes',)
+    permissions = ('ec2:DescribeVpcAttribute',)
 
     def process(self, resources, event=None):
         results = []

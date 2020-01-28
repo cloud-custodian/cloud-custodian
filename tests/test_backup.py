@@ -28,7 +28,7 @@ class BackupTest(BaseTest):
         plan = resources.pop()
         self.assertEqual(
             plan['Tags'],
-            [{'Name': 'App', 'Value': 'Backups'}])
+            [{'Key': 'App', 'Value': 'Backups'}])
         self.assertTrue('Rules' in plan)
 
         self.assertEqual(
@@ -36,3 +36,25 @@ class BackupTest(BaseTest):
             [plan['BackupPlanArn']])
         resources = p.resource_manager.get_resources([plan['BackupPlanId']])
         self.assertEqual(len(resources), 1)
+
+
+class BackupPlanTest(BaseTest):
+
+    def test_backup_plan_tag_untag(self):
+        factory = self.replay_flight_data("test_backup_plan_tag_untag")
+        p = self.load_policy(
+            {
+                "name": "backup-plan-tag",
+                "resource": "backup-plan",
+                "filters": [{"tag:target-tag": "present"}],
+                "actions": [
+                    {"type": "remove-tag", "tags": ["target-tag"]},
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client("backup")
+        tag = client.list_tags(ResourceArn=resources[0]['BackupPlanArn'])
+        self.assertEqual(len(tag.get('Tags')), 0)

@@ -1495,6 +1495,11 @@ class GroupMembership(ValueFilter):
 class UserAccessKey(ValueFilter):
     """Filter IAM users based on access-key values
 
+    By default multiple uses of this filter will match
+    on any user key satisfying either filter. To find
+    specific keys that match multiple access-key filters,
+    use `match-operator: and`
+
     :example:
 
     .. code-block:: yaml
@@ -1506,9 +1511,17 @@ class UserAccessKey(ValueFilter):
               - type: access-key
                 key: Status
                 value: Active
+              - type: access-key
+                match-operator: and
+                key: CreateDate
+                value_type: age
+                value: 90
     """
 
-    schema = type_schema('access-key', rinherit=ValueFilter.schema)
+    schema = type_schema(
+        'access-key',
+        rinherit=ValueFilter.schema,
+        **{'match-operator': {'enum': ['and', 'or']}})
     schema_alias = False
     permissions = ('iam:ListAccessKeys',)
     annotation_key = 'c7n:AccessKeys'
@@ -1532,13 +1545,17 @@ class UserAccessKey(ValueFilter):
                 chunks(augment_set, 50)))
 
         matched = []
+        match_op = self.data.get('match-operator', 'or')
         for r in resources:
+            keys = r[self.annotation_key]
+            if self.matched_annotation_key in r and match_op == 'and':
+                keys = r[self.matched_annotation_key]
             k_matched = []
-            for k in r[self.annotation_key]:
+            for k in keys:
                 if self.match(k):
                     k_matched.append(k)
             for k in k_matched:
-                k['c7n:matched-type'] = 'access'
+                k['c7n:match-type'] = 'access'
             self.merge_annotation(r, self.matched_annotation_key, k_matched)
             if k_matched:
                 matched.append(r)
@@ -1565,7 +1582,7 @@ class UserMfaDevice(ValueFilter):
 
     schema = type_schema('mfa-device', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ('iam:ListMfaDevices',)
+    permissions = ('iam:ListMFADevices',)
 
     def __init__(self, *args, **kw):
         super(UserMfaDevice, self).__init__(*args, **kw)

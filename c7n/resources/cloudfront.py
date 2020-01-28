@@ -173,7 +173,7 @@ class MismatchS3Origin(Filter):
         'mismatch-s3-origin',
         check_custom_origins={'type': 'boolean'})
 
-    permissions = ('s3:ListBuckets',)
+    permissions = ('s3:ListAllMyBuckets',)
     retry = staticmethod(get_retry(('Throttling',)))
 
     def is_s3_domain(self, x):
@@ -278,8 +278,8 @@ class DistributionDisableAction(BaseAction):
                   - type: disable
     """
     schema = type_schema('disable')
-    permissions = ("distribution:GetDistributionConfig",
-                   "distribution:UpdateDistribution",)
+    permissions = ("cloudfront:GetDistributionConfig",
+                   "cloudfront:UpdateDistribution",)
 
     def process(self, distributions):
         client = local_session(
@@ -325,8 +325,8 @@ class StreamingDistributionDisableAction(BaseAction):
     """
     schema = type_schema('disable')
 
-    permissions = ("streaming-distribution:GetStreamingDistributionConfig",
-                   "streaming-distribution:UpdateStreamingDistribution",)
+    permissions = ("cloudfront:GetStreamingDistributionConfig",
+                   "cloudfront:UpdateStreamingDistribution",)
 
     def process(self, distributions):
         client = local_session(
@@ -389,8 +389,8 @@ class DistributionSSLAction(BaseAction):
         }
     }
 
-    permissions = ("distribution:GetDistributionConfig",
-                   "distribution:UpdateDistribution",)
+    permissions = ("cloudfront:GetDistributionConfig",
+                   "cloudfront:UpdateDistribution",)
 
     def process(self, distributions):
         client = local_session(self.manager.session_factory).client(

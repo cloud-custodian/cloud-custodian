@@ -33,7 +33,7 @@ custodian actions are resource specific.
 
 .. code-block:: yaml
 
-   policy:
+   policies:
      - name: remediate
        resource: aws.ec2
        mode:
@@ -51,7 +51,7 @@ guard duty (note custodian also has support for guard duty events directly).
 
 .. code-block:: yaml
 
-   policy:
+   policies:
      - name: remediate
        resource: aws.iam
        mode:

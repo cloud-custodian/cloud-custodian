@@ -1,0 +1,87 @@
+{
+    "version": "0",
+    "id": "4fa18fb8-cd5e-ffe6-bb73-36bac665af54",
+    "detail-type": "Security Hub Findings - Custom Action",
+    "source": "aws.securityhub",
+    "account": "519413311747",
+    "time": "2020-01-15T15:56:47Z",
+    "region": "us-east-1",
+    "resources": [
+        "arn:aws:securityhub:us-east-1:519413311747:action/custom/remediate"
+    ],
+    "detail": {
+        "actionName": "Lambda remediate",
+        "actionDescription": "remediate",
+        "findings": [
+            {
+                "SchemaVersion": "2018-10-08",
+                "ProductArn": "arn:aws:securityhub:us-east-1:644160558196:product/644160558196/default",
+                "AwsAccountId": "644160558196",
+                "Description": "Bad Lambda Monkey",
+                "Title": "lambda-finding",
+                "Id": "us-east-1/644160558196/356580e4704cf1222cbee13685416652/84a7b9799285262dbf00c7b214463dde",
+                "GeneratorId": "lambda-finding",
+                "CreatedAt": "2020-01-15T15:55:49.624441+00:00",
+                "UpdatedAt": "2020-01-15T15:55:49.624441+00:00",
+                "RecordState": "ACTIVE",
+                "Severity": {
+                    "Product": 0,
+                    "Normalized": 6
+                },
+                "Confidence": 100,
+                "Compliance": {
+                    "Status": "FAILED"
+                },
+                "ProductFields": {
+                    "resource": "aws.lambda",
+                    "ProviderName": "CloudCustodian",
+                    "ProviderVersion": "0.8.45.4",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1:644160558196:product/644160558196/default/us-east-1/644160558196/356580e4704cf1222cbee13685416652/84a7b9799285262dbf00c7b214463dde",
+                    "aws/securityhub/SeverityLabel": "LOW",
+                    "aws/securityhub/ProductName": "Default",
+                    "aws/securityhub/CompanyName": "Personal"
+                },
+                "Resources": [
+                    {
+                        "Type": "Other",
+                        "Id": "arn:aws:lambda:us-east-1:644160558196:function:custodian-enterprise-ec2-instances-no-elastic-ip-isolate",
+                        "Region": "us-east-1",
+                        "Partition": "aws",
+                        "Details": {
+                            "Other": {
+                                "FunctionName": "custodian-enterprise-ec2-instances-no-elastic-ip-isolate",
+                                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-enterprise-ec2-instances-no-elastic-ip-isolate",
+                                "Runtime": "python3.7",
+                                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                                "Handler": "custodian_policy.run",
+                                "CodeSize": "544043",
+                                "Description": "OPS9 - Instances should not have public ips.\n",
+                                "Timeout": "60",
+                                "MemorySize": "512",
+                                "LastModified": "2019-06-21T19:13:22.979+0000",
+                                "CodeSha256": "PiBNBRB/LSwwtLdczV1z822kUD1Aq1eVPlLyvIualE4=",
+                                "Version": "",
+                                "VpcConfig": "{\n\"SubnetIds\": [],\n\"SecurityGroupIds\": [],\n\"VpcId\": \"\"\n}",
+                                "TracingConfig": "{\n\"Mode\": \"PassThrough\"\n}",
+                                "RevisionId": "8b24c19d-972a-4254-9bd8-8c6a9accf695",
+                                "Tags": "[\n{\n\"Key\": \"ASV\",\n\"Value\": \"ASVCLOUDCUSTODIAN\"\n},\n{\n\"Key\": \"CMDBEnvironment\",\n\"Value\": \"ENVPRCLOUDMAID\"\n},\n{\n\"Key\": \"OwnerContact\",\n\"Value\": \"cloudmaid@capitalone.com\"\n}\n]",
+                                "c7n:MatchedFilters": "[\n\"FunctionName\"\n]",
+                                "c7n:resource-type": "lambda"
+                            }
+                        },
+                        "Tags": {
+                            "ASV": "ASVCLOUDCUSTODIAN",
+                            "CMDBEnvironment": "ENVPRCLOUDMAID",
+                            "OwnerContact": "cloudmaid@capitalone.com"
+                        }
+                    }
+                ],
+                "Types": [
+                    "Software and Configuration Checks/Custodian/Monkey Lambda"
+                ],
+                "WorkflowState": "NEW"
+            }
+        ]
+    },
+    "debug": true
+}

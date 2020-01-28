@@ -28,6 +28,7 @@ class BackupPlan(QueryResourceManager):
         id = 'BackupPlanName'
         name = 'BackupPlanId'
         arn = 'BackupPlanArn'
+        universal_taggable = object()
 
     def augment(self, resources):
         super(BackupPlan, self).augment(resources)
@@ -38,7 +39,7 @@ class BackupPlan(QueryResourceManager):
                 tags = client.list_tags(ResourceArn=r['BackupPlanArn']).get('Tags', {})
             except client.exceptions.ResourceNotFoundException:
                 continue
-            r['Tags'] = [{'Name': k, 'Value': v} for k, v in tags.items()]
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
             results.append(r)
 
         return results

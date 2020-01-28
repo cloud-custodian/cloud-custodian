@@ -14,9 +14,9 @@
 
 from .azure_common import BaseTest, arm_template
 from c7n_azure.utils import ResourceIdParser
-from jsonschema.exceptions import ValidationError
 from c7n_azure.session import Session
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
 
 
@@ -83,7 +83,7 @@ class LockActionTest(BaseTest):
             ],
         }
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(PolicyValidationError):
             self.load_policy(data=policy, validate=True)
 
     @arm_template('locked.json')
