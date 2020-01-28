@@ -7,6 +7,29 @@ import c7n.tests.common
 import c7n.filters.core
 import c7n.testing
 import c7n.utils
+import c7n.output
+
+@c7n.output.log_outputs.register('default')
+class NullOutput(object):
+    def __init__(self, ctx, config=None):
+        self.ctx = ctx
+        self.config = config or {}
+        self.handler = None
+
+    def get_handler(self):
+        raise NotImplementedError()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        pass
+
+    def join_log(self):
+        pass
+
+    def leave_log(self):
+        pass
 
 def patch(replay):
     process_set = c7n.filters.core.Not.process_set
