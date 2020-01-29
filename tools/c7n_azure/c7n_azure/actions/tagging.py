@@ -268,6 +268,7 @@ class AutoTagUser(AutoTagBase):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
+        self.query_select = "eventTimestamp, operationName, caller, claims"
 
     def _get_tag_value_from_event(self, event):
         principal_role = self.principal_role_jmes_path.search(event)
