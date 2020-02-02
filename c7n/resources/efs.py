@@ -207,7 +207,7 @@ class LifecyclePolicyEnabled(Filter):
             policies:
               - name: efs-filter-lifecycle
                 resource: efs
-                actions:
+                filters:
                   - type: lifecycle-policy-enabled
                     state: true
 
