@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
@@ -193,3 +194,43 @@ class ConfigureLifecycle(BaseAction):
                     LifecyclePolicies=op_map.get(self.data.get('state')))
             except client.exceptions.FileSystemNotFound:
                 continue
+
+
+@ElasticFileSystem.filter_registry.register('lifecycle-policy-enabled')
+class LifecyclePolicyEnabled(Filter):
+    """Filters efs based on the state of lifecycle policies
+
+    :example:
+
+      .. code-block:: yaml
+
+            policies:
+              - name: efs-filter-lifecycle
+                resource: efs
+                actions:
+                  - type: lifecycle-policy-enabled
+                    state: true
+
+    """
+    schema = type_schema(
+        'lifecycle-policy-enabled',
+        state={'type': 'boolean'},
+        required=['state'])
+
+    permissions = ('elasticfilesystem:DescribeLifecycleConfiguration',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('efs')
+        results = []
+        for r in resources:
+            try:
+                response = client.describe_lifecycle_configuration(
+                    FileSystemId=r['FileSystemId'])
+            except client.exceptions.FileSystemNotFound:
+                continue
+            if self.data.get('state') and response.get('LifecyclePolicies'):
+                results.append(r)
+            elif (self.data.get('state') == False) and (
+                response.get('LifecyclePolicies') == []):
+                results.append(r)
+        return results

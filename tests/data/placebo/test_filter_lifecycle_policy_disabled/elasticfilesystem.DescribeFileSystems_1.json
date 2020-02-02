@@ -1,0 +1,80 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "b4e42131-e164-4c89-93b8-a0f527226530",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b4e42131-e164-4c89-93b8-a0f527226530",
+                "content-type": "application/json",
+                "content-length": "938",
+                "date": "Sun, 02 Feb 2020 19:55:34 GMT"
+            },
+            "RetryAttempts": 0
+        },
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "console-beffed71-ea8e-4ae2-998c-edc4ed201afb",
+                "FileSystemId": "fs-a666ae26",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 2,
+                    "day": 2,
+                    "hour": 14,
+                    "minute": 40,
+                    "second": 31,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "NumberOfMountTargets": 1,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": false,
+                "ThroughputMode": "bursting",
+                "Tags": []
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "console-6e223c9a-73a0-4a63-87ff-964c612aef82",
+                "FileSystemId": "fs-c13df541",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 2,
+                    "day": 2,
+                    "hour": 12,
+                    "minute": 23,
+                    "second": 41,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "NumberOfMountTargets": 1,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2020,
+                        "month": 2,
+                        "day": 2,
+                        "hour": 14,
+                        "minute": 41,
+                        "second": 17,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": false,
+                "ThroughputMode": "bursting",
+                "Tags": []
+            }
+        ]
+    }
+}
