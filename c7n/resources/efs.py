@@ -230,7 +230,6 @@ class LifecyclePolicyEnabled(Filter):
                 continue
             if self.data.get('state') and response.get('LifecyclePolicies'):
                 results.append(r)
-            elif (self.data.get('state') == False) and (
-                response.get('LifecyclePolicies') == []):
+            elif (self.data.get('state') is False) and (response.get('LifecyclePolicies') == []):
                 results.append(r)
         return results
