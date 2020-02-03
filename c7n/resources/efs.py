@@ -196,8 +196,8 @@ class ConfigureLifecycle(BaseAction):
                 continue
 
 
-@ElasticFileSystem.filter_registry.register('lifecycle-policy-enabled')
-class LifecyclePolicyEnabled(Filter):
+@ElasticFileSystem.filter_registry.register('lifecycle-policy')
+class LifecyclePolicy(Filter):
     """Filters efs based on the state of lifecycle policies
 
     :example:
@@ -208,12 +208,12 @@ class LifecyclePolicyEnabled(Filter):
               - name: efs-filter-lifecycle
                 resource: efs
                 filters:
-                  - type: lifecycle-policy-enabled
+                  - type: lifecycle-policy
                     state: true
 
     """
     schema = type_schema(
-        'lifecycle-policy-enabled',
+        'lifecycle-policy',
         state={'type': 'boolean'},
         required=['state'])
 

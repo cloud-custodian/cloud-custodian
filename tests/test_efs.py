@@ -197,7 +197,7 @@ class ElasticFileSystem(BaseTest):
             {
                 "name": "efs-lifecycle-policy-enabled",
                 "resource": "efs",
-                "filters": [{"type": "lifecycle-policy-enabled", "state": True}],
+                "filters": [{"type": "lifecycle-policy", "state": True}],
             },
             session_factory=factory,
         )
@@ -211,7 +211,7 @@ class ElasticFileSystem(BaseTest):
             {
                 "name": "efs-lifecycle-policy-disabled",
                 "resource": "efs",
-                "filters": [{"type": "lifecycle-policy-enabled", "state": False}],
+                "filters": [{"type": "lifecycle-policy", "state": False}],
             },
             session_factory=factory,
         )
