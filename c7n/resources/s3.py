@@ -2427,11 +2427,7 @@ class SetInventory(BucketActionBase):
 
         bucket = {
             'Bucket': "arn:aws:s3:::%s" % destination,
-<<<<<<< HEAD
-            'Format' = inventory_format
-=======
             'Format': inventory_format
->>>>>>> don’t need if block
         }
 
         inventory = {
