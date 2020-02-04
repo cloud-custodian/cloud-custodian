@@ -362,6 +362,9 @@ class StorageTest(BaseTest):
         }, validate=True)
 
         resources = p.run()
+
+        self.sleep_in_live_mode(30)
+
         session = local_session(p.session_factory)
         token = StorageUtilities.get_storage_token(session)
         blob_settings = StorageSettingsUtilities.get_settings(
@@ -411,6 +414,9 @@ class StorageTest(BaseTest):
         }, validate=True)
 
         resources = p.run()
+
+        self.sleep_in_live_mode(30)
+
         session = local_session(p.session_factory)
         token = StorageUtilities.get_storage_token(session)
         blob_settings = StorageSettingsUtilities.get_settings(
