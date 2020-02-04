@@ -52,7 +52,7 @@ class CloudWatchEvents(object):
             'source': 'redshift.amazonaws.com'},
 
         'CreateLoadBalancer': {
-            'ids': 'requestParameters.loadBalancerName',
+            'ids': 'requestParameters.name',
             'source': 'elasticloadbalancing.amazonaws.com'},
 
         'CreateLoadBalancerPolicy': {
