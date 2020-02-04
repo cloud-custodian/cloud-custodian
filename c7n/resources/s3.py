@@ -2384,6 +2384,7 @@ class SetInventory(BucketActionBase):
         key_id={'type': 'string', 'description': 'Optional Customer KMS KeyId for SSE-KMS'},
         versions={'enum': ['All', 'Current']},
         schedule={'enum': ['Daily', 'Weekly']},
+        format={'enum': ['CSV', 'ORC', 'Parquet']},
         fields={'type': 'array', 'items': {'enum': [
             'Size', 'LastModifiedDate', 'StorageClass', 'ETag',
             'IsMultipartUploaded', 'ReplicationStatus', 'EncryptionStatus']}})
@@ -2409,6 +2410,7 @@ class SetInventory(BucketActionBase):
         versions = self.data.get('versions', 'Current')
         state = self.data.get('state', 'enabled')
         encryption = self.data.get('encryption')
+        inventory_format = self.data.get('format', 'CSV')
 
         if not prefix:
             prefix = "Inventories/%s" % (self.manager.config.account_id)
@@ -2424,8 +2426,7 @@ class SetInventory(BucketActionBase):
             return
 
         bucket = {
-            'Bucket': "arn:aws:s3:::%s" % destination,
-            'Format': 'CSV'
+            'Bucket': "arn:aws:s3:::%s" % destination
         }
 
         inventory = {
@@ -2440,6 +2441,9 @@ class SetInventory(BucketActionBase):
                 'Frequency': schedule
             }
         }
+
+        if inventory_format:
+            bucket['Format'] = inventory_format
 
         if prefix:
             bucket['Prefix'] = prefix
