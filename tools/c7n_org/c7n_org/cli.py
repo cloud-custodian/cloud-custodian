@@ -239,7 +239,8 @@ def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     for a in accounts_config.get('accounts', ()):
         if not_accounts and a['name'] in not_accounts:
             continue
-        if accounts and a['name'] not in accounts:
+        account_id = a.get('account_id') or a.get('project_id') or a.get('subscription_id') or ''
+        if accounts and a['name'] not in accounts and account_id not in accounts:
             continue
         if tags:
             found = set()
