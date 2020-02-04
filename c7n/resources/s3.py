@@ -2426,7 +2426,8 @@ class SetInventory(BucketActionBase):
             return
 
         bucket = {
-            'Bucket': "arn:aws:s3:::%s" % destination
+            'Bucket': "arn:aws:s3:::%s" % destination,
+            'Format' = inventory_format
         }
 
         inventory = {
@@ -2441,9 +2442,6 @@ class SetInventory(BucketActionBase):
                 'Frequency': schedule
             }
         }
-
-        if inventory_format:
-            bucket['Format'] = inventory_format
 
         if prefix:
             bucket['Prefix'] = prefix
