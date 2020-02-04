@@ -2,19 +2,19 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "2fb82150-a862-4b2f-8c93-40c4fadca592",
+            "RequestId": "eb1f2296-2c53-4e9a-8b6b-ee2f2d764f47",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "2fb82150-a862-4b2f-8c93-40c4fadca592",
+                "x-amzn-requestid": "eb1f2296-2c53-4e9a-8b6b-ee2f2d764f47",
                 "content-type": "application/json",
-                "content-length": "57",
-                "date": "Sun, 02 Feb 2020 19:55:35 GMT"
+                "content-length": "58",
+                "date": "Tue, 04 Feb 2020 18:26:12 GMT"
             },
             "RetryAttempts": 0
         },
         "LifecyclePolicies": [
             {
-                "TransitionToIA": "AFTER_7_DAYS"
+                "TransitionToIA": "AFTER_14_DAYS"
             }
         ]
     }

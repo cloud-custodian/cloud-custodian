@@ -209,27 +209,30 @@ class LifecyclePolicy(Filter):
                 resource: efs
                 filters:
                   - type: lifecycle-policy
-                    state: true
+                    state: present
+                    value: AFTER_7_DAYS
 
     """
     schema = type_schema(
         'lifecycle-policy',
-        state={'type': 'boolean'},
-        required=['state'])
+        state={'enum': ['present', 'absent']},
+        value={'type': 'string'},
+        required=['state', 'value'])
 
     permissions = ('elasticfilesystem:DescribeLifecycleConfiguration',)
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('efs')
         results = []
+        config = {'TransitionToIA': self.data.get('value')}
         for r in resources:
             try:
-                response = client.describe_lifecycle_configuration(
-                    FileSystemId=r['FileSystemId'])
+                lfc = client.describe_lifecycle_configuration(
+                    FileSystemId=r['FileSystemId']).get('LifecyclePolicies')
             except client.exceptions.FileSystemNotFound:
                 continue
-            if self.data.get('state') and response.get('LifecyclePolicies'):
+            if self.data.get('state') == 'present' and (config in lfc):
                 results.append(r)
-            elif (self.data.get('state') is False) and (response.get('LifecyclePolicies') == []):
+            elif self.data.get('state') == 'absent' and (config not in lfc):
                 results.append(r)
         return results

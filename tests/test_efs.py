@@ -191,30 +191,32 @@ class ElasticFileSystem(BaseTest):
             }
         )
 
-    def test_filter_lifecycle_policy_enabled(self):
-        factory = self.replay_flight_data("test_filter_lifecycle_policy_enabled")
+    def test_filter_lifecycle_policy_present(self):
+        factory = self.replay_flight_data("test_filter_lifecycle_policy_present")
         p = self.load_policy(
             {
                 "name": "efs-lifecycle-policy-enabled",
                 "resource": "efs",
-                "filters": [{"type": "lifecycle-policy", "state": True}],
+                "filters": [{"type": "lifecycle-policy",
+                            "state": "present", "value": "AFTER_7_DAYS"}],
             },
             session_factory=factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["FileSystemId"], "fs-a666ae26")
+        self.assertEqual(resources[0]["FileSystemId"], "fs-fef0277e")
 
-    def test_filter_lifecycle_policy_disabled(self):
-        factory = self.replay_flight_data("test_filter_lifecycle_policy_disabled")
+    def test_filter_lifecycle_policy_absent(self):
+        factory = self.replay_flight_data("test_filter_lifecycle_policy_absent")
         p = self.load_policy(
             {
                 "name": "efs-lifecycle-policy-disabled",
                 "resource": "efs",
-                "filters": [{"type": "lifecycle-policy", "state": False}],
+                "filters": [{"type": "lifecycle-policy",
+                            "state": "absent", "value": "AFTER_7_DAYS"}],
             },
             session_factory=factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["FileSystemId"], "fs-c13df541")
+        self.assertEqual(resources[0]["FileSystemId"], "fs-28f027a8")

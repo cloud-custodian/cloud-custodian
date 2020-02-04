@@ -2,55 +2,29 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "74efd849-8e73-4add-a86c-22e65532988a",
+            "RequestId": "0f744a82-5fec-4afa-9eb2-29a4088300bd",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "74efd849-8e73-4add-a86c-22e65532988a",
+                "x-amzn-requestid": "0f744a82-5fec-4afa-9eb2-29a4088300bd",
                 "content-type": "application/json",
-                "content-length": "938",
-                "date": "Sun, 02 Feb 2020 19:56:08 GMT"
+                "content-length": "947",
+                "date": "Tue, 04 Feb 2020 18:26:12 GMT"
             },
             "RetryAttempts": 0
         },
         "FileSystems": [
             {
                 "OwnerId": "644160558196",
-                "CreationToken": "console-beffed71-ea8e-4ae2-998c-edc4ed201afb",
-                "FileSystemId": "fs-a666ae26",
+                "CreationToken": "console-11213257-7503-44c6-8537-651c92cab13e",
+                "FileSystemId": "fs-28f027a8",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 2,
-                    "day": 2,
-                    "hour": 14,
-                    "minute": 40,
-                    "second": 31,
-                    "microsecond": 0
-                },
-                "LifeCycleState": "available",
-                "NumberOfMountTargets": 1,
-                "SizeInBytes": {
-                    "Value": 6144,
-                    "ValueInIA": 0,
-                    "ValueInStandard": 6144
-                },
-                "PerformanceMode": "generalPurpose",
-                "Encrypted": false,
-                "ThroughputMode": "bursting",
-                "Tags": []
-            },
-            {
-                "OwnerId": "644160558196",
-                "CreationToken": "console-6e223c9a-73a0-4a63-87ff-964c612aef82",
-                "FileSystemId": "fs-c13df541",
-                "CreationTime": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 2,
-                    "day": 2,
+                    "day": 4,
                     "hour": 12,
-                    "minute": 23,
-                    "second": 41,
+                    "minute": 7,
+                    "second": 51,
                     "microsecond": 0
                 },
                 "LifeCycleState": "available",
@@ -61,10 +35,46 @@
                         "__class__": "datetime",
                         "year": 2020,
                         "month": 2,
-                        "day": 2,
-                        "hour": 14,
-                        "minute": 41,
+                        "day": 4,
+                        "hour": 13,
+                        "minute": 23,
                         "second": 17,
+                        "microsecond": 0
+                    },
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": false,
+                "ThroughputMode": "bursting",
+                "Tags": []
+            },
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "console-24b7fde1-4408-4960-9f2c-604d179d5186",
+                "FileSystemId": "fs-fef0277e",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 2,
+                    "day": 4,
+                    "hour": 12,
+                    "minute": 7,
+                    "second": 29,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "NumberOfMountTargets": 1,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "Timestamp": {
+                        "__class__": "datetime",
+                        "year": 2020,
+                        "month": 2,
+                        "day": 4,
+                        "hour": 13,
+                        "minute": 24,
+                        "second": 22,
                         "microsecond": 0
                     },
                     "ValueInIA": 0,
