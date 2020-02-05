@@ -2,45 +2,35 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "0f744a82-5fec-4afa-9eb2-29a4088300bd",
+            "RequestId": "a971c0a1-b12f-4330-866d-68ef28770e55",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "0f744a82-5fec-4afa-9eb2-29a4088300bd",
+                "x-amzn-requestid": "a971c0a1-b12f-4330-866d-68ef28770e55",
                 "content-type": "application/json",
-                "content-length": "947",
-                "date": "Tue, 04 Feb 2020 18:26:12 GMT"
+                "content-length": "938",
+                "date": "Wed, 05 Feb 2020 20:10:05 GMT"
             },
             "RetryAttempts": 0
         },
         "FileSystems": [
             {
                 "OwnerId": "644160558196",
-                "CreationToken": "console-11213257-7503-44c6-8537-651c92cab13e",
-                "FileSystemId": "fs-28f027a8",
+                "CreationToken": "console-b17cf1c7-2e1e-4fdf-835f-4a1edb6ac0a6",
+                "FileSystemId": "fs-a4cc1c24",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 2,
-                    "day": 4,
-                    "hour": 12,
-                    "minute": 7,
-                    "second": 51,
+                    "day": 5,
+                    "hour": 14,
+                    "minute": 54,
+                    "second": 29,
                     "microsecond": 0
                 },
                 "LifeCycleState": "available",
                 "NumberOfMountTargets": 1,
                 "SizeInBytes": {
                     "Value": 6144,
-                    "Timestamp": {
-                        "__class__": "datetime",
-                        "year": 2020,
-                        "month": 2,
-                        "day": 4,
-                        "hour": 13,
-                        "minute": 23,
-                        "second": 17,
-                        "microsecond": 0
-                    },
                     "ValueInIA": 0,
                     "ValueInStandard": 6144
                 },
@@ -51,16 +41,16 @@
             },
             {
                 "OwnerId": "644160558196",
-                "CreationToken": "console-24b7fde1-4408-4960-9f2c-604d179d5186",
-                "FileSystemId": "fs-fef0277e",
+                "CreationToken": "console-12733db8-6523-4439-87a3-8b9a00a5e028",
+                "FileSystemId": "fs-5f61b0df",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 2,
-                    "day": 4,
-                    "hour": 12,
-                    "minute": 7,
-                    "second": 29,
+                    "day": 5,
+                    "hour": 11,
+                    "minute": 8,
+                    "second": 14,
                     "microsecond": 0
                 },
                 "LifeCycleState": "available",
@@ -71,10 +61,10 @@
                         "__class__": "datetime",
                         "year": 2020,
                         "month": 2,
-                        "day": 4,
-                        "hour": 13,
-                        "minute": 24,
-                        "second": 22,
+                        "day": 5,
+                        "hour": 14,
+                        "minute": 55,
+                        "second": 29,
                         "microsecond": 0
                     },
                     "ValueInIA": 0,
