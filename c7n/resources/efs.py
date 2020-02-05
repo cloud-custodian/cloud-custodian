@@ -223,7 +223,6 @@ class LifecyclePolicy(Filter):
 
     def process(self, resources, event=None):
         resources = self.lfc_evaluation(resources)
-        config = {'TransitionToIA': self.data.get('value')}
         if self.data.get('value'):
             config = {'TransitionToIA': self.data.get('value')}
             if self.data.get('state') == 'present':
