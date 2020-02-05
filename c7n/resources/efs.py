@@ -217,22 +217,30 @@ class LifecyclePolicy(Filter):
         'lifecycle-policy',
         state={'enum': ['present', 'absent']},
         value={'type': 'string'},
-        required=['state', 'value'])
+        required=['state'])
 
     permissions = ('elasticfilesystem:DescribeLifecycleConfiguration',)
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('efs')
-        results = []
+        resources = self.lfc_evaluation(resources)
         config = {'TransitionToIA': self.data.get('value')}
+        if self.data.get('value'):
+            config = {'TransitionToIA': self.data.get('value')}
+            if self.data.get('state') == 'present':
+                return [r for r in resources if config in r.get('LifecyclePolicies')]
+            return [r for r in resources if config not in r.get('LifecyclePolicies')]
+        else:
+            if self.data.get('state') == 'present':
+                return [r for r in resources if r.get('LifecyclePolicies')]
+            return [r for r in resources if r.get('LifecyclePolicies') == []]
+
+    def lfc_evaluation(self, resources):
+        client = local_session(self.manager.session_factory).client('efs')
         for r in resources:
             try:
                 lfc = client.describe_lifecycle_configuration(
                     FileSystemId=r['FileSystemId']).get('LifecyclePolicies')
+                r['LifecyclePolicies'] = lfc
             except client.exceptions.FileSystemNotFound:
                 continue
-            if self.data.get('state') == 'present' and (config in lfc):
-                results.append(r)
-            elif self.data.get('state') == 'absent' and (config not in lfc):
-                results.append(r)
-        return results
+        return resources
