@@ -2488,7 +2488,9 @@ class SetInventory(BucketActionBase):
         format={'enum': ['CSV', 'ORC', 'Parquet']},
         fields={'type': 'array', 'items': {'enum': [
             'Size', 'LastModifiedDate', 'StorageClass', 'ETag',
-            'IsMultipartUploaded', 'ReplicationStatus', 'EncryptionStatus']}})
+            'IsMultipartUploaded', 'ReplicationStatus', 'EncryptionStatus',
+            'ObjectLockRetainUntilDate', 'ObjectLockMode', 'ObjectLockLegalHoldStatus',
+            'IntelligentTieringAccessTier']}})
 
     permissions = ('s3:PutInventoryConfiguration', 's3:GetInventoryConfiguration')
 
