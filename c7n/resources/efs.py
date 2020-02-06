@@ -222,24 +222,24 @@ class LifecyclePolicy(Filter):
     permissions = ('elasticfilesystem:DescribeLifecycleConfiguration',)
 
     def process(self, resources, event=None):
-        resources = self.lfc_evaluation(resources)
+        resources = self.fetch_resources_lfc(resources)
         if self.data.get('value'):
             config = {'TransitionToIA': self.data.get('value')}
             if self.data.get('state') == 'present':
-                return [r for r in resources if config in r.get('LifecyclePolicies')]
-            return [r for r in resources if config not in r.get('LifecyclePolicies')]
+                return [r for r in resources if config in r.get('c7n:LifecyclePolicies')]
+            return [r for r in resources if config not in r.get('c7n:LifecyclePolicies')]
         else:
             if self.data.get('state') == 'present':
-                return [r for r in resources if r.get('LifecyclePolicies')]
-            return [r for r in resources if r.get('LifecyclePolicies') == []]
+                return [r for r in resources if r.get('c7n:LifecyclePolicies')]
+            return [r for r in resources if r.get('c7n:LifecyclePolicies') == []]
 
-    def lfc_evaluation(self, resources):
+    def fetch_resources_lfc(self, resources):
         client = local_session(self.manager.session_factory).client('efs')
         for r in resources:
             try:
                 lfc = client.describe_lifecycle_configuration(
                     FileSystemId=r['FileSystemId']).get('LifecyclePolicies')
-                r['LifecyclePolicies'] = lfc
+                r['c7n:LifecyclePolicies'] = lfc
             except client.exceptions.FileSystemNotFound:
                 continue
         return resources
