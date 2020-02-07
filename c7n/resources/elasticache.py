@@ -468,6 +468,6 @@ class ElastiCacheReplicationGroup(QueryResourceManager):
         enum_spec = ('describe_replication_groups',
                      'ReplicationGroups[]', None)
         arn_type = 'replicationgroup'
-        id = Name = dimension = 'ReplicationGroupId'
+        id = name = dimension = 'ReplicationGroupId'
 
     permissions = ('elasticache:DescribeReplicationGroups',)
