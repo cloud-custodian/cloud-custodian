@@ -190,3 +190,48 @@ class ElasticFileSystem(BaseTest):
                 "actions": [{"type": "configure-lifecycle-policy", "state": "enable"}],
             }
         )
+
+    def test_filter_lifecycle_policy_present(self):
+        factory = self.replay_flight_data("test_filter_lifecycle_policy_present")
+        p = self.load_policy(
+            {
+                "name": "efs-lifecycle-policy-enabled",
+                "resource": "efs",
+                "filters": [{"type": "lifecycle-policy",
+                            "state": "present"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-5f61b0df")
+
+    def test_filter_lifecycle_policy_absent(self):
+        factory = self.replay_flight_data("test_filter_lifecycle_policy_absent")
+        p = self.load_policy(
+            {
+                "name": "efs-lifecycle-policy-disabled",
+                "resource": "efs",
+                "filters": [{"type": "lifecycle-policy",
+                            "state": "absent"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-a4cc1c24")
+
+    def test_filter_lifecycle_policy_value(self):
+        factory = self.replay_flight_data("test_filter_lifecycle_policy_value")
+        p = self.load_policy(
+            {
+                "name": "efs-lifecycle-policy-enabled",
+                "resource": "efs",
+                "filters": [{"type": "lifecycle-policy",
+                            "state": "present", "value": "AFTER_7_DAYS"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-5f61b0df")

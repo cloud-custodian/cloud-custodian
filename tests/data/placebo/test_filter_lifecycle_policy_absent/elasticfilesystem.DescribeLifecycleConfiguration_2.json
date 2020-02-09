@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "d5470cd5-fddf-4f39-a43f-bcca4a02a5fb",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d5470cd5-fddf-4f39-a43f-bcca4a02a5fb",
+                "content-type": "application/json",
+                "content-length": "57",
+                "date": "Wed, 05 Feb 2020 20:10:26 GMT"
+            },
+            "RetryAttempts": 0
+        },
+        "LifecyclePolicies": [
+            {
+                "TransitionToIA": "AFTER_7_DAYS"
+            }
+        ]
+    }
+}

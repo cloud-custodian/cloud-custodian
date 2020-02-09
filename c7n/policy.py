@@ -954,8 +954,9 @@ class Policy(object):
 
         if 'mode' in self.data:
             if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
-                self.data['mode']['role'] = "arn:aws:iam::%s:role/%s" % \
-                                            (self.options.account_id, self.data['mode']['role'])
+                partition = utils.get_partition(self.options.region)
+                self.data['mode']['role'] = "arn:%s:iam::%s:role/%s" % \
+                    (partition, self.options.account_id, self.data['mode']['role'])
 
         variables.update({
             # standard runtime variables for interpolation
