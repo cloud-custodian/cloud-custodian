@@ -300,7 +300,7 @@ def _package_deps(package, deps=None, ignore=()):
     pdeps = pkgmd.requires(package) or ()
     for r in pdeps:
         # skip optional deps
-        if ';' in r:
+        if ';' in r and 'extra' in r:
             continue
         for idx, c in enumerate(r):
             if not c.isalnum() and c not in ('-', '_', '.'):
@@ -311,8 +311,11 @@ def _package_deps(package, deps=None, ignore=()):
         if pkg_name in ignore:
             continue
         if pkg_name not in deps:
+            try:
+                _package_deps(pkg_name, deps, ignore)
+            except pkgmd.PackageNotFoundError:
+                continue
             deps.append(pkg_name)
-            _package_deps(pkg_name, deps, ignore)
     return deps
 
 
