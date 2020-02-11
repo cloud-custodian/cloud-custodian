@@ -470,3 +470,4 @@ class TestElastiCacheReplicationGroup(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReplicationGroupId'], 'test-c7n-rg')
