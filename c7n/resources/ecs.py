@@ -780,3 +780,81 @@ TaskDefinition.action_registry.register('auto-tag-user', AutoTagUser)
 Service.action_registry.register('auto-tag-user', AutoTagUser)
 Task.action_registry.register('auto-tag-user', AutoTagUser)
 ContainerInstance.action_registry.register('auto-tag-user', AutoTagUser)
+
+
+@ECSCluster.action_registry.register('deregister-container-instances')
+class DeregisterInstances(BaseAction):
+    """Deregister container instances from an ECS Cluster.
+
+    Setting force = True will deregister the instance irrespective of task
+    running on it. Instances will still be running.
+
+    :example:
+
+      .. code-block:: yaml
+        - name: deregister-instances
+          resource: ecs
+          filters:
+            - 'tag:Name': 'c7n'
+          actions:
+            - type: deregister-container-instances
+              force: True
+    """
+    schema = type_schema('deregister-container-instances',
+        force={'type': 'boolean'})
+    permissions = ('ecs:DeregisterInstances',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecs')
+        error = None
+        for r in resources:
+            instance_arns = client.list_container_instances(
+                cluster=r['clusterArn']).get('containerInstanceArns')
+            for inst_arns in instance_arns:
+                try:
+                    client.deregister_container_instance(
+                        cluster=r['clusterArn'], containerInstance=inst_arns, force=self.data.get(
+                            'force', False))
+                except ClientError as e:
+                    error = e
+        if error:
+            raise error
+
+
+@ECSCluster.action_registry.register('delete')
+class DeleteEcsCluster(BaseAction):
+    """Delete an ECS Cluster.
+
+    For example, if you want to automatically delete an ecs cluster.
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: delete-cluster
+          resource: ecs
+          filters:
+            - 'tag:Name': 'c7n'
+          actions:
+            - type: delete
+              force: true
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('ecs:DeleteCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecs')
+        error = None
+        if self.data.get('force', False):
+            dereg_instance = self.manager.action_registry['deregister-container-instances'](
+                {'force': True}, self.manager)
+            dereg_instance.process(resources)
+        for r in resources:
+            try:
+                client.delete_cluster(cluster=r['clusterArn'])
+            except ClientError as e:
+                error = e
+                continue
+        if error:
+            raise error

@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "containerInstanceArns": [
+            "arn:aws:ecs:us-east-1:644160558196:container-instance/test-cluster/f74bae60f9b0430880119be3816ef652"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "7a036dda-f52e-4562-8f89-1d8906189f07",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7a036dda-f52e-4562-8f89-1d8906189f07",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "129",
+                "date": "Tue, 11 Feb 2020 04:27:50 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

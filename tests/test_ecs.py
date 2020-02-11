@@ -411,3 +411,58 @@ class TestEcsContainerInstance(BaseTest):
             "status"
         ]
         self.assertEqual(state, "DRAINING")
+
+
+class TestEcs(BaseTest):
+
+    def test_deregister_container_instances(self):
+        session_factory = self.replay_flight_data("test_deregister_container_instances")
+        client = session_factory().client("ecs")
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 1)
+        p = self.load_policy(
+            {
+                "name": "deregister-instances",
+                "resource": "ecs",
+                "filters": [{"type": "value", "key": "clusterName",
+                            "value": "test-cluster"}],
+                "actions": [
+                    {
+                        "type": "deregister-container-instances",
+                        "force": True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 0)
+
+    def test_delete_cluster(self):
+        session_factory = self.replay_flight_data("test_delete_cluster")
+        client = session_factory().client("ecs")
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('status'), 'ACTIVE')
+        p = self.load_policy(
+            {
+                "name": "deregister-instances",
+                "resource": "ecs",
+                "filters": [{"type": "value", "key": "clusterName",
+                            "value": "test-cluster"}],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "force": True
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(30)
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('status'), 'INACTIVE')

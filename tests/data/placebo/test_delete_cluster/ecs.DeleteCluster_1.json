@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "cluster": {
+            "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+            "clusterName": "test-cluster",
+            "status": "DEPROVISIONING",
+            "registeredContainerInstancesCount": 0,
+            "runningTasksCount": 0,
+            "pendingTasksCount": 0,
+            "activeServicesCount": 0,
+            "statistics": [],
+            "tags": [],
+            "settings": [
+                {
+                    "name": "containerInsights",
+                    "value": "disabled"
+                }
+            ],
+            "capacityProviders": [
+                "FARGATE_SPOT",
+                "FARGATE"
+            ],
+            "defaultCapacityProviderStrategy": [],
+            "attachments": [],
+            "attachmentsStatus": "UPDATE_IN_PROGRESS"
+        },
+        "ResponseMetadata": {
+            "RequestId": "c6e4885a-60d5-43f5-83b8-6e567d466d5b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c6e4885a-60d5-43f5-83b8-6e567d466d5b",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "474",
+                "date": "Tue, 11 Feb 2020 04:27:51 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

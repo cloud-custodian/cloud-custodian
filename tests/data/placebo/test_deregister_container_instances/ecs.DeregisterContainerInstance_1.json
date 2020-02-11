@@ -1,0 +1,297 @@
+{
+    "status_code": 200,
+    "data": {
+        "containerInstance": {
+            "containerInstanceArn": "arn:aws:ecs:us-east-1:644160558196:container-instance/test-cluster/4a9b18714edf46008170667648194c70",
+            "ec2InstanceId": "i-0211464708b254056",
+            "version": 4,
+            "versionInfo": {
+                "agentVersion": "1.31.0",
+                "agentHash": "9715741e",
+                "dockerVersion": "DockerVersion: 18.06.1-ce"
+            },
+            "remainingResources": [
+                {
+                    "name": "CPU",
+                    "type": "INTEGER",
+                    "doubleValue": 0.0,
+                    "longValue": 0,
+                    "integerValue": 1024
+                },
+                {
+                    "name": "MEMORY",
+                    "type": "INTEGER",
+                    "doubleValue": 0.0,
+                    "longValue": 0,
+                    "integerValue": 983
+                },
+                {
+                    "name": "PORTS",
+                    "type": "STRINGSET",
+                    "doubleValue": 0.0,
+                    "longValue": 0,
+                    "integerValue": 0,
+                    "stringSetValue": [
+                        "22",
+                        "2376",
+                        "2375",
+                        "51678",
+                        "51679"
+                    ]
+                },
+                {
+                    "name": "PORTS_UDP",
+                    "type": "STRINGSET",
+                    "doubleValue": 0.0,
+                    "longValue": 0,
+                    "integerValue": 0,
+                    "stringSetValue": []
+                }
+            ],
+            "registeredResources": [
+                {
+                    "name": "CPU",
+                    "type": "INTEGER",
+                    "doubleValue": 0.0,
+                    "longValue": 0,
+                    "integerValue": 1024
+                },
+                {
+                    "name": "MEMORY",
+                    "type": "INTEGER",
+                    "doubleValue": 0.0,
+                    "longValue": 0,
+                    "integerValue": 983
+                },
+                {
+                    "name": "PORTS",
+                    "type": "STRINGSET",
+                    "doubleValue": 0.0,
+                    "longValue": 0,
+                    "integerValue": 0,
+                    "stringSetValue": [
+                        "22",
+                        "2376",
+                        "2375",
+                        "51678",
+                        "51679"
+                    ]
+                },
+                {
+                    "name": "PORTS_UDP",
+                    "type": "STRINGSET",
+                    "doubleValue": 0.0,
+                    "longValue": 0,
+                    "integerValue": 0,
+                    "stringSetValue": []
+                }
+            ],
+            "status": "INACTIVE",
+            "agentConnected": true,
+            "runningTasksCount": 0,
+            "pendingTasksCount": 0,
+            "attributes": [
+                {
+                    "name": "ecs.capability.secrets.asm.environment-variables"
+                },
+                {
+                    "name": "ecs.capability.branch-cni-plugin-version",
+                    "value": "cc99efdd-"
+                },
+                {
+                    "name": "ecs.ami-id",
+                    "value": "ami-0efc825d3882f058d"
+                },
+                {
+                    "name": "ecs.capability.secrets.asm.bootstrap.log-driver"
+                },
+                {
+                    "name": "ecs.capability.task-eia.optimized-cpu"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.none"
+                },
+                {
+                    "name": "ecs.capability.ecr-endpoint"
+                },
+                {
+                    "name": "ecs.capability.docker-plugin.local"
+                },
+                {
+                    "name": "ecs.capability.task-cpu-mem-limit"
+                },
+                {
+                    "name": "ecs.capability.secrets.ssm.bootstrap.log-driver"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.30"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.31"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.32"
+                },
+                {
+                    "name": "ecs.capability.firelens.options.config.file"
+                },
+                {
+                    "name": "ecs.availability-zone",
+                    "value": "us-east-1e"
+                },
+                {
+                    "name": "ecs.capability.aws-appmesh"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.24"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.25"
+                },
+                {
+                    "name": "ecs.capability.task-eni-trunking"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.26"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.27"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.privileged-container"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.28"
+                },
+                {
+                    "name": "ecs.cpu-architecture",
+                    "value": "x86_64"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.ecr-auth"
+                },
+                {
+                    "name": "ecs.capability.firelens.fluentbit"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.20"
+                },
+                {
+                    "name": "ecs.os-type",
+                    "value": "linux"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.22"
+                },
+                {
+                    "name": "ecs.capability.private-registry-authentication.secretsmanager"
+                },
+                {
+                    "name": "ecs.capability.task-eia"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.23"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.syslog"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.awsfirelens"
+                },
+                {
+                    "name": "ecs.capability.firelens.options.config.s3"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.logging-driver.json-file"
+                },
+                {
+                    "name": "ecs.capability.execution-role-awslogs"
+                },
+                {
+                    "name": "ecs.vpc-id",
+                    "value": "vpc-d2d616b5"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+                },
+                {
+                    "name": "ecs.capability.task-eni"
+                },
+                {
+                    "name": "ecs.capability.firelens.fluentd"
+                },
+                {
+                    "name": "ecs.capability.execution-role-ecr-pull"
+                },
+                {
+                    "name": "ecs.capability.container-health-check"
+                },
+                {
+                    "name": "ecs.subnet-id",
+                    "value": "subnet-e3b194de"
+                },
+                {
+                    "name": "ecs.instance-type",
+                    "value": "t2.micro"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.task-iam-role-network-host"
+                },
+                {
+                    "name": "ecs.capability.container-ordering"
+                },
+                {
+                    "name": "ecs.capability.cni-plugin-version",
+                    "value": "91ccefc8-2019.06.0"
+                },
+                {
+                    "name": "ecs.capability.secrets.ssm.environment-variables"
+                },
+                {
+                    "name": "ecs.capability.pid-ipc-namespace-sharing"
+                },
+                {
+                    "name": "com.amazonaws.ecs.capability.task-iam-role"
+                }
+            ],
+            "registeredAt": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 2,
+                "day": 10,
+                "hour": 23,
+                "minute": 9,
+                "second": 44,
+                "microsecond": 435000
+            },
+            "attachments": [],
+            "tags": []
+        },
+        "ResponseMetadata": {
+            "RequestId": "3072cb1c-75e6-400b-9d46-36301a805d4c",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3072cb1c-75e6-400b-9d46-36301a805d4c",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "4473",
+                "date": "Tue, 11 Feb 2020 04:10:04 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
