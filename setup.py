@@ -40,9 +40,7 @@ setup(
         "argcomplete",
         "tabulate>=0.8.2",
         "urllib3",
-        "certifi"
-    ],
-    extra_requires={
-        ":python_version<'3.3'": ["backports.functools-lru-cache"]
-    }
+        "certifi",
+        "backports.functools-lru-cache;python_version<'3.3'"
+    ]
 )
