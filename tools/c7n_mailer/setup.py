@@ -32,13 +32,6 @@ requires = [
     "redis"]
 
 
-try:
-    from concurrent import futures  # noqa F401
-except ImportError:
-    # The backport has SyntaxErrors under py36, so avoid installing it.
-    # https://github.com/agronholm/pythonfutures/issues/41
-    requires += ['futures']
-
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
 readme = path.join(this_directory, 'README.md')
@@ -60,6 +53,7 @@ setup(
     url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
+    python_requires=">=3.6",
     entry_points={
         'console_scripts': [
             'c7n-mailer = c7n_mailer.cli:main',

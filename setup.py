@@ -1,10 +1,5 @@
-import os
-from io import open
+from pathlib import Path
 from setuptools import setup, find_packages
-
-
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname), encoding='utf-8').read()
 
 
 setup(
@@ -12,13 +7,12 @@ setup(
     use_scm_version={'write_to': 'c7n/version.py', 'fallback_version': '0.9.0dev'},
     setup_requires=['setuptools_scm'],
     description="Cloud Custodian - Policy Rules Engine",
-    long_description=read('README.md'),
+    long_description=Path('README.md').read_text(),
     long_description_content_type='text/markdown',
     classifiers=[
         'Topic :: System :: Systems Administration',
         'Topic :: System :: Distributed Computing',
         'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
@@ -26,7 +20,7 @@ setup(
     url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
-    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3, !=3.4, !=3.5, <4'",
+    python_requires=">=3.6, <4",
     entry_points={
         'console_scripts': [
             'custodian = c7n.cli:main']},
@@ -42,7 +36,4 @@ setup(
         "urllib3",
         "certifi"
     ],
-    extra_requires={
-        ":python_version<'3.3'": ["backports.functools-lru-cache"]
-    }
 )

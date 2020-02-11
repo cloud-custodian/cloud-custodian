@@ -15,7 +15,6 @@
 from io import open
 from os import path
 from setuptools import setup, find_packages
-import sys
 
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
@@ -24,10 +23,6 @@ long_description = ''
 if path.exists(readme):
     with open(readme, encoding='utf-8') as f:
         long_description = f.read()
-
-# azure-functions are required if running in Azure Functions
-# mode which is not supported for Python 2.7
-extra_dependencies = ["azure-functions"] if sys.version_info[0] >= 3 else []
 
 setup(
     name="c7n_azure",
@@ -42,11 +37,13 @@ setup(
     url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
+    python_requires=">=3",
     entry_points={
         "custodian.resources": [
             'azure = c7n_azure.entry:initialize_azure']
     },
-    install_requires=["azure-mgmt-authorization",
+    install_requires=["azure-functions",
+                      "azure-mgmt-authorization",
                       "azure-mgmt-apimanagement",
                       "azure-mgmt-applicationinsights",
                       "azure-mgmt-batch",
@@ -101,9 +98,7 @@ setup(
                       "c7n>=0.8.45.1",
                       "azure-cli-core",
                       "adal",
-                      "backports.functools_lru_cache",
-                      "futures>=3.1.1",
-                      "netaddr"] + extra_dependencies,
+                      "netaddr"],
     package_data={str(''): [str('function_binding_resources/bin/*.dll'),
                             str('function_binding_resources/*.csproj'),
                             str('function_binding_resources/bin/*.json')]}
