@@ -4,7 +4,9 @@ from setuptools import setup, find_packages
 
 
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname), encoding='utf-8').read()
+    with open(os.path.join(os.path.dirname(__file__), fname), encoding='utf-8') as f:
+        rtn = f.read()
+    return rtn
 
 
 setup(
