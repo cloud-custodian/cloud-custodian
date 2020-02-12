@@ -99,7 +99,7 @@ setup(
                       "requests",
                       "PyJWT",
                       "c7n>=0.8.45.1",
-                      "azure-cli-core",
+                      "azure-cli-core<2",
                       "adal",
                       "backports.functools_lru_cache",
                       "futures>=3.1.1",
