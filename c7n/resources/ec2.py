@@ -537,7 +537,7 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
     valid_origin_states = ('running',)
 
     def process(self, resources, event=None):
-        if self.data.get('disable-state-filter', True):
+        if self.data.get('disable-state-filter', False):
             return super(InstanceOffHour, self).process(resources)
         else:
             return super(InstanceOffHour, self).process(
@@ -618,7 +618,7 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
     valid_origin_states = ('stopped',)
 
     def process(self, resources, event=None):
-        if self.data.get('disable-state-filter', True):
+        if self.data.get('disable-state-filter', False):
             return super(InstanceOnHour, self).process(resources)
         else:
             return super(InstanceOnHour, self).process(
