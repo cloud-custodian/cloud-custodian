@@ -465,7 +465,8 @@ class SecurityGroup(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'security-group'
         enum_spec = ('describe_security_groups', 'SecurityGroups', None)
-        name = id = 'GroupId'
+        id = 'GroupId'
+        name = 'GroupName'
         filter_name = "GroupIds"
         filter_type = 'list'
         config_type = "AWS::EC2::SecurityGroup"
