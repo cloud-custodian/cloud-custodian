@@ -486,7 +486,7 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
     can be taken from a specified url.
 
     Note: You can disable filtering of only running instances by setting
-    `disable-state-filter: true`
+    `state-filter: false`
 
     :Example:
 
@@ -531,17 +531,17 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
 
     schema = type_schema(
         'offhour', rinherit=OffHour.schema,
-        **{'disable-state-filter': {'type': 'boolean'}})
+        **{'state-filter': {'type': 'boolean'}})
     schema_alias = False
 
     valid_origin_states = ('running',)
 
     def process(self, resources, event=None):
-        if self.data.get('disable-state-filter', False):
-            return super(InstanceOffHour, self).process(resources)
-        else:
+        if self.data.get('state-filter', True):
             return super(InstanceOffHour, self).process(
                 self.filter_instance_state(resources))
+        else:
+            return super(InstanceOffHour, self).process(resources)
 
 
 @filters.register('network-location')
@@ -567,7 +567,7 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
     can be taken from a specified url.
 
     Note: You can disable filtering of only stopped instances by setting
-    `disable-state-filter: true`
+    `state-filter: false`
 
     :Example:
 
@@ -612,17 +612,17 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
 
     schema = type_schema(
         'onhour', rinherit=OnHour.schema,
-        **{'disable-state-filter': {'type': 'boolean'}})
+        **{'state-filter': {'type': 'boolean'}})
     schema_alias = False
 
     valid_origin_states = ('stopped',)
 
     def process(self, resources, event=None):
-        if self.data.get('disable-state-filter', False):
-            return super(InstanceOnHour, self).process(resources)
-        else:
+        if self.data.get('state-filter', True):
             return super(InstanceOnHour, self).process(
                 self.filter_instance_state(resources))
+        else:
+            return super(InstanceOnHour, self).process(resources)
 
 
 @filters.register('ephemeral')
