@@ -50,6 +50,7 @@ def should_load_provider(name, provider_types):
         return True
     return False
 
+
 def load_available():
     """Load available installed providers
 
