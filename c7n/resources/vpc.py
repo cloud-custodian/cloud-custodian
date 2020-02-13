@@ -458,6 +458,12 @@ class Subnet(query.QueryResourceManager):
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
 
 
+@Subnet.filter_registry.register('vpc')
+class SubnetVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 @resources.register('security-group')
 class SecurityGroup(query.QueryResourceManager):
 
@@ -1467,6 +1473,12 @@ class RouteTable(query.QueryResourceManager):
         filter_name = 'RouteTableIds'
         filter_type = 'list'
         id_prefix = "rtb-"
+
+
+@RouteTable.filter_registry.register('vpc')
+class RouteTableVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
 
 
 @RouteTable.filter_registry.register('subnet')
