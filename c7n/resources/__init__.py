@@ -61,7 +61,7 @@ def load_available():
     for provider in ('aws', 'azure', 'gcp', 'k8s'):
         try:
             load_providers((provider,))
-        except ImportError as e:
+        except ImportError as e: # pragma: no cover
             continue
         else:
             found.append(provider)
