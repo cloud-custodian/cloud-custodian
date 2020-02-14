@@ -428,7 +428,7 @@ class TestEcs(BaseTest):
                             "value": "test-cluster"}],
                 "actions": [
                     {
-                        "type": "deregister-container-instances",
+                        "type": "deregister-instances",
                         "force": True
                     }
                 ]

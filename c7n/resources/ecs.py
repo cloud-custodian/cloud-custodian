@@ -782,7 +782,7 @@ Task.action_registry.register('auto-tag-user', AutoTagUser)
 ContainerInstance.action_registry.register('auto-tag-user', AutoTagUser)
 
 
-@ECSCluster.action_registry.register('deregister-container-instances')
+@ECSCluster.action_registry.register('deregister-instances')
 class DeregisterInstances(BaseAction):
     """Deregister container instances from an ECS Cluster.
 
@@ -797,10 +797,11 @@ class DeregisterInstances(BaseAction):
           filters:
             - 'tag:Name': 'c7n'
           actions:
-            - type: deregister-container-instances
+            - type: deregister-instances
               force: True
+
     """
-    schema = type_schema('deregister-container-instances',
+    schema = type_schema('deregister-instances',
         force={'type': 'boolean'})
     permissions = ('ecs:DeregisterInstances',)
 
@@ -815,6 +816,8 @@ class DeregisterInstances(BaseAction):
                     client.deregister_container_instance(
                         cluster=r['clusterArn'], containerInstance=inst_arns, force=self.data.get(
                             'force', False))
+                except client.exceptions.ClusterNotFoundException:
+                    continue
                 except ClientError as e:
                     error = e
         if error:
@@ -838,6 +841,7 @@ class DeleteEcsCluster(BaseAction):
           actions:
             - type: delete
               force: true
+
     """
 
     schema = type_schema('delete', force={'type': 'boolean'})
@@ -847,12 +851,14 @@ class DeleteEcsCluster(BaseAction):
         client = local_session(self.manager.session_factory).client('ecs')
         error = None
         if self.data.get('force', False):
-            dereg_instance = self.manager.action_registry['deregister-container-instances'](
+            dereg_instance = self.manager.action_registry['deregister-instances'](
                 {'force': True}, self.manager)
             dereg_instance.process(resources)
         for r in resources:
             try:
                 client.delete_cluster(cluster=r['clusterArn'])
+            except client.exceptions.ClusterNotFoundException:
+                continue
             except ClientError as e:
                 error = e
                 continue
