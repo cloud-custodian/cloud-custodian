@@ -1198,10 +1198,25 @@ class Stop(BaseAction, StateTransitionFilter):
               - instance-state-name: running
             actions:
               - stop
+
+          - name: ec2-hibernate-instances
+            resources: ec2
+            query:
+              - instance-state-name: running
+            actions:
+              - type: stop
+                hibernate: true
     """
     valid_origin_states = ('running',)
 
-    schema = type_schema('stop', **{'terminate-ephemeral': {'type': 'boolean'}})
+    schema = type_schema(
+        'stop',
+        **{'terminate-ephemeral': {'type': 'boolean'},
+           'hibernate': {'type': 'boolean'}})
+
+    has_hibernate = ValueFilter({
+        'key': 'HibernationOptions.Configured',
+        'value': True}).validate()
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
@@ -1219,6 +1234,16 @@ class Stop(BaseAction, StateTransitionFilter):
                 persistent.append(i)
         return ephemeral, persistent
 
+    def split_on_hibernate(self, instances):
+        enabled = []
+        disabled = []
+        for i in instances:
+            if self.has_hibernate(i):
+                enabled.append(i)
+            else:
+                disabled.append(i)
+        return enabled, disabled
+
     def process(self, instances):
         instances = self.filter_instance_state(instances)
         if not len(instances):
@@ -1232,15 +1257,25 @@ class Stop(BaseAction, StateTransitionFilter):
                 client.terminate_instances,
                 [i['InstanceId'] for i in ephemeral])
         if persistent:
-            self._run_instances_op(
-                client.stop_instances,
-                [i['InstanceId'] for i in persistent])
+            if self.data.get('hibernate', False):
+                enabled, disabled = self.split_on_hibernate(instances)
+                self._run_instances_op(
+                    client.stop_instances,
+                    [i['InstanceId'] for i in enabled],
+                    Hibernate=True)
+                self._run_instances_op(
+                    client.stop_instances,
+                    [i['InstanceId'] for i in disabled])
+            else:
+                self._run_instances_op(
+                    client.stop_instances,
+                    [i['InstanceId'] for i in persistent])
         return instances
 
-    def _run_instances_op(self, op, instance_ids):
+    def _run_instances_op(self, op, instance_ids, **kwargs):
         while instance_ids:
             try:
-                return self.manager.retry(op, InstanceIds=instance_ids)
+                return self.manager.retry(op, InstanceIds=instance_ids, **kwargs)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     instance_ids.remove(extract_instance_id(e))
