@@ -792,18 +792,21 @@ class DeregisterInstances(BaseAction):
     :example:
 
       .. code-block:: yaml
-        - name: deregister-instances
-          resource: ecs
-          filters:
-            - 'tag:Name': 'c7n'
-          actions:
-            - type: deregister-instances
-              force: True
+
+            policies:
+              - name: deregister-instances
+                resource: ecs
+                filters:
+                    - 'tag:Name': 'c7n'
+                actions:
+                    - type: deregister-instances
+                      force: True
 
     """
+
     schema = type_schema('deregister-instances',
         force={'type': 'boolean'})
-    permissions = ('ecs:DeregisterInstances',)
+    permissions = ('ecs:DeregisterContainerInstance',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
@@ -828,19 +831,18 @@ class DeregisterInstances(BaseAction):
 class DeleteEcsCluster(BaseAction):
     """Delete an ECS Cluster.
 
-    For example, if you want to automatically delete an ecs cluster.
-
     :example:
 
       .. code-block:: yaml
 
-        - name: delete-cluster
-          resource: ecs
-          filters:
-            - 'tag:Name': 'c7n'
-          actions:
-            - type: delete
-              force: true
+            policies:
+              - name: ecs-delete-cluster
+                resource: efs
+                filters:
+                    - 'tag:Name': 'c7n'
+                actions:
+                    - type: delete
+                      force: True
 
     """
 
