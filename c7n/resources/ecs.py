@@ -837,7 +837,7 @@ class DeleteEcsCluster(BaseAction):
 
             policies:
               - name: ecs-delete-cluster
-                resource: efs
+                resource: ecs
                 filters:
                     - 'tag:Name': 'c7n'
                 actions:
