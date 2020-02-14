@@ -886,6 +886,7 @@ class TestStop(BaseTest):
         self.assertEqual(len(stopped), 1)
         self.assertEqual(len(hibernated), 1)
 
+
 class TestReboot(BaseTest):
 
     def test_ec2_reboot(self):
