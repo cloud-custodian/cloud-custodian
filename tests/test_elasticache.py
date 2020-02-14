@@ -471,21 +471,3 @@ class TestElastiCacheReplicationGroup(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['ReplicationGroupId'], 'test-c7n-rg')
-
-    def test_elasticache_replication_group_encryption(self):
-        session_factory = self.replay_flight_data("test_elasticache_replication_group_encryption")
-        p = self.load_policy(
-            {
-                "name": "elasticache-rg",
-                "resource": "replication-group",
-                "filters": [{
-                    "type": "value",
-                    "key": "AtRestEncryptionEnabled",
-                    "value": False
-                }],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['ReplicationGroupId'], 'test-c7n-rg')
