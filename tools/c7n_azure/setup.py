@@ -71,10 +71,6 @@ setup(
                       "azure-mgmt-network>=4.0.0",
                       "azure-mgmt-redis",
                       "azure-mgmt-resourcegraph",
-                      # Indirect depencency from azure-cli-core. Since azure-cli-core
-                      # pins azure-mgmt-resource, this would need to match to prevent
-                      # a version conflict.
-                      # "azure-mgmt-resource",
                       "azure-mgmt-rdbms",
                       "azure-mgmt-search",
                       "azure-mgmt-sql",
