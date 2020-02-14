@@ -34,7 +34,7 @@ from c7n.schema import ElementSchema, StructureParser, generate
 from c7n.utils import dumps, load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
 from c7n import provider
-from c7n.resources import load_resources
+from c7n.resources import load_resources, load_available
 
 
 log = logging.getLogger('custodian.commands')
@@ -348,7 +348,7 @@ def schema_completer(prefix):
     filtering via startswith happens after this list is returned.
     """
     from c7n import schema
-    load_resources()
+    load_available()
     components = prefix.split('.')
 
     if components[0] in provider.clouds.keys():
@@ -394,7 +394,7 @@ def schema_cmd(options):
         schema.json_dump(options.resource)
         return
 
-    load_resources()
+    load_available()
 
     resource_mapping = schema.resource_vocabulary()
     if options.summary:
