@@ -124,22 +124,6 @@
                         },
                         "Tags": [
                             {
-                                "Key": "Creator",
-                                "Value": "tstansell"
-                            },
-                            {
-                                "Key": "c7n_test",
-                                "Value": "yes"
-                            },
-                            {
-                                "Key": "Service",
-                                "Value": "saws-prototype"
-                            },
-                            {
-                                "Key": "AccountingCategory",
-                                "Value": "Engineering"
-                            },
-                            {
                                 "Key": "Testing",
                                 "Value": "yes"
                             }
@@ -288,20 +272,8 @@
                         },
                         "Tags": [
                             {
-                                "Key": "Creator",
-                                "Value": "tstansell"
-                            },
-                            {
-                                "Key": "Service",
-                                "Value": "saws-prototype"
-                            },
-                            {
                                 "Key": "Testing",
                                 "Value": "yes"
-                            },
-                            {
-                                "Key": "AccountingCategory",
-                                "Value": "Engineering"
                             }
                         ],
                         "VirtualizationType": "hvm",
