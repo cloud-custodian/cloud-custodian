@@ -26,6 +26,9 @@ def load_resources(resource_types=('*',)):
     pmap = {}
     for r in resource_types:
         parts = r.split('.', 1)
+        # support aws.*
+        if parts[-1] == '*':
+            r = '*'
         pmap.setdefault(parts[0], []).append(r)
 
     load_providers(set(pmap))
@@ -46,6 +49,23 @@ def should_load_provider(name, provider_types):
          name in provider_types)):
         return True
     return False
+
+
+def load_available():
+    """Load available installed providers
+
+    Unlike load_resources() this will catch ImportErrors on uninstalled
+    providers.
+    """
+    found = []
+    for provider in ('aws', 'azure', 'gcp', 'k8s'):
+        try:
+            load_providers((provider,))
+        except ImportError as e: # pragma: no cover
+            continue
+        else:
+            found.append(provider)
+    load_resources(['%s.*' % s for s in found])
 
 
 def load_providers(provider_types):

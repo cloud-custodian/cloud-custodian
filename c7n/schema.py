@@ -37,7 +37,7 @@ from jsonschema.exceptions import best_match
 
 from c7n.policy import execution
 from c7n.provider import clouds
-from c7n.resources import load_resources
+from c7n.resources import load_available
 from c7n.resolver import ValuesFrom
 from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
 from c7n.structure import StructureParser # noqa
@@ -574,7 +574,7 @@ def pprint_schema_summary(vocabulary):
 
 
 def json_dump(resource=None):
-    load_resources()
+    load_available()
     print(json.dumps(generate(resource), indent=2))
 
 
