@@ -17,7 +17,8 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('dns-managed-zone')
 class DnsManagedZone(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/dns/docs/reference/v1beta2/managedZones
+    """
     class resource_type(TypeInfo):
         service = 'dns'
         version = 'v1beta2'
@@ -30,12 +31,13 @@ class DnsManagedZone(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_query(
                 'get', {'project': resource_info['project_id'],
-                        'managedZone': resource_info['name']})
+                        'managedZone': resource_info['zone_name']})
 
 
 @resources.register('dns-policy')
 class DnsPolicy(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/dns/docs/reference/v1beta2/policies
+    """
     class resource_type(TypeInfo):
         service = 'dns'
         version = 'v1beta2'
@@ -48,4 +50,4 @@ class DnsPolicy(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_query(
                 'get', {'project': resource_info['project_id'],
-                        'policy': resource_info['name']})
+                        'policy': resource_info['policy_name']})

@@ -33,7 +33,9 @@ sys.path.insert(0, os.path.abspath('../..'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'c7n_sphinxext.c7n_schema',
+    'c7n_sphinxext.docgen',
+    'recommonmark',
+    'sphinx_markdown_tables'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -41,8 +43,8 @@ extensions = [
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
+
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -52,7 +54,6 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Cloud Custodian'
-copyright = u'2017, Capital One Services, LLC'
 author = u'Kapil Thangavelu'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -118,7 +119,15 @@ html_theme = 'sphinx_rtd_theme'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+  'prev_next_buttons_location': 'both',
+  'style_external_links': True,
+  # Toc options
+  'collapse_navigation': False,
+  'sticky_navigation': True,
+  'includehidden': True,
+  'titles_only': False
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
@@ -138,7 +147,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'c1_labs.ico'
+html_favicon = 'icon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

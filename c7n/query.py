@@ -21,14 +21,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 import itertools
 import json
-from concurrent.futures import as_completed
 
 import jmespath
 import six
 import os
 
 from c7n.actions import ActionRegistry
-from c7n.exceptions import ClientError, ResourceLimitExceeded
+from c7n.exceptions import ClientError, ResourceLimitExceeded, PolicyExecutionError
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
@@ -38,10 +37,13 @@ from c7n.utils import (
 
 
 try:
-    from botocore.paginate import PageIterator
+    from botocore.paginate import PageIterator, Paginator
 except ImportError:
     # Likely using another provider in a serverless environment
     class PageIterator(object):
+        pass
+
+    class Paginator(object):
         pass
 
 
@@ -107,7 +109,7 @@ class ResourceQuery(object):
         resources = self.filter(resource_manager, **params)
         if client_filter:
             # This logic was added to prevent the issue from:
-            # https://github.com/capitalone/cloud-custodian/issues/1398
+            # https://github.com/cloud-custodian/cloud-custodian/issues/1398
             if all(map(lambda r: isinstance(r, six.string_types), resources)):
                 resources = [r for r in resources if r in identities]
             else:
@@ -215,11 +217,11 @@ sources = PluginRegistry('sources')
 @sources.register('describe')
 class DescribeSource(object):
 
-    QueryFactory = ResourceQuery
+    resource_query_factory = ResourceQuery
 
     def __init__(self, manager):
         self.manager = manager
-        self.query = self.QueryFactory(self.manager.session_factory)
+        self.query = self.get_query()
 
     def get_resources(self, ids, cache=True):
         return self.query.get(self.manager, ids)
@@ -227,13 +229,26 @@ class DescribeSource(object):
     def resources(self, query):
         return self.query.filter(self.manager, **query)
 
+    def get_query(self):
+        return self.resource_query_factory(self.manager.session_factory)
+
+    def get_query_params(self, query_params):
+        return query_params
+
     def get_permissions(self):
         m = self.manager.get_model()
-        perms = ['%s:%s' % (m.service, _napi(m.enum_spec[0]))]
-        if getattr(m, 'detail_spec', None):
-            perms.append("%s:%s" % (m.service, _napi(m.detail_spec[0])))
-        if getattr(m, 'batch_detail_spec', None):
-            perms.append("%s:%s" % (m.service, _napi(m.batch_detail_spec[0])))
+        prefix = m.permission_prefix or m.service
+        if m.permissions_enum:
+            perms = list(m.permissions_enum)
+        else:
+            perms = ['%s:%s' % (prefix, _napi(m.enum_spec[0]))]
+        if m.permissions_augment:
+            perms.extend(m.permissions_augment)
+        else:
+            if getattr(m, 'detail_spec', None):
+                perms.append("%s:%s" % (prefix, _napi(m.detail_spec[0])))
+            if getattr(m, 'batch_detail_spec', None):
+                perms.append("%s:%s" % (prefix, _napi(m.batch_detail_spec[0])))
         return perms
 
     def augment(self, resources):
@@ -259,10 +274,6 @@ class DescribeSource(object):
 class ChildDescribeSource(DescribeSource):
 
     resource_query_factory = ChildResourceQuery
-
-    def __init__(self, manager):
-        self.manager = manager
-        self.query = self.get_query()
 
     def get_query(self):
         return self.resource_query_factory(
@@ -296,6 +307,43 @@ class ConfigSource(object):
             results.append(self.load_resource(revisions[0]))
         return list(filter(None, results))
 
+    def get_query_params(self, query):
+        """Parse config select expression from policy and parameter.
+
+        On policy config supports a full statement being given, or
+        a clause that will be added to the where expression.
+
+        If no query is specified, a default query is utilized.
+
+        A valid query should at minimum select fields
+        for configuration, supplementaryConfiguration and
+        must have resourceType qualifier.
+        """
+        if query and not isinstance(query, dict):
+            raise PolicyExecutionError("invalid config source query %s" % (query,))
+
+        if query is None and 'query' in self.manager.data:
+            _q = [q for q in self.manager.data['query'] if 'expr' in q]
+            if _q:
+                query = _q.pop()
+
+        if query is None and 'query' in self.manager.data:
+            _c = [q['clause'] for q in self.manager.data['query'] if 'clause' in q]
+            if _c:
+                _c = _c.pop()
+        elif query:
+            return query
+        else:
+            _c = None
+
+        s = "select configuration, supplementaryConfiguration where resourceType = '{}'".format(
+            self.manager.resource_type.config_type)
+
+        if _c:
+            s += "AND {}".format(_c)
+
+        return {'expr': s}
+
     def load_resource(self, item):
         if isinstance(item['configuration'], six.string_types):
             item_config = json.loads(item['configuration'])
@@ -305,30 +353,18 @@ class ConfigSource(object):
 
     def resources(self, query=None):
         client = local_session(self.manager.session_factory).client('config')
-        paginator = client.get_paginator('list_discovered_resources')
-        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-        pages = paginator.paginate(
-            resourceType=self.manager.get_model().config_type)
+        query = self.get_query_params(query)
+        pager = Paginator(
+            client.select_resource_config,
+            {'input_token': 'NextToken', 'output_token': 'NextToken',
+             'result_key': 'Results'},
+            client.meta.service_model.operation_model('SelectResourceConfig'))
+        pager.PAGE_ITERATOR_CLS = RetryPageIterator
+
         results = []
-
-        with self.manager.executor_factory(max_workers=5) as w:
-            ridents = pages.build_full_result()
-            resource_ids = [
-                r['resourceId'] for r in ridents.get('resourceIdentifiers', ())]
-            self.manager.log.debug(
-                "querying %d %s resources",
-                len(resource_ids),
-                self.manager.__class__.__name__.lower())
-
-            for resource_set in chunks(resource_ids, 50):
-                futures = []
-                futures.append(w.submit(self.get_resources, resource_set))
-                for f in as_completed(futures):
-                    if f.exception():
-                        self.manager.log.error(
-                            "Exception getting resources from config \n %s" % (
-                                f.exception()))
-                    results.extend(f.result())
+        for page in pager.paginate(Expression=query['expr']):
+            results.extend([
+                self.load_resource(json.loads(r)) for r in page['Results']])
         return results
 
     def augment(self, resources):
@@ -339,8 +375,6 @@ class ConfigSource(object):
 class QueryResourceManager(ResourceManager):
 
     resource_type = ""
-
-    retry = None
 
     # TODO Check if we can move to describe source
     max_workers = 3
@@ -371,9 +405,9 @@ class QueryResourceManager(ResourceManager):
 
     @classmethod
     def has_arn(cls):
-        if getattr(cls.resource_type, 'arn', None):
-            return True
-        elif getattr(cls.resource_type, 'type', None) is not None:
+        if cls.resource_type.arn is not None:
+            return bool(cls.resource_type.arn)
+        elif getattr(cls.resource_type, 'arn_type', None) is not None:
             return True
         elif cls.__dict__.get('get_arns'):
             return True
@@ -402,10 +436,12 @@ class QueryResourceManager(ResourceManager):
             'account': self.account_id,
             'region': self.config.region,
             'resource': str(self.__class__.__name__),
+            'source': self.source_type,
             'q': query
         }
 
     def resources(self, query=None):
+        query = self.source.get_query_params(query)
         cache_key = self.get_cache_key(query)
         resources = None
 
@@ -521,11 +557,11 @@ class QueryResourceManager(ResourceManager):
         if self._generate_arn is None:
             self._generate_arn = functools.partial(
                 generate_arn,
-                self.get_model().service,
-                region=self.config.region,
+                self.resource_type.arn_service or self.resource_type.service,
+                region=not self.resource_type.global_resource and self.config.region or "",
                 account_id=self.account_id,
-                resource_type=self.get_model().type,
-                separator='/')
+                resource_type=self.resource_type.arn_type,
+                separator=self.resource_type.arn_separator)
         return self._generate_arn
 
 
@@ -648,3 +684,121 @@ class RetryPageIterator(PageIterator):
 
     def _make_request(self, current_kwargs):
         return self.retry(self._method, **current_kwargs)
+
+
+class TypeMeta(type):
+
+    def __repr__(cls):
+        identifier = None
+        if cls.config_type:
+            identifier = cls.config_type
+        elif cls.arn_type:
+            identifier = "AWS::%s::%s" % (cls.service.title(), cls.arn_type.title())
+        elif cls.enum_spec:
+            identifier = "AWS::%s::%s" % (cls.service.title(), cls.enum_spec[1])
+        else:
+            identifier = "AWS::%s::%s" % (cls.service.title(), cls.id)
+        return "<TypeInfo %s>" % identifier
+
+
+@six.add_metaclass(TypeMeta)
+class TypeInfo(object):
+    """Resource Type Metadata"""
+
+    ###########
+    # Required
+
+    # id field, should be the identifier used for apis
+    id = None
+
+    # name field, used for display
+    name = None
+
+    # which aws service (per sdk) has the api for this resource.
+    service = None
+
+    # used to query the resource by describe-sources
+    enum_spec = None
+
+    ###########
+    # Optional
+
+    ############
+    # Permissions
+
+    # Permission string prefix if not service
+    permission_prefix = None
+
+    # Permissions for resource enumeration/get. Normally we autogen
+    # but in some cases we need to specify statically
+    permissions_enum = None
+
+    # Permissions for resourcee augment
+    permissions_augment = None
+
+    ###########
+    # Arn handling / generation metadata
+
+    # arn resource attribute, when describe format has arn
+    arn = None
+
+    # type, used for arn construction, also required for universal tag augment
+    arn_type = None
+
+    # how arn type is separated from rest of arn
+    arn_separator = "/"
+
+    # for services that need custom labeling for arns
+    arn_service = None
+
+    ##########
+    # Resource retrieval
+
+    # filter_name, when fetching a single resource via enum_spec
+    # technically optional, but effectively required for serverless
+    # event policies else we have to enumerate the population.
+    filter_name = None
+
+    # filter_type, scalar or list
+    filter_type = None
+
+    # used to enrich the resource descriptions returned by enum_spec
+    detail_spec = None
+
+    # used when the api supports getting resource details enmasse
+    batch_detail_spec = None
+
+    ##########
+    # Misc
+
+    # used for reporting, array of fields
+    default_report_fields = ()
+
+    # date, latest date associated to resource, generally references
+    # either create date or modified date.
+    date = None
+
+    # dimension, defines that resource has cloud watch metrics and the
+    # resource id can be passed as this value. further customizations
+    # of dimensions require subclass metrics filter.
+    dimension = None
+
+    # AWS Config Service resource type name
+    config_type = None
+
+    # Whether or not resource group tagging api can be used, in which
+    # case we'll automatically register tag actions/filters.
+    #
+    # Note values of True will register legacy tag filters/actions, values
+    # of object() will just register current standard tag/filters/actions.
+    universal_taggable = False
+
+    # Denotes if this resource exists across all regions (iam, cloudfront, r53)
+    global_resource = False
+
+    # Generally we utilize a service to namespace mapping in the metrics filter
+    # however some resources have a type specific namespace (ig. ebs)
+    metrics_namespace = None
+
+    # specific to ec2 service resources used to disambiguate a resource by its id
+    id_prefix = None

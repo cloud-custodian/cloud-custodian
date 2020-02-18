@@ -13,13 +13,14 @@
 # limitations under the License.
 import jmespath
 
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
 
 
 @resources.register('bq-dataset')
 class DataSet(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/datasets
+    """
     class resource_type(TypeInfo):
         service = 'bigquery'
         version = 'v2'
@@ -33,12 +34,15 @@ class DataSet(QueryResourceManager):
         @staticmethod
         def get(client, event):
             # dataset creation doesn't include data set name in resource name.
-            _, method = event['protoPayload']['methodName'].split('.')
-            if method not in ('insert', 'update'):
-                raise RuntimeError("unknown event %s" % event)
-            expr = 'protoPayload.serviceData.dataset{}Response.resource.datasetName'.format(
-                method.capitalize())
-            ref = jmespath.search(expr, event)
+            if 'protoPayload' in event:
+                _, method = event['protoPayload']['methodName'].split('.')
+                if method not in ('insert', 'update'):
+                    raise RuntimeError("unknown event %s" % event)
+                expr = 'protoPayload.serviceData.dataset{}Response.resource.datasetName'.format(
+                    method.capitalize())
+                ref = jmespath.search(expr, event)
+            else:
+                ref = event
             return client.execute_query('get', verb_arguments=ref)
 
     def augment(self, resources):
@@ -54,27 +58,32 @@ class DataSet(QueryResourceManager):
 
 @resources.register('bq-job')
 class BigQueryJob(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs
+    """
     class resource_type(TypeInfo):
         service = 'bigquery'
         version = 'v2'
         component = 'jobs'
         enum_spec = ('list', 'jobs[]', {'allUsers': True})
+        get_requires_event = True
         scope = 'project'
         scope_key = 'projectId'
         id = 'id'
 
         @staticmethod
-        def get(client, resource_info):
+        def get(client, event):
             return client.execute_query('get', {
-                'projectId': resource_info['project_id'],
-                'jobId': resource_info['job_id']
+                'projectId': jmespath.search('resource.labels.project_id', event),
+                'jobId': jmespath.search(
+                    'protoPayload.metadata.tableCreation.jobName', event
+                ).rsplit('/', 1)[-1]
             })
 
 
 @resources.register('bq-project')
 class BigQueryProject(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/projects
+    """
     class resource_type(TypeInfo):
         service = 'bigquery'
         version = 'v2'
@@ -82,3 +91,35 @@ class BigQueryProject(QueryResourceManager):
         enum_spec = ('list', 'projects[]', None)
         scope = 'global'
         id = 'id'
+
+
+@resources.register('bq-table')
+class BigQueryTable(ChildResourceManager):
+    """GCP resource: https://cloud.google.com/bigquery/docs/reference/rest/v2/tables
+    """
+
+    class resource_type(ChildTypeInfo):
+        service = 'bigquery'
+        version = 'v2'
+        component = 'tables'
+        enum_spec = ('list', 'tables[]', None)
+        scope_key = 'projectId'
+        id = 'id'
+        parent_spec = {
+            'resource': 'bq-dataset',
+            'child_enum_params': [
+                ('datasetReference.datasetId', 'datasetId'),
+            ],
+            'parent_get_params': [
+                ('tableReference.projectId', 'projectId'),
+                ('tableReference.datasetId', 'datasetId'),
+            ]
+        }
+
+        @staticmethod
+        def get(client, event):
+            return client.execute_query('get', {
+                'projectId': event['project_id'],
+                'datasetId': event['dataset_id'],
+                'tableId': event['resourceName'].rsplit('/', 1)[-1]
+            })

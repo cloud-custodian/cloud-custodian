@@ -5,10 +5,6 @@
             {
                 "CertificateArn": "arn:aws:acm:us-west-2:644160558196:certificate/41fe41b0-a474-4df3-9821-1c0b7a3155e1",
                 "DomainName": "foobar.com"
-            },
-            {
-                "CertificateArn": "arn:aws:acm:us-west-2:644160558196:certificate/b867707e-33c3-4024-b45d-b6133c3b4c05",
-                "DomainName": "foobaz.com"
             }
         ],
         "ResponseMetadata": {

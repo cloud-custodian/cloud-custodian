@@ -1,0 +1,226 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2019-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 28 Aug 2019 23:19:02 GMT"
+                    ],
+                    "content-length": [
+                        "4673"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "92fb254d-fa8d-407c-b1d2-022b5aad40d4",
+                        "28cd531c-8de3-4244-a7e2-40cc093d6725"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestvm",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "testtag": "testvalue",
+                                    "schedule": "on=(M-U,8);off=(M-U,18);tz=pt"
+                                },
+                                "properties": {
+                                    "vmId": "987cd274-2230-4d4e-a648-ff5bff230cc3",
+                                    "hardwareProfile": {
+                                        "vmSize": "Basic_A0"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "16.04.0-LTS",
+                                            "version": "latest"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "cctestvm_OsDisk_1_281576b3adf340ad93b48ed4ce32c7b7",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Standard_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_OsDisk_1_281576b3adf340ad93b48ed4ce32c7b7"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": [
+                                            {
+                                                "lun": 0,
+                                                "name": "cctestvm_disk2_faa8d572b4424b709b634f3ab154bc4b",
+                                                "createOption": "Empty",
+                                                "caching": "None",
+                                                "managedDisk": {
+                                                    "storageAccountType": "Standard_LRS",
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/disks/cctestvm_disk2_faa8d572b4424b709b634f3ab154bc4b"
+                                                },
+                                                "diskSizeGB": 1023,
+                                                "toBeDetached": false
+                                            }
+                                        ]
+                                    },
+                                    "osProfile": {
+                                        "computerName": "vmpmvqwjwl57ofs",
+                                        "adminUsername": "testuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": false
+                                        },
+                                        "secrets": []
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic"
+                                            }
+                                        ]
+                                    },
+                                    "diagnosticsProfile": {
+                                        "bootDiagnostics": {
+                                            "enabled": true,
+                                            "storageUri": "https://pmvqwjwl57ofssalinuxvm.blob.core.windows.net/"
+                                        }
+                                    },
+                                    "provisioningState": "Creating"
+                                }
+                            },
+                            {
+                                "name": "aks-default-21042115-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_AZURE-SINGLE-KEYVAULT-RG_AZURE-SINGLE-KEYVAULT_WESTUS2/providers/Microsoft.Compute/virtualMachines/aks-default-21042115-0",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "westus2",
+                                "tags": {
+                                    "aksEngineVersion": "v0.38.4-aks",
+                                    "creationSource": "aks-aks-default-21042115-0",
+                                    "orchestrator": "Kubernetes:1.13.7",
+                                    "poolName": "default",
+                                    "resourceNameSuffix": "21042115",
+                                    "Hello": "World"
+                                },
+                                "properties": {
+                                    "vmId": "6fe8a810-f7cd-482b-a7a7-564d153301b2",
+                                    "availabilitySet": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_AZURE-SINGLE-KEYVAULT-RG_AZURE-SINGLE-KEYVAULT_WESTUS2/providers/Microsoft.Compute/availabilitySets/DEFAULT-AVAILABILITYSET-21042115"
+                                    },
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B2s"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "microsoft-aks",
+                                            "offer": "aks",
+                                            "sku": "aks-ubuntu-1604-201907",
+                                            "version": "2019.07.10"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "aks-default-21042115-0_OsDisk_1_3288027384f443f0aa7336e03b33db04",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "Premium_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_azure-single-keyvault-rg_azure-single-keyvault_westus2/providers/Microsoft.Compute/disks/aks-default-21042115-0_OsDisk_1_3288027384f443f0aa7336e03b33db04"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "aks-default-21042115-0",
+                                        "adminUsername": "k8sadmin",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/k8sadmin/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCYADDuGxunu3KlrYLXAzhdDegjL42RL5lrDUqvSHs4GfntHna9s5nVTgcPwla/QDhxgGHDvEjxjpoi1peWwbgiksZ+dGKv0RpkR/UfgiCjop/9zXDy8u3s8i39cObYO8+ED4MAugRtPMWj2ORcHiAEs/cxt8U/socm8cqtWzKeVzs06fFfmOZC6R5EcWMyIZClbBqXw5VoBthbio/e3lPCSxFbZgAcr7OLe7xyZa1ICy5wKJsc9vZESs31sZHvIx65V/WrZCBe5vjO7iQt42iPVGabKmohwFdZHpwLhta6Z6N4oKymTnLX8KpjBW4lDETvWQE2yXyDZXLWqafYGpqV jomalsan@duck1.local"
+                                                    }
+                                                ]
+                                            },
+                                            "provisionVMAgent": true
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_azure-single-keyvault-rg_azure-single-keyvault_westus2/providers/Microsoft.Network/networkInterfaces/aks-default-21042115-nic-0"
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                },
+                                "resources": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_AZURE-SINGLE-KEYVAULT-RG_AZURE-SINGLE-KEYVAULT_WESTUS2/providers/Microsoft.Compute/virtualMachines/aks-default-21042115-0/extensions/computeAksLinuxBilling"
+                                    },
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_AZURE-SINGLE-KEYVAULT-RG_AZURE-SINGLE-KEYVAULT_WESTUS2/providers/Microsoft.Compute/virtualMachines/aks-default-21042115-0/extensions/cse-agent-0"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm/providers/microsoft.insights/metrics?timespan=2019-08-27%2023%3A59%3A59%2F2019-08-28%2023%3A59%3A59&interval=P1D&metricnames=InvalidMetric&aggregation=average&api-version=2018-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 400,
+                    "message": "Failed to find metric configuration for provider: Microsoft.Compute, resource Type: virtualMachines, metric: InvalidMetric, Valid metrics: Percentage CPU,Network In,Network Out,Disk Read Bytes,Disk Write Bytes,Disk Read Operations/Sec,Disk Write Operations/Sec,CPU Credits Remaining,CPU Credits Consumed,Per Disk Read Bytes/sec,Per Disk Write Bytes/sec,Per Disk Read Operations/Sec,Per Disk Write Operations/Sec,Per Disk QD,OS Per Disk Read Bytes/sec,OS Per Disk Write Bytes/sec,OS Per Disk Read Operations/Sec,O"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Wed, 28 Aug 2019 23:19:02 GMT"
+                    ],
+                    "content-length": [
+                        "1117"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "code": "BadRequest",
+                        "message": "Failed to find metric configuration for provider: Microsoft.Compute, resource Type: virtualMachines, metric: InvalidMetric, Valid metrics: Percentage CPU,Network In,Network Out,Disk Read Bytes,Disk Write Bytes,Disk Read Operations/Sec,Disk Write Operations/Sec,CPU Credits Remaining,CPU Credits Consumed,Per Disk Read Bytes/sec,Per Disk Write Bytes/sec,Per Disk Read Operations/Sec,Per Disk Write Operations/Sec,Per Disk QD,OS Per Disk Read Bytes/sec,OS Per Disk Write Bytes/sec,OS Per Disk Read Operations/Sec,OS Per Disk Write Operations/Sec,OS Per Disk QD,Data Disk Read Bytes/sec,Data Disk Write Bytes/sec,Data Disk Read Operations/Sec,Data Disk Write Operations/Sec,Data Disk Queue Depth,OS Disk Read Bytes/sec,OS Disk Write Bytes/sec,OS Disk Read Operations/Sec,OS Disk Write Operations/Sec,OS Disk Queue Depth,Inbound Flows,Outbound Flows,Inbound Flows Maximum Creation Rate,Outbound Flows Maximum Creation Rate,Premium Data Disk Cache Read Hit,Premium Data Disk Cache Read Miss,Premium OS Disk Cache Read Hit,Premium OS Disk Cache Read Miss,Network In Total,Network Out Total"
+                    }
+                }
+            }
+        }
+    ]
+}

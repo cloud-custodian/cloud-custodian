@@ -78,3 +78,22 @@ class EKS(BaseTest):
         client = factory().client("eks")
         cluster = client.describe_cluster(name='dev').get('cluster')
         self.assertEqual(cluster['status'], 'DELETING')
+
+    def test_tag_and_remove_tag(self):
+        factory = self.replay_flight_data('test_eks_tag_and_remove_tag')
+        p = self.load_policy({
+            'name': 'eks-tag-and-remove',
+            'resource': 'aws.eks',
+            'filters': [{'tag:Env': 'Dev'}],
+            'actions': [
+                {'type': 'tag', 'tags': {'App': 'Custodian'}},
+                {'type': 'remove-tag', 'tags': ['Env']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'devx')
+        client = factory().client('eks')
+        self.assertEqual(
+            client.describe_cluster(
+                name='devx')['cluster']['tags'],
+            {'App': 'Custodian'})

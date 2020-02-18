@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [
+            {
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/testrepo",
+                "registryId": "644160558196",
+                "repositoryName": "testrepo",
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/testrepo",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 2,
+                    "day": 11,
+                    "hour": 11,
+                    "minute": 57,
+                    "second": 36,
+                    "microsecond": 0
+                },
+                "imageTagMutability": "IMMUTABLE",
+                "imageScanningConfiguration": {
+                    "scanOnPush": true
+                }
+            }
+        ]
+    }
+}

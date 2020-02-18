@@ -16,38 +16,40 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import copy
 import csv
 from datetime import datetime, timedelta
-import functools
 import json
 import itertools
 import logging
 import os
 import random
 import re
+import sys
 import threading
 import time
+
 import six
-import sys
-
 from six.moves.urllib import parse as urlparse
+from six.moves.urllib.request import getproxies
 
-from c7n.exceptions import ClientError, PolicyValidationError
 from c7n import ipaddress, config
+from c7n.exceptions import ClientError, PolicyValidationError
 
-# Try to place nice in lambda exec environment
-# where we don't require yaml
+# Try to play nice in a serverless environment, where we don't require yaml
+
 try:
     import yaml
 except ImportError:  # pragma: no cover
-    yaml = None
+    SafeLoader = BaseSafeDumper = yaml = None
 else:
     try:
-        from yaml import CSafeLoader
-        SafeLoader = CSafeLoader
+        from yaml import CSafeLoader as SafeLoader, CSafeDumper as BaseSafeDumper
     except ImportError:  # pragma: no cover
-        try:
-            from yaml import SafeLoader
-        except ImportError:
-            SafeLoader = None
+        from yaml import SafeLoader, SafeDumper as BaseSafeDumper
+
+
+class SafeDumper(BaseSafeDumper or object):
+    def ignore_aliases(self, data):
+        return True
+
 
 log = logging.getLogger('custodian.utils')
 
@@ -103,6 +105,12 @@ def yaml_load(value):
     if yaml is None:
         raise RuntimeError("Yaml not available")
     return yaml.load(value, Loader=SafeLoader)
+
+
+def yaml_dump(value):
+    if yaml is None:
+        raise RuntimeError("Yaml not available")
+    return yaml.dump(value, default_flow_style=False, Dumper=SafeDumper)
 
 
 def loads(body):
@@ -322,6 +330,10 @@ REGION_PARTITION_MAP = {
 }
 
 
+def get_partition(region):
+    return REGION_PARTITION_MAP.get(region, 'aws')
+
+
 def generate_arn(
         service, resource, partition='aws',
         region=None, account_id=None, resource_type=None, separator='/'):
@@ -346,6 +358,9 @@ def snapshot_identifier(prefix, db_identifier):
     """
     now = datetime.now()
     return '%s-%s-%s' % (prefix, db_identifier, now.strftime('%Y-%m-%d-%H-%M'))
+
+
+retry_log = logging.getLogger('c7n.retry')
 
 
 def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
@@ -379,7 +394,7 @@ def get_retry(codes=(), max_attempts=8, min_delay=1, log_retries=False):
                 elif idx == max_attempts - 1:
                     raise
                 if log_retries:
-                    worker_log.log(
+                    retry_log.log(
                         log_retries,
                         "retrying %s on error:%s attempt:%d last delay:%0.2f",
                         func, e.response['Error']['Code'], idx, delay)
@@ -420,30 +435,6 @@ class IPv4Network(ipaddress.IPv4Network):
         if isinstance(other, ipaddress._BaseNetwork):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)
-
-
-worker_log = logging.getLogger('c7n.worker')
-
-
-def worker(f):
-    """Generic wrapper to log uncaught exceptions in a function.
-
-    When we cross concurrent.futures executor boundaries we lose our
-    traceback information, and when doing bulk operations we may tolerate
-    transient failures on a partial subset. However we still want to have
-    full accounting of the error in the logs, in a format that our error
-    collection (cwl subscription) can still pickup.
-    """
-    def _f(*args, **kw):
-        try:
-            return f(*args, **kw)
-        except Exception:
-            worker_log.exception(
-                'Error invoking %s',
-                "%s.%s" % (f.__module__, f.__name__))
-            raise
-    functools.update_wrapper(_f, f)
-    return _f
 
 
 def reformat_schema(model):
@@ -533,6 +524,24 @@ def parse_url_config(url):
         conf[k] = v[0]
     conf['url'] = url
     return conf
+
+
+def get_proxy_url(url):
+    proxies = getproxies()
+    url_parts = parse_url_config(url)
+
+    proxy_keys = [
+        url_parts['scheme'] + '://' + url_parts['netloc'],
+        url_parts['scheme'],
+        'all://' + url_parts['netloc'],
+        'all'
+    ]
+
+    for key in proxy_keys:
+        if key in proxies:
+            return proxies[key]
+
+    return None
 
 
 class FormatDate(object):
@@ -629,3 +638,7 @@ class QueryParser(object):
             filters.append(d)
 
         return filters
+
+
+def get_annotation_prefix(s):
+    return 'c7n:{}'.format(s)

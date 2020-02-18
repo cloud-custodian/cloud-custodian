@@ -1,0 +1,54 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "authenticationInfo": {
+      "principalEmail": "yauhen_shaliou@comelfo.com"
+    },
+    "requestMetadata": {
+      "callerIp": "217.21.63.2",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-05-15T13:06:32.353456386Z",
+        "auth": {
+          "accessLevels": [
+            "no_matching_definitions"
+          ]
+        }
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "spanner.googleapis.com",
+    "methodName": "google.spanner.admin.database.v1.DatabaseAdmin.GetDatabase",
+    "authorizationInfo": [
+      {
+        "resource": "projects/custodian-test-project-0/instances/custodian-spanner-1/databases/db-1",
+        "permission": "spanner.databases.get",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "spanner",
+          "name": "projects/custodian-test-project-0/instances/custodian-spanner-1/databases/db-1",
+          "type": "spanner.databases"
+        }
+      }
+    ],
+    "resourceName": "projects/custodian-test-project-0/instances/custodian-spanner-1/databases/db-1",
+    "request": {
+      "@type": "type.googleapis.com/google.spanner.admin.database.v1.GetDatabaseRequest",
+      "name": "projects/custodian-test-project-0/instances/custodian-spanner-1/databases/db-1"
+    }
+  },
+  "insertId": "iboqp6bne",
+  "resource": {
+    "type": "spanner_instance",
+    "labels": {
+      "location": "",
+      "instance_config": "",
+      "instance_id": "custodian-spanner-1",
+      "project_id": "custodian-test-project-0"
+    }
+  },
+  "timestamp": "2019-05-15T13:06:32.344100916Z",
+  "severity": "INFO",
+  "logName": "projects/custodian-test-project-0/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2019-05-15T13:06:33.963451234Z"
+}

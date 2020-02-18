@@ -15,7 +15,7 @@
 import logging
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n import utils
 from c7n import tags
 from c7n.utils import local_session, type_schema
@@ -27,13 +27,13 @@ log = logging.getLogger('custodian.elasticbeanstalk')
 @resources.register('elasticbeanstalk')
 class ElasticBeanstalk(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elasticbeanstalk'
         enum_spec = ('describe_applications', 'Applications', None)
         name = "ApplicationName"
         id = "ApplicationName"
         arn = "ApplicationArn"
-        dimension = None
+        arn_type = 'application'
         default_report_fields = (
             'ApplicationName',
             'DateCreated',
@@ -48,12 +48,12 @@ class ElasticBeanstalkEnvironment(QueryResourceManager):
     """ Resource manager for Elasticbeanstalk Environments
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'elasticbeanstalk'
         enum_spec = ('describe_environments', 'Environments', None)
         name = id = "EnvironmentName"
-        dimension = None
         arn = "EnvironmentArn"
+        arn_type = 'environment'
         default_report_fields = (
             'EnvironmentName',
             'DateCreated',
@@ -105,7 +105,7 @@ class TagDelayedAction(tags.TagDelayedAction):
     .. code-block:: yaml
 
             policies:
-              - name: mark-for-delete
+              - name: eb-mark-for-delete
                 resource: elasticbeanstalk-environment
                 filters:
                   - type: value
@@ -142,7 +142,7 @@ class Tag(tags.Tag):
     """
 
     batch_size = 5
-    permissions = ('elasticbeanstalk:UpdateTagsForResource',)
+    permissions = ('elasticbeanstalk:AddTags',)
 
     def process_resource_set(self, client, envs, ts):
         for env in envs:
@@ -173,7 +173,7 @@ class RemoveTag(tags.RemoveTag):
     """
 
     batch_size = 5
-    permissions = ('elasticbeanstalk:UpdateTagsForResource',)
+    permissions = ('elasticbeanstalk:RemoveTags',)
 
     def process_resource_set(self, client, envs, tag_keys):
         for env in envs:

@@ -11,45 +11,73 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n_gcp.actions import SetIamPolicy
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
 @resources.register('organization')
 class Organization(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/resource-manager/reference/rest/v1/organizations
+    """
     class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
         version = 'v1'
         component = 'organizations'
         scope = 'global'
         enum_spec = ('search', 'organizations[]', {'body': {}})
-        id = "name"
+        id = 'name'
 
-        @staticmethod
-        def get(client, resource_info):
-            return client.execute_query(
-                'get', {'name': resource_info['name']})
+
+@Organization.action_registry.register('set-iam-policy')
+class OrganizationSetIamPolicy(SetIamPolicy):
+    """
+    Overrides the base implementation to process Organization resources correctly.
+    """
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments
 
 
 @resources.register('folder')
 class Folder(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/resource-manager/reference/rest/v1/folders
+    """
     class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
         version = 'v2'
         component = 'folders'
         scope = 'global'
-        id = "name"
+        enum_spec = ('list', 'folders', None)
+        id = 'name'
+
+    def get_resource_query(self):
+        if 'query' in self.data:
+            for child in self.data.get('query'):
+                if 'parent' in child:
+                    return {'parent': child['parent']}
 
 
 @resources.register('project')
 class Project(QueryResourceManager):
-
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects
+    """
     class resource_type(TypeInfo):
         service = 'cloudresourcemanager'
         version = 'v1'
         component = 'projects'
         scope = 'global'
         enum_spec = ('list', 'projects', None)
-        id = "projectId"
+        id = 'projectId'
+
+
+@Project.action_registry.register('set-iam-policy')
+class ProjectSetIamPolicy(SetIamPolicy):
+    """
+    Overrides the base implementation to process Project resources correctly.
+    """
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments

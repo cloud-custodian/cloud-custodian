@@ -1,0 +1,424 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/dnszones?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "private"
+                    ],
+                    "date": [
+                        "Tue, 12 Nov 2019 00:47:25 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "499"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59999"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "576"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com",
+                                "name": "h7s6n7kl225j4.cloudcustodiantest.com",
+                                "type": "Microsoft.Network/dnszones",
+                                "etag": "00000002-0000-0000-0282-5b75c895d501",
+                                "location": "global",
+                                "tags": {},
+                                "properties": {
+                                    "maxNumberOfRecordSets": 10000,
+                                    "maxNumberOfRecordsPerRecordSet": null,
+                                    "nameServers": [
+                                        "ns1-07.azure-dns.com.",
+                                        "ns2-07.azure-dns.net.",
+                                        "ns3-07.azure-dns.org.",
+                                        "ns4-07.azure-dns.info."
+                                    ],
+                                    "numberOfRecordSets": 4,
+                                    "zoneType": "Public"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_dns/providers/Microsoft.Network/dnsZones/h7s6n7kl225j4.cloudcustodiantest.com/recordsets?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "private"
+                    ],
+                    "date": [
+                        "Tue, 12 Nov 2019 00:47:25 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "499"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59996"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "2072"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/NS/@",
+                                "name": "@",
+                                "type": "Microsoft.Network/dnszones/NS",
+                                "etag": "4a34baf3-1864-4af6-adb1-51b90b32823c",
+                                "properties": {
+                                    "fqdn": "h7s6n7kl225j4.cloudcustodiantest.com.",
+                                    "TTL": 172800,
+                                    "NSRecords": [
+                                        {
+                                            "nsdname": "ns1-07.azure-dns.com."
+                                        },
+                                        {
+                                            "nsdname": "ns2-07.azure-dns.net."
+                                        },
+                                        {
+                                            "nsdname": "ns3-07.azure-dns.org."
+                                        },
+                                        {
+                                            "nsdname": "ns4-07.azure-dns.info."
+                                        }
+                                    ],
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/SOA/@",
+                                "name": "@",
+                                "type": "Microsoft.Network/dnszones/SOA",
+                                "etag": "10b28560-9227-4aa8-89be-b079e5bdfdc2",
+                                "properties": {
+                                    "fqdn": "h7s6n7kl225j4.cloudcustodiantest.com.",
+                                    "TTL": 3600,
+                                    "SOARecord": {
+                                        "email": "azuredns-hostmaster.microsoft.com",
+                                        "expireTime": 2419200,
+                                        "host": "ns1-07.azure-dns.com.",
+                                        "minimumTTL": 300,
+                                        "refreshTime": 3600,
+                                        "retryTime": 300,
+                                        "serialNumber": 1
+                                    },
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/A/deleteme",
+                                "name": "deleteme",
+                                "type": "Microsoft.Network/dnszones/A",
+                                "etag": "5c9ecdd3-419a-4ade-8a71-6672b0e96a67",
+                                "properties": {
+                                    "fqdn": "deleteme.h7s6n7kl225j4.cloudcustodiantest.com.",
+                                    "TTL": 3600,
+                                    "ARecords": [
+                                        {
+                                            "ipv4Address": "1.2.3.6"
+                                        }
+                                    ],
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/A/www",
+                                "name": "www",
+                                "type": "Microsoft.Network/dnszones/A",
+                                "etag": "0cea3c9f-bb3e-4143-9cc5-f52c95a7a4fb",
+                                "properties": {
+                                    "fqdn": "www.h7s6n7kl225j4.cloudcustodiantest.com.",
+                                    "TTL": 3600,
+                                    "ARecords": [
+                                        {
+                                            "ipv4Address": "1.2.3.4"
+                                        },
+                                        {
+                                            "ipv4Address": "1.2.3.5"
+                                        }
+                                    ],
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network?api-version=2019-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 12 Nov 2019 00:47:26 GMT"
+                    ],
+                    "content-length": [
+                        "68390"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network",
+                        "namespace": "Microsoft.Network",
+                        "authorizations": [],
+                        "resourceTypes": [
+                            {
+                                "resourceType": "dnszones/A",
+                                "apiVersions": [
+                                    "2018-05-01"
+                                ]
+                            }                        ],
+                        "registrationState": "Registered",
+                        "registrationPolicy": "RegistrationRequired"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/A/deleteme?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "private"
+                    ],
+                    "date": [
+                        "Tue, 12 Nov 2019 00:47:26 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
+                    ],
+                    "content-length": [
+                        "0"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_dns/providers/Microsoft.Network/dnsZones/h7s6n7kl225j4.cloudcustodiantest.com/recordsets?api-version=2018-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "private"
+                    ],
+                    "date": [
+                        "Tue, 12 Nov 2019 00:47:26 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "498"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-entities-read": [
+                        "59993"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1615"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/NS/@",
+                                "name": "@",
+                                "type": "Microsoft.Network/dnszones/NS",
+                                "etag": "4a34baf3-1864-4af6-adb1-51b90b32823c",
+                                "properties": {
+                                    "fqdn": "h7s6n7kl225j4.cloudcustodiantest.com.",
+                                    "TTL": 172800,
+                                    "NSRecords": [
+                                        {
+                                            "nsdname": "ns1-07.azure-dns.com."
+                                        },
+                                        {
+                                            "nsdname": "ns2-07.azure-dns.net."
+                                        },
+                                        {
+                                            "nsdname": "ns3-07.azure-dns.org."
+                                        },
+                                        {
+                                            "nsdname": "ns4-07.azure-dns.info."
+                                        }
+                                    ],
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/SOA/@",
+                                "name": "@",
+                                "type": "Microsoft.Network/dnszones/SOA",
+                                "etag": "10b28560-9227-4aa8-89be-b079e5bdfdc2",
+                                "properties": {
+                                    "fqdn": "h7s6n7kl225j4.cloudcustodiantest.com.",
+                                    "TTL": 3600,
+                                    "SOARecord": {
+                                        "email": "azuredns-hostmaster.microsoft.com",
+                                        "expireTime": 2419200,
+                                        "host": "ns1-07.azure-dns.com.",
+                                        "minimumTTL": 300,
+                                        "refreshTime": 3600,
+                                        "retryTime": 300,
+                                        "serialNumber": 1
+                                    },
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/A/www",
+                                "name": "www",
+                                "type": "Microsoft.Network/dnszones/A",
+                                "etag": "0cea3c9f-bb3e-4143-9cc5-f52c95a7a4fb",
+                                "properties": {
+                                    "fqdn": "www.h7s6n7kl225j4.cloudcustodiantest.com.",
+                                    "TTL": 3600,
+                                    "ARecords": [
+                                        {
+                                            "ipv4Address": "1.2.3.4"
+                                        },
+                                        {
+                                            "ipv4Address": "1.2.3.5"
+                                        }
+                                    ],
+                                    "targetResource": {},
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_dns/providers/Microsoft.Network/dnsZones/h7s6n7kl225j4.cloudcustodiantest.com/A/deleteme?api-version=2018-05-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "cache-control": [
+                        "private"
+                    ],
+                    "date": [
+                        "Tue, 12 Nov 2019 00:47:26 GMT"
+                    ],
+                    "content-length": [
+                        "456"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
+                    ],
+                    "etag": [
+                        "c523ca0d-e7a4-47ae-9e6e-f4c0c28de132"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourceGroups/test_dns/providers/Microsoft.Network/dnszones/h7s6n7kl225j4.cloudcustodiantest.com/A/deleteme",
+                        "name": "deleteme",
+                        "type": "Microsoft.Network/dnszones/A",
+                        "etag": "c523ca0d-e7a4-47ae-9e6e-f4c0c28de132",
+                        "properties": {
+                            "fqdn": "deleteme.h7s6n7kl225j4.cloudcustodiantest.com.",
+                            "TTL": 3600,
+                            "ARecords": [
+                                {
+                                    "ipv4Address": "1.2.3.6"
+                                }
+                            ],
+                            "targetResource": {},
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

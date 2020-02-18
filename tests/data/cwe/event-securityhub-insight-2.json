@@ -1,0 +1,34 @@
+{
+    "version": "0",
+    "id": "52a27f40-ef9f-26df-46cf-9f8c0f6a721c",
+    "detail-type": "Security Hub Insight Results",
+    "source": "aws.securityhub",
+    "account": "644160558196",
+    "time": "2019-07-11T15:15:46Z",
+    "region": "us-east-1",
+    "resources": [
+        "arn:aws:securityhub:us-east-1:644160558196:action/custom/aws"
+    ],
+    "detail": {
+        "actionName": "Ec2 aws",
+        "actionDescription": "This is cool.",
+        "insightName": "5. AWS users with the most suspicious activity",
+        "insightArn": "arn:aws:securityhub:::insight/securityhub/default/9",                                                                          
+        "resultType": "ResourceAwsIamAccessKeyUserName",
+        "insightResults": [
+            {
+                "kapil": 2
+            },
+            {
+                "brent.clements@capitalone.com": 1
+            },
+            {
+                "david.shepherd2@capitalone.com": 1
+            },
+            {
+                "david.yun@capitalone.com": 1
+            }
+        ]
+    },
+    "debug": true
+}

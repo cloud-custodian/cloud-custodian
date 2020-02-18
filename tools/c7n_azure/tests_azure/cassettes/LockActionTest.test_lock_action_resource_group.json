@@ -1,0 +1,395 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups?api-version=2019-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:25 GMT"
+                    ],
+                    "content-length": [
+                        "5628"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/sls-weur-dev-andy-py-1-rg",
+                                "name": "sls-weur-dev-andy-py-1-rg",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "westeurope",
+                                "tags": {
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-sendgrid",
+                                "name": "custodian-sendgrid",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "centralus",
+                                "tags": {
+                                    "kiril-test-1": "passed",
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/custodian-cask",
+                                "name": "custodian-cask",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "westus",
+                                "tags": {
+                                    "kiril-test-1": "passed",
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/vm-images",
+                                "name": "vm-images",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "westus2",
+                                "tags": {
+                                    "kiril-test-1": "passed",
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/NetworkWatcherRG",
+                                "name": "NetworkWatcherRG",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "eastus2",
+                                "tags": {
+                                    "kiril-test-1": "passed",
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/orphan-disk",
+                                "name": "orphan-disk",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "centralus",
+                                "tags": {
+                                    "OwnerEmail2": "anluong@microsoft.com",
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/tag-rg-consumption",
+                                "name": "tag-rg-consumption",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "eastus",
+                                "tags": {
+                                    "OwnerEmail": "fee7b372-b4d4-4369-a8fc-20a72ac4eefc",
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-sentinel",
+                                "name": "cloud-custodian-sentinel",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "westus2",
+                                "tags": {
+                                    "GenericArm": "works-final",
+                                    "kiril-test-1": "passed",
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/kiril-images",
+                                "name": "kiril-images",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "westus2",
+                                "tags": {
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked",
+                                "name": "test_locked",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "99ca02d4-39ae-4631-8228-26015d259d18"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian",
+                                "name": "cloud-custodian",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "eastus",
+                                "tags": {
+                                    "OwnerEmail3": "99ca02d4-39ae-4631-8228-26015d259d18",
+                                    "OwnerContact": "multi-sub"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test1",
+                                "name": "test1",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "eastus",
+                                "tags": {
+                                    "OwnerEmail3": "kiril@microsoft.com",
+                                    "OwnerContact": "multi-sub"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test-fc",
+                                "name": "test-fc",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "eastus",
+                                "tags": {
+                                    "OwnerEmail3": "kiril@microsoft.com",
+                                    "OwnerContact": "multi-sub"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/functionshost",
+                                "name": "functionshost",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "eastus",
+                                "tags": {
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f",
+                                    "OwnerContact": "multi-sub"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/andy-1",
+                                "name": "andy-1",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "westus",
+                                "tags": {
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/andy-2",
+                                "name": "andy-2",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "westus",
+                                "tags": {
+                                    "OwnerEmail3": "anluong@microsoft.com",
+                                    "OwnerContact": "multi-sub"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-custodian-emailer",
+                                "name": "cloud-custodian-emailer",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "westus2",
+                                "tags": {
+                                    "OwnerEmail": "anluong@microsoft.com",
+                                    "kiril-test-1": "passed",
+                                    "OwnerContact": "multi-sub",
+                                    "OwnerEmail3": "08de6971-2223-4979-bcdc-d32298d85b3f"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Authorization/locks/rglock?api-version=2016-09-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:25 GMT"
+                    ],
+                    "content-length": [
+                        "247"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "level": "CanNotDelete",
+                            "notes": "testNotes"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Authorization/locks/rglock",
+                        "type": "Microsoft.Authorization/locks",
+                        "name": "rglock"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:25 GMT"
+                    ],
+                    "content-length": [
+                        "572"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "level": "CanNotDelete",
+                                    "notes": "This lock is for the cc test_filter_resource_lock test"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_locked/providers/Microsoft.Authorization/locks/cctestlockfilter",
+                                "type": "Microsoft.Authorization/locks",
+                                "name": "cctestlockfilter"
+                            },
+                            {
+                                "properties": {
+                                    "level": "CanNotDelete",
+                                    "notes": "testNotes"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Authorization/locks/rglock",
+                                "type": "Microsoft.Authorization/locks",
+                                "name": "rglock"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Authorization/locks/rglock?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "14999"
+                    ],
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:25 GMT"
+                    ],
+                    "content-length": [
+                        "0"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        }
+    ]
+}

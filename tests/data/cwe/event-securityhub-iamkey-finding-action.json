@@ -1,0 +1,80 @@
+{
+    "version": "0",
+    "id": "25a1be76-1141-cb5d-be5c-bbaa5461e626",
+    "detail-type": "Security Hub Findings - Custom Action",
+    "source": "aws.securityhub",
+    "account": "644160558196",
+    "time": "2019-07-11T17:52:40Z",
+    "region": "us-east-1",
+    "resources": [
+        "arn:aws:securityhub:us-east-1:644160558196:action/custom/aws"
+    ],
+    "detail": {
+        "actionName": "Ec2 aws",
+        "actionDescription": "This is cool.",
+        "findings": [
+            {
+                "SchemaVersion": "2018-10-08",
+                "Id": "arn:aws:guardduty:us-east-1:644160558196:detector/06b01209ca77b0865dd973df0355fc1e/finding/4cb5a629e9757b650d102f683cdbcd7b",
+                "ProductArn": "arn:aws:securityhub:us-east-1::product/aws/guardduty",
+                "GeneratorId": "arn:aws:guardduty:us-east-1:644160558196:detector/06b01209ca77b0865dd973df0355fc1e",
+                "AwsAccountId": "644160558196",
+                "Types": [
+                    "Unusual Behaviors/User/UnauthorizedAccess:IAMUser-ConsoleLogin"
+                ],
+                "FirstObservedAt": "2019-06-12T15:11:20Z",
+                "LastObservedAt": "2019-06-12T15:12:40Z",
+                "CreatedAt": "2019-06-12T15:34:50.346Z",
+                "UpdatedAt": "2019-06-12T15:34:50.346Z",
+                "Severity": {
+                    "Product": 5,
+                    "Normalized": 50
+                },
+                "Title": "Unusual console login was seen for principal kapil.",
+                "Description": "Unusual console login seen from principal kapil. Login activity using this client application, from the specific location has not been seen before from this principal.",
+                "ProductFields": {
+                    "detectorId": "06b01209ca77b0865dd973df0355fc1e",
+                    "action/actionType": "AWS_API_CALL",
+                    "action/awsApiCallAction/api": "ConsoleLogin",
+                    "action/awsApiCallAction/serviceName": "signin.amazonaws.com",
+                    "action/awsApiCallAction/callerType": "Remote IP",
+                    "action/awsApiCallAction/remoteIpDetails/ipAddressV4": "208.115.85.104",
+                    "action/awsApiCallAction/remoteIpDetails/organization/asn": "26925",
+                    "action/awsApiCallAction/remoteIpDetails/organization/asnOrg": "Smart City Networks, L.P.",
+                    "action/awsApiCallAction/remoteIpDetails/organization/isp": "Smart City Networks, L.P.",
+                    "action/awsApiCallAction/remoteIpDetails/organization/org": "Smart City Networks, L.P.",
+                    "action/awsApiCallAction/remoteIpDetails/country/countryName": "United States",
+                    "action/awsApiCallAction/remoteIpDetails/city/cityName": "Washington",
+                    "action/awsApiCallAction/remoteIpDetails/geoLocation/lat": "38.9034",
+                    "action/awsApiCallAction/remoteIpDetails/geoLocation/lon": "-76.9882",
+                    "resourceRole": "TARGET",
+                    "additionalInfo": "{\"recentApiCalls\":[{\"api\":\"ConsoleLogin\",\"count\":1}]}",
+                    "archived": "false",
+                    "count": "1",
+                    "aws/securityhub/FindingId": "arn:aws:securityhub:us-east-1::product/aws/guardduty/arn:aws:guardduty:us-east-1:644160558196:detector/06b01209ca77b0865dd973df0355fc1e/finding/4cb5a629e9757b650d102f683cdbcd7b",
+                    "aws/securityhub/SeverityLabel": "MEDIUM",
+                    "aws/securityhub/ProductName": "GuardDuty",
+                    "aws/securityhub/CompanyName": "AWS"
+                },
+                "Resources": [
+                    {
+                        "Type": "AwsIamAccessKey",
+                        "Id": "AWS::IAM::AccessKey:null",
+                        "Partition": "aws",
+                        "Region": "us-east-1",
+                        "Details": {
+                            "AwsIamAccessKey": {
+                                "UserName": "kapil"
+                            }
+                        }
+                    }
+                ],
+                "RecordState": "ACTIVE",
+                "WorkflowState": "NEW",
+                "approximateArrivalTimestamp": 1560354029.052,
+                "updatedAt": "2019-06-12T15:34:50.346Z"
+            }
+        ]
+    },
+    "debug": true
+}

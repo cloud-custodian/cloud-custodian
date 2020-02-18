@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "CertificateSummaryList": [
+            {
+                "CertificateArn": "arn:aws:acm:us-east-1:644160558196:certificate/70e45883-48b0-4024-88a3-2c145f4fe5c0",
+                "DomainName": "*.pratyush.com"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "cc249f5e-9557-41fb-a4e1-d1bfc8c19c6f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "cc249f5e-9557-41fb-a4e1-d1bfc8c19c6f",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "163",
+                "date": "Tue, 06 Aug 2019 18:24:12 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -4,14 +4,19 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "c45f14de-6bce-11e7-8110-65c21ac11bf6", 
+            "RequestId": "c4abfc7b-6bce-11e7-b392-6379faaa3b00", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "c45f14de-6bce-11e7-8110-65c21ac11bf6", 
+                "x-amzn-requestid": "c4abfc7b-6bce-11e7-b392-6379faaa3b00", 
                 "date": "Tue, 18 Jul 2017 15:35:45 GMT", 
-                "content-length": "293", 
+                "content-length": "390", 
                 "content-type": "text/xml"
             }
         }, 
-        "TagList": []
+        "TagList": [
+            {
+                "Value": "hello world", 
+                "Key": "xyz"
+            }
+        ]
     }
 }

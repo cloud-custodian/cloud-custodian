@@ -22,14 +22,15 @@ if os.path.exists('readme.md'):
 
 setup(
     name="c7n_guardian",
-    version='0.3.2',
+    version='0.3.3',
     description="Cloud Custodian - Multi Account Guard Duty Setup",
     long_description=description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],
-    url="https://github.com/capitalone/cloud-custodian",
+    url="https://github.com/cloud-custodian/cloud-custodian",
     author="Kapil Thangavelu",
     author_email="kapil.foss@gmail.com",
     license="Apache-2.0",

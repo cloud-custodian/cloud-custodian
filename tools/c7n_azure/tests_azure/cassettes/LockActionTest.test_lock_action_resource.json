@@ -1,0 +1,177 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2015-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:24 GMT"
+                    ],
+                    "content-length": [
+                        "428"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "cclockedsqlserverc129bfa71a47.database.windows.net"
+                                },
+                                "location": "eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47",
+                                "name": "cclockedsqlserverc129bfa71a47",
+                                "type": "Microsoft.Sql/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "PUT",
+                "uri": "https://management.azure.com/%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2Ftest_locked%2Fproviders%2FMicrosoft.Sql%2Fservers%2Fcclockedsqlserverc129bfa71a47/providers/Microsoft.Authorization/locks/sqllock?api-version=2016-09-01",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 201,
+                    "message": "Created"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1196"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:24 GMT"
+                    ],
+                    "content-length": [
+                        "307"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "level": "ReadOnly",
+                            "notes": "testNotes"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47/providers/Microsoft.Authorization/locks/sqllock",
+                        "type": "Microsoft.Authorization/locks",
+                        "name": "sqllock"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_locked/providers/Microsoft.Sql%2FServers/cclockedsqlserverc129bfa71a47/providers/Microsoft.Authorization/locks?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:24 GMT"
+                    ],
+                    "content-length": [
+                        "632"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "level": "CanNotDelete",
+                                    "notes": "This lock is for the cc test_filter_resource_lock test"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_locked/providers/Microsoft.Authorization/locks/cctestlockfilter",
+                                "type": "Microsoft.Authorization/locks",
+                                "name": "cctestlockfilter"
+                            },
+                            {
+                                "properties": {
+                                    "level": "ReadOnly",
+                                    "notes": "testNotes"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_locked/providers/Microsoft.Sql/servers/cclockedsqlserverc129bfa71a47/providers/Microsoft.Authorization/locks/sqllock",
+                                "type": "Microsoft.Authorization/locks",
+                                "name": "sqllock"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "DELETE",
+                "uri": "https://management.azure.com/%2Fsubscriptions%2Fea42f556-5106-4743-99b0-c129bfa71a47%2FresourceGroups%2Ftest_locked%2Fproviders%2FMicrosoft.Sql%2Fservers%2Fcclockedsqlserverc129bfa71a47/providers/Microsoft.Authorization/locks/sqllock?api-version=2016-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-deletes": [
+                        "14999"
+                    ],
+                    "date": [
+                        "Sun, 08 Dec 2019 00:48:24 GMT"
+                    ],
+                    "content-length": [
+                        "0"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        }
+    ]
+}

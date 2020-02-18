@@ -1,0 +1,16 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:rds:us-east-2:123456789012:cluster:c7ntest",
+                "Tags": [
+		    {
+			"Value": "hello world",
+			"Key": "xyz"
+		    }
+                ]
+            }
+        ]
+    }
+}

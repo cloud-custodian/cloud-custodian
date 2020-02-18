@@ -17,7 +17,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import six
 
 from azure.mgmt.resource.policy.models import PolicyAssignment
-from azure.mgmt.subscription import SubscriptionClient
+from azure.mgmt.resource import SubscriptionClient
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -26,17 +26,48 @@ from c7n.manager import ResourceManager
 from c7n.utils import local_session, type_schema
 
 from c7n_azure.provider import resources
-from c7n_azure.query import QueryMeta
+from c7n_azure.query import QueryMeta, TypeInfo
 
 
 @resources.register('subscription')
 @six.add_metaclass(QueryMeta)
 class Subscription(ResourceManager):
+    """Subscription Resource
 
-    class resource_type(object):
+    :example:
+
+    This policy creates Azure Policy scoped to the current subscription if doesn't exist.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: azure-policy-sample
+            resource: azure.subscription
+            filters:
+              - type: missing
+                policy:
+                  resource: azure.policyassignments
+                  filters:
+                    - type: value
+                      key: properties.displayName
+                      op: eq
+                      value_type: normalize
+                      value: dn_sample_policy
+            actions:
+              - type: add-policy
+                name: sample_policy
+                display_name: dn_sample_policy
+                definition_name: "Audit use of classic storage accounts"
+
+    """
+
+    class resource_type(TypeInfo):
+        doc_groups = ['Subscription']
+
         id = 'subscriptionId'
         name = 'displayName'
         filter_name = None
+        service = 'subscription'
 
     def get_model(self):
         return self.resource_type
@@ -50,7 +81,7 @@ class Subscription(ResourceManager):
     def _get_subscription(self, session_factory, config):
         session = local_session(session_factory)
         client = SubscriptionClient(session.get_credentials())
-        details = client.subscriptions.get(subscription_id=session.subscription_id)
+        details = client.subscriptions.get(subscription_id=session.get_subscription_id())
         return details.serialize(True)
 
 

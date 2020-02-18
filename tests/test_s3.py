@@ -32,6 +32,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
+from c7n.utils import get_account_alias_from_sts
 
 from .common import (
     BaseTest,
@@ -39,7 +40,6 @@ from .common import (
     event_data,
     skip_if_not_validating,
     functional,
-    TestConfig as Config,
 )
 
 
@@ -114,6 +114,28 @@ def generateBucketContents(s3, bucket, contents=None):
 
 
 class BucketMetrics(BaseTest):
+
+    def test_metrics_dims(self):
+        factory = self.replay_flight_data('test_s3_metrics_user_dims')
+        p = self.load_policy({
+            'name': 's3',
+            'resource': 's3',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId = 'c7n-ssm-build'"}],
+            'filters': [{
+                'type': 'metrics',
+                'name': 'BucketSizeBytes',
+                'dimensions': {
+                    'StorageType': 'StandardStorage'},
+                'days': 7,
+                'value': 100,
+                'op': 'gte'}]},
+            session_factory=factory,
+            config={'region': 'us-east-2'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn('c7n.metrics', resources[0])
 
     def test_metrics(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -727,7 +749,8 @@ class S3ConfigSource(ConfigTest):
     def test_normalize(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         augments = list(s3.S3_AUGMENT_TABLE)
-        augments.remove(("get_bucket_location", "Location", None, None))
+        augments.remove((
+            "get_bucket_location", "Location", {}, None, 's3:GetBucketLocation'))
         self.patch(s3, "S3_AUGMENT_TABLE", augments)
 
         bname = "custodian-test-data-23"
@@ -867,7 +890,7 @@ class S3ConfigSource(ConfigTest):
         results = self.wait_for_config(session, queue_url, bname)
         resource_b = s3.ConfigS3(manager).load_resource(results[0])
         self.maxDiff = None
-
+        self.assertEqual(s3.get_region(resource_b), 'us-east-1')
         for k in ("Logging", "Policy", "Versioning", "Name", "Website"):
             self.assertEqual(resource_a[k], resource_b[k])
 
@@ -881,6 +904,7 @@ class S3ConfigSource(ConfigTest):
         p = self.load_policy({"name": "s3cfg", "resource": "s3"})
         source = p.resource_manager.get_source("config")
         resource = source.load_resource(event)
+        self.assertEqual(s3.get_region(resource), 'us-east-1')
         self.assertEqual(
             resource["Notification"],
             {
@@ -1062,6 +1086,7 @@ class S3ConfigSource(ConfigTest):
             {"Planet": "Earth", "Verbose": "Game"},
             {t["Key"]: t["Value"] for t in resource.pop("Tags")},
         )
+        self.assertEqual(s3.get_region(resource), 'us-east-2')
         self.assertEqual(
             resource,
             {
@@ -1127,7 +1152,7 @@ class S3ConfigSource(ConfigTest):
                     2017, 9, 15, 2, 5, 40, tzinfo=tzutc()
                 ),
                 u"Lifecycle": None,
-                u"Location": None,
+                u"Location": {},
                 u"Logging": None,
                 u"Name": u"c7n-fire-logs",
                 u"Notification": {},
@@ -1194,7 +1219,7 @@ class BucketPolicyStatements(BaseTest):
         self.assertTrue(len(policy["Statement"]) > 0)
         self.assertTrue(
             len([s for s in policy["Statement"] if s["Sid"] == sid and
-              s["Resource"] == "arn:aws:s3:::%s/*" % (bname)]) == 1
+                s["Resource"] == "arn:aws:s3:::%s/*" % (bname)]) == 1
         )
 
     @functional
@@ -1230,6 +1255,22 @@ class BucketPolicyStatements(BaseTest):
 
 
 class S3Test(BaseTest):
+
+    def test_bucket_get_resources(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [
+            ('get_bucket_tagging', 'Tags', [], 'TagSet')])
+        session_factory = self.replay_flight_data("test_s3_get_resources")
+        p = self.load_policy(
+            {"name": "bucket-fetch", "resource": "s3"},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(['c7n-codebuild'])
+        self.assertEqual(len(resources), 1)
+        tags = {t['Key']: t['Value'] for t in resources[0].get('Tags')}
+        self.assertEqual(
+            tags, {
+                'Application': 'test', 'Env': 'Dev', 'Owner': 'nicholase',
+                'Retention': '2', 'Retention2': '3', 'test': 'test'})
 
     def test_multipart_large_file(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -1686,43 +1727,35 @@ class S3Test(BaseTest):
 
     @functional
     def test_enable_logging(self):
-        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
-        self.patch(
-            s3, "S3_AUGMENT_TABLE", [("get_bucket_logging", "Logging", None, None)]
-        )
-        session_factory = self.replay_flight_data("test_s3_enable_logging")
         bname = "superduper-and-magic"
 
-        session = session_factory()
-        client = session.client("s3")
-        client.create_bucket(Bucket=bname)
-        client.put_bucket_acl(
-            Bucket=bname,
-            AccessControlPolicy={
-                "Owner": {
-                    "DisplayName": "mandeep.bal",
-                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15",
-                },
-                "Grants": [
-                    {
-                        "Grantee": {
-                            "Type": "Group",
-                            "URI": "http://acs.amazonaws.com/groups/s3/LogDelivery",
-                        },
-                        "Permission": "WRITE",
-                    },
-                    {
-                        "Grantee": {
-                            "Type": "Group",
-                            "URI": "http://acs.amazonaws.com/groups/s3/LogDelivery",
-                        },
-                        "Permission": "READ_ACP",
-                    },
-                ],
-            },
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        # only augment with logging info to minimize API calls
+        self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [("get_bucket_logging", "Logging", None, "LoggingEnabled")],
         )
+        # and ignore any other buckets we might have in this test account
+        # to minimize the placebo data and API calls
+        self.patch(
+            s3.S3.resource_type,
+            "enum_spec",
+            ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
+        )
+        session_factory = self.replay_flight_data("test_s3_enable_logging")
 
+        session = session_factory()
+        account_name = get_account_alias_from_sts(session)
+        client = session.client("s3")
+        client.create_bucket(Bucket=bname, ACL="log-delivery-write")
         self.addCleanup(destroyBucket, client, bname)
+
+        if self.recording:
+            time.sleep(5)
+
+        acl = client.get_bucket_acl(Bucket=bname)
+        self.assertEqual(len(acl['Grants']), 3)
 
         p = self.load_policy(
             {
@@ -1743,14 +1776,50 @@ class S3Test(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
 
-        # eventual consistency fun for recording
+        if self.recording:
+            time.sleep(5)
+
+        logging = client.get_bucket_logging(Bucket=bname).get("LoggingEnabled")
+        self.assertEqual(
+            logging["TargetPrefix"], "{}/{}".format(account_name, bname)
+        )
+
+        # now override existing setting
+        p = self.load_policy(
+            {
+                "name": "s3-version",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {
+                        "type": "bucket-logging",
+                        "op": "not-equal",
+                        "target_bucket": bname,
+                        "target_prefix": "{account_id}/{source_bucket_name}/",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "toggle-logging",
+                        "target_bucket": bname,
+                        "target_prefix": "{account_id}/{source_bucket_name}/",
+                    }
+                ],
+            },
+            config={'account_id': self.account_id},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], bname)
+
         if self.recording:
             time.sleep(5)
 
         logging = client.get_bucket_logging(Bucket=bname).get("LoggingEnabled")
         self.assertTrue(logging)
         self.assertEqual(
-            logging["TargetPrefix"], "custodian-skunk-works/superduper-and-magic"
+            logging["TargetPrefix"], "{}/{}/".format(self.account_id, bname)
         )
 
         # Flip the switch
@@ -1766,10 +1835,10 @@ class S3Test(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], bname)
 
-        # eventual consistency fun for recording
         if self.recording:
-            time.sleep(12)
+            time.sleep(20)
 
         logging = client.get_bucket_logging(Bucket=bname).get("LoggingEnabled")
         self.assertFalse(logging)
@@ -2042,7 +2111,7 @@ class S3Test(BaseTest):
                 "filters": [{"Name": bname}],
                 "actions": [{"type": "attach-encrypt", "role": role}],
             },
-            config=Config.empty(region="us-west-2"),
+            config=dict(region="us-west-2"),
             session_factory=session_factory,
         )
 

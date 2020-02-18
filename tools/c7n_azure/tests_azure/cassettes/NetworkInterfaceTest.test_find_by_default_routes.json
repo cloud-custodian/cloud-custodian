@@ -1,0 +1,272 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/networkInterfaces?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "2953"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "211dafb9-93db-4c4c-85da-d74f9a915537",
+                        "770012d6-c9b8-46ac-b409-531ea41e7c4b"
+                    ],
+                    "date": [
+                        "Mon, 25 Nov 2019 19:11:31 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestnic",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_network_interface/providers/Microsoft.Network/networkInterfaces/cctestnic",
+                                "etag": "W/\"b3d40af0-d267-4138-a91b-eb86e3d34711\"",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "382ac9ec-cd9c-48d4-a1c5-162ee506dcae",
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "ipconfig1",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_network_interface/providers/Microsoft.Network/networkInterfaces/cctestnic/ipConfigurations/ipconfig1",
+                                            "etag": "W/\"b3d40af0-d267-4138-a91b-eb86e3d34711\"",
+                                            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAddress": "10.1.0.4",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_network_interface/providers/Microsoft.Network/virtualNetworks/cctestvnetnic/subnets/default"
+                                                },
+                                                "primary": true,
+                                                "privateIPAddressVersion": "IPv4"
+                                            }
+                                        }
+                                    ],
+                                    "dnsSettings": {
+                                        "dnsServers": [],
+                                        "appliedDnsServers": [],
+                                        "internalDomainNameSuffix": "jl1wkh35iy2uhlzr0xb5hx4ata.bx.internal.cloudapp.net"
+                                    },
+                                    "enableAcceleratedNetworking": false,
+                                    "enableIPForwarding": false,
+                                    "hostedWorkloads": [],
+                                    "tapConfigurations": []
+                                },
+                                "type": "Microsoft.Network/networkInterfaces"
+                            },
+                            {
+                                "name": "myVMNic",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic",
+                                "etag": "W/\"52417afa-b08a-4c32-b910-c26fd6577046\"",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "8186cc94-419e-4f55-8359-10ccb53cdca3",
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "ipconfig1",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic/ipConfigurations/ipconfig1",
+                                            "etag": "W/\"52417afa-b08a-4c32-b910-c26fd6577046\"",
+                                            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAddress": "10.0.0.4",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/publicIPAddresses/myPublicIP"
+                                                },
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/virtualNetworks/MyVNET/subnets/Subnet"
+                                                },
+                                                "primary": true,
+                                                "privateIPAddressVersion": "IPv4"
+                                            }
+                                        }
+                                    ],
+                                    "dnsSettings": {
+                                        "dnsServers": [],
+                                        "appliedDnsServers": [],
+                                        "internalDomainNameSuffix": "z3rekmuctr2u1b3ro5dvchk3jd.jx.internal.cloudapp.net"
+                                    },
+                                    "macAddress": "00-0D-3A-73-CF-2E",
+                                    "enableAcceleratedNetworking": false,
+                                    "enableIPForwarding": false,
+                                    "primary": true,
+                                    "virtualMachine": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Compute/virtualMachines/cctestvm"
+                                    },
+                                    "hostedWorkloads": [],
+                                    "tapConfigurations": []
+                                },
+                                "type": "Microsoft.Network/networkInterfaces"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_vm/providers/Microsoft.Network/networkInterfaces/myVMNic/effectiveRouteTable?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "4d4b3f24-1ec9-4bcf-b1ec-07c716b18684"
+                    ],
+                    "date": [
+                        "Mon, 25 Nov 2019 19:11:52 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-writes": [
+                        "1199"
+                    ],
+                    "content-length": [
+                        "4"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Network/locations/southcentralus/operationResults/2bb2b4f9-6bf8-491a-8345-45ea65dcf8e4?api-version=2019-09-01"
+                    ]
+                },
+                "body": {
+                    "data": null
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/locations/southcentralus/operationResults/2bb2b4f9-6bf8-491a-8345-45ea65dcf8e4?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "4d4b3f24-1ec9-4bcf-b1ec-07c716b18684"
+                    ],
+                    "date": [
+                        "Mon, 25 Nov 2019 19:15:25 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "location": [
+                        "https://management.azure.com/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/providers/Microsoft.Network/locations/southcentralus/operationResults/2bb2b4f9-6bf8-491a-8345-45ea65dcf8e4?api-version=2019-09-01"
+                    ],
+                    "content-length": [
+                        "1643"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "disableBgpRoutePropagation": false,
+                                "source": "Default",
+                                "state": "Active",
+                                "hasBgpOverride": false,
+                                "addressPrefix": [
+                                    "10.0.0.0/16"
+                                ],
+                                "nextHopType": "VnetLocal",
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
+                            },
+                            {
+                                "disableBgpRoutePropagation": false,
+                                "source": "Default",
+                                "state": "Active",
+                                "hasBgpOverride": false,
+                                "addressPrefix": [
+                                    "0.0.0.0/0"
+                                ],
+                                "nextHopType": "Internet",
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
+                            },
+                            {
+                                "disableBgpRoutePropagation": false,
+                                "source": "Default",
+                                "state": "Active",
+                                "hasBgpOverride": false,
+                                "addressPrefix": [
+                                    "10.0.0.0/8"
+                                ],
+                                "nextHopType": "None",
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
+                            },
+                            {
+                                "disableBgpRoutePropagation": false,
+                                "source": "Default",
+                                "state": "Active",
+                                "hasBgpOverride": false,
+                                "addressPrefix": [
+                                    "100.64.0.0/10"
+                                ],
+                                "nextHopType": "None",
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
+                            },
+                            {
+                                "disableBgpRoutePropagation": false,
+                                "source": "Default",
+                                "state": "Active",
+                                "hasBgpOverride": false,
+                                "addressPrefix": [
+                                    "192.168.0.0/16"
+                                ],
+                                "nextHopType": "None",
+                                "nextHopIpAddress": [],
+                                "destinationServiceTags": [],
+                                "tagMap": {}
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

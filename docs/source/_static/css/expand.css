@@ -13,12 +13,12 @@
 }
 
 .toggle .header:before {
-  font-size:0.7em;
-  content:"\25BA"
+  font-size:1em;
+  content:"\25BA\20Schema:"
 }
 
 .toggle .header.open:before {
-  font-size:0.7em;
-  content:"\25BC";
+  font-size:1em;
+  content:"\25BC\20Schema:";
   margin-right:0.5em
 }

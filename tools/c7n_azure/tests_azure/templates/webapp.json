@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "sitesName":"[concat('cctestwebapp', variables('suffix'))]",
+        "serverfarms_name": "[concat('ccctestServicePlane', variables('suffix'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 1
+            },
+            "kind": "app",
+            "name": "[variables('serverfarms_name')]",
+            "apiVersion": "2016-09-01",
+            "location": "Central US",
+            "properties": {
+                "reserved": false
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "kind": "api",
+            "name": "[variables('sitesName')]",
+            "apiVersion": "2016-08-01",
+            "location": "Central US",
+            "scale": null,
+            "properties": {
+                "enabled": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_name'))]",
+                "reserved": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverfarms_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "name": "[concat(variables('sitesName'), '/web')]",
+            "apiVersion": "2016-08-01",
+            "location": "Central US",
+            "properties": {
+                "numberOfWorkers": 1,
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "pythonVersion": "",
+                "nodeVersion": "",
+                "linuxFxVersion": "",
+
+                "http20Enabled": false,
+                "minTlsVersion": "1.0"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('sitesName'))]"
+            ]
+        }
+    ]
+}

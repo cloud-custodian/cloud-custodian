@@ -27,13 +27,14 @@ import six
 import yaml
 from yaml.constructor import ConstructorError
 
-from c7n.exceptions import ClientError
+from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
-from c7n.utils import dumps, load_file, local_session, SafeLoader
+from c7n.schema import ElementSchema, StructureParser, generate
+from c7n.utils import dumps, load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
 from c7n import provider
-from c7n.resources import load_resources
+from c7n.resources import load_resources, load_available
 
 
 log = logging.getLogger('custodian.commands')
@@ -51,7 +52,6 @@ def policy_command(f):
         if not validate:
             log.debug('Policy validation disabled')
 
-        load_resources()
         vars = _load_vars(options)
 
         errors = 0
@@ -77,7 +77,11 @@ def policy_command(f):
                     fp, str(e)))
                 errors += 1
                 continue
-
+            except PolicyValidationError as e:
+                log.error('invalid policy file: {} error: {}'.format(
+                    fp, str(e)))
+                errors += 1
+                continue
             if collection is None:
                 log.debug('Loaded file {}. Contained no policies.'.format(fp))
             else:
@@ -92,8 +96,8 @@ def policy_command(f):
 
         # filter by name and resource type
         policies = all_policies.filter(
-            getattr(options, 'policy_filter', None),
-            getattr(options, 'resource_type', None))
+            getattr(options, 'policy_filters', []),
+            getattr(options, 'resource_types', []))
 
         # provider initialization
         provider_policies = {}
@@ -153,14 +157,16 @@ def _load_vars(options):
 
 
 def _print_no_policies_warning(options, policies):
-    if options.policy_filter or options.resource_type:
+    if options.policy_filters or options.resource_types:
         log.warning("Warning: no policies matched the filters provided.")
 
         log.warning("Filters:")
-        if options.policy_filter:
-            log.warning("    Policy name filter (-p): " + options.policy_filter)
-        if options.resource_type:
-            log.warning("    Resource type filter (-t): " + options.resource_type)
+        if options.policy_filters:
+            log.warning("    Policy name filter (-p): {}".format(
+                ", ".join(options.policy_filters)))
+        if options.resource_types:
+            log.warning("    Resource type filter (-t): {}".format(
+                ", ".join(options.resource_types)))
 
         log.warning("Available policies:")
         for policy in policies:
@@ -194,16 +200,17 @@ class DuplicateKeyCheckLoader(SafeLoader):
 
 def validate(options):
     from c7n import schema
-    load_resources()
+
     if len(options.configs) < 1:
         log.error('no config files specified')
         sys.exit(1)
 
     used_policy_names = set()
-    schm = schema.generate()
+    structure = StructureParser()
     errors = []
 
     for config_file in options.configs:
+
         config_file = os.path.expanduser(config_file)
         if not os.path.exists(config_file):
             raise ValueError("Invalid path for config %r" % config_file)
@@ -218,6 +225,16 @@ def validate(options):
                 log.error("The config file must end in .json, .yml or .yaml.")
                 raise ValueError("The config file must end in .json, .yml or .yaml.")
 
+        try:
+            structure.validate(data)
+        except PolicyValidationError as e:
+            log.error("Configuration invalid: {}".format(config_file))
+            log.error("%s" % e)
+            errors.append(e)
+            continue
+
+        load_resources(structure.get_resource_types(data))
+        schm = schema.generate()
         errors += schema.validate(data, schm)
         conf_policy_names = {
             p.get('name', 'unknown') for p in data.get('policies', ())}
@@ -331,7 +348,7 @@ def schema_completer(prefix):
     filtering via startswith happens after this list is returned.
     """
     from c7n import schema
-    load_resources()
+    load_available()
     components = prefix.split('.')
 
     if components[0] in provider.clouds.keys():
@@ -377,11 +394,11 @@ def schema_cmd(options):
         schema.json_dump(options.resource)
         return
 
-    load_resources()
+    load_available()
 
     resource_mapping = schema.resource_vocabulary()
     if options.summary:
-        schema.summary(resource_mapping)
+        schema.pprint_schema_summary(resource_mapping)
         return
 
     # Here are the formats for what we accept:
@@ -404,7 +421,7 @@ def schema_cmd(options):
 
     if not options.resource:
         resource_list = {'resources': sorted(provider.resources().keys())}
-        print(yaml.safe_dump(resource_list, default_flow_style=False))
+        print(yaml_dump(resource_list))
         return
 
     # Format is [PROVIDER].RESOURCE.CATEGORY.ITEM
@@ -413,7 +430,7 @@ def schema_cmd(options):
     if len(components) == 1 and components[0] in provider.clouds.keys():
         resource_list = {'resources': sorted(
             provider.resources(cloud_provider=components[0]).keys())}
-        print(yaml.safe_dump(resource_list, default_flow_style=False))
+        print(yaml_dump(resource_list))
         return
     if components[0] in provider.clouds.keys():
         cloud_provider = components.pop(0)
@@ -432,7 +449,7 @@ def schema_cmd(options):
     if components[0] == "mode":
         if len(components) == 1:
             output = {components[0]: list(resource_mapping[components[0]].keys())}
-            print(yaml.safe_dump(output, default_flow_style=False))
+            print(yaml_dump(output))
             return
 
         if len(components) == 2:
@@ -463,7 +480,7 @@ def schema_cmd(options):
             print("\nHelp\n----\n")
             print(docstring + '\n')
         output = {resource: resource_mapping[resource]}
-        print(yaml.safe_dump(output))
+        print(yaml_dump(output))
         return
 
     #
@@ -479,7 +496,7 @@ def schema_cmd(options):
         if category in resource_mapping[resource]:
             output = {resource: {
                 category: resource_mapping[resource][category]}}
-        print(yaml.safe_dump(output))
+        print(yaml_dump(output))
         return
 
     #
@@ -515,10 +532,9 @@ def _print_cls_schema(cls):
     # Print schema
     print("\nSchema\n------\n")
     if hasattr(cls, 'schema'):
-        component_schema = dict(cls.schema)
-        component_schema.pop('additionalProperties', None)
-        component_schema.pop('type', None)
-        print(yaml.safe_dump(component_schema))
+        definitions = generate()['definitions']
+        component_schema = ElementSchema.schema(definitions, cls)
+        print(yaml_dump(component_schema))
     else:
         # Shouldn't ever hit this, so exclude from cover
         print("No schema is available for this item.", file=sys.sterr)  # pragma: no cover
@@ -574,5 +590,8 @@ def version_cmd(options):
     except Exception:  # pragma: no cover
         print("Platform:  ", sys.platform)
     print("Using venv: ", hasattr(sys, 'real_prefix'))
+
+    in_container = os.path.exists('/.dockerenv')
+    print("Docker: %s" % str(bool(in_container)))
     print("PYTHONPATH: ")
     pp.pprint(sys.path)

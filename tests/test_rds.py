@@ -25,7 +25,7 @@ from collections import OrderedDict
 
 from botocore.exceptions import ClientError
 import boto3
-from .common import BaseTest, event_data, TestConfig as Config
+from .common import BaseTest, event_data
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -132,7 +132,6 @@ class RDSTest(BaseTest):
                 "resource": "rds",
                 "filters": [{"tag:Platform": "postgres"}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -148,7 +147,6 @@ class RDSTest(BaseTest):
                 "filters": [{"tag:Platform": "postgres"}],
                 "actions": [{"type": "tag-trim", "preserve": ["Name", "Owner"]}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -166,7 +164,6 @@ class RDSTest(BaseTest):
                 "filters": [{"tag:Platform": "postgres"}],
                 "actions": [{"type": "tag", "key": "xyz", "value": "hello world"}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -185,7 +182,6 @@ class RDSTest(BaseTest):
                 "filters": [{"tag:xyz": "not-null"}],
                 "actions": [{"type": "remove-tag", "tags": ["xyz"]}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = policy.run()
@@ -211,7 +207,6 @@ class RDSTest(BaseTest):
                     }
                 ],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -230,7 +225,6 @@ class RDSTest(BaseTest):
                     }
                 ],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = policy.run()
@@ -365,7 +359,7 @@ class RDSTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 5)
 
     def test_rds_retention_copy_tags(self):
         session_factory = self.replay_flight_data("test_rds_retention")
@@ -379,7 +373,7 @@ class RDSTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 6)
+        self.assertEqual(len(resources), 5)
 
     def test_rds_restore(self):
         self.patch(rds.RestoreInstance, "executor_factory", MainThreadExecutor)
@@ -403,7 +397,7 @@ class RDSTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-east-2"),
+            config=dict(region="us-east-2"),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -427,7 +421,7 @@ class RDSTest(BaseTest):
                 "filters": [{"DBInstanceIdentifier": instance_id}],
                 "actions": [{"type": "delete", "copy-restore-info": True}],
             },
-            config=Config.empty(region="us-east-2"),
+            config=dict(region="us-east-2"),
             session_factory=session_factory,
         )
         p.run()
@@ -448,7 +442,7 @@ class RDSTest(BaseTest):
                 "filters": [{"tag:Owner": "test"}],
                 "actions": [{"type": "delete", "skip-snapshot": True}],
             },
-            config=Config.empty(region="us-west-2"),
+            config=dict(region="us-west-2"),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -520,7 +514,6 @@ class RDSTest(BaseTest):
                 ],
                 "actions": [{"type": "upgrade", "immediate": False}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -900,7 +893,6 @@ class RDSSnapshotTest(BaseTest):
         )
 
     def test_rds_cross_region_copy_skip_same_region(self):
-        self.change_environment(AWS_DEFAULT_REGION="us-east-2")
         factory = self.replay_flight_data("test_rds_snapshot_latest")
         output = self.capture_logging("custodian.actions")
         p = self.load_policy(
@@ -909,7 +901,7 @@ class RDSSnapshotTest(BaseTest):
                 "resource": "rds-snapshot",
                 "actions": [{"type": "region-copy", "target_region": "us-east-2"}],
             },
-            Config.empty(region="us-east-2"),
+            config={'region': 'us-east-2'},
             session_factory=factory,
         )
         resources = p.run()
@@ -928,7 +920,7 @@ class RDSSnapshotTest(BaseTest):
         def brooklyn(delay):
             return
 
-        output = self.capture_logging("c7n.worker", level=logging.DEBUG)
+        output = self.capture_logging("c7n.retry", level=logging.DEBUG)
         self.patch(time, "sleep", brooklyn)
         self.change_environment(AWS_DEFAULT_REGION="us-east-1")
         p = self.load_policy(
@@ -945,7 +937,6 @@ class RDSSnapshotTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-east-1"),
             session_factory=factory,
         )
         resources = p.run()
@@ -973,7 +964,7 @@ class RDSSnapshotTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-east-1"),
+            config=dict(region="us-east-1"),
             session_factory=factory,
         )
         resources = p.run()
@@ -1013,7 +1004,6 @@ class RDSSnapshotTest(BaseTest):
                 "resource": "rds-snapshot",
                 "filters": [{"type": "marked-for-op", "op": "delete"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -1254,6 +1244,36 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(len(clean_resources[0]["VpcSecurityGroups"]), 2)
         self.assertEqual(len(clean_resources), 4)
 
+    def test_rds_filter_by_vpcid(self):
+        #
+        # Test conditions:
+        # Purpose of test is only to validate checking vpc filtered ID with DBSubnetGroup.VpcId
+        # Uses the add_security_group data--should match 4 DB instances (all in the filtered VPC)
+        # Checks that the expected VPC is present
+
+        session_factory = self.replay_flight_data("test_rds_add_security_group")
+        p = self.load_policy(
+            {
+                "name": "filter-by-vpcid",
+                "resource": "rds",
+                "filters": [
+                    {
+                        "type": "vpc",
+                        "key": "VpcId",
+                        "value": "vpc-09b75e60",
+                        "op": "eq",
+                    },
+                ],
+                "actions": [{"type": "modify-security-groups", "add": "sg-6360920a"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 4)
+        self.assertEqual("vpc-09b75e60", resources[0]["DBSubnetGroup"]["VpcId"])
+
 
 class TestHealthEventsFilter(BaseTest):
 
@@ -1468,3 +1488,18 @@ class Resize(BaseTest):
         wait_until("modifying")
         wait_until("available")
         self.assertEqual(describe()["AllocatedStorage"], 6)  # nearest gigabyte
+
+
+class TestReservedRDSInstance(BaseTest):
+    def test_reserved_rds_instance_query(self):
+        session_factory = self.replay_flight_data("test_reserved_rds_instance_query")
+        p = self.load_policy(
+            {
+                "name": "filter-rds-reserved-instances",
+                "resource": "aws.rds-reserved"
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ReservedDBInstanceId"], "ri-2019-05-06-14-19-06-332")

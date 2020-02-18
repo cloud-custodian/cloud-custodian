@@ -161,8 +161,8 @@ is exceeded, policy execution is stopped before taking any actions::
   $ custodian run -s out policy.yml
   custodian.commands:ERROR policy: log-delete exceeded resource limit: 2.5% found: 1 total: 1
 
-If metrics are being published ('-m/--metrics-enabled') then an additional
-metric named `ResourceLimitExceeded` will be published with the number
+If metrics are being published :code:`(-m/--metrics)` then an additional
+metric named `ResourceCount` will be published with the number
 of resources that matched the policy.
 
 Max resources can also be specified as an object with an `or` or `and` operator

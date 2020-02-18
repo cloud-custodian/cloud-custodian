@@ -57,7 +57,6 @@ from concurrent.futures import as_completed
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
-from c7n.actions.securityhub import OtherResourcePostFinding
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
@@ -65,14 +64,14 @@ from c7n.filters import (
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, ConfigSource
+from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n import tags
-from c7n.tags import universal_augment, register_universal_tags
+from c7n.tags import universal_augment
 
 from c7n.utils import (
-    local_session, type_schema,
-    get_retry, chunks, generate_arn, snapshot_identifier)
+    local_session, type_schema, get_retry, chunks, snapshot_identifier)
 from c7n.resources.kms import ResourceKmsKeyAlias
+from c7n.resources.securityhub import OtherResourcePostFinding
 
 log = logging.getLogger('custodian.rds')
 
@@ -85,9 +84,10 @@ class RDS(QueryResourceManager):
     """Resource manager for RDS DB instances.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'rds'
-        type = 'db'
+        arn_type = 'db'
+        arn_separator = ':'
         enum_spec = ('describe_db_instances', 'DBInstances', None)
         id = 'DBInstanceIdentifier'
         name = 'Endpoint.Address'
@@ -96,7 +96,8 @@ class RDS(QueryResourceManager):
         date = 'InstanceCreateTime'
         dimension = 'DBInstanceIdentifier'
         config_type = 'AWS::RDS::DBInstance'
-
+        arn = 'DBInstanceArn'
+        universal_taggable = True
         default_report_fields = (
             'DBInstanceIdentifier',
             'DBName',
@@ -108,21 +109,10 @@ class RDS(QueryResourceManager):
             'PubliclyAccessible',
             'InstanceCreateTime',
         )
+        permissions_enum = ('rds:DescribeDBInstances',)
 
     filter_registry = filters
     action_registry = actions
-    _generate_arn = None
-
-    def __init__(self, data, options):
-        super(RDS, self).__init__(data, options)
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='db', separator=':')
-        return self._generate_arn
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -147,11 +137,6 @@ class ConfigRDS(ConfigSource):
         resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
           for t in item['supplementaryConfiguration']['Tags']]
         return resource
-
-
-register_universal_tags(
-    RDS.filter_registry,
-    RDS.action_registry)
 
 
 def _db_instance_eligible_for_backup(resource):
@@ -231,7 +216,7 @@ def _get_available_engine_upgrades(client, major=False):
 
     Example::
 
-      >>> _get_engine_upgrades(client)
+      >>> _get_available_engine_upgrades(client)
       {
          'oracle-se2': {'12.1.0.2.v2': '12.1.0.2.v5',
                         '12.1.0.2.v3': '12.1.0.2.v5'},
@@ -242,30 +227,25 @@ def _get_available_engine_upgrades(client, major=False):
       }
     """
     results = {}
-    engine_versions = client.describe_db_engine_versions()['DBEngineVersions']
-    for v in engine_versions:
-        if not v['Engine'] in results:
-            results[v['Engine']] = {}
-        if 'ValidUpgradeTarget' not in v or len(v['ValidUpgradeTarget']) == 0:
-            continue
-        for t in v['ValidUpgradeTarget']:
-            if not major and t['IsMajorVersionUpgrade']:
+    paginator = client.get_paginator('describe_db_engine_versions')
+    for page in paginator.paginate():
+        engine_versions = page['DBEngineVersions']
+        for v in engine_versions:
+            if not v['Engine'] in results:
+                results[v['Engine']] = {}
+            if 'ValidUpgradeTarget' not in v or len(v['ValidUpgradeTarget']) == 0:
                 continue
-            if LooseVersion(t['EngineVersion']) > LooseVersion(
-                    results[v['Engine']].get(v['EngineVersion'], '0.0.0')):
-                results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
+            for t in v['ValidUpgradeTarget']:
+                if not major and t['IsMajorVersionUpgrade']:
+                    continue
+                if LooseVersion(t['EngineVersion']) > LooseVersion(
+                        results[v['Engine']].get(v['EngineVersion'], '0.0.0')):
+                    results[v['Engine']][v['EngineVersion']] = t['EngineVersion']
     return results
 
 
-@filters.register('offhour')
-class RDSOffHour(OffHour):
-    """Scheduled action on rds instance.
-    """
-
-
-@filters.register('onhour')
-class RDSOnHour(OnHour):
-    """Scheduled action on rds instance."""
+filters.register('offhour', OffHour)
+filters.register('onhour', OnHour)
 
 
 @filters.register('default-vpc')
@@ -303,7 +283,7 @@ class SubnetFilter(net_filters.SubnetFilter):
 @filters.register('vpc')
 class VpcFilter(net_filters.VpcFilter):
 
-    RelatedIdsExpression = "DBSubnetGroup.Subnets[].VpcId"
+    RelatedIdsExpression = "DBSubnetGroup.VpcId"
 
 
 filters.register('network-location', net_filters.NetworkLocation)
@@ -465,8 +445,7 @@ class TagTrim(tags.TagTrim):
     permissions = ('rds:RemoveTagsFromResource',)
 
     def process_tag_removal(self, client, resource, candidates):
-        arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
-        client.remove_tags_from_resource(ResourceName=arn, TagKeys=candidates)
+        client.remove_tags_from_resource(ResourceName=resource['DBInstanceArn'], TagKeys=candidates)
 
 
 START_STOP_ELIGIBLE_ENGINES = {
@@ -509,8 +488,7 @@ class Stop(BaseAction):
 
     schema = type_schema('stop')
 
-    # permissions are unclear, and not currrently documented or in iam gen
-    permissions = ("rds:RebootDBInstance",)
+    permissions = ("rds:StopDBInstance",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
@@ -531,8 +509,7 @@ class Start(BaseAction):
 
     schema = type_schema('start')
 
-    # permissions are unclear, and not currrently documented or in iam gen
-    permissions = ("rds:RebootDBInstance",)
+    permissions = ("rds:StartDBInstance",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('rds')
@@ -651,7 +628,11 @@ class Delete(BaseAction):
 class CopySnapshotTags(BaseAction):
     """Enables copying tags from rds instance to snapshot
 
-        .. code-block: yaml
+    DEPRECATED - use modify-db instead with `CopyTagsToSnapshot`
+
+    :example:
+
+        .. code-block:: yaml
 
             policies:
               - name: enable-rds-snapshot-tags
@@ -669,26 +650,32 @@ class CopySnapshotTags(BaseAction):
     schema = type_schema(
         'set-snapshot-copy-tags',
         enable={'type': 'boolean'})
-    permissions = ('rds:ModifyDBInstances',)
+    permissions = ('rds:ModifyDBInstance',)
 
     def process(self, resources):
+        error = None
         with self.executor_factory(max_workers=2) as w:
-            futures = []
+            futures = {}
+            client = local_session(self.manager.session_factory).client('rds')
+            resources = [r for r in resources
+                         if r['CopyTagsToSnapshot'] != self.data.get('enable', True)]
             for r in resources:
-                futures.append(w.submit(
-                    self.set_snapshot_tags, r))
+                futures[w.submit(self.set_snapshot_tags, client, r)] = r
             for f in as_completed(futures):
                 if f.exception():
+                    error = f.exception()
                     self.log.error(
-                        'Exception updating rds CopyTagsToSnapshot  \n %s',
-                        f.exception())
+                        'error updating rds:%s CopyTagsToSnapshot \n %s',
+                        futures[f]['DBInstanceIdentifier'], error)
+        if error:
+            raise error
         return resources
 
-    def set_snapshot_tags(self, r):
-        c = local_session(self.manager.session_factory).client('rds')
-        self.manager.retry(c.modify_db_instance(
+    def set_snapshot_tags(self, client, r):
+        self.manager.retry(
+            client.modify_db_instance,
             DBInstanceIdentifier=r['DBInstanceIdentifier'],
-            CopyTagsToSnapshot=self.data.get('enable', True)))
+            CopyTagsToSnapshot=self.data.get('enable', True))
 
 
 @RDS.action_registry.register("post-finding")
@@ -756,7 +743,7 @@ class ResizeInstance(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: rds-snapshot-retention
+              - name: rds-resize-up
                 resource: rds
                 filters:
                   - type: metrics
@@ -777,7 +764,7 @@ class ResizeInstance(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: rds-snapshot-retention
+              - name: rds-resize-down
                 resource: rds
                 filters:
                   - type: metrics
@@ -941,21 +928,18 @@ class RDSSetPublicAvailability(BaseAction):
 @resources.register('rds-subscription')
 class RDSSubscription(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'rds'
-        type = 'rds-subscription'
+        arn_type = 'rds-subscription'
         enum_spec = (
             'describe_event_subscriptions', 'EventSubscriptionsList', None)
         name = id = "EventSubscriptionArn"
         date = "SubscriptionCreateTime"
         config_type = "AWS::DB::EventSubscription"
-        dimension = None
         # SubscriptionName isn't part of describe events results?! all the
         # other subscription apis.
         # filter_name = 'SubscriptionName'
         # filter_type = 'scalar'
-        filter_name = None
-        filter_type = None
 
 
 @resources.register('rds-snapshot')
@@ -963,33 +947,17 @@ class RDSSnapshot(QueryResourceManager):
     """Resource manager for RDS DB snapshots.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'rds'
-        type = 'rds-snapshot'
+        arn_type = 'snapshot'
+        arn_separator = ':'
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
         name = id = 'DBSnapshotIdentifier'
-        filter_name = None
-        filter_type = None
-        dimension = None
         date = 'SnapshotCreateTime'
         config_type = "AWS::RDS::DBSnapshot"
-        # Need resource_type for Universal Tagging
-        resource_type = "rds:snapshot"
-
-    filter_registry = FilterRegistry('rds-snapshot.filters')
-    action_registry = ActionRegistry('rds-snapshot.actions')
-
-    _generate_arn = None
-    retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id, resource_type='snapshot',
-                separator=':')
-        return self._generate_arn
+        filter_name = "DBSnapshotIdentifier"
+        universal_taggable = True
+        permissions_enum = ('rds:DescribeDBSnapshots',)
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -1015,11 +983,6 @@ class ConfigRDSSnapshot(ConfigSource):
           for t in item['supplementaryConfiguration']['Tags']]
         # TODO: Load DBSnapshotAttributes into annotation
         return resource
-
-
-register_universal_tags(
-    RDSSnapshot.filter_registry,
-    RDSSnapshot.action_registry)
 
 
 @RDSSnapshot.filter_registry.register('onhour')
@@ -1070,6 +1033,9 @@ class RDSSnapshotAge(AgeFilter):
         op={'$ref': '#/definitions/filters_common/comparison_operators'})
 
     date_attribute = 'SnapshotCreateTime'
+
+    def get_resource_date(self, i):
+        return i.get('SnapshotCreateTime')
 
 
 @RDSSnapshot.action_registry.register('restore')
@@ -1375,6 +1341,7 @@ class RDSSnapshotDelete(BaseAction):
 class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
     permissions = ('rds:ModifyDBInstance', 'rds:ModifyDBCluster')
+    vpc_expr = 'DBSubnetGroup.VpcId'
 
     def process(self, rds_instances):
         replication_group_map = {}
@@ -1404,16 +1371,15 @@ class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 class RDSSubnetGroup(QueryResourceManager):
     """RDS subnet group."""
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'rds'
-        type = 'rds-subnet-group'
+        arn_type = 'rds-subnet-group'
         id = name = 'DBSubnetGroupName'
         enum_spec = (
             'describe_db_subnet_groups', 'DBSubnetGroups', None)
         filter_name = 'DBSubnetGroupName'
         filter_type = 'scalar'
-        dimension = None
-        date = None
+        permissions_enum = ('rds:DescribeDBSubnetGroups',)
 
     def augment(self, resources):
         _db_subnet_group_tags(
@@ -1447,7 +1413,7 @@ class RDSSubnetGroupDeleteAction(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: rds-subnet-group-delete-unused
+              - name: rds-subnet-group-delete
                 resource: rds-subnet-group
                 filters:
                   - Instances: []
@@ -1517,6 +1483,7 @@ class ParameterFilter(ValueFilter):
     """
 
     schema = type_schema('db-parameter', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters', )
 
     @staticmethod
@@ -1680,3 +1647,19 @@ class ModifyDb(BaseAction):
                 c.modify_db_instance(**param)
             except c.exceptions.DBInstanceNotFoundFault:
                 raise
+
+
+@resources.register('rds-reserved')
+class ReservedRDS(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'rds'
+        name = id = 'ReservedDBInstanceId'
+        date = 'StartTime'
+        enum_spec = (
+            'describe_reserved_db_instances', 'ReservedDBInstances', None)
+        filter_name = 'ReservedDBInstances'
+        filter_type = 'list'
+        arn_type = "reserved-db"
+        arn = "ReservedDBInstanceArn"
+        permissions_enum = ('rds:DescribeReservedDBInstances',)

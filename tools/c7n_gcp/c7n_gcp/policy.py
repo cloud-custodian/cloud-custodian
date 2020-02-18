@@ -21,6 +21,8 @@ from c7n.utils import local_session, type_schema
 
 from c7n_gcp import mu
 
+DEFAULT_REGION = 'us-central1'
+
 
 class FunctionMode(ServerlessExecutionMode):
 
@@ -31,7 +33,6 @@ class FunctionMode(ServerlessExecutionMode):
            'memory-size': {'type': 'integer'},
            'labels': {'type': 'object'},
            'network': {'type': 'string'},
-           'region': {'type': 'string'},
            'max-instances': {'type': 'integer'},
            'service-account': {'type': 'string'},
            'environment': {'type': 'object'}})
@@ -39,17 +40,18 @@ class FunctionMode(ServerlessExecutionMode):
     def __init__(self, policy):
         self.policy = policy
         self.log = logging.getLogger('custodian.gcp.funcexec')
+        self.region = policy.options.regions[0] if len(policy.options.regions) else DEFAULT_REGION
 
     def run(self):
         raise NotImplementedError("subclass responsibility")
 
     def provision(self):
         self.log.info("Provisioning policy function %s", self.policy.name)
-        manager = mu.CloudFunctionManager(self.policy.session_factory)
+        manager = mu.CloudFunctionManager(self.policy.session_factory, self.region)
         return manager.publish(self._get_function())
 
     def deprovision(self):
-        manager = mu.CloudFunctionManager(self.policy.session_factory)
+        manager = mu.CloudFunctionManager(self.policy.session_factory, self.region)
         return manager.remove(self._get_function())
 
     def validate(self):
@@ -86,7 +88,9 @@ class PeriodicMode(FunctionMode, PullMode):
     def _get_function(self):
         events = [mu.PeriodicEvent(
             local_session(self.policy.session_factory),
-            self.policy.data['mode'])]
+            self.policy.data['mode'],
+            self.region
+        )]
         return mu.PolicyFunction(self.policy, events=events)
 
     def run(self, event, context):
@@ -134,6 +138,8 @@ class ApiAuditMode(FunctionMode):
 
     def run(self, event, context):
         """Execute a gcp serverless model"""
+        from c7n.actions import EventAction
+
         resources = self.resolve_resources(event)
         if not resources:
             return
@@ -146,7 +152,14 @@ class ApiAuditMode(FunctionMode):
         if not resources:
             return
 
+        self.policy.ctx.metrics.put_metric(
+            'ResourceCount', len(resources), 'Count', Scope="Policy",
+            buffer=False)
+
         for action in self.policy.resource_manager.actions:
-            action.process(resources)
+            if isinstance(action, EventAction):
+                action.process(resources, event)
+            else:
+                action.process(resources)
 
         return resources

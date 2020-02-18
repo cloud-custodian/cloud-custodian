@@ -14,21 +14,20 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-import functools
 
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.filters import AgeFilter
+from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
-    type_schema, local_session, snapshot_identifier, chunks,
-    get_retry, generate_arn)
+    type_schema, local_session, snapshot_identifier, chunks)
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -38,136 +37,23 @@ class RDSCluster(QueryResourceManager):
     """Resource manager for RDS clusters.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
 
         service = 'rds'
-        type = 'cluster'
+        arn = 'DBClusterArn'
+        arn_type = 'cluster'
+        arn_separator = ":"
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
-        filter_name = None
-        filter_type = None
         dimension = 'DBClusterIdentifier'
-        date = None
+        universal_taggable = True
+        permissions_enum = ('rds:DescribeDBClusters',)
 
-    retry = staticmethod(get_retry(('Throttled',)))
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn, 'rds', region=self.config.region,
-                account_id=self.account_id,
-                resource_type=self.resource_type.type, separator=':')
-        return self._generate_arn
-
-    def augment(self, dbs):
-        return list(filter(None, _rds_cluster_tags(
-            self.get_model(),
-            dbs, self.session_factory,
-            self.generate_arn, self.retry)))
+    augment = tags.universal_augment
 
 
-RDSCluster.filter_registry.register('tag-count', tags.TagCountFilter)
-RDSCluster.filter_registry.register('marked-for-op', tags.TagActionFilter)
-
-
-def _rds_cluster_tags(model, dbs, session_factory, generator, retry):
-    """Augment rds clusters with their respective tags."""
-    client = local_session(session_factory).client('rds')
-
-    def process_tags(db):
-        try:
-            db['Tags'] = retry(
-                client.list_tags_for_resource,
-                ResourceName=generator(db[model.id]))['TagList']
-            return db
-        except client.exceptions.DBClusterNotFoundFault:
-            return None
-
-    # Rds maintains a low api call limit, so this can take some time :-(
-    return list(filter(None, map(process_tags, dbs)))
-
-
-@RDSCluster.action_registry.register('mark-for-op')
-class TagDelayedAction(tags.TagDelayedAction):
-    """Mark a RDS cluster for specific custodian action
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: mark-for-delete
-                resource: rds-cluster
-                filters:
-                  - type: value
-                    key: default-vpc
-                    value: True
-                actions:
-                  - type: mark-for-op
-                    op: delete
-                    days: 7
-    """
-
-
-@RDSCluster.action_registry.register('tag')
-@RDSCluster.action_registry.register('mark')
-class Tag(tags.Tag):
-    """Mark/tag a RDS cluster with a key/value
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: rds-cluster-owner-tag
-                resource: rds-cluster
-                filters:
-                  - "tag:OwnerName": absent
-                actions:
-                  - type: tag
-                    key: OwnerName
-                    value: OwnerName
-    """
-
-    concurrency = 2
-    batch_size = 5
-    permissions = ('rds:AddTagsToResource',)
-
-    def process_resource_set(self, client, dbs, ts):
-        for db in dbs:
-            arn = self.manager.generate_arn(db['DBClusterIdentifier'])
-            client.add_tags_to_resource(ResourceName=arn, Tags=ts)
-
-
-@RDSCluster.action_registry.register('remove-tag')
-@RDSCluster.action_registry.register('unmark')
-class RemoveTag(tags.RemoveTag):
-    """Removes a tag or set of tags from RDS clusters
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: rds-unmark-cluster
-                resource: rds-cluster
-                filters:
-                  - "tag:ExpiredTag": present
-                actions:
-                  - type: unmark
-                    tags: ["ExpiredTag"]
-    """
-
-    concurrency = 2
-    batch_size = 5
-    permissions = ('rds:RemoveTagsFromResource',)
-
-    def process_resource_set(self, client, dbs, tag_keys):
-        for db in dbs:
-            client.remove_tags_from_resource(
-                ResourceName=self.manager.generate_arn(db['DBClusterIdentifier']),
-                TagKeys=tag_keys)
+RDSCluster.filter_registry.register('offhour', OffHour)
+RDSCluster.filter_registry.register('onhour', OnHour)
 
 
 @RDSCluster.filter_registry.register('security-group')
@@ -457,17 +343,20 @@ class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
     """
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
 
         service = 'rds'
-        type = 'rds-cluster-snapshot'
+        arn_type = 'cluster-snapshot'
+        arn_separator = ':'
+        arn = 'DBClusterSnapshotArn'
         enum_spec = (
             'describe_db_cluster_snapshots', 'DBClusterSnapshots', None)
         name = id = 'DBClusterSnapshotIdentifier'
-        filter_name = None
-        filter_type = None
-        dimension = None
         date = 'SnapshotCreateTime'
+        universal_tagging = object()
+        permissions_enum = ('rds:DescribeDBClusterSnapshots',)
+
+    augment = tags.universal_augment
 
 
 @RDSClusterSnapshot.filter_registry.register('age')
@@ -520,7 +409,7 @@ class RDSClusterSnapshotDelete(BaseAction):
     permissions = ('rds:DeleteDBClusterSnapshot',)
 
     def process(self, snapshots):
-        log.info("Deleting %d RDS cluster snapshots", len(snapshots))
+        self.log.info("Deleting %d RDS cluster snapshots", len(snapshots))
         client = local_session(self.manager.session_factory).client('rds')
         error = None
         with self.executor_factory(max_workers=2) as w:

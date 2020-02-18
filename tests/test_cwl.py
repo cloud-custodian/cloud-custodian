@@ -32,6 +32,22 @@ class LogGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:CrossAccountViolations"], ["1111111111111"])
 
+    def test_age_normalize(self):
+        factory = self.replay_flight_data("test_log_group_age_normalize")
+        p = self.load_policy({
+            'name': 'log-age',
+            'resource': 'aws.log-group',
+            'filters': [{
+                'type': 'value',
+                'value_type': 'age',
+                'value': 30,
+                'op': 'greater-than',
+                'key': 'creationTime'}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['creationTime'], 1548368507.441)
+
     def test_last_write(self):
         factory = self.replay_flight_data("test_log_group_last_write")
         p = self.load_policy(

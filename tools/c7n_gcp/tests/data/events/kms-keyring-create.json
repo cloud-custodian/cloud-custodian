@@ -1,0 +1,56 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.91",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0,gzip(gfe),gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-04-22T14:33:47.947011349Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "cloudkms.googleapis.com",
+    "methodName": "CreateKeyRing",
+    "authorizationInfo": [
+      {
+        "resource": "projects/cloud-custodian/locations/us-central1",
+        "permission": "cloudkms.keyRings.create",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "google.cloud.kms",
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/cloud-custodian",
+          "type": "google.cloud.kms.KeyRing"
+        }
+      }
+    ],
+    "resourceName": "projects/cloud-custodian/locations/us-central1/keyRings/cloud-custodian",
+    "request": {
+      "keyRingId": "cloud-custodian",
+      "@type": "type.googleapis.com/google.cloud.kms.v1.CreateKeyRingRequest",
+      "parent": "projects/cloud-custodian/locations/us-central1"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1"
+      ]
+    }
+  },
+  "insertId": "1uvby3sea7j9u",
+  "resource": {
+    "type": "cloudkms_keyring",
+    "labels": {
+      "key_ring_id": "cloud-custodian",
+      "project_id": "cloud-custodian",
+      "location": "us-central1"
+    }
+  },
+  "timestamp": "2019-04-22T14:33:47.917078363Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-04-22T14:33:48.176780384Z"
+}

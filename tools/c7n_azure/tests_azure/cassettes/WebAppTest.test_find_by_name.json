@@ -1,0 +1,158 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Web/sites?api-version=2018-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "etag": [
+                        "\"1D56A6327B0767F\""
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Fri, 13 Sep 2019 18:43:59 GMT"
+                    ],
+                    "content-length": [
+                        "3205"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_webapp/providers/Microsoft.Web/sites/cctestwebappc129bfa71a47",
+                                "name": "cctestwebappc129bfa71a47",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "api",
+                                "location": "Central US",
+                                "properties": {
+                                    "name": "cctestwebappc129bfa71a47",
+                                    "state": "Running",
+                                    "hostNames": [
+                                        "cctestwebappc129bfa71a47.azurewebsites.net"
+                                    ],
+                                    "webSpace": "test_webapp-CentralUSwebspace",
+                                    "selfLink": "https://waws-prod-dm1-095.api.azurewebsites.windows.net:454/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/webspaces/test_webapp-CentralUSwebspace/sites/cctestwebappc129bfa71a47",
+                                    "repositorySiteName": "cctestwebappc129bfa71a47",
+                                    "owner": null,
+                                    "usageState": "Normal",
+                                    "enabled": true,
+                                    "adminEnabled": true,
+                                    "enabledHostNames": [
+                                        "cctestwebappc129bfa71a47.azurewebsites.net",
+                                        "cctestwebappc129bfa71a47.scm.azurewebsites.net"
+                                    ],
+                                    "siteProperties": {
+                                        "metadata": null,
+                                        "properties": [
+                                            {
+                                                "name": "LinuxFxVersion",
+                                                "value": ""
+                                            },
+                                            {
+                                                "name": "WindowsFxVersion",
+                                                "value": null
+                                            }
+                                        ],
+                                        "appSettings": null
+                                    },
+                                    "availabilityState": "Normal",
+                                    "sslCertificates": [],
+                                    "csrs": [],
+                                    "cers": null,
+                                    "siteMode": "Limited",
+                                    "hostNameSslStates": [
+                                        {
+                                            "name": "cctestwebappc129bfa71a47.azurewebsites.net",
+                                            "sslState": "Disabled",
+                                            "ipBasedSslResult": null,
+                                            "virtualIP": null,
+                                            "thumbprint": null,
+                                            "toUpdate": null,
+                                            "toUpdateIpBasedSsl": null,
+                                            "ipBasedSslState": "NotConfigured",
+                                            "hostType": "Standard"
+                                        },
+                                        {
+                                            "name": "cctestwebappc129bfa71a47.scm.azurewebsites.net",
+                                            "sslState": "Disabled",
+                                            "ipBasedSslResult": null,
+                                            "virtualIP": null,
+                                            "thumbprint": null,
+                                            "toUpdate": null,
+                                            "toUpdateIpBasedSsl": null,
+                                            "ipBasedSslState": "NotConfigured",
+                                            "hostType": "Repository"
+                                        }
+                                    ],
+                                    "computeMode": "Dedicated",
+                                    "serverFarm": null,
+                                    "serverFarmId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_webapp/providers/Microsoft.Web/serverfarms/ccctestServicePlanec129bfa71a47",
+                                    "reserved": false,
+                                    "isXenon": false,
+                                    "hyperV": false,
+                                    "lastModifiedTimeUtc": "2019-09-13T18:43:08.0633333",
+                                    "storageRecoveryDefaultState": "Running",
+                                    "contentAvailabilityState": "Normal",
+                                    "runtimeAvailabilityState": "Normal",
+                                    "siteConfig": null,
+                                    "deploymentId": "cctestwebappc129bfa71a47",
+                                    "trafficManagerHostNames": null,
+                                    "sku": "Standard",
+                                    "scmSiteAlsoStopped": false,
+                                    "targetSwapSlot": null,
+                                    "hostingEnvironment": null,
+                                    "hostingEnvironmentProfile": null,
+                                    "clientAffinityEnabled": true,
+                                    "clientCertEnabled": false,
+                                    "clientCertExclusionPaths": null,
+                                    "hostNamesDisabled": false,
+                                    "domainVerificationIdentifiers": null,
+                                    "kind": "api",
+                                    "inboundIpAddress": "40.69.190.41",
+                                    "possibleInboundIpAddresses": "40.69.190.41",
+                                    "outboundIpAddresses": "40.69.190.41,13.89.184.220,52.176.48.248,52.165.230.98,13.89.189.195",
+                                    "possibleOutboundIpAddresses": "40.69.190.41,13.89.184.220,52.176.48.248,52.165.230.98,13.89.189.195,52.173.36.174,52.173.33.211,52.173.38.3",
+                                    "containerSize": 0,
+                                    "dailyMemoryTimeQuota": 0,
+                                    "suspendedTill": null,
+                                    "siteDisabledReason": 0,
+                                    "functionExecutionUnitsCache": null,
+                                    "maxNumberOfWorkers": null,
+                                    "homeStamp": "waws-prod-dm1-095",
+                                    "cloningInfo": null,
+                                    "hostingEnvironmentId": null,
+                                    "tags": null,
+                                    "resourceGroup": "test_webapp",
+                                    "defaultHostName": "cctestwebappc129bfa71a47.azurewebsites.net",
+                                    "slotSwapStatus": null,
+                                    "httpsOnly": false,
+                                    "redundancyMode": "None",
+                                    "inProgressOperationId": null,
+                                    "geoDistributions": null,
+                                    "privateEndpointConnections": null
+                                }
+                            }
+                        ],
+                        "nextLink": null,
+                        "id": null
+                    }
+                }
+            }
+        }
+    ]
+}

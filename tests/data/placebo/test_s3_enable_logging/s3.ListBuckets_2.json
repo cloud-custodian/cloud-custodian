@@ -1,64 +1,38 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Owner": {
-            "DisplayName": "mandeep.bal", 
-            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
-        }, 
+        "ResponseMetadata": {
+            "RequestId": "0257124B7808B253",
+            "HostId": "vsRqkNAm1YpbU9zi2Cvx56VmkHjl49796qMX6Lj12i6BDwlolUNNDtEIk6siTH04fvAWzXSvFlA=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "vsRqkNAm1YpbU9zi2Cvx56VmkHjl49796qMX6Lj12i6BDwlolUNNDtEIk6siTH04fvAWzXSvFlA=",
+                "x-amz-request-id": "0257124B7808B253",
+                "date": "Fri, 20 Dec 2019 23:00:27 GMT",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
         "Buckets": [
             {
+                "Name": "superduper-and-magic",
                 "CreationDate": {
-                    "hour": 17, 
-                    "__class__": "datetime", 
-                    "month": 9, 
-                    "second": 39, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 5, 
-                    "minute": 26
-                }, 
-                "Name": "config-bucket-644160558196"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 17, 
-                    "__class__": "datetime", 
-                    "month": 9, 
-                    "second": 56, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 5, 
-                    "minute": 26
-                }, 
-                "Name": "custodian-skunk-trails"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 9, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 19, 
-                    "microsecond": 0, 
-                    "year": 2018, 
-                    "day": 18, 
-                    "minute": 46
-                }, 
-                "Name": "superduper-and-magic"
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 20,
+                    "hour": 23,
+                    "minute": 0,
+                    "second": 14,
+                    "microsecond": 0
+                }
             }
-        ], 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "jLsnauofCD4+21ssDmjLMnV2k39bJliUZaQADy7YfABvO5SsCpPtNMKyCgWYIBHB6bshOofMCpQ=", 
-            "RequestId": "9CBB388E15713197", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "jLsnauofCD4+21ssDmjLMnV2k39bJliUZaQADy7YfABvO5SsCpPtNMKyCgWYIBHB6bshOofMCpQ=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "9CBB388E15713197", 
-                "date": "Thu, 18 Jan 2018 09:46:26 GMT", 
-                "content-type": "application/xml"
-            }
+        ],
+        "Owner": {
+            "DisplayName": "custodian-skunkworks",
+            "ID": "631e4e145c2211ed2e31307ba841b1862307d16de5eab6f5399a23bbbecc26e2"
         }
     }
 }

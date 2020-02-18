@@ -1,0 +1,21 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "The role with name c7n-pratyush-test cannot be found."
+        },
+        "ResponseMetadata": {
+            "RequestId": "b7f483ac-9cfb-11e9-92c3-fff4205c7789",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "b7f483ac-9cfb-11e9-92c3-fff4205c7789",
+                "content-type": "text/xml",
+                "content-length": "297",
+                "date": "Tue, 02 Jul 2019 19:00:54 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

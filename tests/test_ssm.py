@@ -13,13 +13,133 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from c7n.exceptions import PolicyValidationError
-from .common import BaseTest, functional
-
+import json
 import time
 
+from c7n.exceptions import PolicyValidationError
 
-class TestSsm(BaseTest):
+from .common import BaseTest, functional
+
+
+class TestOpsCenter(BaseTest):
+
+    def test_post_ops_item(self):
+        factory = self.replay_flight_data('test_post_ops_item')
+        p = self.load_policy({
+            'name': 'checking-lambdas',
+            'description': 'something good',
+            'resource': 'aws.lambda',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId = 'custodian-aws'"}],
+            'actions': [{
+                'type': 'post-item'}]},
+            session_factory=factory, config={'region': 'us-east-1'})
+        resources = p.run()
+        client = factory().client('ssm', region_name='us-east-1')
+        item = client.get_ops_item(
+            OpsItemId=resources[0]['c7n:opsitem']).get('OpsItem')
+        arn = p.resource_manager.get_arns(resources)[0]
+        self.assertTrue(
+            arn in item['OperationalData']['/aws/resources']['Value'])
+        self.assertTrue(item['OperationalData']['/aws/dedup'])
+        self.assertEqual(item['Title'], p.name)
+        self.assertEqual(item['Description'], p.data['description'])
+
+    def test_ops_item_filter(self):
+        factory = self.replay_flight_data('test_ops_item_filter')
+        p = self.load_policy({
+            'name': 'checking-lambdas',
+            'description': 'something good',
+            'resource': 'aws.lambda',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId = 'custodian-aws'"}],
+            'filters': [{
+                'type': 'ops-item',
+                'priority': [3, 4, 5],
+                'title': 'checking-lambdas',
+                'source': 'Cloud Custodian',
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:opsitems'],
+            ['oi-9be57440dcb3'])
+
+    def test_post_ops_item_update(self):
+        factory = self.replay_flight_data('test_post_ops_item_update')
+        p = self.load_policy({
+            'name': 'checking-lambdas',
+            'description': 'something good',
+            'resource': 'aws.lambda',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId = 'custodian-nuke-emr'"}],
+            'actions': [{
+                'type': 'post-item'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('ssm', region_name='us-east-1')
+        item = client.get_ops_item(
+            OpsItemId=resources[0]['c7n:opsitem']).get('OpsItem')
+        self.assertEqual(
+            json.loads(item['OperationalData']['/aws/resources']['Value']),
+            [{'arn': 'arn:aws:lambda:us-east-1::function:custodian-aws'},
+             {'arn': 'arn:aws:lambda:us-east-1::function:custodian-nuke-emr'}])
+
+    def test_update_ops_item(self):
+        factory = self.replay_flight_data('test_update_ops_item')
+        p = self.load_policy({
+            'name': 'checking-lambdas',
+            'description': 'something good',
+            'resource': 'aws.ops-item',
+            'query': [
+                {'Key': 'Status', 'Operator': 'Equal', 'Values': ['Open']}
+            ],
+            'actions': [{
+                'type': 'update',
+                'topics': ['arn:aws:sns:us-west-2:644160558196:aws-command'],
+                'status': 'Resolved',
+            }]},
+            config={'region': 'us-west-2'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('ssm', region_name='us-west-2')
+        if self.recording:
+            time.sleep(5)
+        item = client.get_ops_item(
+            OpsItemId=resources[0]['OpsItemId'])['OpsItem']
+        self.assertEqual(item['Status'], 'Resolved')
+        self.assertEqual(
+            item['Notifications'],
+            [{'Arn': 'arn:aws:sns:us-west-2:644160558196:aws-command'}])
+
+    def test_invalid_resource_query(self):
+        self.assertRaises(
+            PolicyValidationError, self.load_policy,
+            {'name': 'value',
+             'resource': 'aws.ops-item',
+             'query': [
+                 {'Key': 'Status', 'Operator': 'Equals', 'Values': ['Open']}]},
+            validate=True)
+
+    def test_get_resources(self):
+        factory = self.replay_flight_data('test_ops_item_get_resources')
+        p = self.load_policy({
+            'name': 'foo',
+            'resource': 'aws.ops-item'},
+            session_factory=factory,
+            config={'region': 'us-east-1'})
+        resources = p.resource_manager.get_resources('oi-5aa4c36439ed')
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['OpsItemId'], 'oi-5aa4c36439ed')
+
+
+class TestSSM(BaseTest):
 
     def test_ec2_ssm_send_command_validate(self):
         self.assertRaises(

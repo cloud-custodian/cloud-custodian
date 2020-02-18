@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "626195D3CD720E20",
+            "HostId": "gV0K9IrTplprt8kI0z7Zzm2G3Ft28DNU2SqUm2d11iVcWrRFzrlUpMs+Fd1BjMYcmFZWZOcKFB0=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "gV0K9IrTplprt8kI0z7Zzm2G3Ft28DNU2SqUm2d11iVcWrRFzrlUpMs+Fd1BjMYcmFZWZOcKFB0=",
+                "x-amz-request-id": "626195D3CD720E20",
+                "date": "Fri, 20 Dec 2019 23:00:19 GMT",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "Owner": {
+            "DisplayName": "custodian-skunkworks",
+            "ID": "631e4e145c2211ed2e31307ba841b1862307d16de5eab6f5399a23bbbecc26e2"
+        },
+        "Grants": [
+            {
+                "Grantee": {
+                    "DisplayName": "custodian-skunkworks",
+                    "ID": "631e4e145c2211ed2e31307ba841b1862307d16de5eab6f5399a23bbbecc26e2",
+                    "Type": "CanonicalUser"
+                },
+                "Permission": "FULL_CONTROL"
+            },
+            {
+                "Grantee": {
+                    "Type": "Group",
+                    "URI": "http://acs.amazonaws.com/groups/s3/LogDelivery"
+                },
+                "Permission": "WRITE"
+            },
+            {
+                "Grantee": {
+                    "Type": "Group",
+                    "URI": "http://acs.amazonaws.com/groups/s3/LogDelivery"
+                },
+                "Permission": "READ_ACP"
+            }
+        ]
+    }
+}

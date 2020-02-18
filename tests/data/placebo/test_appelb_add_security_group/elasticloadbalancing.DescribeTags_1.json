@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:123412341234:loadbalancer/app/test-abc/543530edaee12345",
+                "Tags": [
+                    {
+                        "Key": "testkey",
+                        "Value": "testval"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "43a8ee4d-a990-11e9-aebf-591f37d83b01",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "43a8ee4d-a990-11e9-aebf-591f37d83b01",
+                "content-type": "text/xml",
+                "content-length": "6372",
+                "vary": "accept-encoding",
+                "date": "Thu, 18 Jul 2019 19:14:28 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

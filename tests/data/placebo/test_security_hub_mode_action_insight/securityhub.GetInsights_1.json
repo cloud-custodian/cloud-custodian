@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "e2e84019-a419-11e9-9e54-13c159e53c03",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 11 Jul 2019 20:24:30 GMT",
+                "content-type": "application/json",
+                "content-length": "328",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "e2e84019-a419-11e9-9e54-13c159e53c03",
+                "x-amz-apigw-id": "crUnrE0ZIAMF2xg=",
+                "x-amzn-trace-id": "Root=1-5d279afd-0a63d5588608ac38d148fa58;Sampled=0"
+            },
+            "RetryAttempts": 0
+        },
+        "Insights": [
+            {
+                "InsightArn": "arn:aws:securityhub:::insight/securityhub/default/9",
+                "Name": "5. AWS users with the most suspicious activity",
+                "Filters": {
+                    "ResourceType": [
+                        {
+                            "Value": "AwsIamAccessKey",
+                            "Comparison": "EQUALS"
+                        }
+                    ],
+                    "RecordState": [
+                        {
+                            "Value": "ACTIVE",
+                            "Comparison": "EQUALS"
+                        }
+                    ]
+                },
+                "GroupByAttribute": "ResourceAwsIamAccessKeyUserName"
+            }
+        ]
+    }
+}

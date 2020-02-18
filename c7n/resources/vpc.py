@@ -26,10 +26,11 @@ import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.revisions import Diff
-from c7n.filters.locked import Locked
 from c7n import query, resolver
 from c7n.manager import resources
-from c7n.utils import chunks, local_session, type_schema, get_retry, parse_cidr
+from c7n.resources.securityhub import OtherResourcePostFinding
+from c7n.utils import (
+    chunks, local_session, type_schema, get_retry, parse_cidr)
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -37,15 +38,13 @@ from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 @resources.register('vpc')
 class Vpc(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc'
+        arn_type = 'vpc'
         enum_spec = ('describe_vpcs', 'Vpcs', None)
         name = id = 'VpcId'
         filter_name = 'VpcIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = 'AWS::EC2::VPC'
         id_prefix = "vpc-"
 
@@ -99,6 +98,7 @@ class FlowLogFilter(Filter):
            'destination': {'type': 'string'},
            'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
            'traffic-type': {'enum': ['accept', 'reject', 'all']},
+           'log-format': {'type': 'string'},
            'log-group': {'type': 'string'}})
 
     permissions = ('ec2:DescribeFlowLogs',)
@@ -118,6 +118,7 @@ class FlowLogFilter(Filter):
 
         enabled = self.data.get('enabled', False)
         log_group = self.data.get('log-group')
+        log_format = self.data.get('log-format')
         traffic_type = self.data.get('traffic-type')
         destination_type = self.data.get('destination-type')
         destination = self.data.get('destination')
@@ -154,11 +155,12 @@ class FlowLogFilter(Filter):
                         traffic_type is None) or op(
                         fl['TrafficType'],
                         traffic_type.upper())
-                    log_group_match = (log_group is None) or op(fl['LogGroupName'], log_group)
-
+                    log_group_match = (log_group is None) or op(fl.get('LogGroupName'), log_group)
+                    log_format_match = (log_format is None) or op(fl.get('LogFormat'), log_format)
                     # combine all conditions to check if flow log matches the spec
                     fl_match = (status_match and traffic_type_match and dest_match and
-                                log_group_match and dest_type_match and delivery_status_match)
+                                log_format_match and log_group_match and
+                                dest_type_match and delivery_status_match)
                     fl_matches.append(fl_match)
 
                 if set_op == 'or':
@@ -180,7 +182,7 @@ class VpcSecurityGroupFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-sg
                 resource: vpc
                 filters:
                   - type: security-group
@@ -214,7 +216,7 @@ class VpcSubnetFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-subnet
                 resource: vpc
                 filters:
                   - type: subnet
@@ -248,7 +250,7 @@ class VpcNatGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-nat
                 resource: vpc
                 filters:
                   - type: nat-gateway
@@ -282,7 +284,7 @@ class VpcInternetGatewayFilter(RelatedResourceFilter):
     .. code-block:: yaml
 
             policies:
-              - name: gray-vpcs
+              - name: vpc-by-igw
                 resource: vpc
                 filters:
                   - type: internet-gateway
@@ -326,7 +328,7 @@ class AttributesFilter(Filter):
         'vpc-attributes',
         dnshostnames={'type': 'boolean'},
         dnssupport={'type': 'boolean'})
-    permissions = ('ec2:DescribeVpcAttributes',)
+    permissions = ('ec2:DescribeVpcAttribute',)
 
     def process(self, resources, event=None):
         results = []
@@ -363,7 +365,7 @@ class DhcpOptionsFilter(Filter):
 
      :example:
 
-     .. code-block: yaml
+     .. code-block:: yaml
 
           policies:
              - name: vpcs-in-domain
@@ -430,18 +432,25 @@ class DhcpOptionsFilter(Filter):
         return found
 
 
+@Vpc.action_registry.register('post-finding')
+class VpcPostFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        fr = super(VpcPostFinding, self).format_resource(r)
+        fr['Type'] = 'AwsEc2Vpc'
+        return fr
+
+
 @resources.register('subnet')
 class Subnet(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'subnet'
+        arn_type = 'subnet'
         enum_spec = ('describe_subnets', 'Subnets', None)
         name = id = 'SubnetId'
         filter_name = 'SubnetIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = 'AWS::EC2::Subnet'
         id_prefix = "subnet-"
 
@@ -449,19 +458,23 @@ class Subnet(query.QueryResourceManager):
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
 
 
+@Subnet.filter_registry.register('vpc')
+class SubnetVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 @resources.register('security-group')
 class SecurityGroup(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'security-group'
+        arn_type = 'security-group'
         enum_spec = ('describe_security_groups', 'SecurityGroups', None)
-        detail_spec = None
-        name = id = 'GroupId'
+        id = 'GroupId'
+        name = 'GroupName'
         filter_name = "GroupIds"
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = "AWS::EC2::SecurityGroup"
         id_prefix = "sg-"
 
@@ -495,13 +508,6 @@ class ConfigSG(query.ConfigSource):
                 if 'Ipv4Ranges' in p:
                     p['IpRanges'] = p.pop('Ipv4Ranges')
         return r
-
-
-@SecurityGroup.filter_registry.register('locked')
-class SecurityGroupLockedFilter(Locked):
-
-    def get_parent_id(self, resource, account_id):
-        return resource.get('VpcId', account_id)
 
 
 @SecurityGroup.filter_registry.register('diff')
@@ -681,7 +687,7 @@ class SGUsage(Filter):
 
     def get_permissions(self):
         return list(itertools.chain(
-            [self.manager.get_resource_manager(m).get_permissions()
+            *[self.manager.get_resource_manager(m).get_permissions()
              for m in
              ['lambda', 'eni', 'launch-config', 'security-group']]))
 
@@ -1000,7 +1006,7 @@ class SGPermission(Filter):
                 fv['key'] = f
             else:
                 fv = {f: fv}
-            vf = ValueFilter(fv)
+            vf = ValueFilter(fv, self.manager)
             vf.annotate = False
             self.vfilters.append(vf)
         return super(SGPermission, self).process(resources, event)
@@ -1024,15 +1030,20 @@ class SGPermission(Filter):
         return found
 
     def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
+
         found = None
         ip_perms = perm.get(range_type, [])
         if not ip_perms:
             return False
 
         match_range = self.data[cidr_key]
-        match_range['key'] = cidr_type
 
-        vf = ValueFilter(match_range)
+        if isinstance(match_range, dict):
+            match_range['key'] = cidr_type
+        else:
+            match_range = {cidr_type: match_range}
+
+        vf = ValueFilter(match_range, self.manager)
         vf.annotate = False
 
         for ip_range in ip_perms:
@@ -1062,7 +1073,7 @@ class SGPermission(Filter):
         d = dict(self.data['Description'])
         d['key'] = 'Description'
 
-        vf = ValueFilter(d)
+        vf = ValueFilter(d, self.manager)
         vf.annotate = False
 
         for k in ('Ipv6Ranges', 'IpRanges', 'UserIdGroupPairs', 'PrefixListIds'):
@@ -1137,20 +1148,42 @@ class SGPermission(Filter):
             return True
 
 
+SGPermissionSchema = {
+    'match-operator': {'type': 'string', 'enum': ['or', 'and']},
+    'Ports': {'type': 'array', 'items': {'type': 'integer'}},
+    'SelfReference': {'type': 'boolean'},
+    'OnlyPorts': {'type': 'array', 'items': {'type': 'integer'}},
+    'IpProtocol': {
+        'oneOf': [
+            {'enum': ["-1", -1, 'tcp', 'udp', 'icmp', 'icmpv6']},
+            {'$ref': '#/definitions/filters/value'}
+        ]
+    },
+    'FromPort': {'oneOf': [
+        {'$ref': '#/definitions/filters/value'},
+        {'type': 'integer'}]},
+    'ToPort': {'oneOf': [
+        {'$ref': '#/definitions/filters/value'},
+        {'type': 'integer'}]},
+    'UserIdGroupPairs': {},
+    'IpRanges': {},
+    'PrefixListIds': {},
+    'Description': {},
+    'Cidr': {},
+    'CidrV6': {},
+}
+
+
 @SecurityGroup.filter_registry.register('ingress')
 class IPPermission(SGPermission):
 
     ip_permissions_key = "IpPermissions"
     schema = {
         'type': 'object',
-        # 'additionalProperties': True,
-        'properties': {
-            'type': {'enum': ['ingress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'Ports': {'type': 'array', 'items': {'type': 'integer'}},
-            'SelfReference': {'type': 'boolean'}
-        },
+        'additionalProperties': False,
+        'properties': {'type': {'enum': ['ingress']}},
         'required': ['type']}
+    schema['properties'].update(SGPermissionSchema)
 
 
 @SecurityGroup.filter_registry.register('egress')
@@ -1159,13 +1192,10 @@ class IPPermissionEgress(SGPermission):
     ip_permissions_key = "IpPermissionsEgress"
     schema = {
         'type': 'object',
-        # 'additionalProperties': True,
-        'properties': {
-            'type': {'enum': ['egress']},
-            'match-operator': {'type': 'string', 'enum': ['or', 'and']},
-            'SelfReference': {'type': 'boolean'}
-        },
+        'additionalProperties': False,
+        'properties': {'type': {'enum': ['egress']}},
         'required': ['type']}
+    schema['properties'].update(SGPermissionSchema)
 
 
 @SecurityGroup.action_registry.register('delete')
@@ -1250,18 +1280,25 @@ class RemovePermissions(BaseAction):
                 method(GroupId=r['GroupId'], IpPermissions=groups)
 
 
+@SecurityGroup.action_registry.register('post-finding')
+class SecurityGroupPostFinding(OtherResourcePostFinding):
+
+    def format_resource(self, r):
+        fr = super(SecurityGroupPostFinding, self).format_resource(r)
+        fr['Type'] = 'AwsEc2SecurityGroup'
+        return fr
+
+
 @resources.register('eni')
 class NetworkInterface(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'eni'
+        arn_type = 'eni'
         enum_spec = ('describe_network_interfaces', 'NetworkInterfaces', None)
         name = id = 'NetworkInterfaceId'
         filter_name = 'NetworkInterfaceIds'
         filter_type = 'list'
-        dimension = None
-        date = None
         config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
 
@@ -1330,7 +1367,7 @@ class InterfaceSecurityGroupFilter(net_filters.SecurityGroupFilter):
 @NetworkInterface.filter_registry.register('vpc')
 class InterfaceVpcFilter(net_filters.VpcFilter):
 
-    RelatedIdsExpress = "VpcId"
+    RelatedIdsExpression = "VpcId"
 
 
 @NetworkInterface.action_registry.register('modify-security-groups')
@@ -1375,19 +1412,74 @@ class InterfaceModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
                 Groups=groups[idx])
 
 
+@NetworkInterface.action_registry.register('delete')
+class DeleteNetworkInterface(BaseAction):
+    """Delete a network interface.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: mark-orphaned-enis
+            comment: Flag abandoned Lambda VPC ENIs for deletion
+            resource: eni
+            filters:
+              - Status: available
+              - type: value
+                op: glob
+                key: Description
+                value: "AWS Lambda VPC ENI*"
+              - "tag:custodian_status": absent
+            actions:
+              - type: mark-for-op
+                tag: custodian_status
+                msg: "Orphaned Lambda VPC ENI: {op}@{action_date}"
+                op: delete
+                days: 1
+
+          - name: delete-marked-enis
+            comment: Delete flagged ENIs that have not been cleaned up naturally
+            resource: eni
+            filters:
+              - type: marked-for-op
+                tag: custodian_status
+                op: delete
+            actions:
+              - type: delete
+    """
+    permissions = ('ec2:DeleteNetworkInterface',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.delete_network_interface,
+                    NetworkInterfaceId=r['NetworkInterfaceId'])
+            except ClientError as err:
+                if not err.response['Error']['Code'] == 'InvalidNetworkInterfaceID.NotFound':
+                    raise
+
+
 @resources.register('route-table')
 class RouteTable(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'route-table'
+        arn_type = 'route-table'
         enum_spec = ('describe_route_tables', 'RouteTables', None)
         name = id = 'RouteTableId'
         filter_name = 'RouteTableIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         id_prefix = "rtb-"
+
+
+@RouteTable.filter_registry.register('vpc')
+class RouteTableVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
 
 
 @RouteTable.filter_registry.register('subnet')
@@ -1433,6 +1525,7 @@ class Route(ValueFilter):
     """Filter a route table by its routes' attributes."""
 
     schema = type_schema('route', rinherit=ValueFilter.schema)
+    schema_alias = False
 
     def process(self, resources, event=None):
         results = []
@@ -1450,10 +1543,9 @@ class Route(ValueFilter):
 @resources.register('transit-gateway')
 class TransitGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
         enum_spec = ('describe_transit_gateways', 'TransitGateways', None)
-        dimension = None
         name = id = 'TransitGatewayId'
         arn = "TransitGatewayArn"
         filter_name = 'TransitGatewayIds'
@@ -1480,32 +1572,26 @@ class TransitGatewayAttachment(query.ChildResourceManager):
 
     child_source = 'transit-attachment'
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
         enum_spec = ('describe_transit_gateway_attachments', 'TransitGatewayAttachments', None)
         parent_spec = ('transit-gateway', 'transit-gateway-id', None)
-        dimension = None
         name = id = 'TransitGatewayAttachmentId'
-        filter_name = None
-        filter_type = None
         arn = False
 
 
 @resources.register('peering-connection')
 class PeeringConnection(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc-peering-connection'
+        arn_type = 'vpc-peering-connection'
         enum_spec = ('describe_vpc_peering_connections',
                      'VpcPeeringConnections', None)
         name = id = 'VpcPeeringConnectionId'
         filter_name = 'VpcPeeringConnectionIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         id_prefix = "pcx-"
-        type = "vpc-peering-connection"
 
 
 @PeeringConnection.filter_registry.register('cross-account')
@@ -1578,15 +1664,13 @@ class MissingRoute(Filter):
 @resources.register('network-acl')
 class NetworkAcl(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'network-acl'
+        arn_type = 'network-acl'
         enum_spec = ('describe_network_acls', 'NetworkAcls', None)
         name = id = 'NetworkAclId'
         filter_name = 'NetworkAclIds'
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = "AWS::EC2::NetworkAcl"
         id_prefix = "acl-"
 
@@ -1671,16 +1755,14 @@ class AclAwsS3Cidrs(Filter):
 @resources.register('network-addr')
 class NetworkAddress(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'eip-allocation'
+        arn_type = 'eip-allocation'
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
         filter_name = 'PublicIps'
         filter_type = 'list'
-        date = None
-        dimension = None
         config_type = "AWS::EC2::EIP"
 
 
@@ -1751,32 +1833,27 @@ class AddressRelease(BaseAction):
 @resources.register('customer-gateway')
 class CustomerGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'customer-gateway'
+        arn_type = 'customer-gateway'
         enum_spec = ('describe_customer_gateways', 'CustomerGateways', None)
-        detail_spec = None
         id = 'CustomerGatewayId'
         filter_name = 'CustomerGatewayIds'
         filter_type = 'list'
         name = 'CustomerGatewayId'
-        date = None
-        dimension = None
         id_prefix = "cgw-"
 
 
 @resources.register('internet-gateway')
 class InternetGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'internet-gateway'
+        arn_type = 'internet-gateway'
         enum_spec = ('describe_internet_gateways', 'InternetGateways', None)
         name = id = 'InternetGatewayId'
         filter_name = 'InternetGatewayIds'
         filter_type = 'list'
-        dimension = None
-        date = None
         config_type = "AWS::EC2::InternetGateway"
         id_prefix = "igw-"
 
@@ -1784,14 +1861,13 @@ class InternetGateway(query.QueryResourceManager):
 @resources.register('nat-gateway')
 class NATGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'nat-gateway'
+        arn_type = 'nat-gateway'
         enum_spec = ('describe_nat_gateways', 'NatGateways', None)
         name = id = 'NatGatewayId'
         filter_name = 'NatGatewayIds'
         filter_type = 'list'
-        dimension = None
         date = 'CreateTime'
         id_prefix = "nat-"
 
@@ -1811,15 +1887,13 @@ class DeleteNATGateway(BaseAction):
 @resources.register('vpn-connection')
 class VPNConnection(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc-connection'
+        arn_type = 'vpc-connection'
         enum_spec = ('describe_vpn_connections', 'VpnConnections', None)
         name = id = 'VpnConnectionId'
         filter_name = 'VpnConnectionIds'
         filter_type = 'list'
-        dimension = None
-        date = None
         config_type = 'AWS::EC2::VPNConnection'
         id_prefix = "vpn-"
 
@@ -1827,15 +1901,13 @@ class VPNConnection(query.QueryResourceManager):
 @resources.register('vpn-gateway')
 class VPNGateway(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc-gateway'
+        arn_type = 'vpc-gateway'
         enum_spec = ('describe_vpn_gateways', 'VpnGateways', None)
         name = id = 'VpnGatewayId'
         filter_name = 'VpnGatewayIds'
         filter_type = 'list'
-        dimension = None
-        date = None
         config_type = 'AWS::EC2::VPNGateway'
         id_prefix = "vgw-"
 
@@ -1843,15 +1915,14 @@ class VPNGateway(query.QueryResourceManager):
 @resources.register('vpc-endpoint')
 class VpcEndpoint(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'vpc-endpoint'
+        arn_type = 'vpc-endpoint'
         enum_spec = ('describe_vpc_endpoints', 'VpcEndpoints', None)
         name = id = 'VpcEndpointId'
         date = 'CreationTimestamp'
         filter_name = 'VpcEndpointIds'
         filter_type = 'list'
-        dimension = None
         id_prefix = "vpce-"
         taggable = False
 
@@ -1885,16 +1956,12 @@ class EndpointVpcFilter(net_filters.VpcFilter):
 @resources.register('key-pair')
 class KeyPair(query.QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'ec2'
-        type = 'key-pair'
+        arn_type = 'key-pair'
         enum_spec = ('describe_key_pairs', 'KeyPairs', None)
-        detail_spec = None
-        id = 'KeyName'
+        name = id = 'KeyName'
         filter_name = 'KeyNames'
-        name = 'KeyName'
-        date = None
-        dimension = None
         taggable = False
 
 
@@ -1906,7 +1973,7 @@ class CreateFlowLogs(BaseAction):
 
     :example:
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
         policies:
           - name: vpc-enable-flow-logs
@@ -1929,6 +1996,7 @@ class CreateFlowLogs(BaseAction):
             'DeliverLogsPermissionArn': {'type': 'string'},
             'LogGroupName': {'type': 'string'},
             'LogDestination': {'type': 'string'},
+            'LogFormat': {'type': 'string'},
             'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
             'TrafficType': {
                 'type': 'string',
@@ -1943,20 +2011,39 @@ class CreateFlowLogs(BaseAction):
         'eni': 'NetworkInterface'
     }
 
+    SchemaValidation = {
+        's3': {
+            'required': ['LogDestination'],
+            'absent': ['LogGroupName', 'DeliverLogsPermissionArn']
+        },
+        'cloud-watch-logs': {
+            'required': ['DeliverLogsPermissionArn'],
+            'one-of': ['LogGroupName', 'LogDestination'],
+        }
+    }
+
     def validate(self):
         self.state = self.data.get('state', True)
-        if self.state:
-            if not self.data.get('DeliverLogsPermissionArn'):
+        if not self.state:
+            return
+        destination_type = self.data.get(
+            'LogDestinationType', 'cloud-watch-logs')
+        dvalidation = self.SchemaValidation[destination_type]
+        for r in dvalidation.get('required', ()):
+            if not self.data.get(r):
                 raise PolicyValidationError(
-                    'DeliverLogsPermissionArn required when '
-                    'creating flow-logs on %s' % (self.manager.data,))
-            if (not self.data.get('LogGroupName') and not self.data.get('LogDestination')):
+                    'Required %s missing for destination-type:%s' % (
+                        r, destination_type))
+        for r in dvalidation.get('absent', ()):
+            if r in self.data:
                 raise PolicyValidationError(
-                    'Either LogGroupName or LogDestination required')
-            if (self.data.get('LogDestinationType') == 's3' and
-               not self.data.get('LogDestination')):
-                raise PolicyValidationError(
-                    'LogDestination required when LogDestinationType is s3')
+                    '%s is prohibited for destination-type:%s' % (
+                        r, destination_type))
+        if ('one-of' in dvalidation and
+                sum([1 for k in dvalidation['one-of'] if k in self.data]) != 1):
+            raise PolicyValidationError(
+                "Destination:%s Exactly one of %s required" % (
+                    destination_type, ", ".join(dvalidation['one-of'])))
         return self
 
     def delete_flow_logs(self, client, rids):
@@ -1992,7 +2079,7 @@ class CreateFlowLogs(BaseAction):
             self.delete_flow_logs(client, params['ResourceIds'])
             return
 
-        params['ResourceType'] = self.RESOURCE_ALIAS[model.type]
+        params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
         params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
 
         try:

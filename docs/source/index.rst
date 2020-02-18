@@ -6,52 +6,89 @@
 Cloud Custodian Documentation
 =============================
 
-Cloud Custodian is a tool that unifies the dozens of tools and scripts most organizations use for managing their AWS accounts into one open source tool. It's a stateless rules engine for policy definition and enforcement, with metrics and detailed reporting for AWS.
+Cloud Custodian is a tool that unifies the dozens of tools and scripts
+most organizations use for managing their public cloud accounts into
+one open source tool. It uses a stateless rules engine for policy
+definition and enforcement, with metrics, structured outputs and
+detailed reporting for clouds infrastructure. It integrates tightly
+with serverless runtimes to provide real time remediation/response with
+low operational overhead.
 
-Organizations can use Custodian to manage their AWS environments by ensuring compliance to security policies, tag policies, garbage collection of unused resources, and cost management via off-hours resource management, all from the same place. Custodian policies are written in simple YAML configuration files that specify given resource types and are constructed from a vocabulary of filters and actions.
+Organizations can use Custodian to manage their cloud environments by
+ensuring compliance to security policies, tag policies, garbage
+collection of unused resources, and cost management from a single
+tool. 
 
-Navigate below and get started with Cloud Custodian!
+Cloud Custodian can be bound to serverless event streams across multiple cloud providers that maps to security, operations, and governance use cases.
+Custodian adheres to a compliance as code principle, so you can validate, dry-run, and review changes to your policies.
+
+Cloud Custodian policies are expressed in YAML and include the following:
+
+* The type of resource to run the policy against
+* Filters to narrow down the set of resources
+* Actions to take on the filtered set of resources
+
+Navigate below to your cloud provider and get started with Cloud Custodian!
 
 .. toctree::
    :maxdepth: 2
    :caption: Introduction
 
-   overview/index
    quickstart/index
-   quickstart/usage
+   filters
+   actions
    quickstart/advanced
    quickstart/policyStructure
+   deployment
 
 .. toctree::
    :maxdepth: 1
-   :caption: Examples
+   :caption: AWS
 
-   usecases/index
+   aws/gettingstarted
+   aws/examples/index
+   aws/aws-modes
+   aws/usage
+   aws/lambda
+   aws/topics/index
+   aws/resources/index
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Azure
 
    azure/gettingstarted
-   azure/authentication
+   azure/configuration/index
    azure/examples/index
-   azure/policy/index
    azure/advanced/index
-   azure/contribute
+   azure/resources/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: GCP
+
+   gcp/gettingstarted
+   gcp/gcp-modes
+   gcp/examples/index
+   gcp/policy/index
+   gcp/contribute
+   gcp/resources/index
+
 
 .. toctree::
    :maxdepth: 2
-   :caption: Working with AWS Lambda
+   :caption: Tools
 
-   policy/lambda
-   policy/mu
+   tools/c7n-org
+   tools/cask
+   tools/c7n-mailer   
+   tools/c7n-logexporter
+   tools/c7n-trailcreator
+   tools/c7n-policystream   
+   tools/omnissm
+   tools/c7n-guardian
+   tools/c7n-salactus
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Policies reference
-
-   policy/index.rst
-   filters
 
 .. toctree::
    :maxdepth: 2
@@ -61,18 +98,6 @@ Navigate below and get started with Cloud Custodian!
    developer/index.rst
    developer/installing.rst
    developer/tests.rst
-
-.. toctree::
-   :maxdepth: 2
-   :caption: API Reference
-
-   generated/aws/modules
-   generated/azure/modules
-   generated/gcp/modules
+   developer/documentation.rst
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`

@@ -13,50 +13,34 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
 import re
 
 from c7n.actions import BaseAction
 from c7n.filters import MetricsFilter, ShieldMetrics, Filter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource
+from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import generate_arn, local_session, type_schema, get_retry
+from c7n.utils import local_session, type_schema, get_retry
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 
 @resources.register('distribution')
 class Distribution(QueryResourceManager):
-    class resource_type(object):
+
+    class resource_type(TypeInfo):
         service = 'cloudfront'
-        type = 'distribution'
+        arn_type = 'distribution'
         enum_spec = ('list_distributions', 'DistributionList.Items', None)
         id = 'Id'
+        arn = 'ARN'
         name = 'DomainName'
         date = 'LastModifiedTime'
         dimension = "DistributionId"
         universal_taggable = True
-        filter_name = None
         config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
-
-    def get_arn(self, r):
-        return r['ARN']
-
-    @property
-    def generate_arn(self):
-        """ Generates generic arn if ID is not already arn format.
-        """
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                self.get_model().service,
-                account_id=self.account_id,
-                resource_type=self.get_model().type,
-                separator='/')
-        return self._generate_arn
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -72,35 +56,20 @@ class DescribeDistribution(DescribeSource):
 
 @resources.register('streaming-distribution')
 class StreamingDistribution(QueryResourceManager):
-    class resource_type(object):
+
+    class resource_type(TypeInfo):
         service = 'cloudfront'
-        type = 'streaming-distribution'
+        arn_type = 'streaming-distribution'
         enum_spec = ('list_streaming_distributions',
                      'StreamingDistributionList.Items',
                      None)
         id = 'Id'
+        arn = 'ARN'
         name = 'DomainName'
         date = 'LastModifiedTime'
         dimension = "DistributionId"
         universal_taggable = True
-        filter_name = None
         config_type = "AWS::CloudFront::StreamingDistribution"
-
-    def get_arn(self, r):
-        return r['ARN']
-
-    @property
-    def generate_arn(self):
-        """ Generates generic arn if ID is not already arn format.
-        """
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                self.get_model().service,
-                account_id=self.account_id,
-                resource_type=self.get_model().type,
-                separator='/')
-        return self._generate_arn
 
     def get_source(self, source_type):
         if source_type == 'describe':
@@ -204,7 +173,7 @@ class MismatchS3Origin(Filter):
         'mismatch-s3-origin',
         check_custom_origins={'type': 'boolean'})
 
-    permissions = ('s3:ListBuckets',)
+    permissions = ('s3:ListAllMyBuckets',)
     retry = staticmethod(get_retry(('Throttling',)))
 
     def is_s3_domain(self, x):
@@ -309,8 +278,8 @@ class DistributionDisableAction(BaseAction):
                   - type: disable
     """
     schema = type_schema('disable')
-    permissions = ("distribution:GetDistributionConfig",
-                   "distribution:UpdateDistribution",)
+    permissions = ("cloudfront:GetDistributionConfig",
+                   "cloudfront:UpdateDistribution",)
 
     def process(self, distributions):
         client = local_session(
@@ -356,8 +325,8 @@ class StreamingDistributionDisableAction(BaseAction):
     """
     schema = type_schema('disable')
 
-    permissions = ("streaming-distribution:GetStreamingDistributionConfig",
-                   "streaming-distribution:UpdateStreamingDistribution",)
+    permissions = ("cloudfront:GetStreamingDistributionConfig",
+                   "cloudfront:UpdateStreamingDistribution",)
 
     def process(self, distributions):
         client = local_session(
@@ -420,8 +389,8 @@ class DistributionSSLAction(BaseAction):
         }
     }
 
-    permissions = ("distribution:GetDistributionConfig",
-                   "distribution:UpdateDistribution",)
+    permissions = ("cloudfront:GetDistributionConfig",
+                   "cloudfront:UpdateDistribution",)
 
     def process(self, distributions):
         client = local_session(self.manager.session_factory).client(

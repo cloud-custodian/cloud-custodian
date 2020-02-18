@@ -691,7 +691,7 @@ def inspect_queue(queue, state, limit, bucket):
     conn = worker.connection
 
     def job_row(j):
-        if isinstance(j.args[0], basestring):
+        if isinstance(j.args[0], basestring):  # noqa: F821
             account, bucket = j.args[0].split(':', 1)
         elif isinstance(j.args[0], dict):
             account, bucket = j.args[0]['name'], "set %d" % len(j.args[1])

@@ -52,22 +52,24 @@ class PluginRegistry(object):
     def __init__(self, plugin_type):
         self.plugin_type = plugin_type
         self._factories = {}
-        self._subscribers = {x: [] for x in self.EVENTS}
+        self._subscribers = []
 
-    def subscribe(self, event, func):
-        if event not in self.EVENTS:
-            raise ValueError('Invalid event')
-        self._subscribers[event].append(func)
+    def subscribe(self, func):
+        self._subscribers.append(func)
+        for p in self.values():
+            func(self, p)
 
     def register(self, name, klass=None, condition=True,
-                 condition_message="Missing dependency for {}"):
+                 condition_message="Missing dependency for {}",
+                 aliases=None):
         if not condition and klass:
             return klass
         # invoked as function
         if klass:
             klass.type = name
+            klass.type_aliases = aliases
             self._factories[name] = klass
-            self.notify(self.EVENT_REGISTER, klass)
+            self.notify(klass)
             return klass
 
         # invoked as class decorator
@@ -76,7 +78,8 @@ class PluginRegistry(object):
                 return klass
             self._factories[name] = klass
             klass.type = name
-            self.notify(self.EVENT_REGISTER, klass)
+            klass.type_aliases = aliases
+            self.notify(klass)
             return klass
         return _register_class
 
@@ -84,21 +87,37 @@ class PluginRegistry(object):
         if name in self._factories:
             del self._factories[name]
 
-    def notify(self, event, key=None):
-        for subscriber in self._subscribers[event]:
+    def notify(self, key=None):
+        for subscriber in self._subscribers:
             subscriber(self, key)
 
     def __contains__(self, key):
         return key in self._factories
 
     def __getitem__(self, name):
-        return self.get(name)
+        v = self.get(name)
+        if v is None:
+            raise KeyError(name)
+        return v
+
+    def __len__(self):
+        return len(self._factories)
 
     def get(self, name):
-        return self._factories.get(name)
+        factory = self._factories.get(name)
+
+        if factory:
+            return factory
+
+        return next((v for k, v in self._factories.items()
+                     if v.type_aliases and name in v.type_aliases),
+                    None)
 
     def keys(self):
         return self._factories.keys()
+
+    def values(self):
+        return self._factories.values()
 
     def items(self):
         return self._factories.items()

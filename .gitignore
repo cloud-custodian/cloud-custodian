@@ -1,6 +1,8 @@
 *.pyc
 *.egg-info/
 *.swp
+.eggs/
+c7n/version.py
 src/
 deps/
 include/
@@ -34,3 +36,9 @@ results.xml
 .pytest_cache/
 pyvenv.cfg
 junit
+/.vs
+docs/source/overview\.rst
+docs/source/tools/c7n-mailer\.md
+docs/source/tools/c7n-org\.md
+docs/source/tools/c7n-policystream\.md
+docs/source/*/resources

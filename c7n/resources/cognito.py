@@ -17,23 +17,21 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
 
 @resources.register('identity-pool')
 class CognitoIdentityPool(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cognito-identity'
         enum_spec = ('list_identity_pools', 'IdentityPools', {'MaxResults': 60})
         detail_spec = (
             'describe_identity_pool', 'IdentityPoolId', 'IdentityPoolId', None)
         id = 'IdentityPoolId'
         name = 'IdentityPoolName'
-        filter_name = None
-        dimension = None
-        type = "identitypool"
+        arn_type = "identitypool"
 
 
 @CognitoIdentityPool.action_registry.register('delete')
@@ -73,16 +71,14 @@ class DeleteIdentityPool(BaseAction):
 @resources.register('user-pool')
 class CognitoUserPool(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = "cognito-idp"
         enum_spec = ('list_user_pools', 'UserPools', {'MaxResults': 60})
         detail_spec = (
             'describe_user_pool', 'UserPoolId', 'Id', 'UserPool')
         id = 'Id'
         name = 'Name'
-        filter_name = None
-        dimension = None
-        type = "userpool"
+        arn_type = "userpool"
 
 
 @CognitoUserPool.action_registry.register('delete')

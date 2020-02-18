@@ -42,6 +42,48 @@ class OutputXrayTracerTest(BaseTest):
             TraceSegmentDocuments=[doc.serialize()])
 
 
+class ArnResolverTest(BaseTest):
+
+    table = [
+        ('arn:aws:waf::123456789012:webacl/3bffd3ed-fa2e-445e-869f-a6a7cf153fd3', 'waf'),
+        ('arn:aws:waf-regional:us-east-1:123456789012:webacl/3bffd3ed-fa2e-445e-869f-a6a7cf153fd3', 'waf-regional'), # NOQA
+        ('arn:aws:acm:region:account-id:certificate/certificate-id', 'acm-certificate'),
+        ('arn:aws:cloudwatch:region:account-id:alarm:alarm-name', 'alarm'),
+        ('arn:aws:logs:us-east-1:123456789012:log-group:my-log-group', 'log-group'),
+        ('arn:aws:codebuild:us-east-1:123456789012:project/my-demo-project', 'codebuild'),
+        ('arn:aws:cognito-idp:region:account-id:userpool/user-pool-id', 'user-pool'),
+        ('arn:aws:config:region:account-id:config-rule/config-rule-id', 'config-rule'),
+        ('arn:aws:directconnect:us-east-1:123456789012:dxcon/dxcon-fgase048', 'directconnect'),
+        ('arn:aws:dynamodb:region:account-id:table/tablename', 'dynamodb-table'),
+        ('arn:aws:ec2:region:account-id:instance/instance-id', 'ec2'),
+        ('arn:aws:ec2:region:account-id:vpc/vpc-id', 'vpc'),
+        ('arn:aws:ds:region:account-id:directory/directoryId', 'directory'),
+        ('arn:aws:elasticbeanstalk:region:account-id:application/applicationname', 'elasticbeanstalk'), # NOQA
+        ('arn:aws:ecr:region:account-id:repository/repository-name', 'ecr'),
+        ('arn:aws:elasticache:us-east-2:123456789012:cluster:myCluster', 'cache-cluster'),
+        ('arn:aws:es:us-east-1:123456789012:domain/streaming-logs', 'elasticsearch'),
+        ('arn:aws:elasticfilesystem:region:account-id:file-system/file-system-id', 'efs'),
+        ('arn:aws:ecs:us-east-1:123456789012:task/my-cluster/1abf0f6d-a411-4033-b8eb-a4eed3ad252a', 'ecs-task'), # NOQA
+        ('arn:aws:autoscaling:region:account-id:autoScalingGroup:groupid:autoScalingGroupName/groupfriendlyname', 'asg') # NOQA
+    ]
+
+    def test_arn_meta(self):
+
+        legacy = set()
+        for k, v in aws.AWS.resources.items():
+            if getattr(v.resource_type, 'type', None) is not None:
+                legacy.add(k)
+        self.assertFalse(legacy)
+
+    def test_arn_resolver(self):
+        for value, expected in self.table:
+            # load the resource types to enable resolution.
+            aws.AWS.get_resource_types(("aws.%s" % expected,))
+            arn = aws.Arn.parse(value)
+            result = aws.ArnResolver.resolve_type(arn)
+            self.assertEqual(result, expected)
+
+
 class ArnTest(BaseTest):
 
     def test_eb_arn(self):
@@ -76,7 +118,7 @@ class ArnTest(BaseTest):
 class UtilTest(BaseTest):
 
     def test_default_account_id_assume(self):
-        config = Bag(assume_role='arn:aws:iam::644160558196:role/custodian-mu')
+        config = Bag(assume_role='arn:aws:iam::644160558196:role/custodian-mu', account_id=None)
         aws._default_account_id(config)
         self.assertEqual(config.account_id, '644160558196')
 
@@ -155,3 +197,55 @@ class OutputMetricsTest(BaseTest):
         self.assertTrue(isinstance(sink, aws.MetricsOutput))
         sink.put_metric('ResourceCount', 101, 'Count')
         sink.flush()
+
+
+class OutputLogsTest(BaseTest):
+    # cloud watch logging
+
+    def test_default_log_group(self):
+        ctx = Bag(session_factory=None,
+                  options=Bag(account_id='001100', region='us-east-1'),
+                  policy=Bag(name='test', resource_type='ec2'))
+
+        log_output = output.log_outputs.select('custodian/xyz', ctx)
+        self.assertEqual(log_output.log_group, 'custodian/xyz')
+        self.assertEqual(log_output.construct_stream_name(), 'test')
+
+        log_output = output.log_outputs.select('/custodian/xyz/', ctx)
+        self.assertEqual(log_output.log_group, 'custodian/xyz')
+
+        log_output = output.log_outputs.select('aws://somewhere/out/there', ctx)
+        self.assertEqual(log_output.log_group, 'somewhere/out/there')
+
+        log_output = output.log_outputs.select('aws:///somewhere/out', ctx)
+        self.assertEqual(log_output.log_group, 'somewhere/out')
+
+        log_output = output.log_outputs.select('aws://somewhere', ctx)
+        self.assertEqual(log_output.log_group, 'somewhere')
+
+        log_output = output.log_outputs.select(
+            "aws:///somewhere/out?stream={region}/{policy}", ctx)
+        self.assertEqual(log_output.log_group, 'somewhere/out')
+        self.assertEqual(log_output.construct_stream_name(), 'us-east-1/test')
+
+    def test_master_log_handler(self):
+        session_factory = self.replay_flight_data('test_log_handler')
+        ctx = Bag(session_factory=session_factory,
+                  options=Bag(account_id='001100', region='us-east-1'),
+                  policy=Bag(name='test', resource_type='ec2'))
+        log_output = output.log_outputs.select(
+            'aws://master/custodian?region=us-east-2', ctx)
+        stream = log_output.get_handler()
+        self.assertTrue(stream.log_group == 'custodian')
+        self.assertTrue(stream.log_stream == '001100/us-east-1/test')
+
+    def test_stream_override(self):
+        session_factory = self.replay_flight_data(
+            'test_log_stream_override')
+        ctx = Bag(session_factory=session_factory,
+            options=Bag(account_id='001100', region='us-east-1'),
+            policy=Bag(name='test', resource_type='ec2'))
+        log_output = output.log_outputs.select(
+            'aws://master/custodian?region=us-east-2&stream=testing', ctx)
+        stream = log_output.get_handler()
+        self.assertTrue(stream.log_stream == 'testing')

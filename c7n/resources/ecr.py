@@ -19,7 +19,7 @@ from c7n.actions import RemovePolicyBase, Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import local_session, type_schema
 
@@ -27,12 +27,12 @@ from c7n.utils import local_session, type_schema
 @resources.register('ecr')
 class ECR(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'ecr'
         enum_spec = ('describe_repositories', 'repositories', None)
         name = "repositoryName"
         arn = id = "repositoryArn"
-        dimension = None
+        arn_type = 'repository'
         filter_name = 'repositoryNames'
         filter_type = 'list'
 
@@ -61,6 +61,49 @@ class ECRTag(tags.Tag):
                 client.tag_resource(resourceArn=r['repositoryArn'], tags=tags)
             except client.exceptions.RepositoryNotFoundException:
                 pass
+
+
+@ECR.action_registry.register('set-scanning')
+class ECRSetScanning(Action):
+
+    permissions = ('ecr:PutImageScanningConfiguration',)
+    schema = type_schema(
+        'set-scanning',
+        state={'type': 'boolean', 'default': True})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecr')
+        s = self.data.get('state', True)
+        for r in resources:
+            try:
+                client.put_image_scanning_configuration(
+                    registryId=r['registryId'],
+                    repositoryName=r['repositoryName'],
+                    imageScanningConfiguration={
+                        'scanOnPush': s})
+            except client.exceptions.RepositoryNotFoundException:
+                continue
+
+
+@ECR.action_registry.register('set-immutability')
+class ECRSetImmutability(Action):
+
+    permissions = ('ecr:PutImageTagMutability',)
+    schema = type_schema(
+        'set-immutability',
+        state={'type': 'boolean', 'default': True})
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ecr')
+        s = 'IMMUTABLE' if self.data.get('state', True) else 'MUTABLE'
+        for r in resources:
+            try:
+                client.put_image_tag_mutability(
+                    registryId=r['registryId'],
+                    repositoryName=r['repositoryName'],
+                    imageTagMutability=s)
+            except client.exceptions.RepositoryNotFoundException:
+                continue
 
 
 @ECR.action_registry.register('remove-tag')

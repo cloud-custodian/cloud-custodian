@@ -13,43 +13,26 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import functools
-
 from c7n.manager import resources
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import (RemoveTag, Tag, universal_augment)
-from c7n.utils import generate_arn
 
 
 @resources.register('cloudhsm-cluster')
 class CloudHSMCluster(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudhsmv2'
-        type = 'cluster'
-        resource_type = 'cloudhsm'
+        arn_type = 'cluster'
+        permission_prefix = arn_service = 'cloudhsm'
         enum_spec = ('describe_clusters', 'Clusters', None)
         id = name = 'ClusterId'
         filter_name = 'Filters'
         filter_type = 'scalar'
-        dimension = None
         # universal_taggable = True
         # Note: resourcegroupstaggingapi still points to hsm-classic
 
     augment = universal_augment
-    _generate_arn = None
-
-    @property
-    def generate_arn(self):
-        if self._generate_arn is None:
-            self._generate_arn = functools.partial(
-                generate_arn,
-                'cloudhsm',
-                region=self.config.region,
-                account_id=self.account_id,
-                resource_type='cluster',
-                separator='/')
-        return self._generate_arn
 
 
 @CloudHSMCluster.action_registry.register('tag')
@@ -61,7 +44,7 @@ class Tag(Tag):
     .. code-block:: yaml
 
             policies:
-              - name: cloudhsm
+              - name: cloudhsm-tag
                 resource: aws.cloudhsm-cluster
                 filters:
                   - "tag:OwnerName": missing
@@ -71,7 +54,7 @@ class Tag(Tag):
                     value: OwnerName
     """
 
-    permissions = ('cloudhsmv2:TagResource',)
+    permissions = ('cloudhsm:TagResource',)
 
     def process_resource_set(self, client, clusters, tags):
         for c in clusters:
@@ -90,7 +73,7 @@ class RemoveTag(RemoveTag):
     .. code-block:: yaml
 
             policies:
-              - name: cloudhsm
+              - name: cloudhsm-remove-tag
                 resource: aws.cloudhsm-cluster
                 filters:
                   - "tag:OldTagKey": present
@@ -99,7 +82,7 @@ class RemoveTag(RemoveTag):
                     tags: [OldTagKey1, OldTagKey2]
     """
 
-    permissions = ('cloudhsmv2:UntagResource',)
+    permissions = ('cloudhsm:UntagResource',)
 
     def process_resource_set(self, client, clusters, tag_keys):
         for c in clusters:
@@ -109,39 +92,33 @@ class RemoveTag(RemoveTag):
 @resources.register('hsm')
 class CloudHSM(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudhsm'
         enum_spec = ('list_hsms', 'HsmList', None)
         arn = id = 'HsmArn'
+        arn_type = 'cluster'
         name = 'Name'
-        date = dimension = None
-        detail_spec = (
-            "describe_hsm", "HsmArn", None, None)
-        filter_name = None
+        detail_spec = ("describe_hsm", "HsmArn", None, None)
 
 
 @resources.register('hsm-hapg')
 class PartitionGroup(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudhsm'
         enum_spec = ('list_hapgs', 'HapgList', None)
         detail_spec = ('describe_hapg', 'HapgArn', None, None)
         arn = id = 'HapgArn'
         name = 'HapgSerial'
         date = 'LastModifiedTimestamp'
-        dimension = None
-        filter_name = None
 
 
 @resources.register('hsm-client')
 class HSMClient(QueryResourceManager):
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         service = 'cloudhsm'
         enum_spec = ('list_luna_clients', 'ClientList', None)
         detail_spec = ('describe_luna_client', 'ClientArn', None, None)
         arn = id = 'ClientArn'
         name = 'Label'
-        date = dimension = None
-        filter_name = None

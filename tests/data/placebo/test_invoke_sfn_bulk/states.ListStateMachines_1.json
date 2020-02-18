@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "stateMachines": [
+            {
+                "stateMachineArn": "arn:aws:states:us-east-1:644160558196:stateMachine:Helloworld",
+                "name": "Helloworld",
+                "creationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 24,
+                    "hour": 11,
+                    "minute": 33,
+                    "second": 30,
+                    "microsecond": 570000
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "7a6577ad-969e-11e9-9dac-53c44a09848f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7a6577ad-969e-11e9-9dac-53c44a09848f",
+                "content-type": "application/x-amz-json-1.0",
+                "content-length": "154"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

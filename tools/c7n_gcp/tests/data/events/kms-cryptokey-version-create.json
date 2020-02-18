@@ -1,0 +1,57 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "alex.karpitski@gmail.com"
+    },
+    "requestMetadata": {
+      "callerIp": "86.57.255.91",
+      "callerSuppliedUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0,gzip(gfe),gzip(gfe)",
+      "requestAttributes": {
+        "time": "2019-04-23T11:55:31.509262266Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "cloudkms.googleapis.com",
+    "methodName": "CreateCryptoKeyVersion",
+    "authorizationInfo": [
+      {
+        "resource": "projects/cloud-custodian/locations/us-central1/keyRings/cloud-custodian/cryptoKeys/cloud-custodian",
+        "permission": "cloudkms.cryptoKeyVersions.create",
+        "granted": true,
+        "resourceAttributes": {
+          "service": "google.cloud.kms",
+          "name": "projects/cloud-custodian/locations/us-central1/keyRings/cloud-custodian/cryptoKeys/cloud-custodian/cryptoKeyVersions/new",
+          "type": "google.cloud.kms.CryptoKeyVersion"
+        }
+      }
+    ],
+    "resourceName": "projects/cloud-custodian/locations/us-central1/keyRings/cloud-custodian/cryptoKeys/cloud-custodian",
+    "request": {
+      "parent": "projects/cloud-custodian/locations/us-central1/keyRings/cloud-custodian/cryptoKeys/cloud-custodian",
+      "@type": "type.googleapis.com/google.cloud.kms.v1.CreateCryptoKeyVersionRequest"
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1"
+      ]
+    }
+  },
+  "insertId": "yovixceak69k",
+  "resource": {
+    "type": "cloudkms_cryptokeyversion",
+    "labels": {
+      "location": "us-central1",
+      "crypto_key_version_id": "1",
+      "key_ring_id": "cloud-custodian",
+      "crypto_key_id": "cloud-custodian",
+      "project_id": "cloud-custodian"
+    }
+  },
+  "timestamp": "2019-04-23T11:55:31.485539167Z",
+  "severity": "NOTICE",
+  "logName": "projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity",
+  "receiveTimestamp": "2019-04-23T11:55:31.546533159Z"
+}

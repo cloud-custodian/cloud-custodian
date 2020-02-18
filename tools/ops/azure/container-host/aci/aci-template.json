@@ -1,0 +1,136 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "aci_name": {
+            "defaultValue": "[concat('custodian-', parameters('azure_subscription_id'))]",
+            "type": "string"
+        },
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "type": "string"
+        },
+        "image_repository": {
+            "defaultValue": "cloudcustodian/c7n",
+            "type": "string"
+        },
+        "image_tag": {
+            "defaultValue": "latest",
+            "type": "string"
+        },
+        "restart_policy": {
+            "type": "string",
+            "allowedValues": [
+                "Always",
+                "OnFailure",
+                "Never"
+            ],
+            "defaultValue": "Always"
+        },
+        "azure_subscription_id": {
+            "type": "string",
+            "defaultValue": "[subscription().subscriptionId]"
+        },
+        "user_assigned_identity_name": {
+            "type": "string"
+        },
+        "azure_container_queue_name": {
+            "type": "string",
+            "defaultValue": "[concat('custodian-', parameters('azure_subscription_id'))]"
+        },
+        "azure_container_policy_uri": {
+            "type": "string"
+        },
+        "azure_container_storage_resource_id": {
+            "type": "string"
+        },
+        "azure_container_log_group": {
+            "type": "string"
+        },
+        "azure_container_metrics": {
+            "type": "string"
+        },
+        "azure_container_output_dir": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "user_assigned_identity_resource_id": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('user_assigned_identity_name'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "apiVersion": "2018-10-01",
+            "name": "[parameters('aci_name')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "[variables('user_assigned_identity_resource_id')]": {}
+                }
+            },
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[parameters('aci_name')]",
+                        "properties": {
+                            "image": "[concat(parameters('image_repository'), ':', parameters('image_tag'))]",
+                            "command": [
+                                "/usr/local/bin/python3",
+                                "-m",
+                                "c7n_azure.container_host.host"
+                            ],
+                            "ports": [],
+                            "environmentVariables": [
+                                {
+                                    "name": "AZURE_USE_MSI",
+                                    "value": "1"
+                                },
+                                {
+                                    "name": "AZURE_CLIENT_ID",
+                                    "value": "[reference(variables('user_assigned_identity_resource_id'), '2018-11-30').clientId]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_QUEUE_NAME",
+                                    "value": "[parameters('azure_container_queue_name')]"
+                                },
+                                {
+                                    "name": "AZURE_SUBSCRIPTION_ID",
+                                    "value": "[parameters('azure_subscription_id')]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_POLICY_URI",
+                                    "value": "[parameters('azure_container_policy_uri')]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_STORAGE_RESOURCE_ID",
+                                    "value": "[parameters('azure_container_storage_resource_id')]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_LOG_GROUP",
+                                    "value": "[parameters('azure_container_log_group')]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_METRICS",
+                                    "value": "[parameters('azure_container_metrics')]"
+                                },
+                                {
+                                    "name": "AZURE_CONTAINER_OUTPUT_DIR",
+                                    "value": "[parameters('azure_container_output_dir')]"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "memoryInGB": 1.5,
+                                    "cpu": 1
+                                }
+                            }
+                        }
+                    }
+                ],
+                "restartPolicy": "[parameters('restart_policy')]",
+                "osType": "Linux"
+            }
+        }
+    ]
+}

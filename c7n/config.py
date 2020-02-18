@@ -26,6 +26,9 @@ class Bag(dict):
         except KeyError:
             raise AttributeError(k)
 
+    def __setattr__(self, k, v):
+        self[k] = v
+
 
 class Config(Bag):
 
@@ -49,6 +52,7 @@ class Config(Bag):
             'log_group': None,
             'tracer': 'default',
             'metrics_enabled': False,
+            'metrics': None,
             'output_dir': '',
             'cache_period': 0,
             'dryrun': False,

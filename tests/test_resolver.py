@@ -17,11 +17,14 @@ import csv
 import json
 import os
 import tempfile
+import vcr
+from six.moves.urllib.request import urlopen
 from six import binary_type
 
-from .common import BaseTest, ACCOUNT_ID, Bag, TestConfig as Config
+from .common import BaseTest, ACCOUNT_ID, Bag
 from .test_s3 import destroyBucket
 
+from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
 
 
@@ -72,6 +75,18 @@ class ResolverTest(BaseTest):
         data = resolver.resolve(uri)
         self.assertEqual(content, data)
         self.assertEqual(list(cache.state.keys()), [("uri-resolver", uri)])
+
+    def test_handle_content_encoding(self):
+        session_factory = self.replay_flight_data("test_s3_resolver")
+        cache = FakeCache()
+        resolver = URIResolver(session_factory, cache)
+        uri = "http://httpbin.org/gzip"
+        with vcr.use_cassette('tests/data/vcr_cassettes/test_resolver.yaml'):
+            response = urlopen(uri)
+            content = resolver.handle_response_encoding(response)
+            data = json.loads(content)
+            self.assertEqual(data['gzipped'], True)
+            self.assertEqual(response.headers['Content-Encoding'], 'gzip')
 
     def test_resolve_file(self):
         content = json.dumps({"universe": {"galaxy": {"system": "sun"}}})

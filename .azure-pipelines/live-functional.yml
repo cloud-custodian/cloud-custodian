@@ -1,0 +1,132 @@
+trigger: none
+
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily midnight build
+  branches:
+    include:
+    - master
+  always: true
+
+variables:
+- group: AzureLiveTests
+
+stages:
+  - stage: azure_live_functional
+    displayName: Azure Live Functional Tests
+
+    jobs:
+    - job: 'azure_nightly_test_run'
+      displayName: 'Azure Nightly Test Run'
+      timeoutInMinutes: 0
+      cancelTimeoutInMinutes: 0
+
+      pool:
+        vmImage: 'Ubuntu-16.04'
+
+      steps:
+        - checkout: self
+          fetchDepth: 1
+
+        - task: UsePythonVersion@0
+          inputs:
+            versionSpec: '3.7'
+            architecture: 'x64'
+
+        - script: python -m pip install --upgrade pip && pip install . && pip install -r requirements-dev.txt
+          displayName: "Install Dependencies"
+
+        - script: az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} && az account set -s ${AZURE_SUBSCRIPTION_ID}
+          displayName: "Login to Azure"
+          env:
+            AZURE_CLIENT_ID: $(azure-client-id)
+            AZURE_CLIENT_SECRET: $(azure-client-secret)
+            AZURE_SUBSCRIPTION_ID: $(azure-subscription-id)
+            AZURE_TENANT_ID: $(azure-tenant-id)
+
+        # Skip some resources due to some restrictions with their provisioning using Service Principal account
+        # We maintain those resources in the test subscription available for the tests
+        - script: /bin/bash tools/c7n_azure/tests_azure/templates/provision.sh --skip keyvault cost-management-export containerservice databricks
+          displayName: "Provision Azure Resources"
+          env:
+            AZURE_CLIENT_ID: $(azure-client-id)
+            AZURE_CLIENT_SECRET: $(azure-client-secret)
+
+        - script: C7N_TEST_RUN=true C7N_FUNCTIONAL=yes pytest -v -m "not skiplive" tools/c7n_azure/tests_azure
+          displayName: "Run Azure tests without cassettes"
+
+        - script: /bin/bash tools/c7n_azure/tests_azure/templates/cleanup.sh --skip keyvault cost-management-export containerservice databricks
+          displayName: "Cleanup Azure Resources"
+          condition: always()
+
+    - job: 'azure_nightly_functions_test'
+      displayName: 'Azure Functions Nightly Test'
+      timeoutInMinutes: 0
+      cancelTimeoutInMinutes: 0
+
+      pool:
+        vmImage: 'Ubuntu-16.04'
+
+      steps:
+        - checkout: self
+          fetchDepth: 1
+
+        - task: UsePythonVersion@0
+          inputs:
+            versionSpec: '3.7'
+            architecture: 'x64'
+
+        - script: python -m pip install --upgrade pip && pip install . && pip install -r requirements-dev.txt
+          displayName: "Install Dependencies"
+
+        - script: /bin/bash test_functions.sh
+          workingDirectory: tools/c7n_azure/tests_azure/azure-functions
+          displayName: "Run Azure Functions Test"
+          env:
+            AZURE_CLIENT_ID: $(azure-client-id)
+            AZURE_CLIENT_SECRET: $(azure-client-secret)
+            AZURE_SUBSCRIPTION_ID: $(azure-subscription-id)
+            AZURE_TENANT_ID: $(azure-tenant-id)
+
+  # If all functional test stages complete successfully then
+  # push a docker image and tag `nightly`.
+  - stage: post_success
+    displayName: After Successful Functional Tests
+    dependsOn: azure_live_functional
+
+    jobs:
+      - job: 'push_docker_nightly'
+        displayName: 'Push Nightly Docker Image'
+
+        pool:
+          vmImage: 'Ubuntu-16.04'
+
+        steps:
+          - bash: |
+              printf -v TAG_DATE '%(%Y%m%d)T\n' -1
+              echo "##vso[task.setvariable variable=TAG_DATE]$TAG_DATE"
+
+          # C7N
+          - task: Docker@2
+            displayName: Build and Push C7N Nightly
+            inputs:
+              command: buildAndPush
+              Dockerfile: Dockerfile
+              containerRegistry: dockerServiceConnection
+              repository: cloudcustodian/c7n
+              tags: |
+                nightly
+                $(TAG_DATE)-nightly
+
+          # Mailer
+          - task: Docker@2
+            displayName: Build and Push Mailer Nightly
+            inputs:
+              command: buildAndPush
+              Dockerfile: tools/c7n_mailer/Dockerfile
+              buildContext: $(Build.Repository.LocalPath)
+              containerRegistry: dockerServiceConnection
+              repository: cloudcustodian/mailer
+              tags: |
+                nightly
+                $(TAG_DATE)-nightly

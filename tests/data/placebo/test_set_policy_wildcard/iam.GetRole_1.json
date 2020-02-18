@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "Role": {
+            "Path": "/aws-service-role/support.amazonaws.com/",
+            "RoleName": "AWSServiceRoleForSupport",
+            "RoleId": "AROAJWGLHKEUYCDFCDPXG",
+            "Arn": "arn:aws:iam::XXXXXXXXXXXX:role/aws-service-role/support.amazonaws.com/AWSServiceRoleForSupport",
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 1,
+                "day": 19,
+                "hour": 23,
+                "minute": 27,
+                "second": 57,
+                "microsecond": 0
+            },
+            "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22support.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
+            "Description": "Enables resource access for AWS to provide billing, administrative and support services",
+            "MaxSessionDuration": 3600
+        },
+        "ResponseMetadata": {
+            "RequestId": "0be4a9d6-9cfb-11e9-a119-f17d98cf0d01",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0be4a9d6-9cfb-11e9-a119-f17d98cf0d01",
+                "content-type": "text/xml",
+                "content-length": "1015",
+                "date": "Tue, 02 Jul 2019 18:56:05 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

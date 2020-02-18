@@ -1,0 +1,68 @@
+{
+    "status_code": 200,
+    "data": {
+        "OpsItemSummaries": [
+            {
+                "CreatedBy": "arn:aws:iam::644160558196:user/kapil",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 7,
+                    "day": 29,
+                    "hour": 17,
+                    "minute": 40,
+                    "second": 27,
+                    "microsecond": 85000
+                },
+                "LastModifiedBy": "arn:aws:iam::644160558196:user/kapil",
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 7,
+                    "day": 29,
+                    "hour": 19,
+                    "minute": 52,
+                    "second": 25,
+                    "microsecond": 123000
+                },
+                "Source": "Cloud Custodian",
+                "Status": "Open",
+                "OpsItemId": "oi-3199a7cf2d35",
+                "Title": "checking-lambdas",
+                "OperationalData": {
+                    "/aws/dedup": {
+                        "Value": "{\"dedupString\": \"57a538066184d23255b108df942f5555\"}",
+                        "Type": "SearchableString"
+                    },
+                    "/aws/resources": {
+                        "Value": "[{\"arn\": \"arn:aws:lambda:us-west-2:644160558196:function:CloudCustodian\"}]",
+                        "Type": "SearchableString"
+                    },
+                    "/custodian/dedup": {
+                        "Value": "57a538066184d23255b108df942f5555",
+                        "Type": "SearchableString"
+                    },
+                    "/custodian/policy-name": {
+                        "Value": "checking-lambdas",
+                        "Type": "SearchableString"
+                    },
+                    "/custodian/resource": {
+                        "Value": "lambda",
+                        "Type": "SearchableString"
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "3747dc7d-0843-4c5b-98c5-f9d8e2af8408",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3747dc7d-0843-4c5b-98c5-f9d8e2af8408",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "796",
+                "date": "Mon, 29 Jul 2019 23:55:41 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

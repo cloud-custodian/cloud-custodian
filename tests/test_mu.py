@@ -28,8 +28,11 @@ import time
 import unittest
 import zipfile
 
+import mock
+
 from c7n.mu import (
     custodian_archive,
+    generate_requirements,
     LambdaFunction,
     LambdaManager,
     PolicyLambda,
@@ -37,14 +40,27 @@ from c7n.mu import (
     CloudWatchLogSubscription,
     SNSSubscription,
     SQSSubscription,
+    CloudWatchEventSource
 )
-from c7n.policy import Policy
+
 from c7n.ufuncs import logsub
-from .common import BaseTest, event_data, functional, Bag, TestConfig as Config
+from .common import (
+    BaseTest, event_data, functional, Bag, ACCOUNT_ID)
 from .data import helloworld
 
 
 ROLE = "arn:aws:iam::644160558196:role/custodian-mu"
+
+
+def test_generate_requirements():
+    lines = generate_requirements(
+        'boto3', ignore=('docutils', 's3transfer', 'six'))
+    packages = []
+    for l in lines.split('\n'):
+        pkg_name, version = l.split('==')
+        packages.append(pkg_name)
+    assert set(packages) == set([
+        'botocore', 'jmespath', 'urllib3', 'python-dateutil'])
 
 
 class Publish(BaseTest):
@@ -55,7 +71,7 @@ class Publish(BaseTest):
             handler="index.handler",
             memory_size=128,
             timeout=3,
-            role=ROLE,
+            role='custodian-mu',
             runtime="python2.7",
             description="test",
         )
@@ -123,13 +139,13 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_config_rule_provision(self):
         session_factory = self.replay_flight_data("test_config_rule")
-        p = Policy(
+        p = self.load_policy(
             {
                 "resource": "security-group",
                 "name": "sg-modified",
                 "mode": {"type": "config-rule"},
             },
-            Config.empty(),
+            session_factory=session_factory
         )
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
@@ -321,27 +337,23 @@ class PolicyLambdaProvision(BaseTest):
         # the focus of the test.
 
         session_factory = self.replay_flight_data("test_cwe_update", zdata=True)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "s3-bucket-policy",
-                "mode": {"type": "cloudtrail", "events": ["CreateBucket"], 'runtime': 'python2.7'},
-                "filters": [
-                    {
-                        "type": "missing-policy-statement",
-                        "statement_ids": ["RequireEncryptedPutObject"],
-                    }
-                ],
-                "actions": ["no-op"],
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "s3-bucket-policy",
+            "mode": {"type": "cloudtrail",
+                     "events": ["CreateBucket"], 'runtime': 'python2.7'},
+            "filters": [
+                {"type": "missing-policy-statement",
+                 "statement_ids": ["RequireEncryptedPutObject"]},
+            ],
+            "actions": ["no-op"],
+        })
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         result = mgr.publish(pl, "Dev", role=ROLE)
         self.addCleanup(mgr.remove, pl)
 
-        p = Policy(
+        p = self.load_policy(
             {
                 "resource": "s3",
                 "name": "s3-bucket-policy",
@@ -366,7 +378,6 @@ class PolicyLambdaProvision(BaseTest):
                 ],
                 "actions": ["no-op"],
             },
-            Config.empty(),
         )
 
         output = self.capture_logging("custodian.serverless", level=logging.DEBUG)
@@ -390,21 +401,19 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_cwe_trail(self):
         session_factory = self.replay_flight_data("test_cwe_trail", zdata=True)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "s3-bucket-policy",
-                "mode": {"type": "cloudtrail", "events": ["CreateBucket"]},
-                "filters": [
-                    {
-                        "type": "missing-policy-statement",
-                        "statement_ids": ["RequireEncryptedPutObject"],
-                    }
-                ],
-                "actions": ["no-op"],
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "s3-bucket-policy",
+            "mode": {"type": "cloudtrail", "events": ["CreateBucket"]},
+            "filters": [
+                {
+                    "type": "missing-policy-statement",
+                    "statement_ids": ["RequireEncryptedPutObject"],
+                }
+            ],
+            "actions": ["no-op"]},
+            session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
@@ -438,16 +447,14 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_mu_metrics(self):
         session_factory = self.replay_flight_data("test_mu_metrics")
-        p = Policy(
+        p = self.load_policy(
             {
-                "resources": "s3",
                 "name": "s3-bucket-policy",
                 "resource": "s3",
                 "mode": {"type": "cloudtrail", "events": ["CreateBucket"]},
                 "actions": ["no-op"],
-            },
-            Config.empty(),
-        )
+            }, session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         end = datetime.utcnow()
@@ -460,14 +467,12 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_cwe_instance(self):
         session_factory = self.replay_flight_data("test_cwe_instance", zdata=True)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "ec2-encrypted-vol",
-                "mode": {"type": "ec2-instance-state", "events": ["pending"]},
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "ec2-encrypted-vol",
+            "mode": {"type": "ec2-instance-state", "events": ["pending"]}},
+            session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
@@ -502,14 +507,13 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_cwe_asg_instance(self):
         session_factory = self.replay_flight_data("test_cwe_asg", zdata=True)
-        p = Policy(
+        p = self.load_policy(
             {
                 "resource": "asg",
                 "name": "asg-spin-detector",
                 "mode": {"type": "asg-instance-state", "events": ["launch-failure"]},
-            },
-            Config.empty(),
-        )
+            }, session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
@@ -540,16 +544,61 @@ class PolicyLambdaProvision(BaseTest):
             },
         )
 
+    def test_cwe_security_hub_action(self):
+        factory = self.replay_flight_data('test_mu_cwe_sechub_action')
+        p = self.load_policy({
+            'name': 'sechub',
+            'resource': 'account',
+            'mode': {
+                'type': 'hub-action'}},
+            session_factory=factory,
+            config={'account_id': ACCOUNT_ID})
+        mu_policy = PolicyLambda(p)
+        events = mu_policy.get_events(factory)
+        self.assertEqual(len(events), 1)
+        hub_action = events.pop()
+        self.assertEqual(
+            json.loads(hub_action.cwe.render_event_pattern()),
+            {'resources': [
+                'arn:aws:securityhub:us-east-1:644160558196:action/custom/sechub'],
+             'source': ['aws.securityhub'],
+             'detail-type': [
+                 'Security Hub Findings - Custom Action', 'Security Hub Insight Results'
+            ]})
+
+        hub_action.cwe = cwe = mock.Mock(CloudWatchEventSource)
+        cwe.get.return_value = False
+        cwe.update.return_value = True
+        cwe.add.return_value = True
+
+        self.assertEqual(repr(hub_action), "<SecurityHub Action sechub>")
+        self.assertEqual(
+            hub_action._get_arn(),
+            "arn:aws:securityhub:us-east-1:644160558196:action/custom/sechub")
+        self.assertEqual(
+            hub_action.get(mu_policy.name), {'event': False, 'action': None})
+        hub_action.add(mu_policy)
+        self.assertEqual(
+            {'event': False,
+             'action': {
+                 'ActionTargetArn': ('arn:aws:securityhub:us-east-1:'
+                                     '644160558196:action/custom/sechub'),
+                 'Name': 'Account sechub', 'Description': 'sechub'}},
+            hub_action.get(mu_policy.name))
+        hub_action.update(mu_policy)
+        hub_action.remove(mu_policy)
+        self.assertEqual(
+            hub_action.get(mu_policy.name),
+            {'event': False, 'action': None})
+
     def test_cwe_schedule(self):
         session_factory = self.replay_flight_data("test_cwe_schedule", zdata=True)
-        p = Policy(
+        p = self.load_policy(
             {
                 "resource": "ec2",
                 "name": "periodic-ec2-checker",
                 "mode": {"type": "periodic", "schedule": "rate(1 day)"},
-            },
-            Config.empty(),
-        )
+            }, session_factory=session_factory)
 
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
@@ -586,15 +635,13 @@ class PolicyLambdaProvision(BaseTest):
             "type": "config-rule", "role": "arn:aws:iam::644160558196:role/custodian-mu"
         }
         mode.update(extra)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "hello-world",
-                "actions": ["no-op"],
-                "mode": mode,
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "hello-world",
+            "actions": ["no-op"],
+            "mode": mode},
+            session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
 
@@ -621,15 +668,12 @@ class PolicyLambdaProvision(BaseTest):
             "type": "config-rule", "role": "arn:aws:iam::644160558196:role/custodian-mu"
         }
         mode.update(config)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "hello-world",
-                "actions": ["no-op"],
-                "mode": mode,
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "hello-world",
+            "actions": ["no-op"],
+            "mode": mode,
+        })
         pl = PolicyLambda(p)
         return mgr.publish(pl)
 
@@ -721,23 +765,19 @@ class PolicyLambdaProvision(BaseTest):
         self.assert_items(tags, {"Foo": "Baz", "Bah": "Bug"})
 
     def test_optional_packages(self):
-        p = Policy(
-            {
-                "resources": "s3",
-                "name": "s3-lambda-extra",
-                "resource": "s3",
-                "mode": {
-                    "type": "cloudtrail",
-                    "packages": ["boto3", "botocore"],
-                    "events": ["CreateBucket"],
-                },
+        data = {
+            "name": "s3-lambda-extra",
+            "resource": "s3",
+            "mode": {
+                "type": "cloudtrail",
+                "packages": ["boto3"],
+                "events": ["CreateBucket"],
             },
-            Config.empty(),
-        )
+        }
+        p = self.load_policy(data)
         pl = PolicyLambda(p)
         pl.archive.close()
         self.assertTrue("boto3/utils.py" in pl.archive.get_filenames())
-        self.assertTrue("botocore/utils.py" in pl.archive.get_filenames())
 
     def test_delta_config_diff(self):
         delta = LambdaManager.delta_function
@@ -800,9 +840,9 @@ class PolicyLambdaProvision(BaseTest):
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python3.7",
+                "Runtime": "python3.8",
                 "Tags": {},
-                "Timeout": 60,
+                "Timeout": 900,
                 "TracingConfig": {"Mode": "PassThrough"},
                 "VpcConfig": {"SecurityGroupIds": [], "SubnetIds": []},
             },
@@ -811,29 +851,29 @@ class PolicyLambdaProvision(BaseTest):
 
 class PythonArchiveTest(unittest.TestCase):
 
-    def make_archive(self, *a, **kw):
-        archive = self.make_open_archive(*a, **kw)
+    def make_archive(self, modules=(), cache_file=None):
+        archive = self.make_open_archive(modules, cache_file=cache_file)
         archive.close()
         return archive
 
-    def make_open_archive(self, *a, **kw):
-        archive = PythonPackageArchive(*a, **kw)
+    def make_open_archive(self, modules=(), cache_file=None):
+        archive = PythonPackageArchive(modules=modules, cache_file=cache_file)
         self.addCleanup(archive.remove)
         return archive
 
-    def get_filenames(self, *a, **kw):
-        return self.make_archive(*a, **kw).get_filenames()
+    def get_filenames(self, modules=()):
+        return self.make_archive(modules).get_filenames()
 
     def test_handles_stdlib_modules(self):
-        filenames = self.get_filenames("webbrowser")
+        filenames = self.get_filenames(["webbrowser"])
         self.assertTrue("webbrowser.py" in filenames)
 
     def test_handles_third_party_modules(self):
-        filenames = self.get_filenames("botocore")
+        filenames = self.get_filenames(["botocore"])
         self.assertTrue("botocore/__init__.py" in filenames)
 
     def test_handles_packages(self):
-        filenames = self.get_filenames("c7n")
+        filenames = self.get_filenames(["c7n"])
         self.assertTrue("c7n/__init__.py" in filenames)
         self.assertTrue("c7n/resources/s3.py" in filenames)
         self.assertTrue("c7n/ufuncs/s3crypt.py" in filenames)
@@ -882,13 +922,13 @@ class PythonArchiveTest(unittest.TestCase):
 
         self.assertEqual(foo, 42)
 
-        filenames = self.get_filenames("namespace_package")
+        filenames = self.get_filenames(["namespace_package"])
         self.assertTrue("namespace_package/__init__.py" not in filenames)
         self.assertTrue("namespace_package/subpackage/__init__.py" in filenames)
         self.assertTrue(filenames[-1].endswith("-nspkg.pth"))
 
     def test_excludes_non_py_files(self):
-        filenames = self.get_filenames("ctypes")
+        filenames = self.get_filenames(["ctypes"])
         self.assertTrue("README.ctypes" not in filenames)
 
     def test_cant_get_bytes_when_open(self):
@@ -947,7 +987,7 @@ class PythonArchiveTest(unittest.TestCase):
             self.assertEqual(info.external_attr & world_readable, world_readable)
 
     def test_files_are_all_readable(self):
-        self.check_world_readable(self.make_archive("c7n"))
+        self.check_world_readable(self.make_archive(["c7n"]))
 
     def test_even_unreadable_files_become_readable(self):
         path = self.make_file()
@@ -963,6 +1003,17 @@ class PythonArchiveTest(unittest.TestCase):
         archive.add_contents(info, "foo.txt")
         archive.close()
         self.assertRaises(AssertionError, self.check_world_readable, archive)
+
+    def test_cache_zip_file(self):
+        archive = self.make_archive(cache_file=os.path.join(os.path.dirname(__file__),
+                                                            "data",
+                                                            "test.zip"))
+
+        self.assertTrue("cheese.txt" in archive.get_filenames())
+        self.assertTrue("cheese/is/yummy.txt" in archive.get_filenames())
+        with archive.get_reader() as reader:
+            self.assertEqual(b"So yummy!", reader.read("cheese.txt"))
+            self.assertEqual(b"True!", reader.read("cheese/is/yummy.txt"))
 
 
 class PycCase(unittest.TestCase):
@@ -1012,13 +1063,13 @@ class Constructor(PycCase):
         else:
             # ... we refuse it.
             with self.assertRaises(ValueError) as raised:
-                PythonPackageArchive("bar")
+                PythonPackageArchive(modules=["bar"])
             msg = raised.exception.args[0]
             self.assertTrue(msg.startswith("Could not find a *.py source file"))
             self.assertTrue(msg.endswith("bar.pyc"))
 
         # We readily ignore a *.pyc if a *.py exists.
-        archive = PythonPackageArchive("foo")
+        archive = PythonPackageArchive(modules=["foo"])
         archive.close()
         self.assertEqual(archive.get_filenames(), ["foo.py"])
         with archive.get_reader() as reader:

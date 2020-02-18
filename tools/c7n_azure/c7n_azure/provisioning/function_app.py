@@ -1,5 +1,16 @@
-import os
-from binascii import hexlify
+# Copyright 2019 Microsoft Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from azure.mgmt.web.models import (Site, SiteConfig)
 from c7n_azure.constants import (FUNCTION_DOCKER_VERSION, FUNCTION_EXT_VERSION)
@@ -32,9 +43,6 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         else:
             functionapp_def.kind = 'functionapp,linux,container'
             site_config.linux_fx_version = FUNCTION_DOCKER_VERSION
-            site_config.app_settings.append(
-                azure_name_value_pair('MACHINEKEY_DecryptionKey',
-                                      FunctionAppDeploymentUnit.generate_machine_decryption_key()))
             site_config.always_on = True
 
         # application insights settings
@@ -43,10 +51,13 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
             site_config.app_settings.append(
                 azure_name_value_pair('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key))
 
+        # Don't generate pycache
+        site_config.app_settings.append(
+            azure_name_value_pair('PYTHONDONTWRITEBYTECODE', 1))
+
         # general app settings
         con_string = params['storage_account_connection_string']
         site_config.app_settings.append(azure_name_value_pair('AzureWebJobsStorage', con_string))
-        site_config.app_settings.append(azure_name_value_pair('AzureWebJobsDashboard', con_string))
         site_config.app_settings.append(azure_name_value_pair('FUNCTIONS_EXTENSION_VERSION',
                                                               FUNCTION_EXT_VERSION))
         site_config.app_settings.append(azure_name_value_pair('FUNCTIONS_WORKER_RUNTIME', 'python'))
@@ -54,8 +65,3 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         return self.client.web_apps.create_or_update(params['resource_group_name'],
                                                      params['name'],
                                                      functionapp_def).result()
-
-    @staticmethod
-    def generate_machine_decryption_key():
-        # randomly generated decryption key for Functions key
-        return str(hexlify(os.urandom(32)).decode()).upper()

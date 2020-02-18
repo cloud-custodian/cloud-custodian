@@ -30,7 +30,7 @@ from c7n.resources.ebs import (
     SnapshotQueryParser as QueryParser
 )
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class SnapshotQueryParse(BaseTest):
@@ -134,7 +134,6 @@ class SnapshotAccessTest(BaseTest):
                 "resource": "ebs-snapshot",
                 "filters": ["cross-account"],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -159,7 +158,7 @@ class SnapshotDetachTest(BaseTest):
                         'type': 'detach'
                     }
                 ]
-            }, config=Config.empty(), session_factory=factory)
+            }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -194,7 +193,7 @@ class SnapshotCopyTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-west-2"),
+            config=dict(region="us-west-2"),
             session_factory=factory,
         )
         resources = p.run()
@@ -420,6 +419,28 @@ class VolumeSnapshotTest(BaseTest):
             Filters=[{"Name": "volume-id", "Values": ["vol-01adbb6a4f175941d"]}]
         )
         self.assertEqual(len(snapshot_data["Snapshots"]), 1)
+
+    def test_volume_snapshot_copy_tags(self):
+        factory = self.replay_flight_data("test_ebs_snapshot_copy_tags")
+        policy = self.load_policy(
+            {
+                "name": "ebs-test-snapshot",
+                "resource": "ebs",
+                "filters": [{"VolumeId": "vol-0252f61378ede9d01"}],
+                "actions": [{"type": "snapshot", "copy-tags": ['Name', 'Stage']}]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        snapshot_data = factory().client("ec2").describe_snapshots(
+            Filters=[{"Name": "volume-id", "Values": ["vol-0252f61378ede9d01"]}]
+        )
+        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
+        rtags.pop('DoNotCopy')
+        rtags['custodian_snapshot'] = ''
+        for s in snapshot_data['Snapshots']:
+            self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
 
 
 class VolumeDeleteTest(BaseTest):
