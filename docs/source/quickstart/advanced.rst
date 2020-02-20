@@ -128,7 +128,7 @@ Limiting how many resources custodian affects
 
 Custodian by default will operate on as many resources exist within an
 environment that match a policy's filters. Custodian also allows policy
-authors to stop policy execution if a policy affects more resources then
+authors to stop policy execution if a policy affects more resources than
 expected, either as a number of resources or as a percentage of total extant
 resources.
 
@@ -181,9 +181,9 @@ if you would like both a resource percent and a resource amount enforced.
     amount is over 20.
       resource: aws.log-group
       max-resources:
-        - percent: 50
-        - amount: 20
-        - op: and
+        percent: 50
+        amount: 20
+        op: and
       filters:
         - type: last-write
     days: 5
