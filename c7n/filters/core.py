@@ -748,7 +748,6 @@ def parse_date(v, tz=None):
         try:
             v = cast_tz(datetime.datetime.fromtimestamp(float(v)), tz)
         except exceptions:
-            # OSError on windows -- https://bugs.python.org/issue36439
             pass
 
     if isinstance(v, (int, float) + six.string_types):
