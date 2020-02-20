@@ -1,4 +1,4 @@
-# Copyright 2016-2017 Capital One Services, LLC
+# Copyright 2016-2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -434,5 +434,56 @@ class DistributionSSLAction(BaseAction):
         except Exception as e:
             self.log.warning(
                 "Exception trying to force ssl on Distribution: %s error: %s",
+                distribution['ARN'], e)
+            return
+
+
+@Distribution.action_registry.register('update-distribution')
+class DistributionUpdateAction(BaseAction):
+    """Action to update the attributes of a distribution
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: enforce-distribution-logging
+                resource: distribution
+                filters:
+                  - Logging.enabled: false
+                actions:
+                  - type: update-distribution
+                    attributes:
+                        Logging:
+                            Enabled: true
+    """
+    schema = type_schema(
+        'update-distribution',
+        attributes={'type': 'object'},
+        required=('attributes',))
+
+    permissions = ("cloudfront:UpdateDistribution, cloudfront:GetDistributionConfig")
+    # shape = 'UpdateDistributionMessage'
+
+    def process(self, distributions):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service)
+        for d in distributions:
+            self.process_distribution(client, d)
+
+    def process_distribution(self, client, distribution):
+        try:
+            res = client.get_distribution_config(
+                Id=distribution[self.manager.get_model().id])
+            config = res['DistributionConfig']
+            config = {**config, **self.data['attributes']}
+            res = client.update_distribution(
+                Id=distribution[self.manager.get_model().id],
+                IfMatch=res['ETag'],
+                DistributionConfig=config
+            )
+        except Exception as e:
+            self.log.warning(
+                "Exception trying to update Distribution: %s error: %s",
                 distribution['ARN'], e)
             return
