@@ -749,7 +749,7 @@ def parse_date(v, tz=None):
     if isinstance(v, (int, float) + six.string_types):
         try:
             # try interpreting as milliseconds epoch
-            v = cast_tz(datetime.datetime.fromtimestamp(float(v)/1000), tz)
+            v = cast_tz(datetime.datetime.fromtimestamp(float(v) / 1000), tz)
         except ValueError:
             pass
 
