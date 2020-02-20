@@ -70,6 +70,8 @@ class FunctionPackage(object):
     def _add_functions_required_files(self, policy, queue_name=None):
         s = local_session(Session)
 
+        has_event_trigger_mode = False
+
         for target_sub_id in self.target_sub_ids:
             name = self.name + ("_" + target_sub_id if target_sub_id else "")
             # generate and add auth
@@ -89,9 +91,11 @@ class FunctionPackage(object):
 
                 self.pkg.add_contents(dest=name + '/config.json',
                                       contents=policy_contents)
-                self._add_host_config(policy['mode']['type'])
-            else:
-                self._add_host_config(None)
+                if policy['mode']['type'] == FUNCTION_EVENT_TRIGGER_MODE:
+                    has_event_trigger_mode = True
+
+        self._add_host_config(
+            FUNCTION_EVENT_TRIGGER_MODE if has_event_trigger_mode else None)
 
     def _add_host_config(self, mode):
         config = copy.deepcopy(FUNCTION_HOST_CONFIG)
