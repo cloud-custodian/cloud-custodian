@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 from dateutil import tz
 from dateutil.parser import parse as parse_date
 import unittest
+import os
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -384,17 +385,27 @@ class TestValueTypes(BaseFilterTest):
     def test_parse_date_epoch(self):
         def t(s, y):
             dt = core_parse_date(s)
-            self.assertEqual(dt.year, y)
+            if y is None:
+                self.assertEqual(dt, None)
+            else:
+                self.assertEqual(dt.year, y)
 
         t("1234567890", 2009)       # (2009, 2, 13, 15, 31, 30))
-        t("12345678901", 2361)      # (2361, 3, 21, 12, 15, 1))
-        t("123456789012", 5882)     # (5882, 3, 10, 16, 30, 12))
         t("1234567890123", 2009)    # (2009, 2, 13, 15, 31, 30, 123000))
-        t("12345678901234", 2361)   # (2361, 3, 21, 12, 15, 1, 234000))
-        t("123456789012345", 5882)  # (5882, 3, 10, 16, 30, 12, 345000))
 
-        # check that it fails to parse this
-        self.assertEqual(core_parse_date("1234567890123456"), None)
+        t("12345678901", 2361)      # (2361, 3, 21, 12, 15, 1))
+        t("12345678901234", 2361)   # (2361, 3, 21, 12, 15, 1, 234000))
+
+        if os.name == "nt":
+            # too big for windows
+            t("123456789012", 1973)     # (1973, 11, 29, 13, 33, 9, 012000)
+            t("123456789012345", None)
+        else:
+            t("123456789012", 5882)     # (5882, 3, 10, 16, 30, 12))
+            t("123456789012345", 5882)  # (5882, 3, 10, 16, 30, 12, 345000))
+
+        # nothing should be able to parse this
+        t("1234567890123456", None)
 
     def test_version(self):
         fdata = {

@@ -24,6 +24,7 @@ import logging
 import operator
 import re
 import sys
+import os
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -745,6 +746,12 @@ def parse_date(v, tz=None):
             v = cast_tz(datetime.datetime.fromtimestamp(float(v)), tz)
         except ValueError:
             pass
+        except OSError:
+            # https://bugs.python.org/issue36439
+            if os.name == "nt":
+                pass
+            else:
+                raise
 
     if isinstance(v, (int, float) + six.string_types):
         try:
@@ -752,6 +759,11 @@ def parse_date(v, tz=None):
             v = cast_tz(datetime.datetime.fromtimestamp(float(v) / 1000), tz)
         except ValueError:
             pass
+        except OSError:
+            if os.name == "nt":
+                pass
+            else:
+                raise
 
     return isinstance(v, datetime.datetime) and v or None
 
