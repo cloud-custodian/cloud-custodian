@@ -737,12 +737,19 @@ def parse_date(v, tz=None):
     if isinstance(v, six.string_types):
         try:
             return cast_tz(parse(v), tz)
-        except (AttributeError, TypeError, ValueError):
+        except (AttributeError, TypeError, ValueError, OverflowError):
             pass
 
     if isinstance(v, (int, float) + six.string_types):
         try:
             v = cast_tz(datetime.datetime.fromtimestamp(float(v)), tz)
+        except ValueError:
+            pass
+
+    if isinstance(v, (int, float) + six.string_types):
+        try:
+            # try interpreting as milliseconds epoch
+            v = cast_tz(datetime.datetime.fromtimestamp(float(v)/1000), tz)
         except ValueError:
             pass
 

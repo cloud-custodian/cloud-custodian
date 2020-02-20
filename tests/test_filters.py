@@ -380,6 +380,9 @@ class TestValueTypes(BaseFilterTest):
 
         self.assertFilter(fdata, i(parse_date('2019/04/01')), True)
         self.assertFilter(fdata, i(datetime.now().isoformat()), False)
+        self.assertFilter(fdata, i("1234567890"), True)     # 2009-02-13T15:31:30
+        self.assertFilter(fdata, i("12345678901"), False)   # 2361-03-21T12:15:01
+        self.assertFilter(fdata, i("1234567890000"), True)  # 2009-02-13T15:31:30 (ms)
 
     def test_version(self):
         fdata = {
