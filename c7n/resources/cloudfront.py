@@ -21,6 +21,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
+from .aws import shape_validate
+from c7n.exceptions import PolicyValidationError
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -446,24 +448,73 @@ class DistributionUpdateAction(BaseAction):
 
     .. code-block:: yaml
 
-            policies:
-              - name: enforce-distribution-logging
-                resource: distribution
-                filters:
-                  - Logging.enabled: false
-                actions:
-                  - type: update-distribution
-                    attributes:
-                        Logging:
-                            Enabled: true
+        policies:
+        - name: enforce-distribution-logging
+          resource: distribution
+          filters:
+            - type: value
+              key: "Logging.Enabled"
+              value: null
+          actions:
+            - type: update-distribution
+              update:
+                Comment: ""
+                Enabled: true
+                Logging:
+                    Enabled: true
+                    IncludeCookies: false
+                    Bucket: 'test-enable-logging-c7n.s3.amazonaws.com'
+                    Prefix: ''
     """
-    schema = type_schema(
-        'update-distribution',
-        attributes={'type': 'object'},
-        required=('attributes',))
+    schema = type_schema('update-distribution',
+                        update={"type": "object"},
+                        required=('update',))
 
-    permissions = ("cloudfront:UpdateDistribution, cloudfront:GetDistributionConfig")
-    # shape = 'UpdateDistributionMessage'
+    permissions = ("cloudfront:UpdateDistribution",
+                   "cloudfront:GetDistributionConfig",)
+    shape = 'UpdateDistributionRequest'
+
+    def validate(self):
+        if not self.data.get('update'):
+            raise PolicyValidationError('update parameters are missing')
+        attrs = dict(self.data.get('update'))
+        if attrs.get('CallerReference') or \
+           attrs.get('Origins') or \
+           attrs.get('DefaultCacheBehavior'):
+            raise PolicyValidationError('Invalid attribute parameter')
+
+        # Set default values for required fields
+        attrs["CallerReference"] = ""
+        attrs["Origins"] = {
+            "Quantity": 0,
+            "Items": [
+                {
+                    "Id": "",
+                    "DomainName": ""
+                }
+            ],
+        }
+        attrs["DefaultCacheBehavior"] = {
+            "TargetOriginId": "",
+            "ForwardedValues": {
+                "QueryString": True,
+                "Cookies": {
+                    "Forward": ""
+                }
+            },
+            "TrustedSigners": {
+                "Enabled": True,
+                "Quantity": 0,
+            },
+            "ViewerProtocolPolicy": "",
+            "MinTTL": 0
+        }
+        request = {
+            "DistributionConfig": attrs,
+            "Id": "sample_id",
+            "IfMatch": "sample_string",
+        }
+        return shape_validate(request, self.shape, 'cloudfront')
 
     def process(self, distributions):
         client = local_session(self.manager.session_factory).client(
@@ -476,7 +527,6 @@ class DistributionUpdateAction(BaseAction):
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])
             config = res['DistributionConfig']
-            config = {**config, **self.data['attributes']}
             res = client.update_distribution(
                 Id=distribution[self.manager.get_model().id],
                 IfMatch=res['ETag'],
