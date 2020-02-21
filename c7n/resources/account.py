@@ -565,7 +565,7 @@ class ServiceLimit(Filter):
         # otherwise, if services specified, limit to those prefixes
         services = self.data.get('services')
         if services:
-            patterns = [f"{i}*" for i in services]
+            patterns = ["{}*".format(i) for i in services]
             return self.match_patterns_to_value(patterns, name.replace(' ', ''))
 
         return True
@@ -591,8 +591,12 @@ class ServiceLimit(Filter):
         results = self.get_check_result(client, check['id'])
 
         # trim to only results for this region
-        results['flaggedResources'] = [r for r in results.get('flaggedResources', [])
-            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')]
+        results['flaggedResources'] = [
+            r
+            for r in results.get('flaggedResources', [])
+            if r['metadata'][0] == region
+            or (r['metadata'][0] == '-' and region == 'us-east-1')
+        ]
 
         # save all raw limit results to the account resource
         if 'c7n:ServiceLimits' not in resources[0]:
@@ -619,8 +623,9 @@ class ServiceLimit(Filter):
             if limits and not self.match_patterns_to_value(limits, limit['check']):
                 continue
             limit['status'] = resource['status']
-            limit['percentage'] = float(limit['extant'] or 0) / float(
-                limit['limit']) * 100
+            limit['percentage'] = (
+                float(limit['extant'] or 0) / float(limit['limit']) * 100
+            )
             if threshold and limit['percentage'] < threshold:
                 continue
             exceeded.append(limit)
