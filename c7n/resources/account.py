@@ -17,7 +17,7 @@ import json
 import time
 from botocore.exceptions import ClientError
 from datetime import datetime, timedelta
-
+from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
@@ -33,6 +33,8 @@ from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
+
+from .aws import shape_validate
 
 filters = FilterRegistry('aws.account.filters')
 actions = ActionRegistry('aws.account.actions')
@@ -434,9 +436,9 @@ class ServiceLimit(Filter):
     checked.  This ends up being just a case-insensitive prefix match
     on the service limit check name.
 
-    The `limits` attribute lets you filter more specifically.  This is
-    just a case-insensitive substring match on the name of the service
-    limit check.
+    The `names` attribute lets you filter more specifically.  This is a
+    case-insensitive globbing match on the name of the check name.  You
+    can specify a name exactly, or use globbing wildcards like "VPC*".
 
     The names are exactly what's shown on the trusted advisor page:
 
@@ -445,12 +447,25 @@ class ServiceLimit(Filter):
     or via the awscli:
 
         aws --region us-east-1 support describe-trusted-advisor-checks --language en \
-            --query 'checks[?category==`service_limits`].[name]' --output text | sort
+            --query 'checks[?category==`service_limits`].[name]' --output text
 
-    Examples:
-        ELB Application Load Balancers
-        ELB Classic Load Balancers
-        ELB Network Load Balancers
+    The `limits` attribute lets you filter based on check result limit
+    names.  This is a case-insensitive string match against the limit
+    name.
+
+    Some example names and their corresponding service and limit names:
+
+    Check Name                          Service         Limit Name
+    ----------------------------------  --------------  ---------------------------------
+    Auto Scaling Groups                 AutoScaling     Auto Scaling groups
+    Auto Scaling Launch Configurations  AutoScaling     Launch configurations
+    CloudFormation Stacks               CloudFormation  Stacks
+    ELB Application Load Balancers      ELB             Active Application Load Balancers
+    ELB Classic Load Balancers          ELB             Active load balancers
+    ELB Network Load Balancers          ELB             Active Network Load Balancers
+    VPC                                 VPC             VPCs
+    VPC Elastic IP Address              VPC             VPC Elastic IP addresses (EIPs)
+    VPC Internet Gateways               VPC             Internet gateways
 
     Note: Some service limits checks are being migrated to service quotas,
     which is expected to largely replace service limit checks in trusted
@@ -484,6 +499,7 @@ class ServiceLimit(Filter):
         threshold={'type': 'number'},
         refresh_period={'type': 'integer',
                         'title': 'how long should a check result be considered fresh'},
+        names={'type': 'array', 'items': {'type': 'string'}},
         limits={'type': 'array', 'items': {'type': 'string'}},
         services={'type': 'array', 'items': {
             'enum': ['AutoScaling', 'CloudFormation',
@@ -534,36 +550,25 @@ class ServiceLimit(Filter):
         checks = client.describe_trusted_advisor_checks(language='en')
         return [c for c in checks['checks'] if c['category'] == category]
 
-    def match_limit(self, name):
-        limits = self.data.get('limits')
-        if limits:
-            for l in limits:
-                # case-insensitive substring match
-                if l.lower() in name.lower():
-                    return True
-            return False
-        else:
-            return True
-
-    def match_service(self, name):
-        # We can limit which checks we look at by stripping the whitespace
-        # in the name and then comparing to the services we are limiting
-        # to.  Names are sometimes "Auto Scaling" where the service is
-        # "AutoScaling".  And "Route 53" instead of "Route53".
-        # These service names always appear at the start of the name.
-        collapsed = name.replace(' ', '').lower()
-        services = self.data.get('services')
-        if services:
-            for s in services:
-                # case-insensitive prefix match
-                if collapsed.startswith(s.lower()):
-                    return True
-            return False
-        else:
-            return True
+    def match_patterns_to_value(self, patterns, value):
+        for p in patterns:
+            if fnmatch(value.lower(), p.lower()):
+                return True
+        return False
 
     def should_process(self, name):
-        return self.match_service(name) and self.match_limit(name)
+        # if names specified, limit to these names
+        patterns = self.data.get('names')
+        if patterns:
+            return self.match_patterns_to_value(patterns, name)
+
+        # otherwise, if services specified, limit to those prefixes
+        services = self.data.get('services')
+        if services:
+            patterns = [f"{i}*" for i in services]
+            return self.match_patterns_to_value(patterns, name.replace(' ', ''))
+
+        return True
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
@@ -600,6 +605,8 @@ class ServiceLimit(Filter):
         if datetime.now(tz=tzutc()) - delta > check_date:
             client.refresh_trusted_advisor_check(checkId=check['id'])
 
+        services = self.data.get('services')
+        limits = self.data.get('limits')
         threshold = self.data.get('threshold')
         exceeded = []
 
@@ -607,6 +614,10 @@ class ServiceLimit(Filter):
             if threshold is None and resource['status'] == 'ok':
                 continue
             limit = dict(zip(self.check_limit, resource['metadata']))
+            if services and not self.match_patterns_to_value(services, limit['service']):
+                continue
+            if limits and not self.match_patterns_to_value(limits, limit['check']):
+                continue
             limit['status'] = resource['status']
             limit['percentage'] = float(limit['extant'] or 0) / float(
                 limit['limit']) * 100
