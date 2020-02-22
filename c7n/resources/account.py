@@ -594,8 +594,7 @@ class ServiceLimit(Filter):
         results['flaggedResources'] = [
             r
             for r in results.get('flaggedResources', [])
-            if r['metadata'][0] == region
-            or (r['metadata'][0] == '-' and region == 'us-east-1')
+            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')
         ]
 
         # save all raw limit results to the account resource
