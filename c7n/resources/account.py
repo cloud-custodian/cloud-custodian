@@ -432,13 +432,9 @@ class ServiceLimit(Filter):
     Supported limits are per trusted advisor, which is variable based
     on usage in the account and support level enabled on the account.
 
-    The `services` attribute lets you filter which service limits are
-    checked.  This ends up being just a case-insensitive prefix match
-    on the check name.
-
-    The `names` attribute lets you filter more specifically.  This is a
-    case-insensitive globbing match on the name of the check name.  You
-    can specify a name exactly or use globbing wildcards like "VPC*".
+    The `names` attribute lets you filter which checks to query limits
+    about.  This is a case-insensitive globbing match on a check name.
+    You can specify a name exactly or use globbing wildcards like `VPC*`.
 
     The names are exactly what's shown on the trusted advisor page:
 
@@ -449,9 +445,24 @@ class ServiceLimit(Filter):
         aws --region us-east-1 support describe-trusted-advisor-checks --language en \
             --query 'checks[?category==`service_limits`].[name]' --output text
 
-    The `limits` attribute lets you filter based on check result limit
-    names.  This is a case-insensitive globbing match against the limit
-    name.
+    While you can target individual checks via the `names` attribute, and
+    that should be the preferred method, the following are provided for
+    backward compatibility with the old style of checks:
+
+    - `services`
+
+        The resulting limit's `service` field must match one of these.
+        These are case-insensitive globbing matches.
+
+        Note: If you haven't specified any `names` to filter, then
+        these service names are used as a case-insensitive prefix match on
+        the check name.  This helps limit the number of API calls we need
+        to make.
+
+    - `limits`
+
+        The resulting limit's `Limit Name` field must match one of these.
+        These are case-insensitive globbing matches.
 
     Some example names and their corresponding service and limit names:
 
@@ -476,6 +487,16 @@ class ServiceLimit(Filter):
     .. code-block:: yaml
 
             policies:
+              - name: specific-account-service-limits
+                resource: account
+                filters:
+                  - type: service-limit
+                    names:
+                      - IAM Policies
+                      - IAM Roles
+                      - "VPC*"
+                    threshold: 1.0
+
               - name: increase-account-service-limits
                 resource: account
                 filters:
@@ -483,6 +504,7 @@ class ServiceLimit(Filter):
                     services:
                       - EC2
                     threshold: 1.0
+
               - name: specify-region-for-global-service
                 region: us-east-1
                 resource: account
