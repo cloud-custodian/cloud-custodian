@@ -1,0 +1,91 @@
+{
+    "status_code": 200,
+    "data": {
+        "result": {
+            "checkId": "dV84wpqRUs",
+            "timestamp": "2020-02-14T09:25:32Z",
+            "status": "ok",
+            "resourcesSummary": {
+                "resourcesProcessed": 4,
+                "resourcesFlagged": 0,
+                "resourcesIgnored": 0,
+                "resourcesSuppressed": 0
+            },
+            "categorySpecificSummary": {
+                "costOptimizing": {
+                    "estimatedMonthlySavings": 0.0,
+                    "estimatedPercentMonthlySavings": 0.0
+                }
+            },
+            "flaggedResources": [
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "rFvNKvEiUZGkZJgqeB9mTWvA7ZkB4e9KW7hVVV6lYT8",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-1",
+                        "RDS",
+                        "RDS DB Manual Snapshots",
+                        "100",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-2",
+                    "resourceId": "ujyBVEk8uHSlDIn4k5tQmEOL168K0qxfx7LbumPe50w",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-2",
+                        "RDS",
+                        "RDS DB Manual Snapshots",
+                        "100",
+                        "51",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-west-1",
+                    "resourceId": "ddGXO2B_7lD7nIytahFAkudCBbRGs7PL7bNHihelrCQ",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-west-1",
+                        "RDS",
+                        "RDS DB Manual Snapshots",
+                        "100",
+                        "2",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-1",
+                    "resourceId": "E1TFI8h28gcDrVS5N1KD5zSckmcsDZO5gKFVAj6Oe7I",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-1",
+                        "RDS",
+                        "RDS DB Manual Snapshots",
+                        "100",
+                        "1",
+                        "Green"
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "07e78747-595f-4afc-b818-c627e7615df0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "07e78747-595f-4afc-b818-c627e7615df0",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1098",
+                "date": "Fri, 21 Feb 2020 23:15:30 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

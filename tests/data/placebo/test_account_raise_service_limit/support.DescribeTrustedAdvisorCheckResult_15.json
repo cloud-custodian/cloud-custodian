@@ -2,8 +2,8 @@
     "status_code": 200,
     "data": {
         "result": {
-            "checkId": "tV7YY0l7J9",
-            "timestamp": "2020-02-21T23:15:23Z",
+            "checkId": "wH7DD0l3J9",
+            "timestamp": "2020-02-21T23:15:40Z",
             "status": "ok",
             "resourcesSummary": {
                 "resourcesProcessed": 16,
@@ -21,13 +21,13 @@
                 {
                     "status": "ok",
                     "region": "ca-central-1",
-                    "resourceId": "AAvcluyMbljL6HkGLpW8IcQET1vHzDkWe0iOskKpJLk",
+                    "resourceId": "Duk2OL4gSrcyB613bsKYZkZlpA5sLeGTjzc79x8F5_w",
                     "isSuppressed": false,
                     "metadata": [
                         "ca-central-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -35,13 +35,13 @@
                 {
                     "status": "ok",
                     "region": "us-east-2",
-                    "resourceId": "fDVfEi07ZWJpXXGb_RGfCEW0GkysIaD2mKYGjQlFVqU",
+                    "resourceId": "wlPUCfj8sw_9pUkzXim_W1LaGSezJZCJtgX3AXqpNDE",
                     "isSuppressed": false,
                     "metadata": [
                         "us-east-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -49,27 +49,13 @@
                 {
                     "status": "ok",
                     "region": "us-west-1",
-                    "resourceId": "t920fKGZpEv0NXwVN-Q6pJaIEZVvPTSj-fxVhaEHThw",
+                    "resourceId": "CtE0IBt8MxkV2Va5ip2me72H9kANUPdrhCY37NUio0E",
                     "isSuppressed": false,
                     "metadata": [
                         "us-west-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-1",
-                    "resourceId": "VCUnXU1iTeDFlBunAdzSVUMD_lB4j2Uc8kK83G7lj4k",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -77,27 +63,27 @@
                 {
                     "status": "ok",
                     "region": "eu-west-2",
-                    "resourceId": "cXDwtOwxtsyrDd-ycZyMBUJIKcrPWYl06XzbU7m2Iio",
+                    "resourceId": "Wq4oRQLkLZhW--SBC_UEq-DhRt_OXx38v2zNfEAFu0k",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-west-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
                 },
                 {
                     "status": "ok",
-                    "region": "eu-central-1",
-                    "resourceId": "vRybyDExciPS9oySFThQQE7hli5k0iM7HJqY3GGZ1qs",
+                    "region": "eu-west-1",
+                    "resourceId": "0EKDXpuvgx4Ommc1-vWmm6zlR-9rTcCpuaa39AYPCmg",
                     "isSuppressed": false,
                     "metadata": [
-                        "eu-central-1",
+                        "eu-west-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -105,41 +91,13 @@
                 {
                     "status": "ok",
                     "region": "ap-northeast-1",
-                    "resourceId": "jn-R8ee8elt9YijUlzsJhuOB1f4sVKqLiL5vsu9Wy14",
+                    "resourceId": "xxuOt6Qiu-xxlCBZ1cW_tpRHQ5IiDe-gqnZ23Dc_1vM",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-northeast-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-1",
-                    "resourceId": "4aDDM6P89nc52mG9HseBsFuFh-Fw69oIqJNKaAbGUS4",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-3",
-                    "resourceId": "gpyvFb-RsM5qhwCWLXdczd-4RVOYGsauhzTmFJ-rSdo",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-3",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -147,13 +105,13 @@
                 {
                     "status": "ok",
                     "region": "ap-northeast-2",
-                    "resourceId": "cdFvlyd9WoolkL-PxMag86rA5FgRme_X3rFggUdQ2sk",
+                    "resourceId": "w1d7S3ow64mor763zST6dYiy4rRH1u98eDleWhLjmW0",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-northeast-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -161,13 +119,13 @@
                 {
                     "status": "ok",
                     "region": "ap-southeast-2",
-                    "resourceId": "bxNrxaaZpktgpqWwhk8kWqJzqIj04xVUeICRuw7Xf7Y",
+                    "resourceId": "L3BdbgmgRCJgnkYMrc3TmJa_y7CoRGbwCv1336hbF8o",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-southeast-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -175,13 +133,55 @@
                 {
                     "status": "ok",
                     "region": "ap-southeast-1",
-                    "resourceId": "jMBfBupjELbPcoeMrbjwVe5e4iblNF4J62UTXxT_PaI",
+                    "resourceId": "wJYVJfc6f_n8oGvosmCC4nw4li2TidZgVnevLDfeNho",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-southeast-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-central-1",
+                    "resourceId": "klnTdhUzdu7k14kfkFwxN_I69Flr3CISL9vQepS6crc",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-central-1",
+                        "EBS",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-west-3",
+                    "resourceId": "tyXrRQYX0x604TSQCmpfrIWo6A-awAfb70UFStMaPcg",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-west-3",
+                        "EBS",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "7CiMx15amgfv8qxS0QvBwENJMWVJpb1PvMFCRrzkFKw",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-1",
+                        "EBS",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -189,13 +189,13 @@
                 {
                     "status": "ok",
                     "region": "eu-north-1",
-                    "resourceId": "XCdZWMbtNwowBRhMwSEST870uNNp-MMPj5trlsX1AA0",
+                    "resourceId": "y_aUwg7lrKeFTlSlUFTW3BxKuSytqfJ8MOZDCehEybA",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-north-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -203,13 +203,13 @@
                 {
                     "status": "ok",
                     "region": "sa-east-1",
-                    "resourceId": "LZRPCW8UYEuHaRsdWTXfTW8-5jaNm6txCI0QPpGTKrU",
+                    "resourceId": "06n06VZWwU4CV3zWkCVC6S1Oy-hqE8G3cziNfeV8pds",
                     "isSuppressed": false,
                     "metadata": [
                         "sa-east-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -217,13 +217,13 @@
                 {
                     "status": "ok",
                     "region": "ap-south-1",
-                    "resourceId": "W2OptYVnPd8tE0qlS58KHSUMszaDVmRaCPLt2U5mxTk",
+                    "resourceId": "PYR03U1YWSCOR9sM2lJSKHE3oEdi1b7GYMMzKmufbBE",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-south-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -231,13 +231,13 @@
                 {
                     "status": "ok",
                     "region": "us-west-2",
-                    "resourceId": "K9zrXoF-IzbQc-hAgb5oI0TAeO2LIi-oQJbgE9_03B4",
+                    "resourceId": "zIBV4851yqY4YCaY5enqqQa8V1QIL6MQWAbWmQEkV6A",
                     "isSuppressed": false,
                     "metadata": [
                         "us-west-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Throughput Optimized HDD (st1) volume storage (GiB)",
+                        "368640",
                         "0",
                         "Green"
                     ]
@@ -245,13 +245,13 @@
             ]
         },
         "ResponseMetadata": {
-            "RequestId": "8d394703-9ad7-44d1-a6f4-86d72ffa6872",
+            "RequestId": "a853af8e-609d-420a-b283-e5355a6d0876",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "8d394703-9ad7-44d1-a6f4-86d72ffa6872",
+                "x-amzn-requestid": "a853af8e-609d-420a-b283-e5355a6d0876",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "3394",
-                "date": "Sat, 22 Feb 2020 00:16:53 GMT"
+                "content-length": "3954",
+                "date": "Sat, 22 Feb 2020 00:16:55 GMT"
             },
             "RetryAttempts": 0
         }

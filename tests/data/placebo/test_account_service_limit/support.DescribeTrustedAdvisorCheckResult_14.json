@@ -1,0 +1,259 @@
+{
+    "status_code": 200,
+    "data": {
+        "result": {
+            "checkId": "fW7HH0l7J9",
+            "timestamp": "2020-02-04T18:46:07Z",
+            "status": "ok",
+            "resourcesSummary": {
+                "resourcesProcessed": 16,
+                "resourcesFlagged": 0,
+                "resourcesIgnored": 0,
+                "resourcesSuppressed": 0
+            },
+            "categorySpecificSummary": {
+                "costOptimizing": {
+                    "estimatedMonthlySavings": 0.0,
+                    "estimatedPercentMonthlySavings": 0.0
+                }
+            },
+            "flaggedResources": [
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "7YaaSUFI3pISSczCq_KTLxAWJuV9GadOO7n94G5lEfU",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-2",
+                    "resourceId": "4KauPhs6tHUY1hN5im0Uu0-a87yWLXrgk5NP8KNfTX0",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-2",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "800",
+                        "172",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-west-1",
+                    "resourceId": "VlfLgv-jwlcvc2TnzyBa4aizz2NRHwUk1FA4lUDchCk",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-west-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-west-2",
+                    "resourceId": "EUKdDyKINNe2AmoYXIugisT2ka1_fB_Aq-3CPAANeVE",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-west-2",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-1",
+                    "resourceId": "D6t7gRjnfyfSCP-VE2wzAvvRxQfNm9ofQBFuQKfhE4Q",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "sa-east-1",
+                    "resourceId": "OmrXrA54-Vz9x9A3b1ivAPkKZuM6g-8LIckSPhPCpTU",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "sa-east-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-northeast-1",
+                    "resourceId": "WtywMag-O-UjGz-IIe4qMb596pIV97fw0oSloCyOJ6I",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-northeast-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-southeast-1",
+                    "resourceId": "efx0SNPa4CUUEq75aYyhIbD-45Vy9SRS4ssPyjPncps",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-southeast-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-southeast-2",
+                    "resourceId": "-0mI5yPEH2MgYu0ejbSfG-i9oDz0Y-yC6jzx7uiRGyI",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-southeast-2",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-central-1",
+                    "resourceId": "O9UDW4p0bETWN0VfRMfs7kHJmsLYZPqSqFCLmEvhsSE",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-central-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-northeast-2",
+                    "resourceId": "I5Y1nn19pBh4ArLGA9cCVhiJIuN3lRbr5pfX_STGUDQ",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-northeast-2",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-south-1",
+                    "resourceId": "zU5A8jVKBOxuvyG56kfnUIB6NQDOkw54okHH2FvUAFU",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-south-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-east-2",
+                    "resourceId": "QYvx1qpzgbEJoK1EOHCaWbIyB2SOCOXzljL48Q94R5Q",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-2",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ca-central-1",
+                    "resourceId": "YymQOho8Bufg91iqd6zonT8lowEW8yPChAzlto0WidQ",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ca-central-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-west-3",
+                    "resourceId": "fQNE2OgshfA-pCvI5uwUdI0aIwZevs-DZ0O05Il565A",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-west-3",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-north-1",
+                    "resourceId": "6aHKTU69oBhaXYrUxmjHglyeukrazTyGcHCmxkAvX3k",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-north-1",
+                        "AutoScaling",
+                        "Auto Scaling groups",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "61f5249a-3b41-45db-ac68-baa4d3085b8a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "61f5249a-3b41-45db-ac68-baa4d3085b8a",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "3524",
+                "date": "Fri, 21 Feb 2020 23:15:23 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

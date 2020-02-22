@@ -1,0 +1,77 @@
+{
+    "status_code": 200,
+    "data": {
+        "result": {
+            "checkId": "hJ7NN0l7J9",
+            "timestamp": "2020-02-04T18:45:45Z",
+            "status": "ok",
+            "resourcesSummary": {
+                "resourcesProcessed": 3,
+                "resourcesFlagged": 0,
+                "resourcesIgnored": 0,
+                "resourcesSuppressed": 0
+            },
+            "categorySpecificSummary": {
+                "costOptimizing": {
+                    "estimatedMonthlySavings": 0.0,
+                    "estimatedPercentMonthlySavings": 0.0
+                }
+            },
+            "flaggedResources": [
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "j8t_Uv_BOzug3oh66lGxjdJJDD9XCPY99qSvl1iv4Po",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-1",
+                        "SES",
+                        "Daily sending quota",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-west-1",
+                    "resourceId": "0DfZxNXRI5VX6MW8Qaw1EjBQ8Iul8HRw7A9j-68mTgc",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-west-1",
+                        "SES",
+                        "Daily sending quota",
+                        "200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-2",
+                    "resourceId": "olLkfCBz_yFNofBYS70xgC7oxMjnqaF3sGytMG_MZds",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-2",
+                        "SES",
+                        "Daily sending quota",
+                        "103200",
+                        "0",
+                        "Green"
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "52e52562-424b-42e4-9f9f-c9acd5c39634",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "52e52562-424b-42e4-9f9f-c9acd5c39634",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "896",
+                "date": "Fri, 21 Feb 2020 23:15:18 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

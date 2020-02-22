@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "result": {
+            "checkId": "jtlIMO3qZM",
+            "timestamp": "2020-02-21T01:32:51Z",
+            "status": "ok",
+            "resourcesSummary": {
+                "resourcesProcessed": 0,
+                "resourcesFlagged": 0,
+                "resourcesIgnored": 0,
+                "resourcesSuppressed": 0
+            },
+            "categorySpecificSummary": {},
+            "flaggedResources": []
+        },
+        "ResponseMetadata": {
+            "RequestId": "ada742a1-a7b8-43ce-95bd-c4593547875d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ada742a1-a7b8-43ce-95bd-c4593547875d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "245",
+                "date": "Sat, 22 Feb 2020 00:24:13 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,245 @@
+{
+    "status_code": 200,
+    "data": {
+        "result": {
+            "checkId": "gW7HH0l7J9",
+            "timestamp": "2020-02-18T19:58:18Z",
+            "status": "ok",
+            "resourcesSummary": {
+                "resourcesProcessed": 14,
+                "resourcesFlagged": 0,
+                "resourcesIgnored": 0,
+                "resourcesSuppressed": 1
+            },
+            "categorySpecificSummary": {
+                "costOptimizing": {
+                    "estimatedMonthlySavings": 0.0,
+                    "estimatedPercentMonthlySavings": 0.0
+                }
+            },
+            "flaggedResources": [
+                {
+                    "status": "ok",
+                    "region": "us-east-2",
+                    "resourceId": "aNyOX6WAcEccyJvD-5PoyMTqGttIo-m5HKk-8M9d9UY",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-2",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "5",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ca-central-1",
+                    "resourceId": "AdRjlA2cHEflds-mAqBeqpLdFIEygqWSfYv86LntgMI",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ca-central-1",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-west-1",
+                    "resourceId": "ayuFE0vLV4bf7ZbT2IONb6l9tA9cu38HzDfG1X6WbNQ",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-west-1",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "2",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-west-2",
+                    "resourceId": "iXBwla10FRV7Niu_2piVyG-IcgnAwSRh-M9Nj-_2E1A",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-west-2",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-1",
+                    "resourceId": "NyCUG_blIHco1_oB_rdDZEkjo7l4xEaB6bhAjjg-Ma0",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-1",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "14",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-central-1",
+                    "resourceId": "bDYCQwyqvKIjSWl5y3U0tkPMd78Wl-6R7UOtsg1Xr7o",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-central-1",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "PmPVmYtj62OTv9qJLzrSZq5d5kPhT9QTlXS06-KEN2I",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-1",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "20",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-northeast-1",
+                    "resourceId": "7gdEm50JTGUKkDVa7Q0MWbPmWS_2fn0o7aIHS9-WVF4",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-northeast-1",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-west-3",
+                    "resourceId": "BZjF69SJHhGbAimBXG9ayLwhh_D2fSizDbVvACYfCGE",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-west-3",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-northeast-2",
+                    "resourceId": "QIrmQOw4bm2BzmlW-VySgpyZxKWPn1At3izT1GYlLlI",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-northeast-2",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-southeast-2",
+                    "resourceId": "xIY9aIGYNBeWjx35RzmeE6vU1a_8MpOj1VAZqXKUZvE",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-southeast-2",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-southeast-1",
+                    "resourceId": "nx3vvvzM_kuVzp5N-H6k3HXgT1WLEl-ITcYSuHr15dM",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-southeast-1",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "sa-east-1",
+                    "resourceId": "GwEHE1m4UnZ06YHaALuRFr1Eh3D9jAdpm3R3x50OhvU",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "sa-east-1",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-south-1",
+                    "resourceId": "1_HcDRVi-yG4MEy_cCGTOa5f7RfcN8G0mN2-kYQ0T9M",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-south-1",
+                        "CloudFormation",
+                        "Stacks",
+                        "200",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-2",
+                    "resourceId": "uJLL88FL2K4kNIg9wEphPjXZBxzJG7mCTj8Z36D4LKw",
+                    "isSuppressed": true,
+                    "metadata": [
+                        "us-west-2",
+                        "CloudFormation",
+                        "Stacks",
+                        "1500",
+                        "819",
+                        "Green"
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "79922ab9-8af8-44c6-b154-3a7428c784f0",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "79922ab9-8af8-44c6-b154-3a7428c784f0",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "3178",
+                "date": "Fri, 21 Feb 2020 23:15:22 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -2,8 +2,8 @@
     "status_code": 200,
     "data": {
         "result": {
-            "checkId": "0Xc6LMYG8P",
-            "timestamp": "2020-02-19T15:40:59Z",
+            "checkId": "pR7UU0l7J9",
+            "timestamp": "2020-02-09T06:29:38Z",
             "status": "ok",
             "resourcesSummary": {
                 "resourcesProcessed": 1,
@@ -20,28 +20,27 @@
             "flaggedResources": [
                 {
                     "status": "ok",
-                    "region": "us-west-2",
-                    "resourceId": "lIi1cavxwxYc43BecsQMJtD9FidDK6rEhSg9lBOpM1o",
+                    "resourceId": "f19bZfCiU_ExI1pPmMw19-MWE--omiiNGUwLF6XIO7A",
                     "isSuppressed": false,
                     "metadata": [
-                        "us-west-2",
-                        "EC2",
-                        "On-Demand instances - Standard",
-                        "68564",
-                        "663",
+                        "-",
+                        "IAM",
+                        "Policies",
+                        "3000",
+                        "2076",
                         "Green"
                     ]
                 }
             ]
         },
         "ResponseMetadata": {
-            "RequestId": "1707b707-afca-47a2-9549-1065e3f4286f",
+            "RequestId": "a5eb1a5d-786f-4aa5-8b4b-88375f153581",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "1707b707-afca-47a2-9549-1065e3f4286f",
+                "x-amzn-requestid": "a5eb1a5d-786f-4aa5-8b4b-88375f153581",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "532",
-                "date": "Fri, 21 Feb 2020 23:15:18 GMT"
+                "content-length": "481",
+                "date": "Fri, 21 Feb 2020 23:15:25 GMT"
             },
             "RetryAttempts": 0
         }

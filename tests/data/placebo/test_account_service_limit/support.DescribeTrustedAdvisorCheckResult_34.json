@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "result": {
+            "checkId": "P1jhKWEmLa",
+            "timestamp": "2020-02-04T18:45:57Z",
+            "status": "ok",
+            "resourcesSummary": {
+                "resourcesProcessed": 2,
+                "resourcesFlagged": 0,
+                "resourcesIgnored": 0,
+                "resourcesSuppressed": 0
+            },
+            "categorySpecificSummary": {
+                "costOptimizing": {
+                    "estimatedMonthlySavings": 0.0,
+                    "estimatedPercentMonthlySavings": 0.0
+                }
+            },
+            "flaggedResources": [
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "A_ZqSg7QBdw65y2c8cql7rWLR0Zp0BuEgEc-xS0J_dg",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-1",
+                        "RDS",
+                        "Storage quota (GB)",
+                        "100000",
+                        "20",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-2",
+                    "resourceId": "Ksn-oz6Nj7Jw_HGD1Sy8vQS26WB6YJElnIuXTXkPs30",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-2",
+                        "RDS",
+                        "Storage quota (GB)",
+                        "100000",
+                        "3360",
+                        "Green"
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "d22148fb-7420-4672-ae72-ce1e87519225",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d22148fb-7420-4672-ae72-ce1e87519225",
+                "x-amzn-actiontrace": "amzn1.tr.0db79feb-5500-11ea-ade9-0aa1f3fa0000.0..agpAQJ",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "713",
+                "date": "Fri, 21 Feb 2020 23:15:30 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

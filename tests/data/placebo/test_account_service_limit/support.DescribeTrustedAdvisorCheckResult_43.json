@@ -2,8 +2,8 @@
     "status_code": 200,
     "data": {
         "result": {
-            "checkId": "tV7YY0l7J9",
-            "timestamp": "2020-02-21T23:15:23Z",
+            "checkId": "c5ftjdfkMr",
+            "timestamp": "2020-02-08T03:43:27Z",
             "status": "ok",
             "resourcesSummary": {
                 "resourcesProcessed": 16,
@@ -20,42 +20,28 @@
             "flaggedResources": [
                 {
                     "status": "ok",
-                    "region": "ca-central-1",
-                    "resourceId": "AAvcluyMbljL6HkGLpW8IcQET1vHzDkWe0iOskKpJLk",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ca-central-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
                     "region": "us-east-2",
-                    "resourceId": "fDVfEi07ZWJpXXGb_RGfCEW0GkysIaD2mKYGjQlFVqU",
+                    "resourceId": "6i_dKXsSYKxjjEEnlXiVSRhP5b15eQQJQxz_YPN-ubQ",
                     "isSuppressed": false,
                     "metadata": [
                         "us-east-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
                 },
                 {
                     "status": "ok",
-                    "region": "us-west-1",
-                    "resourceId": "t920fKGZpEv0NXwVN-Q6pJaIEZVvPTSj-fxVhaEHThw",
+                    "region": "ca-central-1",
+                    "resourceId": "gfy33DMmK-Pmp9hcwedpP3zSC-PQNWrTPsMywWZ2L8Q",
                     "isSuppressed": false,
                     "metadata": [
-                        "us-west-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "ca-central-1",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
@@ -63,13 +49,13 @@
                 {
                     "status": "ok",
                     "region": "eu-west-1",
-                    "resourceId": "VCUnXU1iTeDFlBunAdzSVUMD_lB4j2Uc8kK83G7lj4k",
+                    "resourceId": "plXokomlkLIk_AixRTv07Wg9nFmNW4Xl56kLlWUBBDQ",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-west-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
@@ -77,13 +63,13 @@
                 {
                     "status": "ok",
                     "region": "eu-west-2",
-                    "resourceId": "cXDwtOwxtsyrDd-ycZyMBUJIKcrPWYl06XzbU7m2Iio",
+                    "resourceId": "XGZKcMK-7IjAGFsiPt5vcm_e6eI4ALWAwFX7VFuAH5E",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-west-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
@@ -91,41 +77,13 @@
                 {
                     "status": "ok",
                     "region": "eu-central-1",
-                    "resourceId": "vRybyDExciPS9oySFThQQE7hli5k0iM7HJqY3GGZ1qs",
+                    "resourceId": "r2-fe8eVpyJW179L9dwtOxv0SKgd0mqyfWoe-2D1894",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-central-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-1",
-                    "resourceId": "jn-R8ee8elt9YijUlzsJhuOB1f4sVKqLiL5vsu9Wy14",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-1",
-                    "resourceId": "4aDDM6P89nc52mG9HseBsFuFh-Fw69oIqJNKaAbGUS4",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
@@ -133,13 +91,69 @@
                 {
                     "status": "ok",
                     "region": "eu-west-3",
-                    "resourceId": "gpyvFb-RsM5qhwCWLXdczd-4RVOYGsauhzTmFJ-rSdo",
+                    "resourceId": "ivemc7zsrcDecdL_Mg-dwJnuYJ4-rFu1HV8NNCkIz1k",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-west-3",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "lqHqUjvNuWDDz4tZxaH_Qj5L6X54iQrUubGvVHMUbcM",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-1",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
+                        "6",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-northeast-1",
+                    "resourceId": "n0XUjeQd1QLpbFe9NynBq8jbEnXqAzUE1QyLQStJwHo",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-northeast-1",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-1",
+                    "resourceId": "DqdOK3r9BEAUPWMiU3kHnHkaLH8f2h0QO5wNb8rPzrU",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-1",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
+                        "3",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "eu-north-1",
+                    "resourceId": "0NbtJFovOoej7FHpfIk5g5anq2f92BpLQwzCp6ewUVA",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "eu-north-1",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
@@ -147,13 +161,13 @@
                 {
                     "status": "ok",
                     "region": "ap-northeast-2",
-                    "resourceId": "cdFvlyd9WoolkL-PxMag86rA5FgRme_X3rFggUdQ2sk",
+                    "resourceId": "ZMOBr9f4XU00QTf2zfpP6K3i1ALWwlk2rHn8qeFLSFc",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-northeast-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
@@ -161,41 +175,13 @@
                 {
                     "status": "ok",
                     "region": "ap-southeast-2",
-                    "resourceId": "bxNrxaaZpktgpqWwhk8kWqJzqIj04xVUeICRuw7Xf7Y",
+                    "resourceId": "DJ9LJ5M0RK9m38ryEF03d4-prs4KnueOiaoqLnFidA0",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-southeast-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-1",
-                    "resourceId": "jMBfBupjELbPcoeMrbjwVe5e4iblNF4J62UTXxT_PaI",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-north-1",
-                    "resourceId": "XCdZWMbtNwowBRhMwSEST870uNNp-MMPj5trlsX1AA0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-north-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
@@ -203,13 +189,13 @@
                 {
                     "status": "ok",
                     "region": "sa-east-1",
-                    "resourceId": "LZRPCW8UYEuHaRsdWTXfTW8-5jaNm6txCI0QPpGTKrU",
+                    "resourceId": "aUGvSNOWIgNG69KA4Z8d6cra8GWKI1ysi48wd9pOrEo",
                     "isSuppressed": false,
                     "metadata": [
                         "sa-east-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
@@ -217,13 +203,27 @@
                 {
                     "status": "ok",
                     "region": "ap-south-1",
-                    "resourceId": "W2OptYVnPd8tE0qlS58KHSUMszaDVmRaCPLt2U5mxTk",
+                    "resourceId": "mqLHcEU063eQNzthZUUGbHv6e9m-PV3kXTo43zi_-Sc",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-south-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-southeast-1",
+                    "resourceId": "43YfX8NabFnxisoJ1ThFof85GP3ojWEnxN-DV6_Hocs",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-southeast-1",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
                         "0",
                         "Green"
                     ]
@@ -231,27 +231,27 @@
                 {
                     "status": "ok",
                     "region": "us-west-2",
-                    "resourceId": "K9zrXoF-IzbQc-hAgb5oI0TAeO2LIi-oQJbgE9_03B4",
+                    "resourceId": "MAHMlxLlnBjZRB6BVJJWrthCAZX29v4mKkuLazMQ8Uo",
                     "isSuppressed": false,
                     "metadata": [
                         "us-west-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
+                        "DynamoDB",
+                        "DynamoDB Write Capacity",
+                        "80000",
+                        "226",
                         "Green"
                     ]
                 }
             ]
         },
         "ResponseMetadata": {
-            "RequestId": "8d394703-9ad7-44d1-a6f4-86d72ffa6872",
+            "RequestId": "550b79a8-c575-452d-805d-024ab3e3a49c",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "8d394703-9ad7-44d1-a6f4-86d72ffa6872",
+                "x-amzn-requestid": "550b79a8-c575-452d-805d-024ab3e3a49c",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "3394",
-                "date": "Sat, 22 Feb 2020 00:16:53 GMT"
+                "content-length": "3572",
+                "date": "Fri, 21 Feb 2020 23:15:33 GMT"
             },
             "RetryAttempts": 0
         }

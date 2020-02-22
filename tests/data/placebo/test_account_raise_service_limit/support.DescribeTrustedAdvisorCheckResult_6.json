@@ -2,8 +2,8 @@
     "status_code": 200,
     "data": {
         "result": {
-            "checkId": "tV7YY0l7J9",
-            "timestamp": "2020-02-21T23:15:23Z",
+            "checkId": "cG7HH0l7J9",
+            "timestamp": "2020-02-21T23:15:30Z",
             "status": "ok",
             "resourcesSummary": {
                 "resourcesProcessed": 16,
@@ -21,13 +21,13 @@
                 {
                     "status": "ok",
                     "region": "ca-central-1",
-                    "resourceId": "AAvcluyMbljL6HkGLpW8IcQET1vHzDkWe0iOskKpJLk",
+                    "resourceId": "eu_UmzlXcaAQSsahia-4R4akIyOLDU_rvuFPvxYSn-I",
                     "isSuppressed": false,
                     "metadata": [
                         "ca-central-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -35,27 +35,13 @@
                 {
                     "status": "ok",
                     "region": "us-east-2",
-                    "resourceId": "fDVfEi07ZWJpXXGb_RGfCEW0GkysIaD2mKYGjQlFVqU",
+                    "resourceId": "thxhOPBfcpMEYuReyY9y4iFsHwS5Aqn9039IcApvTkA",
                     "isSuppressed": false,
                     "metadata": [
                         "us-east-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-1",
-                    "resourceId": "t920fKGZpEv0NXwVN-Q6pJaIEZVvPTSj-fxVhaEHThw",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -63,13 +49,13 @@
                 {
                     "status": "ok",
                     "region": "eu-west-1",
-                    "resourceId": "VCUnXU1iTeDFlBunAdzSVUMD_lB4j2Uc8kK83G7lj4k",
+                    "resourceId": "L22n0XXUN0r9ilPGk-t46aravFiK5T53eg1vNPntzjE",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-west-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -77,13 +63,27 @@
                 {
                     "status": "ok",
                     "region": "eu-west-2",
-                    "resourceId": "cXDwtOwxtsyrDd-ycZyMBUJIKcrPWYl06XzbU7m2Iio",
+                    "resourceId": "hZfEnInTxj-k47sOL97oxcYxMCKIAO9zIJ49wrkzb4o",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-west-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-1",
+                    "resourceId": "6IYtILkOgj3HnPs8kMo09dGtoFE6lWMnf8KyI96fcnQ",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-1",
+                        "EBS",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -91,13 +91,13 @@
                 {
                     "status": "ok",
                     "region": "eu-central-1",
-                    "resourceId": "vRybyDExciPS9oySFThQQE7hli5k0iM7HJqY3GGZ1qs",
+                    "resourceId": "Up7BfyO_OD4GctFqlqtrkXMa6b2Id8Npk6bq3g_5vX0",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-central-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -105,41 +105,13 @@
                 {
                     "status": "ok",
                     "region": "ap-northeast-1",
-                    "resourceId": "jn-R8ee8elt9YijUlzsJhuOB1f4sVKqLiL5vsu9Wy14",
+                    "resourceId": "GlsQH5mSkGRtk6t6VDOfNgd9-WgcCDpGj1H9Eg0t_UM",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-northeast-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-1",
-                    "resourceId": "4aDDM6P89nc52mG9HseBsFuFh-Fw69oIqJNKaAbGUS4",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-3",
-                    "resourceId": "gpyvFb-RsM5qhwCWLXdczd-4RVOYGsauhzTmFJ-rSdo",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-3",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -147,13 +119,13 @@
                 {
                     "status": "ok",
                     "region": "ap-northeast-2",
-                    "resourceId": "cdFvlyd9WoolkL-PxMag86rA5FgRme_X3rFggUdQ2sk",
+                    "resourceId": "gZunaA6AnKIeh9T4-cAvbofYMPUVZcVxUj-Gn_alPq8",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-northeast-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -161,27 +133,41 @@
                 {
                     "status": "ok",
                     "region": "ap-southeast-2",
-                    "resourceId": "bxNrxaaZpktgpqWwhk8kWqJzqIj04xVUeICRuw7Xf7Y",
+                    "resourceId": "cJPKeiDcVQfGDR9DvkHrTeHqtbP8fsCEFVjO7cOzTsw",
                     "isSuppressed": false,
                     "metadata": [
                         "ap-southeast-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
                 },
                 {
                     "status": "ok",
-                    "region": "ap-southeast-1",
-                    "resourceId": "jMBfBupjELbPcoeMrbjwVe5e4iblNF4J62UTXxT_PaI",
+                    "region": "eu-west-3",
+                    "resourceId": "JRs1wHIZrwcu5VCp8-x_vtVhGVBhTXu9CG2HwhfmO7Q",
                     "isSuppressed": false,
                     "metadata": [
-                        "ap-southeast-1",
+                        "eu-west-3",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "OuokRze3iU6oulvLpXVn36mSNWHEMk6fVQgGBuql-ck",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-1",
+                        "EBS",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -189,13 +175,27 @@
                 {
                     "status": "ok",
                     "region": "eu-north-1",
-                    "resourceId": "XCdZWMbtNwowBRhMwSEST870uNNp-MMPj5trlsX1AA0",
+                    "resourceId": "1Vi7QwlbJWVfol4PN8ZOLxVYAfk18bOFB2Q0e9TpnXA",
                     "isSuppressed": false,
                     "metadata": [
                         "eu-north-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
+                        "0",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-southeast-1",
+                    "resourceId": "A8zW9buVL6JV72ZfoPyXiOl766l7XTpnJFwft49Z7SY",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-southeast-1",
+                        "EBS",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -203,27 +203,13 @@
                 {
                     "status": "ok",
                     "region": "sa-east-1",
-                    "resourceId": "LZRPCW8UYEuHaRsdWTXfTW8-5jaNm6txCI0QPpGTKrU",
+                    "resourceId": "eYbxbYRRRby4JimIreQabDFW4B5yFb8SGnMkAsDGMyc",
                     "isSuppressed": false,
                     "metadata": [
                         "sa-east-1",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-south-1",
-                    "resourceId": "W2OptYVnPd8tE0qlS58KHSUMszaDVmRaCPLt2U5mxTk",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-south-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -231,13 +217,27 @@
                 {
                     "status": "ok",
                     "region": "us-west-2",
-                    "resourceId": "K9zrXoF-IzbQc-hAgb5oI0TAeO2LIi-oQJbgE9_03B4",
+                    "resourceId": "Sbmu3vTTDkKKS6SMZCqrrZgv53hlv6Yxkil3PSxYrHM",
                     "isSuppressed": false,
                     "metadata": [
                         "us-west-2",
                         "EBS",
-                        "Provisioned IOPS",
-                        "300000",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
+                        "4286",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "ap-south-1",
+                    "resourceId": "RMS8C0rhz2cZMixjds2cgXqaJjl1T1mlJL1RtuDl3P0",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "ap-south-1",
+                        "EBS",
+                        "Magnetic (standard) volume storage (GiB)",
+                        "307200",
                         "0",
                         "Green"
                     ]
@@ -245,12 +245,12 @@
             ]
         },
         "ResponseMetadata": {
-            "RequestId": "8d394703-9ad7-44d1-a6f4-86d72ffa6872",
+            "RequestId": "d8c4fc82-ca36-4b04-870e-e09e54b82c4f",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "8d394703-9ad7-44d1-a6f4-86d72ffa6872",
+                "x-amzn-requestid": "d8c4fc82-ca36-4b04-870e-e09e54b82c4f",
                 "content-type": "application/x-amz-json-1.1",
-                "content-length": "3394",
+                "content-length": "3781",
                 "date": "Sat, 22 Feb 2020 00:16:53 GMT"
             },
             "RetryAttempts": 0

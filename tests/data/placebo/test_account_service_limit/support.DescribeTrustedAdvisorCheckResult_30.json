@@ -1,0 +1,91 @@
+{
+    "status_code": 200,
+    "data": {
+        "result": {
+            "checkId": "dYWBaXaaMM",
+            "timestamp": "2020-02-17T23:57:24Z",
+            "status": "ok",
+            "resourcesSummary": {
+                "resourcesProcessed": 4,
+                "resourcesFlagged": 0,
+                "resourcesIgnored": 0,
+                "resourcesSuppressed": 0
+            },
+            "categorySpecificSummary": {
+                "costOptimizing": {
+                    "estimatedMonthlySavings": 0.0,
+                    "estimatedPercentMonthlySavings": 0.0
+                }
+            },
+            "flaggedResources": [
+                {
+                    "status": "ok",
+                    "region": "us-east-1",
+                    "resourceId": "CkizdzyRpnHq6cBa4UEzpgcf_g7CIvXroHZhAEu8aPI",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-1",
+                        "RDS",
+                        "Subnet groups",
+                        "50",
+                        "2",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-2",
+                    "resourceId": "QavnafO3Grxm83M9AXF2UvN8Yr3foLoRMWGClERa9-c",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-2",
+                        "RDS",
+                        "Subnet groups",
+                        "100",
+                        "24",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-west-1",
+                    "resourceId": "_uBaY8hrn-_8D7uw3ajVcp60TV3dEf886oDiHCYxrrA",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-west-1",
+                        "RDS",
+                        "Subnet groups",
+                        "50",
+                        "1",
+                        "Green"
+                    ]
+                },
+                {
+                    "status": "ok",
+                    "region": "us-east-2",
+                    "resourceId": "d5zt42kJ_AaQDYOt1bKqgwFO_4t0nzF7mLn1iEMpCnE",
+                    "isSuppressed": false,
+                    "metadata": [
+                        "us-east-2",
+                        "RDS",
+                        "Subnet groups",
+                        "50",
+                        "1",
+                        "Green"
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "87cd1802-6353-4c3b-a19b-52d3a2d9c0c8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "87cd1802-6353-4c3b-a19b-52d3a2d9c0c8",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1055",
+                "date": "Fri, 21 Feb 2020 23:15:29 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
