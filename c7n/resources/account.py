@@ -15,8 +15,8 @@
 """
 import json
 import time
+import datetime
 from botocore.exceptions import ClientError
-from datetime import datetime, timedelta
 from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
@@ -434,11 +434,11 @@ class ServiceLimit(Filter):
 
     The `services` attribute lets you filter which service limits are
     checked.  This ends up being just a case-insensitive prefix match
-    on the service limit check name.
+    on the check name.
 
     The `names` attribute lets you filter more specifically.  This is a
     case-insensitive globbing match on the name of the check name.  You
-    can specify a name exactly, or use globbing wildcards like "VPC*".
+    can specify a name exactly or use globbing wildcards like "VPC*".
 
     The names are exactly what's shown on the trusted advisor page:
 
@@ -450,7 +450,7 @@ class ServiceLimit(Filter):
             --query 'checks[?category==`service_limits`].[name]' --output text
 
     The `limits` attribute lets you filter based on check result limit
-    names.  This is a case-insensitive string match against the limit
+    names.  This is a case-insensitive globbing match against the limit
     name.
 
     Some example names and their corresponding service and limit names:
@@ -604,9 +604,9 @@ class ServiceLimit(Filter):
         resources[0]['c7n:ServiceLimits'].append(results)
 
         # check if we need to refresh the check for next time
-        delta = timedelta(self.data.get('refresh_period', 1))
+        delta = datetime.timedelta(self.data.get('refresh_period', 1))
         check_date = parse_date(results['timestamp'])
-        if datetime.now(tz=tzutc()) - delta > check_date:
+        if datetime.datetime.now(tz=tzutc()) - delta > check_date:
             client.refresh_trusted_advisor_check(checkId=check['id'])
 
         services = self.data.get('services')
