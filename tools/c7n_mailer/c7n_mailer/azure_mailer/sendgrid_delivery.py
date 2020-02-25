@@ -89,7 +89,7 @@ class SendGridDelivery(object):
         for email_to_addrs, message in six.iteritems(to_addrs_to_email_messages_map):
             for to_address in email_to_addrs:
                 try:
-                    mail = SendGridDelivery._sendgrid_mail_from_email_message(message)
+                    mail = SendGridDelivery._sendgrid_mail_from_email_message(message, to_address)
                     self.sendgrid_client.send(mail)
                 except (exceptions.UnauthorizedError, exceptions.BadRequestsError) as e:
                     self.logger.warning(
@@ -107,7 +107,7 @@ class SendGridDelivery(object):
         return True
 
     @staticmethod
-    def _sendgrid_mail_from_email_message(message):
+    def _sendgrid_mail_from_email_message(message, to_address):
         """
         Create a Mail object from an instance of email.message.EmailMessage.
 
@@ -123,7 +123,7 @@ class SendGridDelivery(object):
             subject=message.get('Subject'),
 
             # Create a To object instead of an Email object
-            to_emails=To(message.get('To')),
+            to_emails=To(to_address),
         )
         try:
             body = message.get_content()
