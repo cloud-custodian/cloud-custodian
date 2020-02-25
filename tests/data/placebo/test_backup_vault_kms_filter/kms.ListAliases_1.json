@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/backup",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/aws/backup",
+                "TargetKeyId": "8d56db16-21c6-412f-b949-7a012e11ee6e"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "1f72fcdf-8aa8-4b20-80e2-e27483e5221d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1f72fcdf-8aa8-4b20-80e2-e27483e5221d",
+                "cache-control": "no-cache, no-store, must-revalidate, private",
+                "expires": "0",
+                "pragma": "no-cache",
+                "date": "Tue, 25 Feb 2020 21:05:31 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "197"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
