@@ -99,4 +99,4 @@ class BackupVault(QueryResourceManager):
 @BackupVault.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
 
-        RelatedIdsExpression = 'EncryptionKeyArn'
+    RelatedIdsExpression = 'EncryptionKeyArn'
