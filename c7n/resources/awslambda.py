@@ -24,6 +24,7 @@ from concurrent.futures import as_completed
 from c7n.actions import BaseAction, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
 import c7n.filters.vpc as net_filters
+from c7n.filters.iam import RoleActionEffectFilter
 from c7n.manager import resources
 from c7n import query
 from c7n.resources.iam import CheckPermissions
@@ -258,6 +259,9 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
         return super(LambdaCrossAccountAccessFilter, self).process(
             resources, event)
 
+@AWSLambda.filter_registry.register('role-action-effect')
+class RoleActionEffectFilter(RoleActionEffectFilter):
+    role_arn_selector = "Role"
 
 @AWSLambda.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):

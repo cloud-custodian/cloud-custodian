@@ -1,16 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from collections import OrderedDict
@@ -36,6 +23,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, Filter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.filters.iam import ActionEffectFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
@@ -1399,6 +1387,51 @@ class IamUserInlinePolicy(Filter):
         return res
 
 
+@User.filter_registry.register('all-user-policies')
+class AllUserPolicies(ValueFilter):
+    """Applies a filter which is given all policies in a hash as an input, suitable
+    for finding details on aggregates / counts of matching policies.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-users-with-with-inline-policies
+            resource: iam-user
+            filters:
+              - type: all-user-policies
+                key: length(InlinePolicyNames)
+                value: 0
+                op: gt
+    """
+
+    schema = type_schema('all-user-policies', rinherit=ValueFilter.schema)
+    permissions = ('iam:ListAttachedUserPolicies', 'iam:ListUserPolicies')
+
+    def user_policies(self, user_set):
+        client = local_session(self.manager.session_factory).client('iam')
+        for u in user_set:
+            if 'c7n:AllUserPolicies' not in u:
+                u['c7n:AllUserPolicies'] = {}
+            mapping = u['c7n:AllUserPolicies']
+            # First, attached policies...
+            if 'AttachedPolicyArns' not in mapping:
+                aps = client.list_attached_user_policies(
+                    UserName=u['UserName'])['AttachedPolicies']
+                mapping['AttachedPolicyArns'] = list(map(lambda x: x['PolicyArn'], aps))
+            if 'InlinePolicyNames' not in mapping:
+                ipns = client.list_user_policies(
+                    UserName=u['UserName'])['PolicyNames']
+                mapping['InlinePolicyNames'] = ipns
+
+    def process(self, resources, event=None):
+        user_set = chunks(resources, size=50)
+        with self.executor_factory(max_workers=2) as w:
+            self.log.debug(
+                "Querying %d users policies" % len(resources))
+            list(w.map(self.user_policies, user_set))
+        return filter(lambda x: self.match(x['c7n:AllUserPolicies']), resources)
+
+
 @User.filter_registry.register('policy')
 class UserPolicy(ValueFilter):
     """Filter IAM users based on attached policy values
@@ -2034,3 +2067,68 @@ class IamGroupInlinePolicy(Filter):
             if len(r['c7n:InlinePolicies']) == 0 and not value:
                 res.append(r)
         return res
+
+@User.filter_registry.register('action-effect')
+class UserActionEffectFilter(ActionEffectFilter):
+    """Filter IAM users based on attached policy action effects
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-users-with-iam-access
+            resource: iam-user
+            filters:
+              - type: action-effect
+                actions:
+                  - iam:GetPolicy
+                effect: Allow
+    """
+
+    def statements_for_resource(self, resource, manager):
+        return manager.for_user(resource['UserName'])
+
+
+@Group.filter_registry.register('action-effect')
+class GroupActionEffectFilter(ActionEffectFilter):
+    """Filter IAM groups based on attached policy action effects
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-groups-with-iam-access
+            resource: iam-group
+            filters:
+              - type: action-effect
+                actions:
+                  - iam:GetPolicy
+                effect: Allow
+    """
+
+    def statements_for_resource(self, resource, manager):
+        return manager.for_group(resource['GroupName'])
+
+
+@Role.filter_registry.register('action-effect')
+class RoleActionEffectFilter(ActionEffectFilter):
+    """Filter IAM roles based on attached policy action effects
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-role-with-iam-access
+            resource: iam-role
+            filters:
+              - type: action-effect
+                actions:
+                  - iam:GetPolicy
+                effect: Allow
+    """
+
+    def statements_for_resource(self, resource, manager):
+        return manager.for_role(resource['RoleName'])
