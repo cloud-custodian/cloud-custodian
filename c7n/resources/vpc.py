@@ -1924,7 +1924,7 @@ class VpcEndpoint(query.QueryResourceManager):
         filter_name = 'VpcEndpointIds'
         filter_type = 'list'
         id_prefix = "vpce-"
-        taggable = False
+        universal_taggable = object()
 
 
 @VpcEndpoint.filter_registry.register('cross-account')
