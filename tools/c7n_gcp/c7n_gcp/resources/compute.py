@@ -104,6 +104,51 @@ class Delete(InstanceAction):
     method_spec = {'op': 'delete'}
 
 
+@Instance.action_registry.register('detach-disks')
+class DetachDisks(MethodAction):
+    """
+    `Detaches <https://cloud.google.com/compute/docs/reference/rest/v1/instances/detachDisk>`_
+    all disks from instance. The action does not specify any parameters.
+
+    It may be useful to be used before deleting instances to not delete disks
+    that are set to auto delete.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-instance-detach-disks
+            resource: gcp.instance
+            filters:
+              - type: value
+                key: name
+                value: instance-template-to-detahc
+            actions:
+              - type: detach-disks
+    """
+    schema = type_schema('detach-disks')
+    attr_filter = ('status', ('TERMINATED',))
+
+    def validate(self):
+        pass
+
+    def process_resource_set(self, client, model, resources):
+        for resource in resources:
+            self.process_resource(client, resource)
+
+    def process_resource(self, client, resource):
+        op_name = 'detachDisk'
+        path_param_re = re.compile(
+            '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
+        project, zone, instance = path_param_re.match(resource['selfLink']).groups()
+
+        base_params = {'project': project, 'zone': zone, 'instance': instance}
+        for disk in resource.get('disks', []):
+            params = dict(base_params, deviceName=disk['deviceName'])
+            self.invoke_api(client, op_name, params)
+
+
 @resources.register('image')
 class Image(QueryResourceManager):
 

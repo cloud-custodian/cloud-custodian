@@ -34,7 +34,7 @@ from c7n.schema import ElementSchema, StructureParser, generate
 from c7n.utils import dumps, load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
 from c7n import provider
-from c7n.resources import load_resources
+from c7n.resources import load_resources, load_available
 
 
 log = logging.getLogger('custodian.commands')
@@ -52,7 +52,6 @@ def policy_command(f):
         if not validate:
             log.debug('Policy validation disabled')
 
-        load_resources()
         vars = _load_vars(options)
 
         errors = 0
@@ -201,17 +200,17 @@ class DuplicateKeyCheckLoader(SafeLoader):
 
 def validate(options):
     from c7n import schema
-    load_resources()
+
     if len(options.configs) < 1:
         log.error('no config files specified')
         sys.exit(1)
 
     used_policy_names = set()
-    schm = schema.generate()
     structure = StructureParser()
     errors = []
 
     for config_file in options.configs:
+
         config_file = os.path.expanduser(config_file)
         if not os.path.exists(config_file):
             raise ValueError("Invalid path for config %r" % config_file)
@@ -233,6 +232,9 @@ def validate(options):
             log.error("%s" % e)
             errors.append(e)
             continue
+
+        load_resources(structure.get_resource_types(data))
+        schm = schema.generate()
         errors += schema.validate(data, schm)
         conf_policy_names = {
             p.get('name', 'unknown') for p in data.get('policies', ())}
@@ -346,7 +348,7 @@ def schema_completer(prefix):
     filtering via startswith happens after this list is returned.
     """
     from c7n import schema
-    load_resources()
+    load_available()
     components = prefix.split('.')
 
     if components[0] in provider.clouds.keys():
@@ -392,7 +394,7 @@ def schema_cmd(options):
         schema.json_dump(options.resource)
         return
 
-    load_resources()
+    load_available()
 
     resource_mapping = schema.resource_vocabulary()
     if options.summary:

@@ -16,8 +16,9 @@ from .core import Filter
 
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
+from c7n.loader import PolicyLoader
 from c7n.utils import type_schema
-from c7n.policy import Policy, PolicyCollection
+from c7n.policy import PolicyCollection
 
 
 class Missing(Filter):
@@ -34,8 +35,6 @@ class Missing(Filter):
     def __init__(self, data, manager):
         super(Missing, self).__init__(data, manager)
         self.data['policy']['name'] = self.manager.ctx.policy.name
-        self.embedded_policy = Policy(
-            self.data['policy'], self.manager.config, self.manager.session_factory)
 
     def validate(self):
         if 'mode' in self.data['policy']:
@@ -46,7 +45,15 @@ class Missing(Filter):
             raise PolicyValidationError(
                 "Actions can't be specified in "
                 "embedded policy %s" % self.data)
-
+        collection = PolicyLoader(
+            self.manager.config).load_data(
+                {'policies': [self.data['policy']]}, "memory://",
+                session_factory=self.manager.session_factory)
+        if not collection:
+            raise PolicyValidationError(
+                "policy %s missing filter empty embedded policy" % (
+                    self.manager.ctx.policy.name))
+        self.embedded_policy = list(collection).pop()
         self.embedded_policy.validate()
         return self
 

@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class ElasticSearch(BaseTest):
@@ -55,7 +55,6 @@ class ElasticSearch(BaseTest):
                     }
                 ],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         self.assertEqual(

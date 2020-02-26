@@ -19,7 +19,6 @@ from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session
 from c7n.resources import account
-from jsonschema.exceptions import ValidationError
 
 import datetime
 from dateutil import parser
@@ -28,7 +27,7 @@ import mock
 import time
 
 from .test_offhours import mock_datetime_now
-from .common import TestConfig as Config, functional
+from .common import functional
 
 TRAIL = "nosetest"
 
@@ -57,7 +56,7 @@ class AccountTests(BaseTest):
         # as a global resource, while the resources are typically regional
         # specific. By default missing fires if any region executed against
         # is missing the regional resource.
-        cfg = Config.empty(regions=["eu-west-1", "us-west-2"])
+        cfg = dict(regions=["eu-west-1", "us-west-2"])
 
         session_factory = self.replay_flight_data('test_account_missing_region_resource')
 
@@ -543,7 +542,7 @@ class AccountTests(BaseTest):
         self.assertTrue(status["IsLogging"])
 
     def test_create_trail_bucket_exists_in_west(self):
-        config = Config.empty(region="us-west-1")
+        config = dict(region="us-west-1")
         factory = self.replay_flight_data(
             "test_cloudtrail_create_bucket_exists_in_west"
         )
@@ -720,7 +719,8 @@ class AccountTests(BaseTest):
                 }
             ],
         }
-        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+        self.assertRaises(
+            PolicyValidationError, self.load_policy, policy, validate=True)
 
     def test_enable_trail(self):
         factory = self.replay_flight_data("test_cloudtrail_enable")

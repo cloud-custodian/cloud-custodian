@@ -17,7 +17,6 @@ import logging
 
 from .azure_common import BaseTest
 from c7n_azure.filters import FirewallRulesFilter
-from jsonschema import ValidationError
 from mock import Mock
 from netaddr import IPRange, IPNetwork, IPSet
 
@@ -170,17 +169,6 @@ class FirewallRulesFilterTest(BaseTest):
         mock.validate()
         actual = mock.process(satisfying_resources + non_satisfying_resources)
         self.assertEqual(satisfying_resources, actual)
-
-    def test_firewall_bad_schema(self):
-        p = self.load_policy({
-            'name': 'test-azure-storage',
-            'resource': 'azure.storage',
-            'filters': [{
-                'type': 'firewall-rules'
-            }],
-        })
-        with self.assertRaises(ValidationError):
-            self.load_policy(data=p, validate=True)
 
 
 class FirewallRulesFilterMock(FirewallRulesFilter):

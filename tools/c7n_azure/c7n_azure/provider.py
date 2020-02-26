@@ -19,6 +19,8 @@ from c7n.registry import PluginRegistry
 from c7n.utils import local_session
 from .session import Session
 
+from c7n_azure.resources.resource_map import ResourceMap
+
 
 @clouds.register('azure')
 class Azure(Provider):
@@ -26,6 +28,7 @@ class Azure(Provider):
     display_name = 'Azure'
     resource_prefix = 'azure'
     resources = PluginRegistry('%s.resources' % resource_prefix)
+    resource_map = ResourceMap
 
     def initialize(self, options):
         if options['account_id'] is None:

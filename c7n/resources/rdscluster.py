@@ -29,7 +29,6 @@ from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
 
-
 log = logging.getLogger('custodian.rds-cluster')
 
 

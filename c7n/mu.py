@@ -300,7 +300,7 @@ def _package_deps(package, deps=None, ignore=()):
     pdeps = pkgmd.requires(package) or ()
     for r in pdeps:
         # skip optional deps
-        if ';' in r:
+        if ';' in r and 'extra' in r:
             continue
         for idx, c in enumerate(r):
             if not c.isalnum() and c not in ('-', '_', '.'):
@@ -311,8 +311,11 @@ def _package_deps(package, deps=None, ignore=()):
         if pkg_name in ignore:
             continue
         if pkg_name not in deps:
+            try:
+                _package_deps(pkg_name, deps, ignore)
+            except pkgmd.PackageNotFoundError:
+                continue
             deps.append(pkg_name)
-            _package_deps(pkg_name, deps, ignore)
     return deps
 
 
@@ -463,6 +466,11 @@ class LambdaManager(object):
                 if k in LAMBDA_EMPTY_VALUES and LAMBDA_EMPTY_VALUES[k] == new_config[k]:
                     continue
                 changed.append(k)
+            # For role we allow name only configuration
+            elif k == 'Role':
+                if (new_config[k] != old_config[k] and
+                        not old_config[k].split('/', 1)[1] == new_config[k]):
+                    changed.append(k)
             elif new_config[k] != old_config[k]:
                 changed.append(k)
         return changed
@@ -863,7 +871,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python3.7')
+        return self.policy.data['mode'].get('runtime', 'python3.8')
 
     @property
     def memory_size(self):

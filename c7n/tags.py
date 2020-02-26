@@ -1094,8 +1094,7 @@ class CopyRelatedResourceTag(Tag):
         resource_class.action_registry.register('copy-related-tag', klass)
 
 
-aws_resources.subscribe(
-    aws_resources.EVENT_REGISTER, CopyRelatedResourceTag.register_resources)
+aws_resources.subscribe(CopyRelatedResourceTag.register_resources)
 
 
 def universal_retry(method, ResourceARNList, **kw):

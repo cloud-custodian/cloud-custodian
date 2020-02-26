@@ -174,12 +174,10 @@ class PutMetric(BaseAction):
 
         return resources
 
-
-def register_action_put_metric(registry, _):
-    # apply put metric to each resource
-    for resource in registry.keys():
-        klass = registry.get(resource)
-        klass.action_registry.register('put-metric', PutMetric)
+    @classmethod
+    def register_resources(cls, registry, resource_class):
+        if 'put-metric' not in resource_class.action_registry:
+            resource_class.action_registry.register('put-metric', PutMetric)
 
 
-resources.subscribe(resources.EVENT_FINAL, register_action_put_metric)
+resources.subscribe(PutMetric.register_resources)

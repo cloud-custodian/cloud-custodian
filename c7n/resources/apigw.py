@@ -37,7 +37,7 @@ class RestAccount(ResourceManager):
     filter_registry = FilterRegistry('rest-account.filters')
     action_registry = ActionRegistry('rest-account.actions')
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'apigateway'
         name = id = 'account_id'
         dimension = None

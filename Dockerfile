@@ -12,6 +12,7 @@ ADD setup.py README.md requirements.txt /src/
 ADD c7n /src/c7n/
 ADD tools/c7n_gcp /src/tools/c7n_gcp
 ADD tools/c7n_azure /src/tools/c7n_azure
+ADD tools/c7n_kube /src/tools/c7n_kube
 
 WORKDIR /src
 
@@ -21,6 +22,7 @@ RUN apt-get --yes update \
  && pip3 install -r requirements.txt  . \
  && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
  && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
+ && pip3 install -r tools/c7n_kube/requirements.txt tools/c7n_kube \
  # Pre-cache Azure Functions package
  && python -c "from c7n_azure.function_package import FunctionPackage; \
       FunctionPackage('cache').build_cache( \

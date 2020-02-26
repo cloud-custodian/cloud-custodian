@@ -24,6 +24,7 @@ from c7n.utils import reset_session_cache
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources
+from c7n.structure import StructureParser
 
 from c7n_azure.provider import Azure
 
@@ -55,7 +56,7 @@ def run(event, context, subscription_id=None):
     if subscription_id is not None:
         options['account_id'] = subscription_id
 
-    load_resources()
+    load_resources(StructureParser().get_resource_types(policy_config))
 
     options = Azure().initialize(options)
 

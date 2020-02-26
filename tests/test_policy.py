@@ -21,16 +21,18 @@ import shutil
 import tempfile
 
 from c7n import policy, manager
+from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
-from c7n.resources import aws
+from c7n.resources import aws, load_resources
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
+from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
 from c7n.version import version
 
-from .common import BaseTest, event_data, Bag, TestConfig as Config
+from .common import BaseTest, event_data, Bag
 
 
 class DummyResource(manager.ResourceManager):
@@ -61,7 +63,11 @@ class DummyResource(manager.ResourceManager):
         return [_a(p1), _a(p2)]
 
 
-class PolicyMeta(BaseTest):
+class PolicyMetaLint(BaseTest):
+
+    def setUp(self):
+        # we need to load all resources for the linting meta tests.
+        load_resources()
 
     def test_policy_missing_provider_session(self):
         self.assertRaises(
@@ -85,32 +91,28 @@ class PolicyMeta(BaseTest):
             ),
         )
 
-    def test_policy_manager_custom_permissions(self):
-        policy = self.load_policy(
-            {
-                "name": "ec2-utilization",
-                "resource": "ec2",
-                "filters": [
-                    {
-                        "type": "metrics",
-                        "name": "CPUUtilization",
-                        "days": 3,
-                        "value": 1.5,
-                    }
-                ],
-            }
-        )
-        perms = policy.get_permissions()
-        self.assertEqual(
-            perms,
-            set(
-                (
-                    "ec2:DescribeInstances",
-                    "ec2:DescribeTags",
-                    "cloudwatch:GetMetricStatistics",
-                )
-            ),
-        )
+    def test_schema_plugin_name_mismatch(self):
+        # todo iterate over all clouds not just aws resources
+        for k, v in manager.resources.items():
+            for fname, f in v.filter_registry.items():
+                if fname in ("or", "and", "not"):
+                    continue
+                self.assertIn(fname, f.schema["properties"]["type"]["enum"])
+            for aname, a in v.action_registry.items():
+                self.assertIn(aname, a.schema["properties"]["type"]["enum"])
+
+    def test_schema(self):
+        try:
+            schema = generate()
+            JsonSchemaValidator.check_schema(schema)
+        except Exception:
+            self.fail("Invalid schema")
+
+    def test_schema_serialization(self):
+        try:
+            dumps(generate())
+        except Exception:
+            self.fail("Failed to serialize schema")
 
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
@@ -316,7 +318,7 @@ class PolicyMeta(BaseTest):
         missing = []
         cfg = Config.empty()
 
-        for k, v in manager.resources.items():
+        for k, v in list(manager.resources.items()):
             p = Bag({"name": "permcheck", "resource": k, 'provider_name': 'aws'})
             ctx = self.get_context(config=cfg, policy=p)
 
@@ -325,7 +327,7 @@ class PolicyMeta(BaseTest):
             if not perms:
                 missing.append(k)
 
-            for n, a in v.action_registry.items():
+            for n, a in list(v.action_registry.items()):
                 p["actions"] = [n]
                 perms = a({}, mgr).get_permissions()
                 found = bool(perms)
@@ -336,7 +338,7 @@ class PolicyMeta(BaseTest):
                 if not found:
                     missing.append("%s.actions.%s" % (k, n))
 
-            for n, f in v.filter_registry.items():
+            for n, f in list(v.filter_registry.items()):
                 if n in ("and", "or", "not", "missing"):
                     continue
                 p["filters"] = [n]
@@ -383,6 +385,54 @@ class PolicyMeta(BaseTest):
             )
 
 
+class PolicyMeta(BaseTest):
+
+    def test_policy_detail_spec_permissions(self):
+        policy = self.load_policy(
+            {"name": "kinesis-delete",
+             "resource": "kinesis",
+             "actions": ["delete"]}
+        )
+        perms = policy.get_permissions()
+        self.assertEqual(
+            perms,
+            set(
+                (
+                    "kinesis:DescribeStream",
+                    "kinesis:ListStreams",
+                    "kinesis:DeleteStream",
+                )
+            ),
+        )
+
+    def test_policy_manager_custom_permissions(self):
+        policy = self.load_policy(
+            {
+                "name": "ec2-utilization",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 3,
+                        "value": 1.5,
+                    }
+                ],
+            }
+        )
+        perms = policy.get_permissions()
+        self.assertEqual(
+            perms,
+            set(
+                (
+                    "ec2:DescribeInstances",
+                    "ec2:DescribeTags",
+                    "cloudwatch:GetMetricStatistics",
+                )
+            ),
+        )
+
+
 class TestPolicyCollection(BaseTest):
 
     def test_expand_partitions(self):
@@ -396,18 +446,6 @@ class TestPolicyCollection(BaseTest):
             sorted([p.options.region for p in collection]),
             ["cn-north-1", "us-gov-west-1", "us-west-2"],
         )
-
-    def test_policy_account_expand(self):
-        factory = self.replay_flight_data('test_aws_policy_region_expand')
-        self.patch(aws, '_profile_session', factory())
-
-        original = policy.PolicyCollection.from_data(
-            {"policies": [{"name": "foo", "resource": "account"}]},
-            Config.empty(regions=["us-east-1", "us-west-2"]),
-        )
-
-        collection = AWS().initialize_policies(original, Config.empty(regions=["all"]))
-        self.assertEqual(len(collection), 1)
 
     def test_policy_expand_group_region(self):
         cfg = Config.empty(regions=["us-east-1", "us-east-2", "us-west-2"])
@@ -434,15 +472,12 @@ class TestPolicyCollection(BaseTest):
     def test_policy_region_expand_global(self):
         factory = self.replay_flight_data('test_aws_policy_global_expand')
         self.patch(aws, '_profile_session', factory())
-
-        original = policy.PolicyCollection.from_data(
-            {
-                "policies": [
-                    {"name": "foo", "resource": "s3"},
-                    {"name": "iam", "resource": "iam-user"},
-                ]
-            },
-            Config.empty(regions=["us-east-1", "us-west-2"]),
+        original = self.policy_loader.load_data(
+            {"policies": [
+                {"name": "foo", "resource": "s3"},
+                {"name": "iam", "resource": "iam-user"}]},
+            'memory://',
+            config=Config.empty(regions=["us-east-1", "us-west-2"]),
         )
 
         collection = AWS().initialize_policies(original, Config.empty(regions=["all"]))
@@ -958,7 +993,7 @@ class TestPolicy(BaseTest):
             'resource': 'ec2',
             'tz': 'asdf'
         }
-        with self.assertRaises(ValueError):
+        with self.assertRaises(PolicyValidationError):
             self.load_policy(data)
 
         data = {
