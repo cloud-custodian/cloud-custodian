@@ -331,6 +331,7 @@ class ConfigS3(query.ConfigSource):
                 'Status': r['status'],
                 'Prefix': r['prefix'],
                 'Destination': {
+                    'Account': r['destinationConfig']['Account'],
                     'Bucket': r['destinationConfig']['bucketARN']}
             }
             if r['destinationConfig']['storageClass']:
