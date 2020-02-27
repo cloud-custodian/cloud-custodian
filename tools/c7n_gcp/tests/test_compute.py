@@ -148,6 +148,26 @@ class InstanceTest(BaseTest):
         self.assertTrue(result['items'][0]['labels']['custodian_status']
                         .startswith("resource_policy-start"))
 
+    def test_detach_disks_from_instance(self):
+        project_id = 'custodian-tests'
+        factory = self.replay_flight_data('instance-detach-disks', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'idetach',
+             'resource': 'gcp.instance',
+             'filters': [{'name': 'test-ingwar'}],
+             'actions': [{'type': 'detach-disks'}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(5)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = test-ingwar',
+                     'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
+        self.assertIsNone(result['items'][0].get("disks"))
+
 
 class DiskTest(BaseTest):
 
