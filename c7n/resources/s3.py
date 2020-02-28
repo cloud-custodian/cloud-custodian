@@ -1308,7 +1308,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             s3.put_bucket_policy(Bucket=bucket['Name'], Policy=json.dumps(p))
         return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
 
-       
+
 @actions.register('set-bucket-replication')
 class RemoveBucketReplicationConfig(RemovePolicyBase):
     """Action to enable, disable or remove replication configuration statement from S3 buckets
@@ -1335,8 +1335,9 @@ class RemoveBucketReplicationConfig(RemovePolicyBase):
                   - type: set-bucket-replication
                     state: enable | disable | remove                    
     """
-
-    permissions = ("s3:GetBucketReplication", "s3:PutBucketReplication", "s3:DeleteBucketReplication")
+    permissions = (
+     "s3:GetBucketReplication", "s3:PutBucketReplication", "s3:DeleteBucketReplication"
+    )
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
