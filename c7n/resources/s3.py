@@ -1308,7 +1308,55 @@ class RemovePolicyStatement(RemovePolicyBase):
             s3.put_bucket_policy(Bucket=bucket['Name'], Policy=json.dumps(p))
         return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
 
+       
+@actions.register('remove-bucket-replication')
+class RemoveBucketReplicationConfig(RemovePolicyBase):
+    """Action to remove replication configuration statement from S3 buckets
 
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-unapproved-account-replication
+                resource: s3
+                filters:
+                  - type: value
+                    key: Replication.ReplicationConfiguration.Rules[].Destination.Account
+                    value: present
+                  - type: value
+                    key: Replication.ReplicationConfiguration.Rules[].Destination.Account
+                    value_from:
+                      url: 's3:///path/to/file.json'
+                      format: json
+                      expr: "approved_accounts.*"
+                    op: ni
+                actions:
+                  - type: remove-bucket-replication
+    """
+
+    permissions = ("s3:GetBucketReplication", "s3:PutBucketReplication")
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            results = []
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    b = futures[f]
+                    self.log.error('error modifying bucket:%s\n%s',
+                                   b['Name'], f.exception())
+                results += filter(None, [f.result()])
+            return results
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+        s3.delete_bucket_replication(Bucket=bucket['Name'])
+        return {'Name': bucket['Name'], 'State': 'ReplicationConfigRemoved'}       
+
+       
 @actions.register('toggle-versioning')
 class ToggleVersioning(BucketActionBase):
     """Action to enable/suspend versioning on a S3 bucket
