@@ -347,12 +347,16 @@ class LogOutput(object):
 
     def join_log(self):
         self.handler = self.get_handler()
+        if self.handler is None:
+            return
         self.handler.setLevel(logging.DEBUG)
         self.handler.setFormatter(logging.Formatter(self.log_format))
         mlog = logging.getLogger('custodian')
         mlog.addHandler(self.handler)
 
     def leave_log(self):
+        if self.handler is None:
+            return
         mlog = logging.getLogger('custodian')
         mlog.removeHandler(self.handler)
         self.handler.flush()
@@ -372,6 +376,40 @@ class LogFile(LogOutput):
 
     def get_handler(self):
         return logging.FileHandler(self.log_path)
+
+
+@log_outputs.register('null')
+class NullLog(LogOutput):
+    # default - for unit tests
+
+    def __repr__(self):
+        return "<Null Log>"
+
+    @property
+    def log_path(self):
+        return "xyz/log.txt"
+
+    def get_handler(self):
+        return None
+
+
+@blob_outputs.register('null')
+class NullBlobOutput(object):
+    # default - for unit tests
+
+    def __init__(self, ctx, config):
+        self.ctx = ctx
+        self.config = config
+        self.root_dir = 'xyz'
+
+    def __repr__(self):
+        return "<null blob output>"
+
+    def __enter__(self):
+        return
+
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        return
 
 
 @blob_outputs.register('file')

@@ -35,10 +35,12 @@ class DependencyManager(object):
 
     @staticmethod
     def get_dependency_packages_list(packages, excluded_packages):
-        dists = DependencyManager._get_installed_distributions()
+        dists = {d.key: d for d in DependencyManager._get_installed_distributions()}
         res = []
         for p in packages:
-            res.extend([str(r) for r in next(d.requires() for d in dists if (p + ' ') in str(d))])
+            if p not in dists:  # pragma: no cover
+                continue
+            res.extend(map(str, dists[p].requires()))
 
         # regex for the package version constraints
         regex = "^[^<>~=]*"

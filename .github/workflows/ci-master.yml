@@ -1,39 +1,52 @@
-name: Release Branch (0.8) Tests
-#on: [push, pull_request]
+name: "CI"
 
 on:
   push:
-    branches: ["release/0.8"]
+    branches:
+      - master
   pull_request:
-    branches: ["release/0.8"]
+    branches:
+      - master
 
 jobs:
-  Linux:
+  Tests:
     runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-        python-version: [2.7, 3.8]
-        exclude:
-          - python-version: 3.8
-            os: windows-latest
-          - python-version: 3.8
-            os: macos-latest
+        os: [macos-latest, ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
         include:
-          - python-version: 2.7
+          - python-version: 3.6
             os: ubuntu-latest
-            tox-target: py27
-          - python-version: 2.7
+            tox-target: py36
+          - python-version: 3.7
+            os: ubuntu-latest
+            tox-target: py37
+          - python-version: 3.8
+            os: ubuntu-latest
+            tox-target: py38
+
+          - python-version: 3.6
             os: windows-latest
-            tox-target: py27
-          - python-version: 2.7
+            tox-target: py36
+          - python-version: 3.7
+            os: windows-latest
+            tox-target: py37
+          - python-version: 3.8
+            os: windows-latest
+            tox-target: py38
+
+          - python-version: 3.6
             os: macos-latest
-            tox-target: py27
+            tox-target: py36
+          - python-version: 3.7
+            tox-target: py37
+            os: macos-latest
           - python-version: 3.8
             tox-target: py38
-            os: ubuntu-latest
+            os: macos-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
