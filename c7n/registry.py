@@ -56,8 +56,6 @@ class PluginRegistry(object):
 
     def subscribe(self, func):
         self._subscribers.append(func)
-        for p in self.values():
-            func(self, p)
 
     def register(self, name, klass=None, condition=True,
                  condition_message="Missing dependency for {}",
@@ -69,7 +67,6 @@ class PluginRegistry(object):
             klass.type = name
             klass.type_aliases = aliases
             self._factories[name] = klass
-            self.notify(klass)
             return klass
 
         # invoked as class decorator
@@ -79,7 +76,6 @@ class PluginRegistry(object):
             self._factories[name] = klass
             klass.type = name
             klass.type_aliases = aliases
-            self.notify(klass)
             return klass
         return _register_class
 

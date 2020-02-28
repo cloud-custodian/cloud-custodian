@@ -1025,7 +1025,9 @@ class S3ConfigSource(ConfigTest):
                         {
                             u"Status": "Enabled",
                             u"Prefix": "",
-                            u"Destination": {u"Bucket": "arn:aws:s3:::testing-west"},
+                            u"Destination": {
+                                u"Account": "000111222333",
+                                u"Bucket": "arn:aws:s3:::testing-west"},
                             u"ID": "testing-99",
                         }
                     ],
