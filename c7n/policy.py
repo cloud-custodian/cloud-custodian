@@ -28,7 +28,7 @@ import six
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
-from c7n.output import DEFAULT_NAMESPACE
+from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
 from c7n.provider import clouds, get_resource_class
@@ -1059,6 +1059,8 @@ class Policy(object):
     run = __call__
 
     def _write_file(self, rel_path, value):
+        if isinstance(self.ctx.output, NullBlobOutput):
+            return
         with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 
