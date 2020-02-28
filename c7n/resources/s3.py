@@ -1363,7 +1363,7 @@ class RemoveBucketReplicationConfig(RemovePolicyBase):
             if state in ('enable', 'disable'):
                 config = s3.get_bucket_replication(Bucket=bucket['Name'])
                 for rule in config['ReplicationConfiguration']['Rules']:
-                    rule['Status'] = state == 'enable', 'Enabled', 'Disabled'
+                    rule['Status'] = 'Enabled' if state == 'enable' else 'Disabled'
                 s3.put_bucket_replication(
                     Bucket=bucket['Name'],
                     ReplicationConfiguration=config
