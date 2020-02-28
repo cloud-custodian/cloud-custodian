@@ -527,6 +527,7 @@ class DistributionUpdateAction(BaseAction):
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])
             config = res['DistributionConfig']
+            config = {**config, **self.data['update']}
             res = client.update_distribution(
                 Id=distribution[self.manager.get_model().id],
                 IfMatch=res['ETag'],
