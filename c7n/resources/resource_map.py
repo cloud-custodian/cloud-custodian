@@ -50,6 +50,7 @@ ResourceMap = {
     "aws.elasticbeanstalk": "c7n.resources.elasticbeanstalk.ElasticBeanstalk",
     "aws.elasticbeanstalk-environment": (
         "c7n.resources.elasticbeanstalk.ElasticBeanstalkEnvironment"),
+    "aws.elasticache-group": "c7n.resources.elasticache.ElastiCacheReplicationGroup",
     "aws.elasticsearch": "c7n.resources.elasticsearch.ElasticSearchDomain",
     "aws.elb": "c7n.resources.elb.ELB",
     "aws.emr": "c7n.resources.emr.EMRCluster",
@@ -119,7 +120,6 @@ ResourceMap = {
     "aws.redshift": "c7n.resources.redshift.Redshift",
     "aws.redshift-snapshot": "c7n.resources.redshift.RedshiftSnapshot",
     "aws.redshift-subnet-group": "c7n.resources.redshift.RedshiftSubnetGroup",
-    "aws.replication-group": "c7n.resources.elasticache.ElastiCacheReplicationGroup",
     "aws.rest-account": "c7n.resources.apigw.RestAccount",
     "aws.rest-api": "c7n.resources.apigw.RestApi",
     "aws.rest-resource": "c7n.resources.apigw.RestResource",
