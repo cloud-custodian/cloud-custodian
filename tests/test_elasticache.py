@@ -465,7 +465,7 @@ class TestElastiCacheReplicationGroup(BaseTest):
     def test_elasticache_replication_group(self):
         session_factory = self.replay_flight_data("test_elasticache_replication_group")
         p = self.load_policy(
-            {"name": "elasticache-rg", "resource": "replication-group"},
+            {"name": "elasticache-rg", "resource": "elasticache-group"},
             session_factory=session_factory,
         )
         resources = p.run()

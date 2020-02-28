@@ -460,7 +460,7 @@ def _cluster_eligible_for_snapshot(cluster):
     )
 
 
-@resources.register('replication-group')
+@resources.register('elasticache-group')
 class ElastiCacheReplicationGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
