@@ -1334,14 +1334,13 @@ class SetBucketReplicationConfig(BucketActionBase):
                     op: ni
                 actions:
                   - type: set-bucket-replication
-                    state: enable | disable | remove                    
+                    state: enable | disable | remove
     """
     schema = type_schema(
         'set-bucket-replication',
-        state={'enum': ['enable','disable', 'remove']})
-    permissions = (
-        "s3:GetBucketReplication", "s3:PutBucketReplication", "s3:DeleteBucketReplication"
-    )
+        state={'enum': ['enable', 'disable', 'remove']})
+    permissions = ("s3:GetBucketReplication", "s3:PutBucketReplication", "s3:DeleteBucketReplication",)
+
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             futures = {}
