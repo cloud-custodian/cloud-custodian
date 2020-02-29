@@ -1,0 +1,24 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "NoSuchBucketPolicy",
+            "Message": "The bucket policy does not exist",
+            "BucketName": "cloud9-584434990413-sam-deployments-us-east-1"
+        },
+        "ResponseMetadata": {
+            "RequestId": "84EC55ADE8406D74",
+            "HostId": "/S44zoKfvrv/GT3DFQTM+ywyfBA9EtDafjuCnEdgjgtKowRSTBwa22bcuUbVy/ZXZ/5jWr43Ud4=",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "x-amz-request-id": "84EC55ADE8406D74",
+                "x-amz-id-2": "/S44zoKfvrv/GT3DFQTM+ywyfBA9EtDafjuCnEdgjgtKowRSTBwa22bcuUbVy/ZXZ/5jWr43Ud4=",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "date": "Sat, 29 Feb 2020 02:35:45 GMT",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

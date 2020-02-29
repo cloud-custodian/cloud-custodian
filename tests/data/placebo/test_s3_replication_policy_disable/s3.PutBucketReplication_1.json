@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "F9790E2D38C8D9B0",
+            "HostId": "ogqpjaSx/aBhBEY/cu9GIgaFxsjsxt/9mChhSGFxorNzbEFG4JdIiToLL/z7SpIx/yk1rMtycwU=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "ogqpjaSx/aBhBEY/cu9GIgaFxsjsxt/9mChhSGFxorNzbEFG4JdIiToLL/z7SpIx/yk1rMtycwU=",
+                "x-amz-request-id": "F9790E2D38C8D9B0",
+                "date": "Sat, 29 Feb 2020 02:35:48 GMT",
+                "content-length": "0",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

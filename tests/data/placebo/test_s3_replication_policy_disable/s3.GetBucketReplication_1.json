@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "8386E79917FAFC95",
+            "HostId": "aEJfXaAZeOWWfZnooZsBQ03tA77hFXO3SpMna4TQKWVJ9Zkw3j7kd27UWfmUauQDgZb1Ln5XNAM=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "aEJfXaAZeOWWfZnooZsBQ03tA77hFXO3SpMna4TQKWVJ9Zkw3j7kd27UWfmUauQDgZb1Ln5XNAM=",
+                "x-amz-request-id": "8386E79917FAFC95",
+                "date": "Sat, 29 Feb 2020 02:35:48 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "ReplicationConfiguration": {
+            "Role": "arn:aws:iam::584434990413:role/aws-service-role/support.amazonaws.com/AWSServiceRoleForSupport",
+            "Rules": [
+                {
+                    "ID": "rep",
+                    "Priority": 1,
+                    "Filter": {},
+                    "Status": "Enabled",
+                    "Destination": {
+                        "Bucket": "arn:aws:s3:::repela2"
+                    },
+                    "DeleteMarkerReplication": {
+                        "Status": "Disabled"
+                    }
+                }
+            ]
+        }
+    }
+}
