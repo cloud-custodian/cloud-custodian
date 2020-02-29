@@ -1599,7 +1599,8 @@ class S3Test(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-
+        self.assertEqual(len(resources), 1)
+        
     def test_has_statement_similar_policies(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(
