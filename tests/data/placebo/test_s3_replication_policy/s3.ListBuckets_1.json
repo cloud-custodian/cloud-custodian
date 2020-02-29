@@ -1,0 +1,116 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "0BA3453AFB2C2925",
+            "HostId": "qLqZF4GOb9oaa55KrjRYaaYnrE7rHZOCzJNBhMK6RNtGmp0ox6zolkrliEwJjtQHsevQX/FJGVE=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "qLqZF4GOb9oaa55KrjRYaaYnrE7rHZOCzJNBhMK6RNtGmp0ox6zolkrliEwJjtQHsevQX/FJGVE=",
+                "x-amz-request-id": "0BA3453AFB2C2925",
+                "date": "Sat, 29 Feb 2020 02:13:34 GMT",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "Buckets": [
+            {
+                "Name": "cloud9-584434990413-sam-deployments-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 27,
+                    "hour": 23,
+                    "minute": 34,
+                    "second": 59,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "config-bucket-584434990413",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 23,
+                    "hour": 18,
+                    "minute": 15,
+                    "second": 50,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "elasticbeanstalk-us-east-1-584434990413",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 23,
+                    "hour": 21,
+                    "minute": 21,
+                    "second": 44,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "snorlaxreportbucket",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 3,
+                    "hour": 16,
+                    "minute": 1,
+                    "second": 42,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "repela",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 2,
+                    "day": 29,
+                    "hour": 1,
+                    "minute": 31,
+                    "second": 19,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "repela2",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 2,
+                    "day": 29,
+                    "hour": 1,
+                    "minute": 33,
+                    "second": 6,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "uda-web",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 23,
+                    "hour": 21,
+                    "minute": 38,
+                    "second": 28,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "pikachu",
+            "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a"
+        }
+    }
+}

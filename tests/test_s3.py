@@ -1543,6 +1543,35 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_bucket_replication_policy(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3.SetBucketReplicationConfig, "executor_factory", MainThreadExecutor
+        )
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        session_factory = self.replay_flight_data("test_s3_replication_policy")
+        bname = "repela"
+        p = self.load_policy(
+            {
+                "name": "s3-has-replica-policy",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname}
+                ],
+                "actions": [
+                    {
+                        "type": "set-bucket-replication",
+                        "state": "remove"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_has_statement_similar_policies(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(

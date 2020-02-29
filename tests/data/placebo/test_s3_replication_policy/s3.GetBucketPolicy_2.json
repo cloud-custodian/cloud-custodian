@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "474E018924037D7B",
+            "HostId": "FbpT9OygjuWGCiuHtwrnTR2ZpQ5xT9gb+g1Fgc7j+i+q2gUD6CkkRNslezF7lcu+SB1s/Rz5hj4=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "FbpT9OygjuWGCiuHtwrnTR2ZpQ5xT9gb+g1Fgc7j+i+q2gUD6CkkRNslezF7lcu+SB1s/Rz5hj4=",
+                "x-amz-request-id": "474E018924037D7B",
+                "date": "Sat, 29 Feb 2020 02:13:34 GMT",
+                "content-type": "application/json",
+                "content-length": "503",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AWSConfigBucketPermissionsCheck\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"config.amazonaws.com\"},\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::config-bucket-584434990413\"},{\"Sid\":\"AWSConfigBucketDelivery\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"config.amazonaws.com\"},\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::config-bucket-584434990413/AWSLogs/584434990413/Config/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}}]}"
+    }
+}
