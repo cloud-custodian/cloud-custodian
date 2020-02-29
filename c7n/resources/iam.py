@@ -60,13 +60,21 @@ class Group(QueryResourceManager):
         global_resource = True
         arn = 'Arn'
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeGroup(self)
+        return super(Group, self).get_source(source_type)
+
+
+class DescribeGroup(DescribeSource):
+
     def get_resources(self, resource_ids, cache=True):
         """For IAM Groups on events, resource ids are Group Names."""
-        client = local_session(self.session_factory).client('iam')
+        client = local_session(self.manager.session_factory).client('iam')
         resources = []
         for rid in resource_ids:
             try:
-                result = client.get_group(GroupName=rid)
+                result = self.manager.retry(client.get_group, GroupName=rid)
             except client.exceptions.NoSuchEntityException:
                 continue
             group = result.pop('Group')
@@ -89,6 +97,25 @@ class Role(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeRole(self)
+        return super(Role, self).get_source(source_type)
+
+
+class DescribeRole(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('iam')
+        resources = []
+        for rid in resource_ids:
+            try:
+                result = self.manager.retry(client.get_role, RoleName=rid)
+            except client.exceptions.NoSuchEntityException:
+                continue
+            resources.append(result.pop('Role'))
+        return resources
 
 
 @Role.action_registry.register('tag')
