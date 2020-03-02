@@ -1185,7 +1185,7 @@ class Resize(BaseAction, StateTransitionFilter):
 
 @actions.register('stop')
 class Stop(BaseAction, StateTransitionFilter):
-    """Stops a running EC2 instances
+    """Stops or hibernates a running EC2 instances
 
     :Example:
 
@@ -1206,6 +1206,7 @@ class Stop(BaseAction, StateTransitionFilter):
             actions:
               - type: stop
                 hibernate: true
+
 
     Note when using hiberate, instances not configured for hiberation
     will just be stopped.
@@ -1259,18 +1260,14 @@ class Stop(BaseAction, StateTransitionFilter):
                 [i['InstanceId'] for i in ephemeral])
         if persistent:
             if self.data.get('hibernate', False):
-                enabled, disabled = self.split_on_hibernate(persistent)
+                enabled, persistent = self.split_on_hibernate(persistent)
                 self._run_instances_op(
                     client.stop_instances,
                     [i['InstanceId'] for i in enabled],
                     Hibernate=True)
-                self._run_instances_op(
-                    client.stop_instances,
-                    [i['InstanceId'] for i in disabled])
-            else:
-                self._run_instances_op(
-                    client.stop_instances,
-                    [i['InstanceId'] for i in persistent])
+            self._run_instances_op(
+                client.stop_instances,
+                [i['InstanceId'] for i in persistent])
         return instances
 
     def _run_instances_op(self, op, instance_ids, **kwargs):
