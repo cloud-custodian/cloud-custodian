@@ -1206,6 +1206,9 @@ class Stop(BaseAction, StateTransitionFilter):
             actions:
               - type: stop
                 hibernate: true
+
+    Note when using hiberate, instances not configured for hiberation
+    will just be stopped.
     """
     valid_origin_states = ('running',)
 
