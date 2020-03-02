@@ -15,7 +15,7 @@
             "RetryAttempts": 0
         },
         "ReplicationConfiguration": {
-            "Role": "arn:aws:iam::584434990413:role/aws-service-role/support.amazonaws.com/AWSServiceRoleForSupport",
+            "Role": "arn:aws:iam::000111222333:role/aws-service-role/support.amazonaws.com/AWSServiceRoleForSupport",
             "Rules": [
                 {
                     "ID": "rep",
