@@ -17,7 +17,7 @@
         },
         "Buckets": [
             {
-                "Name": "cloud9-584434990413-sam-deployments-us-east-1",
+                "Name": "snorlax-000111222333-sam-deployments-us-east-1",
                 "CreationDate": {
                     "__class__": "datetime",
                     "year": 2019,
@@ -30,7 +30,7 @@
                 }
             },
             {
-                "Name": "config-bucket-584434990413",
+                "Name": "config-bucket-000111222333",
                 "CreationDate": {
                     "__class__": "datetime",
                     "year": 2019,
@@ -43,7 +43,7 @@
                 }
             },
             {
-                "Name": "elasticbeanstalk-us-east-1-584434990413",
+                "Name": "elasticbeanstalk-us-east-1-000111222333",
                 "CreationDate": {
                     "__class__": "datetime",
                     "year": 2019,
