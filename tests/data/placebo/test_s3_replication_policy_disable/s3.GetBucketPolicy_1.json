@@ -4,7 +4,7 @@
         "Error": {
             "Code": "NoSuchBucketPolicy",
             "Message": "The bucket policy does not exist",
-            "BucketName": "cloud9-584434990413-sam-deployments-us-east-1"
+            "BucketName": "magikarp-000111222333-sam-deployments-us-east-1"
         },
         "ResponseMetadata": {
             "RequestId": "84EC55ADE8406D74",
