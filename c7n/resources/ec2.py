@@ -1237,8 +1237,7 @@ class Stop(BaseAction, StateTransitionFilter):
         return ephemeral, persistent
 
     def split_on_hibernate(self, instances):
-        enabled = []
-        disabled = []
+        enabled, disabled = [], []
         for status, i in zip(self.has_hibernate.search(instances), instances):
             if status is True:
                 enabled.append(i)
@@ -1261,10 +1260,11 @@ class Stop(BaseAction, StateTransitionFilter):
         if persistent:
             if self.data.get('hibernate', False):
                 enabled, persistent = self.split_on_hibernate(persistent)
-                self._run_instances_op(
-                    client.stop_instances,
-                    [i['InstanceId'] for i in enabled],
-                    Hibernate=True)
+                if enabled:
+                    self._run_instances_op(
+                        client.stop_instances,
+                        [i['InstanceId'] for i in enabled],
+                        Hibernate=True)
             self._run_instances_op(
                 client.stop_instances,
                 [i['InstanceId'] for i in persistent])
