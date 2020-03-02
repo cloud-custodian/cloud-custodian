@@ -64,7 +64,11 @@ class Provider(object):
     @classmethod
     def get_resource_types(cls, resource_types):
         """Return the resource classes for the given type names"""
-        return import_resource_classes(cls.resource_map, resource_types)
+        resource_classes, not_found = import_resource_classes(
+            cls.resource_map, resource_types)
+        for r in resource_classes:
+            cls.resources.notify(r)
+        return resource_classes, not_found
 
 
 def import_resource_classes(resource_map, resource_types):
@@ -73,11 +77,12 @@ def import_resource_classes(resource_map, resource_types):
 
     mod_map = {}
     rmods = set()
-    not_found = []
+    not_found = set()
+    found = []
 
     for r in resource_types:
         if r not in resource_map:
-            not_found.append(r)
+            not_found.add(r)
             continue
         rmodule, rclass = resource_map[r].rsplit('.', 1)
         rmods.add(rmodule)
@@ -85,10 +90,16 @@ def import_resource_classes(resource_map, resource_types):
     for rmodule in rmods:
         mod_map[rmodule] = importlib.import_module(rmodule)
 
-    return [getattr(mod_map[rmodule], rclass, None) for
-            rmodule, rclass in [
-                resource_map[r].rsplit('.', 1) for r in resource_types
-                if r in resource_map]], not_found
+    for rtype in resource_types:
+        if rtype in not_found:
+            continue
+        rmodule, rclass = resource_map[rtype].rsplit('.', 1)
+        r = getattr(mod_map[rmodule], rclass, None)
+        if r is None:
+            not_found.add(rtype)
+        else:
+            found.append(r)
+    return found, list(not_found)
 
 
 # nosetests seems to think this function is a test

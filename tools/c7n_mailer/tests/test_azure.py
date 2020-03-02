@@ -24,7 +24,7 @@ from c7n_mailer.azure_mailer import deploy
 from c7n_mailer.azure_mailer.azure_queue_processor import \
     MailerAzureQueueProcessor
 from c7n_mailer.azure_mailer.sendgrid_delivery import SendGridDelivery
-from common import (ASQ_MESSAGE, ASQ_MESSAGE_DATADOG, ASQ_MESSAGE_SLACK,
+from common import (ASQ_MESSAGE, ASQ_MESSAGE_DATADOG, ASQ_MESSAGE_MULTIPLE_ADDRS, ASQ_MESSAGE_SLACK,
                     ASQ_MESSAGE_TAG, MAILER_CONFIG_AZURE, logger)
 
 
@@ -37,6 +37,8 @@ class AzureTest(unittest.TestCase):
         self.loaded_message = json.loads(ASQ_MESSAGE)
 
         self.tag_message = json.loads(ASQ_MESSAGE_TAG)
+
+        self.multiple_addrs_message = json.loads(ASQ_MESSAGE_MULTIPLE_ADDRS)
 
     @patch('c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery.sendgrid_handler')
     @patch('c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery'
@@ -92,9 +94,25 @@ class AzureTest(unittest.TestCase):
             sendgrid_delivery.get_to_addrs_sendgrid_messages_map(self.loaded_message)
         result = sendgrid_delivery.sendgrid_handler(self.loaded_message, sendgrid_messages)
         self.assertTrue(result)
-        mock_send.assert_called()
+        mock_send.assert_called_once()
         mail_contents = mock_send.call_args[0][0].contents[0].content
         self.assertIn('The following azure.keyvault resources', mail_contents)
+
+    @patch('sendgrid.SendGridAPIClient.send')
+    def test_sendgrid_handler_multiple_to_addrs(self, mock_send):
+        sendgrid_delivery = SendGridDelivery(MAILER_CONFIG_AZURE, Mock(), logger)
+        sendgrid_messages = \
+            sendgrid_delivery.get_to_addrs_sendgrid_messages_map(self.multiple_addrs_message)
+        result = sendgrid_delivery.sendgrid_handler(self.multiple_addrs_message, sendgrid_messages)
+        self.assertTrue(result)
+        self.assertEqual(2, mock_send.call_count)
+        mail_contents = mock_send.call_args[0][0].contents[0].content
+        self.assertIn('The following azure.keyvault resources', mail_contents)
+
+        address_one = mock_send.call_args_list[0][0][0].personalizations[0].tos[0]['email']
+        self.assertEqual("user2@domain.com", address_one)
+        address_two = mock_send.call_args_list[1][0][0].personalizations[0].tos[0]['email']
+        self.assertEqual("user@domain.com", address_two)
 
     @patch('c7n_mailer.azure_mailer.deploy.FunctionPackage')
     def test_build_function_package(self, package_mock):

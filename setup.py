@@ -34,6 +34,5 @@ setup(
         "argcomplete",
         "tabulate>=0.8.2",
         "urllib3",
-        "certifi"
-    ],
+        "certifi"]
 )
