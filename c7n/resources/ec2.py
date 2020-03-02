@@ -1214,9 +1214,7 @@ class Stop(BaseAction, StateTransitionFilter):
         **{'terminate-ephemeral': {'type': 'boolean'},
            'hibernate': {'type': 'boolean'}})
 
-    has_hibernate = ValueFilter({
-        'key': 'HibernationOptions.Configured',
-        'value': True}).validate()
+    has_hibernate = jmespath.compile('[].HibernationOptions.Configured')
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
@@ -1237,8 +1235,8 @@ class Stop(BaseAction, StateTransitionFilter):
     def split_on_hibernate(self, instances):
         enabled = []
         disabled = []
-        for i in instances:
-            if self.has_hibernate(i):
+        for status, i in zip(self.has_hibernate.search(instances), instances):
+            if status is True:
                 enabled.append(i)
             else:
                 disabled.append(i)
