@@ -347,6 +347,8 @@ def generate_arn(
     arn = 'arn:%s:%s:%s:%s:' % (
         partition, service, region if region else '', account_id if account_id else '')
     if resource_type:
+        if resource.startswith(separator):
+            separator = ''
         arn = arn + '%s%s%s' % (resource_type, separator, resource)
     else:
         arn = arn + resource
