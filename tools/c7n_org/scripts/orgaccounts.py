@@ -37,7 +37,8 @@ ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
     '-f', '--output', type=click.File('w'),
     help="File to store the generated config (default stdout)")
 @click.option('-a', '--active', default=False, help="Get only active accounts", type=click.BOOL)
-@click.option('-ex', '--exceptions', multiple=True, help="list of accounts that won't be added to the config file")
+@click.option('-ex', '--exceptions', multiple=True,
+  help="list of accounts that won't be added to the config file")
 def main(role, ou, assume, profile, output, regions, active, exceptions):
     """Generate a c7n-org accounts config file using AWS Organizations
 
@@ -134,7 +135,7 @@ def get_accounts_for_ou(client, ou, active, recursive=True, exceptions=[]):
             a['Path'] = ou['Path']
 
             if a['Id'] in exceptions:
-              continue
+                continue
 
             if active:
                 if a['Status'] == 'ACTIVE':
