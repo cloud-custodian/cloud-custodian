@@ -3,9 +3,11 @@ name: Release Branch (0.8) Tests
 
 on:
   push:
-    branches: ["release/0.8"]
+    branches:
+      - "release/0.8"
   pull_request:
-    branches: ["release/0.8"]
+    branches:
+      - "release/0.8"
 
 jobs:
   Linux:
@@ -39,11 +41,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Set up cache
-        uses: actions/cache@v1
-        with:
-          path: .tox/${{ matrix.tox-target }}
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/setup.py') }}
+# Disabling cache until we figure out the good way to solve it for Tox environment
+#      - name: Set up cache
+#        uses: actions/cache@v1
+#        with:
+#          path: .tox/${{ matrix.tox-target }}
+#          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/setup.py') }}
 
       - name: Install Test Runner
         run: |

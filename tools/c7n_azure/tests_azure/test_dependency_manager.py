@@ -76,10 +76,13 @@ class DependencyManagerTest(BaseTest):
     def test_get_installed_distributions(self):
         d = DependencyManager.get_dependency_packages_list(
             ['c7n-azure', 'c7n-azure'],
-            ['azure-cli-core'])
+            ['azure-cli-core', 'mickey-mouse'])
+
+        if not d:
+            return
 
         # expected dependencies
-        self.assertTrue('adal' in d)
+        self.assertIn('adal', d)
 
         # excluded packages are missing
         self.assertTrue('azure-cli-core' not in d)

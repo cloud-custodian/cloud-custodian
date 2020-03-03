@@ -584,8 +584,7 @@ class AWS(Provider):
 
                 if len(options.regions) > 1 or 'all' in options.regions and getattr(
                         options, 'output_dir', None):
-                    options_copy.output_dir = (
-                        options.output_dir.rstrip('/') + '/%s' % region)
+                    options_copy.output_dir = join_output(options.output_dir, region)
                 policies.append(
                     Policy(p.data, options_copy,
                            session_factory=policy_collection.session_factory()))
@@ -596,6 +595,12 @@ class AWS(Provider):
             # is stable.
             sorted(policies, key=operator.attrgetter('options.region')),
             options)
+
+
+def join_output(output_dir, suffix):
+    if output_dir.endswith('://'):
+        return output_dir + suffix
+    return output_dir.rstrip('/') + '/%s' % suffix
 
 
 def fake_session():

@@ -13,14 +13,11 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .azure_common import BaseTest
 from c7n_azure.filters import ParentFilter
 from c7n_azure.resources.key_vault import KeyVault
-from c7n_azure.resources.key_vault_keys import KeyVaultKeys
 
-from c7n.config import Config, Bag
-from c7n.ctx import ExecutionContext
 from c7n.filters.core import ValueFilter
+from .azure_common import BaseTest
 
 
 class ParentFilterTest(BaseTest):
@@ -53,28 +50,21 @@ class ParentFilterTest(BaseTest):
         }, validate=True))
 
     def test_verify_parent_filter(self):
-        manager = KeyVaultKeys(
-            ExecutionContext(
-                None,
-                Bag(name="xyz", provider_name='azure'),
-                Config.empty()
-            ),
-            {
-                'name': 'test-policy',
-                'resource': 'azure.keyvault-key',
-                'filters': [
-                    {'type': 'parent',
-                     'filter': {
-                         'type': 'value',
-                         'key': 'name',
-                         'op': 'glob',
-                         'value': 'cctestkv*'
-                     }}]}
-        )
+        p = self.load_policy({
+            'name': 'test-policy',
+            'resource': 'azure.keyvault-key',
+            'filters': [
+                {'type': 'parent',
+                 'filter': {
+                     'type': 'value',
+                     'key': 'name',
+                     'op': 'glob',
+                     'value': 'cctestkv*'
+                 }}]})
 
-        self.assertEqual(len(manager.filters), 1)
+        self.assertEqual(len(p.resource_manager.filters), 1)
 
-        filter = manager.filters[0]
+        filter = p.resource_manager.filters[0]
         self.assertTrue(isinstance(filter, ParentFilter))
         self.assertTrue(isinstance(filter.parent_manager, KeyVault))
         self.assertTrue(isinstance(filter.parent_filter, ValueFilter))
