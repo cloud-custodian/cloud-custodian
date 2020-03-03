@@ -121,7 +121,7 @@ def get_sub_ous(client, ou):
     return results
 
 
-def get_accounts_for_ou(client, ou, active, recursive=True, ignoredAccounts=[]):
+def get_accounts_for_ou(client, ou, active, recursive=True, ignoredAccounts=()):
     results = []
     ous = [ou]
     if recursive:
