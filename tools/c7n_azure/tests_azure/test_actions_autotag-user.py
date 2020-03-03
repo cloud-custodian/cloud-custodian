@@ -13,14 +13,15 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from . import tools_tags as tools
 from azure.mgmt.monitor.models import EventData
-from .azure_common import BaseTest
 from c7n_azure.actions.tagging import AutoTagBase, AutoTagUser
 from mock import patch, Mock
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
+from c7n.resources import load_resources
+from . import tools_tags as tools
+from .azure_common import BaseTest
 
 
 class ActionsAutotagUserTest(BaseTest):
@@ -39,6 +40,10 @@ class ActionsAutotagUserTest(BaseTest):
         },
         "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
     })
+
+    def __init__(self, *args, **kwargs):
+        super(ActionsAutotagUserTest, self).__init__(*args, **kwargs)
+        load_resources(['azure.vm'])
 
     def _get_action(self, data):
         return AutoTagUser(data=data, manager=Mock())
