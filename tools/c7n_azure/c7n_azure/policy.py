@@ -26,7 +26,6 @@ from c7n_azure.constants import (FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIG
 from c7n_azure.function_package import FunctionPackage
 from c7n_azure.functionapp_utils import FunctionAppUtilities
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.resources.generic_arm_resource import GenericArmResource
 from c7n_azure.storage_utils import StorageUtilities
 from c7n_azure.utils import ResourceIdParser, StringUtils
 
@@ -372,7 +371,7 @@ class AzureEventGridMode(AzureFunctionMode):
 
     def _validate_event_matches_resource(self):
         resource_type = self.policy.resource_manager.resource_type.resource_type
-        if resource_type is not GenericArmResource.resource_type.resource_type:
+        if resource_type != 'armresource':
             for event in self.subscribed_events:
                 if resource_type.lower() not in event.lower():
                     raise PolicyValidationError(
