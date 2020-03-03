@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
+from c7n.tags import universal_augment
 from c7n.utils import local_session
 
 
@@ -67,21 +68,12 @@ class BackupVault(QueryResourceManager):
         detail_spec = ('describe_backup_vault', 'BackupVaultName', 'BackupVaultName', None)
         name = id = 'BackupVaultName'
         arn = 'BackupVaultArn'
+        arn_type = 'backup-vault'
         universal_taggable = object()
 
     def augment(self, resources):
-        super(BackupVault, self).augment(resources)
-        client = local_session(self.session_factory).client('backup')
-        results = []
-        for r in resources:
-            try:
-                tags = client.list_tags(ResourceArn=r['BackupVaultArn']).get('Tags', {})
-            except client.exceptions.ResourceNotFoundException:
-                continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
-            results.append(r)
-
-        return results
+        return universal_augment(
+            self, super(BackupVault, self).augment(resources))
 
     def get_resources(self, resource_ids, cache=True):
         client = local_session(self.session_factory).client('backup')
