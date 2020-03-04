@@ -32,6 +32,16 @@ class Kafka(QueryResourceManager):
         filter_name = 'ClusterNameFilter'
         filter_type = 'scalar'
 
+    def augment(self, resources):
+        for r in resources:
+            if 'Tags' not in r:
+                continue
+            tags = []
+            for k, v in r['Tags'].items():
+                tags.append({'Key': k, 'Value': v})
+            r['Tags'] = tags
+        return resources
+
 
 @Kafka.filter_registry.register('security-group')
 class KafkaSGFilter(SecurityGroupFilter):
