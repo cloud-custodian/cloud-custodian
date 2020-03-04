@@ -52,11 +52,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Set up cache
-        uses: actions/cache@v1
-        with:
-          path: .tox/${{ matrix.tox-target }}
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/setup.py') }}
+# Disabling cache until we figure out the good way to solve it for Tox environment
+#      - name: Set up cache
+#        uses: actions/cache@v1
+#        with:
+#          path: .tox/${{ matrix.tox-target }}
+#          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/setup.py') }}
 
       - name: Install Test Runner
         run: |
