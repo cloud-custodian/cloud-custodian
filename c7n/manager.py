@@ -99,7 +99,7 @@ class ResourceManager(object):
 
     def is_only_event(self, f):
         valid = set(['or', 'not', 'and', 'event'])
-        ftypes = set([i.type for i in self.iter_filters(start=f)])
+        ftypes = set([i.type for i in self.iter_filters(start=[f])])
         return bool(ftypes - valid)
 
     def filter_event(self, event=None):
