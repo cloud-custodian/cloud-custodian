@@ -278,18 +278,31 @@ def checksum(fh, hasher, blocksize=65536):
     return hasher.digest()
 
 
-def generate_requirements(package, ignore=()):
-    """Generate frozen requirements file for the given package.
+def generate_requirements(packages, ignore=(), exclude=(), include_self=False):
+    """Generate frozen requirements file for the given set of packages
+
+    if include_self is True we'll also include the packages in the generated
+    requirements.
     """
     if pkgmd is None:
         raise ImportError("importlib_metadata missing")
-    deps = []
-    deps = _package_deps(package, ignore=ignore)
-    lines = []
+    if isinstance(packages, str):
+        packages = [packages]
 
+    deps = []
+    for p in packages:
+        _package_deps(p, deps, ignore=ignore)
+    lines = []
+    if include_self:
+        deps = list(set(deps).union(packages))
     for d in sorted(deps):
-        lines.append(
-            '%s==%s' % (d, pkgmd.distribution(d).version))
+        if d in exclude:
+            continue
+        try:
+            lines.append(
+                '%s==%s' % (d, pkgmd.distribution(d).version))
+        except pkgmd.PackageNotFoundError:
+            continue
     return '\n'.join(lines)
 
 
@@ -297,7 +310,10 @@ def _package_deps(package, deps=None, ignore=()):
     """Recursive gather package's named transitive dependencies"""
     if deps is None:
         deps = []
-    pdeps = pkgmd.requires(package) or ()
+    try:
+        pdeps = pkgmd.requires(package) or ()
+    except pkgmd.PackageNotFoundError:
+        return deps
     for r in pdeps:
         # skip optional deps
         if ';' in r and 'extra' in r:

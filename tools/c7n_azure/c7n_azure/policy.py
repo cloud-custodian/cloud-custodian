@@ -32,6 +32,7 @@ from c7n_azure.utils import ResourceIdParser, StringUtils
 from c7n import utils
 from c7n.actions import EventAction
 from c7n.exceptions import PolicyValidationError
+from c7n.mu import generate_requirements
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
 from c7n.utils import local_session
 
@@ -221,15 +222,17 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def build_functions_package(self, queue_name=None, target_subscription_ids=None):
         self.log.info("Building function package for %s" % self.function_params.function_app_name)
 
+        requirements = generate_requirements('c7n-azure',
+                                             ignore=['boto3', 'botocore', 'pywin32'],
+                                             exclude='c7n')
         package = FunctionPackage(self.policy_name, target_sub_ids=target_subscription_ids)
         package.build(self.policy.data,
                       modules=['c7n', 'c7n-azure'],
-                      non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'pyrsistent'],
-                      excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'],
+                      requirements=requirements,
                       queue_name=queue_name)
         package.close()
 
-        self.log.info("Function package built, size is %dMB" % (package.pkg.size / (1024 * 1024)))
+        self.log.info("Function package built, size is %dKB" % (package.pkg.size / 1024))
         return package
 
 

@@ -39,7 +39,7 @@ from c7n.testing import TestUtils
 from c7n.utils import local_session
 from .azure_serializer import AzureSerializer
 
-# ensure the azure provider is loaded
+# Ensure the azure provider is loaded.
 from c7n_azure import provider # noqa
 
 BASE_FOLDER = os.path.dirname(__file__)
