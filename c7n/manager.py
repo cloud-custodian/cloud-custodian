@@ -105,10 +105,12 @@ class ResourceManager(object):
     def filter_event(self, event=None):
         if not event:
             return True
+        resource_type = self.get_model()
+        fakes = [{resource_type.id: "fake"}]
         for f in self.filters:
             if self.is_only_event(f):
                 with self.ctx.tracer.subsegment("event-filter:%s" % f.type):
-                    result = f.process([{}], event)
+                    result = f.process(fakes, event)
                     if event.get('debug', False):
                         self.log.debug("applied event filter %s: %s", f, bool(result))
                     if not result:
