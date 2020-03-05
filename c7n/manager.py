@@ -97,7 +97,25 @@ class ResourceManager(object):
             return klass(self.ctx, {'source': self.source_type})
         return klass(self.ctx, data or {})
 
-    def filter_resources(self, resources, event=None):
+    def is_only_event(self, f):
+        valid = set('or', 'not', 'and', 'event')
+        ftypes = set([i.type for i in self.iter_filters(start=f)])
+        return bool(ftypes - valid)
+
+    def filter_event(self, event=None):
+        if not event:
+            return True
+        for f in self.filters:
+            if self.is_only_event(f):
+                with self.ctx.tracer.subsegment("event-filter:%" % f.type):
+                    result = f.process([{}], event)
+                    if event.get('debug', False):
+                        self.log.debug("applied event filter %s: %s", f, bool(result))
+                    if not result:
+                        return False
+        return True
+
+    def filter_resources(self, resources, event=None, skip_event_filters=False):
         original = len(resources)
         if event and event.get('debug', False):
             self.log.info(
@@ -105,6 +123,8 @@ class ResourceManager(object):
         for f in self.filters:
             if not resources:
                 break
+            if skip_event_filters and self.is_only_event(f):
+                continue
             rcount = len(resources)
 
             with self.ctx.tracer.subsegment("filter:%s" % f.type):
@@ -122,8 +142,8 @@ class ResourceManager(object):
         """
         return self.query.resolve(self.resource_type)
 
-    def iter_filters(self, block_end=False):
-        queue = deque(self.filters)
+    def iter_filters(self, block_end=False, start=None):
+        queue = deque(start or self.filters)
         while queue:
             f = queue.popleft()
             if f and f.type in ('or', 'and', 'not'):

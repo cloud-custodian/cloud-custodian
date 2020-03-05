@@ -505,12 +505,21 @@ class LambdaMode(ServerlessExecutionMode):
         metrics per normal.
         """
         self.setup_exec_environment(event)
+
+        # check only event filters first
+        if not self.policy.resource_manager.filter_event(event):
+            self.policy.log.info(
+                "policy:%s resources:%s no event match" % (
+                    self.policy.name, self.policy.resource_type))
+            return
+
+        # now load resource info to filter events
         resources = self.resolve_resources(event)
         if not resources:
             return resources
         rcount = len(resources)
         resources = self.policy.resource_manager.filter_resources(
-            resources, event)
+            resources, event, skip_event_filters=True)
 
         if 'debug' in event:
             self.policy.log.info(
