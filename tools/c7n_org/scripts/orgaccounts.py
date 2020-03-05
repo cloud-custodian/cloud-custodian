@@ -20,13 +20,17 @@ from c7n.credentials import assumed_session, SessionFactory
 from c7n.utils import yaml_dump
 
 ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
-
+NAME_TEMPLATE = "{Name}"
 
 @click.command()
 @click.option(
     '--role',
     default=ROLE_TEMPLATE,
     help="Role template for accounts in the config, defaults to %s" % ROLE_TEMPLATE)
+@click.option(
+    '--name',
+    default=NAME_TEMPLATE,
+    help="Name template for accounts in the config, defaults to %s" % NAME_TEMPLATE)
 @click.option('--ou', multiple=True, default=["/"],
               help="Only export the given subtrees of an organization")
 @click.option('-r', '--regions', multiple=True,
@@ -39,7 +43,7 @@ ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
 @click.option('-a', '--active', default=False, help="Get only active accounts", type=click.BOOL)
 @click.option('-i', '--ignore', multiple=True,
   help="list of accounts that won't be added to the config file")
-def main(role, ou, assume, profile, output, regions, active, ignore):
+def main(role, name, ou, assume, profile, output, regions, active, ignore):
     """Generate a c7n-org accounts config file using AWS Organizations
 
     With c7n-org you can then run policies or arbitrary scripts across
@@ -63,10 +67,13 @@ def main(role, ou, assume, profile, output, regions, active, ignore):
         for tag in list_tags_for_account(client, a['Id']):
             tags.append("{}:{}".format(tag.get('Key'), tag.get('Value')))
 
+        a['OrgId'] = a['Arn'].split('/')[1]
         ainfo = {
             'account_id': a['Id'],
             'email': a['Email'],
-            'name': a['Name'],
+            'display_name': a['Name'],
+            'organization_id': a['OrgId'],
+            'name': name.format(**a),
             'tags': tags,
             'role': role.format(**a)}
         if regions:
