@@ -97,7 +97,7 @@ class ResourceManager(object):
             return klass(self.ctx, {'source': self.source_type})
         return klass(self.ctx, data or {})
 
-    def is_only_event(self, f):
+    def is_event_filter(self, f):
         valid = set(['or', 'not', 'and', 'event'])
         ftypes = set([i.type for i in self.iter_filters(start=[f])])
         return not (ftypes - valid)
@@ -106,11 +106,11 @@ class ResourceManager(object):
         if not event:
             return True
         resource_type = self.get_model()
-        fakes = [{resource_type.id: "fake"}]
+        fake_resources = [{resource_type.id: "fake"}]
         for f in self.filters:
-            if self.is_only_event(f):
+            if self.is_event_filter(f):
                 with self.ctx.tracer.subsegment("event-filter:%s" % f.type):
-                    result = f.process(fakes, event)
+                    result = f.process(fake_resources, event)
                     if event.get('debug', False):
                         self.log.debug("applied event filter %s: %s", f, bool(result))
                     if not result:
@@ -125,7 +125,7 @@ class ResourceManager(object):
         for f in self.filters:
             if not resources:
                 break
-            if skip_event_filters and self.is_only_event(f):
+            if skip_event_filters and self.is_event_filter(f):
                 continue
             rcount = len(resources)
 
