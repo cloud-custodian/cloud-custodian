@@ -107,7 +107,7 @@ class ResourceManager(object):
             return True
         for f in self.filters:
             if self.is_only_event(f):
-                with self.ctx.tracer.subsegment("event-filter:%" % f.type):
+                with self.ctx.tracer.subsegment("event-filter:%s" % f.type):
                     result = f.process([{}], event)
                     if event.get('debug', False):
                         self.log.debug("applied event filter %s: %s", f, bool(result))
