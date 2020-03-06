@@ -1354,7 +1354,7 @@ class SetBucketReplicationConfig(BucketActionBase):
                     self.log.error(err)
                     errors.append(err)
             if errors:
-                raise Exception(errors)
+                raise Exception('\n'.join(map(str, errors)))
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
