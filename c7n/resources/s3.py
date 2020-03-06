@@ -1343,17 +1343,13 @@ class SetBucketReplicationConfig(BucketActionBase):
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
-            futures = {}
-            results = []
-            for b in buckets:
-                futures[w.submit(self.process_bucket, b)] = b
-            for f in as_completed(futures):
-                if f.exception():
-                    b = futures[f]
-                    self.log.error('error modifying bucket:%s\n%s',
-                                   b['Name'], f.exception())
-                results += filter(None, [f.result()])
-            return results
+            futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            for future in as_completed(futures):
+                bucket = futures[future]
+                try:
+                    future.result()
+                except Exception as e:
+                    self.log.error('Message: %s Bucket: %s', e, bucket['Name'])
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
