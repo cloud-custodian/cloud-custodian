@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "04257f0b-4265-4129-a984-47afd5ea7992",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "04257f0b-4265-4129-a984-47afd5ea7992",
+                "content-type": "text/xml",
+                "content-length": "576",
+                "date": "Sat, 07 Mar 2020 14:18:22 GMT"
+            },
+            "RetryAttempts": 0
+        },
+        "ResourceRecordSets": [
+            {
+                "Name": "awsapichanges.info.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z2111222111222",
+                    "DNSName": "d456zzzzyxnc123.cloudfront.net.",
+                    "EvaluateTargetHealth": false
+                }
+            }
+        ],
+        "IsTruncated": true,
+        "NextRecordName": "awsapichanges.info.",
+        "NextRecordType": "NS",
+        "MaxItems": "1"
+    }
+}
