@@ -1,17 +1,7 @@
 {
-    "status_code": 200,
-    "data": {
-        "FailedResourcesMap": {},
-        "ResponseMetadata": {
-            "RequestId": "4f49b8fd-6664-4c33-ac71-45c52a00a21d",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "4f49b8fd-6664-4c33-ac71-45c52a00a21d",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "25",
-                "date": "Tue, 03 Mar 2020 22:43:29 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "FailedResourcesMap": {},
+    "ResponseMetadata": {}
+  }
 }

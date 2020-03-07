@@ -65,27 +65,24 @@ class BackupVault(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'backup'
         enum_spec = ('list_backup_vaults', 'BackupVaultList', None)
-        detail_spec = ('describe_backup_vault', 'BackupVaultName', 'BackupVaultName', None)
         name = id = 'BackupVaultName'
         arn = 'BackupVaultArn'
         arn_type = 'backup-vault'
         universal_taggable = object()
 
     def augment(self, resources):
-        return universal_augment(
-            self, super(BackupVault, self).augment(resources))
+        return universal_augment(self, super(BackupVault, self).augment(resources))
 
     def get_resources(self, resource_ids, cache=True):
         client = local_session(self.session_factory).client('backup')
         resources = []
-
         for rid in resource_ids:
             try:
                 resources.append(
                     client.describe_backup_vault(BackupVaultName=rid))
             except client.exceptions.ResourceNotFoundException:
                 continue
-        return resources
+        return self.augment(resources)
 
 
 @BackupVault.filter_registry.register('kms-key')

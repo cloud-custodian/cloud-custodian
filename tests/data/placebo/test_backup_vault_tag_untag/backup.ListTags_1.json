@@ -1,18 +1,7 @@
 {
-    "status_code": 200,
-    "data": {
-        "ResponseMetadata": {
-            "RequestId": "256c75c5-30b9-44a8-af9b-82b41504a793",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "content-type": "application/json",
-                "date": "Tue, 3 Mar 2020 22:43:29 GMT",
-                "x-amzn-requestid": "256c75c5-30b9-44a8-af9b-82b41504a793",
-                "content-length": "28",
-                "connection": "keep-alive"
-            },
-            "RetryAttempts": 0
-        },
-        "Tags": {}
-    }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "Tags": {}
+  }
 }
