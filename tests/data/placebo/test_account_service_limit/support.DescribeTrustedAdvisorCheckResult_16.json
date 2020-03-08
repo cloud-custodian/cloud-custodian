@@ -1,259 +1,249 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "kM7QQ0l7J9",
-            "timestamp": "2020-02-15T18:56:29Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 16,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "region": "us-east-2",
-                    "resourceId": "_tYDXyh4EBPBhJijLCNC7JalAvVNO_V_A0VdSCe4EgI",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-2",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "2",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ca-central-1",
-                    "resourceId": "kJRQy71yd_VNGOla3nZQn1gwZSFVk8E64sEoxjcUntg",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ca-central-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-1",
-                    "resourceId": "weMXfYeTRpOmJtxOMzFIDsGwomjLpiajgD-cncXzT1s",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-1",
-                    "resourceId": "Fw318bcfQQz1asN5kmNjPK6Dw_SZqsw-dyKVusPZq6A",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-2",
-                    "resourceId": "-9k-ZYjMCZeWiDJB8kUNixCzy2W2U1nSjS9eL0Sv9Wg",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-2",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-central-1",
-                    "resourceId": "Z2UbGaComTdPO2V-QmCPmnKMDTRlWhcCyD2UbDL0YdM",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-central-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-3",
-                    "resourceId": "MbpO2COefDlf8XO_nf3rpqYyrfNM5Sg_B76ERPA3qyk",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-3",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-2",
-                    "resourceId": "dm9DNqyzf6uEHHkW4N6WzWpjMKpxZVLlNv3ozWE4T14",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-2",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "3",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-1",
-                    "resourceId": "2DPPZhFEgNkAApNyRM6l_z9HjTAfddNeN7MmsjL96A0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-1",
-                    "resourceId": "juSMEd8u86J_Bk21G6BF1Rnsea5ZVleeVXhjQNGay0Y",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-north-1",
-                    "resourceId": "-k_NApWiiq25afskrcL4bhUDREPBf3SQt-1JmX7dZx8",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-north-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-2",
-                    "resourceId": "q0HQGFs9wlCKrnVCpY2ICvRtVQEI-mkp1RfpS9cytE8",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-2",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-2",
-                    "resourceId": "t6p65IEVaoQcjznTJCcePb4a9GZbY5WL0XPGM-Awj38",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-2",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "sa-east-1",
-                    "resourceId": "nLKXAeDsRMAc4dWg2R2Vs5_PHEKN7U4hWVtOYgXmRsI",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "sa-east-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-1",
-                    "resourceId": "AeIqEaMcZbO-XLRUDGyvpDiXZAySKYwrm8mkAl9kh2E",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-south-1",
-                    "resourceId": "iyR6E_rTch1sv32hxaT1l_eDFn-rtBO79aRAhHQIVpM",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-south-1",
-                        "VPC",
-                        "Internet gateways",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "bdf42248-a280-4f78-8b69-de78b6985d60",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "bdf42248-a280-4f78-8b69-de78b6985d60",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "3330",
-                "date": "Fri, 21 Feb 2020 23:15:24 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "kM7QQ0l7J9",
+      "timestamp": "2020-02-15T18:56:29Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 16,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "region": "us-east-2",
+          "resourceId": "_tYDXyh4EBPBhJijLCNC7JalAvVNO_V_A0VdSCe4EgI",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-2",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "2",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ca-central-1",
+          "resourceId": "kJRQy71yd_VNGOla3nZQn1gwZSFVk8E64sEoxjcUntg",
+          "isSuppressed": false,
+          "metadata": [
+            "ca-central-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-1",
+          "resourceId": "weMXfYeTRpOmJtxOMzFIDsGwomjLpiajgD-cncXzT1s",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-1",
+          "resourceId": "Fw318bcfQQz1asN5kmNjPK6Dw_SZqsw-dyKVusPZq6A",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-2",
+          "resourceId": "-9k-ZYjMCZeWiDJB8kUNixCzy2W2U1nSjS9eL0Sv9Wg",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-2",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-central-1",
+          "resourceId": "Z2UbGaComTdPO2V-QmCPmnKMDTRlWhcCyD2UbDL0YdM",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-central-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-3",
+          "resourceId": "MbpO2COefDlf8XO_nf3rpqYyrfNM5Sg_B76ERPA3qyk",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-3",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-2",
+          "resourceId": "dm9DNqyzf6uEHHkW4N6WzWpjMKpxZVLlNv3ozWE4T14",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-2",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "3",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-east-1",
+          "resourceId": "2DPPZhFEgNkAApNyRM6l_z9HjTAfddNeN7MmsjL96A0",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-1",
+          "resourceId": "juSMEd8u86J_Bk21G6BF1Rnsea5ZVleeVXhjQNGay0Y",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-north-1",
+          "resourceId": "-k_NApWiiq25afskrcL4bhUDREPBf3SQt-1JmX7dZx8",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-north-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-2",
+          "resourceId": "q0HQGFs9wlCKrnVCpY2ICvRtVQEI-mkp1RfpS9cytE8",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-2",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-2",
+          "resourceId": "t6p65IEVaoQcjznTJCcePb4a9GZbY5WL0XPGM-Awj38",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-2",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "sa-east-1",
+          "resourceId": "nLKXAeDsRMAc4dWg2R2Vs5_PHEKN7U4hWVtOYgXmRsI",
+          "isSuppressed": false,
+          "metadata": [
+            "sa-east-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-1",
+          "resourceId": "AeIqEaMcZbO-XLRUDGyvpDiXZAySKYwrm8mkAl9kh2E",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-south-1",
+          "resourceId": "iyR6E_rTch1sv32hxaT1l_eDFn-rtBO79aRAhHQIVpM",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-south-1",
+            "VPC",
+            "Internet gateways",
+            "5",
+            "1",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

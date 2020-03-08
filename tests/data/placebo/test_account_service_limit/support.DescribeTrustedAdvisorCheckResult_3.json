@@ -1,259 +1,249 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "tV7YY0l7J9",
-            "timestamp": "2020-02-09T17:05:51Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 16,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "region": "ca-central-1",
-                    "resourceId": "AAvcluyMbljL6HkGLpW8IcQET1vHzDkWe0iOskKpJLk",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ca-central-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-2",
-                    "resourceId": "fDVfEi07ZWJpXXGb_RGfCEW0GkysIaD2mKYGjQlFVqU",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-1",
-                    "resourceId": "t920fKGZpEv0NXwVN-Q6pJaIEZVvPTSj-fxVhaEHThw",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-2",
-                    "resourceId": "cXDwtOwxtsyrDd-ycZyMBUJIKcrPWYl06XzbU7m2Iio",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-1",
-                    "resourceId": "VCUnXU1iTeDFlBunAdzSVUMD_lB4j2Uc8kK83G7lj4k",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-central-1",
-                    "resourceId": "vRybyDExciPS9oySFThQQE7hli5k0iM7HJqY3GGZ1qs",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-central-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-1",
-                    "resourceId": "jn-R8ee8elt9YijUlzsJhuOB1f4sVKqLiL5vsu9Wy14",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-2",
-                    "resourceId": "cdFvlyd9WoolkL-PxMag86rA5FgRme_X3rFggUdQ2sk",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-2",
-                    "resourceId": "bxNrxaaZpktgpqWwhk8kWqJzqIj04xVUeICRuw7Xf7Y",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-1",
-                    "resourceId": "jMBfBupjELbPcoeMrbjwVe5e4iblNF4J62UTXxT_PaI",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-3",
-                    "resourceId": "gpyvFb-RsM5qhwCWLXdczd-4RVOYGsauhzTmFJ-rSdo",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-3",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-1",
-                    "resourceId": "4aDDM6P89nc52mG9HseBsFuFh-Fw69oIqJNKaAbGUS4",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-north-1",
-                    "resourceId": "XCdZWMbtNwowBRhMwSEST870uNNp-MMPj5trlsX1AA0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-north-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "sa-east-1",
-                    "resourceId": "LZRPCW8UYEuHaRsdWTXfTW8-5jaNm6txCI0QPpGTKrU",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "sa-east-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-south-1",
-                    "resourceId": "W2OptYVnPd8tE0qlS58KHSUMszaDVmRaCPLt2U5mxTk",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-south-1",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-2",
-                    "resourceId": "K9zrXoF-IzbQc-hAgb5oI0TAeO2LIi-oQJbgE9_03B4",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-2",
-                        "EBS",
-                        "Provisioned IOPS",
-                        "300000",
-                        "0",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "f8f96396-d0f9-48ba-bd1b-e7eee6a2a0df",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "f8f96396-d0f9-48ba-bd1b-e7eee6a2a0df",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "3394",
-                "date": "Fri, 21 Feb 2020 23:15:18 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "tV7YY0l7J9",
+      "timestamp": "2020-02-09T17:05:51Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 16,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "region": "ca-central-1",
+          "resourceId": "AAvcluyMbljL6HkGLpW8IcQET1vHzDkWe0iOskKpJLk",
+          "isSuppressed": false,
+          "metadata": [
+            "ca-central-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-east-2",
+          "resourceId": "fDVfEi07ZWJpXXGb_RGfCEW0GkysIaD2mKYGjQlFVqU",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-2",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-1",
+          "resourceId": "t920fKGZpEv0NXwVN-Q6pJaIEZVvPTSj-fxVhaEHThw",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-2",
+          "resourceId": "cXDwtOwxtsyrDd-ycZyMBUJIKcrPWYl06XzbU7m2Iio",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-2",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-1",
+          "resourceId": "VCUnXU1iTeDFlBunAdzSVUMD_lB4j2Uc8kK83G7lj4k",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-central-1",
+          "resourceId": "vRybyDExciPS9oySFThQQE7hli5k0iM7HJqY3GGZ1qs",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-central-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-1",
+          "resourceId": "jn-R8ee8elt9YijUlzsJhuOB1f4sVKqLiL5vsu9Wy14",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-2",
+          "resourceId": "cdFvlyd9WoolkL-PxMag86rA5FgRme_X3rFggUdQ2sk",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-2",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-2",
+          "resourceId": "bxNrxaaZpktgpqWwhk8kWqJzqIj04xVUeICRuw7Xf7Y",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-2",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-1",
+          "resourceId": "jMBfBupjELbPcoeMrbjwVe5e4iblNF4J62UTXxT_PaI",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-3",
+          "resourceId": "gpyvFb-RsM5qhwCWLXdczd-4RVOYGsauhzTmFJ-rSdo",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-3",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-east-1",
+          "resourceId": "4aDDM6P89nc52mG9HseBsFuFh-Fw69oIqJNKaAbGUS4",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-north-1",
+          "resourceId": "XCdZWMbtNwowBRhMwSEST870uNNp-MMPj5trlsX1AA0",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-north-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "sa-east-1",
+          "resourceId": "LZRPCW8UYEuHaRsdWTXfTW8-5jaNm6txCI0QPpGTKrU",
+          "isSuppressed": false,
+          "metadata": [
+            "sa-east-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-south-1",
+          "resourceId": "W2OptYVnPd8tE0qlS58KHSUMszaDVmRaCPLt2U5mxTk",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-south-1",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-2",
+          "resourceId": "K9zrXoF-IzbQc-hAgb5oI0TAeO2LIi-oQJbgE9_03B4",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-2",
+            "EBS",
+            "Provisioned IOPS",
+            "300000",
+            "0",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

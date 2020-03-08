@@ -1,48 +1,38 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "rT7WW0l7J9",
-            "timestamp": "2020-02-11T14:07:35Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 1,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "resourceId": "2WAKjyOU9HiV1bJmiyInFZ1KDfWioM5YsUVhR5foqxM",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "-",
-                        "IAM",
-                        "Server certificates",
-                        "20",
-                        "1",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "cbd92527-3107-4672-9171-fe3de2933ebc",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "cbd92527-3107-4672-9171-fe3de2933ebc",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "487",
-                "date": "Fri, 21 Feb 2020 23:15:26 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "rT7WW0l7J9",
+      "timestamp": "2020-02-11T14:07:35Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 1,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "resourceId": "2WAKjyOU9HiV1bJmiyInFZ1KDfWioM5YsUVhR5foqxM",
+          "isSuppressed": false,
+          "metadata": [
+            "-",
+            "IAM",
+            "Server certificates",
+            "20",
+            "1",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

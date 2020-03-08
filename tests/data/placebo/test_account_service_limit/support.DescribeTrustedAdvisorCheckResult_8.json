@@ -1,259 +1,249 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "cG7HH0l7J9",
-            "timestamp": "2020-02-08T02:26:23Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 16,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "region": "ca-central-1",
-                    "resourceId": "eu_UmzlXcaAQSsahia-4R4akIyOLDU_rvuFPvxYSn-I",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ca-central-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-2",
-                    "resourceId": "thxhOPBfcpMEYuReyY9y4iFsHwS5Aqn9039IcApvTkA",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-2",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-1",
-                    "resourceId": "6IYtILkOgj3HnPs8kMo09dGtoFE6lWMnf8KyI96fcnQ",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-2",
-                    "resourceId": "hZfEnInTxj-k47sOL97oxcYxMCKIAO9zIJ49wrkzb4o",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-2",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-1",
-                    "resourceId": "L22n0XXUN0r9ilPGk-t46aravFiK5T53eg1vNPntzjE",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-central-1",
-                    "resourceId": "Up7BfyO_OD4GctFqlqtrkXMa6b2Id8Npk6bq3g_5vX0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-central-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-1",
-                    "resourceId": "GlsQH5mSkGRtk6t6VDOfNgd9-WgcCDpGj1H9Eg0t_UM",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-2",
-                    "resourceId": "gZunaA6AnKIeh9T4-cAvbofYMPUVZcVxUj-Gn_alPq8",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-2",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-2",
-                    "resourceId": "cJPKeiDcVQfGDR9DvkHrTeHqtbP8fsCEFVjO7cOzTsw",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-2",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-1",
-                    "resourceId": "A8zW9buVL6JV72ZfoPyXiOl766l7XTpnJFwft49Z7SY",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-1",
-                    "resourceId": "OuokRze3iU6oulvLpXVn36mSNWHEMk6fVQgGBuql-ck",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-3",
-                    "resourceId": "JRs1wHIZrwcu5VCp8-x_vtVhGVBhTXu9CG2HwhfmO7Q",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-3",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-north-1",
-                    "resourceId": "1Vi7QwlbJWVfol4PN8ZOLxVYAfk18bOFB2Q0e9TpnXA",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-north-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "sa-east-1",
-                    "resourceId": "eYbxbYRRRby4JimIreQabDFW4B5yFb8SGnMkAsDGMyc",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "sa-east-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-south-1",
-                    "resourceId": "RMS8C0rhz2cZMixjds2cgXqaJjl1T1mlJL1RtuDl3P0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-south-1",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-2",
-                    "resourceId": "Sbmu3vTTDkKKS6SMZCqrrZgv53hlv6Yxkil3PSxYrHM",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-2",
-                        "EBS",
-                        "Magnetic (standard) volume storage (GiB)",
-                        "307200",
-                        "1810",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "6637315b-f796-4e14-94af-6533addd36ac",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "6637315b-f796-4e14-94af-6533addd36ac",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "3781",
-                "date": "Fri, 21 Feb 2020 23:15:20 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "cG7HH0l7J9",
+      "timestamp": "2020-02-08T02:26:23Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 16,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "region": "ca-central-1",
+          "resourceId": "eu_UmzlXcaAQSsahia-4R4akIyOLDU_rvuFPvxYSn-I",
+          "isSuppressed": false,
+          "metadata": [
+            "ca-central-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-east-2",
+          "resourceId": "thxhOPBfcpMEYuReyY9y4iFsHwS5Aqn9039IcApvTkA",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-2",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-1",
+          "resourceId": "6IYtILkOgj3HnPs8kMo09dGtoFE6lWMnf8KyI96fcnQ",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-2",
+          "resourceId": "hZfEnInTxj-k47sOL97oxcYxMCKIAO9zIJ49wrkzb4o",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-2",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-1",
+          "resourceId": "L22n0XXUN0r9ilPGk-t46aravFiK5T53eg1vNPntzjE",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-central-1",
+          "resourceId": "Up7BfyO_OD4GctFqlqtrkXMa6b2Id8Npk6bq3g_5vX0",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-central-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-1",
+          "resourceId": "GlsQH5mSkGRtk6t6VDOfNgd9-WgcCDpGj1H9Eg0t_UM",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-2",
+          "resourceId": "gZunaA6AnKIeh9T4-cAvbofYMPUVZcVxUj-Gn_alPq8",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-2",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-2",
+          "resourceId": "cJPKeiDcVQfGDR9DvkHrTeHqtbP8fsCEFVjO7cOzTsw",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-2",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-1",
+          "resourceId": "A8zW9buVL6JV72ZfoPyXiOl766l7XTpnJFwft49Z7SY",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-east-1",
+          "resourceId": "OuokRze3iU6oulvLpXVn36mSNWHEMk6fVQgGBuql-ck",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-3",
+          "resourceId": "JRs1wHIZrwcu5VCp8-x_vtVhGVBhTXu9CG2HwhfmO7Q",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-3",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-north-1",
+          "resourceId": "1Vi7QwlbJWVfol4PN8ZOLxVYAfk18bOFB2Q0e9TpnXA",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-north-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "sa-east-1",
+          "resourceId": "eYbxbYRRRby4JimIreQabDFW4B5yFb8SGnMkAsDGMyc",
+          "isSuppressed": false,
+          "metadata": [
+            "sa-east-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-south-1",
+          "resourceId": "RMS8C0rhz2cZMixjds2cgXqaJjl1T1mlJL1RtuDl3P0",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-south-1",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-2",
+          "resourceId": "Sbmu3vTTDkKKS6SMZCqrrZgv53hlv6Yxkil3PSxYrHM",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-2",
+            "EBS",
+            "Magnetic (standard) volume storage (GiB)",
+            "307200",
+            "1810",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

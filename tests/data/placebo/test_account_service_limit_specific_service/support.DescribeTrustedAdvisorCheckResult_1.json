@@ -1,48 +1,38 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "nO7SS0l7J9",
-            "timestamp": "2020-02-21T01:32:45Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 1,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "resourceId": "HezvUYantuOovlsV3Z6jtBcpN5jX1X8LAfWgkw7FzFE",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "-",
-                        "IAM",
-                        "Instance profiles",
-                        "1000",
-                        "7",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "b484d928-e445-43c7-b248-274e3035cb56",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "b484d928-e445-43c7-b248-274e3035cb56",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "487",
-                "date": "Fri, 21 Feb 2020 21:26:17 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "nO7SS0l7J9",
+      "timestamp": "2020-02-21T01:32:45Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 1,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "resourceId": "HezvUYantuOovlsV3Z6jtBcpN5jX1X8LAfWgkw7FzFE",
+          "isSuppressed": false,
+          "metadata": [
+            "-",
+            "IAM",
+            "Instance profiles",
+            "1000",
+            "7",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

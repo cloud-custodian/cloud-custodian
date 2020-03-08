@@ -1,49 +1,39 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "jtlIMO3qZM",
-            "timestamp": "2020-02-21T07:51:29Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 1,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "region": "us-west-2",
-                    "resourceId": "qQZTiEUqAS855y4JiSQL0wcaC377IQuZJUkD3_-37K0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-2",
-                        "RDS",
-                        "Cluster parameter groups",
-                        "100",
-                        "3",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "e576b459-c5b1-4e19-ae7e-12ea1667adf7",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "e576b459-c5b1-4e19-ae7e-12ea1667adf7",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "522",
-                "date": "Fri, 21 Feb 2020 23:15:28 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "jtlIMO3qZM",
+      "timestamp": "2020-02-21T07:51:29Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 1,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "region": "us-west-2",
+          "resourceId": "qQZTiEUqAS855y4JiSQL0wcaC377IQuZJUkD3_-37K0",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-2",
+            "RDS",
+            "Cluster parameter groups",
+            "100",
+            "3",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

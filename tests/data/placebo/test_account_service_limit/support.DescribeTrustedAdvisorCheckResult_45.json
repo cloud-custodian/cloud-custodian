@@ -1,48 +1,38 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "dx3xfcdfMr",
-            "timestamp": "2020-02-18T15:30:06Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 1,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "resourceId": "EPwqJ8k6Ra_OGTiXctRpkQW37XHpKgwckVCYd3FPHF8",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "-",
-                        "Route53",
-                        "Route 53 Hosted Zones",
-                        "500",
-                        "23",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "0b6387b2-9447-42b8-b2f8-9bc2c166a751",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "0b6387b2-9447-42b8-b2f8-9bc2c166a751",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "495",
-                "date": "Fri, 21 Feb 2020 23:15:34 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "dx3xfcdfMr",
+      "timestamp": "2020-02-18T15:30:06Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 1,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "resourceId": "EPwqJ8k6Ra_OGTiXctRpkQW37XHpKgwckVCYd3FPHF8",
+          "isSuppressed": false,
+          "metadata": [
+            "-",
+            "Route53",
+            "Route 53 Hosted Zones",
+            "500",
+            "23",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

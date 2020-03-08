@@ -1,29 +1,19 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "3Njm0DJQO9",
-            "timestamp": "2020-02-21T13:56:56Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 0,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {},
-            "flaggedResources": []
-        },
-        "ResponseMetadata": {
-            "RequestId": "f6165f79-c31f-4399-bc34-12e075cba8b9",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "f6165f79-c31f-4399-bc34-12e075cba8b9",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "245",
-                "date": "Fri, 21 Feb 2020 23:15:29 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "3Njm0DJQO9",
+      "timestamp": "2020-02-21T13:56:56Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 0,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {},
+      "flaggedResources": []
+    },
+    "ResponseMetadata": {}
+  }
 }

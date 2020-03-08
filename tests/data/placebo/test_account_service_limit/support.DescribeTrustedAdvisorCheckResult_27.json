@@ -1,63 +1,53 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "gjqMBn6pjz",
-            "timestamp": "2020-02-09T14:11:29Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 2,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "region": "us-east-1",
-                    "resourceId": "RuYPBNTcCleQ7v8-z4W66LapKyFAJws3y-wpJbYes4s",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-1",
-                        "RDS",
-                        "Clusters",
-                        "40",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-2",
-                    "resourceId": "UviTamKs7AKVX7J-ii0ULWrcRvUYYnT-uR6RrnAs1K0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-2",
-                        "RDS",
-                        "Clusters",
-                        "40",
-                        "11",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "a6a950de-f034-4c4f-8966-490b140633b4",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "a6a950de-f034-4c4f-8966-490b140633b4",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "682",
-                "date": "Fri, 21 Feb 2020 23:15:28 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "gjqMBn6pjz",
+      "timestamp": "2020-02-09T14:11:29Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 2,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "region": "us-east-1",
+          "resourceId": "RuYPBNTcCleQ7v8-z4W66LapKyFAJws3y-wpJbYes4s",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-1",
+            "RDS",
+            "Clusters",
+            "40",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-2",
+          "resourceId": "UviTamKs7AKVX7J-ii0ULWrcRvUYYnT-uR6RrnAs1K0",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-2",
+            "RDS",
+            "Clusters",
+            "40",
+            "11",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

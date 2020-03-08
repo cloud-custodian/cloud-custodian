@@ -1,48 +1,38 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "ty3xfcdfMr",
-            "timestamp": "2020-02-06T08:43:59Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 1,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "resourceId": "TX0gENU9CffK7854BKTRiZAOgtB3BlMn6JT7l8rutC0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "-",
-                        "Route53",
-                        "Route 53 Reusable Delegation Sets",
-                        "100",
-                        "0",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "b808b033-4f2c-448f-8c25-a62d7342f670",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "b808b033-4f2c-448f-8c25-a62d7342f670",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "506",
-                "date": "Fri, 21 Feb 2020 23:15:34 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "ty3xfcdfMr",
+      "timestamp": "2020-02-06T08:43:59Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 1,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "resourceId": "TX0gENU9CffK7854BKTRiZAOgtB3BlMn6JT7l8rutC0",
+          "isSuppressed": false,
+          "metadata": [
+            "-",
+            "Route53",
+            "Route 53 Reusable Delegation Sets",
+            "100",
+            "0",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

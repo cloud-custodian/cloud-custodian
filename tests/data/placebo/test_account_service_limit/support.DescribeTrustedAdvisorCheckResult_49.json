@@ -1,49 +1,39 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "EM8b3yLRTr",
-            "timestamp": "2020-02-15T18:56:55Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 1,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "region": "us-west-2",
-                    "resourceId": "Se7XCaG7Yty2eSYB1e6IjUCG9mua1ZE026p9eKHZujk",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-2",
-                        "ELB",
-                        "Active Application Load Balancers",
-                        "350",
-                        "98",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "f161eec1-4c73-4377-9f30-5c0c9249ea7d",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "f161eec1-4c73-4377-9f30-5c0c9249ea7d",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "532",
-                "date": "Fri, 21 Feb 2020 23:15:35 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "EM8b3yLRTr",
+      "timestamp": "2020-02-15T18:56:55Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 1,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "region": "us-west-2",
+          "resourceId": "Se7XCaG7Yty2eSYB1e6IjUCG9mua1ZE026p9eKHZujk",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-2",
+            "ELB",
+            "Active Application Load Balancers",
+            "350",
+            "98",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

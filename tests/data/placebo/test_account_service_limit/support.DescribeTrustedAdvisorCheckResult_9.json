@@ -1,259 +1,249 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "aW9HH0l8J6",
-            "timestamp": "2020-02-19T09:42:14Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 16,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "region": "us-east-2",
-                    "resourceId": "Z1pBElaolJn5j4VGMDu16RgApcPnZcOqY8PbLA0ZOQw",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-2",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ca-central-1",
-                    "resourceId": "i1ehyxgPcO1nBrDeftNV7xJVyEM2muXKARoDcc7KmOI",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ca-central-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-1",
-                    "resourceId": "xx4S4-yHlvsG-VgIfJy_Nx_1LXW2OMRbZDNO37-TGUU",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-2",
-                    "resourceId": "ixsdbMZggLyHjRLkYO1MlXnBWxJRj2cIase9w9QZqQA",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-2",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-1",
-                    "resourceId": "tsGSqTKSTy71VJlHCNiTMBEpfa3oPCKRbxVCU19_XRc",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-central-1",
-                    "resourceId": "RPGdKGW4QYrHfJQP-TbulCEh9YotYKcPzVJrWXY0GNY",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-central-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-1",
-                    "resourceId": "Aao6OoW_B5TOqRIFJ5v9LM5iU0Z2d-fQZzE2JefFty8",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-3",
-                    "resourceId": "1q-cYc1lDp0i03_Vke2RIQL1uKynzAPF3b5r0KnrtIM",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-3",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-1",
-                    "resourceId": "L8xZvflDYRDNFVd4ThoDHdxKZhCWt4DrWFYlBY2fIbQ",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-2",
-                    "resourceId": "oKHVWvrK_ET53NYR6imysh0qv1R984Kspo0KsQIuucs",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-2",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-2",
-                    "resourceId": "-McPHFiPhDEMmmpZsDCQMC1wgn53UknoewIxMZySTUM",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-2",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-north-1",
-                    "resourceId": "xmafVQSGb_QN4kSvS4MRKHUx8MqrKRJt9Hv6PoPBD2A",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-north-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-2",
-                    "resourceId": "CCJGKEwiYMOGzbxv8a1MAqmT8UHhAkUTAcxMaaoYpDU",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-2",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-1",
-                    "resourceId": "CuduS8tdhptAMUPLoGlG4WkgH39Pmwwmjucs5-ZoANc",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "sa-east-1",
-                    "resourceId": "UCLLnJ3twBQisT2OCSSJgdtZ6_pgCObZcXvZQr5QUhg",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "sa-east-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-south-1",
-                    "resourceId": "jaIa456wLQSATBl8DujBhQ1ovbvvJNFggUofgwnvljw",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-south-1",
-                        "EC2",
-                        "Elastic IP addresses (EIPs)",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "d233d218-5fb4-4708-90de-567c3667ca71",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "d233d218-5fb4-4708-90de-567c3667ca71",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "3490",
-                "date": "Fri, 21 Feb 2020 23:15:21 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "aW9HH0l8J6",
+      "timestamp": "2020-02-19T09:42:14Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 16,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "region": "us-east-2",
+          "resourceId": "Z1pBElaolJn5j4VGMDu16RgApcPnZcOqY8PbLA0ZOQw",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-2",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ca-central-1",
+          "resourceId": "i1ehyxgPcO1nBrDeftNV7xJVyEM2muXKARoDcc7KmOI",
+          "isSuppressed": false,
+          "metadata": [
+            "ca-central-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-1",
+          "resourceId": "xx4S4-yHlvsG-VgIfJy_Nx_1LXW2OMRbZDNO37-TGUU",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-2",
+          "resourceId": "ixsdbMZggLyHjRLkYO1MlXnBWxJRj2cIase9w9QZqQA",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-2",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-1",
+          "resourceId": "tsGSqTKSTy71VJlHCNiTMBEpfa3oPCKRbxVCU19_XRc",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-central-1",
+          "resourceId": "RPGdKGW4QYrHfJQP-TbulCEh9YotYKcPzVJrWXY0GNY",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-central-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-east-1",
+          "resourceId": "Aao6OoW_B5TOqRIFJ5v9LM5iU0Z2d-fQZzE2JefFty8",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-3",
+          "resourceId": "1q-cYc1lDp0i03_Vke2RIQL1uKynzAPF3b5r0KnrtIM",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-3",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-1",
+          "resourceId": "L8xZvflDYRDNFVd4ThoDHdxKZhCWt4DrWFYlBY2fIbQ",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-2",
+          "resourceId": "oKHVWvrK_ET53NYR6imysh0qv1R984Kspo0KsQIuucs",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-2",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-2",
+          "resourceId": "-McPHFiPhDEMmmpZsDCQMC1wgn53UknoewIxMZySTUM",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-2",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-north-1",
+          "resourceId": "xmafVQSGb_QN4kSvS4MRKHUx8MqrKRJt9Hv6PoPBD2A",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-north-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-2",
+          "resourceId": "CCJGKEwiYMOGzbxv8a1MAqmT8UHhAkUTAcxMaaoYpDU",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-2",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-1",
+          "resourceId": "CuduS8tdhptAMUPLoGlG4WkgH39Pmwwmjucs5-ZoANc",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "sa-east-1",
+          "resourceId": "UCLLnJ3twBQisT2OCSSJgdtZ6_pgCObZcXvZQr5QUhg",
+          "isSuppressed": false,
+          "metadata": [
+            "sa-east-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-south-1",
+          "resourceId": "jaIa456wLQSATBl8DujBhQ1ovbvvJNFggUofgwnvljw",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-south-1",
+            "EC2",
+            "Elastic IP addresses (EIPs)",
+            "5",
+            "0",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

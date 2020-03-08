@@ -1,48 +1,38 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "pR7UU0l7J9",
-            "timestamp": "2020-02-21T01:32:42Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 1,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "resourceId": "f19bZfCiU_ExI1pPmMw19-MWE--omiiNGUwLF6XIO7A",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "-",
-                        "IAM",
-                        "Policies",
-                        "1500",
-                        "0",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "1bcd5910-29bb-4e9f-8eec-ffab12e683e8",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "1bcd5910-29bb-4e9f-8eec-ffab12e683e8",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "478",
-                "date": "Fri, 21 Feb 2020 21:26:17 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "pR7UU0l7J9",
+      "timestamp": "2020-02-21T01:32:42Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 1,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "resourceId": "f19bZfCiU_ExI1pPmMw19-MWE--omiiNGUwLF6XIO7A",
+          "isSuppressed": false,
+          "metadata": [
+            "-",
+            "IAM",
+            "Policies",
+            "1500",
+            "0",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }

@@ -1,48 +1,38 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "dx8afcdfMr",
-            "timestamp": "2020-02-13T03:38:07Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 1,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "resourceId": "M_yoHlsiI6IfzsjE-0wA8-mq3DrnwBWc6kvqBZ1LZS0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "-",
-                        "Route53",
-                        "Route 53 Traffic Policy Instances",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "38fc4c4c-a55b-4d9d-81a3-d1884e585f49",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "38fc4c4c-a55b-4d9d-81a3-d1884e585f49",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "504",
-                "date": "Fri, 21 Feb 2020 23:15:35 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "dx8afcdfMr",
+      "timestamp": "2020-02-13T03:38:07Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 1,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "resourceId": "M_yoHlsiI6IfzsjE-0wA8-mq3DrnwBWc6kvqBZ1LZS0",
+          "isSuppressed": false,
+          "metadata": [
+            "-",
+            "Route53",
+            "Route 53 Traffic Policy Instances",
+            "5",
+            "0",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }
