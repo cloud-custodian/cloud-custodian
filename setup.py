@@ -9,7 +9,7 @@ def read(fname):
 
 setup(
     name="c7n",
-    use_scm_version={'write_to': 'c7n/version.py', 'fallback_version': '0.9.0-unreleased'},
+    use_scm_version={'write_to': 'c7n/version.py', 'fallback_version': '0.9.0dev'},
     setup_requires=['setuptools_scm'],
     description="Cloud Custodian - Policy Rules Engine",
     long_description=read('README.md'),
@@ -40,9 +40,7 @@ setup(
         "argcomplete",
         "tabulate>=0.8.2",
         "urllib3",
-        "certifi"
-    ],
-    extra_requires={
-        ":python_version<'3.3'": ["backports.functools-lru-cache"]
-    }
+        "certifi",
+        "backports.functools-lru-cache;python_version<'3.3'"
+    ]
 )

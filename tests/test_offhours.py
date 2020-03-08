@@ -50,6 +50,7 @@ class OffHoursFilterTest(BaseTest):
                         },
                     ],
                 },
+                output_dir=None,
                 session_factory=session_factory,
             )
             resources = p.run()

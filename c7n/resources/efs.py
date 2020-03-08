@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
@@ -193,3 +194,52 @@ class ConfigureLifecycle(BaseAction):
                     LifecyclePolicies=op_map.get(self.data.get('state')))
             except client.exceptions.FileSystemNotFound:
                 continue
+
+
+@ElasticFileSystem.filter_registry.register('lifecycle-policy')
+class LifecyclePolicy(Filter):
+    """Filters efs based on the state of lifecycle policies
+
+    :example:
+
+      .. code-block:: yaml
+
+            policies:
+              - name: efs-filter-lifecycle
+                resource: efs
+                filters:
+                  - type: lifecycle-policy
+                    state: present
+                    value: AFTER_7_DAYS
+
+    """
+    schema = type_schema(
+        'lifecycle-policy',
+        state={'enum': ['present', 'absent']},
+        value={'type': 'string'},
+        required=['state'])
+
+    permissions = ('elasticfilesystem:DescribeLifecycleConfiguration',)
+
+    def process(self, resources, event=None):
+        resources = self.fetch_resources_lfc(resources)
+        if self.data.get('value'):
+            config = {'TransitionToIA': self.data.get('value')}
+            if self.data.get('state') == 'present':
+                return [r for r in resources if config in r.get('c7n:LifecyclePolicies')]
+            return [r for r in resources if config not in r.get('c7n:LifecyclePolicies')]
+        else:
+            if self.data.get('state') == 'present':
+                return [r for r in resources if r.get('c7n:LifecyclePolicies')]
+            return [r for r in resources if r.get('c7n:LifecyclePolicies') == []]
+
+    def fetch_resources_lfc(self, resources):
+        client = local_session(self.manager.session_factory).client('efs')
+        for r in resources:
+            try:
+                lfc = client.describe_lifecycle_configuration(
+                    FileSystemId=r['FileSystemId']).get('LifecyclePolicies')
+                r['c7n:LifecyclePolicies'] = lfc
+            except client.exceptions.FileSystemNotFound:
+                continue
+        return resources

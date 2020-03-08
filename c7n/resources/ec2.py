@@ -485,6 +485,9 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
     with the format YYYY-MM-DD. Alternatively, the list (using the same syntax)
     can be taken from a specified url.
 
+    Note: You can disable filtering of only running instances by setting
+    `state-filter: false`
+
     :Example:
 
     .. code-block:: yaml
@@ -526,11 +529,19 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
               - stop
     """
 
+    schema = type_schema(
+        'offhour', rinherit=OffHour.schema,
+        **{'state-filter': {'type': 'boolean'}})
+    schema_alias = False
+
     valid_origin_states = ('running',)
 
     def process(self, resources, event=None):
-        return super(InstanceOffHour, self).process(
-            self.filter_instance_state(resources))
+        if self.data.get('state-filter', True):
+            return super(InstanceOffHour, self).process(
+                self.filter_instance_state(resources))
+        else:
+            return super(InstanceOffHour, self).process(resources)
 
 
 @filters.register('network-location')
@@ -554,6 +565,9 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
     the day. A list of days to excluded can be included as a list of strings
     with the format YYYY-MM-DD. Alternatively, the list (using the same syntax)
     can be taken from a specified url.
+
+    Note: You can disable filtering of only stopped instances by setting
+    `state-filter: false`
 
     :Example:
 
@@ -596,11 +610,19 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
               - start
     """
 
+    schema = type_schema(
+        'onhour', rinherit=OnHour.schema,
+        **{'state-filter': {'type': 'boolean'}})
+    schema_alias = False
+
     valid_origin_states = ('stopped',)
 
     def process(self, resources, event=None):
-        return super(InstanceOnHour, self).process(
-            self.filter_instance_state(resources))
+        if self.data.get('state-filter', True):
+            return super(InstanceOnHour, self).process(
+                self.filter_instance_state(resources))
+        else:
+            return super(InstanceOnHour, self).process(resources)
 
 
 @filters.register('ephemeral')
@@ -1163,7 +1185,7 @@ class Resize(BaseAction, StateTransitionFilter):
 
 @actions.register('stop')
 class Stop(BaseAction, StateTransitionFilter):
-    """Stops a running EC2 instances
+    """Stops or hibernates a running EC2 instances
 
     :Example:
 
@@ -1176,10 +1198,27 @@ class Stop(BaseAction, StateTransitionFilter):
               - instance-state-name: running
             actions:
               - stop
+
+          - name: ec2-hibernate-instances
+            resources: ec2
+            query:
+              - instance-state-name: running
+            actions:
+              - type: stop
+                hibernate: true
+
+
+    Note when using hiberate, instances not configured for hiberation
+    will just be stopped.
     """
     valid_origin_states = ('running',)
 
-    schema = type_schema('stop', **{'terminate-ephemeral': {'type': 'boolean'}})
+    schema = type_schema(
+        'stop',
+        **{'terminate-ephemeral': {'type': 'boolean'},
+           'hibernate': {'type': 'boolean'}})
+
+    has_hibernate = jmespath.compile('[].HibernationOptions.Configured')
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
@@ -1197,6 +1236,15 @@ class Stop(BaseAction, StateTransitionFilter):
                 persistent.append(i)
         return ephemeral, persistent
 
+    def split_on_hibernate(self, instances):
+        enabled, disabled = [], []
+        for status, i in zip(self.has_hibernate.search(instances), instances):
+            if status is True:
+                enabled.append(i)
+            else:
+                disabled.append(i)
+        return enabled, disabled
+
     def process(self, instances):
         instances = self.filter_instance_state(instances)
         if not len(instances):
@@ -1210,15 +1258,22 @@ class Stop(BaseAction, StateTransitionFilter):
                 client.terminate_instances,
                 [i['InstanceId'] for i in ephemeral])
         if persistent:
+            if self.data.get('hibernate', False):
+                enabled, persistent = self.split_on_hibernate(persistent)
+                if enabled:
+                    self._run_instances_op(
+                        client.stop_instances,
+                        [i['InstanceId'] for i in enabled],
+                        Hibernate=True)
             self._run_instances_op(
                 client.stop_instances,
                 [i['InstanceId'] for i in persistent])
         return instances
 
-    def _run_instances_op(self, op, instance_ids):
+    def _run_instances_op(self, op, instance_ids, **kwargs):
         while instance_ids:
             try:
-                return self.manager.retry(op, InstanceIds=instance_ids)
+                return self.manager.retry(op, InstanceIds=instance_ids, **kwargs)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     instance_ids.remove(extract_instance_id(e))

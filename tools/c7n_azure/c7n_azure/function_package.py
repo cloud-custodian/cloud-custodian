@@ -12,20 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import copy
-import distutils.util
 import json
 import logging
 import os
-import shutil
 import time
 
+import distutils.util
 import requests
 from c7n_azure.constants import (ENV_CUSTODIAN_DISABLE_SSL_CERT_VERIFICATION,
                                  FUNCTION_EVENT_TRIGGER_MODE,
                                  FUNCTION_TIME_TRIGGER_MODE,
                                  FUNCTION_HOST_CONFIG,
                                  FUNCTION_EXTENSION_BUNDLE_CONFIG)
-from c7n_azure.dependency_manager import DependencyManager
 from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive
@@ -67,8 +65,11 @@ class FunctionPackage(object):
         if not self.enable_ssl_cert:
             self.log.warning('SSL Certificate Validation is disabled')
 
-    def _add_functions_required_files(self, policy, queue_name=None):
+    def _add_functions_required_files(self, policy, requirements, queue_name=None):
         s = local_session(Session)
+
+        self.pkg.add_contents(dest='requirements.txt',
+                              contents=requirements)
 
         for target_sub_id in self.target_sub_ids:
             name = self.name + ("_" + target_sub_id if target_sub_id else "")
@@ -142,70 +143,14 @@ class FunctionPackage(object):
         c7n_azure_root = os.path.dirname(__file__)
         return os.path.join(c7n_azure_root, 'cache')
 
-    def build(self, policy, modules, non_binary_packages, excluded_packages, queue_name=None):
-        cache_zip_file = self.build_cache(modules, excluded_packages, non_binary_packages)
+    def build(self, policy, modules, requirements, queue_name=None):
+        self.pkg = AzurePythonPackageArchive()
 
-        self.pkg = AzurePythonPackageArchive(cache_file=cache_zip_file)
-
-        exclude = os.path.normpath('/cache/') + os.path.sep
-        self.pkg.add_modules(lambda f: (exclude in f),
+        self.pkg.add_modules(None,
                              [m.replace('-', '_') for m in modules])
 
         # add config and policy
-        self._add_functions_required_files(policy, queue_name)
-
-    def build_cache(self, modules, excluded_packages, non_binary_packages):
-        wheels_folder = os.path.join(self.cache_folder, 'wheels')
-        wheels_install_folder = os.path.join(self.cache_folder, 'dependencies')
-        cache_zip_file = os.path.join(self.cache_folder, 'cache.zip')
-        cache_metadata_file = os.path.join(self.cache_folder, 'metadata.json')
-        packages = DependencyManager.get_dependency_packages_list(modules, excluded_packages)
-        packages_root = os.path.join('.python_packages', 'lib', 'python3.6', 'site-packages')
-
-        if not DependencyManager.check_cache(cache_metadata_file, cache_zip_file, packages):
-            cache_pkg = AzurePythonPackageArchive()
-            self.log.info("Cached packages not found or requirements were changed.")
-
-            # If cache check fails, wipe all previous wheels, installations etc
-            if os.path.exists(self.cache_folder):
-                self.log.info("Removing cache folder...")
-                shutil.rmtree(self.cache_folder)
-
-            self.log.info("Preparing non binary wheels...")
-            DependencyManager.prepare_non_binary_wheels(non_binary_packages, wheels_folder)
-
-            self.log.info("Downloading wheels...")
-            DependencyManager.download_wheels(packages, wheels_folder)
-
-            self.log.info("Installing wheels...")
-            DependencyManager.install_wheels(wheels_folder, wheels_install_folder)
-
-            for root, _, files in os.walk(wheels_install_folder):
-                arc_prefix = os.path.relpath(root, wheels_install_folder)
-                for f in files:
-                    dest_path = os.path.join(packages_root, arc_prefix, f)
-
-                    if f.endswith('.pyc') or f.endswith('.c'):
-                        continue
-                    f_path = os.path.join(root, f)
-
-                    cache_pkg.add_file(f_path, dest_path)
-
-            self.log.info('Saving cache zip file...')
-            cache_pkg.close()
-            with open(cache_zip_file, 'wb') as fout:
-                fout.write(cache_pkg.get_stream().read())
-
-            self.log.info("Removing temporary folders...")
-            shutil.rmtree(wheels_folder)
-            shutil.rmtree(wheels_install_folder)
-
-            self.log.info("Updating metadata file...")
-            DependencyManager.create_cache_metadata(cache_metadata_file,
-                                                    cache_zip_file,
-                                                    packages)
-
-        return cache_zip_file
+        self._add_functions_required_files(policy, requirements, queue_name)
 
     def wait_for_status(self, deployment_creds, retries=10, delay=15):
         for r in range(retries):
@@ -233,7 +178,7 @@ class FunctionPackage(object):
 
         # update perms of the package
         self._update_perms_package()
-        zip_api_url = '%s/api/zipdeploy?isAsync=true' % deployment_creds.scm_uri
+        zip_api_url = '%s/api/zipdeploy?isAsync=true&synctriggers=true' % deployment_creds.scm_uri
         headers = {'content-type': 'application/octet-stream'}
         self.log.info("Publishing Function package from %s" % self.pkg.path)
 
@@ -251,6 +196,39 @@ class FunctionPackage(object):
         r.raise_for_status()
 
         self.log.info("Function publish result: %s" % r.status_code)
+
+    def wait_for_remote_build(self, deployment_creds, is_consumption):
+        self.log.info('Waiting for the remote build to finish')
+
+        # Replicate the behavior from azure core func tool.. Some racing in kudulight,
+        # so different way to get the status. https://bit.ly/32AM71b
+        if not is_consumption:
+            is_deploying = True
+            is_deploying_uri = '%s/api/isdeploying' % deployment_creds.scm_uri
+            while is_deploying != 'False':
+                self.log.info('Waiting for deployment to complete...')
+                is_deploying = requests.get(is_deploying_uri).json()['value']
+                time.sleep(10)
+
+        # Get deployment id
+        deployments_uri = '%s/deployments' % deployment_creds.scm_uri
+        r = requests.get(deployments_uri).json()
+        deployment_id = r[0]['id']
+
+        status_uri = '%s/deployments/%s' % (deployment_creds.scm_uri, deployment_id)
+        status_decoding = ['Pending', 'Building', 'Deploying', 'Failed', 'Success']
+        while True:
+            status = requests.get(status_uri).json()['status']
+            if status == 3 or status == 4:
+                break
+            self.log.info('Deployment status: %s', status_decoding[status])
+            time.sleep(10)
+
+        if status == 3:
+            log_uri = '%s/log' % status_uri
+            self.log.error("Remote build failed. You can retrieve logs here: %s", log_uri)
+            return False
+        return True
 
     def close(self):
         self.pkg.close()

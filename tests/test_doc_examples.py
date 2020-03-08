@@ -82,8 +82,8 @@ skip_condition = not (
      # to run on the py3.6 test runner, as its the only one
      # without additional responsibilities.
      (os.environ.get('C7N_TEST_RUN') and
-      sys.version_info.major == 2 and
-      sys.version_info.minor == 7)))
+      sys.version_info.major == 3 and
+      sys.version_info.minor == 6)))
 
 
 @pytest.mark.skipif(skip_condition, reason="Doc tests must be explicitly enabled with C7N_DOC_TEST")

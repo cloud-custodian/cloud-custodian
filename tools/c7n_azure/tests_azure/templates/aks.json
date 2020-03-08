@@ -17,7 +17,6 @@
             "name": "cctestaks",
             "location": "westus2",
             "properties": {
-                "kubernetesVersion": "1.12.8",
                 "dnsPrefix": "cctestaks-dns",
                 "agentPoolProfiles": [
                     {

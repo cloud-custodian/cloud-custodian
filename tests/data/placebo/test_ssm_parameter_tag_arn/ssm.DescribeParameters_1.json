@@ -1,0 +1,73 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "Name": "/gittersearch/token",
+                "Type": "String",
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 8,
+                    "day": 11,
+                    "hour": 15,
+                    "minute": 22,
+                    "second": 16,
+                    "microsecond": 376000
+                },
+                "LastModifiedUser": "arn:aws:iam::123456789123:user/deputy",
+                "Version": 2,
+                "Tier": "Standard",
+                "Policies": []
+            },
+            {
+                "Name": "Bar",
+                "Type": "String",
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 2,
+                    "day": 28,
+                    "hour": 15,
+                    "minute": 14,
+                    "second": 58,
+                    "microsecond": 394000
+                },
+                "LastModifiedUser": "arn:aws:iam::123456789123:root",
+                "Description": "Missing",
+                "Version": 1,
+                "Tier": "Standard",
+                "Policies": []
+            },
+            {
+                "Name": "Foo",
+                "Type": "String",
+                "LastModifiedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 2,
+                    "day": 28,
+                    "hour": 15,
+                    "minute": 14,
+                    "second": 49,
+                    "microsecond": 412000
+                },
+                "LastModifiedUser": "arn:aws:iam::123456789123:root",
+                "Version": 1,
+                "Tier": "Standard",
+                "Policies": []
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "c4776bce-8b94-4a33-b0f5-0a37c2280acd",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c4776bce-8b94-4a33-b0f5-0a37c2280acd",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "606",
+                "date": "Fri, 28 Feb 2020 20:52:21 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
