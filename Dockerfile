@@ -20,6 +20,7 @@ RUN adduser --disabled-login custodian
 RUN apt-get --yes update \
  && apt-get --yes install build-essential --no-install-recommends \
  && pip3 install -r requirements.txt  . \
+ && pip3 install aws-xray-sdk \
  && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
  && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
  && pip3 install -r tools/c7n_kube/requirements.txt tools/c7n_kube \
