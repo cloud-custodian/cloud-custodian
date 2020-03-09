@@ -46,7 +46,7 @@ except (ImportError, FileNotFoundError):
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
-from c7n.utils import parse_s3, local_session, get_retry
+from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 
 log = logging.getLogger('custodian.serverless')
 
@@ -1131,6 +1131,8 @@ class CloudWatchEventSource(object):
                 "Unknown lambda event source type: %s" % event_type)
         if not payload:
             return None
+        if self.data.get('pattern'):
+            payload = merge_dict(payload, self.data['pattern'])
         return json.dumps(payload)
 
     def add(self, func):

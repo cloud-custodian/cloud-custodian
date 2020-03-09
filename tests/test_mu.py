@@ -208,6 +208,29 @@ class PolicyLambdaProvision(BaseTest):
              'source': ['aws.health']}
         )
 
+    def test_user_pattern_merge(self):
+        p = self.load_policy({
+            'name': 'ec2-retire',
+            'resource': 'ec2',
+            'mode': {
+                'type': 'cloudtrail',
+                'pattern': {
+                    'detail': {
+                        'userIdentity': {
+                            'userName': [{'anything-but': 'deputy'}]}}},
+                'events': [{
+                    'ids': 'responseElements.subnet.subnetId',
+                    'source': 'ec2.amazonaws.com',
+                    'event': 'CreateSubnet'}]}})
+        p_lambda = PolicyLambda(p)
+        events = p_lambda.get_events(None)
+        self.assertEqual(
+            json.loads(events[0].render_event_pattern()),
+            {'detail': {'eventName': ['CreateSubnet'],
+                        'eventSource': ['ec2.amazonaws.com'],
+                        'userIdentity': {'userName': [{'anything-but': 'deputy'}]}},
+             'detail-type': ['AWS API Call via CloudTrail']})
+
     def test_cwl_subscriber(self):
         self.patch(CloudWatchLogSubscription, "iam_delay", 0.01)
         session_factory = self.replay_flight_data("test_cwl_subscriber")
