@@ -1350,9 +1350,7 @@ class SetBucketReplicationConfig(BucketActionBase):
                 try:
                     future.result()
                 except ClientError as e:
-                    err = 'Message: %s Bucket: %s', e, bucket['Name']
-                    self.log.error(err)
-                    errors.append(err)
+                    errors.append("Message: %s Bucket: %s", e, bucket['Name'])
             if errors:
                 raise Exception('\n'.join(map(str, errors)))
 
