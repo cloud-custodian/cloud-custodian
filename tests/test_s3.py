@@ -1558,7 +1558,17 @@ class S3Test(BaseTest):
                 "name": "s3-has-replica-policy",
                 "resource": "s3",
                 "filters": [
-                    {"Name": bname}
+                    {"Name": bname},
+                    {
+                        "type": "value",
+                        "key": "Replication.ReplicationConfiguration.Rules[].Destination",
+                        "value": "present"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Replication.ReplicationConfiguration.Rules[].Status",
+                        "value": "Enabled"
+                    }
                 ],
                 "actions": [
                     {
@@ -1587,7 +1597,12 @@ class S3Test(BaseTest):
                 "name": "s3-has-replica-policy",
                 "resource": "s3",
                 "filters": [
-                    {"Name": bname}
+                    {"Name": bname},
+                    {
+                        "type": "value",
+                        "key": "Replication.ReplicationConfiguration.Rules[].Destination",
+                        "value": "present"
+                    }
                 ],
                 "actions": [
                     {
