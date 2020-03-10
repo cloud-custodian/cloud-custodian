@@ -122,9 +122,6 @@ class FunctionAppUtilities(object):
 
         if package.wait_for_status(publish_creds):
             package.publish(publish_creds)
-
-            is_consumption = cls.is_consumption_plan(function_params)
-            package.wait_for_remote_build(publish_creds, is_consumption)
             cls.log.info('Finished publishing Function application')
         else:
             cls.log.error("Aborted deployment, ensure Application Service is healthy.")
