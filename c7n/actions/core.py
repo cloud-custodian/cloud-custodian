@@ -28,9 +28,7 @@ class ActionRegistry(PluginRegistry):
     def __init__(self, *args, **kw):
         super(ActionRegistry, self).__init__(*args, **kw)
         # Defer to provider initialization of registry
-        from .notify import Notify
         from .webhook import Webhook
-        self.register('notify', Notify)
         self.register('webhook', Webhook)
 
     def parse(self, data, manager):

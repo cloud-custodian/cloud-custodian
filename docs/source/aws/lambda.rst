@@ -128,6 +128,41 @@ substituted so a policy can be used across accounts.
          schedule: "rate(1 day)"
          role: arn:aws:iam::{account_id}:role/some-role
 
+Event Pattern Filtering
++++++++++++++++++++++++
+
+Cloud Watch Events also support content/pattern filtering, see
+
+- https://docs.aws.amazon.com/eventbridge/latest/userguide/content-filtering-with-event-patterns.html
+- https://aws.amazon.com/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/
+
+In the context of a custodian policy you can define a 'pattern' key under mode, the pattern
+will be merged with the custodian generated default event pattern.
+
+If the pattern filtering does not match the event, the custodian policy lambda will not
+be invoked/executed.
+
+In the following example policy, an additional event pattern is supplied that ignores
+any create subnet call by the iam user named `deputy`.
+
+.. code-block:: yaml
+
+   policies:
+     - name: subnet-detect
+       resource: aws.subnet
+       mode:
+         type: cloudtrail
+         role: CustodianDemoRole
+         events:
+           - source: ec2.amazonaws.com
+             event: CreateSubnet
+             ids: responseElements.subnet.subnetId
+         pattern:
+           detail:
+             userIdentity:
+               userName: [{'anything-but': 'deputy'}]
+
+
 
 Config Rules
 ############

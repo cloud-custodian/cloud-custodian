@@ -40,7 +40,7 @@ from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class
 from c7n.reports.csvout import Formatter, fs_record_set
-from c7n.resources import load_resources
+from c7n.resources import load_available
 from c7n.utils import CONN_CACHE, dumps
 
 from c7n_org.utils import environ, account_tags
@@ -194,7 +194,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
     filter_policies(custodian_config, policy_tags, policies, resource)
     filter_accounts(accounts_config, tags, accounts)
 
-    load_resources()
+    load_available()
     MainThreadExecutor.c7n_async = False
     executor = debug and MainThreadExecutor or ProcessPoolExecutor
     return accounts_config, custodian_config, executor
@@ -277,6 +277,7 @@ def report_account(account, region, policies_config, output_path, cache_path, de
     output_path = os.path.join(output_path, account['name'], region)
     cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['name'], region))
 
+    load_available()
     config = Config.empty(
         region=region,
         output_dir=output_path,
@@ -514,6 +515,7 @@ def run_account(account, region, policies_config, output_path,
     logging.getLogger('custodian.output').setLevel(logging.ERROR + 1)
     CONN_CACHE.session = None
     CONN_CACHE.time = None
+    load_available()
 
     # allow users to specify interpolated output paths
     if '{' not in output_path:
