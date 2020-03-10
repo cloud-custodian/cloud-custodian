@@ -2,7 +2,7 @@ click
 boto3
 requests
 c7n
-pygit2
+pygit2==1.0.3
 PyYAML>=4.2b4
 sqlalchemy
 urllib3>=1.24.1

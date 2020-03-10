@@ -172,11 +172,11 @@ class FunctionAppUtilsTest(BaseTest):
         wc = self.session.client('azure.mgmt.web.WebSiteManagementClient')
         app_settings = wc.web_apps.list_application_settings(
             CONST_GROUP_NAME, function_app_name)
-        self.assertIsNotNone(app_settings.properties['WEBSITE_RUN_FROM_PACKAGE'])
+        self.assertNotIn('WEBSITE_RUN_FROM_PACKAGE', app_settings.properties)
 
     @arm_template('functionapp-reqs.json')
-    @patch('c7n_azure.function_package.FunctionPackage.publish')
-    def test_publish_functions_package_dedicated(self, mock_function_package_publish):
+    @patch('time.sleep')
+    def test_publish_functions_package_dedicated(self, _1):
         parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights={
                 'id': '',
@@ -197,5 +197,8 @@ class FunctionAppUtilsTest(BaseTest):
             function_app_resource_group_name=CONST_GROUP_NAME,
             function_app_name=self.dedicated_function_name)
 
-        FunctionAppUtilities.publish_functions_package(parameters, FunctionPackage("TestPolicy"))
-        mock_function_package_publish.assert_called_once()
+        package = FunctionPackage("TestPolicy")
+        package.pkg = AzurePythonPackageArchive()
+        package.close()
+
+        FunctionAppUtilities.publish_functions_package(parameters, package)

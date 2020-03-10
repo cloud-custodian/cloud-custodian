@@ -945,8 +945,8 @@ class TestPolicy(BaseTest):
             "actions": [{"days": 10, "type": "retention"}],
         }
         session_factory = self.replay_flight_data("test_logs_from_group")
-        config = {"log_group": "test-logs"}
-        policy = self.load_policy(p_data, config, session_factory)
+        policy = self.load_policy(
+            p_data, session_factory=session_factory, log_group='test-logs')
         logs = list(policy.get_logs("2016-11-01 00:00:00", "2016-11-30 11:59:59"))
         self.assertEqual(len(logs), 6)
         # entries look reasonable

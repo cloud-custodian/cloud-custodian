@@ -28,7 +28,7 @@ import six
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
-from c7n.output import DEFAULT_NAMESPACE
+from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
 from c7n.provider import clouds, get_resource_class
@@ -412,6 +412,7 @@ class LambdaMode(ServerlessExecutionMode):
             'runtime': {'enum': ['python2.7', 'python3.6',
                                  'python3.7', 'python3.8']},
             'role': {'type': 'string'},
+            'pattern': {'type': 'object', 'minProperties': 1},
             'timeout': {'type': 'number'},
             'memory': {'type': 'number'},
             'environment': {'type': 'object'},
@@ -769,7 +770,6 @@ class ConfigRuleMode(LambdaMode):
     """a lambda policy that executes as a config service rule.
         http://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
     """
-
     cfg_event = None
     schema = utils.type_schema('config-rule', rinherit=LambdaMode.schema)
 
@@ -779,6 +779,10 @@ class ConfigRuleMode(LambdaMode):
             raise PolicyValidationError(
                 "policy:%s AWS Config does not support resource-type:%s" % (
                     self.policy.name, self.policy.resource_type))
+        if self.policy.data['mode'].get('pattern'):
+            raise PolicyValidationError(
+                "policy:%s AWS Config does not support event pattern filtering" % (
+                    self.policy.name))
 
     def resolve_resources(self, event):
         source = self.policy.resource_manager.get_source('config')
@@ -1059,6 +1063,8 @@ class Policy(object):
     run = __call__
 
     def _write_file(self, rel_path, value):
+        if isinstance(self.ctx.output, NullBlobOutput):
+            return
         with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 

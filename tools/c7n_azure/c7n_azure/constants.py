@@ -21,8 +21,6 @@ FUNCTION_EXT_VERSION = '~2'
 FUNCTION_EVENT_TRIGGER_MODE = 'azure-event-grid'
 FUNCTION_TIME_TRIGGER_MODE = 'azure-periodic'
 FUNCTION_KEY_URL = 'hostruntime/admin/host/systemkeys/_master?api-version=2018-02-01'
-FUNCTION_CONSUMPTION_BLOB_CONTAINER = 'cloud-custodian-packages'
-FUNCTION_PACKAGE_SAS_EXPIRY_DAYS = 365 * 10  # 10 years
 FUNCTION_AUTOSCALE_NAME = 'cloud_custodian_default'
 
 """

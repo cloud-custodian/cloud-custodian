@@ -71,6 +71,7 @@ from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
 from c7n.manager import resources
+from c7n.output import NullBlobOutput
 from c7n import query
 from c7n.resources.securityhub import PostFinding
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
@@ -1769,7 +1770,9 @@ class ScanBucket(BucketActionBase):
         return results
 
     def write_denied_buckets_file(self):
-        if self.denied_buckets and self.manager.ctx.log_dir:
+        if (self.denied_buckets and
+                self.manager.ctx.log_dir and
+                not isinstance(self.manager.ctx.output, NullBlobOutput)):
             with open(
                     os.path.join(
                         self.manager.ctx.log_dir, 'denied.json'), 'w') as fh:

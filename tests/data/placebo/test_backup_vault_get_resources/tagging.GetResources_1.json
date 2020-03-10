@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:backup:us-east-1:644160558196:backup-vault:Default",
+                "Tags": [
+                    {
+                        "Key": "target-tag",
+                        "Value": "target-value"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "1645fa50-6912-4460-91fe-9eb55974822d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "1645fa50-6912-4460-91fe-9eb55974822d",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "179",
+                "date": "Tue, 03 Mar 2020 22:43:29 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
