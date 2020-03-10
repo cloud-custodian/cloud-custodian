@@ -55,6 +55,14 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         site_config.app_settings.append(
             azure_name_value_pair('PYTHONDONTWRITEBYTECODE', 1))
 
+        # Enable server side build
+        site_config.app_settings.append(
+            azure_name_value_pair('ENABLE_ORYX_BUILD', 'true')
+        )
+        site_config.app_settings.append(
+            azure_name_value_pair('SCM_DO_BUILD_DURING_DEPLOYMENT', 'true')
+        )
+
         # general app settings
         con_string = params['storage_account_connection_string']
         site_config.app_settings.append(azure_name_value_pair('AzureWebJobsStorage', con_string))

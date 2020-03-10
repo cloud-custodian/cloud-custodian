@@ -196,7 +196,8 @@ class Retention(BaseAction):
         client = local_session(self.manager.session_factory).client('logs')
         days = self.data['days']
         for r in resources:
-            client.put_retention_policy(
+            self.manager.retry(
+                client.put_retention_policy,
                 logGroupName=r['logGroupName'],
                 retentionInDays=days)
 

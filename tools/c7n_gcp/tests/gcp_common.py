@@ -19,13 +19,10 @@ import shutil
 
 from c7n.testing import TestUtils
 from c7n.schema import generate
-from c7n.resources import load_resources
-
 from c7n_gcp.client import Session, LOCAL_THREAD
 
 from recorder import HttpRecorder, HttpReplay
 
-load_resources()
 
 PROJECT_ID = ""
 

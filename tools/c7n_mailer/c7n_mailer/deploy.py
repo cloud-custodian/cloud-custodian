@@ -41,20 +41,22 @@ def dispatch(event, context):
     return handle.start_c7n_mailer(logger)
 """
 
+CORE_DEPS = [
+    # core deps
+    'jinja2', 'markupsafe', 'ruamel', 'ldap3', 'pyasn1', 'redis', 'jmespath',
+    # for other dependencies
+    'pkg_resources',
+    # transport datadog - recursive deps
+    'datadog', 'simplejson', 'decorator',
+    # requests (recursive deps), needed by datadog, slackclient, splunk
+    'requests', 'urllib3', 'idna', 'chardet', 'certifi',
+    # used by splunk; also dependencies of c7n itself
+    'jsonpointer', 'jsonpatch']
+
 
 def get_archive(config):
-    archive = PythonPackageArchive(modules=[
-        'c7n_mailer',
-        # core deps
-        'jinja2', 'markupsafe', 'ruamel', 'ldap3', 'pyasn1', 'redis',
-        # for other dependencies
-        'pkg_resources',
-        # transport datadog - recursive deps
-        'datadog', 'simplejson', 'decorator',
-        # requests (recursive deps), needed by datadog, slackclient, splunk
-        'requests', 'urllib3', 'idna', 'chardet', 'certifi',
-        # used by splunk; also dependencies of c7n itself
-        'jsonpointer', 'jsonpatch'])
+    deps = ['c7n_mailer'] + list(CORE_DEPS)
+    archive = PythonPackageArchive(modules=deps)
 
     for d in set(config['templates_folders']):
         if not os.path.exists(d):
