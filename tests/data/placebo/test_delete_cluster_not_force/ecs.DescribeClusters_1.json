@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusters": [
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+                "clusterName": "test-cluster",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 1,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": [],
+                "tags": [],
+                "settings": [
+                    {
+                        "name": "containerInsights",
+                        "value": "disabled"
+                    }
+                ],
+                "capacityProviders": [
+                    "FARGATE_SPOT",
+                    "FARGATE"
+                ],
+                "defaultCapacityProviderStrategy": []
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {
+            "RequestId": "2406a0ad-64df-4007-900f-65a3de93a3df",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "2406a0ad-64df-4007-900f-65a3de93a3df",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "425",
+                "date": "Tue, 10 Mar 2020 21:47:46 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

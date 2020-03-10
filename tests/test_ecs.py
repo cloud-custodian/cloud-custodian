@@ -466,3 +466,29 @@ class TestEcs(BaseTest):
             time.sleep(30)
         response = client.describe_clusters(clusters=['test-cluster'])
         self.assertEqual(response['clusters'][0].get('status'), 'INACTIVE')
+
+    def test_delete_cluster_not_force(self):
+        session_factory = self.replay_flight_data("test_delete_cluster_not_force")
+        client = session_factory().client("ecs")
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('status'), 'ACTIVE')
+        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 1)
+        p = self.load_policy(
+            {
+                "name": "deregister-instances",
+                "resource": "ecs",
+                "filters": [{"type": "value", "key": "clusterName",
+                            "value": "test-cluster"}],
+                "actions": [
+                    {
+                        "type": "delete"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with self.assertRaises(client.exceptions.ClusterContainsContainerInstancesException):
+            p.run()
+        response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('status'), 'ACTIVE')
+        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 1)

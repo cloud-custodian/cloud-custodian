@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusterArns": [
+            "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "a84c0846-21aa-499e-8cd1-6196cfce7527",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a84c0846-21aa-499e-8cd1-6196cfce7527",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "349",
+                "date": "Tue, 10 Mar 2020 21:47:47 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
