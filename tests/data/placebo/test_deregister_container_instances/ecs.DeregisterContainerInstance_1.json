@@ -17,35 +17,6 @@
                     "doubleValue": 0.0,
                     "longValue": 0,
                     "integerValue": 1024
-                },
-                {
-                    "name": "MEMORY",
-                    "type": "INTEGER",
-                    "doubleValue": 0.0,
-                    "longValue": 0,
-                    "integerValue": 983
-                },
-                {
-                    "name": "PORTS",
-                    "type": "STRINGSET",
-                    "doubleValue": 0.0,
-                    "longValue": 0,
-                    "integerValue": 0,
-                    "stringSetValue": [
-                        "22",
-                        "2376",
-                        "2375",
-                        "51678",
-                        "51679"
-                    ]
-                },
-                {
-                    "name": "PORTS_UDP",
-                    "type": "STRINGSET",
-                    "doubleValue": 0.0,
-                    "longValue": 0,
-                    "integerValue": 0,
-                    "stringSetValue": []
                 }
             ],
             "registeredResources": [
@@ -55,35 +26,6 @@
                     "doubleValue": 0.0,
                     "longValue": 0,
                     "integerValue": 1024
-                },
-                {
-                    "name": "MEMORY",
-                    "type": "INTEGER",
-                    "doubleValue": 0.0,
-                    "longValue": 0,
-                    "integerValue": 983
-                },
-                {
-                    "name": "PORTS",
-                    "type": "STRINGSET",
-                    "doubleValue": 0.0,
-                    "longValue": 0,
-                    "integerValue": 0,
-                    "stringSetValue": [
-                        "22",
-                        "2376",
-                        "2375",
-                        "51678",
-                        "51679"
-                    ]
-                },
-                {
-                    "name": "PORTS_UDP",
-                    "type": "STRINGSET",
-                    "doubleValue": 0.0,
-                    "longValue": 0,
-                    "integerValue": 0,
-                    "stringSetValue": []
                 }
             ],
             "status": "INACTIVE",
