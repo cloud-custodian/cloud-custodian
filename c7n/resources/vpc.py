@@ -458,6 +458,12 @@ class Subnet(query.QueryResourceManager):
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
 
 
+@Subnet.filter_registry.register('vpc')
+class SubnetVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 @resources.register('security-group')
 class SecurityGroup(query.QueryResourceManager):
 
@@ -465,7 +471,8 @@ class SecurityGroup(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'security-group'
         enum_spec = ('describe_security_groups', 'SecurityGroups', None)
-        name = id = 'GroupId'
+        id = 'GroupId'
+        name = 'GroupName'
         filter_name = "GroupIds"
         filter_type = 'list'
         config_type = "AWS::EC2::SecurityGroup"
@@ -1469,6 +1476,12 @@ class RouteTable(query.QueryResourceManager):
         id_prefix = "rtb-"
 
 
+@RouteTable.filter_registry.register('vpc')
+class RouteTableVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 @RouteTable.filter_registry.register('subnet')
 class SubnetRoute(net_filters.SubnetFilter):
     """Filter a route table by its associated subnet attributes."""
@@ -1911,7 +1924,7 @@ class VpcEndpoint(query.QueryResourceManager):
         filter_name = 'VpcEndpointIds'
         filter_type = 'list'
         id_prefix = "vpce-"
-        taggable = False
+        universal_taggable = object()
 
 
 @VpcEndpoint.filter_registry.register('cross-account')

@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ssm:us-east-1:123456789123:parameter/Foo",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Magic"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Prod"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:ssm:us-east-1:123456789123:parameter/gittersearch/token",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "GitterSearch"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "0ed4f989-5faf-4af2-8833-1b1e161bd3d2",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0ed4f989-5faf-4af2-8833-1b1e161bd3d2",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "340",
+                "date": "Fri, 28 Feb 2020 20:52:21 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

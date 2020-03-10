@@ -24,6 +24,7 @@ import logging
 import operator
 import re
 import sys
+import os
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -737,13 +738,23 @@ def parse_date(v, tz=None):
     if isinstance(v, six.string_types):
         try:
             return cast_tz(parse(v), tz)
-        except (AttributeError, TypeError, ValueError):
+        except (AttributeError, TypeError, ValueError, OverflowError):
             pass
+
+    # OSError on windows -- https://bugs.python.org/issue36439
+    exceptions = (ValueError, OSError) if os.name == "nt" else (ValueError)
 
     if isinstance(v, (int, float) + six.string_types):
         try:
             v = cast_tz(datetime.datetime.fromtimestamp(float(v)), tz)
-        except ValueError:
+        except exceptions:
+            pass
+
+    if isinstance(v, (int, float) + six.string_types):
+        try:
+            # try interpreting as milliseconds epoch
+            v = cast_tz(datetime.datetime.fromtimestamp(float(v) / 1000), tz)
+        except exceptions:
             pass
 
     return isinstance(v, datetime.datetime) and v or None

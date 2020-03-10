@@ -23,12 +23,6 @@ RUN apt-get --yes update \
  && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
  && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
  && pip3 install -r tools/c7n_kube/requirements.txt tools/c7n_kube \
- # Pre-cache Azure Functions package
- && python -c "from c7n_azure.function_package import FunctionPackage; \
-      FunctionPackage('cache').build_cache( \
-      modules=['c7n', 'c7n-azure'], \
-      non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'pyrsistent'], \
-      excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])" \
  && apt-get --yes remove build-essential \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
  && rm -Rf /var/cache/apt/ \
