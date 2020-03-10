@@ -1548,10 +1548,86 @@ class S3Test(BaseTest):
         self.patch(
             s3.SetBucketReplicationConfig, "executor_factory", MainThreadExecutor
         )
-        self.patch(
-            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
-        )
         session_factory = self.replay_flight_data("test_s3_replication_policy_remove")
+        replicated_from_name = "replication-from-12345"
+        replicated_to_name = "replication-t0-12345"
+        session = session_factory()
+        client = session.client("s3")
+        account_id = session.client('sts').get_caller_identity().get('Account')
+
+        # Setup buckets for replication by creating and adding versioning
+        for bucket in (replicated_from_name, replicated_to_name):
+            client.create_bucket(
+                Bucket=bucket
+            )
+            client.put_bucket_versioning(
+                Bucket=bucket,
+                VersioningConfiguration={
+                    'MFADelete': 'Disabled',
+                    'Status': 'Enabled'
+                }
+            )
+
+        # add a replication policy between them
+        client.put_bucket_replication(
+            Bucket=replicated_from_name,
+            ReplicationConfiguration={
+                'Role': 'arn:aws:iam::' + account_id + ':role/s3_replicator',
+                'Rules': [
+                    {
+                        'ID': 'test12345',
+                        'Prefix': '',
+                        'Status': 'Enabled',
+                        'Destination': {
+                            'Bucket': 'arn:aws:s3:::' + replicated_to_name
+                        }
+                    }
+                ]
+            }
+        )
+        # Test to make sure that a replication policy was in fact created between the buckets
+        response = client.get_bucket_replication(Bucket=replicated_from_name)
+        for rule in response['ReplicationConfiguration']['Rules']:
+            self.assertEqual(rule['Status'], 'Enabled')        
+        p = self.load_policy(
+            {
+                "name": "s3-has-replica-policy",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Replication.ReplicationConfiguration.Rules[].Destination",
+                        "value": "present"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Replication.ReplicationConfiguration.Rules[].Status",
+                        "value": "Enabled",
+                        "op": "contains"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-bucket-replication",
+                        "state": "remove"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+         # Test to make sure that the replication policy removed from the buckets
+        self.assertRaises(ClientError, client.get_bucket_replication, Bucket=replicated_from_name)
+
+
+    def test_bucket_replication_policy_disable(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3.SetBucketReplicationConfig, "executor_factory", MainThreadExecutor
+        )
+        session_factory = self.replay_flight_data("test_s3_replication_policy_disable")
         bname = "repela"
         p = self.load_policy(
             {
@@ -1567,41 +1643,8 @@ class S3Test(BaseTest):
                     {
                         "type": "value",
                         "key": "Replication.ReplicationConfiguration.Rules[].Status",
-                        "value": "Enabled"
-                    }
-                ],
-                "actions": [
-                    {
-                        "type": "set-bucket-replication",
-                        "state": "remove"
-                    }
-                ]
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-
-    def test_bucket_replication_policy_disable(self):
-        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
-        self.patch(
-            s3.SetBucketReplicationConfig, "executor_factory", MainThreadExecutor
-        )
-        self.patch(
-            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
-        )
-        session_factory = self.replay_flight_data("test_s3_replication_policy_disable")
-        bname = "repela"
-        p = self.load_policy(
-            {
-                "name": "s3-has-replica-policy",
-                "resource": "s3",
-                "filters": [
-                    {"Name": bname},
-                    {
-                        "type": "value",
-                        "key": "Replication.ReplicationConfiguration.Rules[].Destination",
-                        "value": "present"
+                        "value": "Enabled",
+                        "op": "contains"
                     }
                 ],
                 "actions": [
@@ -1614,7 +1657,11 @@ class S3Test(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
+        # Test that there was a bucket with an enabled replication policy
         self.assertEqual(len(resources), 1)
+        # Run the filter again and test that there are no longer any buckets with replication policies
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     def test_has_statement_similar_policies(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
