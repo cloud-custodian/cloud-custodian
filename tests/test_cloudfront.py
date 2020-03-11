@@ -14,7 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import jmespath
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 from c7n.utils import local_session
 
 
@@ -229,7 +229,6 @@ class CloudFront(BaseTest):
                 "filters": [{"tag:abc": "present"}],
                 "actions": [{"type": "tag", "key": "123", "value": "456"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -277,7 +276,6 @@ class CloudFront(BaseTest):
                 "filters": [{"tag:123": "present"}],
                 "actions": [{"type": "tag", "key": "abc", "value": "123"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -295,7 +293,7 @@ class CloudFront(BaseTest):
                 "resource": "distribution",
                 "filters": [{"tag:tag": "present"}]
             },
-            config=Config.empty(region='us-east-1'),
+            config=dict(region='us-east-1'),
             session_factory=factory,
         )
 
@@ -305,7 +303,7 @@ class CloudFront(BaseTest):
                 "resource": "distribution",
                 "filters": [{"tag:tag": "present"}]
             },
-            config=Config.empty(region='us-west-2'),
+            config=dict(region='us-west-2'),
             session_factory=factory,
         )
 

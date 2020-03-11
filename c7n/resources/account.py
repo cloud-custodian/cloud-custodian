@@ -31,7 +31,7 @@ from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema, generate_arn
-from c7n.query import QueryResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
@@ -60,7 +60,7 @@ class Account(ResourceManager):
     action_registry = actions
     retry = staticmethod(QueryResourceManager.retry)
 
-    class resource_type(object):
+    class resource_type(TypeInfo):
         id = 'account_id'
         name = 'account_name'
         filter_name = None

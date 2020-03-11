@@ -68,7 +68,8 @@ class LambdaInvoke(EventAction):
         }
     }
 
-    permissions = ('lambda:InvokeFunction',)
+    permissions = ('lambda:InvokeFunction',
+               'iam:ListAccountAliases',)
 
     def process(self, resources, event=None):
         params = dict(FunctionName=self.data['function'])
@@ -82,10 +83,15 @@ class LambdaInvoke(EventAction):
             'timeout', 90), region_name=self.data.get('region', None))
         client = utils.local_session(
             self.manager.session_factory).client('lambda', config=config)
+        alias = utils.get_account_alias_from_sts(
+            utils.local_session(self.manager.session_factory))
 
         payload = {
             'version': VERSION,
             'event': event,
+            'account_id': self.manager.config.account_id,
+            'account': alias,
+            'region': self.manager.config.region,
             'action': self.data,
             'policy': self.manager.data}
 
@@ -100,11 +106,10 @@ class LambdaInvoke(EventAction):
             results.append(result)
         return results
 
+    @classmethod
+    def register_resources(klass, registry, resource_class):
+        if 'invoke-lambda' not in resource_class.action_registry:
+            resource_class.action_registry.register('invoke-lambda', LambdaInvoke)
 
-def register_action_invoke_lambda(registry, _):
-    for resource in registry.keys():
-        klass = registry.get(resource)
-        klass.action_registry.register('invoke-lambda', LambdaInvoke)
 
-
-resources.subscribe(resources.EVENT_FINAL, register_action_invoke_lambda)
+resources.subscribe(LambdaInvoke.register_resources)

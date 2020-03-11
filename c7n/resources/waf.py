@@ -29,6 +29,8 @@ class WAF(QueryResourceManager):
         dimension = "WebACL"
         config_type = "AWS::WAF::WebACL"
         arn_type = "webacl"
+        permissions_enum = ('waf:ListWebACLs',)
+        permissions_augment = ('waf:GetWebACL',)
 
 
 @resources.register('waf-regional')
@@ -43,3 +45,5 @@ class RegionalWAF(QueryResourceManager):
         dimension = "WebACL"
         config_type = "AWS::WAFRegional::WebACL"
         arn_type = "webacl"
+        permissions_enum = ('waf-regional:ListWebACLs',)
+        permissions_augment = ('waf-regional:GetWebACL',)

@@ -26,6 +26,22 @@ class StripPrefix(unittest.TestCase):
         self.assertEqual(utils.strip_prefix('', 'aws.'), '')
 
 
+class GetResourceTagTargets(unittest.TestCase):
+
+    def test_target_tag_list(self):
+        self.assertEqual(
+            utils.get_resource_tag_targets(
+                {'Tags': [{'Key': 'Creator', 'Value': 'alice'}]},
+                ['Creator']),
+            ['alice'])
+
+    def test_target_tag_map(self):
+        r = {'Tags': {'Creator': 'Bob'}}
+        self.assertEqual(
+            utils.get_resource_tag_targets(r, ['Creator']),
+            ['Bob'])
+
+
 class ResourceFormat(unittest.TestCase):
 
     def test_efs(self):
@@ -73,6 +89,27 @@ class ResourceFormat(unittest.TestCase):
             'arn: arn:aws:elasticloadbalancing:us-east-1:367930536793:'
             'loadbalancer/app/dev/1234567890'
             '  zones: 0  scheme: internal')
+
+    def test_cloudtrail(self):
+        self.assertEqual(
+            utils.resource_format(
+                {
+                    "Name": "trail-x",
+                    "S3BucketName": "trail-x-bucket",
+                    "IncludeGlobalServiceEvents": True,
+                    "IsMultiRegionTrail": False,
+                    "HomeRegion": "eu-west-2",
+                    "TrailARN": "arn:aws:cloudtrail:eu-west-2:123456789012:trail/trail-x",
+                    "LogFileValidationEnabled": True,
+                    "HasCustomEventSelectors": False,
+                    "HasInsightSelectors": False,
+                    "IsOrganizationTrail": False,
+                    "Tags": [],
+                },
+                "aws.cloudtrail",
+            ),
+            "trail-x",
+        )
 
 
 class GetAwsUsernameFromEvent(unittest.TestCase):

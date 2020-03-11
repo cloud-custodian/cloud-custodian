@@ -31,8 +31,7 @@ class Directory(QueryResourceManager):
         filter_name = 'DirectoryIds'
         filter_type = 'list'
         arn_type = "directory"
-
-    permissions = ('ds:ListTagsForResource',)
+        permission_augment = ('ds:ListTagsForResource',)
 
     def augment(self, directories):
         client = local_session(self.session_factory).client('ds')
@@ -81,7 +80,7 @@ class DirectoryTag(Tag):
                     key: desired-tag
                     value: desired-value
     """
-    permissions = ('ds:AddTagToResource',)
+    permissions = ('ds:AddTagsToResource',)
 
     def process_resource_set(self, client, directories, tags):
         for d in directories:

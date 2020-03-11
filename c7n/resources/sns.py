@@ -45,7 +45,7 @@ class SNS(QueryResourceManager):
             'SubscriptionsDeleted'
         )
 
-    permissions = ('SNS:ListTagsForResource',)
+    permissions = ('sns:ListTagsForResource',)
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('sns')

@@ -33,7 +33,7 @@ class Database(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'lightsail'
-        enum_spec = ('get_relational_databases', 'relationDatabases', None)
+        enum_spec = ('get_relational_databases', 'relationalDatabases', None)
         name = 'name'
         arn = id = 'arn'
         date = 'createdAt'

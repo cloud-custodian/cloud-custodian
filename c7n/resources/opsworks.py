@@ -164,6 +164,7 @@ class OpsworksCM(QueryResourceManager):
     class resource_type(TypeInfo):
         service = "opsworkscm"
         enum_spec = ('describe_servers', 'Servers', None)
+        permission_prefix = 'opsworks-cm'
         filter_name = 'ServerName'
         filter_type = 'scalar'
         name = id = 'ServerName'

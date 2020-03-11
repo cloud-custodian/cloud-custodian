@@ -25,7 +25,7 @@ from collections import OrderedDict
 
 from botocore.exceptions import ClientError
 import boto3
-from .common import BaseTest, event_data, TestConfig as Config
+from .common import BaseTest, event_data
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -132,7 +132,6 @@ class RDSTest(BaseTest):
                 "resource": "rds",
                 "filters": [{"tag:Platform": "postgres"}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -148,7 +147,6 @@ class RDSTest(BaseTest):
                 "filters": [{"tag:Platform": "postgres"}],
                 "actions": [{"type": "tag-trim", "preserve": ["Name", "Owner"]}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -166,7 +164,6 @@ class RDSTest(BaseTest):
                 "filters": [{"tag:Platform": "postgres"}],
                 "actions": [{"type": "tag", "key": "xyz", "value": "hello world"}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -185,7 +182,6 @@ class RDSTest(BaseTest):
                 "filters": [{"tag:xyz": "not-null"}],
                 "actions": [{"type": "remove-tag", "tags": ["xyz"]}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = policy.run()
@@ -211,7 +207,6 @@ class RDSTest(BaseTest):
                     }
                 ],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -230,7 +225,6 @@ class RDSTest(BaseTest):
                     }
                 ],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = policy.run()
@@ -403,7 +397,7 @@ class RDSTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-east-2"),
+            config=dict(region="us-east-2"),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -427,7 +421,7 @@ class RDSTest(BaseTest):
                 "filters": [{"DBInstanceIdentifier": instance_id}],
                 "actions": [{"type": "delete", "copy-restore-info": True}],
             },
-            config=Config.empty(region="us-east-2"),
+            config=dict(region="us-east-2"),
             session_factory=session_factory,
         )
         p.run()
@@ -448,7 +442,7 @@ class RDSTest(BaseTest):
                 "filters": [{"tag:Owner": "test"}],
                 "actions": [{"type": "delete", "skip-snapshot": True}],
             },
-            config=Config.empty(region="us-west-2"),
+            config=dict(region="us-west-2"),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -520,7 +514,6 @@ class RDSTest(BaseTest):
                 ],
                 "actions": [{"type": "upgrade", "immediate": False}],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = p.run()
@@ -900,7 +893,6 @@ class RDSSnapshotTest(BaseTest):
         )
 
     def test_rds_cross_region_copy_skip_same_region(self):
-        self.change_environment(AWS_DEFAULT_REGION="us-east-2")
         factory = self.replay_flight_data("test_rds_snapshot_latest")
         output = self.capture_logging("custodian.actions")
         p = self.load_policy(
@@ -909,7 +901,7 @@ class RDSSnapshotTest(BaseTest):
                 "resource": "rds-snapshot",
                 "actions": [{"type": "region-copy", "target_region": "us-east-2"}],
             },
-            Config.empty(region="us-east-2"),
+            config={'region': 'us-east-2'},
             session_factory=factory,
         )
         resources = p.run()
@@ -945,7 +937,6 @@ class RDSSnapshotTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-east-1"),
             session_factory=factory,
         )
         resources = p.run()
@@ -973,7 +964,7 @@ class RDSSnapshotTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-east-1"),
+            config=dict(region="us-east-1"),
             session_factory=factory,
         )
         resources = p.run()
@@ -1013,7 +1004,6 @@ class RDSSnapshotTest(BaseTest):
                 "resource": "rds-snapshot",
                 "filters": [{"type": "marked-for-op", "op": "delete"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()

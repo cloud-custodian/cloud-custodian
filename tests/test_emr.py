@@ -15,29 +15,28 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import unittest
 
+from c7n.config import Config
 from c7n.exceptions import PolicyValidationError
 from c7n.resources import emr
 from c7n.resources.emr import actions, QueryFilter
 
-from .common import BaseTest, Bag, TestConfig as Config
+from .common import BaseTest, Bag
 
 
 class TestEMR(BaseTest):
 
     def test_get_emr_by_ids(self):
         session_factory = self.replay_flight_data("test_emr_query_ids")
-
-        ctx = Bag(session_factory=session_factory, log_dir="", options=Config.empty())
-
-        mgr = emr.EMRCluster(ctx, {})
-        resources = mgr.get_resources(["j-1EJMJNTXC63JW"])
+        p = self.load_policy(
+            {'name': 'emr', 'resource': 'aws.emr'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(["j-1EJMJNTXC63JW"])
         self.assertEqual(resources[0]["Id"], "j-1EJMJNTXC63JW")
 
     def test_consolidate_query_filter(self):
         session_factory = self.replay_flight_data("test_emr_query_ids")
 
         ctx = Bag(session_factory=session_factory, log_dir="", options=Config.empty())
-
         query = {
             "query": [{"tag:foo": "val1"}, {"tag:foo": "val2"}, {"tag:bar": "val3"}]
         }

@@ -443,6 +443,14 @@ The optional `owner_absent_contact` list specifies email addresses to notify onl
 the `resource-owner` special option was unable to find any matching owner contact
 tags.
 
+In addition, you may choose to use a custom tag instead of the default `OwnerContact`.  In order to configure this, the mailer.yaml must be modified to include the contact_tags and the custom tag.  The `resource-owner` will now email the custom tag instead of `OwnerContact`. 
+
+```yaml
+contact_tags:
+  - "custom_tag"
+```
+
+
 For reference purposes, the JSON Schema of the `notify` action:
 
 ```json

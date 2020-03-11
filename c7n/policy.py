@@ -28,7 +28,7 @@ import six
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
-from c7n.output import DEFAULT_NAMESPACE
+from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
 from c7n.provider import clouds, get_resource_class
@@ -43,16 +43,18 @@ def load(options, path, format=None, validate=True, vars=None):
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
-    load_resources()
+    from c7n.schema import validate, StructureParser
     data = utils.load_file(path, format=format, vars=vars)
+
+    structure = StructureParser()
+    structure.validate(data)
+    load_resources(structure.get_resource_types(data))
 
     if isinstance(data, list):
         log.warning('yaml in invalid format. The "policies:" line is probably missing.')
         return None
 
     if validate:
-        from c7n.schema import validate, StructureParser
-        StructureParser().validate(data)
         errors = validate(data)
         if errors:
             raise PolicyValidationError(
@@ -79,9 +81,11 @@ class PolicyCollection(object):
         self.policies = policies
 
     @classmethod
-    def from_data(cls, data, options):
-        policies = [Policy(p, options,
-                           session_factory=cls.session_factory())
+    def from_data(cls, data, options, session_factory=None):
+        # session factory param introduction needs an audit and review
+        # on tests.
+        sf = session_factory if session_factory else cls.session_factory()
+        policies = [Policy(p, options, session_factory=sf)
                     for p in data.get('policies', ())]
         return cls(policies, options)
 
@@ -405,8 +409,10 @@ class LambdaMode(ServerlessExecutionMode):
             # Lambda passthrough config
             'layers': {'type': 'array', 'items': {'type': 'string'}},
             'concurrency': {'type': 'integer'},
-            'runtime': {'enum': ['python2.7', 'python3.6', 'python3.7']},
+            'runtime': {'enum': ['python2.7', 'python3.6',
+                                 'python3.7', 'python3.8']},
             'role': {'type': 'string'},
+            'pattern': {'type': 'object', 'minProperties': 1},
             'timeout': {'type': 'number'},
             'memory': {'type': 'number'},
             'environment': {'type': 'object'},
@@ -463,6 +469,7 @@ class LambdaMode(ServerlessExecutionMode):
             member_role = member_role.format(account_id=member_id)
             utils.reset_session_cache()
             self.policy.options['account_id'] = member_id
+            self.policy.options['region'] = region
             self.policy.session_factory.region = region
             self.policy.session_factory.assume_role = member_role
             self.policy.log.info(
@@ -498,29 +505,34 @@ class LambdaMode(ServerlessExecutionMode):
         If metrics execution option is enabled, custodian will generate
         metrics per normal.
         """
-        from c7n.actions import EventAction
-
-        mode = self.policy.data.get('mode', {})
-        if not bool(mode.get("log", True)):
-            root = logging.getLogger()
-            map(root.removeHandler, root.handlers[:])
-            root.handlers = [logging.NullHandler()]
-
+        self.setup_exec_environment(event)
         resources = self.resolve_resources(event)
         if not resources:
             return resources
+        rcount = len(resources)
         resources = self.policy.resource_manager.filter_resources(
             resources, event)
 
         if 'debug' in event:
-            self.policy.log.info("Filtered resources %d" % len(resources))
+            self.policy.log.info(
+                "Filtered resources %d of %d", len(resources), rcount)
 
         if not resources:
             self.policy.log.info(
                 "policy:%s resources:%s no resources matched" % (
                     self.policy.name, self.policy.resource_type))
             return
+        return self.run_resource_set(event, resources)
 
+    def setup_exec_environment(self, event):
+        mode = self.policy.data.get('mode', {})
+        if not bool(mode.get("log", True)):
+            root = logging.getLogger()
+            map(root.removeHandler, root.handlers[:])
+            root.handlers = [logging.NullHandler()]
+
+    def run_resource_set(self, event, resources):
+        from c7n.actions import EventAction
         with self.policy.ctx:
             self.policy.ctx.metrics.put_metric(
                 'ResourceCount', len(resources), 'Count', Scope="Policy",
@@ -758,7 +770,6 @@ class ConfigRuleMode(LambdaMode):
     """a lambda policy that executes as a config service rule.
         http://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
     """
-
     cfg_event = None
     schema = utils.type_schema('config-rule', rinherit=LambdaMode.schema)
 
@@ -768,6 +779,10 @@ class ConfigRuleMode(LambdaMode):
             raise PolicyValidationError(
                 "policy:%s AWS Config does not support resource-type:%s" % (
                     self.policy.name, self.policy.resource_type))
+        if self.policy.data['mode'].get('pattern'):
+            raise PolicyValidationError(
+                "policy:%s AWS Config does not support event pattern filtering" % (
+                    self.policy.name))
 
     def resolve_resources(self, event):
         source = self.policy.resource_manager.get_source('config')
@@ -819,6 +834,14 @@ class ConfigRuleMode(LambdaMode):
         return resources
 
 
+def get_session_factory(provider_name, options):
+    try:
+        return clouds[provider_name]().get_session_factory(options)
+    except KeyError:
+        raise RuntimeError(
+            "%s provider not installed" % provider_name)
+
+
 class Policy(object):
 
     log = logging.getLogger('custodian.policy')
@@ -828,7 +851,8 @@ class Policy(object):
         self.options = options
         assert "name" in self.data
         if session_factory is None:
-            session_factory = clouds[self.provider_name]().get_session_factory(options)
+            session_factory = get_session_factory(
+                self.provider_name, options)
         self.session_factory = session_factory
         self.ctx = ExecutionContext(self.session_factory, self, self.options)
         self.resource_manager = self.load_resource_manager()
@@ -893,8 +917,9 @@ class Policy(object):
         return self.data.get('mode', {'type': 'pull'})['type']
 
     def get_execution_mode(self):
-        exec_mode = execution[self.execution_mode]
-        if exec_mode is None:
+        try:
+            exec_mode = execution[self.execution_mode]
+        except KeyError:
             return None
         return exec_mode(self)
 
@@ -933,8 +958,9 @@ class Policy(object):
 
         if 'mode' in self.data:
             if 'role' in self.data['mode'] and not self.data['mode']['role'].startswith("arn:aws"):
-                self.data['mode']['role'] = "arn:aws:iam::%s:role/%s" % \
-                                            (self.options.account_id, self.data['mode']['role'])
+                partition = utils.get_partition(self.options.region)
+                self.data['mode']['role'] = "arn:%s:iam::%s:role/%s" % \
+                    (partition, self.options.account_id, self.data['mode']['role'])
 
         variables.update({
             # standard runtime variables for interpolation
@@ -1037,6 +1063,8 @@ class Policy(object):
     run = __call__
 
     def _write_file(self, rel_path, value):
+        if isinstance(self.ctx.output, NullBlobOutput):
+            return
         with open(os.path.join(self.ctx.log_dir, rel_path), 'w') as fh:
             fh.write(value)
 
@@ -1054,14 +1082,16 @@ class Policy(object):
             try:
                 p_tz = tzutil.gettz(policy_tz)
             except Exception as e:
-                raise ValueError(
-                    "Policy: %s TZ not parsable: %s, %s" % (policy_name, policy_tz, e))
+                raise PolicyValidationError(
+                    "Policy: %s TZ not parsable: %s, %s" % (
+                        policy_name, policy_tz, e))
 
             # Type will be tzwin on windows, but tzwin is null on linux
             if not (isinstance(p_tz, tzutil.tzfile) or
                     (tzutil.tzwin and isinstance(p_tz, tzutil.tzwin))):
-                raise ValueError(
-                    "Policy: %s TZ not parsable: %s" % (policy_name, policy_tz))
+                raise PolicyValidationError(
+                    "Policy: %s TZ not parsable: %s" % (
+                        policy_name, policy_tz))
 
         for i in [policy_start, policy_end]:
             if i:

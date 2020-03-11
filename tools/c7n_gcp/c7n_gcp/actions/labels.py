@@ -66,7 +66,7 @@ class BaseLabelAction(MethodAction):
             resource_class.filter_registry.register('marked-for-op', LabelActionFilter)
 
 
-gcp_resources.subscribe(gcp_resources.EVENT_REGISTER, BaseLabelAction.register_resources)
+gcp_resources.subscribe(BaseLabelAction.register_resources)
 
 
 class SetLabelsAction(BaseLabelAction):

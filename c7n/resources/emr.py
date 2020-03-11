@@ -43,6 +43,7 @@ class EMRCluster(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'emr'
         arn_type = 'emr'
+        permission_prefix = 'elasticmapreduce'
         cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
         enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
         name = 'Name'

@@ -15,10 +15,22 @@
 
 from .common import BaseTest
 
-from c7n.provider import clouds, get_resource_class
+from c7n.provider import get_resource_class, import_resource_classes
+from c7n.resources import load_resources
+from c7n.resources.resource_map import ResourceMap
 
 
 class ProviderTest(BaseTest):
+
+    def test_import_resource_classes(self):
+        rtypes, missing = import_resource_classes(
+            ResourceMap, ('aws.ec2', 'aws.app-elb', 'aws.foobar'))
+        self.assertEqual(len(rtypes), 2)
+        self.assertEqual([r.type for r in rtypes], ['ec2', 'app-elb'])
+        self.assertEqual(missing, ['aws.foobar'])
+
+#    def test_import_resource_classes_wildcard(self):
+#        rtypes = import_resource_classes(ResourceMap, ('*',))
 
     def test_get_resource_class(self):
         with self.assertRaises(KeyError) as ectx:
@@ -29,10 +41,6 @@ class ProviderTest(BaseTest):
             get_resource_class('xyz.foo')
         self.assertIn("provider: xyz", str(ectx.exception))
 
+        load_resources(('aws.ec2',))
         ec2 = get_resource_class('aws.ec2')
         self.assertEqual(ec2.type, 'ec2')
-
-    def test_available_clouds(self):
-        # the other providers are currently distributed as separate
-        # installs (tools/c7n_azure and tools/c7n_gcp)
-        self.assertEqual(sorted(clouds.keys()), ["aws", "azure", "gcp", "k8s"])

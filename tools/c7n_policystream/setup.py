@@ -38,7 +38,8 @@ setup(
         'console_scripts': [
             'c7n-policystream = policystream:cli']},
     install_requires=[
-        "c7n", "click", "pygit2",
+        "c7n", "click",
+        "pygit2==1.0.3",
         "python-dateutil", "jmespath", "requests",
         "pyyaml>=4.2b4"]
 )

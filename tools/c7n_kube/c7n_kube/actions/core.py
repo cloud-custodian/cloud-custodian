@@ -148,5 +148,7 @@ class DeleteResource(DeleteAction):
     @classmethod
     def register_resources(klass, registry, resource_class):
         model = resource_class.resource_type
-        if hasattr(model, 'delete') and hasattr(model, 'namespaced'):
+        if ('delete' not in resource_class.action_registry and
+            hasattr(model, 'delete') and
+                hasattr(model, 'namespaced')):
             resource_class.action_registry.register('delete', klass)

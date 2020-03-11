@@ -293,17 +293,37 @@ class PillTest(CustodianTestCore):
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)
 
-        def factory(region=None, assume=None):
-            if region and region != default_region:
-                new_session = boto3.Session(region_name=region)
-                assert not zdata
-                new_pill = placebo.attach(new_session, test_dir, debug=True)
-                new_pill.record()
-                self.addCleanup(new_pill.stop)
-                return new_session
-            return session
+        class FakeFactory(object):
 
-        return factory
+            def __call__(fake, region=None, assume=None):
+                new_session = None
+                # slightly experimental for test recording, using
+                # cross account assumes, note this will record sts
+                # assume role api calls creds into test data, they will
+                # go stale, but its best to modify before commiting.
+                # Disabled by default.
+                if 0 and (assume is not False and fake.assume_role):
+                    client = session.client('sts')
+                    creds = client.assume_role(
+                        RoleArn=fake.assume_role,
+                        RoleSessionName='CustodianTest')['Credentials']
+                    new_session = boto3.Session(
+                        aws_access_key_id=creds['AccessKeyId'],
+                        aws_secret_access_key=creds['SecretAccessKey'],
+                        aws_session_token=creds['SessionToken'],
+                        region_name=region or fake.region or default_region)
+                elif region and region != default_region:
+                    new_session = boto3.Session(region_name=region)
+
+                if new_session:
+                    assert not zdata
+                    new_pill = placebo.attach(new_session, test_dir, debug=True)
+                    new_pill.record()
+                    self.addCleanup(new_pill.stop)
+                    return new_session
+                return session
+
+        return FakeFactory()
 
     def replay_flight_data(self, test_case, zdata=False, region=None):
         """

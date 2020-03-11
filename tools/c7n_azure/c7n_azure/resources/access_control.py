@@ -27,6 +27,7 @@ from c7n.filters import Filter
 from c7n.filters import FilterValidationError
 from c7n.filters import ValueFilter
 from c7n.filters.related import RelatedResourceFilter
+from c7n.resources import load_resources
 from c7n.query import sources
 from c7n.utils import local_session
 from c7n.utils import type_schema
@@ -289,6 +290,7 @@ class ResourceAccessFilter(RelatedResourceFilter):
     def __init__(self, data, manager=None):
         super(ResourceAccessFilter, self).__init__(data, manager)
         resource_type = self.data['relatedResource']
+        load_resources((resource_type,))
         self.factory = Azure.resources.get(
             resource_type.rsplit('.', 1)[-1])
 

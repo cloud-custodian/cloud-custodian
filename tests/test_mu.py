@@ -43,10 +43,9 @@ from c7n.mu import (
     CloudWatchEventSource
 )
 
-from c7n.policy import Policy
 from c7n.ufuncs import logsub
 from .common import (
-    BaseTest, event_data, functional, Bag, ACCOUNT_ID, TestConfig as Config)
+    BaseTest, event_data, functional, Bag, ACCOUNT_ID)
 from .data import helloworld
 
 
@@ -55,12 +54,13 @@ ROLE = "arn:aws:iam::644160558196:role/custodian-mu"
 
 def test_generate_requirements():
     lines = generate_requirements(
-        'boto3', ignore=('docutils', 's3transfer'))
+        'boto3', ignore=('docutils', 's3transfer', 'six'), exclude=['urllib3'])
     packages = []
     for l in lines.split('\n'):
         pkg_name, version = l.split('==')
         packages.append(pkg_name)
-    assert packages == ['botocore', 'jmespath']
+    assert set(packages) == set([
+        'botocore', 'jmespath', 'python-dateutil'])
 
 
 class Publish(BaseTest):
@@ -71,7 +71,7 @@ class Publish(BaseTest):
             handler="index.handler",
             memory_size=128,
             timeout=3,
-            role=ROLE,
+            role='custodian-mu',
             runtime="python2.7",
             description="test",
         )
@@ -139,13 +139,13 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_config_rule_provision(self):
         session_factory = self.replay_flight_data("test_config_rule")
-        p = Policy(
+        p = self.load_policy(
             {
                 "resource": "security-group",
                 "name": "sg-modified",
                 "mode": {"type": "config-rule"},
             },
-            Config.empty(),
+            session_factory=session_factory
         )
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
@@ -207,6 +207,29 @@ class PolicyLambdaProvision(BaseTest):
                 'eventTypeCode': ['AWS_EC2_PERSISTENT_INSTANCE_RETIREMENT_SCHEDULED']},
              'source': ['aws.health']}
         )
+
+    def test_user_pattern_merge(self):
+        p = self.load_policy({
+            'name': 'ec2-retire',
+            'resource': 'ec2',
+            'mode': {
+                'type': 'cloudtrail',
+                'pattern': {
+                    'detail': {
+                        'userIdentity': {
+                            'userName': [{'anything-but': 'deputy'}]}}},
+                'events': [{
+                    'ids': 'responseElements.subnet.subnetId',
+                    'source': 'ec2.amazonaws.com',
+                    'event': 'CreateSubnet'}]}})
+        p_lambda = PolicyLambda(p)
+        events = p_lambda.get_events(None)
+        self.assertEqual(
+            json.loads(events[0].render_event_pattern()),
+            {'detail': {'eventName': ['CreateSubnet'],
+                        'eventSource': ['ec2.amazonaws.com'],
+                        'userIdentity': {'userName': [{'anything-but': 'deputy'}]}},
+             'detail-type': ['AWS API Call via CloudTrail']})
 
     def test_cwl_subscriber(self):
         self.patch(CloudWatchLogSubscription, "iam_delay", 0.01)
@@ -337,27 +360,23 @@ class PolicyLambdaProvision(BaseTest):
         # the focus of the test.
 
         session_factory = self.replay_flight_data("test_cwe_update", zdata=True)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "s3-bucket-policy",
-                "mode": {"type": "cloudtrail", "events": ["CreateBucket"], 'runtime': 'python2.7'},
-                "filters": [
-                    {
-                        "type": "missing-policy-statement",
-                        "statement_ids": ["RequireEncryptedPutObject"],
-                    }
-                ],
-                "actions": ["no-op"],
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "s3-bucket-policy",
+            "mode": {"type": "cloudtrail",
+                     "events": ["CreateBucket"], 'runtime': 'python2.7'},
+            "filters": [
+                {"type": "missing-policy-statement",
+                 "statement_ids": ["RequireEncryptedPutObject"]},
+            ],
+            "actions": ["no-op"],
+        })
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         result = mgr.publish(pl, "Dev", role=ROLE)
         self.addCleanup(mgr.remove, pl)
 
-        p = Policy(
+        p = self.load_policy(
             {
                 "resource": "s3",
                 "name": "s3-bucket-policy",
@@ -382,7 +401,6 @@ class PolicyLambdaProvision(BaseTest):
                 ],
                 "actions": ["no-op"],
             },
-            Config.empty(),
         )
 
         output = self.capture_logging("custodian.serverless", level=logging.DEBUG)
@@ -406,21 +424,19 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_cwe_trail(self):
         session_factory = self.replay_flight_data("test_cwe_trail", zdata=True)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "s3-bucket-policy",
-                "mode": {"type": "cloudtrail", "events": ["CreateBucket"]},
-                "filters": [
-                    {
-                        "type": "missing-policy-statement",
-                        "statement_ids": ["RequireEncryptedPutObject"],
-                    }
-                ],
-                "actions": ["no-op"],
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "s3-bucket-policy",
+            "mode": {"type": "cloudtrail", "events": ["CreateBucket"]},
+            "filters": [
+                {
+                    "type": "missing-policy-statement",
+                    "statement_ids": ["RequireEncryptedPutObject"],
+                }
+            ],
+            "actions": ["no-op"]},
+            session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
@@ -454,16 +470,14 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_mu_metrics(self):
         session_factory = self.replay_flight_data("test_mu_metrics")
-        p = Policy(
+        p = self.load_policy(
             {
-                "resources": "s3",
                 "name": "s3-bucket-policy",
                 "resource": "s3",
                 "mode": {"type": "cloudtrail", "events": ["CreateBucket"]},
                 "actions": ["no-op"],
-            },
-            Config.empty(),
-        )
+            }, session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         end = datetime.utcnow()
@@ -476,14 +490,12 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_cwe_instance(self):
         session_factory = self.replay_flight_data("test_cwe_instance", zdata=True)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "ec2-encrypted-vol",
-                "mode": {"type": "ec2-instance-state", "events": ["pending"]},
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "ec2-encrypted-vol",
+            "mode": {"type": "ec2-instance-state", "events": ["pending"]}},
+            session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
@@ -518,14 +530,13 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_cwe_asg_instance(self):
         session_factory = self.replay_flight_data("test_cwe_asg", zdata=True)
-        p = Policy(
+        p = self.load_policy(
             {
                 "resource": "asg",
                 "name": "asg-spin-detector",
                 "mode": {"type": "asg-instance-state", "events": ["launch-failure"]},
-            },
-            Config.empty(),
-        )
+            }, session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
         self.addCleanup(mgr.remove, pl)
@@ -605,14 +616,12 @@ class PolicyLambdaProvision(BaseTest):
 
     def test_cwe_schedule(self):
         session_factory = self.replay_flight_data("test_cwe_schedule", zdata=True)
-        p = Policy(
+        p = self.load_policy(
             {
                 "resource": "ec2",
                 "name": "periodic-ec2-checker",
                 "mode": {"type": "periodic", "schedule": "rate(1 day)"},
-            },
-            Config.empty(),
-        )
+            }, session_factory=session_factory)
 
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
@@ -649,15 +658,13 @@ class PolicyLambdaProvision(BaseTest):
             "type": "config-rule", "role": "arn:aws:iam::644160558196:role/custodian-mu"
         }
         mode.update(extra)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "hello-world",
-                "actions": ["no-op"],
-                "mode": mode,
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "hello-world",
+            "actions": ["no-op"],
+            "mode": mode},
+            session_factory=session_factory)
+
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
 
@@ -684,15 +691,12 @@ class PolicyLambdaProvision(BaseTest):
             "type": "config-rule", "role": "arn:aws:iam::644160558196:role/custodian-mu"
         }
         mode.update(config)
-        p = Policy(
-            {
-                "resource": "s3",
-                "name": "hello-world",
-                "actions": ["no-op"],
-                "mode": mode,
-            },
-            Config.empty(),
-        )
+        p = self.load_policy({
+            "resource": "s3",
+            "name": "hello-world",
+            "actions": ["no-op"],
+            "mode": mode,
+        })
         pl = PolicyLambda(p)
         return mgr.publish(pl)
 
@@ -784,23 +788,19 @@ class PolicyLambdaProvision(BaseTest):
         self.assert_items(tags, {"Foo": "Baz", "Bah": "Bug"})
 
     def test_optional_packages(self):
-        p = Policy(
-            {
-                "resources": "s3",
-                "name": "s3-lambda-extra",
-                "resource": "s3",
-                "mode": {
-                    "type": "cloudtrail",
-                    "packages": ["boto3", "botocore"],
-                    "events": ["CreateBucket"],
-                },
+        data = {
+            "name": "s3-lambda-extra",
+            "resource": "s3",
+            "mode": {
+                "type": "cloudtrail",
+                "packages": ["boto3"],
+                "events": ["CreateBucket"],
             },
-            Config.empty(),
-        )
+        }
+        p = self.load_policy(data)
         pl = PolicyLambda(p)
         pl.archive.close()
         self.assertTrue("boto3/utils.py" in pl.archive.get_filenames())
-        self.assertTrue("botocore/utils.py" in pl.archive.get_filenames())
 
     def test_delta_config_diff(self):
         delta = LambdaManager.delta_function
@@ -863,7 +863,7 @@ class PolicyLambdaProvision(BaseTest):
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python3.7",
+                "Runtime": "python3.8",
                 "Tags": {},
                 "Timeout": 900,
                 "TracingConfig": {"Mode": "PassThrough"},

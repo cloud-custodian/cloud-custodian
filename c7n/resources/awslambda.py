@@ -55,12 +55,28 @@ class AWSLambda(query.QueryResourceManager):
         raise ValueError("Unsupported source: %s for %s" % (
             source_type, self.resource_type.config_type))
 
+    def get_resources(self, ids, cache=True, augment=False):
+        return super(AWSLambda, self).get_resources(ids, cache, augment)
+
 
 class DescribeLambda(query.DescribeSource):
 
     def augment(self, resources):
         return universal_augment(
             self.manager, super(DescribeLambda, self).augment(resources))
+
+    def get_resources(self, ids):
+        client = local_session(self.manager.session_factory).client('lambda')
+        resources = []
+        for rid in ids:
+            try:
+                func = self.manager.retry(client.get_function, FunctionName=rid)
+            except client.exceptions.ResourceNotFoundException:
+                continue
+            config = func.pop('Configuration')
+            config.update(func)
+            resources.append(config)
+        return resources
 
 
 class ConfigLambda(query.ConfigSource):

@@ -50,7 +50,9 @@ class Encrypt(Action):
                          key={'type': 'string'},
                          required=('key',))
 
-    permissions = ("kinesis:UpdateStream",)
+    # not see any documentation on what permission is actually neeeded.
+    # https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonkinesis.html
+    permissions = ("kinesis:UpdateShardCount",)
 
     def process(self, resources):
         # get KeyId

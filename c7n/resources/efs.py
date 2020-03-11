@@ -13,13 +13,16 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from c7n.actions import Action
+from c7n.actions import Action, BaseAction
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
+from .aws import shape_validate
 
 
 @resources.register('efs')
@@ -33,7 +36,7 @@ class ElasticFileSystem(QueryResourceManager):
         date = 'CreationTime'
         dimension = 'FileSystemId'
         arn_type = 'file-system'
-        arn_service = 'elasticfilesystem'
+        permission_prefix = arn_service = 'elasticfilesystem'
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
         universal_taggable = True
@@ -48,6 +51,7 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         service = 'efs'
         parent_spec = ('efs', 'FileSystemId', None)
         enum_spec = ('describe_mount_targets', 'MountTargets', None)
+        permission_prefix = 'elasticfilesystem'
         name = id = 'MountTargetId'
         filter_name = 'MountTargetId'
         filter_type = 'scalar'
@@ -117,9 +121,9 @@ class KmsFilter(KmsRelatedFilter):
 class Delete(Action):
 
     schema = type_schema('delete')
-    permissions = ('efs:DescribeMountTargets',
-                   'efs:DeleteMountTargets',
-                   'efs:DeleteFileSystem')
+    permissions = ('elasticfilesystem:DescribeMountTargets',
+                   'elasticfilesystem:DeleteMountTarget',
+                   'elasticfilesystem:DeleteFileSystem')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('efs')
@@ -136,3 +140,106 @@ class Delete(Action):
             for t in client.describe_mount_targets(
                     FileSystemId=r['FileSystemId'])['MountTargets']:
                 client.delete_mount_target(MountTargetId=t['MountTargetId'])
+
+
+@ElasticFileSystem.action_registry.register('configure-lifecycle-policy')
+class ConfigureLifecycle(BaseAction):
+    """Enable/disable lifecycle policy for efs.
+
+    :example:
+
+      .. code-block:: yaml
+
+            policies:
+              - name: efs-apply-lifecycle
+                resource: efs
+                actions:
+                  - type: configure-lifecycle-policy
+                    state: enable
+                    rules:
+                      - 'TransitionToIA': 'AFTER_7_DAYS'
+
+    """
+    schema = type_schema(
+        'configure-lifecycle-policy',
+        state={'enum': ['enable', 'disable']},
+        rules={
+            'type': 'array',
+            'items': {'type': 'object'}},
+        required=['state'])
+
+    permissions = ('elasticfilesystem:PutLifecycleConfiguration',)
+    shape = 'PutLifecycleConfigurationRequest'
+
+    def validate(self):
+        if self.data.get('state') == 'enable' and 'rules' not in self.data:
+            raise PolicyValidationError(
+                'rules are required to enable lifecycle configuration %s' % (self.manager.data))
+        if self.data.get('state') == 'disable' and 'rules' in self.data:
+            raise PolicyValidationError(
+                'rules not required to disable lifecycle configuration %s' % (self.manager.data))
+        if self.data.get('rules'):
+            attrs = {}
+            attrs['LifecyclePolicies'] = self.data['rules']
+            attrs['FileSystemId'] = 'PolicyValidator'
+            return shape_validate(attrs, self.shape, 'efs')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('efs')
+        op_map = {'enable': self.data.get('rules'), 'disable': []}
+        for r in resources:
+            try:
+                client.put_lifecycle_configuration(
+                    FileSystemId=r['FileSystemId'],
+                    LifecyclePolicies=op_map.get(self.data.get('state')))
+            except client.exceptions.FileSystemNotFound:
+                continue
+
+
+@ElasticFileSystem.filter_registry.register('lifecycle-policy')
+class LifecyclePolicy(Filter):
+    """Filters efs based on the state of lifecycle policies
+
+    :example:
+
+      .. code-block:: yaml
+
+            policies:
+              - name: efs-filter-lifecycle
+                resource: efs
+                filters:
+                  - type: lifecycle-policy
+                    state: present
+                    value: AFTER_7_DAYS
+
+    """
+    schema = type_schema(
+        'lifecycle-policy',
+        state={'enum': ['present', 'absent']},
+        value={'type': 'string'},
+        required=['state'])
+
+    permissions = ('elasticfilesystem:DescribeLifecycleConfiguration',)
+
+    def process(self, resources, event=None):
+        resources = self.fetch_resources_lfc(resources)
+        if self.data.get('value'):
+            config = {'TransitionToIA': self.data.get('value')}
+            if self.data.get('state') == 'present':
+                return [r for r in resources if config in r.get('c7n:LifecyclePolicies')]
+            return [r for r in resources if config not in r.get('c7n:LifecyclePolicies')]
+        else:
+            if self.data.get('state') == 'present':
+                return [r for r in resources if r.get('c7n:LifecyclePolicies')]
+            return [r for r in resources if r.get('c7n:LifecyclePolicies') == []]
+
+    def fetch_resources_lfc(self, resources):
+        client = local_session(self.manager.session_factory).client('efs')
+        for r in resources:
+            try:
+                lfc = client.describe_lifecycle_configuration(
+                    FileSystemId=r['FileSystemId']).get('LifecyclePolicies')
+                r['c7n:LifecyclePolicies'] = lfc
+            except client.exceptions.FileSystemNotFound:
+                continue
+        return resources

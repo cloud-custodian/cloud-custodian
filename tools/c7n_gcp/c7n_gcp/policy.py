@@ -138,6 +138,8 @@ class ApiAuditMode(FunctionMode):
 
     def run(self, event, context):
         """Execute a gcp serverless model"""
+        from c7n.actions import EventAction
+
         resources = self.resolve_resources(event)
         if not resources:
             return
@@ -150,7 +152,14 @@ class ApiAuditMode(FunctionMode):
         if not resources:
             return
 
+        self.policy.ctx.metrics.put_metric(
+            'ResourceCount', len(resources), 'Count', Scope="Policy",
+            buffer=False)
+
         for action in self.policy.resource_manager.actions:
-            action.process(resources)
+            if isinstance(action, EventAction):
+                action.process(resources, event)
+            else:
+                action.process(resources)
 
         return resources

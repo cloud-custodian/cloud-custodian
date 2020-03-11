@@ -30,7 +30,7 @@ from c7n.resources.ebs import (
     SnapshotQueryParser as QueryParser
 )
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class SnapshotQueryParse(BaseTest):
@@ -134,7 +134,6 @@ class SnapshotAccessTest(BaseTest):
                 "resource": "ebs-snapshot",
                 "filters": ["cross-account"],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -159,7 +158,7 @@ class SnapshotDetachTest(BaseTest):
                         'type': 'detach'
                     }
                 ]
-            }, config=Config.empty(), session_factory=factory)
+            }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -194,7 +193,7 @@ class SnapshotCopyTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-west-2"),
+            config=dict(region="us-west-2"),
             session_factory=factory,
         )
         resources = p.run()

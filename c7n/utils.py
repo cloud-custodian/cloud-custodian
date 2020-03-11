@@ -347,6 +347,8 @@ def generate_arn(
     arn = 'arn:%s:%s:%s:%s:' % (
         partition, service, region if region else '', account_id if account_id else '')
     if resource_type:
+        if resource.startswith(separator):
+            separator = ''
         arn = arn + '%s%s%s' % (resource_type, separator, resource)
     else:
         arn = arn + resource
@@ -642,3 +644,21 @@ class QueryParser(object):
 
 def get_annotation_prefix(s):
     return 'c7n:{}'.format(s)
+
+
+def merge_dict(a, b):
+    """Perform a merge of dictionaries a and b
+
+    Any subdictionaries will be recursively merged.
+    Any leaf elements in the form of a list or scalar will use the value from a
+    """
+    d = {}
+    for k, v in a.items():
+        if k not in b:
+            d[k] = v
+        elif isinstance(v, dict) and isinstance(b[k], dict):
+            d[k] = merge_dict(v, b[k])
+    for k, v in b.items():
+        if k not in d:
+            d[k] = v
+    return d

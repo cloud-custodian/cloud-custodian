@@ -99,7 +99,7 @@ Filename: ``custodian.yml``
     policies:
       - name: my-first-policy
         description: |
-          Stops all compute instances that contain the word "test"
+          Stops all compute instances that are named "test"
         resource: gcp.instance
         filters:
           - type: value

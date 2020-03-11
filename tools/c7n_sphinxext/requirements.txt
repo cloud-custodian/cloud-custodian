@@ -1,5 +1,5 @@
-Sphinx==2.2.1
-Pygments==2.4.2
-recommonmark>=0.5.0
+Sphinx==2.3.1
+Pygments==2.5.2
+recommonmark>=0.6.0
 git+https://github.com/readthedocs/sphinx_rtd_theme.git@feb0beb44a444f875f3369a945e6055965ee993f#egg=sphinx-rtd-theme
 git+https://github.com/kapilt/sphinx-markdown-tables.git#egg=sphinx-markdown-tables

@@ -17,7 +17,7 @@ from c7n.ctx import ExecutionContext
 from c7n.filters import Filter
 from c7n.resources.ec2 import EC2
 from c7n.tags import Tag
-from .common import BaseTest, instance, Bag, TestConfig as Config
+from .common import BaseTest, instance, Bag
 
 
 class TestEC2Manager(BaseTest):
@@ -25,8 +25,8 @@ class TestEC2Manager(BaseTest):
     def get_manager(self, data, config=None, session_factory=None):
         ctx = ExecutionContext(
             session_factory, Bag(
-                {"name": "test-policy", 'provider_name': 'aws'}), config or Config.empty()
-        )
+                {"name": "test-policy", 'provider_name': 'aws'}),
+            config or {})
         return EC2(ctx, data)
 
     def test_manager_iter_filters(self):
@@ -91,17 +91,17 @@ class TestEC2Manager(BaseTest):
             {'resource': 'ec2',
              'source': 'config',
              'name': 'instances'})
-        manager = p.resource_manager.get_resource_manager(
-            'aws.security-group')
+        manager = p.resource_manager.get_resource_manager('aws.security-group')
         self.assertEqual(manager.source_type, 'config')
 
     def test_manager(self):
-        ec2_mgr = self.get_manager(
-            {
-                "query": [{"tag-key": "CMDBEnvironment"}],
-                "filters": [{"tag:ASV": "absent"}],
-            }
-        )
+        ec2_mgr = self.load_policy({
+            'name': 'xyz',
+            'resource': 'aws.ec2',
+            "query": [{"tag-key": "CMDBEnvironment"}],
+            "filters": [{"tag:ASV": "absent"}]}
+        ).resource_manager
+
         self.assertEqual(len(ec2_mgr.filters), 1)
         self.assertEqual(len(ec2_mgr.queries), 1)
         self.assertEqual(
@@ -110,8 +110,9 @@ class TestEC2Manager(BaseTest):
         )
 
     def test_filters(self):
-        ec2 = self.get_manager({"filters": [{"tag:CMDBEnvironment": "absent"}]})
-
+        ec2 = self.load_policy({
+            'name': 'xyz', 'resource': 'aws.ec2',
+            'filters': [{"tag:CMDBEnvironment": "absent"}]}).resource_manager
         self.assertEqual(
             len(
                 ec2.filter_resources([instance(Tags=[{"Key": "ASV", "Value": "xyz"}])])
@@ -130,16 +131,21 @@ class TestEC2Manager(BaseTest):
 
     def test_actions(self):
         # a simple action by string
-        ec2 = self.get_manager({"actions": ["mark"]})
+        ec2 = self.load_policy(
+            {'name': 'xyz', 'resource': 'aws.ec2',
+             'actions': ['mark']}).resource_manager
         self.assertEqual(len(ec2.actions), 1)
         self.assertTrue(isinstance(ec2.actions[0], Tag))
 
         # a configured action with dict
-        ec2 = self.get_manager(
-            {"actions": [{"type": "mark", "msg": "Missing proper tags"}]}
-        )
+        ec2 = self.load_policy(
+            {'name': 'xyz', 'resource': 'aws.ec2',
+             "actions": [
+                 {"type": "mark",
+                  "value": "Missing proper tags"}]}).resource_manager
+
         self.assertEqual(len(ec2.actions), 1)
         self.assertTrue(isinstance(ec2.actions[0], Tag))
         self.assertEqual(
-            ec2.actions[0].data, {"msg": "Missing proper tags", "type": "mark"}
+            ec2.actions[0].data, {"value": "Missing proper tags", "type": "mark"}
         )

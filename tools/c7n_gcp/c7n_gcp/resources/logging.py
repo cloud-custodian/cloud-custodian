@@ -11,30 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n.utils import local_session, type_schema
+
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 # TODO .. folder, billing account, org sink
 # how to map them given a project level root entity sans use of c7n-org
-
-
-@resources.register('logsink')
-class LogSink(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'logging'
-        version = 'v2'
-        component = 'projects.sinks'
-        enum_spec = ('list', 'sinks[]', None)
-        scope_key = 'parent'
-        scope_template = "projects/{}"
-        id = "name"
-
-        @staticmethod
-        def get(client, resource_info):
-            return client.execute_query('get', {
-                'sinkName': 'projects/{project_id}/sinks/{name}'.format(
-                    **resource_info)})
 
 
 @resources.register('log-project-sink')
@@ -54,6 +38,18 @@ class LogProjectSink(QueryResourceManager):
             return client.execute_query('get', {
                 'sinkName': 'projects/{project_id}/sinks/{name}'.format(
                     **resource_info)})
+
+
+@LogProjectSink.action_registry.register('delete')
+class DeletePubSubTopic(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, m, r):
+        session = local_session(self.manager.session_factory)
+        project = session.get_default_project()
+        return {'sinkName': 'projects/{}/sinks/{}'.format(project, r['name'])}
 
 
 @resources.register('log-project-metric')

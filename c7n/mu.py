@@ -46,7 +46,7 @@ except (ImportError, FileNotFoundError):
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
 from c7n.logs_support import _timestamp_from_string
-from c7n.utils import parse_s3, local_session, get_retry
+from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 
 log = logging.getLogger('custodian.serverless')
 
@@ -278,18 +278,31 @@ def checksum(fh, hasher, blocksize=65536):
     return hasher.digest()
 
 
-def generate_requirements(package, ignore=()):
-    """Generate frozen requirements file for the given package.
+def generate_requirements(packages, ignore=(), exclude=(), include_self=False):
+    """Generate frozen requirements file for the given set of packages
+
+    if include_self is True we'll also include the packages in the generated
+    requirements.
     """
     if pkgmd is None:
         raise ImportError("importlib_metadata missing")
-    deps = []
-    deps = _package_deps(package, ignore=ignore)
-    lines = []
+    if isinstance(packages, str):
+        packages = [packages]
 
+    deps = []
+    for p in packages:
+        _package_deps(p, deps, ignore=ignore)
+    lines = []
+    if include_self:
+        deps = list(set(deps).union(packages))
     for d in sorted(deps):
-        lines.append(
-            '%s==%s' % (d, pkgmd.distribution(d).version))
+        if d in exclude:
+            continue
+        try:
+            lines.append(
+                '%s==%s' % (d, pkgmd.distribution(d).version))
+        except pkgmd.PackageNotFoundError:
+            continue
     return '\n'.join(lines)
 
 
@@ -297,10 +310,13 @@ def _package_deps(package, deps=None, ignore=()):
     """Recursive gather package's named transitive dependencies"""
     if deps is None:
         deps = []
-    pdeps = pkgmd.requires(package) or ()
+    try:
+        pdeps = pkgmd.requires(package) or ()
+    except pkgmd.PackageNotFoundError:
+        return deps
     for r in pdeps:
         # skip optional deps
-        if ';' in r:
+        if ';' in r and 'extra' in r:
             continue
         for idx, c in enumerate(r):
             if not c.isalnum() and c not in ('-', '_', '.'):
@@ -311,8 +327,11 @@ def _package_deps(package, deps=None, ignore=()):
         if pkg_name in ignore:
             continue
         if pkg_name not in deps:
+            try:
+                _package_deps(pkg_name, deps, ignore)
+            except pkgmd.PackageNotFoundError:
+                continue
             deps.append(pkg_name)
-            _package_deps(pkg_name, deps, ignore)
     return deps
 
 
@@ -463,6 +482,11 @@ class LambdaManager(object):
                 if k in LAMBDA_EMPTY_VALUES and LAMBDA_EMPTY_VALUES[k] == new_config[k]:
                     continue
                 changed.append(k)
+            # For role we allow name only configuration
+            elif k == 'Role':
+                if (new_config[k] != old_config[k] and
+                        not old_config[k].split('/', 1)[1] == new_config[k]):
+                    changed.append(k)
             elif new_config[k] != old_config[k]:
                 changed.append(k)
         return changed
@@ -863,7 +887,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python3.7')
+        return self.policy.data['mode'].get('runtime', 'python3.8')
 
     @property
     def memory_size(self):
@@ -1107,6 +1131,8 @@ class CloudWatchEventSource(object):
                 "Unknown lambda event source type: %s" % event_type)
         if not payload:
             return None
+        if self.data.get('pattern'):
+            payload = merge_dict(payload, self.data['pattern'])
         return json.dumps(payload)
 
     def add(self, func):

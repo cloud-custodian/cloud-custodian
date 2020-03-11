@@ -34,7 +34,7 @@ class PolicyCompliance(BaseTest):
             self.assertTrue(p)
 
     @arm_template('vm.json')
-    @patch("azure.mgmt.policyinsights.operations.policy_states_operations.PolicyStatesOperations."
+    @patch("azure.mgmt.policyinsights.operations.PolicyStatesOperations."
            "list_query_results_for_subscription")
     def test_find_by_name(self, policy_mock):
         policy_mock.return_value.value = []
@@ -70,7 +70,7 @@ class PolicyCompliance(BaseTest):
         self.assertEqual(len(resources), 0)
 
     @arm_template('emptyrg.json')
-    @patch("azure.mgmt.policyinsights.operations.policy_states_operations.PolicyStatesOperations."
+    @patch("azure.mgmt.policyinsights.operations.PolicyStatesOperations."
            "list_query_results_for_subscription")
     @patch("azure.mgmt.resource.policy.PolicyClient")
     def test_find_by_name_definition(self, client_mock, policy_mock):

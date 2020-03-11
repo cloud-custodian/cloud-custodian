@@ -142,7 +142,7 @@ class Tag(tags.Tag):
     """
 
     batch_size = 5
-    permissions = ('elasticbeanstalk:UpdateTagsForResource',)
+    permissions = ('elasticbeanstalk:AddTags',)
 
     def process_resource_set(self, client, envs, ts):
         for env in envs:
@@ -173,7 +173,7 @@ class RemoveTag(tags.RemoveTag):
     """
 
     batch_size = 5
-    permissions = ('elasticbeanstalk:UpdateTagsForResource',)
+    permissions = ('elasticbeanstalk:RemoveTags',)
 
     def process_resource_set(self, client, envs, tag_keys):
         for env in envs:

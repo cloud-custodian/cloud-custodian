@@ -31,7 +31,7 @@ extra_dependencies = ["azure-functions"] if sys.version_info[0] >= 3 else []
 
 setup(
     name="c7n_azure",
-    version='0.6.2',
+    version='0.6.3',
     description="Cloud Custodian - Azure Support",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -71,7 +71,6 @@ setup(
                       "azure-mgmt-network>=4.0.0",
                       "azure-mgmt-redis",
                       "azure-mgmt-resourcegraph",
-                      "azure-mgmt-resource~=4.0.0",
                       "azure-mgmt-rdbms",
                       "azure-mgmt-search",
                       "azure-mgmt-sql",
@@ -101,8 +100,6 @@ setup(
                       "c7n>=0.8.45.1",
                       "azure-cli-core",
                       "adal",
-                      "backports.functools_lru_cache",
-                      "futures>=3.1.1",
                       "netaddr"] + extra_dependencies,
     package_data={str(''): [str('function_binding_resources/bin/*.dll'),
                             str('function_binding_resources/*.csproj'),

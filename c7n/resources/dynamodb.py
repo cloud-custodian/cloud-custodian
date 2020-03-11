@@ -43,8 +43,6 @@ class Table(query.QueryResourceManager):
         config_type = 'AWS::DynamoDB::Table'
         universal_taggable = object()
 
-    permissions = ('dynamodb:ListTagsOfResource',)
-
     def get_source(self, source_type):
         if source_type == 'describe':
             return DescribeTable(self)
@@ -354,6 +352,7 @@ class Stream(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'dynamodbstreams'
+        permission_prefix = 'dynamodb'
         # Note max rate of 5 calls per second
         enum_spec = ('list_streams', 'Streams', None)
         # Note max rate of 10 calls per second.

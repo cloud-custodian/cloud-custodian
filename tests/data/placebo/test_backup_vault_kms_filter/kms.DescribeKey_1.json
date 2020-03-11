@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "8d56db16-21c6-412f-b949-7a012e11ee6e",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/8d56db16-21c6-412f-b949-7a012e11ee6e",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 11,
+                "day": 19,
+                "hour": 11,
+                "minute": 42,
+                "second": 20,
+                "microsecond": 817000
+            },
+            "Enabled": true,
+            "Description": "Default master key that protects my Backup data when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ]
+        },
+        "ResponseMetadata": {
+            "RequestId": "e776b683-a7b9-4ca1-8591-f0d86fa1b42a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "e776b683-a7b9-4ca1-8591-f0d86fa1b42a",
+                "cache-control": "no-cache, no-store, must-revalidate, private",
+                "expires": "0",
+                "pragma": "no-cache",
+                "date": "Tue, 3 Mar 2020 22:43:28 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "495"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

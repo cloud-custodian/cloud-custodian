@@ -1,4 +1,4 @@
-FROM python:3.7-slim-stretch
+FROM python:3.8-slim-buster
 
 LABEL name="custodian" \
       description="Cloud Management Rules Engine" \
@@ -12,6 +12,7 @@ ADD setup.py README.md requirements.txt /src/
 ADD c7n /src/c7n/
 ADD tools/c7n_gcp /src/tools/c7n_gcp
 ADD tools/c7n_azure /src/tools/c7n_azure
+ADD tools/c7n_kube /src/tools/c7n_kube
 
 WORKDIR /src
 
@@ -21,12 +22,7 @@ RUN apt-get --yes update \
  && pip3 install -r requirements.txt  . \
  && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
  && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
- # Pre-cache Azure Functions package
- && python -c "from c7n_azure.function_package import FunctionPackage; \
-      FunctionPackage('cache').build_cache( \
-      modules=['c7n', 'c7n-azure'], \
-      non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'pyrsistent'], \
-      excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])" \
+ && pip3 install -r tools/c7n_kube/requirements.txt tools/c7n_kube \
  && apt-get --yes remove build-essential \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
  && rm -Rf /var/cache/apt/ \

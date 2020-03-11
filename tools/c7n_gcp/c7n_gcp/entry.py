@@ -14,43 +14,19 @@
 
 import logging
 
-# This is an alphabetically sorted import list
-import c7n_gcp.actions
-import c7n_gcp.filters
-import c7n_gcp.output
-import c7n_gcp.policy
-import c7n_gcp.resources.appengine
-import c7n_gcp.resources.bigquery
-import c7n_gcp.resources.build
-import c7n_gcp.resources.cloudbilling
-import c7n_gcp.resources.compute
-import c7n_gcp.resources.dataflow
-import c7n_gcp.resources.deploymentmanager
-import c7n_gcp.resources.dns
-import c7n_gcp.resources.function
-import c7n_gcp.resources.gke
-import c7n_gcp.resources.iam
-import c7n_gcp.resources.kms
-import c7n_gcp.resources.loadbalancer
-import c7n_gcp.resources.logging
-import c7n_gcp.resources.mlengine
-import c7n_gcp.resources.network
-import c7n_gcp.resources.pubsub
-import c7n_gcp.resources.resourcemanager
-import c7n_gcp.resources.service
-import c7n_gcp.resources.source
-import c7n_gcp.resources.spanner
-import c7n_gcp.resources.storage
-import c7n_gcp.resources.sql  # noqa: F401
+# register provider
+import c7n_gcp.provider # noqa
 
-
-from c7n_gcp.provider import resources as gcp_resources
-
+# squelch inconsiderate logging
 logging.getLogger('googleapiclient.discovery').setLevel(logging.WARNING)
-
-# Let resource registry subscribers have a chance to look at full set of resources.
-gcp_resources.notify(gcp_resources.EVENT_FINAL)
 
 
 def initialize_gcp():
-    pass
+    """Load gcp provider"""
+
+    # register execution modes
+    import c7n_gcp.policy # noqa
+
+    # load shared registered resources
+    import c7n_gcp.actions
+    import c7n_gcp.output # noqa
