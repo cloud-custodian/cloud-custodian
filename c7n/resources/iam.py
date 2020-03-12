@@ -1213,7 +1213,7 @@ class CredentialReport(Filter):
            key: password_last_used
            value: absent
          - type: credential
-           key: access_keys.last_used
+           key: access_keys.last_used_date
            value_type: age
            value: 30
            op: less-than
