@@ -101,6 +101,11 @@ class CodeBuildProject(QueryResourceManager):
 
 class DescribeBuild(DescribeSource):
 
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('codebuild')
+        return client.batch_get_projects(
+            projects=resource_ids).get('projects', [])
+
     def augment(self, resources):
         return universal_augment(
             self.manager,
@@ -148,15 +153,10 @@ class DeleteProject(BaseAction):
     def process(self, projects):
         client = local_session(self.manager.session_factory).client('codebuild')
         for p in projects:
-            self.process_project(client, p)
-
-    def process_project(self, client, project):
-
-        try:
-            client.delete_project(name=project['name'])
-        except ClientError as e:
-            self.log.exception(
-                "Exception deleting project:\n %s" % e)
+            try:
+                client.delete_project(name=p['name'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
 
 
 @resources.register('codepipeline')

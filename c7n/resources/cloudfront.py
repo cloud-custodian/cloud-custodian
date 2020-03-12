@@ -50,6 +50,16 @@ class Distribution(QueryResourceManager):
 
 class DescribeDistribution(DescribeSource):
 
+    def get_resources(self, resource_ids, cache=True):
+        results = []
+        client = local_session(self.manager.session_factory).client('cloudfront')
+        for rid in resource_ids:
+            try:
+                results.append(client.get_distribution(Id=rid)['Distribution'])
+            except client.exceptions.NoSuchDistribution:
+                continue
+        return results
+
     def augment(self, resources):
         return universal_augment(self.manager, resources)
 
@@ -78,6 +88,17 @@ class StreamingDistribution(QueryResourceManager):
 
 
 class DescribeStreamingDistribution(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        results = []
+        client = local_session(self.manager.session_factory).client('cloudfront')
+        for rid in resource_ids:
+            try:
+                results.append(
+                    client.get_streaming_distribution(Id=rid)['Distribution'])
+            except client.exceptions.NoSuchDistribution:
+                continue
+        return results
 
     def augment(self, resources):
         return universal_augment(self.manager, resources)

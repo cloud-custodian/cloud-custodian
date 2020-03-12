@@ -74,10 +74,19 @@ class ConfigTable(query.ConfigSource):
 
 class DescribeTable(query.DescribeSource):
 
+    def get_resources(self, resource_ids, cache=True):
+        results = []
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resource_ids:
+            try:
+                results.append(client.describe_table(TableName=rid)['Table'])
+            except client.exceptions.TableNotFoundException:
+                continue
+        return results
+
     def augment(self, resources):
         return universal_augment(
-            self.manager,
-            super(DescribeTable, self).augment(resources))
+            self.manager, super(DescribeTable, self).augment(resources))
 
 
 class StatusFilter(object):

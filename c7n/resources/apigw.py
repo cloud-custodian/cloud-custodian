@@ -159,6 +159,16 @@ class RestApi(query.QueryResourceManager):
 
 class ApiDescribeSource(query.DescribeSource):
 
+    def get_resources(self, resource_ids, cache=True):
+        results = []
+        client = utils.local_session(self.manager.session_factory).client('apigateway')
+        for rid in resource_ids:
+            try:
+                results.append(client.get_rest_api(RestApiId=rid))
+            except client.exceptions.NotFoundException:
+                continue
+        return results
+
     def augment(self, resources):
         for r in resources:
             tags = r.setdefault('Tags', [])

@@ -54,6 +54,17 @@ class Certificate(QueryResourceManager):
 
 class DescribeCertificate(DescribeSource):
 
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).clieent('acm')
+        results = []
+        for rid in resource_ids:
+            try:
+                results.append(
+                    client.describe_certificate(CertficateArn=rid))
+            except client.exceptions.ResourceNotFoundException:
+                continue
+        return results
+
     def augment(self, resources):
         return universal_augment(
             self.manager,

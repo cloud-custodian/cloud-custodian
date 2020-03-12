@@ -713,6 +713,8 @@ class RedshiftSnapshot(QueryResourceManager):
         service = 'redshift'
         arn_type = 'snapshot'
         arn_separator = ':'
+        filter_name = 'SnapshotIdentifier'
+        filter_type = 'scalar'
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
         name = id = 'SnapshotIdentifier'
         date = 'SnapshotCreateTime'
