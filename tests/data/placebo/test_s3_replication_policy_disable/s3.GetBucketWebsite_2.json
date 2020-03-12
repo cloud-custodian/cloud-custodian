@@ -2,17 +2,17 @@
     "status_code": 404,
     "data": {
         "Error": {
-            "Code": "NoSuchBucketPolicy",
-            "Message": "The bucket policy does not exist",
+            "Code": "NoSuchWebsiteConfiguration",
+            "Message": "The specified bucket does not have a website configuration",
             "BucketName": "repela"
         },
         "ResponseMetadata": {
-            "RequestId": "CAC2DF54CF7399D9",
-            "HostId": "uj142ptUccivGCcdDFS9K+C7lNBc/mNmkFo/wqhO6DOdPsoKR8MB8g2TRWsy2IMDECBoHcQS/7M=",
+            "RequestId": "5C85CF8F2955C7D8",
+            "HostId": "b2JtbBLo0y6vUsHbDLYayvg29wSB2EoUQO8rmQCCjiCYPbh8ODy8AfhsMhpw05Wsl8oUxSPxvPY=",
             "HTTPStatusCode": 404,
             "HTTPHeaders": {
-                "x-amz-request-id": "CAC2DF54CF7399D9",
-                "x-amz-id-2": "uj142ptUccivGCcdDFS9K+C7lNBc/mNmkFo/wqhO6DOdPsoKR8MB8g2TRWsy2IMDECBoHcQS/7M=",
+                "x-amz-request-id": "5C85CF8F2955C7D8",
+                "x-amz-id-2": "b2JtbBLo0y6vUsHbDLYayvg29wSB2EoUQO8rmQCCjiCYPbh8ODy8AfhsMhpw05Wsl8oUxSPxvPY=",
                 "content-type": "application/xml",
                 "transfer-encoding": "chunked",
                 "date": "Thu, 12 Mar 2020 17:20:30 GMT",

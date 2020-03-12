@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "C92B1C31D7CB8E18",
+            "HostId": "DbD/3KE0zXz59choHIOUMneK+GAq7A5mJerpSLyp7YZAp1NXHdM30h50mcsdaYrtQrXvXWqGWyw=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "DbD/3KE0zXz59choHIOUMneK+GAq7A5mJerpSLyp7YZAp1NXHdM30h50mcsdaYrtQrXvXWqGWyw=",
+                "x-amz-request-id": "C92B1C31D7CB8E18",
+                "date": "Thu, 12 Mar 2020 17:23:35 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "ReplicationConfiguration": {
+            "Role": "arn:aws:iam::1112223334445:role/s3_replicator",
+            "Rules": [
+                {
+                    "ID": "test12345",
+                    "Prefix": "",
+                    "Status": "Enabled",
+                    "Destination": {
+                        "Bucket": "arn:aws:s3:::replication-t0-12345"
+                    }
+                }
+            ]
+        }
+    }
+}

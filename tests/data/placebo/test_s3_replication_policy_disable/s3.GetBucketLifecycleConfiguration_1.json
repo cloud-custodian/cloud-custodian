@@ -1,0 +1,24 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "NoSuchLifecycleConfiguration",
+            "Message": "The lifecycle configuration does not exist",
+            "BucketName": "repela"
+        },
+        "ResponseMetadata": {
+            "RequestId": "517B5743BE5722B4, 517B5743BE5722B4",
+            "HostId": "26SNu9kVGE14A9/wH8E3prixZlmiGN5pSCg22TgH/6AhXfOwBGpc/fuusSI0+xXCcqqhZ7VZfpA=, 26SNu9kVGE14A9/wH8E3prixZlmiGN5pSCg22TgH/6AhXfOwBGpc/fuusSI0+xXCcqqhZ7VZfpA=",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "x-amz-id-2": "26SNu9kVGE14A9/wH8E3prixZlmiGN5pSCg22TgH/6AhXfOwBGpc/fuusSI0+xXCcqqhZ7VZfpA=, 26SNu9kVGE14A9/wH8E3prixZlmiGN5pSCg22TgH/6AhXfOwBGpc/fuusSI0+xXCcqqhZ7VZfpA=",
+                "x-amz-request-id": "517B5743BE5722B4, 517B5743BE5722B4",
+                "date": "Thu, 12 Mar 2020 17:20:30 GMT",
+                "content-type": "application/xml",
+                "content-length": "280",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

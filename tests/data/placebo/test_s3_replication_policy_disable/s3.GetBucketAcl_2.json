@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "14010D6900CBC382",
+            "HostId": "vJJxkRgclI7SinKf9Cu9fICrf/iK6nKtnAEjIuxZne2TCe0do5wig15nZQdfIBOEUK0yd2U6mok=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "vJJxkRgclI7SinKf9Cu9fICrf/iK6nKtnAEjIuxZne2TCe0do5wig15nZQdfIBOEUK0yd2U6mok=",
+                "x-amz-request-id": "14010D6900CBC382",
+                "date": "Thu, 12 Mar 2020 17:20:31 GMT",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "Owner": {
+            "DisplayName": "pikachu",
+            "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a"
+        },
+        "Grants": [
+            {
+                "Grantee": {
+                    "DisplayName": "pikachu",
+                    "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a",
+                    "Type": "CanonicalUser"
+                },
+                "Permission": "FULL_CONTROL"
+            }
+        ]
+    }
+}

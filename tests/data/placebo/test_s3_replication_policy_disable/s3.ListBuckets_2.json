@@ -2,13 +2,13 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "2BE8583BD5F5EE22",
-            "HostId": "ZdiJGr2pmqNUMm1yi/6Ex0wFTpkdXxWdjPOpmxw5pazwXoaBUL/4RLphT9Ukey0m9wGKUuQm5Xc=",
+            "RequestId": "8669127BE89964CD",
+            "HostId": "6UPQCtJ+hc67kpEfglFkxVgwH0gDv22GYH+7HG25yGf2pDXPm5tVkd0SDTcSdlOXn0RtR1e3RMQ=",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "ZdiJGr2pmqNUMm1yi/6Ex0wFTpkdXxWdjPOpmxw5pazwXoaBUL/4RLphT9Ukey0m9wGKUuQm5Xc=",
-                "x-amz-request-id": "2BE8583BD5F5EE22",
-                "date": "Thu, 12 Mar 2020 17:23:35 GMT",
+                "x-amz-id-2": "6UPQCtJ+hc67kpEfglFkxVgwH0gDv22GYH+7HG25yGf2pDXPm5tVkd0SDTcSdlOXn0RtR1e3RMQ=",
+                "x-amz-request-id": "8669127BE89964CD",
+                "date": "Thu, 12 Mar 2020 17:20:31 GMT",
                 "content-type": "application/xml",
                 "transfer-encoding": "chunked",
                 "server": "AmazonS3"
@@ -65,32 +65,6 @@
                     "hour": 20,
                     "minute": 20,
                     "second": 54,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "replication-from-12345",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 12,
-                    "hour": 17,
-                    "minute": 23,
-                    "second": 33,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "replication-t0-12345",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 12,
-                    "hour": 17,
-                    "minute": 23,
-                    "second": 34,
                     "microsecond": 0
                 }
             }

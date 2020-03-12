@@ -1,0 +1,24 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "NoSuchLifecycleConfiguration",
+            "Message": "The lifecycle configuration does not exist",
+            "BucketName": "replication-from-12345"
+        },
+        "ResponseMetadata": {
+            "RequestId": "2267FE247F7656F7, 2267FE247F7656F7",
+            "HostId": "BhfrEx6I0OZF/jrEVVs4Q/S+ge1G72eq6ofCh7cRRNrcSss1IuyIE+PUHzIuhia5wFi5H6KpA3A=, BhfrEx6I0OZF/jrEVVs4Q/S+ge1G72eq6ofCh7cRRNrcSss1IuyIE+PUHzIuhia5wFi5H6KpA3A=",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "x-amz-id-2": "BhfrEx6I0OZF/jrEVVs4Q/S+ge1G72eq6ofCh7cRRNrcSss1IuyIE+PUHzIuhia5wFi5H6KpA3A=, BhfrEx6I0OZF/jrEVVs4Q/S+ge1G72eq6ofCh7cRRNrcSss1IuyIE+PUHzIuhia5wFi5H6KpA3A=",
+                "x-amz-request-id": "2267FE247F7656F7, 2267FE247F7656F7",
+                "date": "Thu, 12 Mar 2020 17:23:35 GMT",
+                "content-type": "application/xml",
+                "content-length": "296",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -2,17 +2,17 @@
     "status_code": 404,
     "data": {
         "Error": {
-            "Code": "NoSuchBucketPolicy",
-            "Message": "The bucket policy does not exist",
+            "Code": "NoSuchWebsiteConfiguration",
+            "Message": "The specified bucket does not have a website configuration",
             "BucketName": "replication-from-12345"
         },
         "ResponseMetadata": {
-            "RequestId": "5A478BCCF9516836",
-            "HostId": "3XYHYEYtisKT28p7dniLS/9Xoc0vUC5vtwbSkvFsyR9Nq7GdJ3Yer+ijA4Be+HhdMY85rFaAhI4=",
+            "RequestId": "723F3741FE402607",
+            "HostId": "PcFIxP+2ClbZ+ygTYsQpStqOBAXteS3dLu0z7LlZFp10sPLgDGFkA10AWEyrPGcAXQUgVrgT4Vc=",
             "HTTPStatusCode": 404,
             "HTTPHeaders": {
-                "x-amz-request-id": "5A478BCCF9516836",
-                "x-amz-id-2": "3XYHYEYtisKT28p7dniLS/9Xoc0vUC5vtwbSkvFsyR9Nq7GdJ3Yer+ijA4Be+HhdMY85rFaAhI4=",
+                "x-amz-request-id": "723F3741FE402607",
+                "x-amz-id-2": "PcFIxP+2ClbZ+ygTYsQpStqOBAXteS3dLu0z7LlZFp10sPLgDGFkA10AWEyrPGcAXQUgVrgT4Vc=",
                 "content-type": "application/xml",
                 "transfer-encoding": "chunked",
                 "date": "Thu, 12 Mar 2020 17:23:33 GMT",

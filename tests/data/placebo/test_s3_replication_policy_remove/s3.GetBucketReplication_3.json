@@ -1,0 +1,24 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "ReplicationConfigurationNotFoundError",
+            "Message": "The replication configuration was not found",
+            "BucketName": "replication-from-12345"
+        },
+        "ResponseMetadata": {
+            "RequestId": "65DB633ADBFABAC8",
+            "HostId": "WZVuPg471+l7xRscUz9KswLYZLWTDwwfv28KYa8gQE+cVqKBkLZYIgY2U+M373ExHhotHokS8nY=",
+            "HTTPStatusCode": 404,
+            "HTTPHeaders": {
+                "x-amz-request-id": "65DB633ADBFABAC8",
+                "x-amz-id-2": "WZVuPg471+l7xRscUz9KswLYZLWTDwwfv28KYa8gQE+cVqKBkLZYIgY2U+M373ExHhotHokS8nY=",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "date": "Thu, 12 Mar 2020 17:23:34 GMT",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

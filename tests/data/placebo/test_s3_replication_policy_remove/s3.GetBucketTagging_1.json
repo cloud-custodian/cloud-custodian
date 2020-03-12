@@ -2,17 +2,17 @@
     "status_code": 404,
     "data": {
         "Error": {
-            "Code": "NoSuchBucketPolicy",
-            "Message": "The bucket policy does not exist",
+            "Code": "NoSuchTagSet",
+            "Message": "The TagSet does not exist",
             "BucketName": "replication-from-12345"
         },
         "ResponseMetadata": {
-            "RequestId": "5A478BCCF9516836",
-            "HostId": "3XYHYEYtisKT28p7dniLS/9Xoc0vUC5vtwbSkvFsyR9Nq7GdJ3Yer+ijA4Be+HhdMY85rFaAhI4=",
+            "RequestId": "0BECEB88DAD31659",
+            "HostId": "ZJ13VHEG3eZzbHqiVrnirJyBdvUxHn7wrwL6QXKrHXDzDah1iyrNJPl1dDXm42GptU9GVPZFYk8=",
             "HTTPStatusCode": 404,
             "HTTPHeaders": {
-                "x-amz-request-id": "5A478BCCF9516836",
-                "x-amz-id-2": "3XYHYEYtisKT28p7dniLS/9Xoc0vUC5vtwbSkvFsyR9Nq7GdJ3Yer+ijA4Be+HhdMY85rFaAhI4=",
+                "x-amz-request-id": "0BECEB88DAD31659",
+                "x-amz-id-2": "ZJ13VHEG3eZzbHqiVrnirJyBdvUxHn7wrwL6QXKrHXDzDah1iyrNJPl1dDXm42GptU9GVPZFYk8=",
                 "content-type": "application/xml",
                 "transfer-encoding": "chunked",
                 "date": "Thu, 12 Mar 2020 17:23:33 GMT",

@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserId": "AIDAYQEYKHVGXBGBCXPRN",
+        "Account": "1112223334445",
+        "Arn": "arn:aws:iam::1112223334445:user/john-admin",
+        "ResponseMetadata": {
+            "RequestId": "7be21bd7-d6d6-44bc-aeaf-89fc54e0bfae",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "7be21bd7-d6d6-44bc-aeaf-89fc54e0bfae",
+                "content-type": "text/xml",
+                "content-length": "407",
+                "date": "Thu, 12 Mar 2020 17:23:29 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

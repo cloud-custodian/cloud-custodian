@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "758227C368941FC6",
+            "HostId": "7y7DBbhXGa2BDv2vFjLTCoO7AcPjN9CfvnC0GunwPVKvcUaHj0oC/C0PZF+Acf1U39pp4LnuWsQ=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "7y7DBbhXGa2BDv2vFjLTCoO7AcPjN9CfvnC0GunwPVKvcUaHj0oC/C0PZF+Acf1U39pp4LnuWsQ=",
+                "x-amz-request-id": "758227C368941FC6",
+                "date": "Thu, 12 Mar 2020 17:23:36 GMT",
+                "x-amz-bucket-region": "us-east-1",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "IsTruncated": false,
+        "Marker": "",
+        "Name": "replication-t0-12345",
+        "Prefix": "",
+        "MaxKeys": 1000,
+        "EncodingType": "url"
+    }
+}

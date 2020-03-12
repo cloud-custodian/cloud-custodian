@@ -2,13 +2,13 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "CE66164EE4363BD6",
-            "HostId": "5vFnUYAyhpbYC95SB9Hp3E8Vj7pfAfyNQZKlmuh2nCYSoYfLkZx2rk72cgWl17edTT2hkGrR+rs=",
+            "RequestId": "C9D3050A783A549B",
+            "HostId": "wt3k+QNMwMuI6AKcGx9/L6nHKZrEK4lpq39XDu6F3Q008Ttx4ievaQLKbzw5nLpSXqSfeahtJCY=",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "5vFnUYAyhpbYC95SB9Hp3E8Vj7pfAfyNQZKlmuh2nCYSoYfLkZx2rk72cgWl17edTT2hkGrR+rs=",
-                "x-amz-request-id": "CE66164EE4363BD6",
-                "date": "Thu, 12 Mar 2020 17:20:30 GMT",
+                "x-amz-id-2": "wt3k+QNMwMuI6AKcGx9/L6nHKZrEK4lpq39XDu6F3Q008Ttx4ievaQLKbzw5nLpSXqSfeahtJCY=",
+                "x-amz-request-id": "C9D3050A783A549B",
+                "date": "Thu, 12 Mar 2020 17:20:31 GMT",
                 "transfer-encoding": "chunked",
                 "server": "AmazonS3"
             },
@@ -21,7 +21,7 @@
                     "ID": "1",
                     "Priority": 1,
                     "Filter": {},
-                    "Status": "Enabled",
+                    "Status": "Disabled",
                     "Destination": {
                         "Bucket": "arn:aws:s3:::repela3"
                     },
