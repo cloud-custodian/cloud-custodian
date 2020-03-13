@@ -305,6 +305,7 @@ class PostFinding(Action):
     """ # NOQA
 
     FindingVersion = "2018-10-08"
+    ProductName = "default"
 
     permissions = ('securityhub:BatchImportFindings',)
 
@@ -450,9 +451,11 @@ class PostFinding(Action):
                         'utf8')).hexdigest())
         finding = {
             "SchemaVersion": self.FindingVersion,
-            "ProductArn": "arn:{}:securityhub:{}::product/cloud-custodian/cloud-custodian".format(
-                get_partition(self.manager.config.region),
-                region
+            "ProductArn": "arn:aws:securityhub:{}:{}:product/{}/{}".format(
+                region,
+                self.manager.config.account_id,
+                self.manager.config.account_id,
+                self.ProductName,
             ),
             "AwsAccountId": self.manager.config.account_id,
             # Long search chain for description values, as this was

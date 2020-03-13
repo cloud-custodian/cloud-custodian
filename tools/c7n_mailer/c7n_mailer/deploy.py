@@ -51,7 +51,9 @@ CORE_DEPS = [
     # requests (recursive deps), needed by datadog, slackclient, splunk
     'requests', 'urllib3', 'idna', 'chardet', 'certifi',
     # used by splunk; also dependencies of c7n itself
-    'jsonpointer', 'jsonpatch']
+    'jsonpointer', 'jsonpatch',
+    # sendgrid dependencies
+    'sendgrid', 'python_http_client']
 
 
 def get_archive(config):
