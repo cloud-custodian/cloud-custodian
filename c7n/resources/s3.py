@@ -1342,34 +1342,34 @@ class FilterPublicBlock(Filter):
 
     permissions = ("s3:GetBucketPublicAccessBlock")
 
-    def process(self, buckets, event=None):
-        kind = self.data.get('kind')
-        results = []
-        if kind is not None:
-            for bucket in buckets:
-                client = bucket_client(local_session(self.manager.session_factory), bucket)
-                result = client.get_public_access_block(Bucket=bucket['Name'])
-                results.append(bucket)
-        return results
-
     # def process(self, buckets, event=None):
-    #     results = list()
-    #     with self.executor_factory(max_workers=2) as w:
-    #         futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
-    #         for future in as_completed(futures):
-    #             bucket = futures[future]
-    #             if future.exception():
-    #                 continue
-    #             if future.result():
-    #                 results += filter(None, [future.result()])
+    #     kind = self.data.get('kind')
+    #     results = []
+    #     if kind is not None:
+    #         for bucket in buckets:
+    #             client = bucket_client(local_session(self.manager.session_factory), bucket)
+    #             result = client.get_public_access_block(Bucket=bucket['Name'])
+    #             results.append(bucket)
     #     return results
 
-    # def process_bucket(self, bucket):
-    #     s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-    #     kind = self.data.get('kind')
+    def process(self, buckets, event=None):
+        results = list()
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            for future in as_completed(futures):
+                bucket = futures[future]
+                if future.exception():
+                    continue
+                if future.result():
+                    results += filter(None, [future.result()])
+        return results
 
-    #     if kind is not None:
-    #         return s3.get_public_access_block(Bucket=bucket['Name'])
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+        kind = self.data.get('kind')
+
+        if kind is not None:
+            return s3.get_public_access_block(Bucket=bucket['Name'])
             
 
 @actions.register('set-public-block')
@@ -1386,10 +1386,17 @@ class SetPublicBlock(BucketActionBase):
                     kind: IgnorePublicAcls     
                 actions:
                   - type: set-public-block
-                    state: disable
+                    kind: All
+                    state: enable
     """
+
     schema = type_schema(
-        'set-bucket-replication',
+        'set-public-block',
+        kind={
+            'type': 'string', 
+            'enum': [ 'BlockPublicAcls', 'IgnorePublicAcls', 
+                'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']},
+        required=['kind', 'state'],        
         state={'type': 'string', 'enum': ['enable', 'disable']})
  
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
@@ -1410,19 +1417,18 @@ class SetPublicBlock(BucketActionBase):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         state = self.data.get('state')
-        if state is not None:
-            if state == 'remove':
-                s3.delete_bucket_replication(Bucket=bucket['Name'])
-                return {'Name': bucket['Name'], 'State': 'ReplicationConfigRemoved'}
-            if state in ('enable', 'disable'):
-                config = s3.get_bucket_replication(Bucket=bucket['Name'])
-                for rule in config['ReplicationConfiguration']['Rules']:
-                    rule['Status'] = 'Enabled' if state == 'enable' else 'Disabled'
-                s3.put_bucket_replication(
-                    Bucket=bucket['Name'],
-                    ReplicationConfiguration=config['ReplicationConfiguration']
-                )
-                return {'Name': bucket['Name'], 'State': 'ReplicationConfigUpdated'}
+        kind = self.data.get('kind')
+        config = s3.get_public_access_block(Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+        if kind == 'All':
+            for key in config.keys():
+                config[key] = True if state == 'enable' else False
+        else:       
+            config[kind] = True if state == 'enable' else False
+        s3.put_public_access_block(
+            Bucket=bucket['Name'],
+            PublicAccessBlockConfiguration=config
+        )
+        return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
 
 
 @actions.register('toggle-versioning')
