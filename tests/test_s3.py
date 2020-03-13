@@ -1553,7 +1553,7 @@ class S3Test(BaseTest):
         self.patch(
             s3,
             "S3_AUGMENT_TABLE",
-            [("get_bucket_replication", 'Replication', 
+            [("get_bucket_replication", 'Replication',
             None, None, 's3:GetReplicationConfiguration')],
         )
 
@@ -1647,7 +1647,7 @@ class S3Test(BaseTest):
         self.patch(
             s3,
             "S3_AUGMENT_TABLE",
-            [("get_bucket_replication", 'Replication', 
+            [("get_bucket_replication", 'Replication',
             None, None, 's3:GetReplicationConfiguration')],
         )
         self.patch(
