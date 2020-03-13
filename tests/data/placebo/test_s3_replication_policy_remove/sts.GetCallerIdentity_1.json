@@ -2,8 +2,8 @@
     "status_code": 200,
     "data": {
         "UserId": "AIDAYQEYKHVGXBGBCXPRN",
-        "Account": "584434990413",
-        "Arn": "arn:aws:iam::584434990413:user/john-admin",
+        "Account": "1112223334445",
+        "Arn": "arn:aws:iam::1112223334445:user/john-admin",
         "ResponseMetadata": {
             "RequestId": "fa47d885-7201-4e98-a897-216d45d28dd1",
             "HTTPStatusCode": 200,

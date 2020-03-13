@@ -15,7 +15,7 @@
             "RetryAttempts": 0
         },
         "ReplicationConfiguration": {
-            "Role": "arn:aws:iam::584434990413:role/s3_replicator",
+            "Role": "arn:aws:iam::1112223334445:role/s3_replicator",
             "Rules": [
                 {
                     "ID": "1",

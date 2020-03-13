@@ -17,7 +17,7 @@
         },
         "Buckets": [
             {
-                "Name": "cloud9-584434990413-sam-deployments-us-east-1",
+                "Name": "cloud9-1112223334445-sam-deployments-us-east-1",
                 "CreationDate": {
                     "__class__": "datetime",
                     "year": 2019,
@@ -30,7 +30,7 @@
                 }
             },
             {
-                "Name": "elasticbeanstalk-us-east-1-584434990413",
+                "Name": "elasticbeanstalk-us-east-1-1112223334445",
                 "CreationDate": {
                     "__class__": "datetime",
                     "year": 2019,
@@ -70,7 +70,7 @@
             }
         ],
         "Owner": {
-            "DisplayName": "hillegassdev",
+            "DisplayName": "pikachu",
             "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a"
         }
     }
