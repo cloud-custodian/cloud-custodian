@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "DB507D277DA4F739",
+            "HostId": "4Ou0Ncrg+Qi9d7k2o+yTfJ9SaSztQqg9iq65H4MuO9v0yrgiRZIsABMZemLRHkN8gpiiln9N7Og=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "4Ou0Ncrg+Qi9d7k2o+yTfJ9SaSztQqg9iq65H4MuO9v0yrgiRZIsABMZemLRHkN8gpiiln9N7Og=",
+                "x-amz-request-id": "DB507D277DA4F739",
+                "date": "Fri, 13 Mar 2020 21:05:51 GMT",
+                "x-amz-bucket-region": "us-east-1",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "IsTruncated": false,
+        "Marker": "",
+        "Name": "mypublicblock",
+        "Prefix": "",
+        "MaxKeys": 1000,
+        "EncodingType": "url"
+    }
+}

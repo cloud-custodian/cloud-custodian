@@ -1342,16 +1342,6 @@ class FilterPublicBlock(Filter):
 
     permissions = ("s3:GetBucketPublicAccessBlock")
 
-    # def process(self, buckets, event=None):
-    #     kind = self.data.get('kind')
-    #     results = []
-    #     if kind is not None:
-    #         for bucket in buckets:
-    #             client = bucket_client(local_session(self.manager.session_factory), bucket)
-    #             result = client.get_public_access_block(Bucket=bucket['Name'])
-    #             results.append(bucket)
-    #     return results
-
     def process(self, buckets, event=None):
         results = list()
         with self.executor_factory(max_workers=2) as w:
@@ -1367,9 +1357,10 @@ class FilterPublicBlock(Filter):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         kind = self.data.get('kind')
-
-        if kind is not None:
-            return s3.get_public_access_block(Bucket=bucket['Name'])
+        response = s3.get_public_access_block(Bucket=bucket['Name'])
+        if response is not None:
+            response['Name'] = bucket['Name']
+        return response
             
 
 @actions.register('set-public-block')
@@ -1419,16 +1410,19 @@ class SetPublicBlock(BucketActionBase):
         state = self.data.get('state')
         kind = self.data.get('kind')
         config = s3.get_public_access_block(Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
-        if kind == 'All':
-            for key in config.keys():
-                config[key] = True if state == 'enable' else False
-        else:       
-            config[kind] = True if state == 'enable' else False
-        s3.put_public_access_block(
-            Bucket=bucket['Name'],
-            PublicAccessBlockConfiguration=config
-        )
-        return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
+        if config is not None:
+            if kind == 'All':
+                for key in config.keys():
+                    config[key] = True if state == 'enable' else False
+            else:       
+                config[kind] = True if state == 'enable' else False
+            s3.put_public_access_block(
+                Bucket=bucket['Name'],
+                PublicAccessBlockConfiguration=config
+            )
+            return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
+        else:
+            return    
 
 
 @actions.register('toggle-versioning')

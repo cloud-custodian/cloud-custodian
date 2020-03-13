@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "3AC21B3CA070D6B9",
+            "HostId": "TKvXzc2gx5mJhW+LqkSjxc0UF0NwthTP6tzaZsTzKSYPEpt7EURqDcASKMcSfVgPQ9x7t2c86Ec=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "TKvXzc2gx5mJhW+LqkSjxc0UF0NwthTP6tzaZsTzKSYPEpt7EURqDcASKMcSfVgPQ9x7t2c86Ec=",
+                "x-amz-request-id": "3AC21B3CA070D6B9",
+                "date": "Fri, 13 Mar 2020 21:13:07 GMT",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": false,
+            "IgnorePublicAcls": true,
+            "BlockPublicPolicy": true,
+            "RestrictPublicBuckets": true
+        }
+    }
+}

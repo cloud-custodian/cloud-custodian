@@ -1,0 +1,90 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "A6A386419A50BF67",
+            "HostId": "SUnDKEMD5YpoQ18T/TjWz7ptLhLS1Xg9JhcaPooKpik7tc5NUhBzXDcg/TuGkskMXLd62HivjWE=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "SUnDKEMD5YpoQ18T/TjWz7ptLhLS1Xg9JhcaPooKpik7tc5NUhBzXDcg/TuGkskMXLd62HivjWE=",
+                "x-amz-request-id": "A6A386419A50BF67",
+                "date": "Fri, 13 Mar 2020 21:00:50 GMT",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "Buckets": [
+            {
+                "Name": "cloud9-1112223334445-sam-deployments-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 27,
+                    "hour": 23,
+                    "minute": 34,
+                    "second": 59,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "elasticbeanstalk-us-east-1-1112223334445",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 23,
+                    "hour": 21,
+                    "minute": 21,
+                    "second": 44,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "mypublicblock",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 13,
+                    "hour": 21,
+                    "minute": 0,
+                    "second": 47,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "repela",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 20,
+                    "second": 1,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "repela3",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 20,
+                    "second": 54,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "pikachu",
+            "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a"
+        }
+    }
+}

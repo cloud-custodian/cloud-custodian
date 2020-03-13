@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "10DAFA1165B4B6FD",
+            "HostId": "YolOw1JKg54AHDXwVf5BSB/scx4T+CXi8rHThNH9OgJjpgpnP+9AFChUc+e8hDq5/HXE0QSMgbo=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "YolOw1JKg54AHDXwVf5BSB/scx4T+CXi8rHThNH9OgJjpgpnP+9AFChUc+e8hDq5/HXE0QSMgbo=",
+                "x-amz-request-id": "10DAFA1165B4B6FD",
+                "date": "Fri, 13 Mar 2020 21:13:04 GMT",
+                "location": "/mypublicblock",
+                "content-length": "0",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "Location": "/mypublicblock"
+    }
+}
