@@ -1553,7 +1553,8 @@ class S3Test(BaseTest):
         self.patch(
             s3,
             "S3_AUGMENT_TABLE",
-            [("get_bucket_replication", 'Replication', None, None, 's3:GetReplicationConfiguration')],
+            [("get_bucket_replication", 'Replication', 
+            None, None, 's3:GetReplicationConfiguration')],
         )
 
         # and ignore any other buckets we might have in this test account
@@ -1629,15 +1630,15 @@ class S3Test(BaseTest):
             session_factory=session_factory,
         )
 
-        # Test that there was a bucket with an enabled replication policy        
+        # Test that there was a bucket with an enabled replication policy
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        # Run the filter again and test that there are no longer any buckets with enabled replication policies
+        # Run the filter again, test there are not any buckets with enabled replication policies
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
-         # Test to make sure that the replication policy removed from the buckets
+        # Test to make sure that the replication policy removed from the buckets
         self.assertRaises(ClientError, client.get_bucket_replication, Bucket=replicated_from_name)
 
     def test_bucket_replication_policy_disable(self):
@@ -1646,7 +1647,8 @@ class S3Test(BaseTest):
         self.patch(
             s3,
             "S3_AUGMENT_TABLE",
-            [("get_bucket_replication", 'Replication', None, None, 's3:GetReplicationConfiguration')],
+            [("get_bucket_replication", 'Replication', 
+            None, None, 's3:GetReplicationConfiguration')],
         )
         self.patch(
             s3.S3.resource_type,
@@ -1688,7 +1690,7 @@ class S3Test(BaseTest):
         # Test that there was a bucket with an enabled replication policy
         self.assertEqual(len(resources), 1)
 
-        # Run the filter again and test that there are no longer any buckets with enabled replication policies
+        # Run the filter again, test there are not any buckets with enabled replication policies
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
