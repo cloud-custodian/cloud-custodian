@@ -420,6 +420,7 @@ S3_AUGMENT_TABLE = (
      'Notification', None, None, 's3:GetBucketNotification'),
     ('get_bucket_lifecycle_configuration',
      'Lifecycle', None, None, 's3:GetLifecycleConfiguration'),
+    ('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')
     #        ('get_bucket_cors', 'Cors'),
 )
 
