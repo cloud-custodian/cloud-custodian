@@ -1199,7 +1199,7 @@ class RegionCopySnapshot(BaseAction):
       - name: copy-encrypted-snapshots
         description: |
           copy snapshots under 1 day old to dr region with kms
-        resource: rdb-snapshot
+        resource: rds-snapshot
         region: us-east-1
         filters:
          - Status: available
@@ -1214,7 +1214,7 @@ class RegionCopySnapshot(BaseAction):
             target_key: arn:aws:kms:us-east-2:0000:key/cb291f53-c9cf61
             copy_tags: true
             tags:
-              - OriginRegion: us-east-1
+              OriginRegion: us-east-1
     """
 
     schema = type_schema(

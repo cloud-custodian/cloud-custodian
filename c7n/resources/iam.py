@@ -378,7 +378,7 @@ class ServiceUsage(Filter):
 
     .. code-block:: yaml
 
-      - name: unused-users
+      - name: usage-unused-users
         resource: iam-user
         filters:
           - type: usage
@@ -1678,7 +1678,7 @@ class UserDelete(BaseAction):
       .. code-block:: yaml
 
         # using a 'credential' filter'
-        - name: iam-only-whitelisted-users
+        - name: iam-only-whitelisted-users-credential
           resource: iam-user
           filters:
             - type: credential
@@ -1691,7 +1691,7 @@ class UserDelete(BaseAction):
             - delete
 
         # using a 'username' filter with 'UserName'
-        - name: iam-only-whitelisted-users
+        - name: iam-only-whitelisted-users-username
           resource: iam-user
           filters:
             - type: value
@@ -1704,7 +1704,7 @@ class UserDelete(BaseAction):
             - delete
 
          # using a 'username' filter with 'Arn'
-        - name: iam-only-whitelisted-users
+        - name: iam-only-whitelisted-users-arn
           resource: iam-user
           filters:
             - type: value
@@ -1735,15 +1735,15 @@ class UserDelete(BaseAction):
                 the username is included in whitelist
               resource: iam-user
               filters:
-                - type: username
+                - type: value
                   key: UserName
                   op: not-in
                   value:
                     - valid-user-1
                     - valid-user-2
                 - type: credential
-                  key: Status
-                  value: Active
+                  key: password_enabled
+                  value: true
               actions:
                 - type: delete
                   options:
