@@ -1548,16 +1548,13 @@ class S3Test(BaseTest):
         replicated_to_name = "replication-t0-12345"
 
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
-        self.patch(
-            s3.SetBucketReplicationConfig, "executor_factory", MainThreadExecutor
-        )
 
-        # Remove GetBucketLocation from augments
-        # was causing AttributeError: 'FakeHttpResponse' object has no attribute 'content'
-        augments = list(s3.S3_AUGMENT_TABLE)
-        augments.remove((
-            "get_bucket_location", "Location", {}, None, 's3:GetBucketLocation'))
-        self.patch(s3, "S3_AUGMENT_TABLE", augments)
+        # only augment with logging info to minimize API calls
+        self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [("get_bucket_replication", 'Replication', None, None, 's3:GetReplicationConfiguration')],
+        )
 
         # and ignore any other buckets we might have in this test account
         # to minimize the placebo data and API calls
@@ -1605,11 +1602,6 @@ class S3Test(BaseTest):
             }
         )
 
-        # Test to make sure that a replication policy was in fact created between the buckets
-        response = client.get_bucket_replication(Bucket=replicated_from_name)
-        for rule in response['ReplicationConfiguration']['Rules']:
-            self.assertEqual(rule['Status'], 'Enabled')
-
         p = self.load_policy(
             {
                 "name": "s3-has-replica-policy",
@@ -1636,22 +1628,26 @@ class S3Test(BaseTest):
             },
             session_factory=session_factory,
         )
+
+        # Test that there was a bucket with an enabled replication policy        
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        # Test to make sure that the replication policy removed from the buckets
+        # Run the filter again and test that there are no longer any buckets with enabled replication policies
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+         # Test to make sure that the replication policy removed from the buckets
         self.assertRaises(ClientError, client.get_bucket_replication, Bucket=replicated_from_name)
 
     def test_bucket_replication_policy_disable(self):
         bname = "repela"
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(
-            s3.SetBucketReplicationConfig, "executor_factory", MainThreadExecutor
+            s3,
+            "S3_AUGMENT_TABLE",
+            [("get_bucket_replication", 'Replication', None, None, 's3:GetReplicationConfiguration')],
         )
-        augments = list(s3.S3_AUGMENT_TABLE)
-        augments.remove((
-            "get_bucket_location", "Location", {}, None, 's3:GetBucketLocation'))
-        self.patch(s3, "S3_AUGMENT_TABLE", augments)
         self.patch(
             s3.S3.resource_type,
             "enum_spec",
@@ -1692,7 +1688,7 @@ class S3Test(BaseTest):
         # Test that there was a bucket with an enabled replication policy
         self.assertEqual(len(resources), 1)
 
-        # Rerun filter to test there are no longer any buckets with enabled replication policies
+        # Run the filter again and test that there are no longer any buckets with enabled replication policies
         resources = p.run()
         self.assertEqual(len(resources), 0)
 

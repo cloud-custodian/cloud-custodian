@@ -2,20 +2,20 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "E8F77969496B1380",
-            "HostId": "FskctD6SXU1WgyQtALQFttGf/tnzzLT6P+OqoaSemC8Q95fD3qMHLfD11siR/NvAUT+0oe2sKYI=",
+            "RequestId": "1766614C41725D37",
+            "HostId": "r5qc1QKns7U3Ln5z9YJ9OoJ9a8Ac/5yvCUDQYsvZdMTLYmQEdVxRp7xJUBFVsGtgHmhXjSJX+4s=",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "FskctD6SXU1WgyQtALQFttGf/tnzzLT6P+OqoaSemC8Q95fD3qMHLfD11siR/NvAUT+0oe2sKYI=",
-                "x-amz-request-id": "E8F77969496B1380",
-                "date": "Thu, 12 Mar 2020 17:20:30 GMT",
+                "x-amz-id-2": "r5qc1QKns7U3Ln5z9YJ9OoJ9a8Ac/5yvCUDQYsvZdMTLYmQEdVxRp7xJUBFVsGtgHmhXjSJX+4s=",
+                "x-amz-request-id": "1766614C41725D37",
+                "date": "Fri, 13 Mar 2020 01:28:47 GMT",
                 "transfer-encoding": "chunked",
                 "server": "AmazonS3"
             },
             "RetryAttempts": 0
         },
         "ReplicationConfiguration": {
-            "Role": "arn:aws:iam::1112223334445:role/s3_replicator",
+            "Role": "arn:aws:iam::584434990413:role/s3_replicator",
             "Rules": [
                 {
                     "ID": "1",
