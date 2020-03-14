@@ -1351,8 +1351,6 @@ class FilterPublicBlock(Filter):
             for future in as_completed(futures):
                 bucket = futures[future]
                 if future.exception():
-                    print(future.exception())
-
                     continue
                 if future.result():
                     results.append(bucket)
@@ -1420,7 +1418,7 @@ class SetPublicBlock(BucketActionBase):
                 try:
                     future.result()
                 except ClientError as e:
-                    errors.append("Message: %s Bucket: %s", e, bucket['Name'])
+                    errors.append("Message: %s Bucket: %s" % (e, bucket['Name']))
             if errors:
                 raise Exception('\n'.join(map(str, errors)))
 
@@ -1428,7 +1426,13 @@ class SetPublicBlock(BucketActionBase):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         state = self.data.get('state')
         kind = self.data.get('kind')
-        config = s3.get_public_access_block(Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+        try:
+            config = s3.get_public_access_block(Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
+                config = None
+            else:
+                raise            
         if config:
             if kind == 'All':
                 for key in config.keys():
