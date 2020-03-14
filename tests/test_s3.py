@@ -1543,6 +1543,7 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @functional
     def test_bucket_replication_policy_remove(self):
         replicated_from_name = "replication-from-12345"
         replicated_to_name = "replication-t0-12345"
