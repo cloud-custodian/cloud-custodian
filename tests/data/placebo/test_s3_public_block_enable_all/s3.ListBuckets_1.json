@@ -2,13 +2,13 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "116A64C57E766CB9",
-            "HostId": "X4w6GjZcOdSQAlgcWbdCekEdMFxPB0LZulKb+Wr7dw3d7sX7XH/eLOxJ9GTcuAHm/+gTRhuSRcI=",
+            "RequestId": "4792E0847BB63838",
+            "HostId": "Bo2Eji0arQ+Vj+PJ/l6cZ11nt3S0yJgM/s2g94tXm6mMdr44V/b7BI8KZgosMCuMZhtCe+9F030=",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "X4w6GjZcOdSQAlgcWbdCekEdMFxPB0LZulKb+Wr7dw3d7sX7XH/eLOxJ9GTcuAHm/+gTRhuSRcI=",
-                "x-amz-request-id": "116A64C57E766CB9",
-                "date": "Fri, 13 Mar 2020 21:00:48 GMT",
+                "x-amz-id-2": "Bo2Eji0arQ+Vj+PJ/l6cZ11nt3S0yJgM/s2g94tXm6mMdr44V/b7BI8KZgosMCuMZhtCe+9F030=",
+                "x-amz-request-id": "4792E0847BB63838",
+                "date": "Sat, 14 Mar 2020 02:32:33 GMT",
                 "content-type": "application/xml",
                 "transfer-encoding": "chunked",
                 "server": "AmazonS3"
@@ -17,67 +17,15 @@
         },
         "Buckets": [
             {
-                "Name": "cloud9-1112223334445-sam-deployments-us-east-1",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 10,
-                    "day": 27,
-                    "hour": 23,
-                    "minute": 34,
-                    "second": 59,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "elasticbeanstalk-us-east-1-1112223334445",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 6,
-                    "day": 23,
-                    "hour": 21,
-                    "minute": 21,
-                    "second": 44,
-                    "microsecond": 0
-                }
-            },
-            {
                 "Name": "mypublicblock",
                 "CreationDate": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 3,
-                    "day": 13,
-                    "hour": 21,
-                    "minute": 0,
-                    "second": 47,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "repela",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 10,
-                    "hour": 20,
-                    "minute": 20,
-                    "second": 1,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "repela3",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 10,
-                    "hour": 20,
-                    "minute": 20,
-                    "second": 54,
+                    "day": 14,
+                    "hour": 0,
+                    "minute": 52,
+                    "second": 29,
                     "microsecond": 0
                 }
             }

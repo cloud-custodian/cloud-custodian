@@ -1561,58 +1561,16 @@ class S3Test(BaseTest):
         session = session_factory()
         client = session.client("s3")
 
-        # Create a bucket with no public blocks
-        client.create_bucket(
-            Bucket=bname
-        )
-        self.addCleanup(destroyBucket, client, bname)
-        client.put_public_access_block(
-            Bucket=bname,
-            PublicAccessBlockConfiguration={
-                'BlockPublicAcls': False,
-                'IgnorePublicAcls': False,
-                'BlockPublicPolicy': False,
-                'RestrictPublicBuckets': False
-            }
-        )
-
-        if self.recording:
-            time.sleep(1)
-
         p = self.load_policy(
             {
                 "name": "CheckForPublicBlocks-Absent",
                 "resource": "s3",
                 "filters": [
                     {
-                        "type": "value",
-                        "key": "PublicBlock",
-                        "value": "present"
-                    },
-                    {
-                        "or": [
-                            {
-                                "type": "value",
-                                "key": "PublicBlock.PublicAccessBlockConfiguration.BlockPublicAcls",
-                                "value": False
-                            },
-                            {
-                                "type": "value",
-                                "key": "PublicBlock.PublicAccessBlockConfiguration.IgnorePublicAcls",
-                                "value": False
-                            },
-                            {
-                                "type": "value",
-                                "key": "PublicBlock.PublicAccessBlockConfiguration.BlockPublicPolicy",
-                                "value": False
-                            },
-                            {
-                                "type": "value",
-                                "key": "PublicBlock.PublicAccessBlockConfiguration.RestrictPublicBuckets",
-                                "value": False
-                            },
-                        ]
-                    }               
+                        "type": "check-public-block",
+                        "scope": "Any",
+                        "state": "absent"
+                    }
                 ],
                 "actions": [
                     {
@@ -1625,22 +1583,21 @@ class S3Test(BaseTest):
             session_factory=session_factory,
         )
 
-        # Test that there was a bucket with missing public blocks
+        # Test that there was a bucket with missing public blocks      
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        if self.recording:
-            time.sleep(1)
-
-        # Run the filter again and test that there are no longer any missing blocks
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
-
         # Verbose test to make sure that the public blocks are enabled on the buckets
-        response = client.get_public_access_block(Bucket=bname)
-        if response['PublicAccessBlockConfiguration'] is not None:
-            for key in response['PublicAccessBlockConfiguration'].keys():
-                self.assertEqual(response['PublicAccessBlockConfiguration'][key], True)
+        try:
+            response = client.get_public_access_block(Bucket=bname)['PublicAccessBlockConfiguration'] 
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
+                response = None
+            else:
+                raise              
+        if response:
+            for key in response.keys():
+                self.assertEqual(response[key], True)
 
     def test_set_public_block_disable_all(self):
         bname = 'mypublicblock'
@@ -1660,57 +1617,15 @@ class S3Test(BaseTest):
         session = session_factory()
         client = session.client("s3")
 
-        # Create a bucket with all public blocks
-        client.create_bucket(
-            Bucket=bname
-        )
-        self.addCleanup(destroyBucket, client, bname)
-        client.put_public_access_block(
-            Bucket=bname,
-            PublicAccessBlockConfiguration={
-                'BlockPublicAcls': True,
-                'IgnorePublicAcls': True,
-                'BlockPublicPolicy': True,
-                'RestrictPublicBuckets': True
-            }
-        )
-
-        if self.recording:
-            time.sleep(1)
-
         p = self.load_policy(
             {
-                "name": "CheckForPublicBlocks-Absent",
+                "name": "CheckForPublicBlocks-Present",
                 "resource": "s3",
                 "filters": [
                     {
-                        "type": "value",
-                        "key": "PublicBlock",
-                        "value": "present"
-                    },
-                    {
-                        "or": [
-                            {
-                                "type": "value",
-                                "key": "PublicBlock.PublicAccessBlockConfiguration.BlockPublicAcls",
-                                "value": True
-                            },
-                            {
-                                "type": "value",
-                                "key": "PublicBlock.PublicAccessBlockConfiguration.IgnorePublicAcls",
-                                "value": True
-                            },
-                            {
-                                "type": "value",
-                                "key": "PublicBlock.PublicAccessBlockConfiguration.BlockPublicPolicy",
-                                "value": True
-                            },
-                            {
-                                "type": "value",
-                                "key": "PublicBlock.PublicAccessBlockConfiguration.RestrictPublicBuckets",
-                                "value": True
-                            },
-                        ]
+                        "type": "check-public-block",
+                        "scope": "Any",
+                        "state": "present"
                     }
                 ],
                 "actions": [
@@ -1724,22 +1639,22 @@ class S3Test(BaseTest):
             session_factory=session_factory,
         )
 
-        # Test that there was a bucket with all public blocks      
+        # Test that there was a bucket with missing public blocks      
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        if self.recording:
-            time.sleep(1)
-
-        # Run the filter again and test that there are no longer any public blocks
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
-
-        # Verbose test to make sure that the public blocks are removed from the buckets
-        response = client.get_public_access_block(Bucket=bname)
-        if response['PublicAccessBlockConfiguration'] is not None:
-            for key in response['PublicAccessBlockConfiguration'].keys():
-                self.assertEqual(response['PublicAccessBlockConfiguration'][key], False)
+        # Verbose test to make sure that the public blocks are enabled on the buckets
+        try:
+            response = client.get_public_access_block(Bucket=bname)['PublicAccessBlockConfiguration'] 
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
+                self.assertEqual(response, None)
+            else:
+                raise              
+        if response:
+            for key in response.keys():
+                self.assertEqual(response[key], False)        
+                         
 
     def test_set_public_block_enable_one(self):
         bname = 'mypublicblock'
@@ -1755,27 +1670,9 @@ class S3Test(BaseTest):
             "enum_spec",
             ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
         )             
-        session_factory = self.replay_flight_data("test_s3_public_block_enable_one")
+        session_factory = self.replay_flight_data("test_s3_public_block_enable_one")      
         session = session_factory()
         client = session.client("s3")
-
-        # Create a bucket with all public blocks
-        client.create_bucket(
-            Bucket=bname
-        )
-        self.addCleanup(destroyBucket, client, bname)
-        client.put_public_access_block(
-            Bucket=bname,
-            PublicAccessBlockConfiguration={
-                'BlockPublicAcls': False,
-                'IgnorePublicAcls': False,
-                'BlockPublicPolicy': False,
-                'RestrictPublicBuckets': False
-            }
-        )
-
-        if self.recording:
-            time.sleep(1)
 
         p = self.load_policy(
             {
@@ -1783,15 +1680,10 @@ class S3Test(BaseTest):
                 "resource": "s3",
                 "filters": [
                     {
-                        "type": "value",
-                        "key": "PublicBlock",
-                        "value": "present"
-                    },
-                    {
-                        "type": "value",
-                        "key": "PublicBlock.PublicAccessBlockConfiguration.BlockPublicPolicy",
-                        "value": False
-                    }        
+                        "type": "check-public-block",
+                        "scope": "BlockPublicPolicy",
+                        "state": "absent"
+                    }
                 ],
                 "actions": [
                     {
@@ -1804,21 +1696,20 @@ class S3Test(BaseTest):
             session_factory=session_factory,
         )
 
-        # Test that there was a bucket with BlockPublicAcls public block
+        # Test that there was a bucket with BlockPublicAcls public block      
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        if self.recording:
-            time.sleep(1)
-
-        # Run the filter again and test that there are no longer a bucket with BlockPublicAcls public block
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
-
-        # Verbose test to make verify BlockPublicAcls was removed
-        response = client.get_public_access_block(Bucket=bname)
-        if response['PublicAccessBlockConfiguration'] is not None:
-            self.assertEqual(response['PublicAccessBlockConfiguration']['BlockPublicPolicy'], True)
+        # Verbose test to make sure that the public blocks are enabled on the buckets
+        try:
+            response = client.get_public_access_block(Bucket=bname)['PublicAccessBlockConfiguration'] 
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
+                self.assertEqual(response, None)
+            else:
+                raise              
+        if response:
+            self.assertEqual(response['BlockPublicPolicy'], True)    
 
     def test_set_public_block_disable_one(self):
         bname = 'mypublicblock'
@@ -1833,28 +1724,10 @@ class S3Test(BaseTest):
             s3.S3.resource_type,
             "enum_spec",
             ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
-        )
+        )             
         session_factory = self.replay_flight_data("test_s3_public_block_disable_one")      
         session = session_factory()
         client = session.client("s3")
-
-        # Create a bucket with all public blocks
-        client.create_bucket(
-            Bucket=bname
-        )
-        self.addCleanup(destroyBucket, client, bname)
-        client.put_public_access_block(
-            Bucket=bname,
-            PublicAccessBlockConfiguration={
-                'BlockPublicAcls': True,
-                'IgnorePublicAcls': True,
-                'BlockPublicPolicy': True,
-                'RestrictPublicBuckets': True
-            }
-        )
-
-        if self.recording:
-            time.sleep(1)
 
         p = self.load_policy(
             {
@@ -1862,20 +1735,15 @@ class S3Test(BaseTest):
                 "resource": "s3",
                 "filters": [
                     {
-                        "type": "value",
-                        "key": "PublicBlock",
-                        "value": "present"
-                    },
-                    {
-                        "type": "value",
-                        "key": "PublicBlock.PublicAccessBlockConfiguration.BlockPublicAcls",
-                        "value": True
+                        "type": "check-public-block",
+                        "scope": "IgnorePublicAcls",
+                        "state": "present"
                     }
                 ],
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "kind": "BlockPublicAcls",
+                        "kind": "IgnorePublicAcls",
                         "state": "disable"
                     }
                 ]
@@ -1883,21 +1751,20 @@ class S3Test(BaseTest):
             session_factory=session_factory,
         )
 
-        # Test that there was a bucket with BlockPublicAcls public block
+        # Test that there was a bucket with BlockPublicAcls public block      
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        if self.recording:
-            time.sleep(1)
-
-        # Run the filter again and test that there are no longer a bucket with BlockPublicAcls public block
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
-
-        # Verbose test to make verify BlockPublicAcls was removed
-        response = client.get_public_access_block(Bucket=bname)
-        if response['PublicAccessBlockConfiguration'] is not None:
-            self.assertEqual(response['PublicAccessBlockConfiguration']['BlockPublicAcls'], False)
+        # Verbose test to make sure that the public blocks are enabled on the buckets
+        try:
+            response = client.get_public_access_block(Bucket=bname)['PublicAccessBlockConfiguration'] 
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
+                self.assertEqual(response, None)
+            else:
+                raise              
+        if response:
+            self.assertEqual(response['IgnorePublicAcls'], False)   
 
     def test_has_statement_similar_policies(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)

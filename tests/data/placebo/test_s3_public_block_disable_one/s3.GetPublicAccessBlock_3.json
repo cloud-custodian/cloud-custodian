@@ -2,20 +2,20 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "B5B7D3E88945E179",
-            "HostId": "s2JFZLVLYEynnQJSgKdFUXJqMGD3Uwv74xKBL3ZLBwJDwGwoeNqmYI9CGv/YxCagLHCZuI7P3WU=",
+            "RequestId": "6626BC583F925E83",
+            "HostId": "l/6ZzI5iiseky8DPkZ6xmLhxoBYmujJr9W63A1+YBU6HRB3OrIraaNX06OH1cTAyR2kXypLc9tg=",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "s2JFZLVLYEynnQJSgKdFUXJqMGD3Uwv74xKBL3ZLBwJDwGwoeNqmYI9CGv/YxCagLHCZuI7P3WU=",
-                "x-amz-request-id": "B5B7D3E88945E179",
-                "date": "Fri, 13 Mar 2020 21:13:07 GMT",
+                "x-amz-id-2": "l/6ZzI5iiseky8DPkZ6xmLhxoBYmujJr9W63A1+YBU6HRB3OrIraaNX06OH1cTAyR2kXypLc9tg=",
+                "x-amz-request-id": "6626BC583F925E83",
+                "date": "Sat, 14 Mar 2020 02:42:51 GMT",
                 "transfer-encoding": "chunked",
                 "server": "AmazonS3"
             },
             "RetryAttempts": 0
         },
         "PublicAccessBlockConfiguration": {
-            "BlockPublicAcls": false,
+            "BlockPublicAcls": true,
             "IgnorePublicAcls": true,
             "BlockPublicPolicy": true,
             "RestrictPublicBuckets": true
