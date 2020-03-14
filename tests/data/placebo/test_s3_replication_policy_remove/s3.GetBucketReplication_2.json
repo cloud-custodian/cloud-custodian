@@ -7,15 +7,15 @@
             "BucketName": "replication-from-12345"
         },
         "ResponseMetadata": {
-            "RequestId": "0ADD73AEC9C0374D",
-            "HostId": "mYsItllEdxTsa4EgWz4VGF83L5ABnNyiTbShXZebyTifeqk6ZzCJj2BUnfUosGHAfIBTV4qXCic=",
+            "RequestId": "34C31C0F84A31C8E",
+            "HostId": "mtneB363n72WYoVeE9dQp8QUQuh8gyd7WB+0HZr7guW79aV1zka3Blm+ioZstR970CQ880S60dM=",
             "HTTPStatusCode": 404,
             "HTTPHeaders": {
-                "x-amz-request-id": "0ADD73AEC9C0374D",
-                "x-amz-id-2": "mYsItllEdxTsa4EgWz4VGF83L5ABnNyiTbShXZebyTifeqk6ZzCJj2BUnfUosGHAfIBTV4qXCic=",
+                "x-amz-request-id": "34C31C0F84A31C8E",
+                "x-amz-id-2": "mtneB363n72WYoVeE9dQp8QUQuh8gyd7WB+0HZr7guW79aV1zka3Blm+ioZstR970CQ880S60dM=",
                 "content-type": "application/xml",
                 "transfer-encoding": "chunked",
-                "date": "Fri, 13 Mar 2020 01:30:28 GMT",
+                "date": "Sat, 14 Mar 2020 00:36:39 GMT",
                 "server": "AmazonS3"
             },
             "RetryAttempts": 0

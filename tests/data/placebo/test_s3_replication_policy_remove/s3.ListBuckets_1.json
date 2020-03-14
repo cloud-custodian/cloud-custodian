@@ -2,13 +2,13 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "04FB138DF3E24ED6",
-            "HostId": "brHUNWyAwlcJ/U7W/jTp9c9n7OdBHP6LafzU9A+LJUBH0+9ImJ99OuT0H/HTLZN6W0rPL2GRbi8=",
+            "RequestId": "B045198DE8B8FFA3",
+            "HostId": "/6n3qKeIVHzcMdkMKFGqE6Zw5HnDu3JZoYhzx+DfSWg4eqlKhc7vHBRROLEW9r0Rb/fVFZ/mif4=",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "brHUNWyAwlcJ/U7W/jTp9c9n7OdBHP6LafzU9A+LJUBH0+9ImJ99OuT0H/HTLZN6W0rPL2GRbi8=",
-                "x-amz-request-id": "04FB138DF3E24ED6",
-                "date": "Fri, 13 Mar 2020 01:30:30 GMT",
+                "x-amz-id-2": "/6n3qKeIVHzcMdkMKFGqE6Zw5HnDu3JZoYhzx+DfSWg4eqlKhc7vHBRROLEW9r0Rb/fVFZ/mif4=",
+                "x-amz-request-id": "B045198DE8B8FFA3",
+                "date": "Sat, 14 Mar 2020 00:36:40 GMT",
                 "content-type": "application/xml",
                 "transfer-encoding": "chunked",
                 "server": "AmazonS3"
@@ -22,29 +22,16 @@
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 3,
-                    "day": 13,
-                    "hour": 1,
-                    "minute": 30,
-                    "second": 26,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "replication-t0-12345",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 13,
-                    "hour": 1,
-                    "minute": 30,
-                    "second": 29,
+                    "day": 14,
+                    "hour": 0,
+                    "minute": 33,
+                    "second": 50,
                     "microsecond": 0
                 }
             }
         ],
         "Owner": {
-            "DisplayName": "pikachu",
+            "DisplayName": "pikachudev",
             "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a"
         }
     }

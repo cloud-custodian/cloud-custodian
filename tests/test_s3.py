@@ -1543,10 +1543,8 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    @functional
     def test_bucket_replication_policy_remove(self):
         replicated_from_name = "replication-from-12345"
-        replicated_to_name = "replication-t0-12345"
 
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
 
@@ -1569,40 +1567,6 @@ class S3Test(BaseTest):
         session_factory = self.replay_flight_data("test_s3_replication_policy_remove")
         session = session_factory()
         client = session.client("s3")
-        account_id = session.client('sts').get_caller_identity().get('Account')
-        self.addCleanup(destroyBucket, client, replicated_from_name)
-        self.addCleanup(destroyBucket, client, replicated_to_name)
-
-        # Setup buckets for replication by creating and adding versioning
-        for bucket in (replicated_from_name, replicated_to_name):
-            client.create_bucket(
-                Bucket=bucket
-            )
-            client.put_bucket_versioning(
-                Bucket=bucket,
-                VersioningConfiguration={
-                    'MFADelete': 'Disabled',
-                    'Status': 'Enabled'
-                }
-            )
-
-        # add a replication policy between them
-        client.put_bucket_replication(
-            Bucket=replicated_from_name,
-            ReplicationConfiguration={
-                'Role': 'arn:aws:iam::' + account_id + ':role/s3_replicator',
-                'Rules': [
-                    {
-                        'ID': 'test12345',
-                        'Prefix': '',
-                        'Status': 'Enabled',
-                        'Destination': {
-                            'Bucket': 'arn:aws:s3:::' + replicated_to_name
-                        }
-                    }
-                ]
-            }
-        )
 
         p = self.load_policy(
             {
@@ -1634,10 +1598,6 @@ class S3Test(BaseTest):
         # Test that there was a bucket with an enabled replication policy
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
-        # Run the filter again, test there are not any buckets with enabled replication policies
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
 
         # Test to make sure that the replication policy removed from the buckets
         self.assertRaises(ClientError, client.get_bucket_replication, Bucket=replicated_from_name)
@@ -1690,10 +1650,6 @@ class S3Test(BaseTest):
 
         # Test that there was a bucket with an enabled replication policy
         self.assertEqual(len(resources), 1)
-
-        # Run the filter again, test there are not any buckets with enabled replication policies
-        resources = p.run()
-        self.assertEqual(len(resources), 0)
 
         # Test that there is a disbled policy on the bucket now
         response = client.get_bucket_replication(Bucket=bname)

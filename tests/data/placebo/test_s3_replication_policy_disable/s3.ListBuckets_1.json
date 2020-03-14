@@ -2,13 +2,13 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "RequestId": "3FEAFAF363DB9DDB",
-            "HostId": "DnOU71d0ErMJTafCf8FqQqExrFecqVk7mgdj2fycf5SFIvIGrqHZ1JB2MpX73qczCRKAtMaHBpk=",
+            "RequestId": "E24A1364168F9863",
+            "HostId": "tizMicEGXiMWg1cnegRnDkg3pnsrO72+q5N+E1KMt1G9G50UJ2tkzpf0a27q9v8MLGo70/qdZaM=",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amz-id-2": "DnOU71d0ErMJTafCf8FqQqExrFecqVk7mgdj2fycf5SFIvIGrqHZ1JB2MpX73qczCRKAtMaHBpk=",
-                "x-amz-request-id": "3FEAFAF363DB9DDB",
-                "date": "Fri, 13 Mar 2020 01:28:46 GMT",
+                "x-amz-id-2": "tizMicEGXiMWg1cnegRnDkg3pnsrO72+q5N+E1KMt1G9G50UJ2tkzpf0a27q9v8MLGo70/qdZaM=",
+                "x-amz-request-id": "E24A1364168F9863",
+                "date": "Sat, 14 Mar 2020 00:38:39 GMT",
                 "content-type": "application/xml",
                 "transfer-encoding": "chunked",
                 "server": "AmazonS3"
@@ -16,6 +16,32 @@
             "RetryAttempts": 0
         },
         "Buckets": [
+            {
+                "Name": "cloud9-1112223334445-sam-deployments-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 27,
+                    "hour": 23,
+                    "minute": 34,
+                    "second": 59,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "elasticbeanstalk-us-east-1-1112223334445",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 23,
+                    "hour": 21,
+                    "minute": 21,
+                    "second": 44,
+                    "microsecond": 0
+                }
+            },
             {
                 "Name": "repela",
                 "CreationDate": {
@@ -26,6 +52,45 @@
                     "hour": 20,
                     "minute": 20,
                     "second": 1,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "repela3",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 20,
+                    "second": 54,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "replication-from-12345",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 0,
+                    "minute": 33,
+                    "second": 50,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "replication-t0-12345",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 0,
+                    "minute": 34,
+                    "second": 3,
                     "microsecond": 0
                 }
             }
