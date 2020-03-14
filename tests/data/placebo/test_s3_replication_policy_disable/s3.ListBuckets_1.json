@@ -1,20 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "E24A1364168F9863",
-            "HostId": "tizMicEGXiMWg1cnegRnDkg3pnsrO72+q5N+E1KMt1G9G50UJ2tkzpf0a27q9v8MLGo70/qdZaM=",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amz-id-2": "tizMicEGXiMWg1cnegRnDkg3pnsrO72+q5N+E1KMt1G9G50UJ2tkzpf0a27q9v8MLGo70/qdZaM=",
-                "x-amz-request-id": "E24A1364168F9863",
-                "date": "Sat, 14 Mar 2020 00:38:39 GMT",
-                "content-type": "application/xml",
-                "transfer-encoding": "chunked",
-                "server": "AmazonS3"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "Buckets": [
             {
                 "Name": "repela",
