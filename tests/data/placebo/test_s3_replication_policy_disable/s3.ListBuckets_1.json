@@ -17,32 +17,6 @@
         },
         "Buckets": [
             {
-                "Name": "cloud9-1112223334445-sam-deployments-us-east-1",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 10,
-                    "day": 27,
-                    "hour": 23,
-                    "minute": 34,
-                    "second": 59,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "elasticbeanstalk-us-east-1-1112223334445",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 6,
-                    "day": 23,
-                    "hour": 21,
-                    "minute": 21,
-                    "second": 44,
-                    "microsecond": 0
-                }
-            },
-            {
                 "Name": "repela",
                 "CreationDate": {
                     "__class__": "datetime",
@@ -52,19 +26,6 @@
                     "hour": 20,
                     "minute": 20,
                     "second": 1,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "repela3",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 10,
-                    "hour": 20,
-                    "minute": 20,
-                    "second": 54,
                     "microsecond": 0
                 }
             }
