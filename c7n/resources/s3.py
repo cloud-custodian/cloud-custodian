@@ -1328,17 +1328,17 @@ class FilterPublicBlock(Filter):
                 region: us-west-2
                 filters:
                   - type: check-public-block
-                    kind: present                    
+                    kind: present
     """
 
     schema = type_schema(
         'check-public-block',
         scope={
-            'type': 'string', 
-            'enum': [ 'BlockPublicAcls', 'IgnorePublicAcls', 
+            'type': 'string',
+            'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
                 'BlockPublicPolicy', 'RestrictPublicBuckets', 'All', 'Any']},
         state={
-            'type': 'string', 
+            'type': 'string',
             'enum': ['absent', 'present']},
         required=['scope', 'state'])
 
@@ -1359,9 +1359,10 @@ class FilterPublicBlock(Filter):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         state = self.data.get('state')
-        scope = self.data.get('scope')        
+        scope = self.data.get('scope')
         try:
-            config = s3.get_public_access_block(Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+            config = s3.get_public_access_block(
+                Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 config = None
@@ -1373,12 +1374,11 @@ class FilterPublicBlock(Filter):
             elif scope == 'Any':
                 return any(config.values()) if state == 'present' else not any(config.values())
             else:
-                return config[scope] if state == 'present' else not config[scope]                                
+                return config[scope] if state == 'present' else not config[scope]
         else:
             # return true for a null config, meaning no public blocks
             return True if state == 'absent' else False
-        
-            
+
 
 @actions.register('set-public-block')
 class SetPublicBlock(BucketActionBase):
@@ -1391,7 +1391,7 @@ class SetPublicBlock(BucketActionBase):
                 resource: s3
                 filters:
                   - type: CheckForPublicBlocks
-                    kind: IgnorePublicAcls     
+                    kind: IgnorePublicAcls
                 actions:
                   - type: set-public-block
                     kind: All
@@ -1401,12 +1401,12 @@ class SetPublicBlock(BucketActionBase):
     schema = type_schema(
         'set-public-block',
         kind={
-            'type': 'string', 
-            'enum': [ 'BlockPublicAcls', 'IgnorePublicAcls', 
+            'type': 'string',
+            'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
                 'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']},
-        required=['kind', 'state'],        
+        required=['kind', 'state'],
         state={'type': 'string', 'enum': ['enable', 'disable']})
- 
+
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
 
     def process(self, buckets):
@@ -1427,17 +1427,18 @@ class SetPublicBlock(BucketActionBase):
         state = self.data.get('state')
         kind = self.data.get('kind')
         try:
-            config = s3.get_public_access_block(Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+            config = s3.get_public_access_block(
+                Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 config = None
             else:
-                raise            
+                raise
         if config:
             if kind == 'All':
                 for key in config.keys():
                     config[key] = True if state == 'enable' else False
-            else:       
+            else:
                 config[kind] = True if state == 'enable' else False
             s3.put_public_access_block(
                 Bucket=bucket['Name'],
@@ -1445,7 +1446,7 @@ class SetPublicBlock(BucketActionBase):
             )
             return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
         else:
-            return    
+            return
 
 
 @actions.register('toggle-versioning')
