@@ -12,7 +12,7 @@ LABEL name="policystream" \
 
 # Transfer Custodian source into container by directory
 # to minimize size
-ADD setup.py README.md requirements.txt /src/
+ADD setup.py README.md requirements-dev.txt requirements.txt /src/
 ADD c7n /src/c7n/
 ADD tools /src/tools/
 
@@ -23,9 +23,7 @@ RUN apt-get --yes update && apt-get --yes upgrade \
 	&& apt-get --yes install build-essential libgit2-dev libffi-dev python3-pip \
            python3-dev python3-setuptools python3-six python3-wheel \
            python3-cryptography python3-idna \
-	&& pip3 install -r requirements.txt  . \
-	&& pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
-	&& pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
+	&& pip3 install -r requirements-dev.txt  . \
 	&& pip3 install -r tools/c7n_policystream/requirements.txt tools/c7n_policystream \
 	&& apt-get --yes remove build-essential \
 	&& apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
