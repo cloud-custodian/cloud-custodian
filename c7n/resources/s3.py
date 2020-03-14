@@ -420,7 +420,6 @@ S3_AUGMENT_TABLE = (
      'Notification', None, None, 's3:GetBucketNotification'),
     ('get_bucket_lifecycle_configuration',
      'Lifecycle', None, None, 's3:GetLifecycleConfiguration'),
-    ('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')
     #        ('get_bucket_cors', 'Cors'),
 )
 
@@ -1323,22 +1322,25 @@ class FilterPublicBlock(Filter):
                 region: us-east-1
                 filters:
                   - type: check-public-block
-                    kind: BlockPublicAcls
+                    kind: absent
               - name: CheckForPublicAclIngnore-Off
                 resource: s3
                 region: us-west-2
                 filters:
-                  - type: CheckForPublicBlocks
-                    kind: IgnorePublicAcls                    
+                  - type: check-public-block
+                    kind: present                    
     """
 
     schema = type_schema(
         'check-public-block',
-        kind={
+        scope={
             'type': 'string', 
             'enum': [ 'BlockPublicAcls', 'IgnorePublicAcls', 
-                'BlockPublicPolicy', 'RestrictPublicBuckets']},
-        required=['kind'])
+                'BlockPublicPolicy', 'RestrictPublicBuckets', 'All', 'Any']},
+        state={
+            'type': 'string', 
+            'enum': ['absent', 'present']},
+        required=['scope', 'state'])
 
     permissions = ("s3:GetBucketPublicAccessBlock")
 
@@ -1349,18 +1351,35 @@ class FilterPublicBlock(Filter):
             for future in as_completed(futures):
                 bucket = futures[future]
                 if future.exception():
+                    print(future.exception())
+
                     continue
                 if future.result():
-                    results += filter(None, [future.result()])
+                    results.append(bucket)
         return results
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        kind = self.data.get('kind')
-        response = s3.get_public_access_block(Bucket=bucket['Name'])
-        if response is not None:
-            response['Name'] = bucket['Name']
-        return response
+        state = self.data.get('state')
+        scope = self.data.get('scope')        
+        try:
+            config = s3.get_public_access_block(Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
+                config = None
+            else:
+                raise
+        if config:
+            if scope == 'All':
+                return all(config.values()) if state == 'present' else not any(config.values())
+            elif scope == 'Any':
+                return any(config.values()) if state == 'present' else not any(config.values())
+            else:
+                return config[scope] if state == 'present' else not config[scope]                                
+        else:
+            # return true for a null config, meaning no public blocks
+            return True if state == 'absent' else False
+        
             
 
 @actions.register('set-public-block')
@@ -1410,7 +1429,7 @@ class SetPublicBlock(BucketActionBase):
         state = self.data.get('state')
         kind = self.data.get('kind')
         config = s3.get_public_access_block(Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
-        if config is not None:
+        if config:
             if kind == 'All':
                 for key in config.keys():
                     config[key] = True if state == 'enable' else False
