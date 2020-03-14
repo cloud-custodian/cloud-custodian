@@ -343,7 +343,7 @@ These fields are not necessary if c7n_mailer is run in a instance/lambda/etc wit
 | Required? | Key                | Type           | Notes              |
 |:---------:|:-------------------|:---------------|:-------------------|
 |           | `sendgrid_api_key` | secured string | SendGrid API token |
-SendGrid is only supported for Azure Cloud use with Azure Storage Queue currently.
+
 
 #### Splunk HEC Config
 

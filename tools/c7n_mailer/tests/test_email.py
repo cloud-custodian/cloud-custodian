@@ -341,3 +341,19 @@ class EmailTest(unittest.TestCase):
             self.email_delivery.config, self.email_delivery.logger,
             SQS_MESSAGE_4, SQS_MESSAGE_4['resources'], ['hello@example.com'])
         self.assertEqual(email['Cc'], 'hello@example.com, cc@example.com')
+
+    def test_sendgrid(self):
+        config = copy.deepcopy(MAILER_CONFIG)
+        logger_mock = MagicMock()
+
+        config['sendgrid_api_key'] = 'SENDGRID_API_KEY'
+        del config['smtp_server']
+
+        delivery = MockEmailDelivery(config, self.aws_session, logger_mock)
+
+        with patch("sendgrid.SendGridAPIClient.send") as mock_send:
+            with patch('c7n_mailer.utils.kms_decrypt') as mock_decrypt:
+                mock_decrypt.return_value = 'xyz'
+                delivery.send_c7n_email(SQS_MESSAGE_1, None, None)
+                mock_decrypt.assert_called_once()
+            mock_send.assert_called()

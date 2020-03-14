@@ -29,7 +29,7 @@ class KmsRelatedFilter(RelatedResourceFilter):
         .. code-block:: yaml
 
             policies:
-                - name:
+                - name: dms-encrypt-key-check
                   resource: dms-instance
                   filters:
                     - type: kms-key

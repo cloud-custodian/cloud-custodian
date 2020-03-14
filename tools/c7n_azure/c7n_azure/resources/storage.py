@@ -283,7 +283,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     .. code-block:: yaml
 
-        policies
+        policies:
           - name: find-load-balancers-with-logs-enabled
             resource: azure.loadbalancer
             filters:
@@ -304,7 +304,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     .. code-block:: yaml
 
-        policies
+        policies:
           - name: find-keyvaults-with-logs-enabled
             resource: azure.keyvault
             filters:
