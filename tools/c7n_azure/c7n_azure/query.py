@@ -261,7 +261,9 @@ class QueryResourceManager(ResourceManager):
         return self.get_session().client(service)
 
     def get_cache_key(self, query):
-        return {'source_type': self.source_type, 'query': query}
+        return {'source_type': self.source_type,
+                'query': query,
+                'resource': str(self.__class__.__name__)}
 
     @classmethod
     def get_model(cls):
