@@ -2006,9 +2006,9 @@ class LaunchTemplate(query.QueryResourceManager):
                     'LaunchTemplate']['LaunchTemplateSpecification']
             if t is None:
                 continue
-            templates.setdefault(
-                (t['LaunchTemplateId'],
-                 t['Version']), []).append(a['AutoScalingGroupName'])
+
+            templateKey = (t['LaunchTemplateId'], t.get('Version', None))
+            templates.setdefault(templateKey, []).append(a['AutoScalingGroupName'])
         return templates
 
 
