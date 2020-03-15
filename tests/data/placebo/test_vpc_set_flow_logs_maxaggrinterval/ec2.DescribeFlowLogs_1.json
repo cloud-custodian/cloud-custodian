@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "FlowLogs": [
+            {
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 15,
+                    "hour": 21,
+                    "minute": 22,
+                    "second": 5,
+                    "microsecond": 625000
+                },
+                "DeliverLogsStatus": "SUCCESS",
+                "FlowLogId": "fl-0b093d092e96cc4e3",
+                "FlowLogStatus": "ACTIVE",
+                "ResourceId": "vpc-d2d616b5",
+                "TrafficType": "ALL",
+                "LogDestinationType": "s3",
+                "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz",
+                "LogFormat": "${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}",
+                "Tags": [],
+                "MaxAggregationInterval": 60
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "3312e68e-4207-4771-bbfb-c013243b7150",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "accept-encoding",
+                "date": "Sun, 15 Mar 2020 21:22:05 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
