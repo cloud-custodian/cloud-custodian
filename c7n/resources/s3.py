@@ -1406,7 +1406,7 @@ class SetPublicBlock(BucketActionBase):
             'type': 'string',
             'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
                 'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']},
-        state={'type': 'string', 
+        state={'type': 'string',
                'enum': ['enable', 'disable']},
         required=['scope', 'state'])
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
