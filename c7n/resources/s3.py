@@ -1315,7 +1315,7 @@ class FilterPublicBlock(Filter):
     """Filter for s3 bucket public blocks
 
     :example:
-    
+
     .. code-block:: yaml
             policies:
               - name: CheckForPublicAclBlock-Off
