@@ -55,7 +55,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: .tox/${{ matrix.tox-target }}
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/setup.py') }}
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/requirement*.txt') }}
 
       - name: Install Test Runner
         run: |

@@ -2,7 +2,7 @@
 *.egg-info/
 *.swp
 .eggs/
-c7n/version.py
+# c7n/version.py
 src/
 deps/
 include/
