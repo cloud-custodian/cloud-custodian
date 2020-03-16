@@ -1,0 +1,32 @@
+{
+  "status_code": 200,
+  "data": {
+    "Vpcs": [
+      {
+        "CidrBlock": "172.31.0.0/16",
+        "DhcpOptionsId": "dopt-24ff1940",
+        "State": "available",
+        "VpcId": "vpc-d2d616b5",
+        "OwnerId": "644160558196",
+        "InstanceTenancy": "default",
+        "CidrBlockAssociationSet": [
+          {
+            "AssociationId": "vpc-cidr-assoc-33669f5a",
+            "CidrBlock": "172.31.0.0/16",
+            "CidrBlockState": {
+              "State": "associated"
+            }
+          }
+        ],
+        "IsDefault": true,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "FlowLogTest"
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
