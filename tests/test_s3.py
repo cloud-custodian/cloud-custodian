@@ -1689,7 +1689,7 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "kind": "BlockPublicPolicy",
+                        "scope": "BlockPublicPolicy",
                         "state": "enable"
                     }
                 ]
@@ -1745,7 +1745,7 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "kind": "IgnorePublicAcls",
+                        "scope": "IgnorePublicAcls",
                         "state": "disable"
                     }
                 ]
