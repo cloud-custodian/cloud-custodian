@@ -1550,7 +1550,8 @@ class S3Test(BaseTest):
         self.patch(
             s3,
             "S3_AUGMENT_TABLE",
-            [('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')],
+            [('get_public_access_block', 'PublicBlock',
+            None, None, 's3:GetBucketPublicAccessBlock')],
         )
         self.patch(
             s3.S3.resource_type,
@@ -1607,7 +1608,8 @@ class S3Test(BaseTest):
         self.patch(
             s3,
             "S3_AUGMENT_TABLE",
-            [('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')],
+            [('get_public_access_block', 'PublicBlock',
+            None, None, 's3:GetBucketPublicAccessBlock')],
         )
         self.patch(
             s3.S3.resource_type,
@@ -1664,7 +1666,8 @@ class S3Test(BaseTest):
         self.patch(
             s3,
             "S3_AUGMENT_TABLE",
-            [('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')],
+            [('get_public_access_block', 'PublicBlock',
+            None, None, 's3:GetBucketPublicAccessBlock')],
         )
         self.patch(
             s3.S3.resource_type,
@@ -1720,7 +1723,8 @@ class S3Test(BaseTest):
         self.patch(
             s3,
             "S3_AUGMENT_TABLE",
-            [('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')],
+            [('get_public_access_block', 'PublicBlock',
+            None, None, 's3:GetBucketPublicAccessBlock')],
         )
         self.patch(
             s3.S3.resource_type,
