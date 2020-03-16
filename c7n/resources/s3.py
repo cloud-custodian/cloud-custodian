@@ -1391,7 +1391,7 @@ class SetPublicBlock(BucketActionBase):
               - name: s3-dont-ignore-public-acls
                 resource: s3
                 filters:
-                  - type: CheckForPublicBlocks
+                  - type: check-public-block
                     scope: Any
                     state: absent
                 actions:
