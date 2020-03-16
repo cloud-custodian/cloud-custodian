@@ -2697,7 +2697,7 @@ class FlowLogsTest(BaseTest):
                 "name": "c7n-vpc-flow-logs-maxinterval",
                 "resource": "vpc",
                 "filters": [
-                    {'type': 'flow-logs', 'enabled': False }
+                    {'type': 'flow-logs', 'enabled': False}
                 ],
                 "actions": [
                     {
