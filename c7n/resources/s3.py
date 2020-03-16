@@ -1381,7 +1381,9 @@ class SetPublicBlock(BucketActionBase):
     """Action to update Public Access blocks on S3 buckets
 
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: s3-dont-ignore-public-acls
                 resource: s3
