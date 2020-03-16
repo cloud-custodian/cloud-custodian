@@ -1326,13 +1326,6 @@ class FilterPublicBlock(Filter):
                   - type: check-public-block
                     scope: Any
                     state: absent
-              - name: CheckForPublicAclIngnore-Off
-                resource: s3
-                region: us-west-2
-                filters:
-                  - type: check-public-block
-                    scope: IgnorePublicAcls
-                    state: present
     """
 
     schema = type_schema(
