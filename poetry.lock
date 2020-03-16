@@ -85,10 +85,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.12.20"
+version = "1.12.21"
 
 [package.dependencies]
-botocore = ">=1.15.20,<1.16.0"
+botocore = ">=1.15.21,<1.16.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -98,7 +98,7 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.15.20"
+version = "1.15.21"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
@@ -881,19 +881,6 @@ python-versions = "*"
 version = "0.5.1"
 
 [[package]]
-category = "main"
-description = "A built-package format for Python."
-name = "wheel"
-optional = false
-python-versions = "*"
-version = "0.30.0"
-
-[package.extras]
-faster-signatures = ["ed25519ll"]
-signatures = ["keyring", "keyrings.alt", "pyxdg"]
-test = ["jsonschema", "pytest (>=3.0.0)", "pytest-cov"]
-
-[[package]]
 category = "dev"
 description = "Module for decorators, wrappers and monkey patching."
 name = "wrapt"
@@ -927,7 +914,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "ecef9574c24f7b28b9fdefb19488c6c6e9b2642a0e6e760270d60b84522452f1"
+content-hash = "1f47a22f26bbaf9f3a379d2d8c6bb21dcd1ce0285e30c30ff2b756213ecd238a"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -960,12 +947,12 @@ bleach = [
     {file = "bleach-3.1.1.tar.gz", hash = "sha256:aa8b870d0f46965bac2c073a93444636b0e1ca74e9777e34f03dd494b8a59d48"},
 ]
 boto3 = [
-    {file = "boto3-1.12.20-py2.py3-none-any.whl", hash = "sha256:918c2e2153d96a5ae30c27ff8bfe2d5f5fc48ce0e62c766236c78a4f5aaff931"},
-    {file = "boto3-1.12.20.tar.gz", hash = "sha256:8804cd39b53ac2add31db3f8617548ce25d373dba179ba7f6d505861fd506042"},
+    {file = "boto3-1.12.21-py2.py3-none-any.whl", hash = "sha256:5fe70e656f92e4e649dc4cf05786f57d180e5d491bcb22c80411512ec2b27c15"},
+    {file = "boto3-1.12.21.tar.gz", hash = "sha256:50105a25e301e20b361b2b8fafee196a425a4758e51f400a0f381d42e4bd909e"},
 ]
 botocore = [
-    {file = "botocore-1.15.20-py2.py3-none-any.whl", hash = "sha256:babe0e84fc8ba1d8b349acf2cd98d5b15d8974912d393ad149ff2b385097a062"},
-    {file = "botocore-1.15.20.tar.gz", hash = "sha256:4aabdfb65e1f3eb6d35fe5d921a9b6fd2880ea0ec39ad874af762192b6c40825"},
+    {file = "botocore-1.15.21-py2.py3-none-any.whl", hash = "sha256:86f7f1c489887f9e3c2ede598e2a30f8bd259c11e8ebe25e897e40231b3f4bc8"},
+    {file = "botocore-1.15.21.tar.gz", hash = "sha256:4aaf6c94bcaace260138d32eae144be1b5d2ddce9ef0f395da32c68e106ff20f"},
 ]
 certifi = [
     {file = "certifi-2019.11.28-py2.py3-none-any.whl", hash = "sha256:017c25db2a153ce562900032d5bc68e9f191e44e9a0f762f373977de9df1fbb3"},
@@ -1325,10 +1312,6 @@ wcwidth = [
 webencodings = [
     {file = "webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78"},
     {file = "webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"},
-]
-wheel = [
-    {file = "wheel-0.30.0-py2.py3-none-any.whl", hash = "sha256:e721e53864f084f956f40f96124a74da0631ac13fbbd1ba99e8e2b5e9cafdf64"},
-    {file = "wheel-0.30.0.tar.gz", hash = "sha256:9515fe0a94e823fd90b08d22de45d7bde57c90edce705b22f5e1ecf7e1b653c8"},
 ]
 wrapt = [
     {file = "wrapt-1.12.1.tar.gz", hash = "sha256:b62ffa81fb85f4332a4f609cab4ac40709470da05643a082ec1eb88e6d9b97d7"},

@@ -3,7 +3,7 @@
 Packaging Custodian
 ===================
 
-Custodian moved to using ``poetry`` https://python-poetry.org/ for
+Custodian uses ``poetry`` https://python-poetry.org/ for
 managing dependencies and providing for repeatable installs. Its not
 typically required for developers as we maintain setuptools/pip/tox
 compatible environments, however familiarity is needed when making
@@ -25,7 +25,7 @@ management activities.
 
 Our additional tooling around poetry is to help automate management
 across the half-dozen custodian packages as well as to keep
-requirements and setup.py files intact. We continue to use
+requirements and setup.py files in sync. We continue to use
 setuptools/pip in our CI infrastructure as it offers significant speed
 benefits [0]. To ensure the poetry install is exercised as part of CI,
 we do maintain the main docker image via poetry.
@@ -52,8 +52,7 @@ poetry.
     this will carry over semver constraints.
 
   - `make pkg-freeze-setup` generate setup.py files from pyproject.toml
-    with all dependencies frozen in setup.py. Note this is not currently
-    transitive on the dep graph, just direct dependencis.
+    with all dependencies frozen in setup.py.
 
   - `make pkg-publish-wheel` increments version, builds wheels, lints,
     and publishes build to testpypi via twine.

@@ -1,6 +1,6 @@
 attrs==19.3.0
-boto3==1.12.20
-botocore==1.15.20
+boto3==1.12.21
+botocore==1.15.21
 certifi==2019.11.28
 chardet==3.0.4
 datadog==0.34.1
