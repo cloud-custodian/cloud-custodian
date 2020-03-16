@@ -1806,7 +1806,7 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "kind": "All",
+                        "scope": "All",
                         "state": "enable"
                     }
                 ]
@@ -1821,7 +1821,7 @@ class S3Test(BaseTest):
         # Because there are no public blocks we will get a client error
         # We want this to throw for code cov
         try:
-            client.get_public_access_block(Bucket=bname)['PublicAccessBlockConfiguration'] 
+            client.get_public_access_block(Bucket=bname)['PublicAccessBlockConfiguration']
         except ClientError as e:
             # Assert that it is the proper error code
             self.assertEqual(e.response['Error']['Code'], 'NoSuchPublicAccessBlockConfiguration')
