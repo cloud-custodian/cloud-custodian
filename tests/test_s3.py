@@ -1773,6 +1773,59 @@ class S3Test(BaseTest):
         if response:
             self.assertEqual(response['IgnorePublicAcls'], False)
 
+    def test_set_public_block_throws_errors(self):
+        bname = 'mypublicblock'
+
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [('get_public_access_block', 'PublicBlock',
+            None, None, 's3:GetBucketPublicAccessBlock')],
+        )
+        self.patch(
+            s3.S3.resource_type,
+            "enum_spec",
+            ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
+        )
+        session_factory = self.replay_flight_data("test_s3_public_block_throws_errors")
+        session = session_factory()
+        client = session.client("s3")
+
+        p = self.load_policy(
+            {
+                "name": "CheckForPublicBlocks-Absent",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "type": "check-public-block",
+                        "scope": "All",
+                        "state": "absent"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-public-block",
+                        "kind": "All",
+                        "state": "enable"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Test that there was a bucket with no public blocks
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Because there are no public blocks we will get a client error
+        # We want this to throw for code cov
+        try:
+            client.get_public_access_block(Bucket=bname)['PublicAccessBlockConfiguration'] 
+        except ClientError as e:
+            # Assert that it is the proper error code
+            self.assertEqual(e.response['Error']['Code'], 'NoSuchPublicAccessBlockConfiguration')
+
     def test_has_statement_similar_policies(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(
