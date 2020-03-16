@@ -1344,7 +1344,7 @@ class FilterPublicBlock(Filter):
             'enum': ['absent', 'present']},
         required=['scope', 'state'])
 
-    permissions = ("s3:GetBucketPublicAccessBlock")
+    permissions = ("s3:GetBucketPublicAccessBlock",)
 
     def process(self, buckets, event=None):
         results = list()
