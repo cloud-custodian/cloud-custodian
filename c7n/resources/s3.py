@@ -1322,13 +1322,15 @@ class FilterPublicBlock(Filter):
                 region: us-east-1
                 filters:
                   - type: check-public-block
-                    kind: absent
+                    scope: Any
+                    state: absent
               - name: CheckForPublicAclIngnore-Off
                 resource: s3
                 region: us-west-2
                 filters:
                   - type: check-public-block
-                    kind: present
+                    scope: IgnorePublicAcls
+                    state: present
     """
 
     schema = type_schema(
@@ -1391,20 +1393,20 @@ class SetPublicBlock(BucketActionBase):
                 resource: s3
                 filters:
                   - type: CheckForPublicBlocks
-                    kind: IgnorePublicAcls
+                    scope: IgnorePublicAcls
                 actions:
                   - type: set-public-block
-                    kind: All
+                    scope: All
                     state: enable
     """
 
     schema = type_schema(
         'set-public-block',
-        kind={
+        scope={
             'type': 'string',
             'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
                 'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']},
-        required=['kind', 'state'],
+        required=['scope', 'state'],
         state={'type': 'string', 'enum': ['enable', 'disable']})
 
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
@@ -1425,7 +1427,7 @@ class SetPublicBlock(BucketActionBase):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         state = self.data.get('state')
-        kind = self.data.get('kind')
+        scope = self.data.get('scope')
         try:
             config = s3.get_public_access_block(
                 Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
@@ -1435,11 +1437,11 @@ class SetPublicBlock(BucketActionBase):
             else:
                 raise
         if config:
-            if kind == 'All':
+            if scope == 'All':
                 for key in config.keys():
                     config[key] = True if state == 'enable' else False
             else:
-                config[kind] = True if state == 'enable' else False
+                config[scope] = True if state == 'enable' else False
             s3.put_public_access_block(
                 Bucket=bucket['Name'],
                 PublicAccessBlockConfiguration=config

@@ -1570,7 +1570,7 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "kind": "All",
+                        "scope": "All",
                         "state": "enable"
                     }
                 ]
@@ -1622,7 +1622,7 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "kind": "All",
+                        "scope": "All",
                         "state": "disable"
                     }
                 ]
