@@ -1343,7 +1343,6 @@ class FilterPublicBlock(Filter):
             'type': 'string',
             'enum': ['absent', 'present']},
         required=['scope', 'state'])
-
     permissions = ("s3:GetBucketPublicAccessBlock",)
 
     def process(self, buckets, event=None):
@@ -1393,7 +1392,8 @@ class SetPublicBlock(BucketActionBase):
                 resource: s3
                 filters:
                   - type: CheckForPublicBlocks
-                    scope: IgnorePublicAcls
+                    scope: Any
+                    state: absent
                 actions:
                   - type: set-public-block
                     scope: All
@@ -1406,9 +1406,9 @@ class SetPublicBlock(BucketActionBase):
             'type': 'string',
             'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
                 'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']},
-        required=['scope', 'state'],
-        state={'type': 'string', 'enum': ['enable', 'disable']})
-
+        state={'type': 'string', 
+               'enum': ['enable', 'disable']},
+        required=['scope', 'state'])
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
 
     def process(self, buckets):
