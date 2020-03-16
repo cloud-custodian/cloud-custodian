@@ -29,7 +29,7 @@ from azure.mgmt.eventgrid.models import (
 
 from c7n.config import Config
 from c7n.policy import PolicyCollection
-from c7n.resources import load_resources
+from c7n import resources
 from c7n.utils import local_session
 from c7n_azure import entry
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
@@ -61,7 +61,7 @@ class Host:
         logging.basicConfig(level=logging.INFO, format='%(message)s')
         log.info("Running Azure Cloud Custodian Self-Host")
 
-        load_resources()
+        resources.load_available()
 
         self.session = local_session(Session)
         self.storage_session = self.session

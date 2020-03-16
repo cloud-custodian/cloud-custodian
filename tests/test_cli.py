@@ -225,8 +225,8 @@ class SchemaTest(CliTest):
 
         output = self.get_output(["custodian", "schema"])
         self.assertIn("aws.ec2", output)
-        self.assertIn("azure.vm", output)
-        self.assertIn("gcp.instance", output)
+        # self.assertIn("azure.vm", output)
+        # self.assertIn("gcp.instance", output)
 
         output = self.get_output(["custodian", "schema", "aws"])
         self.assertIn("aws.ec2", output)

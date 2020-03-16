@@ -43,8 +43,9 @@ class EmailDelivery(object):
     def get_valid_emails_from_list(self, targets):
         emails = []
         for target in targets:
-            if is_email(target):
-                emails.append(target)
+            for email in target.split(':'):
+                if is_email(target):
+                    emails.append(target)
         return emails
 
     def get_event_owner_email(self, targets, event):

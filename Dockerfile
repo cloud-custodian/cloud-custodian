@@ -8,27 +8,32 @@ LABEL name="custodian" \
 
 # Transfer Custodian source into container by directory
 # to minimize size
-ADD setup.py README.md requirements.txt /src/
+ADD pyproject.toml poetry.lock README.md /src/
 ADD c7n /src/c7n/
 ADD tools/c7n_gcp /src/tools/c7n_gcp
 ADD tools/c7n_azure /src/tools/c7n_azure
 ADD tools/c7n_kube /src/tools/c7n_kube
+ADD tools/c7n_org /src/tools/c7n_org
+ADD tools/c7n_mailer /src/tools/c7n_mailer
 
 WORKDIR /src
 
 RUN adduser --disabled-login custodian
 RUN apt-get --yes update \
- && apt-get --yes install build-essential --no-install-recommends \
- && pip3 install -r requirements.txt  . \
- && pip3 install -r tools/c7n_gcp/requirements.txt tools/c7n_gcp \
- && pip3 install -r tools/c7n_azure/requirements.txt tools/c7n_azure \
- && pip3 install -r tools/c7n_kube/requirements.txt tools/c7n_kube \
+ && apt-get --yes install build-essential curl --no-install-recommends \
+ && python3 -m venv /usr/local \
+ && curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 \
+ && . /usr/local/bin/activate \
+ && $HOME/.poetry/bin/poetry install --no-dev \
+ && cd tools/c7n_azure && $HOME/.poetry/bin/poetry install && cd ../.. \
+ && cd tools/c7n_gcp && $HOME/.poetry/bin/poetry install && cd ../.. \
+ && cd tools/c7n_kube && $HOME/.poetry/bin/poetry install && cd ../.. \
  && apt-get --yes remove build-essential \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
  && rm -Rf /var/cache/apt/ \
  && rm -Rf /var/lib/apt/lists/* \
- && rm -Rf /src/ \
  && rm -Rf /root/.cache/ \
+ && rm -Rf /root/.poetry \
  && mkdir /output \
  && chown custodian: /output
 
