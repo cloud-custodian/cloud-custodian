@@ -1317,6 +1317,7 @@ class FilterPublicBlock(Filter):
     :example:
 
     .. code-block:: yaml
+
             policies:
               - name: CheckForPublicAclBlock-Off
                 resource: s3
