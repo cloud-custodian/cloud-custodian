@@ -1548,6 +1548,11 @@ class S3Test(BaseTest):
 
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')],
+        )
+        self.patch(
             s3.S3.resource_type,
             "enum_spec",
             ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
@@ -1599,6 +1604,11 @@ class S3Test(BaseTest):
         bname = 'mypublicblock'
 
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')],
+        )
         self.patch(
             s3.S3.resource_type,
             "enum_spec",
@@ -1652,6 +1662,11 @@ class S3Test(BaseTest):
 
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')],
+        )
+        self.patch(
             s3.S3.resource_type,
             "enum_spec",
             ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
@@ -1702,6 +1717,11 @@ class S3Test(BaseTest):
         bname = 'mypublicblock'
 
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [('get_public_access_block', 'PublicBlock', None, None, 's3:GetBucketPublicAccessBlock')],
+        )
         self.patch(
             s3.S3.resource_type,
             "enum_spec",
