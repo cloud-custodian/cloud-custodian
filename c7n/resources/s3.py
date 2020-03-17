@@ -1368,7 +1368,7 @@ class FilterPublicBlock(Filter):
             if scope == 'All':
                 return all(config.values()) if state == 'present' else not any(config.values())
             elif scope == 'Any':
-                return any(config.values()) if state == 'present' else not any(config.values())
+                return any(config.values()) if state == 'present' else not all(config.values())
             else:
                 return config[scope] if state == 'present' else not config[scope]
         else:
