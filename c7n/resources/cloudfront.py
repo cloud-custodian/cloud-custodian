@@ -476,39 +476,40 @@ class DistributionUpdateAction(BaseAction):
 
     def validate(self):
         if not self.data.get('update'):
-            raise PolicyValidationError('update parameters are missing')
+            raise PolicyValidationError('Update parameters are missing')
         attrs = dict(self.data.get('update'))
-        if attrs.get('CallerReference') or \
-           attrs.get('Origins') or \
-           attrs.get('DefaultCacheBehavior'):
-            raise PolicyValidationError('Invalid attribute parameter')
+        if attrs.get('CallerReference'):
+            raise PolicyValidationError('CallerReference attribute cannot be changed when updating a distribution')
 
-        # Set default values for required fields
+        # Set default values for required fields if they are not present
         attrs["CallerReference"] = ""
-        attrs["Origins"] = {
-            "Quantity": 0,
-            "Items": [
-                {
-                    "Id": "",
-                    "DomainName": ""
-                }
-            ],
-        }
-        attrs["DefaultCacheBehavior"] = {
-            "TargetOriginId": "",
-            "ForwardedValues": {
-                "QueryString": True,
-                "Cookies": {
-                    "Forward": ""
-                }
-            },
-            "TrustedSigners": {
-                "Enabled": True,
+        if not attrs.get('Origins'):
+            attrs["Origins"] = {
                 "Quantity": 0,
-            },
-            "ViewerProtocolPolicy": "",
-            "MinTTL": 0
-        }
+                "Items": [
+                    {
+                        "Id": "",
+                        "DomainName": ""
+                    }
+                ],
+            }
+        if not attrs.get('DefaultCacheBehavior'):
+            attrs["DefaultCacheBehavior"] = {
+                "TargetOriginId": "",
+                "ForwardedValues": {
+                    "QueryString": True,
+                    "Cookies": {
+                        "Forward": ""
+                    }
+                },
+                "TrustedSigners": {
+                    "Enabled": True,
+                    "Quantity": 0,
+                },
+                "ViewerProtocolPolicy": "",
+                "MinTTL": 0
+            }
+
         request = {
             "DistributionConfig": attrs,
             "Id": "sample_id",
@@ -527,11 +528,13 @@ class DistributionUpdateAction(BaseAction):
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])
             config = res['DistributionConfig']
-            config = {**config, **self.data['update']}
+            updatedConfig = {**config, **self.data['update']}
+            if config == updatedConfig:
+                return
             res = client.update_distribution(
                 Id=distribution[self.manager.get_model().id],
                 IfMatch=res['ETag'],
-                DistributionConfig=config
+                DistributionConfig=updatedConfig
             )
         except Exception as e:
             self.log.warning(

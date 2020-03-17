@@ -350,8 +350,7 @@ class CloudFront(BaseTest):
         self.assertEqual(len(resources), 1)
 
         client = local_session(factory).client("cloudfront")
-        resp = client.list_distributions()
-        dist_id = resp["DistributionList"]["Items"][0]["Id"]
+        dist_id = resources[0]['Id']
         resp = client.get_distribution_config(Id=dist_id)
         self.assertEqual(
             resp['DistributionConfig']['Logging']['Enabled'], True
