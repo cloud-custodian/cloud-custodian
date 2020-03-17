@@ -479,12 +479,21 @@ class DistributionUpdateAction(BaseAction):
             raise PolicyValidationError('Update parameters are missing')
         attrs = dict(self.data.get('update'))
         if attrs.get('CallerReference'):
-            raise PolicyValidationError('CallerReference attribute cannot be changed when updating a distribution')
+            raise PolicyValidationError('CallerReference field cannot be updated')
 
         # Set default values for required fields if they are not present
         attrs["CallerReference"] = ""
-        if not attrs.get('Origins'):
-            attrs["Origins"] = {
+        self.set_required_update_fields(attrs)
+        request = {
+            "DistributionConfig": attrs,
+            "Id": "sample_id",
+            "IfMatch": "sample_string",
+        }
+        return shape_validate(request, self.shape, 'cloudfront')
+
+    def set_required_update_fields(self, config):
+        if 'Origins' not in config:
+            config["Origins"] = {
                 "Quantity": 0,
                 "Items": [
                     {
@@ -493,8 +502,8 @@ class DistributionUpdateAction(BaseAction):
                     }
                 ],
             }
-        if not attrs.get('DefaultCacheBehavior'):
-            attrs["DefaultCacheBehavior"] = {
+        if 'DefaultCacheBehavior' not in config:
+            config["DefaultCacheBehavior"] = {
                 "TargetOriginId": "",
                 "ForwardedValues": {
                     "QueryString": True,
@@ -510,13 +519,6 @@ class DistributionUpdateAction(BaseAction):
                 "MinTTL": 0
             }
 
-        request = {
-            "DistributionConfig": attrs,
-            "Id": "sample_id",
-            "IfMatch": "sample_string",
-        }
-        return shape_validate(request, self.shape, 'cloudfront')
-
     def process(self, distributions):
         client = local_session(self.manager.session_factory).client(
             self.manager.get_model().service)
@@ -529,6 +531,7 @@ class DistributionUpdateAction(BaseAction):
                 Id=distribution[self.manager.get_model().id])
             config = res['DistributionConfig']
             updatedConfig = {**config, **self.data['update']}
+            self.set_required_update_fields(updatedConfig)
             if config == updatedConfig:
                 return
             res = client.update_distribution(
@@ -536,8 +539,10 @@ class DistributionUpdateAction(BaseAction):
                 IfMatch=res['ETag'],
                 DistributionConfig=updatedConfig
             )
+        except client.exceptions.NoSuchResource:
+            pass
         except Exception as e:
             self.log.warning(
                 "Exception trying to update Distribution: %s error: %s",
                 distribution['ARN'], e)
-            return
+            raise e
