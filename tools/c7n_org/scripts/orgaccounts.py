@@ -37,7 +37,9 @@ ROLE_TEMPLATE = "arn:aws:iam::{Id}:role/OrganizationAccountAccessRole"
     '-f', '--output', type=click.File('w'),
     help="File to store the generated config (default stdout)")
 @click.option('-a', '--active', default=False, help="Get only active accounts", type=click.BOOL)
-def main(role, ou, assume, profile, output, regions, active):
+@click.option('-i', '--ignore', multiple=True,
+  help="list of accounts that won't be added to the config file")
+def main(role, ou, assume, profile, output, regions, active, ignore):
     """Generate a c7n-org accounts config file using AWS Organizations
 
     With c7n-org you can then run policies or arbitrary scripts across
@@ -49,7 +51,7 @@ def main(role, ou, assume, profile, output, regions, active):
     accounts = []
     for path in ou:
         ou = get_ou_from_path(client, path)
-        accounts.extend(get_accounts_for_ou(client, ou, active))
+        accounts.extend(get_accounts_for_ou(client, ou, active, ignoredAccounts=ignore))
 
     results = []
     for a in accounts:
@@ -119,7 +121,7 @@ def get_sub_ous(client, ou):
     return results
 
 
-def get_accounts_for_ou(client, ou, active, recursive=True):
+def get_accounts_for_ou(client, ou, active, recursive=True, ignoredAccounts=()):
     results = []
     ous = [ou]
     if recursive:
@@ -131,6 +133,10 @@ def get_accounts_for_ou(client, ou, active, recursive=True):
             ParentId=ou['Id']).build_full_result().get(
                 'Accounts', []):
             a['Path'] = ou['Path']
+
+            if a['Id'] in ignoredAccounts:
+                continue
+
             if active:
                 if a['Status'] == 'ACTIVE':
                     results.append(a)

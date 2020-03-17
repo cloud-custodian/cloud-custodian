@@ -1,0 +1,68 @@
+policies:
+  - name: custodian_functions_test_event_consumption
+    resource: azure.resourcegroup
+    mode:
+        type: azure-event-grid
+        events: ['ResourceGroupWrite']
+        provision-options:
+          servicePlan:
+            resourceGroupName: ${rg_name}-consumption
+    filters:
+      - name: $rg_name
+      - tag:custodian-function-test-event-consumption: absent
+    actions:
+      - type: tag
+        tag: custodian-function-test-event-consumption
+        value: passed
+
+  - name: custodian_functions_test_event_dedicated
+    resource: azure.resourcegroup
+    mode:
+        type: azure-event-grid
+        events: ['ResourceGroupWrite']
+        provision-options:
+          servicePlan:
+            resourceGroupName: ${rg_name}-dedicated
+            skuName: S2
+            skuTier: Standard
+    filters:
+      - name: $rg_name
+      - tag:custodian-function-test-event-dedicated: absent
+    actions:
+      - type: tag
+        tag: custodian-function-test-event-dedicated
+        value: passed
+
+  - name: custodian_functions_test_timer_consumption
+    resource: azure.resourcegroup
+    mode:
+        type: azure-periodic
+        schedule: '0 */5 * * * *'
+        provision-options:
+          servicePlan:
+            resourceGroupName: ${rg_name}-consumption
+    filters:
+      - name: $rg_name
+      - tag:custodian-function-test-timer-consumption: absent
+    actions:
+      - type: tag
+        tag: custodian-function-test-timer-consumption
+        value: passed
+
+  - name: custodian_functions_test_timer_dedicated
+    resource: azure.resourcegroup
+    mode:
+        type: azure-periodic
+        schedule: '0 */5 * * * *'
+        provision-options:
+          servicePlan:
+            resourceGroupName: ${rg_name}-dedicated
+            skuName: S2
+            skuTier: Standard
+    filters:
+      - name: $rg_name
+      - tag:custodian-function-test-timer-dedicated: absent
+    actions:
+      - type: tag
+        tag: custodian-function-test-timer-dedicated
+        value: passed

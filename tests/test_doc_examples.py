@@ -21,6 +21,7 @@ from c7n.config import Config
 from c7n.loader import PolicyLoader
 from c7n.provider import clouds
 from c7n.resources import load_resources
+from c7n.schema import ElementSchema
 from c7n.utils import yaml_load
 
 from .common import BaseTest  # NOQA - loads providers for individual module testing
@@ -34,13 +35,20 @@ def get_doc_examples(resources):
             if cls in seen:
                 continue
             seen.add(cls)
-            if not cls.__doc__:
+
+            doc = ElementSchema.doc(cls)
+            if not doc:
                 continue
+
             # split on yaml and new lines
-            split_doc = [x.split('\n\n') for x in cls.__doc__.split('yaml')]
+            split_doc = [x.split('\n\n') for x in doc.split('yaml')]
             for item in itertools.chain.from_iterable(split_doc):
                 if 'policies:\n' in item:
                     policies.append((item, resource_name, cls.type))
+                elif 'resource:' in item:
+                    item = 'policies:\n' + item
+                    policies.append((item, resource_name, cls.type))
+
     return policies
 
 
@@ -55,10 +63,17 @@ def get_doc_policies(resources):
     policies = {}
     duplicate_names = set()
     for ptext, resource_name, el_name in get_doc_examples(resources):
-        data = yaml_load(ptext)
+        try:
+            data = yaml_load(ptext)
+        except Exception:
+            print('failed %s %s\n %s' % (resource_name, el_name, ptext))
+            raise
+
         for p in data.get('policies', []):
             if p['name'] in policies:
                 if policies[p['name']] != p:
+                    print('duplicate %s %s %s' % (
+                        resource_name, el_name, p['name']))
                     duplicate_names.add(p['name'])
             else:
                 policies[p['name']] = p
@@ -70,8 +85,9 @@ def get_doc_policies(resources):
         print('Duplicate policy names:')
         for d in duplicate_names:
             print('\t{0}'.format(d))
+        raise AssertionError("Duplication doc policy names")
 
-    return policies, duplicate_names
+    return policies
 
 
 skip_condition = not (
@@ -92,12 +108,10 @@ def test_doc_examples(provider_name):
     load_resources()
     loader = PolicyLoader(Config.empty())
     provider = clouds.get(provider_name)
-    policies, duplicate_names = get_doc_policies(provider.resources)
+    policies = get_doc_policies(provider.resources)
 
     for p in policies.values():
         loader.load_data({'policies': [p]}, 'memory://')
-
-    assert not duplicate_names
 
     for p in policies.values():
         # Note max name size here is 54 if it a lambda policy given

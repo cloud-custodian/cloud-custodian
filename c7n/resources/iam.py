@@ -60,13 +60,21 @@ class Group(QueryResourceManager):
         global_resource = True
         arn = 'Arn'
 
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeGroup(self)
+        return super(Group, self).get_source(source_type)
+
+
+class DescribeGroup(DescribeSource):
+
     def get_resources(self, resource_ids, cache=True):
         """For IAM Groups on events, resource ids are Group Names."""
-        client = local_session(self.session_factory).client('iam')
+        client = local_session(self.manager.session_factory).client('iam')
         resources = []
         for rid in resource_ids:
             try:
-                result = client.get_group(GroupName=rid)
+                result = self.manager.retry(client.get_group, GroupName=rid)
             except client.exceptions.NoSuchEntityException:
                 continue
             group = result.pop('Group')
@@ -89,6 +97,25 @@ class Role(QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeRole(self)
+        return super(Role, self).get_source(source_type)
+
+
+class DescribeRole(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('iam')
+        resources = []
+        for rid in resource_ids:
+            try:
+                result = self.manager.retry(client.get_role, RoleName=rid)
+            except client.exceptions.NoSuchEntityException:
+                continue
+            resources.append(result.pop('Role'))
+        return resources
 
 
 @Role.action_registry.register('tag')
@@ -351,7 +378,7 @@ class ServiceUsage(Filter):
 
     .. code-block:: yaml
 
-      - name: unused-users
+      - name: usage-unused-users
         resource: iam-user
         filters:
           - type: usage
@@ -1186,7 +1213,7 @@ class CredentialReport(Filter):
            key: password_last_used
            value: absent
          - type: credential
-           key: access_keys.last_used
+           key: access_keys.last_used_date
            value_type: age
            value: 30
            op: less-than
@@ -1651,7 +1678,7 @@ class UserDelete(BaseAction):
       .. code-block:: yaml
 
         # using a 'credential' filter'
-        - name: iam-only-whitelisted-users
+        - name: iam-only-whitelisted-users-credential
           resource: iam-user
           filters:
             - type: credential
@@ -1664,7 +1691,7 @@ class UserDelete(BaseAction):
             - delete
 
         # using a 'username' filter with 'UserName'
-        - name: iam-only-whitelisted-users
+        - name: iam-only-whitelisted-users-username
           resource: iam-user
           filters:
             - type: value
@@ -1677,7 +1704,7 @@ class UserDelete(BaseAction):
             - delete
 
          # using a 'username' filter with 'Arn'
-        - name: iam-only-whitelisted-users
+        - name: iam-only-whitelisted-users-arn
           resource: iam-user
           filters:
             - type: value
@@ -1708,15 +1735,15 @@ class UserDelete(BaseAction):
                 the username is included in whitelist
               resource: iam-user
               filters:
-                - type: username
+                - type: value
                   key: UserName
                   op: not-in
                   value:
                     - valid-user-1
                     - valid-user-2
                 - type: credential
-                  key: Status
-                  value: Active
+                  key: password_enabled
+                  value: true
               actions:
                 - type: delete
                   options:

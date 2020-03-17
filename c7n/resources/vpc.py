@@ -1997,6 +1997,7 @@ class CreateFlowLogs(BaseAction):
             'LogGroupName': {'type': 'string'},
             'LogDestination': {'type': 'string'},
             'LogFormat': {'type': 'string'},
+            'MaxAggregationInterval': {'type': 'integer'},
             'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
             'TrafficType': {
                 'type': 'string',
@@ -2081,6 +2082,7 @@ class CreateFlowLogs(BaseAction):
 
         params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
         params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
+        params['MaxAggregationInterval'] = self.data.get('MaxAggregationInterval', 600)
 
         try:
             results = client.create_flow_logs(**params)

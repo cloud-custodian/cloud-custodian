@@ -51,12 +51,11 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-
       - name: Set up cache
         uses: actions/cache@v1
         with:
           path: .tox/${{ matrix.tox-target }}
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/setup.py') }}
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/requirement*.txt') }}
 
       - name: Install Test Runner
         run: |

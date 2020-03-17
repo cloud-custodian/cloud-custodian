@@ -114,6 +114,17 @@ class AzureTest(unittest.TestCase):
         address_two = mock_send.call_args_list[1][0][0].personalizations[0].tos[0]['email']
         self.assertEqual("user@domain.com", address_two)
 
+    def test_azure_mailer_requirements(self):
+        reqs = deploy.get_mailer_requirements()
+        self.assertIn('adal', reqs)
+        self.assertIn('azure-storage-common', reqs)
+        self.assertIn('azure-common', reqs)
+        self.assertIn('msrestazure', reqs)
+        self.assertIn('jmespath', reqs)
+        self.assertIn('jinja2', reqs)
+        self.assertIn('sendgrid', reqs)
+        self.assertIn('ldap3', reqs)
+
     @patch('c7n_mailer.azure_mailer.deploy.FunctionPackage')
     def test_build_function_package(self, package_mock):
         deploy.build_function_package(MAILER_CONFIG_AZURE, "test_mailer", 'sub')

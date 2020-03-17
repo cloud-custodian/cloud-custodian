@@ -102,8 +102,8 @@ As a quick walk through, below are some sample policies for AWS resources.
   1. will enforce that no S3 buckets have cross-account access enabled.
   1. will terminate any newly launched EC2 instance that do not have an encrypted EBS volume.
   1. will tag any EC2 instance that does not have the follow tags
-     "Environment", "AppId", and either "OwnerContact" or "DeptID" to be stopped
-	 in four days.
+     "Environment", "AppId", and either "OwnerContact" or "DeptID" to
+     be stopped in four days.
 
 ```yaml
 policies:
