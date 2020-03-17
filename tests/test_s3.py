@@ -1553,11 +1553,7 @@ class S3Test(BaseTest):
             [('get_public_access_block', 'PublicBlock',
             None, None, 's3:GetBucketPublicAccessBlock')],
         )
-        self.patch(
-            s3.S3.resource_type,
-            "enum_spec",
-            ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
-        )
+
         session_factory = self.replay_flight_data("test_s3_public_block_enable_all")
         session = session_factory()
         client = session.client("s3")
@@ -1567,6 +1563,7 @@ class S3Test(BaseTest):
                 "name": "CheckForPublicBlocks-Absent",
                 "resource": "s3",
                 "filters": [
+                    {"Name": bname},
                     {
                         "type": "check-public-block",
                         "scope": "Any",
@@ -1611,11 +1608,7 @@ class S3Test(BaseTest):
             [('get_public_access_block', 'PublicBlock',
             None, None, 's3:GetBucketPublicAccessBlock')],
         )
-        self.patch(
-            s3.S3.resource_type,
-            "enum_spec",
-            ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
-        )
+
         session_factory = self.replay_flight_data("test_s3_public_block_disable_all")
         session = session_factory()
         client = session.client("s3")
@@ -1625,6 +1618,7 @@ class S3Test(BaseTest):
                 "name": "CheckForPublicBlocks-Present",
                 "resource": "s3",
                 "filters": [
+                    {"Name": bname},
                     {
                         "type": "check-public-block",
                         "scope": "Any",
@@ -1669,11 +1663,7 @@ class S3Test(BaseTest):
             [('get_public_access_block', 'PublicBlock',
             None, None, 's3:GetBucketPublicAccessBlock')],
         )
-        self.patch(
-            s3.S3.resource_type,
-            "enum_spec",
-            ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
-        )
+
         session_factory = self.replay_flight_data("test_s3_public_block_enable_one")
         session = session_factory()
         client = session.client("s3")
@@ -1683,6 +1673,7 @@ class S3Test(BaseTest):
                 "name": "CheckForPublicBlocks-Absent",
                 "resource": "s3",
                 "filters": [
+                    {"Name": bname},
                     {
                         "type": "check-public-block",
                         "scope": "BlockPublicPolicy",
@@ -1726,11 +1717,7 @@ class S3Test(BaseTest):
             [('get_public_access_block', 'PublicBlock',
             None, None, 's3:GetBucketPublicAccessBlock')],
         )
-        self.patch(
-            s3.S3.resource_type,
-            "enum_spec",
-            ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
-        )
+
         session_factory = self.replay_flight_data("test_s3_public_block_disable_one")
         session = session_factory()
         client = session.client("s3")
@@ -1740,6 +1727,7 @@ class S3Test(BaseTest):
                 "name": "CheckForPublicBlocks-Absent",
                 "resource": "s3",
                 "filters": [
+                    {"Name": bname},
                     {
                         "type": "check-public-block",
                         "scope": "IgnorePublicAcls",
