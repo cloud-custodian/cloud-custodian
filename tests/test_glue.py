@@ -305,6 +305,30 @@ class TestGlueCrawlers(BaseTest):
         crawlers = client.get_crawlers()["Crawlers"]
         self.assertFalse("test" in [c.get("Name") for c in crawlers])
 
+    def test_security_config_filter(self):
+        session_factory = self.replay_flight_data("test_glue_sec_config_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-crawler-security-config",
+                "resource": "glue-crawler",
+                "filters": [{
+                    "type": "security-config",
+                    "key": "EncryptionConfiguration.CloudWatchEncryption.CloudWatchEncryptionMode",
+                    "value": "SSE-KMS",
+                    "op": "eq"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['c7n:SecurityConfiguration']['EncryptionConfiguration']
+            ['CloudWatchEncryption']['CloudWatchEncryptionMode'],
+            'SSE-KMS'
+        )
+        self.assertEqual(resources[0]['Name'], 'test-filter-crawler')
+
 
 class TestGlueTables(BaseTest):
     def test_tables_delete(self):

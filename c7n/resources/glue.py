@@ -22,7 +22,7 @@ from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.tags import universal_augment
-from c7n.filters import StateTransitionFilter
+from c7n.filters import StateTransitionFilter, ValueFilter
 from c7n import query
 
 
@@ -182,6 +182,54 @@ class GlueCrawler(QueryResourceManager):
 
     permissions = ('glue:GetCrawlers',)
     augment = universal_augment
+
+
+@GlueCrawler.filter_registry.register('security-config')
+class GlueCrawlerSecurityConfigFilter(ValueFilter):
+    """Filters glue crawlers with security configurations
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: need-kms-cloudwatch
+                resource: glue-crawler
+                filters:
+                  - type: security-config
+                    key: EncryptionConfiguration.CloudWatchEncryption.CloudWatchEncryptionMode
+                    op: ne
+                    value: SSE-KMS
+    """
+
+    permissions = ('glue:GetSecurityConfiguration',)
+    sec_conf_attribute = 'c7n:SecurityConfiguration'
+    security_config_key = 'CrawlerSecurityConfiguration'
+    schema = type_schema('security-config', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        self.log.debug("fetching security configuration for %d glue crawlers" % len(resources))
+        resources = self.get_security_configuration(resources)
+        return super(ValueFilter, self).process(resources, event)
+
+    def __call__(self, r):
+        if self.sec_conf_attribute not in r:
+            return False
+        return self.match(r[self.sec_conf_attribute])
+
+    def get_security_configuration(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            if self.security_config_key not in r:
+                continue
+            if self.sec_conf_attribute not in r:
+                try:
+                    security_configuration = client.get_security_configuration(
+                        Name=r[self.security_config_key])
+                    r[self.sec_conf_attribute] = security_configuration.get('SecurityConfiguration')
+                except client.exceptions.EntityNotFoundException:
+                    continue
+        return resources
 
 
 @GlueCrawler.action_registry.register('delete')
