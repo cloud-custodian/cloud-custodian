@@ -204,7 +204,7 @@ class GlueCrawlerSecurityConfigFilter(ValueFilter):
 
     permissions = ('glue:GetSecurityConfiguration',)
     sec_conf_attribute = 'c7n:SecurityConfiguration'
-    security_config_key = 'CrawlerSecurityConfiguration'
+    boto_security_config_key = 'CrawlerSecurityConfiguration'
     schema = type_schema('security-config', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
@@ -220,12 +220,12 @@ class GlueCrawlerSecurityConfigFilter(ValueFilter):
     def get_security_configuration(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
         for r in resources:
-            if self.security_config_key not in r:
+            if self.boto_security_config_key not in r:
                 continue
             if self.sec_conf_attribute not in r:
                 try:
                     security_configuration = client.get_security_configuration(
-                        Name=r[self.security_config_key])
+                        Name=r[self.boto_security_config_key])
                     r[self.sec_conf_attribute] = security_configuration.get('SecurityConfiguration')
                 except client.exceptions.EntityNotFoundException:
                     continue
