@@ -475,8 +475,6 @@ class DistributionUpdateAction(BaseAction):
     shape = 'UpdateDistributionRequest'
 
     def validate(self):
-        if not self.data.get('update'):
-            raise PolicyValidationError('Update parameters are missing')
         attrs = dict(self.data.get('update'))
         if attrs.get('CallerReference'):
             raise PolicyValidationError('CallerReference field cannot be updated')
@@ -539,7 +537,7 @@ class DistributionUpdateAction(BaseAction):
                 IfMatch=res['ETag'],
                 DistributionConfig=updatedConfig
             )
-        except client.exceptions.NoSuchResource:
+        except (client.exceptions.NoSuchResource, client.exceptions.NoSuchDistribution):
             pass
         except Exception as e:
             self.log.warning(
