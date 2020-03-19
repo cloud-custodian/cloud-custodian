@@ -1310,7 +1310,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
 
 
-@actions.register('set-bucket-replication')
+@actions.register('set-replication')
 class SetBucketReplicationConfig(BucketActionBase):
     """Action to add or remove replication configuration statement from S3 buckets
 
@@ -1333,11 +1333,11 @@ class SetBucketReplicationConfig(BucketActionBase):
                       expr: "approved_accounts.*"
                     op: ni
                 actions:
-                  - type: set-bucket-replication
+                  - type: set-replication
                     state: enable
     """
     schema = type_schema(
-        'set-bucket-replication',
+        'set-replication',
         state={'type': 'string', 'enum': ['enable', 'disable', 'remove']})
     permissions = ("s3:GetReplicationConfiguration", "s3:PutReplicationConfiguration")
 

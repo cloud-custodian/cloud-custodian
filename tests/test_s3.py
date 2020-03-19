@@ -1587,7 +1587,7 @@ class S3Test(BaseTest):
                 ],
                 "actions": [
                     {
-                        "type": "set-bucket-replication",
+                        "type": "set-replication",
                         "state": "remove"
                     }
                 ]
@@ -1639,7 +1639,7 @@ class S3Test(BaseTest):
                 ],
                 "actions": [
                     {
-                        "type": "set-bucket-replication",
+                        "type": "set-replication",
                         "state": "disable"
                     }
                 ]
