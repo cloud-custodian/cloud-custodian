@@ -220,15 +220,18 @@ class GlueCrawlerSecurityConfigFilter(ValueFilter):
     def get_security_configuration(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
         for r in resources:
-            if self.boto_security_config_key not in r:
-                continue
-            if self.sec_conf_attribute not in r:
-                try:
-                    security_configuration = client.get_security_configuration(
-                        Name=r[self.boto_security_config_key])
-                    r[self.sec_conf_attribute] = security_configuration.get('SecurityConfiguration')
-                except client.exceptions.EntityNotFoundException:
+            try:
+                security_config_name = r.get(self.boto_security_config_key)
+                if security_config_name is None:
+                    # I can't make a API to get_security_configuration without
+                    # a Name parameter
                     continue
+                security_configuration_result = client.get_security_configuration(
+                    Name=security_config_name)
+                if 'SecurityConfiguration' in security_configuration_result:
+                    r[self.sec_conf_attribute] = security_configuration_result['SecurityConfiguration']
+            except client.exceptions.EntityNotFoundException:
+                continue
         return resources
 
 
