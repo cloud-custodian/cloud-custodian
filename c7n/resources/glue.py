@@ -272,3 +272,138 @@ class DeleteTable(BaseAction):
                 client.delete_table(DatabaseName=r['DatabaseName'], Name=r['Name'])
             except client.exceptions.EntityNotFoundException:
                 continue
+
+@resources.register('glue-classifier')
+class GlueClassifier(query.ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_classifiers', 'Classifiers', None)
+        id = name = 'Name'
+        date = 'CreationTime'
+        arn_type = 'classifier'
+        universal_taggable = True
+
+    permissions = ('glue:GetClassifiers',)
+    augment = universal_augment
+
+@GlueClassifier.action_registry.register('delete')
+class DeleteClassifier(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteClassifier',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_classifier(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
+
+# @resources.register('glue-ml-transform')
+# class GlueMLTransform(query.ChildResourceManager):
+
+#     class resource_type(TypeInfo):
+#         service = 'glue'
+#         enum_spec = ('get_ml_transforms', 'MlTransforms', None)
+#         id = 'TransformId'
+#         name = 'Name'
+#         date = 'CreatedOn'
+#         arn_type = 'mltransform'
+#         universal_taggable = True
+
+#     permissions = ('glue:GetJobs',)
+#     augment = universal_augment
+
+@resources.register('glue-partition')
+class GluePartition(query.ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_partitions', 'PartitionList', None)
+        id = 'CatalogId'
+        name = 'DatabaseName'
+        arn_type = 'partition'
+        universal_taggable = True
+
+    permissions = ('glue:GetPartitions',)
+    augment = universal_augment
+
+@GluePartition.action_registry.register('delete')
+class DeletePartition(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteClassifier',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_classifier(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
+
+# @resources.register('glue-script')
+# class GluePartition(query.ChildResourceManager):
+
+#     class resource_type(TypeInfo):
+#         service = 'glue'
+#         enum_spec = ('get_partitions', 'PartitionList', None)
+#         id = 'CatalogId'
+#         name = 'DatabaseName'
+#         arn_type = 'partition'
+
+@resources.register('glue-security-configuration')
+class GlueSecurityConfiguration(query.ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_security_configurations', 'SecurityConfigurations', None)
+        id = name = 'Name'
+        arn_type = 'securityConfiguration'
+        date = 'CreatedTimeStamp'
+        universal_taggable = True
+
+    permissions = ('glue:GetSecurityConfigurations',)
+    augment = universal_augment
+
+@resources.register('glue-trigger')
+class GlueTrigger(query.ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_triggers', 'Triggers', None)
+        id = 'Id'
+        name = 'Name'
+        arn_type = 'trigger'
+        universal_taggable = True
+
+    permissions = ('glue:GetTriggers',)
+    augment = universal_augment
+
+@resources.register('glue-user-defined-function')
+class GluePartition(query.ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_user_defined_functions', 'UserDefinedFunctions', None)
+        id = 'CatalogId'
+        name = 'DatabaseName'
+        arn_type = 'partition'
+        universal_taggable = True
+
+    permissions = ('glue:GetUserDefinedFunctions',)
+    augment = universal_augment
+
+@resources.register('glue-workflow')
+class GlueWorkflow(query.ChildResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_workflow_runs', 'WorkflowRuns', None)
+        id = name = 'Name'
+        arn_type = 'workflow'
+        universal_taggable = True
+
+    augment = universal_augment
