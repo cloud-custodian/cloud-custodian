@@ -1510,7 +1510,6 @@ class SetPublicBlock(BucketActionBase):
             return
 
 
-
 @actions.register('toggle-versioning')
 class ToggleVersioning(BucketActionBase):
     """Action to enable/suspend versioning on a S3 bucket
