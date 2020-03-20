@@ -467,7 +467,7 @@ class DistributionUpdateAction(BaseAction):
                     Prefix: ''
     """
     schema = type_schema('set-attributes',
-                        update={"type": "object"},
+                        attributes={"type": "object"},
                         required=('attributes',))
 
     permissions = ("cloudfront:UpdateDistribution",
