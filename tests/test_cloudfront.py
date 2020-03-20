@@ -327,8 +327,8 @@ class CloudFront(BaseTest):
                 ],
                 "actions": [
                     {
-                        "type": "update-distribution",
-                        "update": {
+                        "type": "set-attributes",
+                        "attributes": {
                             "Comment": "",
                             "Enabled": True,
                             "Logging": {

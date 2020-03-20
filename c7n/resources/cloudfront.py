@@ -440,7 +440,7 @@ class DistributionSSLAction(BaseAction):
             return
 
 
-@Distribution.action_registry.register('update-distribution')
+@Distribution.action_registry.register('set-attributes')
 class DistributionUpdateAction(BaseAction):
     """Action to update the attributes of a distribution
 
@@ -456,8 +456,8 @@ class DistributionUpdateAction(BaseAction):
               key: "Logging.Enabled"
               value: null
           actions:
-            - type: update-distribution
-              update:
+            - type: set-attributes
+              attributes:
                 Comment: ""
                 Enabled: true
                 Logging:
@@ -466,16 +466,16 @@ class DistributionUpdateAction(BaseAction):
                     Bucket: 'test-enable-logging-c7n.s3.amazonaws.com'
                     Prefix: ''
     """
-    schema = type_schema('update-distribution',
+    schema = type_schema('set-attributes',
                         update={"type": "object"},
-                        required=('update',))
+                        required=('attributes',))
 
     permissions = ("cloudfront:UpdateDistribution",
                    "cloudfront:GetDistributionConfig",)
     shape = 'UpdateDistributionRequest'
 
     def validate(self):
-        attrs = dict(self.data.get('update'))
+        attrs = dict(self.data.get('attributes'))
         if attrs.get('CallerReference'):
             raise PolicyValidationError('CallerReference field cannot be updated')
 
@@ -528,7 +528,7 @@ class DistributionUpdateAction(BaseAction):
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])
             config = res['DistributionConfig']
-            updatedConfig = {**config, **self.data['update']}
+            updatedConfig = {**config, **self.data['attributes']}
             self.set_required_update_fields(updatedConfig)
             if config == updatedConfig:
                 return
