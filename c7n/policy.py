@@ -549,7 +549,8 @@ class LambdaMode(ServerlessExecutionMode):
         from c7n import mu
         with self.policy.ctx:
             self.policy.log.info(
-                "Provisioning policy lambda %s", self.policy.name)
+                "Provisioning policy lambda: %s region: %s", self.policy.name,
+                self.policy.options.region)
             try:
                 manager = mu.LambdaManager(self.policy.session_factory)
             except ClientError:
