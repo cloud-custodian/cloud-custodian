@@ -343,3 +343,142 @@ class TestGlueDatabases(BaseTest):
         client = session_factory().client("glue")
         databases = client.get_databases()
         self.assertFalse("test" in [t.get("Name") for t in databases.get("DatabaseList", [])])
+
+
+# class TestGlueClassifiers(BaseTest):
+
+#     def test_classifiers_delete(self):
+#         session_factory = self.record_flight_data("test_glue_classifier_delete")
+#         p = self.load_policy(
+#             {
+#                 "name": "glue-classifier-delete",
+#                 "resource": "glue-classifier",
+#                 "filters": [{"CsvClassifier.Name": "test"}],
+#                 "actions": [{"type": "delete"}],
+#             },
+#             session_factory=session_factory,
+#         )
+#         resources = p.run()
+#         self.assertEqual(len(resources), 1)
+#         client = session_factory().client("glue")
+#         classifiers = client.get_classifiers()
+#         self.assertFalse("test" in [t.get('CsvClassifier').get("Name") for t in classifiers.get("Classifiers", [])])
+
+class GlueMLTransform(BaseTest):
+
+    def test_ml_transforms_delete(self):
+        session_factory = self.replay_flight_data("test_glue_ml_transform_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-ml-transform-delete",
+                "resource": "glue-ml-transform",
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        ml_transforms = client.get_ml_transforms()
+        self.assertFalse("test" in [t.get("Name") for t in ml_transforms.get("Transforms", [])])
+
+
+class TestGluePartitions(BaseTest):
+
+    def test_partitions_delete(self):
+        session_factory = self.replay_flight_data("test_glue_partition_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-partition-delete",
+                "resource": "glue-partition",
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        partitions = client.get_partitions()
+        self.assertFalse("test" in [t.get("Name") for t in partitions.get("Partitions", [])])
+
+
+# class TestGlueSecurityConfiguration(BaseTest):
+
+#     def test_glue_security_configuration_delete(self):
+#         session_factory = self.replay_flight_data("test_glue_security_configuration_delete")
+#         p = self.load_policy(
+#             {
+#                 "name": "glue-security-configuration-delete",
+#                 "resource": "glue-security-configuration",
+#                 "filters": [{"Name": "test"}],
+#                 "actions": [{"type": "delete"}],
+#             },
+#             session_factory=session_factory,
+#         )
+#         resources = p.run()
+#         self.assertEqual(len(resources), 1)
+#         client = session_factory().client("glue")
+#         security_configrations = client.get_security_configurations()
+#         self.assertFalse("test" in [t.get("Name") for t in security_configrations.get("SecurityConfigurations", [])])
+
+
+# class TestGlueTriggers(BaseTest):
+
+#     def test_databases_delete(self):
+#         session_factory = self.replay_flight_data("test_glue_trigger_delete")
+#         p = self.load_policy(
+#             {
+#                 "name": "glue-trigger-delete",
+#                 "resource": "glue-trigger",
+#                 "filters": [{"Name": "test"}],
+#                 "actions": [{"type": "delete"}],
+#             },
+#             session_factory=session_factory,
+#         )
+#         resources = p.run()
+#         self.assertEqual(len(resources), 1)
+#         client = session_factory().client("glue")
+#         triggers = client.get_triggers()
+#         self.assertFalse("test" in [t.get("Name") for t in triggers.get("Triggers", [])])
+
+
+# class TestGlueUserDefinedFunctions(BaseTest):
+
+#     def test_user_defined_functions_delete(self):
+#         session_factory = self.replay_flight_data("test_glue_user_defined_function_delete")
+#         p = self.load_policy(
+#             {
+#                 "name": "glue-user-defined-function-delete",
+#                 "resource": "glue-user-defined-function",
+#                 "filters": [{"Name": "test"}],
+#                 "actions": [{"type": "delete"}],
+#             },
+#             session_factory=session_factory,
+#         )
+#         resources = p.run()
+#         self.assertEqual(len(resources), 1)
+#         client = session_factory().client("glue")
+#         user_defined_functions = client.get_user_defined_functions()
+#         self.assertFalse("test" in [t.get("Name") for t in user_defined_functions.get("UserDefinedFunctions", [])])
+
+
+# class TestGlueWorkflows(BaseTest):
+
+#     def test_workflows_delete(self):
+#         session_factory = self.replay_flight_data("test_glue_workflow_delete")
+#         p = self.load_policy(
+#             {
+#                 "name": "glue-workflow-delete",
+#                 "resource": "glue-workflow",
+#                 "filters": [{"Name": "test"}],
+#                 "actions": [{"type": "delete"}],
+#             },
+#             session_factory=session_factory,
+#         )
+#         resources = p.run()
+#         self.assertEqual(len(resources), 1)
+#         client = session_factory().client("glue")
+#         workflows = client.get_databases()
+#         self.assertFalse("test" in [t.get("Name") for t in workflows.get("Workflows", [])])
