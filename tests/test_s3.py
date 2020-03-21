@@ -1680,9 +1680,7 @@ class S3Test(BaseTest):
                 ],
                 "actions": [
                     {
-                        "type": "set-public-block",
-                        "scope": "All",
-                        "state": "enable"
+                        "type": "set-public-block"
                     }
                 ]
             },
@@ -1731,7 +1729,6 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "scope": "All",
                         "state": "disable"
                     }
                 ]
@@ -1781,7 +1778,9 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "scope": "BlockPublicPolicy",
+                        "scope": [
+                            "BlockPublicPolicy"
+                        ],
                         "state": "enable"
                     }
                 ]
@@ -1830,7 +1829,9 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "scope": "IgnorePublicAcls",
+                        "scope": [
+                            "IgnorePublicAcls"
+                        ],
                         "state": "disable"
                     }
                 ]
@@ -1879,8 +1880,6 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "scope": "All",
-                        "state": "enable"
                     }
                 ]
             },

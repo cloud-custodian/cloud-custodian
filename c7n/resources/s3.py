@@ -1411,7 +1411,7 @@ class FilterPublicBlock(Filter):
                 if future.exception():
                     continue
                 if future.result():
-                    results.append(bucket)
+                    results.append(future.result())
         return results
 
     def process_bucket(self, bucket):
@@ -1426,25 +1426,28 @@ class FilterPublicBlock(Filter):
                 config = None
             else:
                 raise
+        if self.matches_filter(config, state, scope):
+            config['Name'] = bucket['Name']
+            return config
+
+    def matches_filter(self, config, state, scope):
         if config:
             if scope == 'All':
                 return all(config.values()) if state == 'present' else not any(config.values())
             elif scope == 'Any':
                 return any(config.values()) if state == 'present' else not all(config.values())
             else:
-                return config[scope] if state == 'present' else not config[scope]
+                return config[scope] if state == 'present' else not config[scope]        
         else:
             # return true for a null config, meaning no public blocks
             return True if state == 'absent' else False
-
 
 @actions.register('set-public-block')
 class SetPublicBlock(BucketActionBase):
     """Action to update Public Access blocks on S3 buckets
 
-    `scope`: BlockPublicAcls | IgnorePublicAcls | BlockPublicPolicy | RestrictPublicBuckets | All
-             Optional: Defaults to All
-    `state`: enable | disable` Optional: Defaults to enable
+    `scope`: Optional: Defaults to All
+    `state`: Optional: Defaults to enable
 
     :example:
 
@@ -1459,16 +1462,19 @@ class SetPublicBlock(BucketActionBase):
                     state: absent
                 actions:
                   - type: set-public-block
-                    # scope: BlockPublicAcls <------ optional (All by default)
+                    # scope: <------ optional (All by default)
+                    #   - BlockPublicAcls 
+                    #   - IgnorePublicAcls
                     # state: enable <------ optional (enable by default)
     """
 
     schema = type_schema(
         'set-public-block',
         scope={
-            'type': 'string',
-            'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
-                'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']},
+            'type': 'array',
+            'items':{'type':'string',
+                     'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
+                        'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']}},
         state={'type': 'string',
                'enum': ['enable', 'disable']})
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
@@ -1488,8 +1494,8 @@ class SetPublicBlock(BucketActionBase):
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        state = self.data.get('state', 'All')
-        scope = self.data.get('scope', 'enable')
+        state = self.data.get('state', 'enable')
+        scopes = self.data.get('scope', ['All'])
         try:
             config = s3.get_public_access_block(
                 Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
@@ -1499,11 +1505,12 @@ class SetPublicBlock(BucketActionBase):
             else:
                 raise
         if config:
-            if scope == 'All':
+            if 'All' in scopes:
                 for key in config.keys():
                     config[key] = True if state == 'enable' else False
             else:
-                config[scope] = True if state == 'enable' else False
+                for scope in scopes:
+                    config[scope] = True if state == 'enable' else False
             s3.put_public_access_block(
                 Bucket=bucket['Name'],
                 PublicAccessBlockConfiguration=config
