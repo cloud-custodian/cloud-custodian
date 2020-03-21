@@ -1472,7 +1472,7 @@ class SetPublicBlock(BucketActionBase):
         'set-public-block',
         scope={
             'type': 'array',
-            'items':{'type': 'string',
+            'items': {'type': 'string',
                      'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
                         'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']}},
         state={'type': 'string',
