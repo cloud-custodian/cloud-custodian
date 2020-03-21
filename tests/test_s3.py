@@ -1876,11 +1876,6 @@ class S3Test(BaseTest):
                         "scope": "All",
                         "state": "absent"
                     }
-                ],
-                "actions": [
-                    {
-                        "type": "set-public-block",
-                    }
                 ]
             },
             session_factory=session_factory,

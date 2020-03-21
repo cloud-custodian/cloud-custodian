@@ -1426,8 +1426,7 @@ class FilterPublicBlock(Filter):
             else:
                 raise
         if self.matches_filter(config, state, scope):
-            config['Name'] = bucket['Name']
-            return config
+            return {"Name": bucket['Name'], "publicblocks": config}
 
     def matches_filter(self, config, state, scope):
         if config:
