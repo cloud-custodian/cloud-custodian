@@ -6,19 +6,6 @@
             "Message": "The public access block configuration was not found",
             "BucketName": "mypublicblock"
         },
-        "ResponseMetadata": {
-            "RequestId": "0C36F099000DF9F5",
-            "HostId": "KOmaHfETANa2l+ucqCuEbDQWTNnajvTE6qAZ0OlnVWBCU4MBYmmzNr6GIpYJGLgh8a5UDAI9nKQ=",
-            "HTTPStatusCode": 404,
-            "HTTPHeaders": {
-                "x-amz-request-id": "0C36F099000DF9F5",
-                "x-amz-id-2": "KOmaHfETANa2l+ucqCuEbDQWTNnajvTE6qAZ0OlnVWBCU4MBYmmzNr6GIpYJGLgh8a5UDAI9nKQ=",
-                "content-type": "application/xml",
-                "transfer-encoding": "chunked",
-                "date": "Sat, 21 Mar 2020 21:42:19 GMT",
-                "server": "AmazonS3"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

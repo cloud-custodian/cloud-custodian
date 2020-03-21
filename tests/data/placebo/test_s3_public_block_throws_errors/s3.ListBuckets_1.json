@@ -1,47 +1,8 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "31556B450F571467",
-            "HostId": "fGfRMrZSdl4xaAer7Jxuf/QybDBWlvdG3H2lCoocZVl77I2nanf7xxDmm9Ho05qfyzyl8xJ5MvM=",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amz-id-2": "fGfRMrZSdl4xaAer7Jxuf/QybDBWlvdG3H2lCoocZVl77I2nanf7xxDmm9Ho05qfyzyl8xJ5MvM=",
-                "x-amz-request-id": "31556B450F571467",
-                "date": "Sat, 21 Mar 2020 21:42:20 GMT",
-                "content-type": "application/xml",
-                "transfer-encoding": "chunked",
-                "server": "AmazonS3"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "Buckets": [
-            {
-                "Name": "cloud9-584434990413-sam-deployments-us-east-1",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 10,
-                    "day": 27,
-                    "hour": 23,
-                    "minute": 34,
-                    "second": 59,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "elasticbeanstalk-us-east-1-584434990413",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2019,
-                    "month": 6,
-                    "day": 23,
-                    "hour": 21,
-                    "minute": 21,
-                    "second": 44,
-                    "microsecond": 0
-                }
-            },
             {
                 "Name": "mypublicblock",
                 "CreationDate": {
@@ -54,62 +15,10 @@
                     "second": 46,
                     "microsecond": 0
                 }
-            },
-            {
-                "Name": "repela",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 10,
-                    "hour": 20,
-                    "minute": 20,
-                    "second": 1,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "repela3",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 10,
-                    "hour": 20,
-                    "minute": 20,
-                    "second": 54,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "replication-from-12345",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 14,
-                    "hour": 0,
-                    "minute": 33,
-                    "second": 50,
-                    "microsecond": 0
-                }
-            },
-            {
-                "Name": "replication-t0-12345",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 14,
-                    "hour": 0,
-                    "minute": 34,
-                    "second": 3,
-                    "microsecond": 0
-                }
             }
         ],
         "Owner": {
-            "DisplayName": "hillegassdev",
+            "DisplayName": "pikachu",
             "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a"
         }
     }
