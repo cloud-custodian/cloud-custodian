@@ -55,35 +55,38 @@ indicate which region each row is from.
 
 .. _scheduling-policy-execution:
 
-Filtering Policy Execution by Date
-----------------------------------
+
+Conditional Policy Execution
+----------------------------
 
 Cloud Custodian can skip policies that are included in a policy file when running if
-the start and end date/times are before or after the current date-time respectively.
-To utilize this behavior, include the ``start``, ``end``, and ``tz`` attributes
-in the policy.
+the policy specifies conditions that aren't met by the current environment.
 
-If the current date and/or time is after the ``start``  value and there is no ``end``
-value, the policy will execute. Likewise, if the ``end`` value is after the current
-date and/or time and there is no ``start`` value, the policy will execute. Otherwise,
-the current date and/or time must fall between ``start`` and ``end`` values for the
-policy to execute. In order to specify a timezone, a ``tz`` attribute must be
-specified. Otherwise, UTC will be used to perform the comparison.
 
-This allows you to continuously run the same policy file for different time periods,
-without having to update the policy file for specific days or times.
+The available environment keys are
 
-**Note**: Dates and/or times specified in ``start`` or ``end`` must not be offset-aware.
-The policy's ``tz`` attribute will be applied to the ``start`` and ``end`` values.
-If no ``tz`` attribute is specified, UTC is set by default.
 
-``start`` and ``end`` attributes support the following formats:
+==========   ========================================================================
+Key          Description
+==========   ========================================================================
+name         Name of the policy
+region       Region the policy is being evaluated in.
+resource     The resource type of the policy.
+account_id   The account id (subscription, project) the policy is being evaluated in.
+provider     The name of the cloud provider (aws, azure, gcp, etc)
+policy       The policy data as structure
+now          The current time
+event        In serverless, the event that triggered the policy
+account      When running in c7n-org, current account info per account config file
+==========   ========================================================================
 
-* a date (example: ``1-1-2018``, ``January 1 2018``, ``2018-1-1``)
-* a offset-naive time with up to second precision (example: ``2:03:01 PM`` ``16:03:01``, ``3 AM``)
-* a date and a offset-naive time with up to second precision (example: ``1-1-2018 2 PM``, ``January 1 2018 14:00:00``)
+If a policy is executing in a serverless mode the triggering ``event`` is available.
+
+As an example, one can set up policy conditions to only execute between a given
+set of dates.
 
 .. code-block:: yaml
+
 
   policies:
 
@@ -100,9 +103,17 @@ If no ``tz`` attribute is specified, UTC is set by default.
         to ensure that the environment is fully
         turned off during the break.
       resource: ec2
-      start: "2018-12-15"
-      end: "2018-12-31"
-      tz: UTC
+      conditions:
+         - type: value
+	   key: now
+	   op: greater-than
+	   value_type: date
+	   value: "2018-12-15"
+	 - type: value
+	   key: now
+	   op: less-than
+	   value_type: date
+	   value: "2018-12-31"
       filters:
         - "tag:holiday-off-hours": present
       actions:
@@ -113,9 +124,17 @@ If no ``tz`` attribute is specified, UTC is set by default.
         This policy will start up all EC2 instances
         and only run on 1-1-2019.
       resource: ec2
-      start: "2019-1-1"
-      end: "2019-1-1 23:59:59"
-      tz: UTC
+      conditions:
+        - type: value
+	  key: now
+	  value_type: date
+	  op: greater-than
+	  value: "2009-1-1"
+	- type: value
+	  key: now
+	  value_type: date
+	  op: less-than
+	  value: "2019-1-1 23:59:59"
       filters:
         - "tag:holiday-off-hours": present
       actions:

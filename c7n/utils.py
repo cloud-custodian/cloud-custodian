@@ -554,6 +554,10 @@ class FormatDate(object):
     def __init__(self, d=None):
         self._d = d
 
+    @property
+    def datetime(self):
+        return self._d
+
     @classmethod
     def utcnow(cls):
         return cls(datetime.utcnow())
