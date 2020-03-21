@@ -1407,7 +1407,6 @@ class FilterPublicBlock(Filter):
         with self.executor_factory(max_workers=2) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
             for future in as_completed(futures):
-                bucket = futures[future]
                 if future.exception():
                     continue
                 if future.result():
@@ -1437,10 +1436,11 @@ class FilterPublicBlock(Filter):
             elif scope == 'Any':
                 return any(config.values()) if state == 'present' else not all(config.values())
             else:
-                return config[scope] if state == 'present' else not config[scope]        
+                return config[scope] if state == 'present' else not config[scope]
         else:
             # return true for a null config, meaning no public blocks
             return True if state == 'absent' else False
+
 
 @actions.register('set-public-block')
 class SetPublicBlock(BucketActionBase):
@@ -1463,7 +1463,7 @@ class SetPublicBlock(BucketActionBase):
                 actions:
                   - type: set-public-block
                     # scope: <------ optional (All by default)
-                    #   - BlockPublicAcls 
+                    #   - BlockPublicAcls
                     #   - IgnorePublicAcls
                     # state: enable <------ optional (enable by default)
     """
@@ -1472,7 +1472,7 @@ class SetPublicBlock(BucketActionBase):
         'set-public-block',
         scope={
             'type': 'array',
-            'items':{'type':'string',
+            'items':{'type': 'string',
                      'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
                         'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']}},
         state={'type': 'string',
