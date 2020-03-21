@@ -21,6 +21,7 @@ from .core import (
     Filter,
     Or,
     And,
+    Not,
     ValueFilter,
     AgeFilter,
     EventFilter,

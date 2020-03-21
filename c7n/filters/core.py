@@ -253,6 +253,10 @@ class BooleanGroupFilter(Filter):
             f.validate()
         return self
 
+    def get_resource_type_id(self):
+        resource_type = self.manager.get_model()
+        return resource_type.id
+
 
 class Or(BooleanGroupFilter):
 
@@ -269,12 +273,12 @@ class Or(BooleanGroupFilter):
         return False
 
     def process_set(self, resources, event):
-        resource_type = self.manager.get_model()
-        resource_map = {r[resource_type.id]: r for r in resources}
+        rtype_id = self.get_resource_type_id()
+        resource_map = {r[rtype_id]: r for r in resources}
         results = set()
         for f in self.filters:
             results = results.union([
-                r[resource_type.id] for r in f.process(resources, event)])
+                r[rtype_id] for r in f.process(resources, event)])
         return [resource_map[r_id] for r_id in results]
 
 
@@ -282,7 +286,7 @@ class And(BooleanGroupFilter):
 
     def process(self, resources, events=None):
         if self.manager:
-            sweeper = AnnotationSweeper(self.manager.get_model().id, resources)
+            sweeper = AnnotationSweeper(self.get_resource_type_id(), resources)
 
         for f in self.filters:
             resources = f.process(resources, events)
@@ -313,9 +317,9 @@ class Not(BooleanGroupFilter):
         return False
 
     def process_set(self, resources, event):
-        resource_type = self.manager.get_model()
-        resource_map = {r[resource_type.id]: r for r in resources}
-        sweeper = AnnotationSweeper(resource_type.id, resources)
+        rtype_id = self.get_resource_type_id()
+        resource_map = {r[rtype_id]: r for r in resources}
+        sweeper = AnnotationSweeper(rtype_id, resources)
 
         for f in self.filters:
             resources = f.process(resources, event)
@@ -323,7 +327,7 @@ class Not(BooleanGroupFilter):
                 break
 
         before = set(resource_map.keys())
-        after = set([r[resource_type.id] for r in resources])
+        after = set([r[rtype_id] for r in resources])
         results = before - after
         sweeper.sweep([])
 
