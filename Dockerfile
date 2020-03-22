@@ -31,7 +31,7 @@ RUN apt-get --yes update \
  && apt-get --yes remove build-essential \
  && apt-get remove --yes --allow-remove-essential sysvinit-utils mount login  bsdutils fdisk  libfdisk1 libmount1 libsmartcols1 e2fsprogs findutils  libblkid1 libcom-err2 libext2fs2 libss2 sed grep gzip hostname openssl \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
- && apt remove --yes --allow-remove-essenial perl-base \
+ && apt remove --yes --allow-remove-essential perl-base \
  ; echo "Still alive" \
  && rm -Rf /var/cache/apt/ \
  && rm -Rf /var/lib/apt/lists/* \
