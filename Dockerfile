@@ -29,6 +29,7 @@ RUN apt-get --yes update \
  && cd tools/c7n_gcp && $HOME/.poetry/bin/poetry install && cd ../.. \
  && cd tools/c7n_kube && $HOME/.poetry/bin/poetry install && cd ../.. \
  && apt-get --yes remove build-essential \
+ && apt-get remove --yes --allow-remove-essential sysvinit-utils mount login  bsdutils fdisk  libfdisk1 libmount1 libsmartcols1 e2fsprogs findutils  libblkid1 libcom-err2 libext2fs2 libss2 sed \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
  && rm -Rf /var/cache/apt/ \
  && rm -Rf /var/lib/apt/lists/* \
