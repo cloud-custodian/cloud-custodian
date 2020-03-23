@@ -238,7 +238,7 @@ class GlueTable(query.ChildResourceManager):
         service = 'glue'
         parent_spec = ('glue-database', 'DatabaseName', None)
         enum_spec = ('get_tables', 'TableList', None)
-        name = 'Name'
+        id = name = 'Name'
         date = 'CreatedOn'
         arn_type = 'table'
 
@@ -273,31 +273,32 @@ class DeleteTable(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
-# @resources.register('glue-classifier')
-# class GlueClassifier(QueryResourceManager):
+@resources.register('glue-classifier')
+class GlueClassifier(QueryResourceManager):
 
-#     class resource_type(TypeInfo):
-#         service = 'glue'
-#         enum_spec = ('get_classifiers', 'Classifiers', None)
-#         id = name = 'Name'
-#         date = 'CreationTime'
-#         arn_type = 'classifier'
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_classifiers', 'Classifiers', None)
+        id = name = 'Name'
+        date = 'CreationTime'
+        arn_type = 'classifier'
 
-#     permissions = ('glue:GetClassifiers',)
+    permissions = ('glue:GetClassifiers',)
 
-# @GlueClassifier.action_registry.register('delete')
-# class DeleteClassifier(BaseAction):
+@GlueClassifier.action_registry.register('delete')
+class DeleteClassifier(BaseAction):
 
-#     schema = type_schema('delete')
-#     permissions = ('glue:DeleteClassifier',)
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteClassifier',)
 
-#     def process(self, resources):
-#         client = local_session(self.manager.session_factory).client('glue')
-#         for r in resources:
-#             try:
-#                 client.delete_classifier(Name=r['Name'])
-#             except client.exceptions.EntityNotFoundException:
-#                 continue
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            classifier = next(iter(r.values()))
+            try:
+                client.delete_classifier(Name=classifier['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
 
 @resources.register('glue-ml-transform')
 class GlueMLTransform(QueryResourceManager):
@@ -305,12 +306,10 @@ class GlueMLTransform(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('get_ml_transforms', 'Transforms', None)
-        Name = 'Name'
+        name = 'Name'
         id = 'TransformId'
         arn_type = 'mltransform'
         universal_taggable = True
-
-    augment = universal_augment
 
 @GlueMLTransform.action_registry.register('delete')
 class DeleteMLTransform(BaseAction):
@@ -326,17 +325,36 @@ class DeleteMLTransform(BaseAction):
                 continue
 
 @resources.register('glue-partition')
-class GluePartition(QueryResourceManager):
+class GluePartition(query.ChildResourceManager):
+
+    child_source = 'describe-partition'
 
     class resource_type(TypeInfo):
         service = 'glue'
+        parent_spec = ('glue-table', 'TableName', None)
         enum_spec = ('get_partitions', 'PartitionList', None)
         id = 'CatalogId'
-        name = 'DatabaseName'
+        values = 'PartitionValues'
         arn_type = 'partition'
 
     permissions = ('glue:GetPartitions',)
-    augment = universal_augment
+
+@query.sources.register('describe-partition')
+class DescribePartition(query.ChildDescribeSource):
+
+    def get_query(self):
+        query = super(DescribePartition, self).get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        result = []
+        print(resources)
+        for parent_id, r in resources:
+            r['TableName'] = parent_id
+            r['DatabaseName'] = parent_id
+            result.append(r)
+        return result
 
 @GluePartition.action_registry.register('delete')
 class DeletePartition(BaseAction):
@@ -348,123 +366,82 @@ class DeletePartition(BaseAction):
         client = local_session(self.manager.session_factory).client('glue')
         for r in resources:
             try:
-                client.delete_partition(Name=r['Name'])
+                client.delete_partition(CatalogId=r['id'], DatabaseName=r['DatabaseName'], TableName=r['TableName'], PartitionValues=r['PartitionValues'])
             except client.exceptions.EntityNotFoundException:
                 continue
 
-# # @resources.register('glue-script')
-# # class GluePartition(QueryResourceManager):
+@resources.register('glue-security-configuration')
+class GlueSecurityConfiguration(QueryResourceManager):
 
-# #     class resource_type(TypeInfo):
-# #         service = 'glue'
-# #         enum_spec = ('get_partitions', 'PartitionList', None)
-# #         id = 'CatalogId'
-# #         name = 'DatabaseName'
-# #         arn_type = 'partition'
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_security_configurations', 'SecurityConfigurations', None)
+        id = name = 'Name'
+        arn_type = 'securityConfiguration'
+        date = 'CreatedTimeStamp'
 
-# @resources.register('glue-security-configuration')
-# class GlueSecurityConfiguration(query.ChildResourceManager):
+    permissions = ('glue:GetSecurityConfigurations',)
 
-#     class resource_type(TypeInfo):
-#         service = 'glue'
-#         enum_spec = ('get_security_configurations', 'SecurityConfigurations', None)
-#         id = name = 'Name'
-#         arn_type = 'securityConfiguration'
-#         date = 'CreatedTimeStamp'
+@GlueSecurityConfiguration.action_registry.register('delete')
+class DeleteSecurityConfiguration(BaseAction):
 
-#     permissions = ('glue:GetSecurityConfigurations',)
-#     augment = universal_augment
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteSecurityConfiguration',)
 
-# @GlueSecurityConfiguration.action_registry.register('delete')
-# class DeleteSecurityConfiguration(BaseAction):
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_security_configuration(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
 
-#     schema = type_schema('delete')
-#     permissions = ('glue:DeleteSecurityConfiguration',)
+@resources.register('glue-trigger')
+class GlueTrigger(QueryResourceManager):
 
-#     def process(self, resources):
-#         client = local_session(self.manager.session_factory).client('glue')
-#         for r in resources:
-#             try:
-#                 client.delete_security_configuration(Name=r['Name'])
-#             except client.exceptions.EntityNotFoundException:
-#                 continue
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_triggers', 'Triggers', None)
+        id = name = 'Name'
+        arn_type = 'trigger'
+        universal_taggable = True
 
-# @resources.register('glue-trigger')
-# class GlueTrigger(query.ChildResourceManager):
+    permissions = ('glue:GetTriggers',)
 
-#     class resource_type(TypeInfo):
-#         service = 'glue'
-#         enum_spec = ('get_triggers', 'Triggers', None)
-#         id = 'Id'
-#         name = 'Name'
-#         arn_type = 'trigger'
-#         universal_taggable = True
+@GlueTrigger.action_registry.register('delete')
+class DeleteTrigger(BaseAction):
 
-#     permissions = ('glue:GetTriggers',)
-#     augment = universal_augment
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteTrigger',)
 
-# @GlueTrigger.action_registry.register('delete')
-# class DeleteTrigger(BaseAction):
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_trigger(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
 
-#     schema = type_schema('delete')
-#     permissions = ('glue:DeleteTrigger',)
+@resources.register('glue-workflow')
+class GlueWorkflow(QueryResourceManager):
 
-#     def process(self, resources):
-#         client = local_session(self.manager.session_factory).client('glue')
-#         for r in resources:
-#             try:
-#                 client.delete_trigger(Name=r['Name'])
-#             except client.exceptions.EntityNotFoundException:
-#                 continue
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('list_workflows', 'Workflows', None)
+        detail_spec = ('get_workflow', 'Name', 'Name', 'Workflow')
+        id = name = 'Name'
+        arn_type = 'workflow'
+        universal_taggable = True
 
-# @resources.register('glue-user-defined-function')
-# class GlueUserDefinedFunction(query.ChildResourceManager):
+@GlueWorkflow.action_registry.register('delete')
+class DeleteWorkflow(BaseAction):
 
-#     class resource_type(TypeInfo):
-#         service = 'glue'
-#         enum_spec = ('get_user_defined_functions', 'UserDefinedFunctions', None)
-#         id = 'CatalogId'
-#         name = 'DatabaseName'
-#         arn_type = 'partition'
+    schema = type_schema('delete')
 
-#     permissions = ('glue:GetUserDefinedFunctions',)
-#     augment = universal_augment
-
-# @GlueUserDefinedFunction.action_registry.register('delete')
-# class DeleteUserDefinedFunction(BaseAction):
-
-#     schema = type_schema('delete')
-#     permissions = ('glue:DeleteUserDefinedFunction',)
-
-#     def process(self, resources):
-#         client = local_session(self.manager.session_factory).client('glue')
-#         for r in resources:
-#             try:
-#                 client.delete_user_defined_function(Name=r['Name'])
-#             except client.exceptions.EntityNotFoundException:
-#                 continue
-
-# @resources.register('glue-workflow')
-# class GlueWorkflow(query.ChildResourceManager):
-
-#     class resource_type(TypeInfo):
-#         service = 'glue'
-#         enum_spec = ('get_workflow_runs', 'WorkflowRuns', None)
-#         id = name = 'Name'
-#         arn_type = 'workflow'
-#         universal_taggable = True
-
-#     augment = universal_augment
-
-# @GlueWorkflow.action_registry.register('delete')
-# class DeleteWorkflow(BaseAction):
-
-#     schema = type_schema('delete')
-
-#     def process(self, resources):
-#         client = local_session(self.manager.session_factory).client('glue')
-#         for r in resources:
-#             try:
-#                 client.delete_workflow(Name=r['Name'])
-#             except client.exceptions.EntityNotFoundException:
-#                 continue
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_workflow(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
