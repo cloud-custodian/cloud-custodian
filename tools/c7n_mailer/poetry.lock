@@ -27,10 +27,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.12.21"
+version = "1.12.25"
 
 [package.dependencies]
-botocore = ">=1.15.21,<1.16.0"
+botocore = ">=1.15.25,<1.16.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -40,7 +40,7 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.15.21"
+version = "1.15.25"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
@@ -110,7 +110,7 @@ description = "Fake implementation of redis API for testing purposes."
 name = "fakeredis"
 optional = false
 python-versions = ">=3.5"
-version = "1.2.1"
+version = "1.3.0"
 
 [package.dependencies]
 redis = "<3.5"
@@ -394,7 +394,7 @@ description = "Twilio SendGrid library for Python"
 name = "sendgrid"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "6.1.3"
+version = "6.2.0"
 
 [package.dependencies]
 python-http-client = ">=3.2.1"
@@ -462,12 +462,12 @@ attrs = [
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
 ]
 boto3 = [
-    {file = "boto3-1.12.21-py2.py3-none-any.whl", hash = "sha256:5fe70e656f92e4e649dc4cf05786f57d180e5d491bcb22c80411512ec2b27c15"},
-    {file = "boto3-1.12.21.tar.gz", hash = "sha256:50105a25e301e20b361b2b8fafee196a425a4758e51f400a0f381d42e4bd909e"},
+    {file = "boto3-1.12.25-py2.py3-none-any.whl", hash = "sha256:5089aada80f023d21a99b7c10b10f0befd223aeeb60266513f322ad6655b5623"},
+    {file = "boto3-1.12.25.tar.gz", hash = "sha256:8214f8b384c03c76b3940f7a9a8b7e1dc3d7e43b12029a17fb0e68f29fff4ac3"},
 ]
 botocore = [
-    {file = "botocore-1.15.21-py2.py3-none-any.whl", hash = "sha256:86f7f1c489887f9e3c2ede598e2a30f8bd259c11e8ebe25e897e40231b3f4bc8"},
-    {file = "botocore-1.15.21.tar.gz", hash = "sha256:4aaf6c94bcaace260138d32eae144be1b5d2ddce9ef0f395da32c68e106ff20f"},
+    {file = "botocore-1.15.25-py2.py3-none-any.whl", hash = "sha256:e38cdfa5928dcdf00852693292642001d816a78fb43af6b38edb194578be0d4e"},
+    {file = "botocore-1.15.25.tar.gz", hash = "sha256:6639ca0f1cc49ce8bfff220cebcf582028e96de2043f83dbc6868edce00e438c"},
 ]
 certifi = [
     {file = "certifi-2019.11.28-py2.py3-none-any.whl", hash = "sha256:017c25db2a153ce562900032d5bc68e9f191e44e9a0f762f373977de9df1fbb3"},
@@ -495,8 +495,8 @@ docutils = [
     {file = "docutils-0.15.2.tar.gz", hash = "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"},
 ]
 fakeredis = [
-    {file = "fakeredis-1.2.1-py3-none-any.whl", hash = "sha256:6cc9ec865ece12e8f4dd260b4f7940fdf630b279aa66c29bb0b84132cf2e79fb"},
-    {file = "fakeredis-1.2.1.tar.gz", hash = "sha256:ec7290d601fa030b03e2a6016b8f5c719ad25db270a6110420e7438289ad22e8"},
+    {file = "fakeredis-1.3.0-py3-none-any.whl", hash = "sha256:422def27971c212e01406dee961b3b9f9deb365df385fefc3b05dace7a5830b9"},
+    {file = "fakeredis-1.3.0.tar.gz", hash = "sha256:7c657d6345f3a9837be1ed118964ba2472f66083d325017edad917b560c01a78"},
 ]
 idna = [
     {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},
@@ -648,9 +648,9 @@ s3transfer = [
     {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
 ]
 sendgrid = [
-    {file = "sendgrid-6.1.3-py3-none-any.whl", hash = "sha256:5f0dba4974ba3ccedd218285d524d95b0b446aa18d1ad103b0bbf5cd933ceb4e"},
-    {file = "sendgrid-6.1.3-py3.6.egg", hash = "sha256:07cae820f33b95e1025f1361309faac1407eb51585145599fb30a56d45bc88b1"},
-    {file = "sendgrid-6.1.3.tar.gz", hash = "sha256:410ecd69fc294786b85c77988996a09bbf8fc111af945e5c0719e442a8190875"},
+    {file = "sendgrid-6.2.0-py3-none-any.whl", hash = "sha256:80ea3a989bd382f2cb7de1508da17c279d9ef74107f456138daeb6bcbd579566"},
+    {file = "sendgrid-6.2.0-py3.6.egg", hash = "sha256:7c19e0f3d40093c8ed938fb091f6444783a94eb5e62000b33acc25160afbfc8c"},
+    {file = "sendgrid-6.2.0.tar.gz", hash = "sha256:3d91d848587a6f2b9f866f88ef65c9278336903524e6eb53bbb40c7ea7c774db"},
 ]
 six = [
     {file = "six-1.14.0-py2.py3-none-any.whl", hash = "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"},

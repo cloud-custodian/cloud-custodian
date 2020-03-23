@@ -2008,7 +2008,7 @@ class LaunchTemplate(query.QueryResourceManager):
                 continue
             templates.setdefault(
                 (t['LaunchTemplateId'],
-                 t['Version']), []).append(a['AutoScalingGroupName'])
+                 t.get('Version', None)), []).append(a['AutoScalingGroupName'])
         return templates
 
 

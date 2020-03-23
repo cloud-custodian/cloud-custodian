@@ -1,0 +1,65 @@
+{
+    "status_code": 200,
+    "data": {
+        "DatabaseList": [
+            {
+                "Name": "central-logs-poc",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 8,
+                    "day": 14,
+                    "hour": 12,
+                    "minute": 23,
+                    "second": 44,
+                    "microsecond": 0
+                },
+                "CreateTableDefaultPermissions": [
+                    {
+                        "Principal": {
+                            "DataLakePrincipalIdentifier": "IAM_ALLOWED_PRINCIPALS"
+                        },
+                        "Permissions": [
+                            "ALL"
+                        ]
+                    }
+                ]
+            },
+            {
+                "Name": "test",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 12,
+                    "minute": 3,
+                    "second": 13,
+                    "microsecond": 0
+                },
+                "CreateTableDefaultPermissions": [
+                    {
+                        "Principal": {
+                            "DataLakePrincipalIdentifier": "IAM_ALLOWED_PRINCIPALS"
+                        },
+                        "Permissions": [
+                            "ALL"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "11f090a6-5323-4182-bd15-870f04b2785f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 23 Mar 2020 18:53:51 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "434",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "11f090a6-5323-4182-bd15-870f04b2785f"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

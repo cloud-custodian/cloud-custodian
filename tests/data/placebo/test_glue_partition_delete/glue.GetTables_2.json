@@ -1,0 +1,71 @@
+{
+    "status_code": 200,
+    "data": {
+        "TableList": [
+            {
+                "Name": "test",
+                "DatabaseName": "test",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 12,
+                    "minute": 3,
+                    "second": 50,
+                    "microsecond": 0
+                },
+                "UpdateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 12,
+                    "minute": 7,
+                    "second": 28,
+                    "microsecond": 0
+                },
+                "Retention": 0,
+                "StorageDescriptor": {
+                    "Columns": [],
+                    "Location": "s3://c7n-test-glue/",
+                    "InputFormat": "org.apache.hadoop.mapred.TextInputFormat",
+                    "OutputFormat": "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
+                    "Compressed": false,
+                    "NumberOfBuckets": 0,
+                    "SerdeInfo": {
+                        "SerializationLibrary": "org.openx.data.jsonserde.JsonSerDe",
+                        "Parameters": {
+                            "paths": "test"
+                        }
+                    },
+                    "SortColumns": [],
+                    "StoredAsSubDirectories": false
+                },
+                "PartitionKeys": [
+                    {
+                        "Name": "test",
+                        "Type": "string"
+                    }
+                ],
+                "TableType": "EXTERNAL_TABLE",
+                "Parameters": {
+                    "classification": "json"
+                },
+                "IsRegisteredWithLakeFormation": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "3dc3e134-7c31-4e2c-843f-78857a941f14",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 23 Mar 2020 18:53:51 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "668",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "3dc3e134-7c31-4e2c-843f-78857a941f14"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

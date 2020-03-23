@@ -185,13 +185,13 @@ Single Node Deployment
 
 Now that your policies are stored and available in source control, you can now
 fill in the next pieces of the puzzle to deploy. The simplest way to operate
-Cloud Custodian is to start with running Cloud Custodian against a single account
-on a virtual machine.
+Cloud Custodian is to start with running Cloud Custodian against a single account (or subscription or project) on a virtual machine.
 
 To start, create a virtual machine on your cloud provider of choice.
 It's recommended to execute Cloud Custodian in the same cloud provider
-that you are operating against to prevent a hard dependency on one cloud
-to another.
+that you are operating against to prevent a hard dependency on one
+cloud to another as well being able to utilize your cloud's best pratices
+for credentials (instance profile, service account, etc).
 
 Then, log into the instance and set up Custodian, following the instructions
 in the  :ref:`install-cc` guide.

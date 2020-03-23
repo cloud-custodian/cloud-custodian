@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "test",
+        "ResponseMetadata": {
+            "RequestId": "98b244cd-6244-424d-b2c0-c3ea5dd4464e",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 23 Mar 2020 16:58:23 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "15",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "98b244cd-6244-424d-b2c0-c3ea5dd4464e"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
