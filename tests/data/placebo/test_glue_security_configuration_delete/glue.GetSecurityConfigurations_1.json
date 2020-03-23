@@ -1,0 +1,77 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityConfigurations": [
+            {
+                "Name": "full-encryption",
+                "CreatedTimeStamp": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 18,
+                    "hour": 10,
+                    "minute": 52,
+                    "second": 32,
+                    "microsecond": 544000
+                },
+                "EncryptionConfiguration": {
+                    "S3Encryption": [
+                        {
+                            "S3EncryptionMode": "SSE-KMS",
+                            "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/ec3b9189-1247-4ecc-8bfd-c492f07621db"
+                        }
+                    ],
+                    "CloudWatchEncryption": {
+                        "CloudWatchEncryptionMode": "SSE-KMS",
+                        "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/358f7699-4ea5-455a-9c78-1c868301e5a8"
+                    },
+                    "JobBookmarksEncryption": {
+                        "JobBookmarksEncryptionMode": "CSE-KMS",
+                        "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/358f7699-4ea5-455a-9c78-1c868301e5a8"
+                    }
+                }
+            },
+            {
+                "Name": "test",
+                "CreatedTimeStamp": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 12,
+                    "minute": 16,
+                    "second": 31,
+                    "microsecond": 842000
+                },
+                "EncryptionConfiguration": {
+                    "S3Encryption": [
+                        {
+                            "S3EncryptionMode": "SSE-KMS",
+                            "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/d1305425-4cde-46ee-be31-e2043dd4df39"
+                        }
+                    ],
+                    "CloudWatchEncryption": {
+                        "CloudWatchEncryptionMode": "SSE-KMS",
+                        "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/358f7699-4ea5-455a-9c78-1c868301e5a8"
+                    },
+                    "JobBookmarksEncryption": {
+                        "JobBookmarksEncryptionMode": "DISABLED"
+                    }
+                }
+            }
+        ],
+        "NextToken": "",
+        "ResponseMetadata": {
+            "RequestId": "ce043353-a892-42de-a308-7c35636c4863",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Mon, 23 Mar 2020 16:19:24 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "1579",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "ce043353-a892-42de-a308-7c35636c4863"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
