@@ -20,6 +20,7 @@ import copy
 import datetime
 from datetime import timedelta
 import fnmatch
+import ipaddress
 import logging
 import operator
 import re
@@ -32,7 +33,6 @@ from distutils import version
 import jmespath
 import six
 
-from c7n import ipaddress
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
