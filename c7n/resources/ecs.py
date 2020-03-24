@@ -865,9 +865,11 @@ class DeleteEcsCluster(BaseAction):
         for r in resources:
             if self.data.get('force', False):
                 instance_arns = extract_container_instances(client, r['clusterArn'])
-                instance_ids = [res.get('ec2InstanceId') for res in client.describe_container_instances(
-                    cluster=r['clusterArn'], containerInstances=instance_arns).get('containerInstances')]
-                self.terminate_container_instances(instance_ids)          
+                instance_ids = [res.get(
+                    'ec2InstanceId') for res in client.describe_container_instances(
+                        cluster=r['clusterArn'], containerInstances=instance_arns).get(
+                            'containerInstances')]
+                self.terminate_container_instances(instance_ids)
                 try:
                     retry(client.delete_cluster, cluster=r['clusterArn'])
                 except ClientError as e:
