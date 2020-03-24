@@ -62,7 +62,7 @@ class ModifyPolicyBase(BaseAction):
     .. code-block:: yaml
 
            policies:
-              - name: sns-cross-account
+              - name: sns-yank-cross-account
                 resource: sns
                 filters:
                   - type: cross-account

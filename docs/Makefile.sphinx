@@ -96,6 +96,12 @@ html:
 	rm $(SRCDIR)/tools/c7n-salactus.md
 	rm $(SRCDIR)/tools/c7n-logexporter.md
 	rm $(SRCDIR)/tools/c7n-guardian.md
+	rm $(SRCDIR)/tools/cask.md
+	rm -R $(SRCDIR)/tools/assets
+	rm $(SRCDIR)/aws/resources/*rst
+	rm $(SRCDIR)/azure/resources/*rst
+	rm $(SRCDIR)/gcp/resources/*rst
+
 
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

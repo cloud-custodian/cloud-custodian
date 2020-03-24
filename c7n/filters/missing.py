@@ -14,11 +14,9 @@
 
 from .core import Filter
 
-from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.loader import PolicyLoader
 from c7n.utils import type_schema
-from c7n.policy import PolicyCollection
 
 
 class Missing(Filter):
@@ -29,7 +27,10 @@ class Missing(Filter):
     This works as an effectively an embedded policy thats evaluated.
     """
     schema = type_schema(
-        'missing', policy={'type': 'object'},
+        'missing',
+        policy={'type': 'object',
+                'required': ['resource'],
+                'properties': {'resource': {'type': 'string'}}},
         required=['policy'])
 
     def __init__(self, data, manager):
@@ -61,27 +62,9 @@ class Missing(Filter):
         return self.embedded_policy.get_permissions()
 
     def process(self, resources, event=None):
+        if not self.embedded_policy.is_runnable():
+            return []
 
-        provider = clouds[self.manager.ctx.policy.provider_name]()
-
-        # if the embedded policy only specifies one region, or only
-        # being executed on a single region.
-        if self.embedded_policy.region or len(self.manager.config.regions) <= 1:
-            if (self.embedded_policy.region and
-                    self.embedded_policy.region != self.manager.config.region):
-                return []
-            self.embedded_policy.expand_variables(self.embedded_policy.get_variables())
-            return not self.embedded_policy.poll() and resources or []
-
-        # For regional resources and multi-region execution, the policy matches if
-        # the resource is missing in any region.
-        found = {}
-        for p in provider.initialize_policies(
-                PolicyCollection([self.embedded_policy], self.manager.config),
-                self.manager.config):
-            p.expand_variables(p.get_variables())
-            p.validate()
-            found[p.options.region] = p.poll()
-        if not all(found.values()):
-            return resources
-        return []
+        if self.embedded_policy.poll():
+            return []
+        return resources

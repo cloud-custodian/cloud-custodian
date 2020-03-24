@@ -214,10 +214,27 @@ def generate(resource_types=()):
                 'name': {
                     'type': 'string',
                     'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]+)*$"},
+                'conditions': {
+                    'type': 'array',
+                    'items': {'anyOf': [
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'or': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'not': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'and': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'$ref': '#/definitions/filters/value'},
+                        {'$ref': '#/definitions/filters/event'},
+                        {'$ref': '#/definitions/filters/valuekv'}]}},
+                # these should be deprecated for conditions
                 'region': {'type': 'string'},
                 'tz': {'type': 'string'},
                 'start': {'format': 'date-time'},
                 'end': {'format': 'date-time'},
+
                 'resource': {'type': 'string'},
                 'max-resources': {'anyOf': [
                     {'type': 'integer', 'minimum': 1},

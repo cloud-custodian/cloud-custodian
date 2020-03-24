@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "c7n_logexporter"
+version = "0.3.2"
+description = "Cloud Custodian - Cloud Watch Log S3 exporter"
+readme = "README.md"
+homepage = "https://cloudcustodian.io"
+repository = "https://github.com/cloud-custodian/cloud-custodian"
+documentation = "https://cloudcustodian.io/docs/"
+authors = ["Cloud Custodian Project"]
+license = "Apache-2.0"
+classifiers = [
+   "Topic :: System :: Systems Administration",
+   "Topic :: System :: Distributed Computing"
+]
+
+[tool.poetry.scripts]
+c7n-log-exporter = 'c7n_logexporter.exporter:cli'
+
+[tool.poetry.dependencies]
+python = "^3.6"
+click = "^7.0"
+
+[tool.poetry.dev-dependencies]
+c7n = {path = "../..", develop = true}
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
