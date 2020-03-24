@@ -299,7 +299,7 @@ class KmsKeyRotation(BaseAction):
 
     .. code-block:: yaml
 
-        policy:
+        policies:
           - name: enable-cmk-rotation
             resource: kms-key
             filters:

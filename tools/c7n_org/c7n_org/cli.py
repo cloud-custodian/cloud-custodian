@@ -549,6 +549,8 @@ def run_account(account, region, policies_config, output_path,
 
     with environ(**env_vars):
         for p in policies:
+            # Extend policy execution conditions with account information
+            p.conditions.env_vars['account'] = account
             # Variable expansion and non schema validation (not optional)
             p.expand_variables(p.get_variables(account.get('vars', {})))
             p.validate()

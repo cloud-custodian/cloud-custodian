@@ -110,8 +110,7 @@ class ResizePlan(AzureBaseAction):
                     type: resource
                     key: sku.name
               - type: resize-plan
-                size:
-                    size: S1
+                size: S1
 
     """
 

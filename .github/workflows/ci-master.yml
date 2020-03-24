@@ -25,17 +25,6 @@ jobs:
           - python-version: 3.8
             os: ubuntu-latest
             tox-target: py38
-
-          - python-version: 3.6
-            os: windows-latest
-            tox-target: py36
-          - python-version: 3.7
-            os: windows-latest
-            tox-target: py37
-          - python-version: 3.8
-            os: windows-latest
-            tox-target: py38
-
           - python-version: 3.6
             os: macos-latest
             tox-target: py36
@@ -55,7 +44,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: .tox/${{ matrix.tox-target }}
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/setup.py') }}
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/requirement*.txt') }}
 
       - name: Install Test Runner
         run: |
