@@ -1,0 +1,78 @@
+{
+  "status_code": 200,
+  "data": {
+    "Reservations": [
+      {
+        "Groups": [],
+        "Instances": [
+          {
+            "AmiLaunchIndex": 0,
+            "ImageId": "ami-02507631a9f7bc956",
+            "InstanceId": "i-0e6824706cd1ba29d",
+            "InstanceType": "t2.micro",
+            "LaunchTime": {
+              "__class__": "datetime",
+              "year": 2020,
+              "month": 3,
+              "day": 24,
+              "hour": 6,
+              "minute": 27,
+              "second": 9,
+              "microsecond": 0
+            },
+            "Monitoring": {
+              "State": "disabled"
+            },
+            "Placement": {
+              "AvailabilityZone": "us-east-1e",
+              "GroupName": "",
+              "Tenancy": "default"
+            },
+            "PrivateDnsName": "",
+            "ProductCodes": [],
+            "PublicDnsName": "",
+            "State": {
+              "Code": 48,
+              "Name": "terminated"
+            },
+            "StateTransitionReason": "User initiated (2020-03-24 06:27:57 GMT)",
+            "Architecture": "x86_64",
+            "BlockDeviceMappings": [],
+            "ClientToken": "",
+            "EbsOptimized": false,
+            "EnaSupport": true,
+            "Hypervisor": "xen",
+            "NetworkInterfaces": [],
+            "RootDeviceName": "/dev/xvda",
+            "RootDeviceType": "ebs",
+            "SecurityGroups": [],
+            "StateReason": {
+              "Code": "Client.UserInitiatedShutdown",
+              "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+            },
+            "VirtualizationType": "hvm",
+            "CpuOptions": {
+              "CoreCount": 1,
+              "ThreadsPerCore": 1
+            },
+            "CapacityReservationSpecification": {
+              "CapacityReservationPreference": "open"
+            },
+            "HibernationOptions": {
+              "Configured": false
+            },
+            "MetadataOptions": {
+              "State": "pending",
+              "HttpTokens": "optional",
+              "HttpPutResponseHopLimit": 1,
+              "HttpEndpoint": "enabled"
+            }
+          }
+        ],
+        "OwnerId": "644160558196",
+        "ReservationId": "r-02ad813f7d746e011"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

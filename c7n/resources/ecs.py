@@ -20,7 +20,7 @@ from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
-from c7n import query
+from c7n import query, utils
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser
 
@@ -812,8 +812,7 @@ class DeregisterInstances(BaseAction):
         client = local_session(self.manager.session_factory).client('ecs')
         error = None
         for r in resources:
-            instance_arns = client.list_container_instances(
-                cluster=r['clusterArn']).get('containerInstanceArns')
+            instance_arns = extract_container_instances(client, r['clusterArn'])
             for inst_arns in instance_arns:
                 try:
                     client.deregister_container_instance(
@@ -825,6 +824,15 @@ class DeregisterInstances(BaseAction):
                     error = e
         if error:
             raise error
+
+
+def extract_container_instances(client, cluster_arn):
+    try:
+        instance_arns = client.list_container_instances(
+            cluster=cluster_arn).get('containerInstanceArns')
+        return instance_arns
+    except client.exceptions.ClusterNotFoundException:
+        return []
 
 
 @ECSCluster.action_registry.register('delete')
@@ -851,18 +859,30 @@ class DeleteEcsCluster(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
+        retryable = ('ClusterContainsContainerInstancesException')
+        retry = utils.get_retry(retryable, max_attempts=10)
         error = None
-        if self.data.get('force', False):
-            dereg_instance = self.manager.action_registry['deregister-instances'](
-                {'force': True}, self.manager)
-            dereg_instance.process(resources)
         for r in resources:
-            try:
-                client.delete_cluster(cluster=r['clusterArn'])
-            except client.exceptions.ClusterNotFoundException:
-                continue
-            except ClientError as e:
-                error = e
-                continue
-        if error:
-            raise error
+            if self.data.get('force', False):
+                instance_arns = extract_container_instances(client, r['clusterArn'])
+                instance_ids = [res.get('ec2InstanceId') for res in client.describe_container_instances(
+                    cluster=r['clusterArn'], containerInstances=instance_arns).get('containerInstances')]
+                self.terminate_container_instances(instance_ids)          
+                try:
+                    retry(client.delete_cluster, cluster=r['clusterArn'])
+                except ClientError as e:
+                    if e.response['Error']['Code'] in retryable:
+                        error = e
+            else:
+                try:
+                    client.delete_cluster(cluster=r['clusterArn'])
+                except client.exceptions.ClusterNotFoundException:
+                    continue
+                except ClientError as e:
+                    error = e
+            if error:
+                raise error
+
+    def terminate_container_instances(self, instance_ids):
+        client = local_session(self.manager.session_factory).client('ec2')
+        client.terminate_instances(InstanceIds=instance_ids)

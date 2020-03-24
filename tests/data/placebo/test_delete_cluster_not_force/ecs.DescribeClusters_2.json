@@ -1,41 +1,31 @@
 {
-    "status_code": 200,
-    "data": {
-        "clusters": [
-            {
-                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
-                "clusterName": "test-cluster",
-                "status": "ACTIVE",
-                "registeredContainerInstancesCount": 1,
-                "runningTasksCount": 0,
-                "pendingTasksCount": 0,
-                "activeServicesCount": 0,
-                "statistics": [],
-                "tags": [],
-                "settings": [
-                    {
-                        "name": "containerInsights",
-                        "value": "disabled"
-                    }
-                ],
-                "capacityProviders": [
-                    "FARGATE_SPOT",
-                    "FARGATE"
-                ],
-                "defaultCapacityProviderStrategy": []
-            }
+  "status_code": 200,
+  "data": {
+    "clusters": [
+      {
+        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+        "clusterName": "test-cluster",
+        "status": "ACTIVE",
+        "registeredContainerInstancesCount": 1,
+        "runningTasksCount": 0,
+        "pendingTasksCount": 0,
+        "activeServicesCount": 0,
+        "statistics": [],
+        "tags": [],
+        "settings": [
+          {
+            "name": "containerInsights",
+            "value": "disabled"
+          }
         ],
-        "failures": [],
-        "ResponseMetadata": {
-            "RequestId": "32583e91-36a3-465b-b8ee-05f0f2ad4fa9",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "32583e91-36a3-465b-b8ee-05f0f2ad4fa9",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "1894",
-                "date": "Tue, 10 Mar 2020 21:47:47 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+        "capacityProviders": [
+          "FARGATE_SPOT",
+          "FARGATE"
+        ],
+        "defaultCapacityProviderStrategy": []
+      }
+    ],
+    "failures": [],
+    "ResponseMetadata": {}
+  }
 }

@@ -1,0 +1,30 @@
+{
+  "status_code": 200,
+  "data": {
+    "cluster": {
+      "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+      "clusterName": "test-cluster",
+      "status": "DEPROVISIONING",
+      "registeredContainerInstancesCount": 0,
+      "runningTasksCount": 0,
+      "pendingTasksCount": 0,
+      "activeServicesCount": 0,
+      "statistics": [],
+      "tags": [],
+      "settings": [
+        {
+          "name": "containerInsights",
+          "value": "disabled"
+        }
+      ],
+      "capacityProviders": [
+        "FARGATE_SPOT",
+        "FARGATE"
+      ],
+      "defaultCapacityProviderStrategy": [],
+      "attachments": [],
+      "attachmentsStatus": "UPDATE_IN_PROGRESS"
+    },
+    "ResponseMetadata": {}
+  }
+}

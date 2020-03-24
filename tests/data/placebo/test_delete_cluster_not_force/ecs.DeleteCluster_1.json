@@ -1,21 +1,10 @@
 {
-    "status_code": 400,
-    "data": {
-        "Error": {
-            "Message": "The Cluster cannot be deleted while Container Instances are active or draining.",
-            "Code": "ClusterContainsContainerInstancesException"
-        },
-        "ResponseMetadata": {
-            "RequestId": "82889989-524b-44c4-bb1e-5c09440757e2",
-            "HTTPStatusCode": 400,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "82889989-524b-44c4-bb1e-5c09440757e2",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "147",
-                "date": "Tue, 10 Mar 2020 21:47:47 GMT",
-                "connection": "close"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 400,
+  "data": {
+    "Error": {
+      "Message": "The Cluster cannot be deleted while Container Instances are active or draining.",
+      "Code": "ClusterContainsContainerInstancesException"
+    },
+    "ResponseMetadata": {}
+  }
 }

@@ -444,6 +444,11 @@ class TestEcs(BaseTest):
         session_factory = self.replay_flight_data("test_delete_cluster")
         client = session_factory().client("ecs")
         response = client.describe_clusters(clusters=['test-cluster'])
+        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 1)
+        instance_arn = client.list_container_instances(
+            cluster='test-cluster').get('containerInstanceArns')
+        instance_id = client.describe_container_instances(
+            cluster="test-cluster", containerInstances=instance_arn).get('containerInstances')[0]['ec2InstanceId']
         self.assertEqual(response['clusters'][0].get('status'), 'ACTIVE')
         p = self.load_policy(
             {
@@ -466,6 +471,9 @@ class TestEcs(BaseTest):
             time.sleep(30)
         response = client.describe_clusters(clusters=['test-cluster'])
         self.assertEqual(response['clusters'][0].get('status'), 'INACTIVE')
+        c = session_factory().client("ec2")
+        res = c.describe_instances(InstanceIds=[instance_id])
+        self.assertEqual(res.get('Reservations')[0].get('Instances')[0].get('State').get('Name'), 'terminated')
 
     def test_delete_cluster_not_force(self):
         session_factory = self.replay_flight_data("test_delete_cluster_not_force")

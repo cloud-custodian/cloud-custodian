@@ -1,19 +1,9 @@
 {
-    "status_code": 200,
-    "data": {
-        "clusterArns": [
-            "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster"
-        ],
-        "ResponseMetadata": {
-            "RequestId": "c804ab45-2f15-4f6e-859e-ca2a83f3c0b1",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "c804ab45-2f15-4f6e-859e-ca2a83f3c0b1",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "349",
-                "date": "Tue, 11 Feb 2020 04:27:49 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "clusterArns": [
+      "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster"
+    ],
+    "ResponseMetadata": {}
+  }
 }
