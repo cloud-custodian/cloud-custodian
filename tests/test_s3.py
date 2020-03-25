@@ -1690,19 +1690,13 @@ class S3Test(BaseTest):
         # Test that there was a bucket with missing public blocks
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], bname)
 
         # Verbose test to make sure that the public blocks are enabled on the buckets
-        try:
-            response = client.get_public_access_block(
-                Bucket=bname)['PublicAccessBlockConfiguration']
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                response = None
-            else:
-                raise
-        if response:
-            for key in response.keys():
-                self.assertEqual(response[key], True)
+        response = client.get_public_access_block(
+            Bucket=bname)['PublicAccessBlockConfiguration']
+        for key in response.keys():
+            self.assertEqual(response[key], True)
 
     def test_set_public_block_disable_all(self):
         bname = 'mypublicblock'
@@ -1739,19 +1733,13 @@ class S3Test(BaseTest):
         # Test that there was a bucket with missing public blocks
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], bname)
 
         # Verbose test to make sure that the public blocks are enabled on the buckets
-        try:
-            response = client.get_public_access_block(
-                Bucket=bname)['PublicAccessBlockConfiguration']
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                self.assertEqual(response, None)
-            else:
-                raise
-        if response:
-            for key in response.keys():
-                self.assertEqual(response[key], False)
+        response = client.get_public_access_block(
+            Bucket=bname)['PublicAccessBlockConfiguration']
+        for key in response.keys():
+            self.assertEqual(response[key], False)
 
     def test_set_public_block_enable_one(self):
         bname = 'mypublicblock'
@@ -1791,18 +1779,12 @@ class S3Test(BaseTest):
         # Test that there was a bucket with BlockPublicAcls public block
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], bname)
 
         # Verbose test to make sure that the public blocks are enabled on the buckets
-        try:
-            response = client.get_public_access_block(
-                Bucket=bname)['PublicAccessBlockConfiguration']
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                self.assertEqual(response, None)
-            else:
-                raise
-        if response:
-            self.assertEqual(response['BlockPublicPolicy'], True)
+        response = client.get_public_access_block(
+            Bucket=bname)['PublicAccessBlockConfiguration']
+        self.assertEqual(response['BlockPublicPolicy'], True)
 
     def test_set_public_block_disable_one(self):
         bname = 'mypublicblock'
@@ -1842,18 +1824,12 @@ class S3Test(BaseTest):
         # Test that there was a bucket with BlockPublicAcls public block
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], bname)
 
         # Verbose test to make sure that the public blocks are enabled on the buckets
-        try:
-            response = client.get_public_access_block(
-                Bucket=bname)['PublicAccessBlockConfiguration']
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                self.assertEqual(response, None)
-            else:
-                raise
-        if response:
-            self.assertEqual(response['IgnorePublicAcls'], False)
+        response = client.get_public_access_block(
+            Bucket=bname)['PublicAccessBlockConfiguration']
+        self.assertEqual(response['IgnorePublicAcls'], False)
 
     def test_set_public_block_throws_errors(self):
         bname = 'mypublicblock'
@@ -1884,6 +1860,7 @@ class S3Test(BaseTest):
         # Test that there was a bucket with no public blocks
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], bname)
 
         # Because there are no public blocks we will get a client error
         # We want this to throw for code cov
