@@ -1376,6 +1376,11 @@ class SetBucketReplicationConfig(BucketActionBase):
 class FilterPublicBlock(Filter):
     """Filter for s3 bucket public blocks
 
+    `scope`: Optional: Defaults to Any
+    `enabled`: Optional: Defaults to False
+
+    The defaults essentially check to see if any public blocks are missing
+
     :example:
 
     .. code-block:: yaml
@@ -1387,7 +1392,8 @@ class FilterPublicBlock(Filter):
                 filters:
                   - type: check-public-block
                     scope: Any
-                    state: absent
+                    enabled: False
+
     """
 
     schema = type_schema(
@@ -1396,10 +1402,7 @@ class FilterPublicBlock(Filter):
             'type': 'string',
             'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
                 'BlockPublicPolicy', 'RestrictPublicBuckets', 'All', 'Any']},
-        state={
-            'type': 'string',
-            'enum': ['absent', 'present']},
-        required=['scope', 'state'])
+        enabled={'type': 'boolean'})
     permissions = ("s3:GetBucketPublicAccessBlock",)
 
     def process(self, buckets, event=None):
@@ -1419,8 +1422,8 @@ class FilterPublicBlock(Filter):
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        state = self.data.get('state')
-        scope = self.data.get('scope')
+        enabled = self.data.get('enabled', False)
+        scope = self.data.get('scope', 'Any')
         try:
             config = s3.get_public_access_block(
                 Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
@@ -1429,20 +1432,20 @@ class FilterPublicBlock(Filter):
                 config = None
             else:
                 raise Exception(e)
-        if self.matches_filter(config, state, scope):
+        if self.matches_filter(config, enabled, scope):
             return {"Name": bucket['Name'], "publicblocks": config}
 
-    def matches_filter(self, config, state, scope):
+    def matches_filter(self, config, enabled, scope):
         if config:
             if scope == 'All':
-                return all(config.values()) if state == 'present' else not any(config.values())
+                return all(config.values()) if enabled else not any(config.values())
             elif scope == 'Any':
-                return any(config.values()) if state == 'present' else not all(config.values())
+                return any(config.values()) if enabled else not all(config.values())
             else:
-                return config[scope] if state == 'present' else not config[scope]
+                return config[scope] if enabled else not config[scope]
         else:
             # return true for a null config, meaning no public blocks
-            return True if state == 'absent' else False
+            return False if enabled else True
 
 
 @actions.register('set-public-block')
@@ -1462,7 +1465,7 @@ class SetPublicBlock(BucketActionBase):
                 filters:
                   - type: check-public-block
                     scope: BlockPublicAcls
-                    state: absent
+                    enabled: False
                 actions:
                   - type: set-public-block
                     # scope: <------ optional (All by default)
