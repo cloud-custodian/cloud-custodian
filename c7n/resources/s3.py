@@ -1406,11 +1406,14 @@ class FilterPublicBlock(Filter):
         results = list()
         with self.executor_factory(max_workers=2) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            errors = list()
             for future in as_completed(futures):
                 if future.exception():
-                    continue
+                    errors.append("Message: %s Bucket: %s" % (future.exception(), bucket['Name']))
                 if future.result():
                     results.append(future.result())
+            if errors:
+                raise Exception('\n'.join(map(str, errors)))                      
         return results
 
     def process_bucket(self, bucket):
