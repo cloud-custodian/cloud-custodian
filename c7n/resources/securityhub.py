@@ -450,10 +450,9 @@ class PostFinding(Action):
                         'utf8')).hexdigest())
         finding = {
             "SchemaVersion": self.FindingVersion,
-            "ProductArn": "arn:{}:securityhub:{}:{}:product/cloud-custodian/cloud-custodian".format(
-                get_partition(self.manager.config.region),
-                region,
-                self.manager.config.account_id,
+            "ProductArn": "arn:{}:securityhub:{}::product/cloud-custodian/cloud-custodian".format(
+                get_partition(self.manager.config.region)
+                region
             ),
             "AwsAccountId": self.manager.config.account_id,
             # Long search chain for description values, as this was
