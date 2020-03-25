@@ -229,7 +229,8 @@ class GlueCrawlerSecurityConfigFilter(ValueFilter):
                 security_configuration_result = client.get_security_configuration(
                     Name=security_config_name)
                 if 'SecurityConfiguration' in security_configuration_result:
-                    r[self.sec_conf_attribute] = security_configuration_result['SecurityConfiguration']
+                    r[self.sec_conf_attribute] = \
+                        security_configuration_result['SecurityConfiguration']
             except client.exceptions.EntityNotFoundException:
                 continue
         return resources
