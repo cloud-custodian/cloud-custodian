@@ -451,7 +451,7 @@ class PostFinding(Action):
         finding = {
             "SchemaVersion": self.FindingVersion,
             "ProductArn": "arn:{}:securityhub:{}::product/cloud-custodian/cloud-custodian".format(
-                get_partition(self.manager.config.region)
+                get_partition(self.manager.config.region),
                 region
             ),
             "AwsAccountId": self.manager.config.account_id,
