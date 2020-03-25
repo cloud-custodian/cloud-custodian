@@ -1417,7 +1417,7 @@ class FilterPublicBlock(Filter):
                 if future.result():
                     results.append(future.result())
             if errors:
-                raise Exception('\n'.join(map(str, errors)))                      
+                raise Exception('\n'.join(map(str, errors)))
         return results
 
     def process_bucket(self, bucket):
@@ -1531,7 +1531,7 @@ class SetPublicBlock(BucketActionBase):
                     'RestrictPublicBuckets': True if state == 'enable' else False
                 }
             )
-        return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}    
+        return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
 
 
 @actions.register('toggle-versioning')
