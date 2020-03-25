@@ -37,7 +37,7 @@ from jsonschema.exceptions import best_match
 
 from c7n.policy import execution
 from c7n.provider import clouds
-from c7n.resources import load_resources
+from c7n.resources import load_available
 from c7n.resolver import ValuesFrom
 from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
 from c7n.structure import StructureParser # noqa
@@ -214,10 +214,27 @@ def generate(resource_types=()):
                 'name': {
                     'type': 'string',
                     'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]+)*$"},
+                'conditions': {
+                    'type': 'array',
+                    'items': {'anyOf': [
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'or': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'not': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'and': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'$ref': '#/definitions/filters/value'},
+                        {'$ref': '#/definitions/filters/event'},
+                        {'$ref': '#/definitions/filters/valuekv'}]}},
+                # these should be deprecated for conditions
                 'region': {'type': 'string'},
                 'tz': {'type': 'string'},
                 'start': {'format': 'date-time'},
                 'end': {'format': 'date-time'},
+
                 'resource': {'type': 'string'},
                 'max-resources': {'anyOf': [
                     {'type': 'integer', 'minimum': 1},
@@ -574,7 +591,7 @@ def pprint_schema_summary(vocabulary):
 
 
 def json_dump(resource=None):
-    load_resources()
+    load_available()
     print(json.dumps(generate(resource), indent=2))
 
 

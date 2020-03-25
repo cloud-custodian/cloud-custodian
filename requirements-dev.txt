@@ -1,30 +1,15 @@
+# Load all project requirements
+
+# note all of these are generated from poetry lock/projects via `make pkg-gen-requirements`
 -r requirements.txt
-
-# Test & lint packages
-coverage==5.0.3
-mock==3.0.5
-placebo==0.9.0
-flake8==3.7.9
-pytest
-pytest-xdist
-pytest-cov==2.8.1
-twine
-tox==3.14.3
-six >= 1.12.0
-
-# Optional feature testing in c7n
-psutil==5.6.7
-aws_xray_sdk==2.4.3
-importlib_metadata==1.4.0
-
--r tools/c7n_mailer/requirements.txt
 -r tools/c7n_azure/requirements.txt
 -r tools/c7n_gcp/requirements.txt
 -r tools/c7n_kube/requirements.txt
+-r tools/c7n_mailer/requirements.txt
+-r tools/c7n_org/requirements.txt
 
-# Specific to testing mailer
-fakeredis==1.1.0
-
+# Setup source directories as editable/development distributions
+-e .
 # Local package required for c7n_mailer tests
 -e tools/c7n_mailer
 # Local package required for c7n_azure tests
@@ -36,5 +21,8 @@ fakeredis==1.1.0
 # Local package required for c7n_org tests
 -e tools/c7n_org
 
-# requires pandoc, fails on ci server, only used for pypi metadata
-# setuptools-markdown==0.2
+# we don't export dev requirements of subpackages (due to editable/distribution above)
+# so explicitly list them here.
+vcrpy-unittest==0.1.7
+parameterized==0.7.1
+fakeredis==1.2.1

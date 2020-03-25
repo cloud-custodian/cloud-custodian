@@ -61,7 +61,7 @@ class ExecutionContext(object):
 
         # Always do file/blob storage outputs
         self.output_logs = None
-        if not isinstance(self.logs, log_outputs['default']):
+        if not isinstance(self.logs, (log_outputs['default'], log_outputs['null'])):
             self.output_logs = log_outputs.select(None, self)
 
         # Look for customizations, but fallback to default

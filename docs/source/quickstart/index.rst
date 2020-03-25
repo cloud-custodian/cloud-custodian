@@ -159,6 +159,39 @@ different clouds, check out the cloud provider specific pages:
 
 For details, see :ref:`usage`.
 
+
+.. _editor-integration:
+
+Editor Integration
+------------------
+
+If your preferred editor supports language servers, you can configure
+it to provide completion and validation while authoring policies.
+
+First generate use custodian to generate a jsonschema file::
+
+  custodian schema --json > schema.json
+
+Next install
+``yaml-language-server <https://github.com/redhat-developer/yaml-language-server>``
+into your editor of choice.
+
+You'll then configure it to use the generated `schema.json` as the
+schema for your policy files. For example in visual studio code
+settings that looks like::
+
+      "yaml.schemas": {
+        "./schema.json": "*yml"
+      },
+
+You'll now have completion and validation while authoring policies
+
+.. image:: c7n-editor.png
+
+
+Note if your authoring policies in json you can also configure the
+json-language-server for the same.
+
 .. _tab-completion:
 
 Tab Completion
@@ -174,6 +207,7 @@ Run:
 
 Now launch a new shell (or refresh your bash environment by sourcing the appropriate
 file).
+
 
 Troubleshooting
 +++++++++++++++

@@ -26,7 +26,18 @@ from c7n.utils import yaml_load
 from .common import BaseTest
 
 
-class UniversalAugmentTest(BaseTest):
+class UniversalTagTest(BaseTest):
+
+    def test_auto_tag_registration(self):
+        try:
+            self.load_policy({
+                'name': 'sfn-auto',
+                'resource': 'step-machine',
+                'mode': {'type': 'cloudtrail',
+                         'events': [{'ids': 'some', 'source': 'thing', 'event': 'wicked'}]},
+                'actions': [{'type': 'auto-tag-user', 'tag': 'creator'}]})
+        except Exception as e:
+            self.fail('auto-tag policy failed to load %s' % e)
 
     def test_universal_augment_resource_missing_tags(self):
         session_factory = self.replay_flight_data('test_tags_universal_augment_missing_tags')
@@ -46,9 +57,6 @@ class UniversalAugmentTest(BaseTest):
         )
         results = policy.run()
         self.assertTrue('Tags' in results[0])
-
-
-class UniversalTagRetry(BaseTest):
 
     def test_retry_no_error(self):
         mock = MagicMock()

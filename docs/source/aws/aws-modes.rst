@@ -37,7 +37,7 @@ Custodian can run in numerous modes depending on the provider with the default b
 - ec2-instance-state:
     Runs custodian in AWS lambda and is triggered by ec2 instance state changes. This is useful if you
     have policies that are specific to ec2. See `EC2 lifecycles
-    <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html/>`_ for more details.
+    <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_ for more details.
 
   .. c7n-schema:: mode.ec2-instance-state
 
@@ -45,7 +45,7 @@ Custodian can run in numerous modes depending on the provider with the default b
 - asg-instance-state:
     Runs custodian in AWS lambda and is triggered by asg instance state changes. This is useful if you
     have policies that are specific to asg. See `ASG lifecycle hooks
-    <https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html/>`_ for more details.
+    <https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html>`_ for more details.
 
   .. c7n-schema:: mode.asg-instance-state
 

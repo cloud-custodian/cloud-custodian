@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
+import ipaddress
 import os
 import sys
 import tempfile
@@ -24,7 +25,7 @@ from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
 import mock
 
-from c7n import ipaddress, utils
+from c7n import utils
 from c7n.config import Config
 from .common import BaseTest
 
@@ -131,6 +132,22 @@ class ProxyUrlTest(BaseTest):
 
 
 class UtilTest(BaseTest):
+
+    def test_merge_dict(self):
+        a = {'detail': {'eventName': ['CreateSubnet'],
+                    'eventSource': ['ec2.amazonaws.com']},
+             'detail-type': ['AWS API Call via CloudTrail']}
+        b = {'detail': {'userIdentity': {
+            'userName': [{'anything-but': 'deputy'}]}}}
+        self.assertEqual(
+            utils.merge_dict(a, b),
+            {'detail-type': ['AWS API Call via CloudTrail'],
+             'detail': {
+                 'eventName': ['CreateSubnet'],
+                 'eventSource': ['ec2.amazonaws.com'],
+                 'userIdentity': {
+                     'userName': [
+                         {'anything-but': 'deputy'}]}}})
 
     def test_local_session_region(self):
         policies = [
