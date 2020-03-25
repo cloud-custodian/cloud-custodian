@@ -1408,6 +1408,7 @@ class FilterPublicBlock(Filter):
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
             errors = list()
             for future in as_completed(futures):
+                bucket = futures[future]
                 if future.exception():
                     errors.append("Message: %s Bucket: %s" % (future.exception(), bucket['Name']))
                 if future.result():
@@ -1427,7 +1428,7 @@ class FilterPublicBlock(Filter):
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 config = None
             else:
-                raise
+                raise Exception(e)
         if self.matches_filter(config, state, scope):
             return {"Name": bucket['Name'], "publicblocks": config}
 
@@ -1517,9 +1518,17 @@ class SetPublicBlock(BucketActionBase):
                 Bucket=bucket['Name'],
                 PublicAccessBlockConfiguration=config
             )
-            return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
         else:
-            return
+            s3.put_public_access_block(
+                Bucket=bucket['Name'],
+                PublicAccessBlockConfiguration={
+                    'BlockPublicAcls': True if state == 'enable' else False,
+                    'IgnorePublicAcls': True if state == 'enable' else False,
+                    'BlockPublicPolicy': True if state == 'enable' else False,
+                    'RestrictPublicBuckets': True if state == 'enable' else False
+                }
+            )
+        return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}    
 
 
 @actions.register('toggle-versioning')
