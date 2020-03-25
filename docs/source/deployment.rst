@@ -163,7 +163,7 @@ In AWS, you will need ReadOnly access as well as the following permissions:
                     "lambda:DeleteFunctionConcurrency",
                     "lambda:DeleteEventSourceMapping",
                     "lambda:RemovePermission",
-                    "lambda:CreateAlias"
+                    "lambda:CreateAlias",
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
                     "logs:CreateLogGroup",
