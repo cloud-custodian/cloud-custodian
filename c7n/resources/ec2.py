@@ -946,12 +946,23 @@ class SsmCompliance(Filter):
                   - UNSPECIFIED
                 states:
                   - NON_COMPLIANT
+                eval_filters:
+                 - type: value
+                   key: ExecutionSummary.ExecutionTime
+                   value_type: age
+                   value: 30
+                   op: less-than
     """
     schema = type_schema(
         'ssm-compliance',
         **{'required': ['compliance_types'],
            'compliance_types': {'type': 'array', 'items': {'type': 'string'}},
            'severity': {'type': 'array', 'items': {'type': 'string'}},
+           'op': {'enum': ['or', 'and']},
+           'eval_filters': {'type': 'array', 'items': {
+                            'oneOf': [
+                                {'$ref': '#/definitions/filters/valuekv'},
+                                {'$ref': '#/definitions/filters/value'}]}},
            'states': {'type': 'array',
                       'default': ['NON_COMPLIANT'],
                       'items': {
@@ -963,14 +974,13 @@ class SsmCompliance(Filter):
     annotation = 'c7n:ssm-compliance'
 
     def process(self, resources, event=None):
-        results = []
-        self.process_resources(resources)
-        for r in resources:
-            if r.get(self.annotation):
-                results.append(r)
-        return results
+        op = self.data.get('op', 'or') == 'or' and any or all
+        eval_filters = []
+        for f in self.data.get('eval_filters', ()):
+            vf = ValueFilter(f)
+            vf.annotate = False
+            eval_filters.append(vf)
 
-    def process_resources(self, resources):
         client = utils.local_session(self.manager.session_factory).client('ssm')
         filters = [
             {
@@ -992,19 +1002,28 @@ class SsmCompliance(Filter):
                     'Values': severity,
                     'Type': 'EQUAL'
                 })
+
         resource_map = {}
         pager = client.get_paginator('list_resource_compliance_summaries')
         for page in pager.paginate(Filters=filters):
             items = page['ResourceComplianceSummaryItems']
             for i in items:
-                resource_map.setdefault(
-                    i['ResourceId'], []).append(i)
-                continue
+                if not eval_filters:
+                    resource_map.setdefault(
+                        i['ResourceId'], []).append(i)
+                    continue
+                if op([f.match(i) for f in eval_filters]):
+                    resource_map.setdefault(
+                        i['ResourceId'], []).append(i)
 
+        results = []
         for r in resources:
-            r[self.annotation] = resource_map.get(r['InstanceId'])
+            result = resource_map.get(r['InstanceId'])
+            if result:
+                r[self.annotation] = result
+                results.append(r)
 
-        return
+        return results
 
 
 @actions.register('set-monitoring')
