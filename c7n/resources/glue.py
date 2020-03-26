@@ -254,6 +254,8 @@ class DescribeTable(query.ChildDescribeSource):
     def augment(self, resources):
         result = []
         for parent_id, r in resources:
+            print("Table augment")
+            print(parent_id)
             r['DatabaseName'] = parent_id
             result.append(r)
         return result
@@ -333,28 +335,12 @@ class GluePartition(query.ChildResourceManager):
         service = 'glue'
         parent_spec = ('glue-table', 'TableName', None)
         enum_spec = ('get_partitions', 'PartitionList', None)
-        id = 'CatalogId'
-        values = 'PartitionValues'
+        # id = Name = 'PartitionValues'
+        partitionValues = 'PartitionValues'
         arn_type = 'partition'
 
     permissions = ('glue:GetPartitions',)
 
-@query.sources.register('describe-partition')
-class DescribePartition(query.ChildDescribeSource):
-
-    def get_query(self):
-        query = super(DescribePartition, self).get_query()
-        query.capture_parent_id = True
-        return query
-
-    def augment(self, resources):
-        result = []
-        print(resources)
-        for parent_id, r in resources:
-            r['TableName'] = parent_id
-            r['DatabaseName'] = parent_id
-            result.append(r)
-        return result
 
 @GluePartition.action_registry.register('delete')
 class DeletePartition(BaseAction):
@@ -428,7 +414,7 @@ class GlueWorkflow(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('list_workflows', 'Workflows', None)
-        detail_spec = ('get_workflow', 'Name', 'Name', 'Workflow')
+        detail_spec = ('get_workflow', 'Name', None, None)
         id = name = 'Name'
         arn_type = 'workflow'
         universal_taggable = True

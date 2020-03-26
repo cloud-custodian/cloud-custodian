@@ -386,26 +386,6 @@ class GlueMLTransform(BaseTest):
         self.assertFalse("test" in [t.get("Name") for t in ml_transforms.get("Transforms", [])])
 
 
-class TestGluePartitions(BaseTest):
-
-    def test_partitions_delete(self):
-        session_factory = self.replay_flight_data("test_glue_partition_delete")
-        p = self.load_policy(
-            {
-                "name": "glue-partition-delete",
-                "resource": "glue-partition",
-                "filters": [{"Name": "test"}],
-                "actions": [{"type": "delete"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = session_factory().client("glue")
-        partitions = client.get_partitions(DatabaseName="test", TableName="test")
-        self.assertFalse("test" in [t.get("Name") for t in partitions.get("Partitions", []).get('StorageDescriptor').get('Columns').get('Name')])
-
-
 class TestGlueSecurityConfiguration(BaseTest):
 
     def test_security_configurations_delete(self):

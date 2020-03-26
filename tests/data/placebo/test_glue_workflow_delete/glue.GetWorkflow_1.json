@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "Workflow": {
+            "Name": "test",
+            "DefaultRunProperties": {},
+            "CreatedOn": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 3,
+                "day": 23,
+                "hour": 13,
+                "minute": 11,
+                "second": 3,
+                "microsecond": 771000
+            },
+            "LastModifiedOn": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 3,
+                "day": 23,
+                "hour": 13,
+                "minute": 11,
+                "second": 3,
+                "microsecond": 771000
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "bf1f3e7a-8186-415d-ae6c-dd2f8e98dd10",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 26 Mar 2020 21:18:59 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "117",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "bf1f3e7a-8186-415d-ae6c-dd2f8e98dd10"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
