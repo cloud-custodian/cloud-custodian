@@ -1837,7 +1837,7 @@ class S3Test(BaseTest):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
 
-        session_factory = self.record_flight_data("test_s3_public_block_throws_errors")
+        session_factory = self.replay_flight_data("test_s3_public_block_throws_errors")
         session = session_factory()
         client = session.client("s3")
 
