@@ -18,10 +18,7 @@
             "value": "disabled"
           }
         ],
-        "capacityProviders": [
-          "FARGATE_SPOT",
-          "FARGATE"
-        ],
+        "capacityProviders": [],
         "defaultCapacityProviderStrategy": []
       }
     ],

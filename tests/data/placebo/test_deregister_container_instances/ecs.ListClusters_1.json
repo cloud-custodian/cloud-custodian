@@ -1,19 +1,13 @@
 {
-    "status_code": 200,
-    "data": {
-        "clusterArns": [
-            "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster"
-        ],
-        "ResponseMetadata": {
-            "RequestId": "9bb95814-9f27-424e-b957-9de40dc7a3da",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "9bb95814-9f27-424e-b957-9de40dc7a3da",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "349",
-                "date": "Tue, 11 Feb 2020 04:10:03 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "clusterArns": [
+      "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+      "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+      "arn:aws:ecs:us-east-1:644160558196:cluster/default-cluster",
+      "arn:aws:ecs:us-east-1:644160558196:cluster/test-comp-environment_Batch_46372d58-df1f-3602-bf52-25989526c72b",
+      "arn:aws:ecs:us-east-1:644160558196:cluster/test"
+    ],
+    "ResponseMetadata": {}
+  }
 }

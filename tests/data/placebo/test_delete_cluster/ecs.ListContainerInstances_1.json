@@ -2,7 +2,7 @@
   "status_code": 200,
   "data": {
     "containerInstanceArns": [
-      "arn:aws:ecs:us-east-1:644160558196:container-instance/test-cluster/b89d2019f1ea4bd3a98cfe0f5cc86364"
+      "arn:aws:ecs:us-east-1:644160558196:container-instance/c7n-cluster/a93f17ef401f444ba3021f972b839e17"
     ],
     "ResponseMetadata": {}
   }

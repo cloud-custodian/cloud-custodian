@@ -1,32 +1,28 @@
 {
-    "status_code": 200,
-    "data": {
-        "clusters": [
-            {
-                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
-                "clusterName": "test-cluster",
-                "status": "ACTIVE",
-                "registeredContainerInstancesCount": 1,
-                "runningTasksCount": 0,
-                "pendingTasksCount": 0,
-                "activeServicesCount": 0,
-                "statistics": [],
-                "tags": [],
-                "capacityProviders": [],
-                "defaultCapacityProviderStrategy": []
-            }
+  "status_code": 200,
+  "data": {
+    "clusters": [
+      {
+        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+        "clusterName": "test-cluster",
+        "status": "ACTIVE",
+        "registeredContainerInstancesCount": 1,
+        "runningTasksCount": 0,
+        "pendingTasksCount": 0,
+        "activeServicesCount": 0,
+        "statistics": [],
+        "tags": [],
+        "settings": [
+          {
+            "name": "containerInsights",
+            "value": "disabled"
+          }
         ],
-        "failures": [],
-        "ResponseMetadata": {
-            "RequestId": "db0e04c8-100d-4303-90ae-1bbf78a2f812",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "db0e04c8-100d-4303-90ae-1bbf78a2f812",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "340",
-                "date": "Tue, 11 Feb 2020 04:10:03 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+        "capacityProviders": [],
+        "defaultCapacityProviderStrategy": []
+      }
+    ],
+    "failures": [],
+    "ResponseMetadata": {}
+  }
 }

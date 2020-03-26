@@ -1,19 +1,9 @@
 {
-    "status_code": 200,
-    "data": {
-        "containerInstanceArns": [
-            "arn:aws:ecs:us-east-1:644160558196:container-instance/test-cluster/4a9b18714edf46008170667648194c70"
-        ],
-        "ResponseMetadata": {
-            "RequestId": "c4a2ab7f-061f-4ab0-a958-199313b9bcf5",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "c4a2ab7f-061f-4ab0-a958-199313b9bcf5",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "129",
-                "date": "Tue, 11 Feb 2020 04:10:04 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "containerInstanceArns": [
+      "arn:aws:ecs:us-east-1:644160558196:container-instance/test-cluster/d85c791f0a1f49d09e581cf61fabbdff"
+    ],
+    "ResponseMetadata": {}
+  }
 }

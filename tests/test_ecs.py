@@ -443,20 +443,22 @@ class TestEcs(BaseTest):
     def test_delete_cluster(self):
         session_factory = self.replay_flight_data("test_delete_cluster")
         client = session_factory().client("ecs")
-        response = client.describe_clusters(clusters=['test-cluster'])
-        self.assertEqual(response['clusters'][0].get('registeredContainerInstancesCount'), 1)
-        instance_arn = client.list_container_instances(
-            cluster='test-cluster').get('containerInstanceArns')
-        instance_id = client.describe_container_instances(
-            cluster="test-cluster", containerInstances=instance_arn).get(
-                'containerInstances')[0]['ec2InstanceId']
+        response = client.describe_clusters(clusters=['c7n-cluster'])
+        cap_provider = client.describe_capacity_providers(
+            capacityProviders=response.get('clusters')[0].get(
+                'capacityProviders')).get('capacityProviders')
+        self.assertEqual(len(cap_provider), 1)
+        self.assertEqual(cap_provider[0].get('autoScalingGroupProvider').get(
+            'managedScaling').get('status'), 'ENABLED')
+        asg = cap_provider[0].get('autoScalingGroupProvider').get(
+            'autoScalingGroupArn').split('/')[-1]
         self.assertEqual(response['clusters'][0].get('status'), 'ACTIVE')
         p = self.load_policy(
             {
                 "name": "deregister-instances",
                 "resource": "ecs",
                 "filters": [{"type": "value", "key": "clusterName",
-                            "value": "test-cluster"}],
+                            "value": "c7n-cluster"}],
                 "actions": [
                     {
                         "type": "delete",
@@ -469,13 +471,12 @@ class TestEcs(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         if self.recording:
-            time.sleep(30)
-        response = client.describe_clusters(clusters=['test-cluster'])
+            time.sleep(90)
+        response = client.describe_clusters(clusters=['c7n-cluster'])
         self.assertEqual(response['clusters'][0].get('status'), 'INACTIVE')
-        c = session_factory().client("ec2")
-        res = c.describe_instances(InstanceIds=[instance_id])
-        self.assertEqual(res.get('Reservations')[0].get(
-            'Instances')[0].get('State').get('Name'), 'terminated')
+        client = session_factory().client("autoscaling")
+        asg_details = client.describe_auto_scaling_groups(AutoScalingGroupNames=[asg])
+        self.assertEqual(asg_details.get('AutoScalingGroups'), [])
 
     def test_delete_cluster_not_force(self):
         session_factory = self.replay_flight_data("test_delete_cluster_not_force")

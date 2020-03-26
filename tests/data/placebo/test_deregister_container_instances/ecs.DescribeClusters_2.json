@@ -1,32 +1,94 @@
 {
-    "status_code": 200,
-    "data": {
-        "clusters": [
-            {
-                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
-                "clusterName": "test-cluster",
-                "status": "ACTIVE",
-                "registeredContainerInstancesCount": 1,
-                "runningTasksCount": 0,
-                "pendingTasksCount": 0,
-                "activeServicesCount": 0,
-                "statistics": [],
-                "tags": [],
-                "capacityProviders": [],
-                "defaultCapacityProviderStrategy": []
-            }
+  "status_code": 200,
+  "data": {
+    "clusters": [
+      {
+        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-cluster",
+        "clusterName": "test-cluster",
+        "status": "ACTIVE",
+        "registeredContainerInstancesCount": 1,
+        "runningTasksCount": 0,
+        "pendingTasksCount": 0,
+        "activeServicesCount": 0,
+        "statistics": [],
+        "tags": [],
+        "settings": [
+          {
+            "name": "containerInsights",
+            "value": "disabled"
+          }
         ],
-        "failures": [],
-        "ResponseMetadata": {
-            "RequestId": "4cd86134-3bba-45e9-b50f-9b1d6aadbb61",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "4cd86134-3bba-45e9-b50f-9b1d6aadbb61",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "1809",
-                "date": "Tue, 11 Feb 2020 04:10:04 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+        "capacityProviders": [],
+        "defaultCapacityProviderStrategy": []
+      },
+      {
+        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/default-cluster",
+        "clusterName": "default-cluster",
+        "status": "ACTIVE",
+        "registeredContainerInstancesCount": 0,
+        "runningTasksCount": 0,
+        "pendingTasksCount": 0,
+        "activeServicesCount": 0,
+        "statistics": [],
+        "tags": [],
+        "capacityProviders": [],
+        "defaultCapacityProviderStrategy": []
+      },
+      {
+        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-comp-environment_Batch_46372d58-df1f-3602-bf52-25989526c72b",
+        "clusterName": "test-comp-environment_Batch_46372d58-df1f-3602-bf52-25989526c72b",
+        "status": "ACTIVE",
+        "registeredContainerInstancesCount": 0,
+        "runningTasksCount": 0,
+        "pendingTasksCount": 0,
+        "activeServicesCount": 0,
+        "statistics": [],
+        "tags": [],
+        "capacityProviders": [],
+        "defaultCapacityProviderStrategy": []
+      },
+      {
+        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
+        "clusterName": "test",
+        "status": "ACTIVE",
+        "registeredContainerInstancesCount": 0,
+        "runningTasksCount": 0,
+        "pendingTasksCount": 0,
+        "activeServicesCount": 2,
+        "statistics": [],
+        "tags": [
+          {
+            "key": "custodian_tag",
+            "value": "Resource does not meet policy: tag@2019/02/23"
+          }
+        ],
+        "capacityProviders": [],
+        "defaultCapacityProviderStrategy": []
+      },
+      {
+        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
+        "clusterName": "Default",
+        "status": "ACTIVE",
+        "registeredContainerInstancesCount": 0,
+        "runningTasksCount": 0,
+        "pendingTasksCount": 0,
+        "activeServicesCount": 0,
+        "statistics": [],
+        "tags": [
+          {
+            "key": "Env",
+            "value": "Dev"
+          },
+          {
+            "key": "Data",
+            "value": "Magic"
+          }
+        ],
+        "capacityProviders": [],
+        "defaultCapacityProviderStrategy": []
+      }
+    ],
+    "failures": [],
+    "ResponseMetadata": {}
+  }
 }

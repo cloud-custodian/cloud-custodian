@@ -800,19 +800,24 @@ class DeregisterInstances(BaseAction):
                     - 'tag:Name': 'c7n'
                 actions:
                     - type: deregister-instances
+                      DeleteCapacityProvider: True
                       force: True
-
     """
 
-    schema = type_schema('deregister-instances',
-        force={'type': 'boolean'})
-    permissions = ('ecs:DeregisterContainerInstance',)
+    schema = type_schema(
+        'deregister-instances',
+        force={'type': 'boolean'},
+        DeleteCapacityProvider={'type': 'boolean'})
+    permissions = ('ecs:DeregisterContainerInstance', "autoscaling:DeleteAutoScalingGroup",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         error = None
         for r in resources:
-            instance_arns = extract_container_instances(client, r['clusterArn'])
+            if self.data.get('DeleteCapacityProvider', False):
+                self.delete_capacity_provider_asgs(client, self.data.get('force', False), r)
+            instance_arns = client.list_container_instances(
+                cluster=r['clusterArn']).get('containerInstanceArns')
             for inst_arns in instance_arns:
                 try:
                     client.deregister_container_instance(
@@ -825,14 +830,22 @@ class DeregisterInstances(BaseAction):
         if error:
             raise error
 
-
-def extract_container_instances(client, cluster_arn):
-    try:
-        instance_arns = client.list_container_instances(
-            cluster=cluster_arn).get('containerInstanceArns')
-        return instance_arns
-    except client.exceptions.ClusterNotFoundException:
-        return []
+    def delete_capacity_provider_asgs(self, client, force, resource):
+        # returns 'capacityProviders': [] if it doesn't exist
+        cap_provider = client.describe_capacity_providers(
+            capacityProviders=resource.get('capacityProviders')).get('capacityProviders')
+        c = local_session(self.manager.session_factory).client('autoscaling')
+        for cp in cap_provider:
+            if cp.get('autoScalingGroupProvider'):
+                stats = cp.get('autoScalingGroupProvider').get('managedScaling').get('status')
+                if stats == "ENABLED":
+                    asg = (cp.get('autoScalingGroupProvider').get(
+                        'autoScalingGroupArn').split('/')[-1])
+                    try:
+                        c.delete_auto_scaling_group(
+                            AutoScalingGroupName=asg, ForceDelete=force)
+                    except ClientError:
+                        continue
 
 
 @ECSCluster.action_registry.register('delete')
@@ -860,21 +873,20 @@ class DeleteEcsCluster(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         retryable = ('ClusterContainsContainerInstancesException')
-        retry = utils.get_retry(retryable, max_attempts=10)
+        retry = utils.get_retry(retryable, max_attempts=5)
         error = None
+        if self.data.get('force', False):
+            dereg_instance = self.manager.action_registry['deregister-instances'](
+                {'force': True, 'DeleteCapacityProvider': True}, self.manager)
+            dereg_instance.process(resources)
         for r in resources:
             if self.data.get('force', False):
-                instance_arns = extract_container_instances(client, r['clusterArn'])
-                instance_ids = [res.get(
-                    'ec2InstanceId') for res in client.describe_container_instances(
-                        cluster=r['clusterArn'], containerInstances=instance_arns).get(
-                            'containerInstances')]
-                self.terminate_container_instances(instance_ids)
                 try:
                     retry(client.delete_cluster, cluster=r['clusterArn'])
+                except client.exceptions.ClusterNotFoundException:
+                    continue
                 except ClientError as e:
-                    if e.response['Error']['Code'] in retryable:
-                        error = e
+                    error = e
             else:
                 try:
                     client.delete_cluster(cluster=r['clusterArn'])
@@ -882,9 +894,5 @@ class DeleteEcsCluster(BaseAction):
                     continue
                 except ClientError as e:
                     error = e
-            if error:
-                raise error
-
-    def terminate_container_instances(self, instance_ids):
-        client = local_session(self.manager.session_factory).client('ec2')
-        client.terminate_instances(InstanceIds=instance_ids)
+        if error:
+            raise error

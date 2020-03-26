@@ -1,0 +1,24 @@
+{
+  "status_code": 200,
+  "data": {
+    "capacityProviders": [
+      {
+        "capacityProviderArn": "arn:aws:ecs:us-east-1:644160558196:capacity-provider/test-123",
+        "name": "test-123",
+        "status": "ACTIVE",
+        "autoScalingGroupProvider": {
+          "autoScalingGroupArn": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:6462423f-faaa-4e16-9ab1-d25723148206:autoScalingGroupName/c7n-test",
+          "managedScaling": {
+            "status": "ENABLED",
+            "targetCapacity": 100,
+            "minimumScalingStepSize": 1,
+            "maximumScalingStepSize": 10000
+          },
+          "managedTerminationProtection": "DISABLED"
+        },
+        "tags": []
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
