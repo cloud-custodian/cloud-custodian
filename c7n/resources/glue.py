@@ -313,10 +313,13 @@ class GlueMLTransform(QueryResourceManager):
         arn_type = 'mltransform'
         universal_taggable = True
 
+    permissions = ('glue:GetMLTransforms',)
+
 @GlueMLTransform.action_registry.register('delete')
 class DeleteMLTransform(BaseAction):
 
     schema = type_schema('delete')
+    permissions = ('glue:DeleteMLTransform',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
@@ -393,6 +396,7 @@ class GlueWorkflow(QueryResourceManager):
 class DeleteWorkflow(BaseAction):
 
     schema = type_schema('delete')
+    permissions = ('glue:DeleteWorkflow',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
