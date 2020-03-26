@@ -314,6 +314,7 @@ class GlueMLTransform(QueryResourceManager):
         universal_taggable = True
 
     permissions = ('glue:GetMLTransforms',)
+    augment = universal_augment
 
 @GlueMLTransform.action_registry.register('delete')
 class DeleteMLTransform(BaseAction):
