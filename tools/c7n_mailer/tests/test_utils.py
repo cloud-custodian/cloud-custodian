@@ -26,6 +26,22 @@ class StripPrefix(unittest.TestCase):
         self.assertEqual(utils.strip_prefix('', 'aws.'), '')
 
 
+class GetResourceTagTargets(unittest.TestCase):
+
+    def test_target_tag_list(self):
+        self.assertEqual(
+            utils.get_resource_tag_targets(
+                {'Tags': [{'Key': 'Creator', 'Value': 'alice'}]},
+                ['Creator']),
+            ['alice'])
+
+    def test_target_tag_map(self):
+        r = {'Tags': {'Creator': 'Bob'}}
+        self.assertEqual(
+            utils.get_resource_tag_targets(r, ['Creator']),
+            ['Bob'])
+
+
 class ResourceFormat(unittest.TestCase):
 
     def test_efs(self):

@@ -155,9 +155,9 @@ class PostFinding(MethodAction):
             'category': self.data.get('category', self.DefaultCategory),
             'eventTime': datetime.datetime.utcnow().isoformat('T') + 'Z',
             'sourceProperties': {
-                'resource-type': self.manager.type,
+                'resource_type': self.manager.type,
                 'title': policy.data.get('title', policy.name),
-                'policy-name': policy.name,
+                'policy_name': policy.name,
                 'policy': json.dumps(policy.data)
             }
         }

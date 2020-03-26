@@ -2689,3 +2689,34 @@ class FlowLogsTest(BaseTest):
             "FlowLogs"
         ]
         self.assertFalse(logs)
+
+    def test_vpc_set_flow_logs_maxaggrinterval(self):
+        session_factory = self.replay_flight_data("test_vpc_set_flow_logs_maxaggrinterval")
+        p = self.load_policy(
+            {
+                "name": "c7n-vpc-flow-logs-maxinterval",
+                "resource": "vpc",
+                "filters": [
+                    {'type': 'flow-logs', 'enabled': False}
+                ],
+                "actions": [
+                    {
+                        "type": "set-flow-log",
+                        "LogDestinationType": "s3",
+                        "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz",
+                        "MaxAggregationInterval": 60,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcId"], "vpc-d2d616b5")
+        client = session_factory(region="us-east-1").client("ec2")
+        logs = client.describe_flow_logs(
+            Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
+        )[
+            "FlowLogs"
+        ]
+        self.assertEqual(logs[0]["MaxAggregationInterval"], 60)

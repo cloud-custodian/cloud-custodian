@@ -99,5 +99,5 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    developer/installing.rst
    developer/tests.rst
    developer/documentation.rst
-
+   developer/packaging.rst
 

@@ -19,7 +19,11 @@ import json
 import logging
 import os
 
+
+from c7n_mailer.deploy import CORE_DEPS
+
 try:
+    from c7n.mu import generate_requirements
     from c7n_azure.function_package import FunctionPackage
     from c7n_azure.functionapp_utils import FunctionAppUtilities
     from c7n_azure.policy import AzureFunctionMode
@@ -33,6 +37,15 @@ except ImportError:
 
 def cache_path():
     return os.path.join(os.path.dirname(__file__), 'cache')
+
+
+def get_mailer_requirements():
+    deps = ['azure-keyvault', 'azure-storage-queue',
+            'azure-storage-blob', 'sendgrid'] + list(CORE_DEPS)
+    requirements = generate_requirements(
+        deps, ignore=['boto3', 'botocore', 'pywin32'],
+        include_self=True)
+    return requirements
 
 
 def build_function_package(config, function_name, sub_id):
@@ -50,10 +63,8 @@ def build_function_package(config, function_name, sub_id):
         cache_override_path=cache_override_path)
 
     package.build(None,
-                  modules=['c7n', 'c7n-azure', 'c7n-mailer'],
-                  non_binary_packages=['pyyaml', 'pycparser', 'tabulate', 'jmespath',
-                                       'datadog', 'MarkupSafe', 'simplejson', 'pyrsistent'],
-                  excluded_packages=['azure-cli-core', 'distlib', 'future', 'futures'])
+                  modules=['c7n', 'c7n_azure', 'c7n_mailer'],
+                  requirements=get_mailer_requirements())
 
     package.pkg.add_contents(
         function_path + '/function.json',

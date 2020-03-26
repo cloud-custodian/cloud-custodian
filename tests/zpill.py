@@ -107,6 +107,7 @@ def serialize(obj):
     raise TypeError("Type not serializable")
 
 
+pill.FakeHttpResponse.raw = None
 placebo.pill.serialize = serialize
 placebo.pill.deserialize = deserialize
 

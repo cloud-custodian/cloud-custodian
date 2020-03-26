@@ -370,7 +370,7 @@ class AutoTagDate(AutoTagBase):
 
 class TagTrim(AzureBaseAction):
     """Automatically remove tags from an azure resource.
-    Azure Resources and Resource Groups have a limit of 15 tags.
+    Azure Resources and Resource Groups have a limit of 50 tags.
     In order to make additional tag space on a set of resources,
     this action can be used to remove enough tags to make the
     desired amount of space while preserving a given set of tags.
@@ -384,22 +384,22 @@ class TagTrim(AzureBaseAction):
        policies:
          - name: azure-tag-trim
            comment: |
-             Any instances with 14 or more tags get tags removed until
-             they match the target tag count, in this case 13, so
+             Any instances with 49 or more tags get tags removed until
+             they match the target tag count, in this case 48, so
              that we free up tag slots for another usage.
            resource: azure.resourcegroup
            filters:
                # Filter down to resources that do not have the space
                # to add additional required tags. For example, if an
                # additional 2 tags need to be added to a resource, with
-               # 15 tags as the limit, then filter down to resources that
-               # have 14 or more tags since they will need to have tags
+               # 50 tags as the limit, then filter down to resources that
+               # have 49 or more tags since they will need to have tags
                # removed for the 2 extra. This also ensures that metrics
                # reporting is correct for the policy.
               - type: value
                 key: "length(Tags)"
                 op: ge
-                value: 14
+                value: 49
            actions:
               - type: tag-trim
                 space: 2
@@ -410,7 +410,7 @@ class TagTrim(AzureBaseAction):
                  - custodian_status
 
     """
-    max_tag_count = 15
+    max_tag_count = 50
 
     schema = utils.type_schema(
         'tag-trim',
@@ -425,8 +425,8 @@ class TagTrim(AzureBaseAction):
         self.space = self.data.get('space', 1)
 
     def validate(self):
-        if self.space < 0 or self.space > 15:
-            raise FilterValidationError("Space must be between 0 and 15")
+        if self.space < 0 or self.space > self.max_tag_count:
+            raise FilterValidationError("Space must be between 0 and %i" % self.max_tag_count)
         return self
 
     def _process_resource(self, resource):

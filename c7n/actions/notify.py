@@ -20,6 +20,7 @@ import zlib
 from .core import EventAction
 from c7n import utils
 from c7n.exceptions import PolicyValidationError
+from c7n.manager import resources as aws_resources
 from c7n.resolver import ValuesFrom
 
 
@@ -299,3 +300,13 @@ class Notify(BaseNotify):
             MessageBody=self.pack(message),
             MessageAttributes=attrs)
         return result['MessageId']
+
+    @classmethod
+    def register_resource(cls, registry, resource_class):
+        if 'notify' in resource_class.action_registry:
+            return
+
+        resource_class.action_registry.register('notify', cls)
+
+
+aws_resources.subscribe(Notify.register_resource)

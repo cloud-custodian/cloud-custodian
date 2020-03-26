@@ -666,6 +666,7 @@ class BucketDelete(BaseTest):
                 "filters": [{"Name": bname}],
                 "actions": [{"type": "delete", "remove-contents": True}],
             },
+            output_dir=None,
             session_factory=session_factory,
         )
         resources = p.run()
@@ -1025,7 +1026,9 @@ class S3ConfigSource(ConfigTest):
                         {
                             u"Status": "Enabled",
                             u"Prefix": "",
-                            u"Destination": {u"Bucket": "arn:aws:s3:::testing-west"},
+                            u"Destination": {
+                                u"Account": "000111222333",
+                                u"Bucket": "arn:aws:s3:::testing-west"},
                             u"ID": "testing-99",
                         }
                     ],
@@ -1327,6 +1330,7 @@ class S3Test(BaseTest):
                 "filters": [{"Name": bname}],
                 "actions": ["encrypt-keys"],
             },
+            output_dir=None,
             session_factory=session_factory,
         )
         p.run()
@@ -1538,6 +1542,119 @@ class S3Test(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_bucket_replication_policy_remove(self):
+        replicated_from_name = "replication-from-12345"
+
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+
+        # only augment with logging info to minimize API calls
+        self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [("get_bucket_replication", 'Replication',
+            None, None, 's3:GetReplicationConfiguration')],
+        )
+
+        # and ignore any other buckets we might have in this test account
+        # to minimize the placebo data and API calls
+        # Inspired by #5206, thanks tjstansell!
+        self.patch(
+            s3.S3.resource_type,
+            "enum_spec",
+            ('list_buckets', "Buckets[?Name=='{}']".format(replicated_from_name), None)
+        )
+        session_factory = self.replay_flight_data("test_s3_replication_policy_remove")
+        session = session_factory()
+        client = session.client("s3")
+
+        p = self.load_policy(
+            {
+                "name": "s3-has-replica-policy",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Replication.ReplicationConfiguration.Rules[].Destination",
+                        "value": "present"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Replication.ReplicationConfiguration.Rules[].Status",
+                        "value": "Enabled",
+                        "op": "contains"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-replication",
+                        "state": "remove"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Test that there was a bucket with an enabled replication policy
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # Test to make sure that the replication policy removed from the buckets
+        self.assertRaises(ClientError, client.get_bucket_replication, Bucket=replicated_from_name)
+
+    def test_bucket_replication_policy_disable(self):
+        bname = "repela"
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3,
+            "S3_AUGMENT_TABLE",
+            [("get_bucket_replication", 'Replication',
+            None, None, 's3:GetReplicationConfiguration')],
+        )
+        self.patch(
+            s3.S3.resource_type,
+            "enum_spec",
+            ('list_buckets', "Buckets[?Name=='{}']".format(bname), None)
+        )
+        session_factory = self.replay_flight_data("test_s3_replication_policy_disable")
+        session = session_factory()
+        client = session.client("s3")
+        p = self.load_policy(
+            {
+                "name": "s3-has-replica-policy",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {
+                        "type": "value",
+                        "key": "Replication.ReplicationConfiguration.Rules[].Destination",
+                        "value": "present"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Replication.ReplicationConfiguration.Rules[].Status",
+                        "value": "Enabled",
+                        "op": "contains"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-replication",
+                        "state": "disable"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        # Test that there was a bucket with an enabled replication policy
+        self.assertEqual(len(resources), 1)
+
+        # Test that there is a disbled policy on the bucket now
+        response = client.get_bucket_replication(Bucket=bname)
+        for rule in response['ReplicationConfiguration']['Rules']:
+            self.assertEqual(rule['Status'], 'Disabled')
 
     def test_has_statement_similar_policies(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -2442,6 +2559,7 @@ class S3Test(BaseTest):
                 "filters": [{"Name": bname}],
                 "actions": ["encrypt-keys"],
             },
+            output_dir=None,
             session_factory=session_factory,
         )
         p.run()
@@ -2484,6 +2602,7 @@ class S3Test(BaseTest):
                 "filters": [{"Name": bname}],
                 "actions": ["encrypt-keys"],
             },
+            output_dir=None,
             session_factory=session_factory,
         )
         p.run()
@@ -2538,6 +2657,7 @@ class S3Test(BaseTest):
                 "filters": [{"Name": bname}],
                 "actions": [{"type": "encrypt-keys", "report-only": True}],
             },
+            output_dir=None,
             session_factory=session_factory,
         )
         report_resources = report_policy.run()
@@ -2551,6 +2671,7 @@ class S3Test(BaseTest):
                 "filters": [{"Name": bname}],
                 "actions": ["encrypt-keys"],
             },
+            output_dir=None,
             session_factory=session_factory,
         )
         p.run()
@@ -2602,6 +2723,7 @@ class S3Test(BaseTest):
                 "filters": [{"Name": bname}],
                 "actions": [{"type": "encrypt-keys"}],
             },
+            output_dir=None,
             session_factory=session_factory,
         )
 
@@ -2638,6 +2760,7 @@ class S3Test(BaseTest):
                     {"type": "encrypt-keys", "crypto": "aws:kms", "key-id": key_one}
                 ],
             },
+            output_dir=None,
             session_factory=session_factory,
         )
         p.run()
@@ -2656,6 +2779,7 @@ class S3Test(BaseTest):
                     {"type": "encrypt-keys", "crypto": "aws:kms", "key-id": key_two}
                 ],
             },
+            output_dir=None,
             session_factory=session_factory,
         )
         p.run()
