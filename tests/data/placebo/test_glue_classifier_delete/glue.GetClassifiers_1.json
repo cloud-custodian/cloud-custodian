@@ -5,26 +5,6 @@
             {
                 "CsvClassifier": {
                     "Name": "test",
-                    "CreationTime": {
-                        "__class__": "datetime",
-                        "year": 2020,
-                        "month": 3,
-                        "day": 23,
-                        "hour": 13,
-                        "minute": 48,
-                        "second": 29,
-                        "microsecond": 0
-                    },
-                    "LastUpdated": {
-                        "__class__": "datetime",
-                        "year": 2020,
-                        "month": 3,
-                        "day": 23,
-                        "hour": 13,
-                        "minute": 48,
-                        "second": 29,
-                        "microsecond": 0
-                    },
                     "Version": 1,
                     "Delimiter": ",",
                     "QuoteSymbol": "\"",

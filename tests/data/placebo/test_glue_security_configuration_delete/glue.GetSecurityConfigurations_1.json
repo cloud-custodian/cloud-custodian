@@ -3,61 +3,7 @@
     "data": {
         "SecurityConfigurations": [
             {
-                "Name": "full-encryption",
-                "CreatedTimeStamp": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 18,
-                    "hour": 10,
-                    "minute": 52,
-                    "second": 32,
-                    "microsecond": 544000
-                },
-                "EncryptionConfiguration": {
-                    "S3Encryption": [
-                        {
-                            "S3EncryptionMode": "SSE-KMS",
-                            "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/ec3b9189-1247-4ecc-8bfd-c492f07621db"
-                        }
-                    ],
-                    "CloudWatchEncryption": {
-                        "CloudWatchEncryptionMode": "SSE-KMS",
-                        "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/358f7699-4ea5-455a-9c78-1c868301e5a8"
-                    },
-                    "JobBookmarksEncryption": {
-                        "JobBookmarksEncryptionMode": "CSE-KMS",
-                        "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/358f7699-4ea5-455a-9c78-1c868301e5a8"
-                    }
-                }
-            },
-            {
-                "Name": "test",
-                "CreatedTimeStamp": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 23,
-                    "hour": 12,
-                    "minute": 16,
-                    "second": 31,
-                    "microsecond": 842000
-                },
-                "EncryptionConfiguration": {
-                    "S3Encryption": [
-                        {
-                            "S3EncryptionMode": "SSE-KMS",
-                            "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/d1305425-4cde-46ee-be31-e2043dd4df39"
-                        }
-                    ],
-                    "CloudWatchEncryption": {
-                        "CloudWatchEncryptionMode": "SSE-KMS",
-                        "KmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/358f7699-4ea5-455a-9c78-1c868301e5a8"
-                    },
-                    "JobBookmarksEncryption": {
-                        "JobBookmarksEncryptionMode": "DISABLED"
-                    }
-                }
+                "Name": "test"
             }
         ],
         "NextToken": "",

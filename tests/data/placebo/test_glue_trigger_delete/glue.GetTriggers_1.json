@@ -4,9 +4,6 @@
         "Triggers": [
             {
                 "Name": "test",
-                "Type": "SCHEDULED",
-                "State": "CREATED",
-                "Schedule": "cron(52 12 * * ? *)",
                 "Actions": [
                     {
                         "JobName": "test",

@@ -2,28 +2,7 @@
     "status_code": 200,
     "data": {
         "Workflow": {
-            "Name": "test",
-            "DefaultRunProperties": {},
-            "CreatedOn": {
-                "__class__": "datetime",
-                "year": 2020,
-                "month": 3,
-                "day": 23,
-                "hour": 13,
-                "minute": 11,
-                "second": 3,
-                "microsecond": 771000
-            },
-            "LastModifiedOn": {
-                "__class__": "datetime",
-                "year": 2020,
-                "month": 3,
-                "day": 23,
-                "hour": 13,
-                "minute": 11,
-                "second": 3,
-                "microsecond": 771000
-            }
+            "Name": "test"
         },
         "ResponseMetadata": {
             "RequestId": "bf1f3e7a-8186-415d-ae6c-dd2f8e98dd10",
