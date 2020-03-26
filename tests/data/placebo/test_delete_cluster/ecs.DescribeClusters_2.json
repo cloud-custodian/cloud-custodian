@@ -3,19 +3,6 @@
   "data": {
     "clusters": [
       {
-        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/default-cluster",
-        "clusterName": "default-cluster",
-        "status": "ACTIVE",
-        "registeredContainerInstancesCount": 0,
-        "runningTasksCount": 0,
-        "pendingTasksCount": 0,
-        "activeServicesCount": 0,
-        "statistics": [],
-        "tags": [],
-        "capacityProviders": [],
-        "defaultCapacityProviderStrategy": []
-      },
-      {
         "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/c7n-cluster",
         "clusterName": "c7n-cluster",
         "status": "ACTIVE",
@@ -34,59 +21,6 @@
         "capacityProviders": [
           "test-123"
         ],
-        "defaultCapacityProviderStrategy": []
-      },
-      {
-        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test-comp-environment_Batch_46372d58-df1f-3602-bf52-25989526c72b",
-        "clusterName": "test-comp-environment_Batch_46372d58-df1f-3602-bf52-25989526c72b",
-        "status": "ACTIVE",
-        "registeredContainerInstancesCount": 0,
-        "runningTasksCount": 0,
-        "pendingTasksCount": 0,
-        "activeServicesCount": 0,
-        "statistics": [],
-        "tags": [],
-        "capacityProviders": [],
-        "defaultCapacityProviderStrategy": []
-      },
-      {
-        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/test",
-        "clusterName": "test",
-        "status": "ACTIVE",
-        "registeredContainerInstancesCount": 0,
-        "runningTasksCount": 0,
-        "pendingTasksCount": 0,
-        "activeServicesCount": 2,
-        "statistics": [],
-        "tags": [
-          {
-            "key": "custodian_tag",
-            "value": "Resource does not meet policy: tag@2019/02/23"
-          }
-        ],
-        "capacityProviders": [],
-        "defaultCapacityProviderStrategy": []
-      },
-      {
-        "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/Default",
-        "clusterName": "Default",
-        "status": "ACTIVE",
-        "registeredContainerInstancesCount": 0,
-        "runningTasksCount": 0,
-        "pendingTasksCount": 0,
-        "activeServicesCount": 0,
-        "statistics": [],
-        "tags": [
-          {
-            "key": "Env",
-            "value": "Dev"
-          },
-          {
-            "key": "Data",
-            "value": "Magic"
-          }
-        ],
-        "capacityProviders": [],
         "defaultCapacityProviderStrategy": []
       }
     ],
