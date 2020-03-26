@@ -326,36 +326,6 @@ class DeleteMLTransform(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
-@resources.register('glue-partition')
-class GluePartition(query.ChildResourceManager):
-
-    child_source = 'describe-partition'
-
-    class resource_type(TypeInfo):
-        service = 'glue'
-        parent_spec = ('glue-table', 'TableName', None)
-        enum_spec = ('get_partitions', 'PartitionList', None)
-        # id = Name = 'PartitionValues'
-        partitionValues = 'PartitionValues'
-        arn_type = 'partition'
-
-    permissions = ('glue:GetPartitions',)
-
-
-@GluePartition.action_registry.register('delete')
-class DeletePartition(BaseAction):
-
-    schema = type_schema('delete')
-    permissions = ('glue:DeletePartition',)
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('glue')
-        for r in resources:
-            try:
-                client.delete_partition(CatalogId=r['id'], DatabaseName=r['DatabaseName'], TableName=r['TableName'], PartitionValues=r['PartitionValues'])
-            except client.exceptions.EntityNotFoundException:
-                continue
-
 @resources.register('glue-security-configuration')
 class GlueSecurityConfiguration(QueryResourceManager):
 
