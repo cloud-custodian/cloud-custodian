@@ -313,7 +313,7 @@ class GlueMLTransform(QueryResourceManager):
         arn_type = 'mltransform'
         universal_taggable = True
 
-    permissions = ('glue:GetMLTransforms',)
+    permissions = ('glue:GetMLTransform',)
     augment = universal_augment
 
 @GlueMLTransform.action_registry.register('delete')
