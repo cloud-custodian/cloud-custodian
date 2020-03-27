@@ -1,0 +1,44 @@
+{
+  "status_code": 200,
+  "data": {
+    "DevEndpoints": [
+      {
+        "EndpointName": "abc.xyz",
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AWSGlueServiceRole-test",
+        "SecurityGroupIds": [],
+        "ZeppelinRemoteSparkInterpreterPort": 9007,
+        "PublicAddress": "ec2-54-82-205-226.compute-1.amazonaws.com",
+        "Status": "READY",
+        "GlueVersion": "1.0",
+        "NumberOfNodes": 5,
+        "AvailabilityZone": "us-east-1a",
+        "CreatedTimestamp": {
+          "__class__": "datetime",
+          "year": 2020,
+          "month": 3,
+          "day": 27,
+          "hour": 17,
+          "minute": 37,
+          "second": 14,
+          "microsecond": 295000
+        },
+        "LastModifiedTimestamp": {
+          "__class__": "datetime",
+          "year": 2020,
+          "month": 3,
+          "day": 27,
+          "hour": 17,
+          "minute": 44,
+          "second": 57,
+          "microsecond": 566000
+        },
+        "Arguments": {
+          "--enable-glue-datacatalog": " ",
+          "GLUE_PYTHON_VERSION": "3"
+        }
+      }
+    ],
+    "NextToken": "",
+    "ResponseMetadata": {}
+  }
+}

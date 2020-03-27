@@ -109,6 +109,20 @@ class TestGlueDevEndpoints(BaseTest):
         dev_endpoints = client.get_dev_endpoints()["DevEndpoints"]
         self.assertFalse(dev_endpoints)
 
+    def test_glue_dev_endpoint_age(self):
+        session_factory = self.replay_flight_data("test_glue_dev_endpoint_age")
+        p = self.load_policy(
+            {
+                "name": "glue-dev-endpoint-delete",
+                "resource": "glue-dev-endpoint",
+                "filters": [{"type": "age", "days": 2, "op": "le"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('EndpointName'), 'abc.xyz')
+
 
 class TestGlueTag(BaseTest):
 

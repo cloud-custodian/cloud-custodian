@@ -22,7 +22,7 @@ from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.tags import universal_augment
-from c7n.filters import StateTransitionFilter
+from c7n.filters import StateTransitionFilter, AgeFilter
 from c7n import query
 
 
@@ -136,6 +136,31 @@ class DeleteDevEndpoint(BaseAction):
                     self.log.error(
                         "Exception deleting glue dev endpoint \n %s",
                         f.exception())
+
+
+@GlueDevEndpoint.filter_registry.register('age')
+class GlueDevEndpointAge(AgeFilter):
+    """Filters GlueDevEndpoint based on age (in days)
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: glue-endpoint-expired
+                resource: glue-dev-endpoint
+                filters:
+                  - type: age
+                    days: 2
+                    op: ge
+                actions:
+                  - delete
+    """
+    schema = type_schema(
+        'age', days={'type': 'number'},
+        op={'$ref': '#/definitions/filters_common/comparison_operators'})
+
+    date_attribute = 'CreatedTimestamp'
 
 
 @resources.register('glue-job')
