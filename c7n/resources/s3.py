@@ -1443,7 +1443,9 @@ class FilterPublicBlock(Filter):
             else:
                 return config[scope] if enabled else not config[scope]
         else:
-            # return true for a null config, meaning no public blocks
+            # When there is a null/none config, treat it as meaning no public blocks
+            # return False if checking for enabled=True because all are false
+            # return True if checking for enabled=False
             return False if enabled else True
 
 
