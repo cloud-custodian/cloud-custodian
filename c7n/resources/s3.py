@@ -1427,7 +1427,7 @@ class FilterPublicBlock(Filter):
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 # Set config to none because NoSuchPublicAccessBlockConfiguration error
                 # was returned. This is important later because it is symbolic of
-                # all blocks being set to false. See if/else in smatches_filter func
+                # all blocks being set to false. See if/else in matches_filter func
                 config = None
             else:
                 raise
