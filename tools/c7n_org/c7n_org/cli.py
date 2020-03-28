@@ -555,7 +555,7 @@ def run_account(account, region, policies_config, output_path,
             p.expand_variables(p.get_variables(account.get('vars', {})))
             p.validate()
 
-            if p.region and p.region != region:
+            if p.config.region and p.config.region != region:
                 continue
 
             log.debug(
