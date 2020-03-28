@@ -116,7 +116,7 @@ class OrgTest(TestUtils):
             ['run', '-c', 'accounts.yml', '-u', 'policies.yml',
              '--debug', '-s', 'output', '--cache-path', 'cache'],
             catch_exceptions=False)
-        self.assertEqual(result.exit_code, 0)        
+        self.assertEqual(result.exit_code, 0)
 
     def test_cli_run_aws(self):
         run_dir = self.setup_run_dir()
