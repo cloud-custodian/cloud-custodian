@@ -21,7 +21,6 @@ RUN apt-get --yes update && apt-get --yes upgrade \
  && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
  && rm -Rf /var/cache/apt/ \
  && rm -Rf /var/lib/apt/lists/* \
- && rm -Rf /src/ \
  && rm -Rf /root/.cache/
 
 USER custodian

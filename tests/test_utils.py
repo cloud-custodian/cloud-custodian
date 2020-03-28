@@ -14,6 +14,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
+import ipaddress
 import os
 import sys
 import tempfile
@@ -24,7 +25,7 @@ from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
 import mock
 
-from c7n import ipaddress, utils
+from c7n import utils
 from c7n.config import Config
 from .common import BaseTest
 
