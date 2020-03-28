@@ -1409,15 +1409,12 @@ class FilterPublicBlock(Filter):
         results = list()
         with self.executor_factory(max_workers=2) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
-            errors = list()
             for future in as_completed(futures):
                 bucket = futures[future]
                 if future.exception():
-                    errors.append("Message: %s Bucket: %s" % (future.exception(), bucket['Name']))
+                    raise future.exception()
                 if future.result():
                     results.append(future.result())
-            if errors:
-                raise Exception('\n'.join(map(str, errors)))
         return results
 
     def process_bucket(self, bucket):
@@ -1490,13 +1487,8 @@ class SetPublicBlock(BucketActionBase):
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
             errors = list()
             for future in as_completed(futures):
-                bucket = futures[future]
-                try:
-                    future.result()
-                except ClientError as e:
-                    errors.append("Message: %s Bucket: %s" % (e, bucket['Name']))
-            if errors:
-                raise Exception('\n'.join(map(str, errors)))
+                if future.exception():
+                    raise future.exception()
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
@@ -1509,7 +1501,7 @@ class SetPublicBlock(BucketActionBase):
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 config = None
             else:
-                raise
+                raise Exception(e)
         if config:
             if 'All' in scopes:
                 for key in config.keys():
