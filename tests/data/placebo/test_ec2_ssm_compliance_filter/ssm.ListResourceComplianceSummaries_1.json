@@ -1,0 +1,150 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResourceComplianceSummaryItems": [
+      {
+        "ComplianceType": "Association",
+        "CompliantSummary": {
+          "CompliantCount": 1,
+          "SeveritySummary": {
+            "CriticalCount": 0,
+            "HighCount": 0,
+            "InformationalCount": 0,
+            "LowCount": 0,
+            "MediumCount": 0,
+            "UnspecifiedCount": 1
+          }
+        },
+        "ExecutionSummary": {
+          "ExecutionTime": "2020-03-20 10:52:50-04:00"
+        },
+        "NonCompliantSummary": {
+          "NonCompliantCount": 3,
+          "SeveritySummary": {
+            "CriticalCount": 0,
+            "HighCount": 0,
+            "InformationalCount": 0,
+            "LowCount": 0,
+            "MediumCount": 0,
+            "UnspecifiedCount": 3
+          }
+        },
+        "OverallSeverity": "UNSPECIFIED",
+        "ResourceId": "i-0dea82d960d56dc1d",
+        "ResourceType": "ManagedInstance",
+        "Status": "NON_COMPLIANT"
+      },
+      {
+        "ComplianceType": "Patch",
+        "CompliantSummary": {
+          "CompliantCount": 310,
+          "SeveritySummary": {
+            "CriticalCount": 0,
+            "HighCount": 0,
+            "InformationalCount": 0,
+            "LowCount": 0,
+            "MediumCount": 0,
+            "UnspecifiedCount": 310
+          }
+        },
+        "ExecutionSummary": {
+          "ExecutionId": "e44bffd7-4017-44ec-80f9-a6fbf932672f",
+          "ExecutionTime": "2020-03-19 18:50:59-04:00",
+          "ExecutionType": "Command"
+        },
+        "NonCompliantSummary": {
+          "NonCompliantCount": 36,
+          "SeveritySummary": {
+            "CriticalCount": 0,
+            "HighCount": 0,
+            "InformationalCount": 0,
+            "LowCount": 0,
+            "MediumCount": 0,
+            "UnspecifiedCount": 36
+          }
+        },
+        "OverallSeverity": "UNSPECIFIED",
+        "ResourceId": "i-0dea82d960d56dc1d",
+        "ResourceType": "ManagedInstance",
+        "Status": "NON_COMPLIANT"
+      },
+      {
+        "ComplianceType": "Association",
+        "CompliantSummary": {
+          "CompliantCount": 1,
+          "SeveritySummary": {
+            "CriticalCount": 0,
+            "HighCount": 0,
+            "InformationalCount": 0,
+            "LowCount": 0,
+            "MediumCount": 0,
+            "UnspecifiedCount": 1
+          }
+        },
+        "ExecutionSummary": {
+          "ExecutionTime": "2020-03-20 10:52:50-04:00"
+        },
+        "NonCompliantSummary": {
+          "NonCompliantCount": 3,
+          "SeveritySummary": {
+            "CriticalCount": 0,
+            "HighCount": 0,
+            "InformationalCount": 0,
+            "LowCount": 0,
+            "MediumCount": 0,
+            "UnspecifiedCount": 3
+          }
+        },
+        "OverallSeverity": "UNSPECIFIED",
+        "ResourceId": "i-0ba3874e85bb97244",
+        "ResourceType": "ManagedInstance",
+        "Status": "NON_COMPLIANT"
+      },
+      {
+        "ComplianceType": "Patch",
+        "CompliantSummary": {
+          "CompliantCount": 310,
+          "SeveritySummary": {
+            "CriticalCount": 0,
+            "HighCount": 0,
+            "InformationalCount": 0,
+            "LowCount": 0,
+            "MediumCount": 0,
+            "UnspecifiedCount": 310
+          }
+        },
+        "ExecutionSummary": {
+          "ExecutionId": "e44bffd7-4017-44ec-80f9-a6fbf932672f",
+          "ExecutionTime": "2020-03-19 18:50:59-04:00",
+          "ExecutionType": "Command"
+        },
+        "NonCompliantSummary": {
+          "NonCompliantCount": 36,
+          "SeveritySummary": {
+            "CriticalCount": 0,
+            "HighCount": 0,
+            "InformationalCount": 0,
+            "LowCount": 0,
+            "MediumCount": 0,
+            "UnspecifiedCount": 36
+          }
+        },
+        "OverallSeverity": "UNSPECIFIED",
+        "ResourceId": "i-0ba3874e85bb97244",
+        "ResourceType": "ManagedInstance",
+        "Status": "NON_COMPLIANT"
+      }
+    ],
+    "ResponseMetadata": {
+      "HTTPHeaders": {
+        "content-length": "12345",
+        "content-type": "application/x-amz-json-1.1",
+        "date": "Fri, 20 Mar 2020 15:09:20 GMT",
+        "x-amzn-requestid": "88383b45-36f4-44bb-b8a6-942dd5ffca3b"
+      },
+      "HTTPStatusCode": 200,
+      "RequestId": "88383b45-36f4-44bb-b8a6-942dd5ffca3b",
+      "RetryAttempts": 0
+    }
+  }
+}

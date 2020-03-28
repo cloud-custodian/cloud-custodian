@@ -13,31 +13,9 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from concurrent.futures import (
-    ProcessPoolExecutor, ThreadPoolExecutor)
-
-from c7n.registry import PluginRegistry
+from concurrent.futures import (ProcessPoolExecutor, ThreadPoolExecutor)  # noqa
 
 import threading
-
-
-class ExecutorRegistry(PluginRegistry):
-
-    def __init__(self, plugin_type):
-        super(ExecutorRegistry, self).__init__(plugin_type)
-
-        self.register('process', ProcessPoolExecutor)
-        self.register('thread', ThreadPoolExecutor)
-        self.register('main', MainThreadExecutor)
-
-
-def executor(name, **kw):
-    factory = executors.get(name)
-    # post element refactoring
-    # factory.validate(kw)
-    if factory is None:
-        raise ValueError("No Such Executor %s" % name)
-    return factory(**kw)
 
 
 class MainThreadExecutor(object):
@@ -103,7 +81,3 @@ class MainThreadFuture(object):
 
     def add_done_callback(self, fn):
         return fn(self)
-
-
-executors = ExecutorRegistry('executor')
-executors.load_plugins()
