@@ -1,4 +1,4 @@
-FROM debian:10 as build-env
+FROM debian:10-slim as build-env
 
 LABEL name="custodian" \
       description="Cloud Management Rules Engine" \
@@ -30,7 +30,7 @@ RUN apt-get --yes update \
  && $HOME/.poetry/bin/poetry install --no-dev \
  && cd tools/c7n_azure && $HOME/.poetry/bin/poetry install && cd ../.. \
  && cd tools/c7n_gcp && $HOME/.poetry/bin/poetry install && cd ../.. \
- && cd tools/c7n_kube && $HOME/.poetry/bin/poetry install && cd ../.. 
+ && cd tools/c7n_kube && $HOME/.poetry/bin/poetry install && cd ../..
 
 # Distroless Container
 FROM gcr.io/distroless/python3-debian10
