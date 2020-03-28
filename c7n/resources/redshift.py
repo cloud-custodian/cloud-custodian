@@ -25,7 +25,7 @@ from c7n.filters import (
     ValueFilter, DefaultVpcBase, AgeFilter, CrossAccountAccessFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
-
+from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.query import QueryResourceManager, TypeInfo
@@ -52,6 +52,8 @@ class Redshift(QueryResourceManager):
 
 Redshift.filter_registry.register('marked-for-op', tags.TagActionFilter)
 Redshift.filter_registry.register('network-location', net_filters.NetworkLocation)
+Redshift.filter_registry.register('offhour', OffHour)
+Redshift.filter_registry.register('onhour', OnHour)
 
 
 @Redshift.filter_registry.register('default-vpc')
@@ -122,6 +124,54 @@ class LoggingFilter(ValueFilter):
             if self.match(cluster[self.annotation_key]):
                 results.append(cluster)
         return results
+
+
+class StateTransitionAction(BaseAction):
+
+    def filter_cluster_state(self, resources, states):
+        resource_count = len(resources)
+        results = [r for r in resources if r['ClusterStatus'] in states]
+        if resource_count != len(results):
+            self.log.warning(
+                '%s filtered to %d of %d clusters in states: %s',
+                self.type, len(results), resource_count, ', '.join(states))
+        return results
+
+
+@Redshift.action_registry.register('pause')
+class Pause(StateTransitionAction):
+
+    schema = type_schema('pause')
+    permissions = ('redshift:PauseCluster',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('redshift')
+        for r in self.filter_cluster_state(resources, ('available',)):
+            try:
+                client.pause_cluster(
+                    ClusterIdentifier=r['ClusterIdentifier'])
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidClusterStateFault):
+                raise
+
+
+@Redshift.action_registry.register('resume')
+class Resume(StateTransitionAction):
+
+    schema = type_schema('resume')
+    permissions = ('redshift:ResumeCluster',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('redshift')
+        for r in self.filter_cluster_state(resources, ('paused',)):
+            try:
+                client.resume_cluster(
+                    ClusterIdentifier=r['ClusterIdentifier'])
+            except (client.exceptions.ClusterNotFoundFault,
+                    client.exceptions.InvalidClusterStateFault):
+                raise
 
 
 @Redshift.action_registry.register('set-logging')
