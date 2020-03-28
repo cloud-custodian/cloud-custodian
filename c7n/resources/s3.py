@@ -1426,8 +1426,8 @@ class FilterPublicBlock(Filter):
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 # Set config to none because NoSuchPublicAccessBlockConfiguration error
-                # was returned. This is important later because it is symbolic of 
-                # all blocks being set to false. See if/else in smatches_filter func           
+                # was returned. This is important later because it is symbolic of
+                # all blocks being set to false. See if/else in smatches_filter func
                 config = None
             else:
                 raise
@@ -1501,7 +1501,7 @@ class SetPublicBlock(BucketActionBase):
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 # Set config to none because NoSuchPublicAccessBlockConfiguration error
-                # was returned. This is important later because it is symbolic of 
+                # was returned. This is important later because it is symbolic of
                 # all blocks being set to false. See if/else statement below
                 config = None
             else:
