@@ -16,7 +16,7 @@ See also the readme in the GitHub repository.
 Install Cloud Custodian
 -----------------------
 
-Cloud Custodian is a Python application and supports Python 2 and 3 on Linux and
+Cloud Custodian is a Python application and supports Python 3 on Linux, MacOS and
 Windows.
 
 We recommend using Python 3.6 or higher.
@@ -186,6 +186,8 @@ configuration file and add the following schema configuration::
       "yaml.schemas": {
         "./schema.json": "*yml"
       },
+
+Note the path to schema.json can either be either relative or the full path.
 
 You'll now have completion and validation while authoring policies.
 
