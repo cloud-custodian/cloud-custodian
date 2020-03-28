@@ -263,6 +263,34 @@ class TestSsm(BaseTest):
             [r['InstanceId'] for r in resources],
             ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
 
+    def test_ssm_compliance(self):
+        session_factory = self.replay_flight_data('test_ec2_ssm_compliance_filter')
+        policy = self.load_policy({
+            'name': 'ec2-ssm-compliance',
+            'resource': 'aws.ec2',
+            'filters': [
+                {'type': 'ssm-compliance',
+                 'compliance_types': [
+                     'Association',
+                     'Patch'
+                 ],
+                 'severity': [
+                     'CRITICAL',
+                     'HIGH',
+                     'MEDIUM',
+                     'LOW',
+                     'UNSPECIFIED'
+                 ],
+                 'states': ['NON_COMPLIANT']}]},
+            session_factory=session_factory,
+            config={'region': 'us-east-2'})
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertTrue('c7n:ssm-compliance' in resources[0])
+        self.assertEqual(
+            [r['InstanceId'] for r in resources],
+            ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
+
 
 class TestHealthEventsFilter(BaseTest):
 
