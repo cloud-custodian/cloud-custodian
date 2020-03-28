@@ -121,14 +121,16 @@ def get_resource_class(resource_type):
         provider_name, resource = resource_type.split('.', 1)
     else:
         provider_name, resource = 'aws', resource_type
+        resource_type = '%s.%s' % (provider_name, resource_type)
 
     provider = clouds.get(provider_name)
     if provider is None:
         raise KeyError(
             "Invalid cloud provider: %s" % provider_name)
 
-    factory = provider.resources.get(resource)
-    if factory is None:
+    if resource_type not in provider.resource_map:
         raise KeyError("Invalid resource: %s for provider: %s" % (
             resource, provider_name))
+    factory = provider.resources.get(resource)
+    assert factory, "Resource:%s not loaded" % resource_type
     return factory
