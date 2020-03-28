@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM debian:10 as build-env
 
 LABEL name="custodian" \
       description="Cloud Management Rules Engine" \
@@ -20,24 +20,19 @@ WORKDIR /src
 
 RUN adduser --disabled-login custodian
 RUN apt-get --yes update \
- && apt-get --yes install build-essential curl --no-install-recommends \
+ && apt-get --yes install build-essential curl python3-venv --no-install-recommends \
  && python3 -m venv /usr/local \
  && curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 \
  && . /usr/local/bin/activate \
  && $HOME/.poetry/bin/poetry install --no-dev \
  && cd tools/c7n_azure && $HOME/.poetry/bin/poetry install && cd ../.. \
  && cd tools/c7n_gcp && $HOME/.poetry/bin/poetry install && cd ../.. \
- && cd tools/c7n_kube && $HOME/.poetry/bin/poetry install && cd ../.. \
- && apt-get --yes remove build-essential \
- && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
- && rm -Rf /var/cache/apt/ \
- && rm -Rf /var/lib/apt/lists/* \
- && rm -Rf /root/.cache/ \
- && rm -Rf /root/.poetry \
- && mkdir /output \
- && chown custodian: /output
+ && cd tools/c7n_kube && $HOME/.poetry/bin/poetry install && cd ../.. 
 
-USER custodian
+# Distroless Container
+FROM gcr.io/distroless/python3-debian10
+COPY --from=build-env /src /src
+COPY --from=build-env /usr/local /usr/local
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 VOLUME ["/home/custodian"]
