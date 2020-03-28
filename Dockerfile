@@ -6,6 +6,10 @@ LABEL name="custodian" \
       homepage="http://github.com/cloud-custodian/cloud-custodian" \
       maintainer="Custodian Community <https://cloudcustodian.io>"
 
+RUN adduser --disabled-login custodian \
+ && mkdir /output \
+ && chown custodian: /output
+
 # Transfer Custodian source into container by directory
 # to minimize size
 ADD pyproject.toml poetry.lock README.md /src/
@@ -18,7 +22,6 @@ ADD tools/c7n_mailer /src/tools/c7n_mailer
 
 WORKDIR /src
 
-RUN adduser --disabled-login custodian
 RUN apt-get --yes update \
  && apt-get --yes install build-essential curl python3-venv --no-install-recommends \
  && python3 -m venv /usr/local \
@@ -33,6 +36,9 @@ RUN apt-get --yes update \
 FROM gcr.io/distroless/python3-debian10
 COPY --from=build-env /src /src
 COPY --from=build-env /usr/local /usr/local
+COPY --from=build-env /output /output
+COPY --from=build-env /etc/passwd /etc/passwd
+USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 VOLUME ["/home/custodian"]
