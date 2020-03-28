@@ -16,7 +16,7 @@ See also the readme in the GitHub repository.
 Install Cloud Custodian
 -----------------------
 
-Cloud Custodian is a Python application and supports Python 2 and 3 on Linux and 
+Cloud Custodian is a Python application and supports Python 3 on Linux, MacOS and
 Windows.
 
 We recommend using Python 3.6 or higher.
@@ -98,7 +98,7 @@ provides the following information::
 
   Schema
   ------
-  
+
   {   'additionalProperties': False,
       'properties': {   'type': {   'enum': ['is-log-target']},
                         'value': {   'type': 'boolean'}},
@@ -168,29 +168,37 @@ Editor Integration
 If your preferred editor supports language servers, you can configure
 it to provide completion and validation while authoring policies.
 
-First generate use custodian to generate a jsonschema file::
+First generate use custodian to generate a json schema file::
 
   custodian schema --json > schema.json
 
-Next install
-``yaml-language-server <https://github.com/redhat-developer/yaml-language-server>``
-into your editor of choice.
+Next install a YAML plug-in for your editor, like `YAML for Visual Studio Code
+<https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml>_` or
+`coc-yaml for coc.nvim <https://github.com/neoclide/coc-yaml>_`. Both plug-ins
+use the `yaml-language-server
+<https://github.com/redhat-developer/yaml-language-server>_` under the hood.
 
-You'll then configure it to use the generated `schema.json` as the
-schema for your policy files. For example in visual studio code
-settings that looks like::
+You'll then need to configure your plug-in to use the generated `schema.json`
+as the schema for your policy files. For example in Visual Studio Code,
+navigate to the settings for the YAML plug-in and under Schemas, edit
+configuration file and add the following schema configuration::
 
       "yaml.schemas": {
         "./schema.json": "*yml"
       },
 
-You'll now have completion and validation while authoring policies
+Note the path to schema.json can either be either relative or the full path.
+
+You'll now have completion and validation while authoring policies.
 
 .. image:: c7n-editor.png
 
-
 Note if your authoring policies in json you can also configure the
 json-language-server for the same.
+
+Also, if you're seeing errors like ``'Request textDocument/hover failed with
+message: Cannot read property '$ref' of null'`` try re-creating your
+schema.json file.
 
 .. _tab-completion:
 
