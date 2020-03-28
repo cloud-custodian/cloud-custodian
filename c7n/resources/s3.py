@@ -1427,7 +1427,7 @@ class FilterPublicBlock(Filter):
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 config = None
             else:
-                raise Exception(e)
+                raise
         if self.matches_filter(config, enabled, scope):
             return {"Name": bucket['Name'], "publicblocks": config}
 
@@ -1499,7 +1499,7 @@ class SetPublicBlock(BucketActionBase):
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 config = None
             else:
-                raise Exception(e)
+                raise
         if config:
             if 'All' in scopes:
                 for key in config.keys():
