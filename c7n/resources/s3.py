@@ -1410,7 +1410,6 @@ class FilterPublicBlock(Filter):
         with self.executor_factory(max_workers=2) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
             for future in as_completed(futures):
-                bucket = futures[future]
                 if future.exception():
                     raise future.exception()
                 if future.result():
@@ -1485,7 +1484,6 @@ class SetPublicBlock(BucketActionBase):
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
-            errors = list()
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
