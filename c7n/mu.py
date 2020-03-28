@@ -338,8 +338,8 @@ def _package_deps(package, deps=None, ignore=()):
 def custodian_archive(packages=None):
     """Create a lambda code archive for running custodian.
 
-    Lambda archive currently always includes `c7n` and
-    `pkg_resources`. Add additional packages in the mode block.
+    Lambda archive currently always includes `c7n`.  Add additional
+    packages via function parameters, or in policy via mode block.
 
     Example policy that includes additional packages
 
@@ -355,7 +355,7 @@ def custodian_archive(packages=None):
     packages: List of additional packages to include in the lambda archive.
 
     """
-    modules = {'c7n', 'pkg_resources'}
+    modules = {'c7n'}
     if packages:
         modules = filter(None, modules.union(packages))
     return PythonPackageArchive(sorted(modules))

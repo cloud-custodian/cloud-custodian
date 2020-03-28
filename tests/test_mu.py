@@ -995,7 +995,6 @@ class PythonArchiveTest(unittest.TestCase):
         archive.close()
         filenames = archive.get_filenames()
         self.assertTrue("c7n/__init__.py" in filenames)
-        self.assertTrue("pkg_resources/__init__.py" in filenames)
 
     def make_file(self):
         bench = tempfile.mkdtemp()
