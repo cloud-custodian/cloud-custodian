@@ -275,15 +275,12 @@ def setup_parser():
     report.set_defaults(command="c7n.commands.report")
     _report_options(report)
 
-    logs_desc = "Get policy execution logs"
     logs = subs.add_parser(
-        'logs', help=logs_desc, description=logs_desc)
+        'logs')
     logs.set_defaults(command="c7n.commands.logs")
     _logs_options(logs)
 
-    metrics_desc = "Retrieve policy execution metrics."
-    metrics = subs.add_parser(
-        'metrics', description=metrics_desc, help=metrics_desc)
+    metrics = subs.add_parser('metrics')
     metrics.set_defaults(command="c7n.commands.metrics_cmd")
     _metrics_options(metrics)
 
