@@ -1491,16 +1491,13 @@ class SetPublicBlock(BucketActionBase):
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        try:
-            config = dict()
-            for key in self.keys:
-                config[key] = self.data.get(key, True)
-            s3.put_public_access_block(
-                Bucket=bucket['Name'],
-                PublicAccessBlockConfiguration=config
-            )
-        except ClientError:
-            raise
+        config = dict()
+        for key in self.keys:
+            config[key] = self.data.get(key, True)
+        s3.put_public_access_block(
+            Bucket=bucket['Name'],
+            PublicAccessBlockConfiguration=config
+        )
         return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
 
 
