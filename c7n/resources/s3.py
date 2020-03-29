@@ -1488,7 +1488,7 @@ class SetPublicBlock(BucketActionBase):
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
-    
+
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         try:
@@ -1500,7 +1500,7 @@ class SetPublicBlock(BucketActionBase):
                 PublicAccessBlockConfiguration=config
             )
         except ClientError:
-                raise
+            raise
         return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
 
 
