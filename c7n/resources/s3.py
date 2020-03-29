@@ -1491,7 +1491,7 @@ class SetPublicBlock(BucketActionBase):
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        config = dict()
+        config = {}
         for key in self.keys:
             config[key] = self.data.get(key, True)
         s3.put_public_access_block(
