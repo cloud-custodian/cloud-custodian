@@ -19,7 +19,7 @@ python-dateutil==2.8.1
 python-http-client==3.2.6
 redis==3.4.1
 requests==2.23.0
-pyyaml>=5.3.1
+pyyaml==5.3.1
 s3transfer==0.3.3
 sendgrid==6.2.0
 six==1.14.0
