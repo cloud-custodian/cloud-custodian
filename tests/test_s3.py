@@ -1692,7 +1692,7 @@ class S3Test(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
 
-        # Verbose test to make sure that the public blocks are enabled on the buckets
+        # Make sure that all blocks are set to on/enabled now
         response = client.get_public_access_block(
             Bucket=bname)['PublicAccessBlockConfiguration']
         for key in response.keys():
@@ -1723,7 +1723,10 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "state": "disable"
+                        "BlockPublicAcls": False,
+                        "IgnorePublicAcls": False,
+                        "BlockPublicPolicy": False,
+                        "RestrictPublicBuckets": False
                     }
                 ]
             },
@@ -1735,7 +1738,7 @@ class S3Test(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
 
-        # Verbose test to make sure that the public blocks are enabled on the buckets
+        # Make sure that the public blocks are enabled on the buckets
         response = client.get_public_access_block(
             Bucket=bname)['PublicAccessBlockConfiguration']
         for key in response.keys():
@@ -1766,22 +1769,20 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "scope": [
-                            "BlockPublicPolicy"
-                        ],
-                        "state": "enable"
+                        "BlockPublicPolicy": True
                     }
                 ]
             },
             session_factory=session_factory,
         )
 
-        # Test that there was a bucket with BlockPublicAcls public block
+        # Test that there was a bucket with BlockPublicAcls public block turned off
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
+        self.assertEqual(resources[0]["PublicAccessBlockConfiguration"]["BlockPublicPolicy"], False)
 
-        # Verbose test to make sure that the public blocks are enabled on the buckets
+        # Make sure that BlockPublicAcls public block turned on now
         response = client.get_public_access_block(
             Bucket=bname)['PublicAccessBlockConfiguration']
         self.assertEqual(response['BlockPublicPolicy'], True)
@@ -1811,22 +1812,20 @@ class S3Test(BaseTest):
                 "actions": [
                     {
                         "type": "set-public-block",
-                        "scope": [
-                            "IgnorePublicAcls"
-                        ],
-                        "state": "disable"
+                        "IgnorePublicAcls": False
                     }
                 ]
             },
             session_factory=session_factory,
         )
 
-        # Test that there was a bucket with BlockPublicAcls public block
+        # Test that there was a bucket with the IgnorePublicAcls public block set to on
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
+        self.assertEqual(resources[0]["PublicAccessBlockConfiguration"]["IgnorePublicAcls"], True)
 
-        # Verbose test to make sure that the public blocks are enabled on the buckets
+        # Make sure that the IgnorePublicAcls public block set to off
         response = client.get_public_access_block(
             Bucket=bname)['PublicAccessBlockConfiguration']
         self.assertEqual(response['IgnorePublicAcls'], False)

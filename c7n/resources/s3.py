@@ -1432,7 +1432,7 @@ class FilterPublicBlock(Filter):
             else:
                 raise
         if self.matches_filter(config, enabled, scope):
-            return {"Name": bucket['Name'], "publicblocks": config}
+            return {"Name": bucket['Name'], "PublicAccessBlockConfiguration": config}
 
     def matches_filter(self, config, enabled, scope):
         if config:
@@ -1465,26 +1465,22 @@ class SetPublicBlock(BucketActionBase):
                 resource: s3
                 filters:
                   - type: check-public-block
-                    scope: BlockPublicAcls
+                    scope: Any
                     enabled: False
                 actions:
                   - type: set-public-block
-                    # scope: <------ optional (All by default)
-                    #   - BlockPublicAcls
-                    #   - IgnorePublicAcls
-                    # state: enable <------ optional (enable by default)
+                    # BlockPublicAcls: true <------ All optional, true by default
     """
 
     schema = type_schema(
         'set-public-block',
-        scope={
-            'type': 'array',
-            'items': {'type': 'string',
-                     'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
-                        'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']}},
-        state={'type': 'string',
-               'enum': ['enable', 'disable']})
+        BlockPublicAcls={'type': 'boolean', 'default': True},
+        IgnorePublicAcls={'type': 'boolean', 'default': True},
+        BlockPublicPolicy={'type': 'boolean', 'default': True},
+        RestrictPublicBuckets={'type': 'boolean', 'default': True})
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
+    keys = (
+        'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
@@ -1492,43 +1488,19 @@ class SetPublicBlock(BucketActionBase):
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
-
+    
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        state = self.data.get('state', 'enable')
-        scopes = self.data.get('scope', ['All'])
         try:
-            config = s3.get_public_access_block(
-                Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                # Set config to none because NoSuchPublicAccessBlockConfiguration error
-                # was returned. This is important later because it is symbolic of
-                # all blocks being set to false. See if/else statement below
-                config = None
-            else:
-                raise
-        if config:
-            if 'All' in scopes:
-                for key in config.keys():
-                    config[key] = True if state == 'enable' else False
-            else:
-                for scope in scopes:
-                    config[scope] = True if state == 'enable' else False
+            config = dict()
+            for key in self.keys:
+                config[key] = self.data.get(key, True)
             s3.put_public_access_block(
                 Bucket=bucket['Name'],
                 PublicAccessBlockConfiguration=config
             )
-        else:
-            s3.put_public_access_block(
-                Bucket=bucket['Name'],
-                PublicAccessBlockConfiguration={
-                    'BlockPublicAcls': True if state == 'enable' else False,
-                    'IgnorePublicAcls': True if state == 'enable' else False,
-                    'BlockPublicPolicy': True if state == 'enable' else False,
-                    'RestrictPublicBuckets': True if state == 'enable' else False
-                }
-            )
+        except ClientError:
+                raise
         return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
 
 
