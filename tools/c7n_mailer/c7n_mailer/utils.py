@@ -22,10 +22,10 @@ import time
 
 import jinja2
 import jmespath
+import yaml
 from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
-from ruamel import yaml
 
 
 class Providers(object):

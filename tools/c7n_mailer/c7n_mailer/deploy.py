@@ -43,7 +43,7 @@ def dispatch(event, context):
 
 CORE_DEPS = [
     # core deps
-    'jinja2', 'markupsafe', 'ruamel', 'ldap3', 'pyasn1', 'redis', 'jmespath',
+    'jinja2', 'markupsafe', 'pyyaml', 'ldap3', 'pyasn1', 'redis', 'jmespath',
     # for other dependencies
     'pkg_resources',
     # transport datadog - recursive deps
