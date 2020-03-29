@@ -219,17 +219,22 @@ class GlueCrawlerSecurityConfigFilter(ValueFilter):
 
     def get_security_configuration(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
+        cached_security_config = {}
         for r in resources:
             security_config_name = r.get(self.boto_security_config_key)
             if security_config_name is None:
                 # We can't make an API call to get_security_configuration without
                 # a Name parameter
                 continue
-            try:
-                security_configuration_result = client.get_security_configuration(
-                    Name=security_config_name)
-            except client.exceptions.EntityNotFoundException:
-                continue
+            if security_config_name in cached_security_config:
+                security_configuration_result = cached_security_config[security_config_name]
+            else:
+                try:
+                    security_configuration_result = client.get_security_configuration(
+                        Name=security_config_name)
+                except client.exceptions.EntityNotFoundException:
+                    continue
+            cached_security_config[security_config_name] = security_configuration_result
             if 'SecurityConfiguration' in security_configuration_result:
                 r[self.sec_conf_attribute] = \
                     security_configuration_result['SecurityConfiguration']
