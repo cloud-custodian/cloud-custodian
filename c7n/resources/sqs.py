@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 
 import json
 
-from c7n.actions import RemovePolicyBase, ModifyPolicyBase
+from c7n.actions import AddPolicyBase, RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
@@ -110,7 +110,6 @@ class SQSCrossAccount(CrossAccountAccessFilter):
                 filters:
                   - type: cross-account
     """
-
     permissions = ("sqs:GetQueueAttributes",)
 
 
@@ -139,7 +138,6 @@ class KmsFilter(KmsRelatedFilter):
                         value: "^(alias/aws/)"
                         op: regex
     """
-
     RelatedIdsExpression = "KmsMasterKeyId"
 
 
@@ -197,7 +195,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
 
 @SQS.action_registry.register("add-statements")
-class AddPolicyStatements(ModifyPolicyBase):
+class AddPolicyStatements(AddPolicyBase):
     """Action to add policy statements to SQS
 
     :example:
@@ -211,10 +209,15 @@ class AddPolicyStatements(ModifyPolicyBase):
                   - type: cross-account
                 actions:
                   - type: add-statements
-                    statement_ids: matched
+                    add-statements: [{
+                        "Sid": "AddedPolicy",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["SNS:GetTopicAttributes"],
+                        "Resource": topic_arn,
+                        }]
     """
-
-    permissions = ("sqs:SetTopicAttributes", "sqs:GetTopicAttributes")
+    permissions = ("sqs:SetQueueAttributes", "sqs:GetQueueAttributes")
 
     def process(self, resources):
         results = []
@@ -243,8 +246,7 @@ class AddPolicyStatements(ModifyPolicyBase):
 
 @SQS.action_registry.register("modify-policy")
 class ModifyPolicyStatement(ModifyPolicyBase):
-
-    permissions = ("sqs:SetTopicAttributes", "sqs:GetTopicAttributes")
+    permissions = ("sqs:SetQueueAttributes", "sqs:GetQueueAttributes")
 
     def process(self, resources):
         results = []
