@@ -273,6 +273,7 @@ class DeleteTable(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
+
 @resources.register('glue-classifier')
 class GlueClassifier(QueryResourceManager):
 
@@ -284,6 +285,7 @@ class GlueClassifier(QueryResourceManager):
         arn_type = 'classifier'
 
     permissions = ('glue:GetClassifiers',)
+
 
 @GlueClassifier.action_registry.register('delete')
 class DeleteClassifier(BaseAction):
@@ -300,6 +302,7 @@ class DeleteClassifier(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
+
 @resources.register('glue-ml-transform')
 class GlueMLTransform(QueryResourceManager):
 
@@ -313,6 +316,7 @@ class GlueMLTransform(QueryResourceManager):
 
     permissions = ('glue:GetMLTransforms',)
     augment = universal_augment
+
 
 @GlueMLTransform.action_registry.register('delete')
 class DeleteMLTransform(BaseAction):
@@ -328,6 +332,7 @@ class DeleteMLTransform(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
+
 @resources.register('glue-security-configuration')
 class GlueSecurityConfiguration(QueryResourceManager):
 
@@ -339,6 +344,7 @@ class GlueSecurityConfiguration(QueryResourceManager):
         date = 'CreatedTimeStamp'
 
     permissions = ('glue:GetSecurityConfigurations',)
+
 
 @GlueSecurityConfiguration.action_registry.register('delete')
 class DeleteSecurityConfiguration(BaseAction):
@@ -354,6 +360,7 @@ class DeleteSecurityConfiguration(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
+
 @resources.register('glue-trigger')
 class GlueTrigger(QueryResourceManager):
 
@@ -366,6 +373,7 @@ class GlueTrigger(QueryResourceManager):
 
     permissions = ('glue:GetTriggers',)
     augment = universal_augment
+
 
 @GlueTrigger.action_registry.register('delete')
 class DeleteTrigger(BaseAction):
@@ -381,6 +389,7 @@ class DeleteTrigger(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
+
 @resources.register('glue-workflow')
 class GlueWorkflow(QueryResourceManager):
 
@@ -393,6 +402,7 @@ class GlueWorkflow(QueryResourceManager):
         universal_taggable = True
 
     permissions = ('glue:ListWorkflows',)
+
 
 @GlueWorkflow.action_registry.register('delete')
 class DeleteWorkflow(BaseAction):

@@ -363,7 +363,8 @@ class TestGlueClassifiers(BaseTest):
         self.assertEqual(len(resources), 1)
         client = session_factory().client("glue")
         classifiers = client.get_classifiers()
-        self.assertFalse("test" in [t.get('CsvClassifier').get("Name") for t in classifiers.get("Classifiers", [])])
+        self.assertFalse("test" in [t.get('CsvClassifier').get("Name")
+            for t in classifiers.get("Classifiers", [])])
 
 
 class GlueMLTransform(BaseTest):
@@ -403,7 +404,8 @@ class TestGlueSecurityConfiguration(BaseTest):
         self.assertEqual(len(resources), 1)
         client = session_factory().client("glue")
         security_configrations = client.get_security_configurations()
-        self.assertFalse("test" in [t.get("Name") for t in security_configrations.get("SecurityConfigurations", [])])
+        self.assertFalse("test" in [t.get("Name")
+            for t in security_configrations.get("SecurityConfigurations", [])])
 
 
 class TestGlueTriggers(BaseTest):
