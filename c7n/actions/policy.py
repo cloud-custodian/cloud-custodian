@@ -16,6 +16,35 @@ from .core import BaseAction
 from c7n import utils
 
 
+class AddPolicyBase(BaseAction):
+    schema = utils.type_schema(
+        'add-statements',
+        **{
+            'add-statements': {
+                'type': 'array',
+                'items': {'$ref': '#/definitions/iam-statement'},
+            }
+        }
+    ),
+
+    def __init__(self, data=None, manager=None):
+        if manager is not None:
+            config_args = {
+                'account_id': manager.config.account_id,
+                'region': manager.config.region
+            }
+            self.data = utils.format_string_values(data, **config_args)
+        else:
+            self.data = utils.format_string_values(data)
+        self.manager = manager
+
+    def add_statements(self, policy_statements):
+        current = {s['Sid']: s for s in policy_statements}
+        additional = {s['Sid']: s for s in self.data.get('add-statements', [])}
+        current.update(additional)
+        return list(current.values()), bool(additional)
+
+
 class RemovePolicyBase(BaseAction):
 
     schema = utils.type_schema(

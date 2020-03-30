@@ -21,7 +21,6 @@ import time
 
 
 class TestSqs(object):
-
     @functional
     def test_sqs_delete(self, test):
         session_factory = test.replay_flight_data("test_sqs_delete")
@@ -62,9 +61,7 @@ class TestSqs(object):
         client_kms = session_factory().client("kms")
         key_id = client_kms.create_key(Description="West SQS encryption key")[
             "KeyMetadata"
-        ][
-            "KeyId"
-        ]
+        ]["KeyId"]
         test.addCleanup(client_kms.disable_key, KeyId=key_id)
 
         alias_name = "alias/new-key-test-sqs"
@@ -87,16 +84,11 @@ class TestSqs(object):
 
         check_master_key = client_sqs.get_queue_attributes(
             QueueUrl=queue_url, AttributeNames=["All"]
-        )[
-            "Attributes"
-        ][
-            "KmsMasterKeyId"
-        ]
+        )["Attributes"]["KmsMasterKeyId"]
         test.assertEqual(check_master_key, key_id)
 
 
 class TestSqsAction(BaseTest):
-
     @functional
     def test_sqs_remove_matched(self):
         session_factory = self.replay_flight_data("test_sqs_remove_matched")
@@ -159,11 +151,7 @@ class TestSqsAction(BaseTest):
         data = json.loads(
             client.get_queue_attributes(
                 QueueUrl=resources[0]["QueueUrl"], AttributeNames=["Policy"]
-            )[
-                "Attributes"
-            ][
-                "Policy"
-            ]
+            )["Attributes"]["Policy"]
         )
         self.assertEqual(
             [s["Sid"] for s in data.get("Statement", ())], ["SpecificAllow"]
@@ -230,11 +218,7 @@ class TestSqsAction(BaseTest):
         data = json.loads(
             client.get_queue_attributes(
                 QueueUrl=resources[0]["QueueUrl"], AttributeNames=["Policy"]
-            )[
-                "Attributes"
-            ][
-                "Policy"
-            ]
+            )["Attributes"]["Policy"]
         )
         self.assertTrue("RemoveMe" not in [s["Sid"] for s in data.get("Statement", ())])
 
@@ -255,8 +239,9 @@ class TestSqsAction(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = factory().client("sqs")
-        d2 = client.get_queue_attributes(
-            QueueUrl=queue_url, AttributeNames=["All"])["Attributes"]
+        d2 = client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=["All"])[
+            "Attributes"
+        ]
         self.assertNotIn("Policy", d2)
 
     @functional
@@ -294,9 +279,6 @@ class TestSqsAction(BaseTest):
             },
         )
 
-        if self.recording:
-            time.sleep(30)
-
         p = self.load_policy(
             {
                 "name": "sqs-add-statements-policy",
@@ -329,15 +311,12 @@ class TestSqsAction(BaseTest):
         data = json.loads(
             client.get_queue_attributes(
                 QueueUrl=resources[0]["QueueUrl"], AttributeNames=["Policy"]
-            )[
-                "Attributes"
-            ][
-                "Policy"
-            ]
+            )["Attributes"]["Policy"]
         )
 
         self.assertEqual(
-            [s["Sid"] for s in data.get("Statement", ())], ["SpecificAllow", "AddedStatement"]
+            [s["Sid"] for s in data.get("Statement", ())],
+            ["SpecificAllow", "AddedStatement"],
         )
 
     @functional
@@ -372,7 +351,7 @@ class TestSqsAction(BaseTest):
                                 "Effect": "Allow",
                                 "Principal": "*",
                                 "Action": ["sqs:GetqueueAttributes"],
-                            }
+                            },
                         ],
                     }
                 ),
@@ -412,11 +391,7 @@ class TestSqsAction(BaseTest):
         data = json.loads(
             client.get_queue_attributes(
                 QueueUrl=resources[0]["QueueUrl"], AttributeNames=["Policy"]
-            )[
-                "Attributes"
-            ][
-                "Policy"
-            ]
+            )["Attributes"]["Policy"]
         )
 
         self.assertEqual(
@@ -507,7 +482,8 @@ class TestSqsAction(BaseTest):
                 "name": "sqs-mark-for-op",
                 "resource": "sqs",
                 "filters": [
-                    {"QueueUrl": queue_url}, {"tag:remove-this-tag": "present"}
+                    {"QueueUrl": queue_url},
+                    {"tag:remove-this-tag": "present"},
                 ],
                 "actions": [{"type": "remove-tag", "tags": ["remove-this-tag"]}],
             },
@@ -573,9 +549,7 @@ class TestSqsAction(BaseTest):
 
         retention = client.get_queue_attributes(
             QueueUrl=resources[0]["QueueUrl"], AttributeNames=["MessageRetentionPeriod"]
-        )[
-            "Attributes"
-        ]
+        )["Attributes"]
         self.assertEqual(int(retention["MessageRetentionPeriod"]), 86400)
 
     def test_sqs_get_resources(self):
@@ -605,28 +579,34 @@ class TestSqsAction(BaseTest):
                                 "type": "value",
                                 "key": "KmsMasterKeyId",
                                 "value": "^(alias/aws/)",
-                                "op": "regex"
+                                "op": "regex",
                             },
                             {
                                 "type": "kms-key",
                                 "key": "c7n:AliasName",
                                 "value": "^(alias/aws/)",
-                                "op": "regex"
-                            }
+                                "op": "regex",
+                            },
                         ]
                     }
-                ]
+                ],
             },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(2, len(resources))
         for r in resources:
-            self.assertTrue(r['KmsMasterKeyId'] in [
-                u'alias/aws/sqs',
-                u'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5'
-            ])
-            self.assertTrue(r['QueueArn'] in [
-                u'arn:aws:sqs:us-east-1:644160558196:sqs-test-alias',
-                u'arn:aws:sqs:us-east-1:644160558196:sqs-test-id'
-            ])
+            self.assertTrue(
+                r["KmsMasterKeyId"]
+                in [
+                    "alias/aws/sqs",
+                    "arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5",
+                ]
+            )
+            self.assertTrue(
+                r["QueueArn"]
+                in [
+                    "arn:aws:sqs:us-east-1:644160558196:sqs-test-alias",
+                    "arn:aws:sqs:us-east-1:644160558196:sqs-test-id",
+                ]
+            )

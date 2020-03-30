@@ -2,27 +2,26 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:test_sqs_add_statements_policy",
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:vxe",
             "ApproximateNumberOfMessages": "0",
             "ApproximateNumberOfMessagesNotVisible": "0",
             "ApproximateNumberOfMessagesDelayed": "0",
-            "CreatedTimestamp": "1585585641",
-            "LastModifiedTimestamp": "1585585651",
+            "CreatedTimestamp": "1548892066",
+            "LastModifiedTimestamp": "1548892066",
             "VisibilityTimeout": "30",
             "MaximumMessageSize": "262144",
             "MessageRetentionPeriod": "345600",
             "DelaySeconds": "0",
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"}]}",
             "ReceiveMessageWaitTimeSeconds": "0"
         },
         "ResponseMetadata": {
-            "RequestId": "ffb1af3b-fe84-556a-8378-f9c7ded084dc",
+            "RequestId": "66e7441a-24e3-5146-8eda-12e6175d3448",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "ffb1af3b-fe84-556a-8378-f9c7ded084dc",
-                "date": "Mon, 30 Mar 2020 16:28:04 GMT",
+                "x-amzn-requestid": "66e7441a-24e3-5146-8eda-12e6175d3448",
+                "date": "Mon, 30 Mar 2020 17:50:54 GMT",
                 "content-type": "text/xml",
-                "content-length": "1518"
+                "content-length": "1157"
             },
             "RetryAttempts": 0
         }

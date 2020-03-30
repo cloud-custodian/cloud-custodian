@@ -5,11 +5,11 @@
             "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"AddedStatement\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\"}]}"
         },
         "ResponseMetadata": {
-            "RequestId": "696b5a02-e13c-5992-9805-0cfec149ea69",
+            "RequestId": "3acfd538-75f9-5818-a690-83c4462769be",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "696b5a02-e13c-5992-9805-0cfec149ea69",
-                "date": "Mon, 30 Mar 2020 16:28:37 GMT",
+                "x-amzn-requestid": "3acfd538-75f9-5818-a690-83c4462769be",
+                "date": "Mon, 30 Mar 2020 17:51:26 GMT",
                 "content-type": "text/xml",
                 "content-length": "784"
             },

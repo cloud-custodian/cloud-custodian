@@ -3,7 +3,7 @@
     "data": {
         "Attributes": {
             "QueueArn": "arn:aws:sqs:us-east-1:644160558196:resource-changes",
-            "ApproximateNumberOfMessages": "2181",
+            "ApproximateNumberOfMessages": "2179",
             "ApproximateNumberOfMessagesNotVisible": "0",
             "ApproximateNumberOfMessagesDelayed": "0",
             "CreatedTimestamp": "1539916425",
@@ -16,11 +16,11 @@
             "ReceiveMessageWaitTimeSeconds": "0"
         },
         "ResponseMetadata": {
-            "RequestId": "922f08fb-21f8-578b-a85a-5e0701acf3bf",
+            "RequestId": "87b3e79b-d257-55d1-b5b6-b167e1ea70df",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "922f08fb-21f8-578b-a85a-5e0701acf3bf",
-                "date": "Mon, 30 Mar 2020 16:28:04 GMT",
+                "x-amzn-requestid": "87b3e79b-d257-55d1-b5b6-b167e1ea70df",
+                "date": "Mon, 30 Mar 2020 17:50:53 GMT",
                 "content-type": "text/xml",
                 "content-length": "1859"
             },
