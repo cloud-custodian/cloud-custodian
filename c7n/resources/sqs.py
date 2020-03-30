@@ -110,6 +110,7 @@ class SQSCrossAccount(CrossAccountAccessFilter):
                 filters:
                   - type: cross-account
     """
+
     permissions = ("sqs:GetQueueAttributes",)
 
 
@@ -138,6 +139,7 @@ class KmsFilter(KmsRelatedFilter):
                         value: "^(alias/aws/)"
                         op: regex
     """
+
     RelatedIdsExpression = "KmsMasterKeyId"
 
 
@@ -217,6 +219,7 @@ class AddPolicyStatements(AddPolicyBase):
                         "Resource": topic_arn,
                         }]
     """
+
     permissions = ("sqs:SetQueueAttributes", "sqs:GetQueueAttributes")
 
     def process(self, resources):
