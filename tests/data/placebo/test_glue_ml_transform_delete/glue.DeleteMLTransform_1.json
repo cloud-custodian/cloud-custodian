@@ -1,18 +1,7 @@
 {
-    "status_code": 200,
-    "data": {
-        "TransformId": "tfm-c81b274a40af3513a814a915c7cba89b2093cb5f",
-        "ResponseMetadata": {
-            "RequestId": "ae6dd450-dadb-4f27-8f37-242b8697f930",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Thu, 19 Mar 2020 18:36:03 GMT",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "62",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "ae6dd450-dadb-4f27-8f37-242b8697f930"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "TransformId": "tfm-c81b274a40af3513a814a915c7cba89b2093cb5f",
+    "ResponseMetadata": {}
+  }
 }

@@ -1,31 +1,20 @@
 {
-    "status_code": 200,
-    "data": {
-        "Triggers": [
-            {
-                "Name": "test",
-                "Actions": [
-                    {
-                        "JobName": "test",
-                        "Arguments": {
-                            "--job-bookmark-option": "job-bookmark-enable"
-                        },
-                        "Timeout": 2880
-                    }
-                ]
-            }
-        ],
-        "ResponseMetadata": {
-            "RequestId": "f3434ef2-187d-4629-be33-29a9f0648d70",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Mon, 23 Mar 2020 16:58:22 GMT",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "206",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "f3434ef2-187d-4629-be33-29a9f0648d70"
+  "status_code": 200,
+  "data": {
+    "Triggers": [
+      {
+        "Name": "test",
+        "Actions": [
+          {
+            "JobName": "test",
+            "Arguments": {
+              "--job-bookmark-option": "job-bookmark-enable"
             },
-            "RetryAttempts": 0
-        }
-    }
+            "Timeout": 2880
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

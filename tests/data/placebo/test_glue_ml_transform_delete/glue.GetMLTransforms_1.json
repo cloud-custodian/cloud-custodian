@@ -1,30 +1,19 @@
 {
-    "status_code": 200,
-    "data": {
-        "Transforms": [
-            {
-                "TransformId": "tfm-c81b274a40af3513a814a915c7cba89b2093cb5f",
-                "Name": "test",
-                "Status": "NOT_READY",
-                "Role": "arn:aws:iam::644160558196:role/c7n-glue-test",
-                "GlueVersion": "1.0",
-                "WorkerType": "G.2X",
-                "NumberOfWorkers": 5,
-                "Timeout": 2880,
-                "MaxRetries": 0
-            }
-        ],
-        "ResponseMetadata": {
-            "RequestId": "3280c1e1-6870-4739-bc34-8eddeafaea23",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Thu, 19 Mar 2020 18:36:02 GMT",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "1932",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "3280c1e1-6870-4739-bc34-8eddeafaea23"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Transforms": [
+      {
+        "TransformId": "tfm-c81b274a40af3513a814a915c7cba89b2093cb5f",
+        "Name": "test",
+        "Status": "NOT_READY",
+        "Role": "arn:aws:iam::644160558196:role/c7n-glue-test",
+        "GlueVersion": "1.0",
+        "WorkerType": "G.2X",
+        "NumberOfWorkers": 5,
+        "Timeout": 2880,
+        "MaxRetries": 0
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

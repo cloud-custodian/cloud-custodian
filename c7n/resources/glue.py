@@ -254,8 +254,6 @@ class DescribeTable(query.ChildDescribeSource):
     def augment(self, resources):
         result = []
         for parent_id, r in resources:
-            print("Table augment")
-            print(parent_id)
             r['DatabaseName'] = parent_id
             result.append(r)
         return result
@@ -311,8 +309,10 @@ class GlueMLTransform(QueryResourceManager):
         name = 'Name'
         id = 'TransformId'
         arn_type = 'mlTransform'
+        universal_taggable = True
 
     permissions = ('glue:GetMLTransforms',)
+    augment = universal_augment
 
 @GlueMLTransform.action_registry.register('delete')
 class DeleteMLTransform(BaseAction):
@@ -365,6 +365,7 @@ class GlueTrigger(QueryResourceManager):
         universal_taggable = True
 
     permissions = ('glue:GetTriggers',)
+    augment = universal_augment
 
 @GlueTrigger.action_registry.register('delete')
 class DeleteTrigger(BaseAction):

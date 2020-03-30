@@ -1,23 +1,12 @@
 {
-    "status_code": 200,
-    "data": {
-        "SecurityConfigurations": [
-            {
-                "Name": "test"
-            }
-        ],
-        "NextToken": "",
-        "ResponseMetadata": {
-            "RequestId": "ce043353-a892-42de-a308-7c35636c4863",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Mon, 23 Mar 2020 16:19:24 GMT",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "1579",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "ce043353-a892-42de-a308-7c35636c4863"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "SecurityConfigurations": [
+      {
+        "Name": "test"
+      }
+    ],
+    "NextToken": "",
+    "ResponseMetadata": {}
+  }
 }

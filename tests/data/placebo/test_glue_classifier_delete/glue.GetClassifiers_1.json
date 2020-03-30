@@ -1,30 +1,19 @@
 {
-    "status_code": 200,
-    "data": {
-        "Classifiers": [
-            {
-                "CsvClassifier": {
-                    "Name": "test",
-                    "Version": 1,
-                    "Delimiter": ",",
-                    "QuoteSymbol": "\"",
-                    "ContainsHeader": "UNKNOWN",
-                    "DisableValueTrimming": false,
-                    "AllowSingleColumn": false
-                }
-            }
-        ],
-        "ResponseMetadata": {
-            "RequestId": "ba053ffb-827f-4914-9a4a-6f0601fecf3a",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Mon, 23 Mar 2020 17:50:06 GMT",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "237",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "ba053ffb-827f-4914-9a4a-6f0601fecf3a"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "Classifiers": [
+      {
+        "CsvClassifier": {
+          "Name": "test",
+          "Version": 1,
+          "Delimiter": ",",
+          "QuoteSymbol": "\"",
+          "ContainsHeader": "UNKNOWN",
+          "DisableValueTrimming": false,
+          "AllowSingleColumn": false
         }
-    }
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

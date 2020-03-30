@@ -374,7 +374,7 @@ class GlueMLTransform(BaseTest):
             {
                 "name": "glue-ml-transform-delete",
                 "resource": "glue-ml-transform",
-                "filters": [{"Name": "test"}],
+                "filters": [{"Name": 'test'}],
                 "actions": [{"type": "delete"}],
             },
             session_factory=session_factory,
