@@ -193,7 +193,7 @@ def _schema_options(p):
 
 def _dryrun_option(p):
     p.add_argument(
-        "-d", "--dryrun", action="store_true",
+        "-d", "--dryrun", "--dry-run", action="store_true",
         help="Don't execute actions but filter resources")
 
 
