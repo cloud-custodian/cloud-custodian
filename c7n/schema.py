@@ -331,6 +331,9 @@ def generate(resource_types=()):
         }
     }
 
+    # allow empty policies with lazy load
+    if not resource_refs:
+        schema['properties']['policies']['items'] = {'type': 'object'}
     return schema
 
 

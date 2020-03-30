@@ -1,0 +1,73 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReplicationGroups": [
+            {
+                "ReplicationGroupId": "test-c7n-rg",
+                "Description": "test-c7n-rg",
+                "Status": "available",
+                "PendingModifiedValues": {},
+                "MemberClusters": [
+                    "test-c7n-rg-001",
+                    "test-c7n-rg-002"
+                ],
+                "NodeGroups": [
+                    {
+                        "NodeGroupId": "0001",
+                        "Status": "available",
+                        "PrimaryEndpoint": {
+                            "Address": "test-c7n-rg.qgcgte.ng.0001.use1.cache.amazonaws.com",
+                            "Port": 6379
+                        },
+                        "ReaderEndpoint": {
+                            "Address": "test-c7n-rg-ro.qgcgte.ng.0001.use1.cache.amazonaws.com",
+                            "Port": 6379
+                        },
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "test-c7n-rg-001",
+                                "CacheNodeId": "0001",
+                                "ReadEndpoint": {
+                                    "Address": "test-c7n-rg-001.qgcgte.0001.use1.cache.amazonaws.com",
+                                    "Port": 6379
+                                },
+                                "PreferredAvailabilityZone": "us-east-1a",
+                                "CurrentRole": "primary"
+                            },
+                            {
+                                "CacheClusterId": "test-c7n-rg-002",
+                                "CacheNodeId": "0001",
+                                "ReadEndpoint": {
+                                    "Address": "test-c7n-rg-002.qgcgte.0001.use1.cache.amazonaws.com",
+                                    "Port": 6379
+                                },
+                                "PreferredAvailabilityZone": "us-east-1a",
+                                "CurrentRole": "replica"
+                            }
+                        ]
+                    }
+                ],
+                "SnapshottingClusterId": "test-c7n-rg-002",
+                "AutomaticFailover": "enabled",
+                "SnapshotRetentionLimit": 1,
+                "SnapshotWindow": "03:00-04:00",
+                "ClusterEnabled": false,
+                "CacheNodeType": "cache.r5.large",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": false,
+                "AtRestEncryptionEnabled": false
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "ca18b602-dd47-44d2-97b0-0b02dea5556d",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ca18b602-dd47-44d2-97b0-0b02dea5556d",
+                "content-type": "text/xml",
+                "content-length": "2848",
+                "date": "Tue, 11 Feb 2020 18:12:43 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

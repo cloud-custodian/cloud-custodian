@@ -24,6 +24,19 @@ class ActionTest(BaseTest):
     def test_process_unimplemented(self):
         self.assertRaises(NotImplementedError, Action().process, None)
 
+    def test_filter_resources(self):
+        a = Action()
+        a.type = 'set-x'
+        log_output = self.capture_logging('custodian.actions')
+        resources = [
+            {'app': 'X', 'state': {'status': 'running'}},
+            {'app': 'Y', 'state': {'status': 'stopped'}},
+            {'app': 'Z', 'state': {'status': 'running'}}]
+        assert {'X', 'Z'} == {r['app'] for r in a.filter_resources(
+            resources, 'state.status', ('running',))}
+        assert log_output.getvalue().strip() == (
+            'set-x implicitly filtered 2 of 3 resources key:state.status on running')
+
     def test_run_api(self):
         resp = {
             "Error": {"Code": "DryRunOperation", "Message": "would have succeeded"},

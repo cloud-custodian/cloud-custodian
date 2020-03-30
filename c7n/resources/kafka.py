@@ -19,6 +19,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 
+from .aws import shape_validate
+
 
 @resources.register('kafka')
 class Kafka(QueryResourceManager):
@@ -31,6 +33,7 @@ class Kafka(QueryResourceManager):
         date = 'CreationTime'
         filter_name = 'ClusterNameFilter'
         filter_type = 'scalar'
+        universal_taggable = object()
 
     def augment(self, resources):
         for r in resources:
@@ -53,6 +56,33 @@ class KafkaSGFilter(SecurityGroupFilter):
 class KafkaSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "BrokerNodeGroupInfo.ClientSubnets[]"
+
+
+@Kafka.action_registry.register('set-monitoring')
+class SetMonitoring(Action):
+
+    schema = type_schema(
+        'set-monitoring',
+        config={'type': 'object', 'minProperties': 1},
+        required=('config',))
+
+    shape = 'UpdateMonitoringRequest'
+    permissions = ('kafka:UpdateClusterConfiguration',)
+
+    def validate(self):
+        attrs = dict(self.data.get('config', {}))
+        attrs['ClusterArn'] = 'arn:'
+        attrs['CurrentVersion'] = '123'
+        shape_validate(attrs, self.shape, 'kafka')
+        return super(SetMonitoring, self).validate()
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('kafka')
+        for r in self.filter_resources(resources, 'State', ('ACTIVE',)):
+            params = dict(self.data.get('config', {}))
+            params['ClusterArn'] = r['ClusterArn']
+            params['CurrentVersion'] = r['CurrentVersion']
+            client.update_monitoring(**params)
 
 
 @Kafka.action_registry.register('delete')

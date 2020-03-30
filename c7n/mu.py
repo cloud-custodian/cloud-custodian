@@ -31,7 +31,6 @@ import time
 import tempfile
 import zipfile
 
-from concurrent.futures import ThreadPoolExecutor
 
 # We use this for freezing dependencies for serverless environments
 # that support service side building.
@@ -45,7 +44,6 @@ except (ImportError, FileNotFoundError):
 # Static event mapping to help simplify cwe rules creation
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
-from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 
 log = logging.getLogger('custodian.serverless')
@@ -407,60 +405,6 @@ class LambdaManager(object):
             self.client.delete_function(FunctionName=func.name)
         except self.client.exceptions.ResourceNotFoundException:
             pass
-
-    def metrics(self, funcs, start, end, period=5 * 60):
-
-        def func_metrics(f):
-            metrics = local_session(self.session_factory).client('cloudwatch')
-            values = {}
-            for m in ('Errors', 'Invocations', 'Durations', 'Throttles'):
-                values[m] = metrics.get_metric_statistics(
-                    Namespace="AWS/Lambda",
-                    Dimensions=[{
-                        'Name': 'FunctionName',
-                        'Value': (
-                                isinstance(f, dict) and f['FunctionName'] or f.name)}],
-                    Statistics=["Sum"],
-                    StartTime=start,
-                    EndTime=end,
-                    Period=period,
-                    MetricName=m)['Datapoints']
-            return values
-
-        with ThreadPoolExecutor(max_workers=3) as w:
-            results = list(w.map(func_metrics, funcs))
-            for m, f in zip(results, funcs):
-                if isinstance(f, dict):
-                    f['Metrics'] = m
-        return results
-
-    def logs(self, func, start, end):
-        logs = self.session_factory().client('logs')
-        group_name = "/aws/lambda/%s" % func.name
-        log.info("Fetching logs from group: %s" % group_name)
-        try:
-            logs.describe_log_groups(
-                logGroupNamePrefix=group_name)
-        except logs.exceptions.ResourceNotFoundException:
-            pass
-
-        try:
-            log_streams = logs.describe_log_streams(
-                logGroupName=group_name,
-                orderBy="LastEventTime", limit=3, descending=True)
-        except logs.exceptions.ResourceNotFoundException:
-            return
-
-        start = _timestamp_from_string(start)
-        end = _timestamp_from_string(end)
-        for s in reversed(log_streams['logStreams']):
-            result = logs.get_log_events(
-                logGroupName=group_name,
-                logStreamName=s['logStreamName'],
-                startTime=start,
-                endTime=end)
-            for e in result['events']:
-                yield e
 
     @staticmethod
     def delta_function(old_config, new_config):
