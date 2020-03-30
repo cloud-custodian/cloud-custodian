@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrl": "https://queue.amazonaws.com/644160558196/test_sqs_add_statements_policy",
+        "ResponseMetadata": {
+            "RequestId": "0db6981d-59a1-5259-a410-cee179886665",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "0db6981d-59a1-5259-a410-cee179886665",
+                "date": "Mon, 30 Mar 2020 16:27:21 GMT",
+                "content-type": "text/xml",
+                "content-length": "342"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

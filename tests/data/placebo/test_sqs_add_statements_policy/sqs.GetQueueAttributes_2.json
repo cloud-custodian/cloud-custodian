@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:c7n-mailer-test-queue",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1545055110",
+            "LastModifiedTimestamp": "1549869758",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0"
+        },
+        "ResponseMetadata": {
+            "RequestId": "40ab9cf4-67ab-59c5-829d-ca0847f8a571",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "40ab9cf4-67ab-59c5-829d-ca0847f8a571",
+                "date": "Mon, 30 Mar 2020 16:28:03 GMT",
+                "content-type": "text/xml",
+                "content-length": "1175"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

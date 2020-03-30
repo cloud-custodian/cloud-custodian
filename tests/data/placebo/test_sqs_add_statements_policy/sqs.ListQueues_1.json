@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://queue.amazonaws.com/644160558196/c7n-mailer-test-queue",
+            "https://queue.amazonaws.com/644160558196/c7nmailer-brenttestq",
+            "https://queue.amazonaws.com/644160558196/gh-event-archive",
+            "https://queue.amazonaws.com/644160558196/my-c7n-test",
+            "https://queue.amazonaws.com/644160558196/origin-dev",
+            "https://queue.amazonaws.com/644160558196/origin-dev-test",
+            "https://queue.amazonaws.com/644160558196/origin-dev-test-2",
+            "https://queue.amazonaws.com/644160558196/origin-dev-test-3",
+            "https://queue.amazonaws.com/644160558196/resource-changes",
+            "https://queue.amazonaws.com/644160558196/test",
+            "https://queue.amazonaws.com/644160558196/test-queue",
+            "https://queue.amazonaws.com/644160558196/test_sqs_add_statements_policy",
+            "https://queue.amazonaws.com/644160558196/vxe"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "eac24ece-514a-53cf-91bc-18327118aed7",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "eac24ece-514a-53cf-91bc-18327118aed7",
+                "date": "Mon, 30 Mar 2020 16:28:02 GMT",
+                "content-type": "text/xml",
+                "content-length": "1242"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
