@@ -184,8 +184,7 @@ class GlueCrawler(QueryResourceManager):
     augment = universal_augment
 
 
-@GlueCrawler.filter_registry.register('security-config')
-class GlueCrawlerSecurityConfigFilter(ValueFilter):
+class SecurityConfigFilter(ValueFilter):
     """Filters glue crawlers with security configurations
 
     :example:
@@ -200,45 +199,75 @@ class GlueCrawlerSecurityConfigFilter(ValueFilter):
                     key: EncryptionConfiguration.CloudWatchEncryption.CloudWatchEncryptionMode
                     op: ne
                     value: SSE-KMS
+
+    To find resources missing any security configuration all set `missing: true` on the filter.
     """
 
     permissions = ('glue:GetSecurityConfiguration',)
-    sec_conf_attribute = 'c7n:SecurityConfiguration'
-    boto_security_config_key = 'CrawlerSecurityConfiguration'
-    schema = type_schema('security-config', rinherit=ValueFilter.schema)
+    annotation_key = 'c7n:SecurityConfiguration'
+    security_name_key = None  # set in subclass for particular resource
+    schema = type_schema(
+        'security-config',
+        missing={'type': 'boolean', 'default': False},
+        rinherit=ValueFilter.schema)
+
+    def validate(self):
+        if self.data.get('missing'):
+            return
+        super().validate()
 
     def process(self, resources, event=None):
-        self.log.debug("fetching security configuration for %d glue crawlers" % len(resources))
-        resources = self.get_security_configuration(resources)
+        resources = self.initialize(resources)
+        if self.data.get('missing'):
+            return resources
         return super(ValueFilter, self).process(resources, event)
 
     def __call__(self, r):
-        if self.sec_conf_attribute not in r:
+        if self.annotation_key not in r:
             return False
-        return self.match(r[self.sec_conf_attribute])
+        return self.match(r[self.annotation_key])
 
-    def get_security_configuration(self, resources):
+    def initialize(self, resources):
+        if self.data.get('missing'):
+            return [r for r in resources if self.security_name_key not in r]
+
+        # fetch security configurations by name for the resources
         client = local_session(self.manager.session_factory).client('glue')
-        cached_security_config = {}
-        for r in resources:
-            security_config_name = r.get(self.boto_security_config_key)
-            if security_config_name is None:
-                # We can't make an API call to get_security_configuration without
-                # a Name parameter
+        # Get the security configurations that aren't already cached.
+        security_config_names = {
+            r.get(self.security_name_key) for r in resources
+            if self.annotation_key not in r}
+        if None in security_config_names:
+            security_config_names.remove(None)
+
+        security_config_map = {}
+        for n in security_config_names:
+            try:
+                security_config_map[n] = client.get_security_configuration(
+                    Name=n)['SecurityConfiguration']
+            except client.exceptions.EntityNotFoundException:
                 continue
-            if security_config_name in cached_security_config:
-                security_configuration_result = cached_security_config[security_config_name]
-            else:
-                try:
-                    security_configuration_result = client.get_security_configuration(
-                        Name=security_config_name)
-                except client.exceptions.EntityNotFoundException:
-                    continue
-            cached_security_config[security_config_name] = security_configuration_result
-            if 'SecurityConfiguration' in security_configuration_result:
-                r[self.sec_conf_attribute] = \
-                    security_configuration_result['SecurityConfiguration']
+
+        for r in resources:
+            if self.security_name_key not in r or self.annotation_key in r:
+                continue
+            r[self.annotation_key] = security_config_map[r[self.security_name_key]]
         return resources
+
+
+@GlueDevEndpoint.filter_registry.register('security-config')
+class DevEndpointSecurityConfigFilter(SecurityConfigFilter):
+    security_name_key = 'SecurityConfiguration'
+
+
+@GlueJob.filter_registry.register('security-config')
+class GlueJobSecurityConfigFilter(SecurityConfigFilter):
+    security_name_key = 'SecurityConfiguration'
+
+
+@GlueCrawler.filter_registry.register('security-config')
+class GlueCrawlerSecurityConfigFilter(SecurityConfigFilter):
+    security_name_key = 'CrawlerSecurityConfiguration'
 
 
 @GlueCrawler.action_registry.register('delete')
