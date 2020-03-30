@@ -458,3 +458,16 @@ def _cluster_eligible_for_snapshot(cluster):
         cluster['Engine'] != 'memcached' and not
         TTYPE.match(cluster['CacheNodeType'])
     )
+
+
+@resources.register('elasticache-group')
+class ElastiCacheReplicationGroup(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = "elasticache"
+        enum_spec = ('describe_replication_groups',
+                     'ReplicationGroups[]', None)
+        arn_type = 'replicationgroup'
+        id = name = dimension = 'ReplicationGroupId'
+
+    permissions = ('elasticache:DescribeReplicationGroups',)

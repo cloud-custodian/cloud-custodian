@@ -117,17 +117,3 @@ class PluginRegistry(object):
 
     def items(self):
         return self._factories.items()
-
-    def load_plugins(self):
-        """ Load external plugins.
-
-        Custodian is intended to interact with internal and external systems
-        that are not suitable for embedding into the custodian code base.
-        """
-        try:
-            from pkg_resources import iter_entry_points
-        except ImportError:
-            return
-        for ep in iter_entry_points(group="custodian.%s" % self.plugin_type):
-            f = ep.load()
-            f()

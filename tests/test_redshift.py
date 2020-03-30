@@ -14,9 +14,46 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .common import BaseTest
+import time
 
 
 class TestRedshift(BaseTest):
+
+    def test_redshift_pause(self):
+        factory = self.replay_flight_data('test_redshift_pause')
+        p = self.load_policy({
+            'name': 'redshift-pause',
+            'resource': 'redshift',
+            'filters': [{'ClusterStatus': 'available'}],
+            'actions': ['pause']},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['ClusterIdentifier'] == 'redshift-cluster-1'
+        if self.recording:
+            time.sleep(2)
+        client = factory().client('redshift')
+        cluster = client.describe_clusters(
+            ClusterIdentifier=resources[0]['ClusterIdentifier']).get('Clusters')[0]
+        assert cluster['ClusterStatus'] == 'pausing'
+
+    def test_redshift_resume(self):
+        factory = self.replay_flight_data('test_redshift_resume')
+        p = self.load_policy({
+            'name': 'redshift-pause',
+            'resource': 'redshift',
+            'filters': [{'ClusterStatus': 'paused'}],
+            'actions': ['resume']},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['ClusterIdentifier'] == 'redshift-cluster-1'
+        if self.recording:
+            time.sleep(2)
+        client = factory().client('redshift')
+        cluster = client.describe_clusters(
+            ClusterIdentifier=resources[0]['ClusterIdentifier']).get('Clusters')[0]
+        assert cluster['ClusterStatus'] == 'resuming'
 
     def test_redshift_security_group_filter(self):
         factory = self.replay_flight_data("test_redshift_security_group_filter")
