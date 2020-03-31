@@ -1508,7 +1508,7 @@ class SetPublicBlock(BucketActionBase):
                 config[key] = self.data.get(key)
         else:
             for key in self.keys:
-                config[key] = True  
+                config[key] = True
         s3.put_public_access_block(
             Bucket=bucket['Name'],
             PublicAccessBlockConfiguration=config
