@@ -36,7 +36,6 @@ class ReplicationInstance(QueryResourceManager):
         arn = 'ReplicationInstanceArn'
         date = 'InstanceCreateTime'
 
-
     filters = FilterRegistry('dms-instance.filters')
     filters.register('marked-for-op', TagActionFilter)
     filter_registry = filters
@@ -60,6 +59,7 @@ class DmsEndpoints(QueryResourceManager):
         universal_taggable = True
 
     augment = universal_augment
+
 
 class InstanceDescribe(DescribeSource):
 
