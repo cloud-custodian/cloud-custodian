@@ -5,7 +5,7 @@
         "PublicAccessBlockConfiguration": {
             "BlockPublicAcls": false,
             "IgnorePublicAcls": false,
-            "BlockPublicPolicy": false,
+            "BlockPublicPolicy": true,
             "RestrictPublicBuckets": false
         }
     }

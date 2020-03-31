@@ -1469,15 +1469,15 @@ class SetPublicBlock(BucketActionBase):
                     enabled: False
                 actions:
                   - type: set-public-block
-                    # BlockPublicAcls: true <------ All optional, true by default
+                  # BlockPublicAcls: true <-- optional, if none provided sets all to true by default
     """
 
     schema = type_schema(
         'set-public-block',
-        BlockPublicAcls={'type': 'boolean', 'default': True},
-        IgnorePublicAcls={'type': 'boolean', 'default': True},
-        BlockPublicPolicy={'type': 'boolean', 'default': True},
-        RestrictPublicBuckets={'type': 'boolean', 'default': True})
+        BlockPublicAcls={'type': 'boolean'},
+        IgnorePublicAcls={'type': 'boolean'},
+        BlockPublicPolicy={'type': 'boolean'},
+        RestrictPublicBuckets={'type': 'boolean'})
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
     keys = (
         'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
@@ -1492,8 +1492,23 @@ class SetPublicBlock(BucketActionBase):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         config = {}
-        for key in self.keys:
-            config[key] = self.data.get(key, True)
+        try:
+            config = s3.get_public_access_block(
+                Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
+                # When there is a None config, set all to false to be symbolic
+                for key in self.keys:
+                    config[key] = False
+            else:
+                raise
+        key_set = [key for key in self.keys if type(self.data.get(key)) is bool]
+        if key_set:
+            for key in key_set:
+                config[key] = self.data.get(key)
+        else:
+            for key in self.keys:
+                config[key] = True  
         s3.put_public_access_block(
             Bucket=bucket['Name'],
             PublicAccessBlockConfiguration=config
