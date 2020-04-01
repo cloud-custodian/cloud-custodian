@@ -311,3 +311,47 @@ class CloudFront(BaseTest):
         west_resources = west_p.run()
 
         self.assertEqual(east_resources, west_resources)
+
+    def test_cloudfront_update_distribution(self):
+        factory = self.replay_flight_data("test_distribution_update_distribution")
+        p = self.load_policy(
+            {
+                "name": "cloudfront-tagging-us-east-1",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Logging.Enabled",
+                        "value": None,
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-attributes",
+                        "attributes": {
+                            "Comment": "",
+                            "Enabled": True,
+                            "Logging": {
+                                "Enabled": True,
+                                "IncludeCookies": False,
+                                "Bucket": 'test-enable-logging-c7n.s3.amazonaws.com',
+                                "Prefix": '',
+                            }
+                        }
+                    }
+                ],
+            },
+            config=dict(region='us-east-1'),
+            session_factory=factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client("cloudfront")
+        dist_id = resources[0]['Id']
+        resp = client.get_distribution_config(Id=dist_id)
+        self.assertEqual(
+            resp['DistributionConfig']['Logging']['Enabled'], True
+        )

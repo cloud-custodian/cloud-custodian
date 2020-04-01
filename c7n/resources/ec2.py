@@ -920,6 +920,112 @@ class SsmStatus(ValueFilter):
             r[self.annotation] = info_map.get(r['InstanceId'], {})
 
 
+@EC2.filter_registry.register('ssm-compliance')
+class SsmCompliance(Filter):
+    """Filter ec2 instances by their ssm compliance status.
+
+    :Example:
+
+    Find non-compliant ec2 instances.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-ssm-compliance
+            resource: ec2
+            filters:
+              - type: ssm-compliance
+                compliance_types:
+                  - Association
+                  - Patch
+                severity:
+                  - CRITICAL
+                  - HIGH
+                  - MEDIUM
+                  - LOW
+                  - UNSPECIFIED
+                states:
+                  - NON_COMPLIANT
+                eval_filters:
+                 - type: value
+                   key: ExecutionSummary.ExecutionTime
+                   value_type: age
+                   value: 30
+                   op: less-than
+    """
+    schema = type_schema(
+        'ssm-compliance',
+        **{'required': ['compliance_types'],
+           'compliance_types': {'type': 'array', 'items': {'type': 'string'}},
+           'severity': {'type': 'array', 'items': {'type': 'string'}},
+           'op': {'enum': ['or', 'and']},
+           'eval_filters': {'type': 'array', 'items': {
+                            'oneOf': [
+                                {'$ref': '#/definitions/filters/valuekv'},
+                                {'$ref': '#/definitions/filters/value'}]}},
+           'states': {'type': 'array',
+                      'default': ['NON_COMPLIANT'],
+                      'items': {
+                          'enum': [
+                              'COMPLIANT',
+                              'NON_COMPLIANT'
+                          ]}}})
+    permissions = ('ssm:ListResourceComplianceSummaries',)
+    annotation = 'c7n:ssm-compliance'
+
+    def process(self, resources, event=None):
+        op = self.data.get('op', 'or') == 'or' and any or all
+        eval_filters = []
+        for f in self.data.get('eval_filters', ()):
+            vf = ValueFilter(f)
+            vf.annotate = False
+            eval_filters.append(vf)
+
+        client = utils.local_session(self.manager.session_factory).client('ssm')
+        filters = [
+            {
+                'Key': 'Status',
+                'Values': self.data['states'],
+                'Type': 'EQUAL'
+            },
+            {
+                'Key': 'ComplianceType',
+                'Values': self.data['compliance_types'],
+                'Type': 'EQUAL'
+            }
+        ]
+        severity = self.data.get('severity')
+        if severity:
+            filters.append(
+                {
+                    'Key': 'OverallSeverity',
+                    'Values': severity,
+                    'Type': 'EQUAL'
+                })
+
+        resource_map = {}
+        pager = client.get_paginator('list_resource_compliance_summaries')
+        for page in pager.paginate(Filters=filters):
+            items = page['ResourceComplianceSummaryItems']
+            for i in items:
+                if not eval_filters:
+                    resource_map.setdefault(
+                        i['ResourceId'], []).append(i)
+                    continue
+                if op([f.match(i) for f in eval_filters]):
+                    resource_map.setdefault(
+                        i['ResourceId'], []).append(i)
+
+        results = []
+        for r in resources:
+            result = resource_map.get(r['InstanceId'])
+            if result:
+                r[self.annotation] = result
+                results.append(r)
+
+        return results
+
+
 @actions.register('set-monitoring')
 class MonitorInstances(BaseAction, StateTransitionFilter):
     """Action on EC2 Instances to enable/disable detailed monitoring

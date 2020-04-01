@@ -21,7 +21,6 @@ import logging
 import os
 import pprint
 import sys
-import time
 
 import six
 import yaml
@@ -31,7 +30,7 @@ from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.schema import ElementSchema, StructureParser, generate
-from c7n.utils import dumps, load_file, local_session, SafeLoader, yaml_dump
+from c7n.utils import load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
 from c7n import provider
 from c7n.resources import load_resources, load_available
@@ -315,19 +314,8 @@ def report(options, policies):
 
 @policy_command
 def logs(options, policies):
-    if len(policies) != 1:
-        log.error("Log subcommand requires exactly one policy")
-        sys.exit(1)
-
-    policy = policies.pop()
-    # initialize policy execution context for access to outputs
-    policy.ctx.initialize()
-
-    for e in policy.get_logs(options.start, options.end):
-        print("%s: %s" % (
-            time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.localtime(e['timestamp'] / 1000)),
-            e['message']))
+    log.warning("logs command has been removed")
+    sys.exit(1)
 
 
 def _schema_get_docstring(starting_class):
@@ -560,14 +548,8 @@ def _metrics_get_endpoints(options):
 
 @policy_command
 def metrics_cmd(options, policies):
-    log.warning("metrics command is deprecated, and will be removed in future")
-    policies = [p for p in policies if p.provider_name == 'aws']
-    start, end = _metrics_get_endpoints(options)
-    data = {}
-    for p in policies:
-        log.info('Getting %s metrics', p)
-        data[p.name] = p.get_metrics(start, end, options.period)
-    print(dumps(data, indent=2))
+    log.warning("metrics command has been removed")
+    sys.exit(1)
 
 
 def version_cmd(options):

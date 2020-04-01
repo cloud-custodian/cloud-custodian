@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "mypublicblock",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 16,
+                    "hour": 18,
+                    "minute": 10,
+                    "second": 48,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "pikachu",
+            "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a"
+        }
+    }
+}
