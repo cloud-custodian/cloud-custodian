@@ -233,8 +233,6 @@ might look like:
             - start
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # note we have to module import for our testing mocks
 import datetime
 import logging

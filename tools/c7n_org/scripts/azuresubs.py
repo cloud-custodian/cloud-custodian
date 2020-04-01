@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-
 import click
 from c7n_azure.session import Session
 from c7n.utils import yaml_dump

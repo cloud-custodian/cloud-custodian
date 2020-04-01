@@ -22,8 +22,6 @@ std logging does default lock acquisition around handler emit).
 also uses a single thread for all outbound. Background thread
 uses a separate session.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from c7n.exceptions import ClientError
 
 import itertools

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from ..azure_common import BaseTest, arm_template, cassette_name
 from mock import patch
 from c7n_azure.resources.generic_arm_resource import GenericArmResource

@@ -16,8 +16,6 @@ Cloud Custodian Lambda Provisioning Support
 
 docs/lambda.rst
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import abc
 import base64
 import hashlib

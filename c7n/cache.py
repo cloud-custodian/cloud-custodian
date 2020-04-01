@@ -14,8 +14,6 @@
 """Provide basic caching services to avoid extraneous queries over
 multiple policies on the same resource type.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from six.moves import cPickle as pickle
 
 import os

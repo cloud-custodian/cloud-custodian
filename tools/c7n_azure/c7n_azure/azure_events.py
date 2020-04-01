@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import six
 from azure.mgmt.eventgrid.models import EventSubscription, EventSubscriptionFilter
 from c7n_azure.session import Session

@@ -18,8 +18,6 @@ a variety of sinks.
 See docs/usage/outputs.rst
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import contextlib
 from datetime import datetime
 import json

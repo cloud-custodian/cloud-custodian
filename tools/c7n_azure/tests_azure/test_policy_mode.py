@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from azure.mgmt.storage.models import StorageAccount
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE

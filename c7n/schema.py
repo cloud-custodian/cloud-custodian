@@ -25,8 +25,6 @@ allowedProperties and enum extension).
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import Counter
 import json
 import inspect

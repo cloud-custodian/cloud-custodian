@@ -18,8 +18,6 @@
 # - lazy load on datetime parse
 # - handle exported log record format
 
-from __future__ import print_function
-
 from datetime import datetime
 
 

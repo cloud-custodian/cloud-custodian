@@ -19,8 +19,6 @@ concurrent.futures implementation over sqs
 Scatter/Gather or Map/Reduce style over two sqs queues.
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import random
 import logging
 import inspect

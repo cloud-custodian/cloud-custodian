@@ -13,8 +13,6 @@
 # limitations under the License.
 """AWS Account as a custodian resource.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import time
 from botocore.exceptions import ClientError

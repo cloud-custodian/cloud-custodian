@@ -7,8 +7,6 @@ data that's enqueued to SQS via :py:meth:`c7n.actions.Notify.send_sqs`.
 Alternatively, with -p|--plain specified, the file will be assumed to be
 JSON data that can be loaded directly.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import argparse
 import base64
 import json

@@ -14,8 +14,6 @@
 """Most tags tests within their corresponding resource tags, we use this
 module to test some universal tagging infrastructure not directly exposed.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import time
 from mock import MagicMock, call
 
