@@ -56,7 +56,7 @@ class DmsEndpoints(QueryResourceManager):
         arn = id = 'EndpointArn'
         name = 'EndpointIdentifier'
         arn_type = 'endpoint'
-        universal_taggable = True
+        universal_taggable = object()
 
     augment = universal_augment
 
