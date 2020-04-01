@@ -93,7 +93,7 @@ class GlueDevEndpoint(QueryResourceManager):
         id = name = 'EndpointName'
         date = 'CreatedTimestamp'
         arn_type = "devEndpoint"
-        universal_taggable = True
+        universal_taggable = object()
 
     permissions = ('glue:GetDevEndpoints',)
     augment = universal_augment
@@ -147,7 +147,7 @@ class GlueJob(QueryResourceManager):
         id = name = 'Name'
         date = 'CreatedOn'
         arn_type = 'job'
-        universal_taggable = True
+        universal_taggable = object()
 
     permissions = ('glue:GetJobs',)
     augment = universal_augment
@@ -178,7 +178,7 @@ class GlueCrawler(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'crawler'
         state_key = 'State'
-        universal_taggable = True
+        universal_taggable = object()
 
     permissions = ('glue:GetCrawlers',)
     augment = universal_augment
@@ -312,7 +312,7 @@ class GlueMLTransform(QueryResourceManager):
         name = 'Name'
         id = 'TransformId'
         arn_type = 'mlTransform'
-        universal_taggable = True
+        universal_taggable = object()
 
     permissions = ('glue:GetMLTransforms',)
     augment = universal_augment
@@ -369,7 +369,7 @@ class GlueTrigger(QueryResourceManager):
         enum_spec = ('get_triggers', 'Triggers', None)
         id = name = 'Name'
         arn_type = 'trigger'
-        universal_taggable = True
+        universal_taggable = object()
 
     permissions = ('glue:GetTriggers',)
     augment = universal_augment
@@ -399,7 +399,7 @@ class GlueWorkflow(QueryResourceManager):
         detail_spec = ('get_workflow', 'Name', None, None)
         id = name = 'Name'
         arn_type = 'workflow'
-        universal_taggable = True
+        universal_taggable = object()
 
     permissions = ('glue:ListWorkflows',)
 
