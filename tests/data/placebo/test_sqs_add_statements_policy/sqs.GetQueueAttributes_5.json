@@ -2,12 +2,12 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:origin-dev-test",
-            "ApproximateNumberOfMessages": "0",
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:origin-dev",
+            "ApproximateNumberOfMessages": "5",
             "ApproximateNumberOfMessagesNotVisible": "0",
             "ApproximateNumberOfMessagesDelayed": "0",
-            "CreatedTimestamp": "1546819890",
-            "LastModifiedTimestamp": "1546819890",
+            "CreatedTimestamp": "1546818761",
+            "LastModifiedTimestamp": "1546818761",
             "VisibilityTimeout": "30",
             "MaximumMessageSize": "262144",
             "MessageRetentionPeriod": "345600",
@@ -15,13 +15,13 @@
             "ReceiveMessageWaitTimeSeconds": "0"
         },
         "ResponseMetadata": {
-            "RequestId": "9ec40ed6-9b05-5346-80d3-582aa8b8e648",
+            "RequestId": "7f5a943e-361d-5c22-bf1d-c2c13ef06563",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "9ec40ed6-9b05-5346-80d3-582aa8b8e648",
-                "date": "Mon, 30 Mar 2020 17:50:53 GMT",
+                "x-amzn-requestid": "7f5a943e-361d-5c22-bf1d-c2c13ef06563",
+                "date": "Wed, 01 Apr 2020 21:25:01 GMT",
                 "content-type": "text/xml",
-                "content-length": "1169"
+                "content-length": "1164"
             },
             "RetryAttempts": 0
         }

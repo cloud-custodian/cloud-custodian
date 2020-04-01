@@ -2,16 +2,16 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"AddedStatement\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\"}]}"
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"AddedStatement\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetqueueAttributes\",\"Resource\":\"https://queue.amazonaws.com/644160558196/test_sqs_add_statements_policy\"}]}"
         },
         "ResponseMetadata": {
-            "RequestId": "3acfd538-75f9-5818-a690-83c4462769be",
+            "RequestId": "1a737a97-7ffd-5a58-ad57-2c6876f39d78",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "3acfd538-75f9-5818-a690-83c4462769be",
-                "date": "Mon, 30 Mar 2020 17:51:26 GMT",
+                "x-amzn-requestid": "1a737a97-7ffd-5a58-ad57-2c6876f39d78",
+                "date": "Wed, 01 Apr 2020 21:25:34 GMT",
                 "content-type": "text/xml",
-                "content-length": "784"
+                "content-length": "889"
             },
             "RetryAttempts": 0
         }

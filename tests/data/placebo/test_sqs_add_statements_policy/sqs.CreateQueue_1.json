@@ -3,11 +3,11 @@
     "data": {
         "QueueUrl": "https://queue.amazonaws.com/644160558196/test_sqs_add_statements_policy",
         "ResponseMetadata": {
-            "RequestId": "db6c2086-00eb-5943-87cd-767a334448e5",
+            "RequestId": "15e36bb0-f4c5-5a38-b0c5-3d4ffc2e6d18",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "db6c2086-00eb-5943-87cd-767a334448e5",
-                "date": "Mon, 30 Mar 2020 17:50:40 GMT",
+                "x-amzn-requestid": "15e36bb0-f4c5-5a38-b0c5-3d4ffc2e6d18",
+                "date": "Wed, 01 Apr 2020 21:24:59 GMT",
                 "content-type": "text/xml",
                 "content-length": "342"
             },

@@ -2,26 +2,27 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:my-c7n-test",
-            "ApproximateNumberOfMessages": "0",
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:resource-changes",
+            "ApproximateNumberOfMessages": "2246",
             "ApproximateNumberOfMessagesNotVisible": "0",
             "ApproximateNumberOfMessagesDelayed": "0",
-            "CreatedTimestamp": "1525459937",
-            "LastModifiedTimestamp": "1532454067",
+            "CreatedTimestamp": "1539916425",
+            "LastModifiedTimestamp": "1539916497",
             "VisibilityTimeout": "30",
             "MaximumMessageSize": "262144",
-            "MessageRetentionPeriod": "345600",
+            "MessageRetentionPeriod": "1209600",
             "DelaySeconds": "0",
+            "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"arn:aws:sqs:us-east-1:644160558196:resource-changes/SQSDefaultPolicy\",\"Statement\":[{\"Sid\":\"AWSEvents_resource-changes_Id319298710029\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"events.amazonaws.com\"},\"Action\":\"sqs:SendMessage\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:resource-changes\",\"Condition\":{\"ArnEquals\":{\"aws:SourceArn\":\"arn:aws:events:us-east-1:644160558196:rule/resource-changes\"}}}]}",
             "ReceiveMessageWaitTimeSeconds": "0"
         },
         "ResponseMetadata": {
-            "RequestId": "019b57bd-37fe-5e0e-812a-014104432cff",
+            "RequestId": "39790f04-f449-52d3-b41a-59fbfca41b92",
             "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "019b57bd-37fe-5e0e-812a-014104432cff",
-                "date": "Mon, 30 Mar 2020 17:50:53 GMT",
+                "x-amzn-requestid": "39790f04-f449-52d3-b41a-59fbfca41b92",
+                "date": "Wed, 01 Apr 2020 21:25:01 GMT",
                 "content-type": "text/xml",
-                "content-length": "1165"
+                "content-length": "1859"
             },
             "RetryAttempts": 0
         }

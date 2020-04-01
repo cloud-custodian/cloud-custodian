@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 
 import json
 
-from c7n.actions import AddPolicyBase, RemovePolicyBase, ModifyPolicyBase
+from c7n.actions import AddPolicyBase, RemovePolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
@@ -211,74 +211,48 @@ class AddPolicyStatements(AddPolicyBase):
                   - type: cross-account
                 actions:
                   - type: add-statements
-                    add-statements: [{
+                    statements: [{
                         "Sid": "AddedPolicy",
                         "Effect": "Allow",
                         "Principal": "*",
                         "Action": ["SNS:GetTopicAttributes"],
-                        "Resource": topic_arn,
+                        "Resource": queue_url,
                         }]
     """
 
-    permissions = ("sqs:SetQueueAttributes", "sqs:GetQueueAttributes")
+    permissions = ("sqs:GetQueueAttributes", "sqs:AddPermission")
 
     def process(self, resources):
         results = []
         client = local_session(self.manager.session_factory).client("sqs")
         for r in resources:
-            policy = json.loads(r.get("Policy") or "{}")
-            policy_statements = policy.setdefault("Statement", [])
-
-            new_policy, added = self.add_statements(policy_statements)
-
-            if not added:
-                continue
-
-            results += {
-                "Name": r["QueueUrl"],
-                "State": "PolicyModified",
-                "Statements": new_policy,
-            }
-            policy["Statement"] = new_policy
-            client.set_queue_attributes(
-                QueueUrl=r["QueueUrl"], Attributes={"Policy": json.dumps(policy),}
-            )
-
+            try:
+                results += filter(None, [self.process_resource(client, r)])
+            except Exception:
+                self.log.exception("Error processing sqs:%s", r["QueueUrl"])
         return results
 
+    def process_resource(self, client, resource):
+        policy = json.loads(resource.get("Policy") or "{}")
+        if policy is None:
+            return
 
-@SQS.action_registry.register("modify-policy")
-class ModifyPolicyStatement(ModifyPolicyBase):
-    permissions = ("sqs:SetQueueAttributes", "sqs:GetQueueAttributes")
+        statements = policy.get("Statement", [])
+        new_policy, added = self.add_statements(statements)
 
-    def process(self, resources):
-        results = []
-        client = local_session(self.manager.session_factory).client("sqs")
-        for r in resources:
-            policy = json.loads(r.get("Policy") or "{}")
-            policy_statements = policy.setdefault("Statement", [])
+        if not added:
+            return
 
-            new_policy, removed = self.remove_statements(
-                policy_statements, r, CrossAccountAccessFilter.annotation_key
-            )
-            if new_policy is None:
-                new_policy = policy_statements
-            new_policy, added = self.add_statements(new_policy)
+        policy["Statement"] = new_policy
+        client.set_queue_attributes(
+            QueueUrl=resource["QueueUrl"], Attributes={"Policy": json.dumps(policy),}
+        )
 
-            if not removed or not added:
-                continue
-
-            results += {
-                "Name": r["QueueUrl"],
-                "State": "PolicyModified",
-                "Statements": new_policy,
-            }
-            policy["Statement"] = new_policy
-            client.set_queue_attributes(
-                QueueUrl=r["QueueUrl"], Attributes={"Policy": json.dumps(policy),}
-            )
-
-        return results
+        return {
+            "Name": resource["QueueUrl"],
+            "State": "PolicyAdded",
+            "Statements": added,
+        }
 
 
 @SQS.action_registry.register("delete")
