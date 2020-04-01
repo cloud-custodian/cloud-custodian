@@ -22,7 +22,7 @@ custodian = 'c7n.cli:main'
 
 [tool.poetry.dependencies]
 python = "^3.6"
-boto3 = "^1.11.12"
+boto3 = "^1.12.31"
 jsonschema = "^3.2.0"
 argcomplete = "^1.11.1"
 python-dateutil = "^2.8.1"

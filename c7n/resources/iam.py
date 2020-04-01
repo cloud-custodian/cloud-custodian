@@ -466,7 +466,7 @@ class ServiceUsage(Filter):
                 saf_matches = saf.process(saf_results)
                 if match_operator == 'all' and len(saf_matches) == len(saf_results):
                     results.append(r)
-                elif saf_matches:
+                elif match_operator != 'all' and saf_matches:
                     results.append(r)
 
             time.sleep(self.data.get('poll-delay', 2))
