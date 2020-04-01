@@ -18,7 +18,7 @@ import json
 import time
 
 
-class TestSqs(object):
+class TestSqs:
 
     @functional
     def test_sqs_delete(self, test):

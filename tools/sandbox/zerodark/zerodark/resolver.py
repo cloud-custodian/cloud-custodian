@@ -20,7 +20,7 @@ import sqlite3
 from .utils import row_factory
 
 
-class IPResolver(object):
+class IPResolver:
     """Resolve as much info as we can about a given ip.
 
     Typically this is a two level lookup.

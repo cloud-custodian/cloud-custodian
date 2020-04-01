@@ -24,7 +24,7 @@ pbm = 'c7n_mailer.splunk_delivery'
 pb = '%s.SplunkHecDelivery' % pbm
 
 
-class DeliveryTester(object):
+class DeliveryTester:
 
     def setup(self):
         self.mock_sess = Mock()

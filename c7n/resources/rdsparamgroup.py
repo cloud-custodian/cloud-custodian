@@ -67,13 +67,13 @@ class RDSClusterParamGroup(QueryResourceManager):
     action_registry = pg_cluster_actions
 
 
-class PGMixin(object):
+class PGMixin:
 
     def get_pg_name(self, pg):
         return pg['DBParameterGroupName']
 
 
-class PGClusterMixin(object):
+class PGClusterMixin:
 
     def get_pg_name(self, pg):
         return pg['DBClusterParameterGroupName']

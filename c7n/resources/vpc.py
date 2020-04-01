@@ -516,7 +516,7 @@ class SecurityGroupDiffFilter(Diff):
         return differ.diff(source, target)
 
 
-class SecurityGroupDiff(object):
+class SecurityGroupDiff:
     """Diff two versions of a security group
 
     Immutable: GroupId, GroupName, Description, VpcId, OwnerId
@@ -623,7 +623,7 @@ class SecurityGroupApplyPatch(BaseAction):
             patcher.apply_delta(client, r, d)
 
 
-class SecurityGroupPatch(object):
+class SecurityGroupPatch:
 
     RULE_TYPE_MAP = {
         'egress': ('IpPermissionsEgress',

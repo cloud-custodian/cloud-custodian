@@ -23,7 +23,7 @@ clouds = PluginRegistry('c7n.providers')
 
 
 @six.add_metaclass(abc.ABCMeta)
-class Provider(object):
+class Provider:
     """Provider Base Class"""
 
     @abc.abstractproperty

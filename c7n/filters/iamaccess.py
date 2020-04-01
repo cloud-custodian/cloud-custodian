@@ -55,7 +55,7 @@ def _account(arn):
     return arn.split(':', 5)[4]
 
 
-class PolicyChecker(object):
+class PolicyChecker:
     """
     checker_config:
       - check_actions: only check one of the specified actions

@@ -96,7 +96,7 @@ class Snapshot(QueryResourceManager):
         return []
 
 
-class ErrorHandler(object):
+class ErrorHandler:
 
     @staticmethod
     def remove_snapshot(rid, resource_set):

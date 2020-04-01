@@ -25,7 +25,7 @@ from ruamel import yaml
 logger = logging.getLogger(__name__)
 
 
-class MailerTester(object):
+class MailerTester:
 
     def __init__(self, msg_file, config, msg_plain=False, json_dump_file=None):
         if not os.path.exists(msg_file):

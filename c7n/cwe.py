@@ -15,7 +15,7 @@ import jmespath
 import six
 
 
-class CloudWatchEvents(object):
+class CloudWatchEvents:
     """A mapping of events to resource types."""
 
     # **These are just shortcuts**, you can use the policy definition to

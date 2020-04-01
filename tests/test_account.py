@@ -58,7 +58,7 @@ class AccountTests(BaseTest):
 
         session_factory = self.replay_flight_data('test_account_missing_region_resource')
 
-        class SessionFactory(object):
+        class SessionFactory:
 
             def __init__(self, options):
                 self.region = options.region

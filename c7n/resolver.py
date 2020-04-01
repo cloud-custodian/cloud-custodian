@@ -30,7 +30,7 @@ log = logging.getLogger('custodian.resolver')
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 
-class URIResolver(object):
+class URIResolver:
 
     def __init__(self, session_factory, cache):
         self.session_factory = session_factory
@@ -73,7 +73,7 @@ class URIResolver(object):
             return body.decode('utf-8')
 
 
-class ValuesFrom(object):
+class ValuesFrom:
     """Retrieve values from a url.
 
     Supports json, csv and line delimited text files and expressions

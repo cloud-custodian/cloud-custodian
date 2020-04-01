@@ -71,7 +71,7 @@ ASG.filter_registry.register('marked-for-op', TagActionFilter)
 ASG.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
-class LaunchInfo(object):
+class LaunchInfo:
 
     permissions = ("ec2:DescribeLaunchTemplateVersions",
                    "autoscaling:DescribeLaunchConfigurations",)

@@ -46,7 +46,7 @@ def factory(config):
     return FileCacheManager(config)
 
 
-class NullCache(object):
+class NullCache:
 
     def __init__(self, config):
         self.config = config
@@ -64,7 +64,7 @@ class NullCache(object):
         return 0
 
 
-class InMemoryCache(object):
+class InMemoryCache:
     # Running in a temporary environment, so keep as a cache.
 
     __shared_state = {}
@@ -85,7 +85,7 @@ class InMemoryCache(object):
         return sum(map(len, self.data.values()))
 
 
-class FileCacheManager(object):
+class FileCacheManager:
 
     def __init__(self, config):
         self.config = config

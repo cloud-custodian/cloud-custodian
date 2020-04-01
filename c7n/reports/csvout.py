@@ -143,7 +143,7 @@ def _get_values(record, field_list, tag_map):
     return vals
 
 
-class Formatter(object):
+class Formatter:
 
     def __init__(self, resource_type, extra_fields=(), include_default_fields=True,
                  include_region=False, include_policy=False, fields=()):

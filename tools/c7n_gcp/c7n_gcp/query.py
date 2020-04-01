@@ -29,7 +29,7 @@ from c7n.utils import local_session
 log = logging.getLogger('c7n_gcp.query')
 
 
-class ResourceQuery(object):
+class ResourceQuery:
 
     def __init__(self, session_factory):
         self.session_factory = session_factory
@@ -74,7 +74,7 @@ class ResourceQuery(object):
 
 
 @sources.register('describe-gcp')
-class DescribeSource(object):
+class DescribeSource:
 
     def __init__(self, manager):
         self.manager = manager
@@ -258,7 +258,7 @@ class TypeMeta(type):
 
 
 @six.add_metaclass(TypeMeta)
-class TypeInfo(object):
+class TypeInfo:
 
     # api client construction information
     service = None
@@ -305,7 +305,7 @@ def extract_error(e):
     return ERROR_REASON.search(edata)
 
 
-class GcpLocation(object):
+class GcpLocation:
     """
     The `_locations` dict is formed by the string keys representing locations taken from
     `KMS <https://cloud.google.com/kms/docs/reference/rest/v1/projects.locations/list>`_ and

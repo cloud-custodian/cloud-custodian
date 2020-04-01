@@ -141,7 +141,7 @@ def cli():
     """custodian organization multi-account runner."""
 
 
-class LogFilter(object):
+class LogFilter:
     """We want to keep the main c7n-org cli output to be readable.
 
     We previously did so via squelching custodian's log output via

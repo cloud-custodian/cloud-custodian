@@ -749,7 +749,7 @@ class DefaultVpc(DefaultVpcBase):
         return elb.get('VPCId') and self.match(elb.get('VPCId')) or False
 
 
-class ELBAttributeFilterBase(object):
+class ELBAttributeFilterBase:
     """ Mixin base class for filters that query LB attributes.
     """
 

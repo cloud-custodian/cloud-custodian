@@ -1286,7 +1286,7 @@ class S3Test(BaseTest):
         client.create_bucket(Bucket=bname)
         self.addCleanup(destroyBucket, client, bname)
 
-        class wrapper(object):
+        class wrapper:
 
             def __init__(self, d, length):
                 self.d = d

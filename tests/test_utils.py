@@ -380,7 +380,7 @@ class UtilTest(BaseTest):
         # Not a real schema, just doing a smoke test of the function
         # properties = 'target'
 
-        class FakeResource(object):
+        class FakeResource:
             schema = {
                 "additionalProperties": False,
                 "properties": {

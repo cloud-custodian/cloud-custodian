@@ -466,7 +466,7 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
     return vocabulary
 
 
-class ElementSchema(object):
+class ElementSchema:
     """Utility functions for working with resource's filters and actions.
     """
 

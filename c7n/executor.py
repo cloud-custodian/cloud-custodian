@@ -16,7 +16,7 @@ from concurrent.futures import (ProcessPoolExecutor, ThreadPoolExecutor)  # noqa
 import threading
 
 
-class MainThreadExecutor(object):
+class MainThreadExecutor:
     """ For running tests.
 
     c7n_async == True  -> catch exceptions and store them in the future.
@@ -49,7 +49,7 @@ class MainThreadExecutor(object):
         return False
 
 
-class MainThreadFuture(object):
+class MainThreadFuture:
     # For Dev/Unit Testing with concurrent.futures
 
     def __init__(self, value, exception=None):

@@ -30,7 +30,7 @@ USE_STS_REGIONAL = os.environ.get(
     'C7N_USE_STS_REGIONAL', '').lower() in ('yes', 'true')
 
 
-class SessionFactory(object):
+class SessionFactory:
 
     def __init__(self, region, profile=None, assume_role=None, external_id=None):
         self.region = region

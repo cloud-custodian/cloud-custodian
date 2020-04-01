@@ -41,7 +41,7 @@ skip_if_not_validating = unittest.skipIf(
 functional = pytest.mark.functional
 
 
-class CustodianTestCore(object):
+class CustodianTestCore:
 
     custodian_schema = None
     # thread local? tests are single threaded, multiprocess execution

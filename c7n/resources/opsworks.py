@@ -20,7 +20,7 @@ from c7n.utils import local_session, type_schema
 from c7n import utils
 
 
-class StateTransitionFilter(object):
+class StateTransitionFilter:
     """Filter instances by state.
 
     Try to simplify construction for policy authors by automatically

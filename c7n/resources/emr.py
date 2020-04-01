@@ -242,7 +242,7 @@ class Terminate(BaseAction):
 EMR_VALID_FILTERS = set(('CreatedAfter', 'CreatedBefore', 'ClusterStates'))
 
 
-class QueryFilter(object):
+class QueryFilter:
 
     @classmethod
     def parse(cls, data):

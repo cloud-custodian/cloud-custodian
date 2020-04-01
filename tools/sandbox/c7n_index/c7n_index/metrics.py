@@ -113,7 +113,7 @@ retry = get_retry(('Throttling',), log_retries=True)
 indexers = PluginRegistry('policy-metrics-indexers')
 
 
-class Indexer(object):
+class Indexer:
     """ Metrics indexer
     """
 

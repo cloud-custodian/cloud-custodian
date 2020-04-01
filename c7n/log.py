@@ -43,7 +43,7 @@ SHUTDOWN_MARKER = object()
 EMPTY = Queue.Empty
 
 
-class Error(object):
+class Error:
 
     AlreadyAccepted = "DataAlreadyAcceptedException"
     InvalidToken = "InvalidSequenceTokenException"
@@ -163,7 +163,7 @@ class CloudWatchLogHandler(logging.Handler):
         self.buf = []
 
 
-class Transport(object):
+class Transport:
 
     def __init__(self, queue, batch_size, batch_interval, session_factory):
         self.queue = queue

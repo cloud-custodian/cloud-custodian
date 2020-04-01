@@ -173,7 +173,7 @@ class Reservation(Bag):
     pass
 
 
-class Client(object):
+class Client:
 
     def __init__(self, instances):
         self.instances = instances

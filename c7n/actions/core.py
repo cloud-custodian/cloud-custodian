@@ -56,7 +56,7 @@ class ActionRegistry(PluginRegistry):
         return action_class(data, manager)
 
 
-class Action(object):
+class Action:
 
     permissions = ()
     metrics = ()

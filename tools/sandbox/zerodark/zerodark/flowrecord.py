@@ -27,7 +27,7 @@ SKIPDATA = 'SKIPDATA'
 NODATA = 'NODATA'
 
 
-class FlowRecord(object):
+class FlowRecord:
     """
     Given a VPC Flow Logs event dictionary, returns a Python object whose
     attributes match the field names in the event record. Integers are stored

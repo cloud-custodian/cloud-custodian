@@ -59,7 +59,7 @@ class JobDefinition(QueryResourceManager):
             'describe_job_definitions', 'jobDefinitions', None)
 
 
-class StateTransitionFilter(object):
+class StateTransitionFilter:
     """Filter resources by state.
 
     Try to simplify construction for policy authors by automatically

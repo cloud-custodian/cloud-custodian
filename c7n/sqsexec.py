@@ -99,7 +99,7 @@ class SQSExecutor(Executor):
         return False
 
 
-class MessageIterator(object):
+class MessageIterator:
 
     msg_attributes = ['sequence_id', 'op', 'ser']
 
@@ -136,7 +136,7 @@ class MessageIterator(object):
             ReceiptHandle=m['ReceiptHandle'])
 
 
-class SQSWorker(object):
+class SQSWorker:
 
     stopped = False
 

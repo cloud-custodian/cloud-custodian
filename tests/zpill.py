@@ -292,7 +292,7 @@ class PillTest(CustodianTestCore):
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)
 
-        class FakeFactory(object):
+        class FakeFactory:
 
             def __call__(fake, region=None, assume=None):
                 new_session = None

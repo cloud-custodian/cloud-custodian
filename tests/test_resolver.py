@@ -26,7 +26,7 @@ from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
 
 
-class FakeCache(object):
+class FakeCache:
 
     def __init__(self):
         self.state = {}
@@ -38,7 +38,7 @@ class FakeCache(object):
         self.state[key] = data
 
 
-class FakeResolver(object):
+class FakeResolver:
 
     def __init__(self, contents):
         if isinstance(contents, binary_type):

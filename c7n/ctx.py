@@ -28,7 +28,7 @@ from c7n.utils import reset_session_cache, dumps, local_session
 from c7n.version import version
 
 
-class ExecutionContext(object):
+class ExecutionContext:
     """Policy Execution Context."""
 
     def __init__(self, session_factory, policy, options):

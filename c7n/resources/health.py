@@ -105,7 +105,7 @@ HEALTH_VALID_FILTERS = {
 }
 
 
-class QueryFilter(object):
+class QueryFilter:
 
     @classmethod
     def parse(cls, data):

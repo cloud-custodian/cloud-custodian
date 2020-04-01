@@ -16,7 +16,7 @@ from c7n import executor
 import unittest
 
 
-class Foo(object):
+class Foo:
 
     def __init__(self, state):
         self.state = state
@@ -36,7 +36,7 @@ class Foo(object):
         return args, kw
 
 
-class ExecutorBase(object):
+class ExecutorBase:
 
     def test_map_instance(self):
         with self.executor_factory(max_workers=3) as w:

@@ -41,7 +41,7 @@ class DummyResource(manager.ResourceManager):
     @property
     def actions(self):
 
-        class _a(object):
+        class _a:
 
             def name(self):
                 return self.f.__name__

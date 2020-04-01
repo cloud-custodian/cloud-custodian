@@ -26,7 +26,7 @@ from dateutil.tz import gettz, tzutc
 from ruamel import yaml
 
 
-class Providers(object):
+class Providers:
     AWS = 0
     Azure = 1
 

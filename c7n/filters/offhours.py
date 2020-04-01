@@ -519,7 +519,7 @@ class OnHour(Time):
         return default
 
 
-class ScheduleParser(object):
+class ScheduleParser:
     """Parses tag values for custom on/off hours schedules.
 
     At the minimum the ``on`` and ``off`` values are required. Each of

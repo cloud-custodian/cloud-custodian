@@ -78,7 +78,7 @@ class DescribeTable(query.DescribeSource):
             super(DescribeTable, self).augment(resources))
 
 
-class StatusFilter(object):
+class StatusFilter:
     """Filter tables by status"""
 
     valid_states = ()

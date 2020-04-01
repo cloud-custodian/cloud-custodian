@@ -28,7 +28,7 @@ except ImportError:
 from c7n.utils import dumps
 
 
-class ResourceManager(object):
+class ResourceManager:
     """
     A Cloud Custodian resource
     """

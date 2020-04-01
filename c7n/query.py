@@ -38,14 +38,14 @@ try:
     from botocore.paginate import PageIterator, Paginator
 except ImportError:
     # Likely using another provider in a serverless environment
-    class PageIterator(object):
+    class PageIterator:
         pass
 
-    class Paginator(object):
+    class Paginator:
         pass
 
 
-class ResourceQuery(object):
+class ResourceQuery:
 
     def __init__(self, session_factory):
         self.session_factory = session_factory
@@ -213,7 +213,7 @@ sources = PluginRegistry('sources')
 
 
 @sources.register('describe')
-class DescribeSource(object):
+class DescribeSource:
 
     resource_query_factory = ResourceQuery
 
@@ -279,7 +279,7 @@ class ChildDescribeSource(DescribeSource):
 
 
 @sources.register('config')
-class ConfigSource(object):
+class ConfigSource:
 
     retry = staticmethod(get_retry(('ThrottlingException',)))
 
@@ -563,7 +563,7 @@ class QueryResourceManager(ResourceManager):
         return self._generate_arn
 
 
-class MaxResourceLimit(object):
+class MaxResourceLimit:
 
     C7N_MAXRES_OP = os.environ.get("C7N_MAXRES_OP", 'or')
 
@@ -700,7 +700,7 @@ class TypeMeta(type):
 
 
 @six.add_metaclass(TypeMeta)
-class TypeInfo(object):
+class TypeInfo:
     """Resource Type Metadata"""
 
     ###########

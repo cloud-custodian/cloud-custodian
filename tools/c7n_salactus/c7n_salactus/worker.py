@@ -410,7 +410,7 @@ def dispatch_object_source(client, account_info, bid, bucket_info):
         invoke(process_bucket_iterator, bid)
 
 
-class CharSet(object):
+class CharSet:
     """Sets of character/gram populations for the ngram partition strategy.
     """
     hex_lower = set(string.hexdigits.lower())
@@ -434,7 +434,7 @@ class CharSet(object):
             cls.ascii_alphanum]
 
 
-class Strategy(object):
+class Strategy:
     """ Partitioning strategy for an s3 bucket.
     """
 

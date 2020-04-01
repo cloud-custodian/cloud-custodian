@@ -24,7 +24,7 @@ from c7n_azure.utils import ResourceIdParser, StringUtils
 from c7n.utils import local_session
 
 
-class FunctionAppUtilities(object):
+class FunctionAppUtilities:
     log = logging.getLogger('custodian.azure.function_app_utils')
 
     class FunctionAppInfrastructureParameters:

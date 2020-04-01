@@ -562,7 +562,7 @@ def get_proxy_url(url):
     return None
 
 
-class FormatDate(object):
+class FormatDate:
     """a datetime wrapper with extended pyformat syntax"""
 
     date_increment = re.compile(r'\+[0-9]+[Mdh]')
@@ -598,7 +598,7 @@ class FormatDate(object):
         return d.__format__(fmt)
 
 
-class QueryParser(object):
+class QueryParser:
 
     QuerySchema = {}
     type_name = ''

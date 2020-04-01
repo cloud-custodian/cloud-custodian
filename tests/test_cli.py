@@ -442,7 +442,7 @@ class TabCompletionTest(CliTest):
 
     def test_schema_completer_wrapper(self):
 
-        class MockArgs(object):
+        class MockArgs:
             summary = False
 
         args = MockArgs()
@@ -609,7 +609,7 @@ class MetricsTest(CliTest):
         #
         # Test for defaults when --start is not supplied
         #
-        class FakeOptions(object):
+        class FakeOptions:
             start = end = None
             days = 5
 

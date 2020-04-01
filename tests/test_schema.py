@@ -542,10 +542,10 @@ class SchemaTest(BaseTest):
 
     def test_element_doc(self):
 
-        class A(object):
+        class A:
             pass
 
-        class B(object):
+        class B:
             """Hello World
 
             xyz

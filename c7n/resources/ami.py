@@ -72,7 +72,7 @@ class DescribeImageSource(DescribeSource):
         return []
 
 
-class ErrorHandler(object):
+class ErrorHandler:
 
     @staticmethod
     def extract_bad_ami(e):

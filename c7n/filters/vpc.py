@@ -18,7 +18,7 @@ from .core import Filter, ValueFilter
 from .related import RelatedResourceFilter
 
 
-class MatchResourceValidator(object):
+class MatchResourceValidator:
 
     def validate(self):
         if self.data.get('match-resource'):

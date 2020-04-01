@@ -24,7 +24,7 @@ name = "WatchFolk"
 """
 
 
-class GitRepo(object):
+class GitRepo:
 
     def __init__(self, repo_path, git_config=None):
         self.repo_path = repo_path
