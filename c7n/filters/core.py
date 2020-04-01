@@ -220,11 +220,6 @@ class Filter:
         if not values and block_op != 'or':
             return
 
-        r_matched = r.setdefault(self.matched_annotation_key, [])
-        for k in values:
-            if k not in r_matched:
-                r_matched.append(k)
-
 
 def intersect_list(a, b):
     if b is None:
