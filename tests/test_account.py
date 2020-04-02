@@ -858,13 +858,11 @@ class AccountTests(BaseTest):
                     'CatalogEncryptionMode': 'DISABLED'},
                 ],
                 "actions": [{
-                    "type": "update-glue-datacatalog-encryption",
+                    "type": "set-glue-catalog-encryption",
                     "attributes": {
-                        "DataCatalogEncryptionSettings": {
-                            "EncryptionAtRest": {
-                                "CatalogEncryptionMode": "SSE-KMS",
-                                "SseAwsKmsKeyId": "alias/aws/glue"},
-                        },
+                        "EncryptionAtRest": {
+                            "CatalogEncryptionMode": "SSE-KMS",
+                            "SseAwsKmsKeyId": "alias/aws/glue"},
                     },
                 }]
             },

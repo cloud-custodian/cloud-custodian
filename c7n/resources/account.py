@@ -1455,7 +1455,7 @@ class GlueEncryptionEnabled(MultiAttrFilter):
         return resource[self.annotation]
 
 
-@actions.register('update-glue-datacatalog-encryption')
+@actions.register('set-glue-catalog-encryption')
 class GlueDataCatalogEncryption(BaseAction):
     """Modifies glue data catalog encryption based on specified
     parameter.
@@ -1471,27 +1471,28 @@ class GlueDataCatalogEncryption(BaseAction):
                   - type: glue-security-config
                     CatalogEncryptionMode: DISABLED
                 actions:
-                  - type: update-glue-datacatalog-encryption
+                  - type: set-glue-catalog-encryption
                     attributes:
-                        DataCatalogEncryptionSettings:
-                            EncryptionAtRest:
-                                CatalogEncryption: SSE-KMS
-                                SseAwsKmsKeyId: alias/aws/glue
+                        EncryptionAtRest:
+                            CatalogEncryption: SSE-KMS
+                            SseAwsKmsKeyId: alias/aws/glue
     """
 
     schema = type_schema(
-        'update-glue-datacatalog-encryption',
-        attributes={'type': 'object'},
+        'set-glue-catalog-encryption',
+        attributes={'type': 'object', "minItems": 1},
         required=('attributes',))
 
     permissions = ('glue:PutDataCatalogEncryptionSettings',)
     shape = 'PutDataCatalogEncryptionSettingsRequest'
 
     def validate(self):
-        attrs = dict(self.data['attributes'])
+        attrs = {}
+        attrs['DataCatalogEncryptionSettings'] = self.data['attributes']
         return shape_validate(attrs, self.shape, 'glue')
 
     def process(self, catalog):
         client = local_session(self.manager.session_factory).client('glue')
         # there is one glue data catalog per account
-        client.put_data_catalog_encryption_settings(**self.data['attributes'])
+        client.put_data_catalog_encryption_settings(
+            DataCatalogEncryptionSettings=self.data['attributes'])
