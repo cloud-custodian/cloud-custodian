@@ -70,15 +70,15 @@ class TestFilter(unittest.TestCase):
         filter_instance2.get_block_operator = lambda: 'and'
 
         resource1 = {'Arn': 'arn:aws:iam::123456789012:user/zscholl',
-        'CreateDate': datetime(2020, 1, 2, 17, 53, 23, 976000, tzinfo=tz.tzutc()),
-        'Path': '/',
-        'UserId': 'xafegj4qjwfl3mpuvyj5',
-        'UserName': 'zscholl'}
+                     'CreateDate': datetime(2020, 1, 2, 17, 53, 23, 976000, tzinfo=tz.tzutc()),
+                     'Path': '/',
+                     'UserId': 'xafegj4qjwfl3mpuvyj5',
+                     'UserName': 'zscholl'}
         resource2 = {'Arn': 'arn:aws:iam::123456789012:user/zscholl',
-        'CreateDate': datetime(2020, 1, 2, 17, 53, 23, 976000, tzinfo=tz.tzutc()),
-        'Path': '/',
-        'UserId': 'xafegj4qjwfl3mpuvyj5',
-        'UserName': 'zscholl'}
+                     'CreateDate': datetime(2020, 1, 2, 17, 53, 23, 976000, tzinfo=tz.tzutc()),
+                     'Path': '/',
+                     'UserId': 'xafegj4qjwfl3mpuvyj5',
+                     'UserName': 'zscholl'}
 
         value1 = {'active': True, 'c7n:match-type': 'credential',
                  'last_rotated': '2019-01-04T17:53:24+00:00',
