@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "DataCatalogEncryptionSettings": {
+            "EncryptionAtRest": {
+                "CatalogEncryptionMode": "SSE-KMS",
+                "SseAwsKmsKeyId": "alias/aws/glue"
+            },
+            "ConnectionPasswordEncryption": {
+                "ReturnConnectionPasswordEncrypted": false
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "5b3cb1f2-7018-4a15-ac6e-6c6fcf1b90c4",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 02 Apr 2020 05:27:31 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "199",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "5b3cb1f2-7018-4a15-ac6e-6c6fcf1b90c4"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

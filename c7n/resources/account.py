@@ -19,7 +19,7 @@ import json
 import time
 from botocore.exceptions import ClientError
 from datetime import datetime, timedelta
-
+from .aws import shape_validate
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
@@ -1453,3 +1453,45 @@ class GlueEncryptionEnabled(MultiAttrFilter):
                 return []
             resource[self.annotation][kmskey] = self.data[kmskey]
         return resource[self.annotation]
+
+
+@actions.register('update-glue-datacatalog-encryption')
+class GlueDataCatalogEncryption(BaseAction):
+    """Modifies glue data catalog encryption based on specified
+    parameter.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: data-catalog-encryption
+                resource: account
+                filters:
+                  - type: glue-security-config
+                    CatalogEncryptionMode: DISABLED
+                actions:
+                  - type: update-glue-datacatalog-encryption
+                    attributes:
+                        DataCatalogEncryptionSettings:
+                            EncryptionAtRest:
+                                CatalogEncryption: SSE-KMS
+                                SseAwsKmsKeyId: alias/aws/glue
+    """
+
+    schema = type_schema(
+        'update-glue-datacatalog-encryption',
+        attributes={'type': 'object'},
+        required=('attributes',))
+
+    permissions = ('glue:PutDataCatalogEncryptionSettings',)
+    shape = 'PutDataCatalogEncryptionSettingsRequest'
+
+    def validate(self):
+        attrs = dict(self.data['attributes'])
+        return shape_validate(attrs, self.shape, 'glue')
+
+    def process(self, catalog):
+        client = local_session(self.manager.session_factory).client('glue')
+        # there is one glue data catalog per account
+        client.put_data_catalog_encryption_settings(**self.data['attributes'])
