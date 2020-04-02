@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
 import unittest
+import jinja2
+import logging
 from mock import Mock, patch
 
 from c7n_mailer import utils
-
+from common import MAILER_CONFIG, SQS_MESSAGE_1, RESOURCE_1
 
 class FormatStruct(unittest.TestCase):
 
@@ -282,3 +285,60 @@ class DecryptTests(unittest.TestCase):
     def test_decrypt_none(self):
         self.assertEqual(utils.decrypt({'queue_url': 'aws'}, Mock(), Mock(), 'test'), None)
         self.assertEqual(utils.decrypt({'queue_url': 'asq://'}, Mock(), Mock(), 'test'), None)
+
+class OtherTests(unittest.TestCase):
+
+    def test_config_defaults(self):
+        config = MAILER_CONFIG
+        utils.setup_defaults(config)
+        self.assertEqual(
+            [
+                config.get('region'),
+                config.get('ses_region'),
+                config.get('memory'),
+                config.get('runtime'),
+                config.get('timeout'),
+                config.get('subnets'),
+                config.get('security_groups'),
+                config.get('contact_tags'),
+                config.get('ldap_uri'),
+                config.get('ldap_bind_dn'),
+                config.get('ldap_bind_user'),
+                config.get('ldap_bind_password'),
+                config.get('datadog_api_key'),
+                config.get('slack_token'),
+                config.get('slack_webhook'),
+                config.get('queue_url')
+            ], 
+            [
+                'us-east-1',
+                config.get('region'),
+                1024,
+                'python2.7',
+                300, 
+                None,
+                None,
+                MAILER_CONFIG['contact_tags'],
+                MAILER_CONFIG['ldap_uri'],
+                None,
+                None,
+                None,
+                None, 
+                None,
+                None,
+                MAILER_CONFIG['queue_url']
+            ]
+        )
+    
+    def test_get_jinja_env(self):
+        env = utils.get_jinja_env(MAILER_CONFIG['templates_folders'])
+        self.assertEqual(env.__class__, jinja2.environment.Environment)
+
+    def test_get_rendered_jinja(self):
+        template_abs_filename = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                             'example.jinja')
+        template_abs_filename = template_abs_filename.replace('\\', '/')
+        SQS_MESSAGE_1['action']['template'] = template_abs_filename
+        body = utils.get_rendered_jinja(
+            ["test@test.com"], SQS_MESSAGE_1, [RESOURCE_1], logging.getLogger('c7n_mailer.utils.email'),
+                'template', 'default', MAILER_CONFIG['templates_folders'])
