@@ -100,7 +100,6 @@ class TestFilter(unittest.TestCase):
         self.assertEqual(resource1, resource2)
 
 
-
 class TestOrFilter(unittest.TestCase):
 
     def test_or(self):
