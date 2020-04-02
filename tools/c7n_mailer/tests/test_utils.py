@@ -26,6 +26,21 @@ class StripPrefix(unittest.TestCase):
         self.assertEqual(utils.strip_prefix('', 'aws.'), '')
 
 
+def test_config_defaults():
+    config = {}
+    utils.setup_defaults(config)
+    for k, v in list(config.items()):
+        if v is None:
+            config.pop(k)
+    assert config == dict(
+        region='us-east-1',
+        ses_region='us-east-1',
+        memory=1024,
+        timeout=300,
+        runtime='python3.7',
+        contact_tags=[])
+
+
 class GetResourceTagTargets(unittest.TestCase):
 
     def test_target_tag_list(self):
