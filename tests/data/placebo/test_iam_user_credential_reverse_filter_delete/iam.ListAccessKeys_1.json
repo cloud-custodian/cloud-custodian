@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "AccessKeyMetadata": [
+            {
+                "UserName": "zscholl",
+                "AccessKeyId": "AKIAJEZJDQQX4TZNRMKQ",
+                "Status": "Active",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 9,
+                    "day": 25,
+                    "hour": 10,
+                    "minute": 52,
+                    "second": 11,
+                    "microsecond": 0
+                }
+            },
+            {
+                "UserName": "zscholl",
+                "AccessKeyId": "AKIAIFX6HPKAM5F7JVAA",
+                "Status": "Active",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 11,
+                    "minute": 12,
+                    "second": 31,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {
+            "RequestId": "f0df3074-f5e3-11e8-8700-7f377c0f7a24",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "f0df3074-f5e3-11e8-8700-7f377c0f7a24",
+                "content-type": "text/xml",
+                "content-length": "761",
+                "date": "Thu, 02 Apr 2020 16:19:57 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

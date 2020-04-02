@@ -117,6 +117,36 @@ class UserCredentialReportTest(BaseTest):
             p.resource_manager.get_arns(resources),
             ["arn:aws:iam::644160558196:user/kapil"])
 
+    def test_credential_access_key_reverse_filter_delete(self):
+        factory = self.replay_flight_data(
+            'test_iam_user_credential_reverse_filter_delete'
+        )
+        p = self.load_policy({
+            'name': 'user-cred-multi-reverse',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'zscholl'},
+                {"type": "credential",
+                 "report_max_age": 1585865564,
+                 "key": "access_keys.last_used_date",
+                 "value": 90,
+                 'op': 'gte',
+                 "value_type": "age"},
+                {"type": "credential",
+                 "report_max_age": 1585865564,
+                 "key": "access_keys.last_rotated",
+                 "value": 90,
+                 "op": "gte",
+                 'value_type': 'age'}],
+            'actions': [
+                {'type': 'remove-keys',
+                 'disable': True,
+                 'matched': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
+
     def test_access_key_last_service(self):
         # Note we're reusing the old console users flight records
         session_factory = self.replay_flight_data("test_iam_user_console_old")
