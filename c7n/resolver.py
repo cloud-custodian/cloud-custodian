@@ -37,6 +37,10 @@ class URIResolver:
         self.cache = cache
 
     def resolve(self, uri):
+        contents = self.cache.get(("uri-resolver", uri))
+        if contents is not None:
+            return contents
+
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
         else:
