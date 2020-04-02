@@ -1458,7 +1458,7 @@ class GlueEncryptionEnabled(MultiAttrFilter):
 @actions.register('set-glue-catalog-encryption')
 class GlueDataCatalogEncryption(BaseAction):
     """Modifies glue data catalog encryption based on specified
-    parameter.
+    parameter
 
     :example:
 
