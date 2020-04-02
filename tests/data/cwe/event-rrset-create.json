@@ -1,0 +1,45 @@
+{
+    "eventVersion": "1.05",
+    "userIdentity": {},
+    "eventTime": "2020-01-02T19:50:52Z",
+    "eventSource": "route53.amazonaws.com",
+    "eventName": "ChangeResourceRecordSets",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "1.1.1.1",
+    "userAgent": "console.amazonaws.com",
+    "requestParameters": {
+        "hostedZoneId": "/hostedzone/Z3U1111222111",
+        "changeBatch": {
+            "changes": [
+                {
+                    "action": "CREATE",
+                    "resourceRecordSet": {
+			"name": "awsapichanges.info",
+                        "type": "A",
+                        "tTL": 300,
+			"aliasTarget": {
+			    "HostedZoneId": "Z211112221111",
+			    "DNSName": "d3z456xncx123.cloudfront.net.",
+			    "EvaluateTargetHealth": false
+			}			
+                    }
+                }
+            ]
+        }
+    },
+    "responseElements": {
+        "changeInfo": {
+            "status": "PENDING",
+            "id": "/change/CHXXXXXXXXXXX",
+            "submittedAt": "Jan 2, 2020 7:50:51 PM"
+        }
+    },
+    "additionalEventData": {
+        "Note": "Do not use to reconstruct hosted zone"
+    },
+    "requestID": "...",
+    "eventID": "...",
+    "eventType": "AwsApiCall",
+    "apiVersion": "2013-04-01",
+    "recipientAccountId": "000000000000"
+}

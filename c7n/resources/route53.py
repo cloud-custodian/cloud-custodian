@@ -127,6 +127,24 @@ class ResourceRecordSet(ChildResourceManager):
         parent_spec = ('hostedzone', 'HostedZoneId', None)
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
+        supports_trailevents = True
+
+    def get_resources(self, ids, cache=True, augment=True):
+        results = []
+        client = local_session(self.session_factory).client('route53')
+        for event in ids:
+            for change in event['changeBatch']['changes']:
+                if change['action'] == 'DELETE':
+                    continue
+                rrsets = client.list_resource_record_sets(
+                    HostedZoneId=event['hostedZoneId'],
+                    StartRecordName=change['resourceRecordSet']['name'],
+                    StartRecordType=change['resourceRecordSet']['type'],
+                    MaxItems='1'
+                ).get('ResourceRecordSets', [])
+                if rrsets:
+                    results.append(rrsets[0])
+        return results
 
 
 @resources.register('r53domain')

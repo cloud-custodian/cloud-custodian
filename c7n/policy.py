@@ -607,7 +607,7 @@ class CloudTrailMode(LambdaMode):
         super(CloudTrailMode, self).validate()
         from c7n import query
         events = self.policy.data['mode'].get('events')
-        assert events, "cloud trail mode requires specifiying events to subscribe"
+        assert events, "cloud trail mode requires specifying events to subscribe"
         for e in events:
             if isinstance(e, six.string_types):
                 assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e

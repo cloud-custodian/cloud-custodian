@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .common import BaseTest
+from .common import BaseTest, event_data
 
 
 class Route53HostedZoneTest(BaseTest):
@@ -187,6 +187,18 @@ class Route53HealthCheckTest(BaseTest):
         tags = client.list_tags_for_resource(ResourceType="healthcheck", ResourceId=_id)
         self.assertEqual(len(tags["ResourceTagSet"]["Tags"]), 3)
         self.assertTrue("maid_status" in tags["ResourceTagSet"]["Tags"][1].values())
+
+
+class Route53RecordSetTest(BaseTest):
+
+    def test_route53_record_set_get(self):
+        session_factory = self.replay_flight_data("test_route53_rrset_get")
+        p = self.load_policy({
+            'name': 'rr',
+            'resource': 'aws.rrset'}, session_factory=session_factory)
+        event = event_data('event-rrset-create.json')
+        resources = p.resource_manager.get_resources([event['requestParameters']])
+        self.assertEqual(len(resources), 1)
 
 
 class Route53DomainTest(BaseTest):
