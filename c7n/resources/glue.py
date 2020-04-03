@@ -369,14 +369,17 @@ class GlueWorkflow(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'glue'
         enum_spec = ('list_workflows', 'Workflows', None)
-        detail_spec = ('get_workflow', 'Name', None, None)
+        detail_spec = ('get_workflow', 'Name', None, 'Workflow')
         id = name = 'Name'
         arn_type = 'workflow'
         universal_taggable = object()
         config_type = "AWS::Glue::Workflow"
 
     permissions = ('glue:ListWorkflows',)
-    augment = universal_augment
+
+    def augment(self, resources):
+        return universal_augment(
+            self, super(GlueWorkflow, self).augment(resources))
 
 
 @GlueWorkflow.action_registry.register('delete')
