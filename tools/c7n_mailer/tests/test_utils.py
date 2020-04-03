@@ -286,6 +286,7 @@ class DecryptTests(unittest.TestCase):
         self.assertEqual(utils.decrypt({'queue_url': 'aws'}, Mock(), Mock(), 'test'), None)
         self.assertEqual(utils.decrypt({'queue_url': 'asq://'}, Mock(), Mock(), 'test'), None)
 
+
 class OtherTests(unittest.TestCase):
 
     def test_config_defaults(self):
@@ -335,10 +336,12 @@ class OtherTests(unittest.TestCase):
         self.assertEqual(env.__class__, jinja2.environment.Environment)
 
     def test_get_rendered_jinja(self):
-        template_abs_filename = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                                             'example.jinja')
-        template_abs_filename = template_abs_filename.replace('\\', '/')
-        SQS_MESSAGE_1['action']['template'] = template_abs_filename
+        SQS_MESSAGE_1['action']['template'] = os.path.abspath(os.path.join(os.path.dirname(__file__), 'example.jinja'))
         body = utils.get_rendered_jinja(
             ["test@test.com"], SQS_MESSAGE_1, [RESOURCE_1], logging.getLogger('c7n_mailer.utils.email'),
                 'template', 'default', MAILER_CONFIG['templates_folders'])
+        self.assertIsNotNone(body)
+    
+    def test_get_message_subject(self):
+        subject = utils.get_message_subject(SQS_MESSAGE_1)
+        self.assertEqual(subject, 'core-services-dev AWS EBS Volumes will be DELETED in 15 DAYS!')
