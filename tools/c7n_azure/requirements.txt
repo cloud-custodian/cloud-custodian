@@ -61,7 +61,7 @@ cffi==1.14.0
 chardet==3.0.4
 click==7.1.1
 colorama==0.4.3
-cryptography==2.8
+cryptography==2.9
 distlib==0.3.0
 humanfriendly==4.18
 idna==2.9
