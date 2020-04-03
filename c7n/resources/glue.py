@@ -283,7 +283,6 @@ class GlueClassifier(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = 'classifier'
-        config_type = "AWS::Glue::Classifier"
 
     permissions = ('glue:GetClassifiers',)
 
@@ -313,7 +312,6 @@ class GlueSecurityConfiguration(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
-        config_type = "AWS::Glue::SecurityConfiguration"
 
     permissions = ('glue:GetSecurityConfigurations',)
 
@@ -342,7 +340,6 @@ class GlueTrigger(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'trigger'
         universal_taggable = object()
-        config_type = "AWS::Glue::Trigger"
 
     permissions = ('glue:GetTriggers',)
     augment = universal_augment
@@ -373,7 +370,6 @@ class GlueWorkflow(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'workflow'
         universal_taggable = object()
-        config_type = "AWS::Glue::Workflow"
 
     permissions = ('glue:ListWorkflows',)
 
