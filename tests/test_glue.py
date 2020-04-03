@@ -413,7 +413,7 @@ class TestGlueTriggers(BaseTest):
 class TestGlueWorkflows(BaseTest):
 
     def test_workflows_delete(self):
-        session_factory = self.replay_flight_data("test_glue_workflow_delete")
+        session_factory = self.record_flight_data("test_glue_workflow_delete")
         p = self.load_policy(
             {
                 "name": "glue-workflow-delete",

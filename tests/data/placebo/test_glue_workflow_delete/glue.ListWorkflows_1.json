@@ -1,9 +1,20 @@
 {
-  "status_code": 200,
-  "data": {
-    "Workflows": [
-      "test"
-    ],
-    "ResponseMetadata": {}
-  }
+    "status_code": 200,
+    "data": {
+        "Workflows": [
+            "test"
+        ],
+        "ResponseMetadata": {
+            "RequestId": "93d8ae00-6262-4bc7-84df-3d157cad09f5",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Fri, 03 Apr 2020 18:18:10 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "22",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "93d8ae00-6262-4bc7-84df-3d157cad09f5"
+            },
+            "RetryAttempts": 0
+        }
+    }
 }
