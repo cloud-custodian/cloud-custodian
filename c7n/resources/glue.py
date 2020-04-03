@@ -93,7 +93,7 @@ class GlueDevEndpoint(QueryResourceManager):
         id = name = 'EndpointName'
         date = 'CreatedTimestamp'
         arn_type = "devEndpoint"
-        universal_taggable = object()
+        universal_taggable = True
 
     permissions = ('glue:GetDevEndpoints',)
     augment = universal_augment
@@ -147,7 +147,7 @@ class GlueJob(QueryResourceManager):
         id = name = 'Name'
         date = 'CreatedOn'
         arn_type = 'job'
-        universal_taggable = object()
+        universal_taggable = True
 
     permissions = ('glue:GetJobs',)
     augment = universal_augment
@@ -178,7 +178,7 @@ class GlueCrawler(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'crawler'
         state_key = 'State'
-        universal_taggable = object()
+        universal_taggable = True
 
     permissions = ('glue:GetCrawlers',)
     augment = universal_augment
