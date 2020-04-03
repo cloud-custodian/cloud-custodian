@@ -352,8 +352,11 @@ class OtherTests(unittest.TestCase):
         self.assertEqual(env.__class__, jinja2.environment.Environment)
 
     def test_get_rendered_jinja(self):
-        SQS_MESSAGE_1['action']['template'] = os.path.abspath(
+        # Jinja paths must always be forward slashes regardless of operating system
+        template_abs_filename = os.path.abspath(
             os.path.join(os.path.dirname(__file__), 'example.jinja'))
+        template_abs_filename = template_abs_filename.replace('\\', '/')
+        SQS_MESSAGE_1['action']['template'] = template_abs_filename
         body = utils.get_rendered_jinja(
             ["test@test.com"], SQS_MESSAGE_1, [RESOURCE_1],
             logging.getLogger('c7n_mailer.utils.email'),
@@ -362,4 +365,13 @@ class OtherTests(unittest.TestCase):
 
     def test_get_message_subject(self):
         subject = utils.get_message_subject(SQS_MESSAGE_1)
-        self.assertEqual(subject, 'core-services-dev AWS EBS Volumes will be DELETED in 15 DAYS!')
+        self.assertEqual(subject,
+        SQS_MESSAGE_1['action']['subject'].replace('{{ account }}', SQS_MESSAGE_1['account']))
+
+    def test_kms_decrypt(self):
+        config = {'test': {'secret': 'mysecretpassword'}}
+        session_mock = Mock()
+        session_mock.client().get_secret().value = 'value'
+        session_mock.get_session_for_resource.return_value = session_mock
+
+        self.assertEqual(utils.kms_decrypt(config, Mock(), session_mock, 'test'), config['test'])
