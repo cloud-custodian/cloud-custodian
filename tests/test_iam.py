@@ -217,6 +217,54 @@ class UserCredentialReportTest(BaseTest):
             },
         )
 
+    def test_record_transform_with_keys(self):
+        info = {
+            "access_key_2_active": "false",
+            "password_next_rotation": "2017-01-24T13:15:33+00:00",
+            "access_key_2_last_rotated": "N/A",
+            "mfa_active": "true",
+            "cert_1_active": "false",
+            "cert_1_last_rotated": "N/A",
+            "access_key_1_last_used_date": "N/A",
+            "arn": "arn:aws:iam::644160558196:user/anthony",
+            "cert_2_active": "false",
+            "password_enabled": "true",
+            "access_key_2_last_used_region": "N/A",
+            "password_last_changed": "2016-10-26T13:15:33+00:00",
+            "access_key_1_last_rotated": "2019-12-04T13:22:47+00:00",
+            "user_creation_time": "2016-10-06T16:11:27+00:00",
+            "access_key_1_last_used_service": "N/A",
+            "user": "anthony",
+            "password_last_used": "2016-10-26T13:14:37+00:00",
+            "cert_2_last_rotated": "N/A",
+            "access_key_2_last_used_date": "N/A",
+            "access_key_2_last_used_service": "N/A",
+            "access_key_1_last_used_region": "N/A",
+            "access_key_1_active": "false",
+        }
+        credential = UserCredentialReport({}, None)
+        credential.process_user_record(info)
+        self.assertEqual(
+            info,
+            {
+                "access_keys": [{
+                    "active": False,
+                    "last_rotated": "2019-12-04T13:22:47+00:00",
+                    "last_used_date": None,
+                    "last_used_region": None,
+                    "last_used_service": None
+                }],
+                "arn": "arn:aws:iam::644160558196:user/anthony",
+                "mfa_active": True,
+                "password_enabled": True,
+                "password_last_changed": "2016-10-26T13:15:33+00:00",
+                "password_last_used": "2016-10-26T13:14:37+00:00",
+                "password_next_rotation": "2017-01-24T13:15:33+00:00",
+                "user": "anthony",
+                "user_creation_time": "2016-10-06T16:11:27+00:00",
+            },
+        )
+
 
 class IamUserTag(BaseTest):
 
