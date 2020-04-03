@@ -27,10 +27,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.12.31"
+version = "1.12.35"
 
 [package.dependencies]
-botocore = ">=1.15.31,<1.16.0"
+botocore = ">=1.15.35,<1.16.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -40,13 +40,16 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.15.31"
+version = "1.15.35"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
 jmespath = ">=0.7.1,<1.0.0"
 python-dateutil = ">=2.1,<3.0.0"
-urllib3 = ">=1.20,<1.26"
+
+[package.dependencies.urllib3]
+python = "<3.4.0 || >=3.5.0"
+version = ">=1.20,<1.26"
 
 [[package]]
 category = "main"
@@ -107,7 +110,7 @@ description = "Fake implementation of redis API for testing purposes."
 name = "fakeredis"
 optional = false
 python-versions = ">=3.5"
-version = "1.3.0"
+version = "1.4.0"
 
 [package.dependencies]
 redis = "<3.5"
@@ -115,6 +118,7 @@ six = ">=1.12"
 sortedcontainers = "*"
 
 [package.extras]
+aioredis = ["aioredis"]
 lua = ["lupa"]
 
 [[package]]
@@ -317,7 +321,7 @@ description = "HTTP REST client, simplified for Python"
 name = "python-http-client"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "3.2.6"
+version = "3.2.7"
 
 [[package]]
 category = "main"
@@ -391,7 +395,7 @@ description = "Twilio SendGrid library for Python"
 name = "sendgrid"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "6.2.0"
+version = "6.2.1"
 
 [package.dependencies]
 python-http-client = ">=3.2.1"
@@ -459,11 +463,11 @@ attrs = [
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
 ]
 boto3 = [
-    {file = "boto3-1.12.31-py2.py3-none-any.whl", hash = "sha256:8bf7e3611d46e8214bf225169ac55de762d9d341514f81ebae885dd601138fcf"},
-    {file = "boto3-1.12.31.tar.gz", hash = "sha256:913fc7bbb9df147ed6fa0bd2b391469652ee8cad3e26ca2355e6ff774d9516fb"},
+    {file = "boto3-1.12.35.tar.gz", hash = "sha256:803b2d69c4d2176c2c1b762cb236fb7c1bb9c2847f2acfe23f327ea084d6f3b1"},
 ]
 botocore = [
-    {file = "botocore-1.15.31.tar.gz", hash = "sha256:3d4684f61ff07aa1b4cd30d13a6b8e6416142be5a2a55aedcc1d7974b9415bb1"},
+    {file = "botocore-1.15.35-py2.py3-none-any.whl", hash = "sha256:4fded7e18681bc9249c6ad930602a394819a5e70cb62dbec46ed92800c2fc701"},
+    {file = "botocore-1.15.35.tar.gz", hash = "sha256:69a0dc4c331d62307b1c09e78e7c6da84e112ab5b37625b966eada4ffc31527c"},
 ]
 certifi = [
     {file = "certifi-2019.11.28-py2.py3-none-any.whl", hash = "sha256:017c25db2a153ce562900032d5bc68e9f191e44e9a0f762f373977de9df1fbb3"},
@@ -491,8 +495,8 @@ docutils = [
     {file = "docutils-0.15.2.tar.gz", hash = "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"},
 ]
 fakeredis = [
-    {file = "fakeredis-1.3.0-py3-none-any.whl", hash = "sha256:422def27971c212e01406dee961b3b9f9deb365df385fefc3b05dace7a5830b9"},
-    {file = "fakeredis-1.3.0.tar.gz", hash = "sha256:7c657d6345f3a9837be1ed118964ba2472f66083d325017edad917b560c01a78"},
+    {file = "fakeredis-1.4.0-py3-none-any.whl", hash = "sha256:d7e8b198ce5cce85374c6bca69bf372cc090d33938f0453c4262df7b281c7c88"},
+    {file = "fakeredis-1.4.0.tar.gz", hash = "sha256:bcb2faeabb1bd7ff2fecaff9b2a47ebfaf31700ee260a2ef66c6cf041d7a78df"},
 ]
 idna = [
     {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},
@@ -604,7 +608,7 @@ python-dateutil = [
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
 ]
 python-http-client = [
-    {file = "python_http_client-3.2.6.tar.gz", hash = "sha256:c26604194cd5b3f6a8c4d88302bd1ba818c4ffcd043e33540e1409894a456d15"},
+    {file = "python_http_client-3.2.7.tar.gz", hash = "sha256:93d6a26b426e48b04e589c1f103e7c040193e4ccc379ea50cd6e12f94cca7c69"},
 ]
 redis = [
     {file = "redis-3.4.1-py2.py3-none-any.whl", hash = "sha256:b205cffd05ebfd0a468db74f0eedbff8df1a7bfc47521516ade4692991bb0833"},
@@ -644,9 +648,9 @@ s3transfer = [
     {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
 ]
 sendgrid = [
-    {file = "sendgrid-6.2.0-py3-none-any.whl", hash = "sha256:80ea3a989bd382f2cb7de1508da17c279d9ef74107f456138daeb6bcbd579566"},
-    {file = "sendgrid-6.2.0-py3.6.egg", hash = "sha256:7c19e0f3d40093c8ed938fb091f6444783a94eb5e62000b33acc25160afbfc8c"},
-    {file = "sendgrid-6.2.0.tar.gz", hash = "sha256:3d91d848587a6f2b9f866f88ef65c9278336903524e6eb53bbb40c7ea7c774db"},
+    {file = "sendgrid-6.2.1-py3-none-any.whl", hash = "sha256:2954caf82c94c3566147e78ff7772f0883a7cc668de5a1c5ff1c49dcb9c1af31"},
+    {file = "sendgrid-6.2.1-py3.6.egg", hash = "sha256:7c606125c59d1df7354e20581ca645d109be1d026f5b01dd62112e07348b2d87"},
+    {file = "sendgrid-6.2.1.tar.gz", hash = "sha256:a58c8d3f99e1b4fed6c041e6bb0e30893a6c40ffc0ecd33430a08d044fe78832"},
 ]
 six = [
     {file = "six-1.14.0-py2.py3-none-any.whl", hash = "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"},

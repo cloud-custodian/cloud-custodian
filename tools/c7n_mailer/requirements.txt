@@ -1,6 +1,6 @@
 attrs==19.3.0
-boto3==1.12.31
-botocore==1.15.31
+boto3==1.12.35
+botocore==1.15.35
 certifi==2019.11.28
 chardet==3.0.4
 datadog==0.34.1
@@ -16,13 +16,13 @@ markupsafe==1.1.1
 pyasn1==0.4.8
 pyrsistent==0.16.0
 python-dateutil==2.8.1
-python-http-client==3.2.6
+python-http-client==3.2.7
 redis==3.4.1
 requests==2.23.0
 ruamel.yaml==0.16.10
 ruamel.yaml.clib==0.2.0; platform_python_implementation == "CPython" and python_version < "3.9"
 s3transfer==0.3.3
-sendgrid==6.2.0
+sendgrid==6.2.1
 six==1.14.0
 urllib3==1.25.8
 zipp==3.1.0
