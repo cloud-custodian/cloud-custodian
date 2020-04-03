@@ -303,6 +303,7 @@ class DeleteClassifier(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
+
 @resources.register('glue-security-configuration')
 class GlueSecurityConfiguration(QueryResourceManager):
 
@@ -344,7 +345,6 @@ class GlueTrigger(QueryResourceManager):
         config_type = "AWS::Glue::Trigger"
 
     permissions = ('glue:GetTriggers',)
-    augment = universal_augment
 
 
 @GlueTrigger.action_registry.register('delete')
