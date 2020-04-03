@@ -345,6 +345,7 @@ class GlueTrigger(QueryResourceManager):
         config_type = "AWS::Glue::Trigger"
 
     permissions = ('glue:GetTriggers',)
+    augment = universal_augment
 
 
 @GlueTrigger.action_registry.register('delete')
@@ -375,6 +376,7 @@ class GlueWorkflow(QueryResourceManager):
         config_type = "AWS::Glue::Workflow"
 
     permissions = ('glue:ListWorkflows',)
+    augment = universal_augment
 
 
 @GlueWorkflow.action_registry.register('delete')
