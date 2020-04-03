@@ -36,8 +36,10 @@ class AWSMailerTests(unittest.TestCase):
         )
 
     def test_sqs_queue_processor(self):
-        mailer_sqs_queue_processor = sqs_queue_processor.MailerSqsQueueProcessor(MAILER_CONFIG, boto3.Session(), logging.getLogger('c7n_mailer'))
-        self.assertIs(mailer_sqs_queue_processor.__class__, sqs_queue_processor.MailerSqsQueueProcessor)
+        mailer_sqs_queue_processor = sqs_queue_processor.MailerSqsQueueProcessor(
+            MAILER_CONFIG, boto3.Session(), logging.getLogger('c7n_mailer'))
+        self.assertIs(mailer_sqs_queue_processor.__class__,
+        sqs_queue_processor.MailerSqsQueueProcessor)
 
     def test_cli_run(self):
         # Generate loggers and make sure they have the right class, for codecov
@@ -47,6 +49,6 @@ class AWSMailerTests(unittest.TestCase):
         self.assertIs(parser.__class__, argparse.ArgumentParser)
         session = cli.session_factory(MAILER_CONFIG)
         self.assertEqual(
-            [session.region_name, session.profile_name], 
+            [session.region_name, session.profile_name],
             ['us-east-1', 'default']
         )
