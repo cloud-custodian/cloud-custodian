@@ -10,6 +10,7 @@ from mock import Mock, patch
 from c7n_mailer import utils
 from common import MAILER_CONFIG, SQS_MESSAGE_1, RESOURCE_1
 
+
 class FormatStruct(unittest.TestCase):
 
     def test_formats_struct(self):
@@ -331,7 +332,7 @@ class OtherTests(unittest.TestCase):
                 config.get('region'),
                 1024,
                 'python2.7',
-                300, 
+                300,
                 None,
                 None,
                 MAILER_CONFIG['contact_tags'],
@@ -339,22 +340,24 @@ class OtherTests(unittest.TestCase):
                 None,
                 None,
                 None,
-                None, 
+                None,
                 None,
                 None,
                 MAILER_CONFIG['queue_url']
             ]
         )
-    
+
     def test_get_jinja_env(self):
         env = utils.get_jinja_env(MAILER_CONFIG['templates_folders'])
         self.assertEqual(env.__class__, jinja2.environment.Environment)
 
     def test_get_rendered_jinja(self):
-        SQS_MESSAGE_1['action']['template'] = os.path.abspath(os.path.join(os.path.dirname(__file__), 'example.jinja'))
+        SQS_MESSAGE_1['action']['template'] = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), 'example.jinja'))
         body = utils.get_rendered_jinja(
-            ["test@test.com"], SQS_MESSAGE_1, [RESOURCE_1], logging.getLogger('c7n_mailer.utils.email'),
-                'template', 'default', MAILER_CONFIG['templates_folders'])
+            ["test@test.com"], SQS_MESSAGE_1, [RESOURCE_1],
+            logging.getLogger('c7n_mailer.utils.email'),
+            'template', 'default', MAILER_CONFIG['templates_folders'])
         self.assertIsNotNone(body)
     
     def test_get_message_subject(self):
