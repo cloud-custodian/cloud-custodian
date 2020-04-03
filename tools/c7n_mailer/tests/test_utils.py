@@ -326,12 +326,12 @@ class OtherTests(unittest.TestCase):
                 config.get('slack_token'),
                 config.get('slack_webhook'),
                 config.get('queue_url')
-            ], 
+            ],
             [
                 'us-east-1',
                 config.get('region'),
                 1024,
-                'python2.7',
+                'python3.7',
                 300,
                 None,
                 None,
@@ -359,7 +359,7 @@ class OtherTests(unittest.TestCase):
             logging.getLogger('c7n_mailer.utils.email'),
             'template', 'default', MAILER_CONFIG['templates_folders'])
         self.assertIsNotNone(body)
-    
+
     def test_get_message_subject(self):
         subject = utils.get_message_subject(SQS_MESSAGE_1)
         self.assertEqual(subject, 'core-services-dev AWS EBS Volumes will be DELETED in 15 DAYS!')

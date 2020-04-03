@@ -27,6 +27,7 @@ from dateutil import parser
 from dateutil.tz import gettz, tzutc
 import yaml
 
+
 class Providers(object):
     AWS = 0
     Azure = 1
