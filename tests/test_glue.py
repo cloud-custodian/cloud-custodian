@@ -367,26 +367,6 @@ class TestGlueClassifiers(BaseTest):
             for t in classifiers.get("Classifiers", [])])
 
 
-class GlueMLTransform(BaseTest):
-
-    def test_ml_transforms_delete(self):
-        session_factory = self.replay_flight_data("test_glue_ml_transform_delete")
-        p = self.load_policy(
-            {
-                "name": "glue-ml-transform-delete",
-                "resource": "glue-ml-transform",
-                "filters": [{"Name": 'test'}],
-                "actions": [{"type": "delete"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = session_factory().client("glue")
-        ml_transforms = client.get_ml_transforms()
-        self.assertFalse("test" in [t.get("Name") for t in ml_transforms.get("Transforms", [])])
-
-
 class TestGlueSecurityConfiguration(BaseTest):
 
     def test_security_configurations_delete(self):

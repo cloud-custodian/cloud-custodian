@@ -283,6 +283,7 @@ class GlueClassifier(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = 'classifier'
+        config_type = "AWS::Glue::Classifier"
 
     permissions = ('glue:GetClassifiers',)
 
@@ -302,37 +303,6 @@ class DeleteClassifier(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
-
-@resources.register('glue-ml-transform')
-class GlueMLTransform(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'glue'
-        enum_spec = ('get_ml_transforms', 'Transforms', None)
-        name = 'Name'
-        id = 'TransformId'
-        arn_type = 'mlTransform'
-        universal_taggable = object()
-
-    permissions = ('glue:GetMLTransforms',)
-    augment = universal_augment
-
-
-@GlueMLTransform.action_registry.register('delete')
-class DeleteMLTransform(BaseAction):
-
-    schema = type_schema('delete')
-    permissions = ('glue:DeleteMLTransform',)
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('glue')
-        for r in resources:
-            try:
-                client.delete_ml_transform(TransformId=r['TransformId'])
-            except client.exceptions.EntityNotFoundException:
-                continue
-
-
 @resources.register('glue-security-configuration')
 class GlueSecurityConfiguration(QueryResourceManager):
 
@@ -342,6 +312,7 @@ class GlueSecurityConfiguration(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
+        config_type = "AWS::Glue::SecurityConfiguration"
 
     permissions = ('glue:GetSecurityConfigurations',)
 
@@ -370,6 +341,7 @@ class GlueTrigger(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'trigger'
         universal_taggable = object()
+        config_type = "AWS::Glue::Trigger"
 
     permissions = ('glue:GetTriggers',)
     augment = universal_augment
@@ -400,6 +372,7 @@ class GlueWorkflow(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'workflow'
         universal_taggable = object()
+        config_type = "AWS::Glue::Workflow"
 
     permissions = ('glue:ListWorkflows',)
 
