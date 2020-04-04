@@ -1,20 +1,10 @@
 {
-    "status_code": 200,
-    "data": {
-        "AccountAliases": [
-            "custodian-skunk-works"
-        ],
-        "IsTruncated": false,
-        "ResponseMetadata": {
-            "RequestId": "91642e45-6c19-4e63-b16d-d3bfdaf122c2",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "91642e45-6c19-4e63-b16d-d3bfdaf122c2",
-                "content-type": "text/xml",
-                "content-length": "400",
-                "date": "Thu, 02 Apr 2020 17:24:28 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "AccountAliases": [
+      "custodian-skunk-works"
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {}
+  }
 }

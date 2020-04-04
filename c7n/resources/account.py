@@ -1474,7 +1474,7 @@ class GlueDataCatalogEncryption(BaseAction):
                   - type: set-glue-catalog-encryption
                     attributes:
                         EncryptionAtRest:
-                            CatalogEncryption: SSE-KMS
+                            CatalogEncryptionMode: SSE-KMS
                             SseAwsKmsKeyId: alias/aws/glue
     """
 

@@ -1,25 +1,14 @@
 {
-    "status_code": 200,
-    "data": {
-        "DataCatalogEncryptionSettings": {
-            "EncryptionAtRest": {
-                "CatalogEncryptionMode": "DISABLED"
-            },
-            "ConnectionPasswordEncryption": {
-                "ReturnConnectionPasswordEncrypted": false
-            }
-        },
-        "ResponseMetadata": {
-            "RequestId": "8b98a919-f221-4ae8-8899-cd76231a68f1",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Thu, 02 Apr 2020 17:24:29 GMT",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "166",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "8b98a919-f221-4ae8-8899-cd76231a68f1"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "DataCatalogEncryptionSettings": {
+      "EncryptionAtRest": {
+        "CatalogEncryptionMode": "DISABLED"
+      },
+      "ConnectionPasswordEncryption": {
+        "ReturnConnectionPasswordEncrypted": false
+      }
+    },
+    "ResponseMetadata": {}
+  }
 }
