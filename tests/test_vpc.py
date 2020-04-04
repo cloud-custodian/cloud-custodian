@@ -867,6 +867,13 @@ class NetworkAddrTest(BaseTest):
         self.addCleanup(self.release_if_still_present, ec2, network_addr)
         self.assert_policy_released(factory, ec2, network_addr)
 
+    def test_elasticip_alias(self):
+        try:
+            self.load_policy({'name': 'eip', 'resource': 'aws.elastic-ip'}, validate=True)
+        except PolicyValidationError:
+            raise
+            self.fail("elastic ip alias failed")
+
     def test_release_attached_ec2(self):
         factory = self.replay_flight_data("test_release_attached_ec2")
 
