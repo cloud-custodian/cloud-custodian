@@ -17,13 +17,13 @@ import functools
 import json
 import os
 import time
+import yaml
 
 import jinja2
 import jmespath
 from botocore.exceptions import ClientError
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
-from ruamel import yaml
 
 
 class Providers:
@@ -119,7 +119,7 @@ def setup_defaults(config):
     config.setdefault('region', 'us-east-1')
     config.setdefault('ses_region', config.get('region'))
     config.setdefault('memory', 1024)
-    config.setdefault('runtime', 'python2.7')
+    config.setdefault('runtime', 'python3.7')
     config.setdefault('timeout', 300)
     config.setdefault('subnets', None)
     config.setdefault('security_groups', None)

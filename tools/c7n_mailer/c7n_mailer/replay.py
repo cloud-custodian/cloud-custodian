@@ -13,6 +13,7 @@ import json
 import logging
 import os
 import zlib
+import yaml
 
 import boto3
 import jsonschema
@@ -20,7 +21,6 @@ from c7n_mailer.cli import CONFIG_SCHEMA
 from c7n_mailer.email_delivery import EmailDelivery
 from c7n_mailer.utils import setup_defaults
 from c7n_mailer.utils_email import get_mimetext_message
-from ruamel import yaml
 
 logger = logging.getLogger(__name__)
 

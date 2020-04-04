@@ -3,16 +3,17 @@
     "data": {
         "Endpoints": [
             {
-                "EndpointIdentifier": "c7n-test",
+                "EndpointIdentifier": "myendpoint",
                 "EndpointType": "SOURCE",
-                "EngineName": "aurora",
-                "EngineDisplayName": "Amazon Aurora MySQL",
+                "EngineName": "oracle",
+                "EngineDisplayName": "Oracle",
                 "Username": "1234",
-                "ServerName": "test",
+                "ServerName": "orkie",
                 "Port": 1234,
-                "Status": "deleting",
+                "DatabaseName": "orkle",
+                "Status": "active",
                 "KmsKeyId": "arn:aws:kms:us-east-1:1112223334445:key/219c196b-3893-4778-b277-a05322f0ea0d",
-                "EndpointArn": "arn:aws:dms:us-east-1:1112223334445:endpoint:TS4PNUPPMTS3VDXUFUUGLKM2FQ",
+                "EndpointArn": "arn:aws:dms:us-east-1:1112223334445:endpoint:AFDRQSDLIZ2X6KNOS4PBGNWUWQ",
                 "SslMode": "none"
             }
         ],

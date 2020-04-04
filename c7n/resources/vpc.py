@@ -1750,7 +1750,7 @@ class AclAwsS3Cidrs(Filter):
         return results
 
 
-@resources.register('network-addr')
+@resources.register('elastic-ip', aliases=('network-addr',))
 class NetworkAddress(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):

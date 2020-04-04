@@ -43,10 +43,10 @@ description = "The AWS SDK for Python"
 name = "boto3"
 optional = false
 python-versions = "*"
-version = "1.12.31"
+version = "1.12.35"
 
 [package.dependencies]
-botocore = ">=1.15.31,<1.16.0"
+botocore = ">=1.15.35,<1.16.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
@@ -56,13 +56,16 @@ description = "Low-level, data-driven core of boto 3."
 name = "botocore"
 optional = false
 python-versions = "*"
-version = "1.15.31"
+version = "1.15.35"
 
 [package.dependencies]
 docutils = ">=0.10,<0.16"
 jmespath = ">=0.7.1,<1.0.0"
 python-dateutil = ">=2.1,<3.0.0"
-urllib3 = ">=1.20,<1.26"
+
+[package.dependencies.urllib3]
+python = "<3.4.0 || >=3.5.0"
+version = ">=1.20,<1.26"
 
 [[package]]
 category = "dev"
@@ -172,7 +175,7 @@ description = "Google Authentication Library"
 name = "google-auth"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
-version = "1.12.0"
+version = "1.13.1"
 
 [package.dependencies]
 cachetools = ">=2.0.0,<5.0"
@@ -258,7 +261,7 @@ description = "A comprehensive HTTP client library."
 name = "httplib2"
 optional = false
 python-versions = "*"
-version = "0.17.0"
+version = "0.17.1"
 
 [[package]]
 category = "main"
@@ -600,11 +603,11 @@ attrs = [
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
 ]
 boto3 = [
-    {file = "boto3-1.12.31-py2.py3-none-any.whl", hash = "sha256:8bf7e3611d46e8214bf225169ac55de762d9d341514f81ebae885dd601138fcf"},
-    {file = "boto3-1.12.31.tar.gz", hash = "sha256:913fc7bbb9df147ed6fa0bd2b391469652ee8cad3e26ca2355e6ff774d9516fb"},
+    {file = "boto3-1.12.35.tar.gz", hash = "sha256:803b2d69c4d2176c2c1b762cb236fb7c1bb9c2847f2acfe23f327ea084d6f3b1"},
 ]
 botocore = [
-    {file = "botocore-1.15.31.tar.gz", hash = "sha256:3d4684f61ff07aa1b4cd30d13a6b8e6416142be5a2a55aedcc1d7974b9415bb1"},
+    {file = "botocore-1.15.35-py2.py3-none-any.whl", hash = "sha256:4fded7e18681bc9249c6ad930602a394819a5e70cb62dbec46ed92800c2fc701"},
+    {file = "botocore-1.15.35.tar.gz", hash = "sha256:69a0dc4c331d62307b1c09e78e7c6da84e112ab5b37625b966eada4ffc31527c"},
 ]
 c7n = []
 cachetools = [
@@ -637,8 +640,8 @@ google-api-python-client = [
     {file = "google_api_python_client-1.8.0-py3-none-any.whl", hash = "sha256:5032ad1af5046889649b3848f2e871889fbb6ae440198a549fe1699581300386"},
 ]
 google-auth = [
-    {file = "google-auth-1.12.0.tar.gz", hash = "sha256:016924388770b7e66c7e9ade1c4c3144ee88812d79697fd6c0dad9abdfcda2fd"},
-    {file = "google_auth-1.12.0-py2.py3-none-any.whl", hash = "sha256:01d686448f57d3bc027726474faa1aa650ba333bedb392e06938b0add8ec8d3a"},
+    {file = "google-auth-1.13.1.tar.gz", hash = "sha256:a5ee4c40fef77ea756cf2f1c0adcf475ecb53af6700cf9c133354cdc9b267148"},
+    {file = "google_auth-1.13.1-py2.py3-none-any.whl", hash = "sha256:cab6c707e6ee20e567e348168a5c69dc6480384f777a9e5159f4299ad177dcc0"},
 ]
 google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.0.3.tar.gz", hash = "sha256:098fade613c25b4527b2c08fa42d11f3c2037dda8995d86de0745228e965d445"},
@@ -660,8 +663,8 @@ googleapis-common-protos = [
     {file = "googleapis-common-protos-1.51.0.tar.gz", hash = "sha256:013c91704279119150e44ef770086fdbba158c1f978a6402167d47d5409e226e"},
 ]
 httplib2 = [
-    {file = "httplib2-0.17.0-py3-none-any.whl", hash = "sha256:79751cc040229ec896aa01dced54de0cd0bf042f928e84d5761294422dde4454"},
-    {file = "httplib2-0.17.0.tar.gz", hash = "sha256:de96d0a49f46d0ee7e0aae80141d37b8fcd6a68fb05d02e0b82c128592dd8261"},
+    {file = "httplib2-0.17.1-py3-none-any.whl", hash = "sha256:4e26d60a6b37ff0e8401e976f13667cb3746dfa1b50833003b7f138042b54247"},
+    {file = "httplib2-0.17.1.tar.gz", hash = "sha256:b81b2cd2248285168a4359f2acf24521a4099b5853e790309c45dcb90ee4b3c6"},
 ]
 idna = [
     {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},
