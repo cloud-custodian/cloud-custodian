@@ -103,6 +103,7 @@ ResourceMap = {
     "aws.ml-model": "c7n.resources.ml.MLModel",
     "aws.nat-gateway": "c7n.resources.vpc.NATGateway",
     "aws.network-acl": "c7n.resources.vpc.NetworkAcl",
+    "aws.elastic-ip": "c7n.resources.vpc.NetworkAddress",
     "aws.network-addr": "c7n.resources.vpc.NetworkAddress",
     "aws.ops-item": "c7n.resources.ssm.OpsItem",
     "aws.opswork-cm": "c7n.resources.opsworks.OpsworksCM",

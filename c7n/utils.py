@@ -327,7 +327,9 @@ REGION_PARTITION_MAP = {
     'us-gov-east-1': 'aws-us-gov',
     'us-gov-west-1': 'aws-us-gov',
     'cn-north-1': 'aws-cn',
-    'cn-northwest-1': 'aws-cn'
+    'cn-northwest-1': 'aws-cn',
+    'us-isob-east-1': 'aws-iso-b',
+    'us-iso-east-1': 'aws-iso'
 }
 
 

@@ -122,6 +122,7 @@ html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
   'prev_next_buttons_location': 'both',
   'style_external_links': True,
+  'analytics_id': "UA-162730326-1",
   # Toc options
   'collapse_navigation': False,
   'sticky_navigation': True,
