@@ -1,5 +1,4 @@
 FROM debian:10-slim as build-env
-ARG providers="azure gcp kube"
 
 # pre-requisite distro deps, and build env setup
 RUN adduser --disabled-login custodian
@@ -22,6 +21,7 @@ ADD tools/c7n_azure /src/tools/c7n_azure
 ADD tools/c7n_kube /src/tools/c7n_kube
 
 # Install requested providers
+ARG providers="azure gcp kube"
 RUN . /usr/local/bin/activate && for pkg in $providers; do cd tools/c7n_$pkg && $HOME/.poetry/bin/poetry install && cd ../../; done
 
 RUN mkdir /output
