@@ -1,31 +1,21 @@
 {
-    "status_code": 200,
-    "data": {
-        "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-east-2:644160558196:omnissm-deferred-actions-queue",
-            "ApproximateNumberOfMessages": "0",
-            "ApproximateNumberOfMessagesNotVisible": "0",
-            "ApproximateNumberOfMessagesDelayed": "0",
-            "CreatedTimestamp": "1538614112",
-            "LastModifiedTimestamp": "1538614112",
-            "VisibilityTimeout": "30",
-            "MaximumMessageSize": "262144",
-            "MessageRetentionPeriod": "345600",
-            "DelaySeconds": "0",
-            "ReceiveMessageWaitTimeSeconds": "0",
-            "KmsMasterKeyId": "alias/cof/sqs/encrypted",
-            "KmsDataKeyReusePeriodSeconds": "300"
-        },
-        "ResponseMetadata": {
-            "RequestId": "bcd6a82b-19d7-59c4-b42a-fcffd21a8926",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "bcd6a82b-19d7-59c4-b42a-fcffd21a8926",
-                "date": "Wed, 06 Feb 2019 11:48:29 GMT",
-                "content-type": "text/xml",
-                "content-length": "1354"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Attributes": {
+      "QueueArn": "arn:aws:sqs:us-east-2:644160558196:omnissm-deferred-actions-queue",
+      "ApproximateNumberOfMessages": "0",
+      "ApproximateNumberOfMessagesNotVisible": "0",
+      "ApproximateNumberOfMessagesDelayed": "0",
+      "CreatedTimestamp": "1538614112",
+      "LastModifiedTimestamp": "1538614112",
+      "VisibilityTimeout": "30",
+      "MaximumMessageSize": "262144",
+      "MessageRetentionPeriod": "345600",
+      "DelaySeconds": "0",
+      "ReceiveMessageWaitTimeSeconds": "0",
+      "KmsMasterKeyId": "alias/cof/sqs/encrypted",
+      "KmsDataKeyReusePeriodSeconds": "300"
+    },
+    "ResponseMetadata": {}
+  }
 }

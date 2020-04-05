@@ -1,18 +1,9 @@
 {
   "status_code": 200,
   "data": {
-    "ResponseMetadata": {
-      "RetryAttempts": 0,
-      "HTTPStatusCode": 200,
-      "RequestId": "db92d985-34ff-4f11-8f44-81c861df6735",
-      "HTTPHeaders": {
-        "x-amzn-requestid": "db92d985-34ff-4f11-8f44-81c861df6735",
-        "date": "Thu, 20 Sep 2018 16:43:25 GMT",
-        "content-length": "2779",
-        "content-type": "application/x-amz-json-1.1"
-      }
-    },
-    "ActivationList": [{
+    "ResponseMetadata": {},
+    "ActivationList": [
+      {
         "IamRole": "service-role/test-role",
         "RegistrationLimit": 1,
         "Description": "222222222222-i-2bb222b222bb2b22b",

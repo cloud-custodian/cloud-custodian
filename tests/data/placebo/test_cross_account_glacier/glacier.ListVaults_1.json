@@ -1,25 +1,15 @@
 {
-    "status_code": 200, 
-    "data": {
-        "VaultList": [
-            {
-                "SizeInBytes": 0, 
-                "VaultARN": "arn:aws:glacier:us-east-1:644160558196:vaults/c7n-cross-check", 
-                "CreationDate": "2017-05-12T00:15:34.699Z", 
-                "VaultName": "c7n-cross-check", 
-                "NumberOfArchives": 0
-            }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "jILmIaxQBiYo-6eDa2546kmzpZHtnUQq4kSG1FV4ZJwM_GU", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "jILmIaxQBiYo-6eDa2546kmzpZHtnUQq4kSG1FV4ZJwM_GU", 
-                "date": "Fri, 12 May 2017 00:15:34 GMT", 
-                "content-length": "240", 
-                "content-type": "application/json"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "VaultList": [
+      {
+        "SizeInBytes": 0,
+        "VaultARN": "arn:aws:glacier:us-east-1:644160558196:vaults/c7n-cross-check",
+        "CreationDate": "2017-05-12T00:15:34.699Z",
+        "VaultName": "c7n-cross-check",
+        "NumberOfArchives": 0
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

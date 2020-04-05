@@ -1,9 +1,6 @@
 {
-    "status_code": 200, 
-    "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "126bc49b-f2bb-5434-93cd-8b336c00e586"
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {}
+  }
 }

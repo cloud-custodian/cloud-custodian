@@ -1,58 +1,48 @@
 {
-    "status_code": 200, 
-    "data": {
-        "LaunchConfigurations": [
-            {
-                "UserData": "", 
-                "IamInstanceProfile": "root_joshua", 
-                "EbsOptimized": false, 
-                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:25aac0eb-2089-4f08-bb63-33364f6d74aa:launchConfigurationName/asg-c7n-tag-check", 
-                "InstanceMonitoring": {
-                    "Enabled": false
-                }, 
-                "ClassicLinkVPCSecurityGroups": [], 
-                "CreatedTime": {
-                    "hour": 4, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 32, 
-                    "microsecond": 673000, 
-                    "year": 2017, 
-                    "day": 19, 
-                    "minute": 13
-                }, 
-                "BlockDeviceMappings": [
-                    {
-                        "DeviceName": "/dev/xvda", 
-                        "Ebs": {
-                            "DeleteOnTermination": true, 
-                            "SnapshotId": "snap-089ba67abbc06b72a", 
-                            "VolumeSize": 8, 
-                            "VolumeType": "gp2"
-                        }
-                    }
-                ], 
-                "KeyName": "", 
-                "SecurityGroups": [
-                    "sg-4b9ada34"
-                ], 
-                "LaunchConfigurationName": "asg-c7n-tag-check", 
-                "KernelId": "", 
-                "RamdiskId": "", 
-                "ImageId": "ami-6057e21a", 
-                "InstanceType": "t2.micro"
+  "status_code": 200,
+  "data": {
+    "LaunchConfigurations": [
+      {
+        "UserData": "",
+        "IamInstanceProfile": "root_joshua",
+        "EbsOptimized": false,
+        "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:644160558196:launchConfiguration:25aac0eb-2089-4f08-bb63-33364f6d74aa:launchConfigurationName/asg-c7n-tag-check",
+        "InstanceMonitoring": {
+          "Enabled": false
+        },
+        "ClassicLinkVPCSecurityGroups": [],
+        "CreatedTime": {
+          "hour": 4,
+          "__class__": "datetime",
+          "month": 11,
+          "second": 32,
+          "microsecond": 673000,
+          "year": 2017,
+          "day": 19,
+          "minute": 13
+        },
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/xvda",
+            "Ebs": {
+              "DeleteOnTermination": true,
+              "SnapshotId": "snap-089ba67abbc06b72a",
+              "VolumeSize": 8,
+              "VolumeType": "gp2"
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "cbad5ffb-1190-11e8-9854-e35ae8092ef3", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "cbad5ffb-1190-11e8-9854-e35ae8092ef3", 
-                "date": "Wed, 14 Feb 2018 14:10:22 GMT", 
-                "content-length": "1630", 
-                "content-type": "text/xml"
-            }
-        }
-    }
+          }
+        ],
+        "KeyName": "",
+        "SecurityGroups": [
+          "sg-4b9ada34"
+        ],
+        "LaunchConfigurationName": "asg-c7n-tag-check",
+        "KernelId": "",
+        "RamdiskId": "",
+        "ImageId": "ami-6057e21a",
+        "InstanceType": "t2.micro"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

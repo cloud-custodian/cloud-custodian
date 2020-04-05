@@ -1,55 +1,44 @@
 {
-    "status_code": 200, 
-    "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "ccc8462d-1190-11e8-bb48-41fa83b3664e", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "ccc8462d-1190-11e8-bb48-41fa83b3664e", 
-                "vary": "Accept-Encoding", 
-                "content-length": "47478", 
-                "content-type": "text/xml", 
-                "date": "Wed, 14 Feb 2018 14:10:23 GMT"
-            }
-        }, 
-        "IsTruncated": false, 
-        "Roles": [
-            {
-                "Description": "SageMaker execution role created from the SageMaker AWS Management Console.", 
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22sagemaker.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D", 
-                "RoleId": "AROAI5BIHC4SP5ZVKBANK", 
-                "CreateDate": {
-                    "hour": 17, 
-                    "__class__": "datetime", 
-                    "month": 1, 
-                    "second": 49, 
-                    "microsecond": 0, 
-                    "year": 2018, 
-                    "day": 8, 
-                    "minute": 23
-                }, 
-                "RoleName": "AmazonSageMaker-ExecutionRole-20180108T122369", 
-                "Path": "/service-role/", 
-                "Arn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369"
-            },
-            {
-                "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22lambda.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
-                "RoleId": "AROAJQ7B35GGHTQXLQCNY",
-                "CreateDate": {
-                    "hour": 12,
-                    "__class__": "datetime",
-                    "month": 8,
-                    "second": 50,
-                    "microsecond": 0,
-                    "year": 2016,
-                    "day": 27,
-                    "minute": 2
-                },
-                "RoleName": "custodian-mu",
-                "Path": "/",
-                "Arn": "arn:aws:iam::644160558196:role/custodian-mu"
-            }
-        ]
-    }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "IsTruncated": false,
+    "Roles": [
+      {
+        "Description": "SageMaker execution role created from the SageMaker AWS Management Console.",
+        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22sagemaker.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
+        "RoleId": "AROAI5BIHC4SP5ZVKBANK",
+        "CreateDate": {
+          "hour": 17,
+          "__class__": "datetime",
+          "month": 1,
+          "second": 49,
+          "microsecond": 0,
+          "year": 2018,
+          "day": 8,
+          "minute": 23
+        },
+        "RoleName": "AmazonSageMaker-ExecutionRole-20180108T122369",
+        "Path": "/service-role/",
+        "Arn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369"
+      },
+      {
+        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22lambda.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
+        "RoleId": "AROAJQ7B35GGHTQXLQCNY",
+        "CreateDate": {
+          "hour": 12,
+          "__class__": "datetime",
+          "month": 8,
+          "second": 50,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 27,
+          "minute": 2
+        },
+        "RoleName": "custodian-mu",
+        "Path": "/",
+        "Arn": "arn:aws:iam::644160558196:role/custodian-mu"
+      }
+    ]
+  }
 }

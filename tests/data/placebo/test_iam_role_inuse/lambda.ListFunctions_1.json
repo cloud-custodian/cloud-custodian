@@ -1,37 +1,26 @@
 {
-    "status_code": 200, 
-    "data": {
-        "Functions": [
-            {
-                "TracingConfig": {
-                    "Mode": "PassThrough"
-                }, 
-                "Version": "$LATEST", 
-                "CodeSha256": "chNnUPxGj+HExuI3bQg1fHnWMMwr4bXVIevpyp/zWns=", 
-                "FunctionName": "custodian-ec2-auto-tag-user", 
-                "MemorySize": 512, 
-                "RevisionId": "d38ce6ea-b323-4b84-853d-cc75d16cff78", 
-                "CodeSize": 1037994, 
-                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-auto-tag-user", 
-                "Handler": "custodian_policy.run", 
-                "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
-                "Timeout": 60, 
-                "LastModified": "2017-05-26T12:15:26.160+0000", 
-                "Runtime": "python2.7", 
-                "Description": "cloud-custodian lambda policy"
-            }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "c6f9273e-1190-11e8-9167-0f343d6908d9", 
-            "HTTPHeaders": {
-                "date": "Wed, 14 Feb 2018 14:10:14 GMT", 
-                "x-amzn-requestid": "c6f9273e-1190-11e8-9167-0f343d6908d9", 
-                "content-length": "24875", 
-                "content-type": "application/json", 
-                "connection": "keep-alive"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Functions": [
+      {
+        "TracingConfig": {
+          "Mode": "PassThrough"
+        },
+        "Version": "$LATEST",
+        "CodeSha256": "chNnUPxGj+HExuI3bQg1fHnWMMwr4bXVIevpyp/zWns=",
+        "FunctionName": "custodian-ec2-auto-tag-user",
+        "MemorySize": 512,
+        "RevisionId": "d38ce6ea-b323-4b84-853d-cc75d16cff78",
+        "CodeSize": 1037994,
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-auto-tag-user",
+        "Handler": "custodian_policy.run",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Timeout": 60,
+        "LastModified": "2017-05-26T12:15:26.160+0000",
+        "Runtime": "python2.7",
+        "Description": "cloud-custodian lambda policy"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

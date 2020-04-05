@@ -1,10 +1,6 @@
 {
-    "status_code": 200, 
-    "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "HostId": "MpAlLJpaPZdNMFzb+UQbjgS0oC36AIFAGvyrLghzeEBSqIfheVSPHZNtPiv1AATzgGG3CgDy954=", 
-            "RequestId": "19D352DFC1F65958"
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {}
+  }
 }

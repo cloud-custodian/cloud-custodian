@@ -1,20 +1,7 @@
 {
-    "status_code": 200, 
-    "data": {
-        "ETag": "\"5d41402abc4b2a76b9719d911017c592\"", 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "8ncwZ6vxGEwmvSCre6bh9Xqe2S+9f1T0MnhoeeLLTltx+EfVJvqJsAeYbAcmvuSJyBkhkp3PkMY=", 
-            "RequestId": "10E2472C422800C2", 
-            "HTTPHeaders": {
-                "content-length": "0", 
-                "x-amz-id-2": "8ncwZ6vxGEwmvSCre6bh9Xqe2S+9f1T0MnhoeeLLTltx+EfVJvqJsAeYbAcmvuSJyBkhkp3PkMY=", 
-                "server": "AmazonS3", 
-                "x-amz-request-id": "10E2472C422800C2", 
-                "etag": "\"5d41402abc4b2a76b9719d911017c592\"", 
-                "date": "Mon, 29 May 2017 00:35:03 GMT"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "ETag": "\"5d41402abc4b2a76b9719d911017c592\"",
+    "ResponseMetadata": {}
+  }
 }

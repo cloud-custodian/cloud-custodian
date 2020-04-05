@@ -1,54 +1,43 @@
 {
-    "status_code": 200, 
-    "data": {
-        "SecurityGroups": [
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1", 
-                        "PrefixListIds": [], 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "0.0.0.0/0"
-                            }
-                        ], 
-                        "UserIdGroupPairs": [], 
-                        "Ipv6Ranges": []
-                    }
-                ], 
-                "Description": "for apps", 
-                "IpPermissions": [
-                    {
-                        "PrefixListIds": [], 
-                        "FromPort": 0, 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "10.2.0.0/16"
-                            }
-                        ], 
-                        "ToPort": 62000, 
-                        "IpProtocol": "tcp", 
-                        "UserIdGroupPairs": [], 
-                        "Ipv6Ranges": []
-                    }
-                ], 
-                "GroupName": "web-tier", 
-                "VpcId": "vpc-7cc27a05", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-e6853097"
-            }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "99feca40-77c1-4e6f-be19-44a192d57682", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 27 Jun 2017 15:45:48 GMT"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "SecurityGroups": [
+      {
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "PrefixListIds": [],
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "UserIdGroupPairs": [],
+            "Ipv6Ranges": []
+          }
+        ],
+        "Description": "for apps",
+        "IpPermissions": [
+          {
+            "PrefixListIds": [],
+            "FromPort": 0,
+            "IpRanges": [
+              {
+                "CidrIp": "10.2.0.0/16"
+              }
+            ],
+            "ToPort": 62000,
+            "IpProtocol": "tcp",
+            "UserIdGroupPairs": [],
+            "Ipv6Ranges": []
+          }
+        ],
+        "GroupName": "web-tier",
+        "VpcId": "vpc-7cc27a05",
+        "OwnerId": "644160558196",
+        "GroupId": "sg-e6853097"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

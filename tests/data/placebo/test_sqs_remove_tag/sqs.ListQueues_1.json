@@ -1,19 +1,9 @@
 {
-    "status_code": 200,
-    "data": {
-        "QueueUrls": [
-            "https://us-west-1.queue.amazonaws.com/644160558196/test-sqs-4"
-        ],
-        "ResponseMetadata": {
-            "RequestId": "0f15e480-12ff-56b6-b427-b054dcc96304",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "0f15e480-12ff-56b6-b427-b054dcc96304",
-                "date": "Wed, 06 Feb 2019 11:58:46 GMT",
-                "content-type": "text/xml",
-                "content-length": "328"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "QueueUrls": [
+      "https://us-west-1.queue.amazonaws.com/644160558196/test-sqs-4"
+    ],
+    "ResponseMetadata": {}
+  }
 }

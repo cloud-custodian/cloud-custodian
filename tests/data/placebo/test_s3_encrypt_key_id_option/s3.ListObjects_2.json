@@ -1,88 +1,74 @@
 {
-    "status_code": 200, 
-    "data": {
-        "Name": "custodian-encrypt-test", 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "Ateen3VmgHffVi5SCs0dPsnVJq9NWKaW2J8EbYSCE7xeB04/Akwqm8zSzVL21dt3fwvbNlPzmlQ=", 
-            "RequestId": "6386914D48619024", 
-            "HTTPHeaders": {
-                "x-amz-bucket-region": "us-east-1", 
-                "x-amz-id-2": "Ateen3VmgHffVi5SCs0dPsnVJq9NWKaW2J8EbYSCE7xeB04/Akwqm8zSzVL21dt3fwvbNlPzmlQ=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "6386914D48619024", 
-                "date": "Mon, 29 May 2017 00:35:06 GMT", 
-                "content-type": "application/xml"
-            }
-        }, 
-        "MaxKeys": 1000, 
-        "Prefix": "", 
-        "Marker": "", 
-        "EncodingType": "url", 
-        "IsTruncated": false, 
-        "Contents": [
-            {
-                "LastModified": {
-                    "hour": 0, 
-                    "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 5, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 29, 
-                    "minute": 35
-                }, 
-                "ETag": "\"2e9032c1cdf2e801ad74d7111a365feb\"", 
-                "StorageClass": "STANDARD", 
-                "Key": "AWSLogs/2015/10/10", 
-                "Owner": {
-                    "DisplayName": "mandeep.bal", 
-                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
-                }, 
-                "Size": 3
-            }, 
-            {
-                "LastModified": {
-                    "hour": 0, 
-                    "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 5, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 29, 
-                    "minute": 35
-                }, 
-                "ETag": "\"d684ba5827784fa34ad03bf5f0c9571b\"", 
-                "StorageClass": "STANDARD", 
-                "Key": "AWSLogs/2015/10/11", 
-                "Owner": {
-                    "DisplayName": "mandeep.bal", 
-                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
-                }, 
-                "Size": 4
-            }, 
-            {
-                "LastModified": {
-                    "hour": 0, 
-                    "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 5, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 29, 
-                    "minute": 35
-                }, 
-                "ETag": "\"d79d08eda750c1171e3fc3f6275331bc\"", 
-                "StorageClass": "STANDARD", 
-                "Key": "home.txt", 
-                "Owner": {
-                    "DisplayName": "mandeep.bal", 
-                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
-                }, 
-                "Size": 5
-            }
-        ]
-    }
+  "status_code": 200,
+  "data": {
+    "Name": "custodian-encrypt-test",
+    "ResponseMetadata": {},
+    "MaxKeys": 1000,
+    "Prefix": "",
+    "Marker": "",
+    "EncodingType": "url",
+    "IsTruncated": false,
+    "Contents": [
+      {
+        "LastModified": {
+          "hour": 0,
+          "__class__": "datetime",
+          "month": 5,
+          "second": 5,
+          "microsecond": 0,
+          "year": 2017,
+          "day": 29,
+          "minute": 35
+        },
+        "ETag": "\"2e9032c1cdf2e801ad74d7111a365feb\"",
+        "StorageClass": "STANDARD",
+        "Key": "AWSLogs/2015/10/10",
+        "Owner": {
+          "DisplayName": "mandeep.bal",
+          "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        },
+        "Size": 3
+      },
+      {
+        "LastModified": {
+          "hour": 0,
+          "__class__": "datetime",
+          "month": 5,
+          "second": 5,
+          "microsecond": 0,
+          "year": 2017,
+          "day": 29,
+          "minute": 35
+        },
+        "ETag": "\"d684ba5827784fa34ad03bf5f0c9571b\"",
+        "StorageClass": "STANDARD",
+        "Key": "AWSLogs/2015/10/11",
+        "Owner": {
+          "DisplayName": "mandeep.bal",
+          "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        },
+        "Size": 4
+      },
+      {
+        "LastModified": {
+          "hour": 0,
+          "__class__": "datetime",
+          "month": 5,
+          "second": 5,
+          "microsecond": 0,
+          "year": 2017,
+          "day": 29,
+          "minute": 35
+        },
+        "ETag": "\"d79d08eda750c1171e3fc3f6275331bc\"",
+        "StorageClass": "STANDARD",
+        "Key": "home.txt",
+        "Owner": {
+          "DisplayName": "mandeep.bal",
+          "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        },
+        "Size": 5
+      }
+    ]
+  }
 }

@@ -1,37 +1,26 @@
 {
-    "status_code": 200, 
-    "data": {
-        "Functions": [
-            {
-                "TracingConfig": {
-                    "Mode": "PassThrough"
-                }, 
-                "Version": "$LATEST", 
-                "CodeSha256": "QYDlWejakU9/FbvkVnWvASojTxa9lDVbavV5XfCxMC8=", 
-                "FunctionName": "guard-duty-archiver-EnhancedEventArchiver-RUML739UKXP0", 
-                "MemorySize": 128, 
-                "RevisionId": "236f8b45-dd7c-4559-a616-033cba696a05", 
-                "CodeSize": 769, 
-                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:guard-duty-archiver-EnhancedEventArchiver-RUML739UKXP0", 
-                "Handler": "archiver.handler", 
-                "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
-                "Timeout": 3, 
-                "LastModified": "2018-01-31T17:47:02.456+0000", 
-                "Runtime": "python2.7", 
-                "Description": ""
-            }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "cd0d651a-1190-11e8-a803-778970a0543b", 
-            "HTTPHeaders": {
-                "date": "Wed, 14 Feb 2018 14:10:24 GMT", 
-                "x-amzn-requestid": "cd0d651a-1190-11e8-a803-778970a0543b", 
-                "content-length": "24875", 
-                "content-type": "application/json", 
-                "connection": "keep-alive"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Functions": [
+      {
+        "TracingConfig": {
+          "Mode": "PassThrough"
+        },
+        "Version": "$LATEST",
+        "CodeSha256": "QYDlWejakU9/FbvkVnWvASojTxa9lDVbavV5XfCxMC8=",
+        "FunctionName": "guard-duty-archiver-EnhancedEventArchiver-RUML739UKXP0",
+        "MemorySize": 128,
+        "RevisionId": "236f8b45-dd7c-4559-a616-033cba696a05",
+        "CodeSize": 769,
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:guard-duty-archiver-EnhancedEventArchiver-RUML739UKXP0",
+        "Handler": "archiver.handler",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Timeout": 3,
+        "LastModified": "2018-01-31T17:47:02.456+0000",
+        "Runtime": "python2.7",
+        "Description": ""
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

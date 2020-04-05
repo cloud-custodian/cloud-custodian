@@ -1,28 +1,18 @@
 {
-    "status_code": 200,
-    "data": {
-        "PaginationToken": "",
-        "ResourceTagMappingList": [
-            {
-                "ResourceARN": "arn:aws:sqs:us-west-1:644160558196:test-sqs-4",
-                "Tags": [
-                    {
-                        "Key": "remove-this-tag",
-                        "Value": "tag to be removed"
-                    }
-                ]
-            }
-        ],
-        "ResponseMetadata": {
-            "RequestId": "8f4f745b-2a06-11e9-ae15-092a2e938e80",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "8f4f745b-2a06-11e9-ae15-092a2e938e80",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "176",
-                "date": "Wed, 06 Feb 2019 11:58:47 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "PaginationToken": "",
+    "ResourceTagMappingList": [
+      {
+        "ResourceARN": "arn:aws:sqs:us-west-1:644160558196:test-sqs-4",
+        "Tags": [
+          {
+            "Key": "remove-this-tag",
+            "Value": "tag to be removed"
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

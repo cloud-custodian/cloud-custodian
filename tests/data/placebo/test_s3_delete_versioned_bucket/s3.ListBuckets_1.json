@@ -1,103 +1,90 @@
 {
-    "status_code": 200, 
-    "data": {
-        "Owner": {
-            "DisplayName": "mandeep.bal", 
-            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
-        }, 
-        "Buckets": [
-            {
-                "CreationDate": {
-                    "hour": 16, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 18, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 15, 
-                    "minute": 0
-                }, 
-                "Name": "cf-templates-9c4kee3xbart-us-west-2"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 10, 
-                    "__class__": "datetime", 
-                    "month": 7, 
-                    "second": 14, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 24, 
-                    "minute": 38
-                }, 
-                "Name": "config-bucket-644160558196"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 23, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 14, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 8, 
-                    "minute": 19
-                }, 
-                "Name": "custodian-byebye"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 21, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 20, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 6, 
-                    "minute": 18
-                }, 
-                "Name": "custodian-skunk-billing"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 8, 
-                    "__class__": "datetime", 
-                    "month": 7, 
-                    "second": 21, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 24, 
-                    "minute": 50
-                }, 
-                "Name": "custodian-skunk-trails"
-            }, 
-            {
-                "CreationDate": {
-                    "hour": 12, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 45, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 5, 
-                    "minute": 31
-                }, 
-                "Name": "scot-test"
-            }
-        ], 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "OV2qWJkEOk/QE7DRbqCCNmV5dnp589LuAJCo3R1pBQYOd0WLOCqWfOEOxQ2KIq0uGlTDIea0ZyU=", 
-            "RequestId": "576F12EBACC39CCD", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "OV2qWJkEOk/QE7DRbqCCNmV5dnp589LuAJCo3R1pBQYOd0WLOCqWfOEOxQ2KIq0uGlTDIea0ZyU=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "576F12EBACC39CCD", 
-                "date": "Tue, 08 Nov 2016 23:19:19 GMT", 
-                "content-type": "application/xml"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Owner": {
+      "DisplayName": "mandeep.bal",
+      "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+    },
+    "Buckets": [
+      {
+        "CreationDate": {
+          "hour": 16,
+          "__class__": "datetime",
+          "month": 10,
+          "second": 18,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 15,
+          "minute": 0
+        },
+        "Name": "cf-templates-9c4kee3xbart-us-west-2"
+      },
+      {
+        "CreationDate": {
+          "hour": 10,
+          "__class__": "datetime",
+          "month": 7,
+          "second": 14,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 24,
+          "minute": 38
+        },
+        "Name": "config-bucket-644160558196"
+      },
+      {
+        "CreationDate": {
+          "hour": 23,
+          "__class__": "datetime",
+          "month": 11,
+          "second": 14,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 8,
+          "minute": 19
+        },
+        "Name": "custodian-byebye"
+      },
+      {
+        "CreationDate": {
+          "hour": 21,
+          "__class__": "datetime",
+          "month": 11,
+          "second": 20,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 6,
+          "minute": 18
+        },
+        "Name": "custodian-skunk-billing"
+      },
+      {
+        "CreationDate": {
+          "hour": 8,
+          "__class__": "datetime",
+          "month": 7,
+          "second": 21,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 24,
+          "minute": 50
+        },
+        "Name": "custodian-skunk-trails"
+      },
+      {
+        "CreationDate": {
+          "hour": 12,
+          "__class__": "datetime",
+          "month": 11,
+          "second": 45,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 5,
+          "minute": 31
+        },
+        "Name": "scot-test"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

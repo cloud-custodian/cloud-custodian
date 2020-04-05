@@ -1,37 +1,27 @@
 {
-    "status_code": 200, 
-    "data": {
-        "CacheSubnetGroups": [
-            {
-                "VpcId": "vpc-f1516b97", 
-                "CacheSubnetGroupDescription": " ", 
-                "Subnets": [
-                    {
-                        "SubnetIdentifier": "subnet-ecfb30a4", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-east-1a"
-                        }
-                    }, 
-                    {
-                        "SubnetIdentifier": "subnet-71bda45c", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-east-1d"
-                        }
-                    }
-                ], 
-                "CacheSubnetGroupName": "msg"
+  "status_code": 200,
+  "data": {
+    "CacheSubnetGroups": [
+      {
+        "VpcId": "vpc-f1516b97",
+        "CacheSubnetGroupDescription": " ",
+        "Subnets": [
+          {
+            "SubnetIdentifier": "subnet-ecfb30a4",
+            "SubnetAvailabilityZone": {
+              "Name": "us-east-1a"
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "bf878889-5883-11e7-934a-f9f9cb6a2eee", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "bf878889-5883-11e7-934a-f9f9cb6a2eee", 
-                "date": "Sat, 24 Jun 2017 02:20:52 GMT", 
-                "content-length": "1043", 
-                "content-type": "text/xml"
+          },
+          {
+            "SubnetIdentifier": "subnet-71bda45c",
+            "SubnetAvailabilityZone": {
+              "Name": "us-east-1d"
             }
-        }
-    }
+          }
+        ],
+        "CacheSubnetGroupName": "msg"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

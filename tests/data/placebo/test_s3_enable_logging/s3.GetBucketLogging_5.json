@@ -1,23 +1,10 @@
 {
-    "status_code": 200,
-    "data": {
-        "ResponseMetadata": {
-            "RequestId": "4645D8C38A79606E",
-            "HostId": "GdKeuqwvSLXp4w1nGi7g4bLdnBAZdABnoLXDNc4cMoY9MeU3QwzdiH/R0zK9dNSRtH6ZZ7nn4J0=",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amz-id-2": "GdKeuqwvSLXp4w1nGi7g4bLdnBAZdABnoLXDNc4cMoY9MeU3QwzdiH/R0zK9dNSRtH6ZZ7nn4J0=",
-                "x-amz-request-id": "4645D8C38A79606E",
-                "date": "Fri, 20 Dec 2019 23:00:35 GMT",
-                "content-type": "application/xml",
-                "transfer-encoding": "chunked",
-                "server": "AmazonS3"
-            },
-            "RetryAttempts": 0
-        },
-        "LoggingEnabled": {
-            "TargetBucket": "superduper-and-magic",
-            "TargetPrefix": "644160558196/superduper-and-magic/"
-        }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "LoggingEnabled": {
+      "TargetBucket": "superduper-and-magic",
+      "TargetPrefix": "644160558196/superduper-and-magic/"
     }
+  }
 }

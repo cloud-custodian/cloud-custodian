@@ -2,18 +2,7 @@
   "status_code": 200,
   "data": {
     "Description": "",
-    "ResponseMetadata": {
-      "RetryAttempts": 0,
-      "HTTPStatusCode": 200,
-      "RequestId": "526a3e1a-2002-4ec6-8860-cc09008173ac",
-      "HTTPHeaders": {
-        "transfer-encoding": "chunked",
-        "vary": "Accept-Encoding",
-        "server": "AmazonEC2",
-        "content-type": "text/xml;charset=UTF-8",
-        "date": "Wed, 03 May 2017 14:43:16 GMT"
-      }
-    },
+    "ResponseMetadata": {},
     "Encrypted": false,
     "VolumeId": "vol-0252f61378ede9d01",
     "State": "pending",

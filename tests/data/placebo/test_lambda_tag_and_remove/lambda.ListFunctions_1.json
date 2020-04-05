@@ -1,37 +1,26 @@
 {
-    "status_code": 200,
-    "data": {
-        "ResponseMetadata": {
-            "RequestId": "f1166076-2bae-11e9-93ed-07eb5dc12b91",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Fri, 08 Feb 2019 14:36:38 GMT",
-                "content-type": "application/json",
-                "content-length": "655",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "f1166076-2bae-11e9-93ed-07eb5dc12b91"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "Functions": [
+      {
+        "FunctionName": "CloudCustodian",
+        "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:CloudCustodian",
+        "Runtime": "python3.7",
+        "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+        "Handler": "lambda_function.lambda_handler",
+        "CodeSize": 299,
+        "Description": "",
+        "Timeout": 3,
+        "MemorySize": 128,
+        "LastModified": "2019-02-08T14:27:40.518+0000",
+        "CodeSha256": "ZQukCqxtkqFgyF2cU41Avj99TKQ/hNihPtDtRcc08mI=",
+        "Version": "$LATEST",
+        "TracingConfig": {
+          "Mode": "PassThrough"
         },
-        "Functions": [
-            {
-                "FunctionName": "CloudCustodian",
-                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:CloudCustodian",
-                "Runtime": "python3.7",
-                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
-                "Handler": "lambda_function.lambda_handler",
-                "CodeSize": 299,
-                "Description": "",
-                "Timeout": 3,
-                "MemorySize": 128,
-                "LastModified": "2019-02-08T14:27:40.518+0000",
-                "CodeSha256": "ZQukCqxtkqFgyF2cU41Avj99TKQ/hNihPtDtRcc08mI=",
-                "Version": "$LATEST",
-                "TracingConfig": {
-                    "Mode": "PassThrough"
-                },
-                "RevisionId": "595da7b3-df74-4d70-bb9e-0df22c156c78"
-            }
-        ]
-    }
+        "RevisionId": "595da7b3-df74-4d70-bb9e-0df22c156c78"
+      }
+    ]
+  }
 }

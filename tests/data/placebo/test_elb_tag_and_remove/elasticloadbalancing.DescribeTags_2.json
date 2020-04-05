@@ -1,20 +1,17 @@
 {
-    "status_code": 200, 
-    "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "b345c8f6-2a89-11e6-ac4a-2f43a15b7ecb"
-        }, 
-        "TagDescriptions": [
-            {
-                "Tags": [
-                    {
-                        "Value": "test", 
-                        "Key": "test"
-                    }
-                ], 
-                "LoadBalancerName": "CloudCustodian"
-            }
-        ]
-    }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "TagDescriptions": [
+      {
+        "Tags": [
+          {
+            "Value": "test",
+            "Key": "test"
+          }
+        ],
+        "LoadBalancerName": "CloudCustodian"
+      }
+    ]
+  }
 }

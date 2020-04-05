@@ -1,38 +1,26 @@
 {
-    "status_code": 200, 
-    "data": {
-        "KeyMetadata": {
-            "Origin": "AWS_KMS", 
-            "KeyId": "3cc8863f-09dd-45cd-90cf-d6149710582e", 
-            "Description": "", 
-            "Enabled": true, 
-            "KeyUsage": "ENCRYPT_DECRYPT", 
-            "KeyState": "Enabled", 
-            "CreationDate": {
-                "hour": 12, 
-                "__class__": "datetime", 
-                "month": 6, 
-                "second": 26, 
-                "microsecond": 305000, 
-                "year": 2017, 
-                "day": 8, 
-                "minute": 59
-            }, 
-            "Arn": "arn:aws:kms:us-east-1:185106417252:key/3cc8863f-09dd-45cd-90cf-d6149710582e", 
-            "AWSAccountId": "185106417252"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "c0b10d3c-4c76-11e7-a803-c35d5aff7716", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "c0b10d3c-4c76-11e7-a803-c35d5aff7716", 
-                "content-length": "311", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Thu, 08 Jun 2017 18:17:38 GMT", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "KeyMetadata": {
+      "Origin": "AWS_KMS",
+      "KeyId": "3cc8863f-09dd-45cd-90cf-d6149710582e",
+      "Description": "",
+      "Enabled": true,
+      "KeyUsage": "ENCRYPT_DECRYPT",
+      "KeyState": "Enabled",
+      "CreationDate": {
+        "hour": 12,
+        "__class__": "datetime",
+        "month": 6,
+        "second": 26,
+        "microsecond": 305000,
+        "year": 2017,
+        "day": 8,
+        "minute": 59
+      },
+      "Arn": "arn:aws:kms:us-east-1:185106417252:key/3cc8863f-09dd-45cd-90cf-d6149710582e",
+      "AWSAccountId": "185106417252"
+    },
+    "ResponseMetadata": {}
+  }
 }

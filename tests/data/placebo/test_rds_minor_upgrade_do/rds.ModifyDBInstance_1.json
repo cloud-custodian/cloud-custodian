@@ -1,108 +1,97 @@
 {
-    "status_code": 200, 
-    "data": {
-        "DBInstance": {
-            "PubliclyAccessible": false, 
-            "MasterUsername": "test", 
-            "MonitoringInterval": 60, 
-            "LicenseModel": "general-public-license", 
-            "VpcSecurityGroups": [
-                {
-                    "Status": "active", 
-                    "VpcSecurityGroupId": "sg-29ee3e5a"
-                }
-            ], 
-            "CopyTagsToSnapshot": false, 
-            "OptionGroupMemberships": [
-                {
-                    "Status": "in-sync", 
-                    "OptionGroupName": "default:mysql-5-6"
-                }
-            ], 
-            "PendingModifiedValues": {
-                "MasterUserPassword": "****", 
-                "EngineVersion": "5.6.35"
-            }, 
-            "Engine": "mysql", 
-            "MultiAZ": true, 
-            "DBSecurityGroups": [], 
-            "DBParameterGroups": [
-                {
-                    "DBParameterGroupName": "default.mysql5.6", 
-                    "ParameterApplyStatus": "in-sync"
-                }
-            ], 
-            "AutoMinorVersionUpgrade": true, 
-            "PreferredBackupWindow": "09:19-09:49", 
-            "DBSubnetGroup": {
-                "Subnets": [
-                    {
-                        "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-3a334610", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-east-1d"
-                        }
-                    }, 
-                    {
-                        "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-efbcccb7", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-east-1b"
-                        }
-                    }, 
-                    {
-                        "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-e3b194de", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-east-1e"
-                        }
-                    }, 
-                    {
-                        "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-914763e7", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-east-1a"
-                        }
-                    }
-                ], 
-                "DBSubnetGroupName": "default", 
-                "VpcId": "vpc-d2d616b5", 
-                "DBSubnetGroupDescription": "default", 
-                "SubnetGroupStatus": "Complete"
-            }, 
-            "ReadReplicaDBInstanceIdentifiers": [], 
-            "AllocatedStorage": 100, 
-            "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:c7n-mysql-test-03", 
-            "BackupRetentionPeriod": 7, 
-            "DBName": "test_03", 
-            "PreferredMaintenanceWindow": "mon:06:38-mon:07:08", 
-            "DBInstanceStatus": "creating", 
-            "IAMDatabaseAuthenticationEnabled": false, 
-            "EngineVersion": "5.6.29", 
-            "AvailabilityZone": "us-east-1b", 
-            "DomainMemberships": [], 
-            "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role", 
-            "StorageType": "io1", 
-            "DbiResourceId": "db-UUDAVA57SRMCF3CPUYCOW3YZNI", 
-            "CACertificateIdentifier": "rds-ca-2015", 
-            "Iops": 1000, 
-            "StorageEncrypted": true, 
-            "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688", 
-            "DBInstanceClass": "db.m4.xlarge", 
-            "DbInstancePort": 0, 
-            "DBInstanceIdentifier": "c7n-mysql-test-03"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "a2bb2653-9a29-11e7-995a-77ea9a57eb1e", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "a2bb2653-9a29-11e7-995a-77ea9a57eb1e", 
-                "vary": "Accept-Encoding", 
-                "content-length": "4270", 
-                "content-type": "text/xml", 
-                "date": "Fri, 15 Sep 2017 15:22:08 GMT"
-            }
+  "status_code": 200,
+  "data": {
+    "DBInstance": {
+      "PubliclyAccessible": false,
+      "MasterUsername": "test",
+      "MonitoringInterval": 60,
+      "LicenseModel": "general-public-license",
+      "VpcSecurityGroups": [
+        {
+          "Status": "active",
+          "VpcSecurityGroupId": "sg-29ee3e5a"
         }
-    }
+      ],
+      "CopyTagsToSnapshot": false,
+      "OptionGroupMemberships": [
+        {
+          "Status": "in-sync",
+          "OptionGroupName": "default:mysql-5-6"
+        }
+      ],
+      "PendingModifiedValues": {
+        "MasterUserPassword": "****",
+        "EngineVersion": "5.6.35"
+      },
+      "Engine": "mysql",
+      "MultiAZ": true,
+      "DBSecurityGroups": [],
+      "DBParameterGroups": [
+        {
+          "DBParameterGroupName": "default.mysql5.6",
+          "ParameterApplyStatus": "in-sync"
+        }
+      ],
+      "AutoMinorVersionUpgrade": true,
+      "PreferredBackupWindow": "09:19-09:49",
+      "DBSubnetGroup": {
+        "Subnets": [
+          {
+            "SubnetStatus": "Active",
+            "SubnetIdentifier": "subnet-3a334610",
+            "SubnetAvailabilityZone": {
+              "Name": "us-east-1d"
+            }
+          },
+          {
+            "SubnetStatus": "Active",
+            "SubnetIdentifier": "subnet-efbcccb7",
+            "SubnetAvailabilityZone": {
+              "Name": "us-east-1b"
+            }
+          },
+          {
+            "SubnetStatus": "Active",
+            "SubnetIdentifier": "subnet-e3b194de",
+            "SubnetAvailabilityZone": {
+              "Name": "us-east-1e"
+            }
+          },
+          {
+            "SubnetStatus": "Active",
+            "SubnetIdentifier": "subnet-914763e7",
+            "SubnetAvailabilityZone": {
+              "Name": "us-east-1a"
+            }
+          }
+        ],
+        "DBSubnetGroupName": "default",
+        "VpcId": "vpc-d2d616b5",
+        "DBSubnetGroupDescription": "default",
+        "SubnetGroupStatus": "Complete"
+      },
+      "ReadReplicaDBInstanceIdentifiers": [],
+      "AllocatedStorage": 100,
+      "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:c7n-mysql-test-03",
+      "BackupRetentionPeriod": 7,
+      "DBName": "test_03",
+      "PreferredMaintenanceWindow": "mon:06:38-mon:07:08",
+      "DBInstanceStatus": "creating",
+      "IAMDatabaseAuthenticationEnabled": false,
+      "EngineVersion": "5.6.29",
+      "AvailabilityZone": "us-east-1b",
+      "DomainMemberships": [],
+      "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+      "StorageType": "io1",
+      "DbiResourceId": "db-UUDAVA57SRMCF3CPUYCOW3YZNI",
+      "CACertificateIdentifier": "rds-ca-2015",
+      "Iops": 1000,
+      "StorageEncrypted": true,
+      "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688",
+      "DBInstanceClass": "db.m4.xlarge",
+      "DbInstancePort": 0,
+      "DBInstanceIdentifier": "c7n-mysql-test-03"
+    },
+    "ResponseMetadata": {}
+  }
 }

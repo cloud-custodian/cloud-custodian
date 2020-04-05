@@ -1,26 +1,12 @@
 {
-    "status_code": 200,
-    "data": {
-        "ResponseMetadata": {
-            "RequestId": "1F7533BB910D5DC5",
-            "HostId": "H0thnkdUZv0kwEoLnd9EOCQ7XF/bQZXQ5vEkHZhGHYWFTcLDpUJMci54WlX8ZoxBoFeX4V/SxYk=",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amz-id-2": "H0thnkdUZv0kwEoLnd9EOCQ7XF/bQZXQ5vEkHZhGHYWFTcLDpUJMci54WlX8ZoxBoFeX4V/SxYk=",
-                "x-amz-request-id": "1F7533BB910D5DC5",
-                "date": "Fri, 20 Dec 2019 23:00:56 GMT",
-                "x-amz-bucket-region": "us-east-1",
-                "content-type": "application/xml",
-                "transfer-encoding": "chunked",
-                "server": "AmazonS3"
-            },
-            "RetryAttempts": 0
-        },
-        "IsTruncated": false,
-        "Marker": "",
-        "Name": "superduper-and-magic",
-        "Prefix": "",
-        "MaxKeys": 1000,
-        "EncodingType": "url"
-    }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "IsTruncated": false,
+    "Marker": "",
+    "Name": "superduper-and-magic",
+    "Prefix": "",
+    "MaxKeys": 1000,
+    "EncodingType": "url"
+  }
 }

@@ -1,29 +1,19 @@
 {
-    "status_code": 200,
-    "data": {
-        "Attributes": {
-            "QueueArn": "arn:aws:sqs:us-west-1:644160558196:test-sqs-5",
-            "ApproximateNumberOfMessages": "0",
-            "ApproximateNumberOfMessagesNotVisible": "0",
-            "ApproximateNumberOfMessagesDelayed": "0",
-            "CreatedTimestamp": "1549454006",
-            "LastModifiedTimestamp": "1549454006",
-            "VisibilityTimeout": "30",
-            "MaximumMessageSize": "262144",
-            "MessageRetentionPeriod": "345600",
-            "DelaySeconds": "0",
-            "ReceiveMessageWaitTimeSeconds": "0"
-        },
-        "ResponseMetadata": {
-            "RequestId": "db9684ce-0a49-593b-aa10-d01ac7426448",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "db9684ce-0a49-593b-aa10-d01ac7426448",
-                "date": "Wed, 06 Feb 2019 11:53:47 GMT",
-                "content-type": "text/xml",
-                "content-length": "1164"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Attributes": {
+      "QueueArn": "arn:aws:sqs:us-west-1:644160558196:test-sqs-5",
+      "ApproximateNumberOfMessages": "0",
+      "ApproximateNumberOfMessagesNotVisible": "0",
+      "ApproximateNumberOfMessagesDelayed": "0",
+      "CreatedTimestamp": "1549454006",
+      "LastModifiedTimestamp": "1549454006",
+      "VisibilityTimeout": "30",
+      "MaximumMessageSize": "262144",
+      "MessageRetentionPeriod": "345600",
+      "DelaySeconds": "0",
+      "ReceiveMessageWaitTimeSeconds": "0"
+    },
+    "ResponseMetadata": {}
+  }
 }

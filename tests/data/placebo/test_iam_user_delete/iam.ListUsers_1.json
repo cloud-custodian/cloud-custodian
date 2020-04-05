@@ -1,36 +1,25 @@
 {
-    "status_code": 200, 
-    "data": {
-        "Users": [
-            {
-                "UserName": "alice", 
-                "Path": "/test/", 
-                "CreateDate": {
-                    "hour": 14, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 32, 
-                    "microsecond": 0, 
-                    "year": 2017, 
-                    "day": 18, 
-                    "minute": 56
-                }, 
-                "UserId": "AIDAIAKM2IUZB4CV6NFGO", 
-                "Arn": "arn:aws:iam::644160558196:user/test/alice"
-            }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "87d77804-b414-11e7-ad14-5b6a92953c46", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "87d77804-b414-11e7-ad14-5b6a92953c46", 
-                "vary": "Accept-Encoding", 
-                "content-length": "7303", 
-                "content-type": "text/xml", 
-                "date": "Wed, 18 Oct 2017 14:56:32 GMT"
-            }
-        }, 
-        "IsTruncated": false
-    }
+  "status_code": 200,
+  "data": {
+    "Users": [
+      {
+        "UserName": "alice",
+        "Path": "/test/",
+        "CreateDate": {
+          "hour": 14,
+          "__class__": "datetime",
+          "month": 10,
+          "second": 32,
+          "microsecond": 0,
+          "year": 2017,
+          "day": 18,
+          "minute": 56
+        },
+        "UserId": "AIDAIAKM2IUZB4CV6NFGO",
+        "Arn": "arn:aws:iam::644160558196:user/test/alice"
+      }
+    ],
+    "ResponseMetadata": {},
+    "IsTruncated": false
+  }
 }

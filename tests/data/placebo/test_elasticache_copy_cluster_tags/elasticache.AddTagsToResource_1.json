@@ -1,22 +1,12 @@
 {
-    "status_code": 200, 
-    "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "e67f5325-5888-11e7-ae60-8191b27e97d6", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "e67f5325-5888-11e7-ae60-8191b27e97d6", 
-                "date": "Sat, 24 Jun 2017 02:57:45 GMT", 
-                "content-length": "384", 
-                "content-type": "text/xml"
-            }
-        }, 
-        "TagList": [
-            {
-                "Value": "tagval", 
-                "Key": "tagkey"
-            }
-        ]
-    }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "TagList": [
+      {
+        "Value": "tagval",
+        "Key": "tagkey"
+      }
+    ]
+  }
 }

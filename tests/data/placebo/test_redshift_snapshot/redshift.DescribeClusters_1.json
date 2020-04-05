@@ -1,90 +1,79 @@
 {
-    "status_code": 200,
-    "data": {
-        "Clusters": [
-            {
-                "PubliclyAccessible": false,
-                "MasterUsername": "test123",
-                "VpcSecurityGroups": [
-                    {
-                        "Status": "active",
-                        "VpcSecurityGroupId": "sg-6c7fa917"
-                    }
-                ],
-                "ClusterPublicKey": "ssh-rsa AAAAB3N Amazon-Redshift\n",
-                "NumberOfNodes": 1,
-                "PendingModifiedValues": {},
-                "VpcId": "vpc-45678",
-                "ClusterVersion": "1.0",
-                "Tags": [
-                    {
-                        "Value": "T11",
-                        "Key": "T1"
-                    },
-                    {
-                        "Value": "T22",
-                        "Key": "T2"
-                    },
-                    {
-                        "Value": "T33",
-                        "Key": "T3"
-                    }
-                ],
-                "AutomatedSnapshotRetentionPeriod": 1,
-                "ClusterParameterGroups": [
-                    {
-                        "ParameterGroupName": "default.redshift-1.0",
-                        "ParameterApplyStatus": "in-sync"
-                    }
-                ],
-                "DBName": "test",
-                "PreferredMaintenanceWindow": "tue:08:30-tue:09:00",
-                "Endpoint": {
-                    "Port": 5439,
-                    "Address": "test-cluster.clalcef7utom.us-east-1.redshift.amazonaws.com"
-                },
-                "IamRoles": [],
-                "AllowVersionUpgrade": true,
-                "ClusterCreateTime": {
-                    "hour": 0,
-                    "__class__": "datetime",
-                    "month": 1,
-                    "second": 47,
-                    "microsecond": 233000,
-                    "year": 2017,
-                    "day": 16,
-                    "minute": 3
-                },
-                "ClusterSubnetGroupName": "default",
-                "EnhancedVpcRouting": false,
-                "ClusterSecurityGroups": [],
-                "ClusterIdentifier": "test-cluster",
-                "ClusterNodes": [
-                    {
-                        "NodeRole": "SHARED",
-                        "PrivateIPAddress": "172.31.63.196",
-                        "PublicIPAddress": "34.195.98.106"
-                    }
-                ],
-                "AvailabilityZone": "us-east-1d",
-                "NodeType": "dc1.large",
-                "Encrypted": true,
-                "ClusterRevisionNumber": "1161",
-                "KmsKeyId": "arn:aws:kms:us-east-1:111111:key/K1",
-                "ClusterStatus": "available"
-            }
+  "status_code": 200,
+  "data": {
+    "Clusters": [
+      {
+        "PubliclyAccessible": false,
+        "MasterUsername": "test123",
+        "VpcSecurityGroups": [
+          {
+            "Status": "active",
+            "VpcSecurityGroupId": "sg-6c7fa917"
+          }
         ],
-        "ResponseMetadata": {
-            "RetryAttempts": 0,
-            "HTTPStatusCode": 200,
-            "RequestId": "e9dc0a3f-db7f-11e6-bcee-b782993fedd5",
-            "HTTPHeaders": {
-                "x-amzn-requestid": "e9dc0a3f-db7f-11e6-bcee-b782993fedd5",
-                "vary": "Accept-Encoding",
-                "content-length": "3135",
-                "content-type": "text/xml",
-                "date": "Mon, 16 Jan 2017 00:08:30 GMT"
-            }
-        }
-    }
+        "ClusterPublicKey": "ssh-rsa AAAAB3N Amazon-Redshift\n",
+        "NumberOfNodes": 1,
+        "PendingModifiedValues": {},
+        "VpcId": "vpc-45678",
+        "ClusterVersion": "1.0",
+        "Tags": [
+          {
+            "Value": "T11",
+            "Key": "T1"
+          },
+          {
+            "Value": "T22",
+            "Key": "T2"
+          },
+          {
+            "Value": "T33",
+            "Key": "T3"
+          }
+        ],
+        "AutomatedSnapshotRetentionPeriod": 1,
+        "ClusterParameterGroups": [
+          {
+            "ParameterGroupName": "default.redshift-1.0",
+            "ParameterApplyStatus": "in-sync"
+          }
+        ],
+        "DBName": "test",
+        "PreferredMaintenanceWindow": "tue:08:30-tue:09:00",
+        "Endpoint": {
+          "Port": 5439,
+          "Address": "test-cluster.clalcef7utom.us-east-1.redshift.amazonaws.com"
+        },
+        "IamRoles": [],
+        "AllowVersionUpgrade": true,
+        "ClusterCreateTime": {
+          "hour": 0,
+          "__class__": "datetime",
+          "month": 1,
+          "second": 47,
+          "microsecond": 233000,
+          "year": 2017,
+          "day": 16,
+          "minute": 3
+        },
+        "ClusterSubnetGroupName": "default",
+        "EnhancedVpcRouting": false,
+        "ClusterSecurityGroups": [],
+        "ClusterIdentifier": "test-cluster",
+        "ClusterNodes": [
+          {
+            "NodeRole": "SHARED",
+            "PrivateIPAddress": "172.31.63.196",
+            "PublicIPAddress": "34.195.98.106"
+          }
+        ],
+        "AvailabilityZone": "us-east-1d",
+        "NodeType": "dc1.large",
+        "Encrypted": true,
+        "ClusterRevisionNumber": "1161",
+        "KmsKeyId": "arn:aws:kms:us-east-1:111111:key/K1",
+        "ClusterStatus": "available"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

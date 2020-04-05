@@ -1,30 +1,19 @@
 {
-    "status_code": 200, 
-    "data": {
-        "StoppingInstances": [
-            {
-                "InstanceId": "i-0aaaaec4b77188b69", 
-                "CurrentState": {
-                    "Code": 64, 
-                    "Name": "stopping"
-                }, 
-                "PreviousState": {
-                    "Code": 16, 
-                    "Name": "running"
-                }
-            }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "292f2c94-e084-4f37-a7ef-540e36314ead", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 08 Jun 2017 18:17:38 GMT"
-            }
+  "status_code": 200,
+  "data": {
+    "StoppingInstances": [
+      {
+        "InstanceId": "i-0aaaaec4b77188b69",
+        "CurrentState": {
+          "Code": 64,
+          "Name": "stopping"
+        },
+        "PreviousState": {
+          "Code": 16,
+          "Name": "running"
         }
-    }
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

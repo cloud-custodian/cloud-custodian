@@ -135,16 +135,6 @@
         "Status": "NON_COMPLIANT"
       }
     ],
-    "ResponseMetadata": {
-      "HTTPHeaders": {
-        "content-length": "12345",
-        "content-type": "application/x-amz-json-1.1",
-        "date": "Fri, 20 Mar 2020 15:09:20 GMT",
-        "x-amzn-requestid": "88383b45-36f4-44bb-b8a6-942dd5ffca3b"
-      },
-      "HTTPStatusCode": 200,
-      "RequestId": "88383b45-36f4-44bb-b8a6-942dd5ffca3b",
-      "RetryAttempts": 0
-    }
+    "ResponseMetadata": {}
   }
 }

@@ -1,18 +1,7 @@
 {
   "status_code": 200,
   "data": {
-    "ResponseMetadata": {
-      "RetryAttempts": 0,
-      "HTTPStatusCode": 200,
-      "RequestId": "53e62ac7-14d4-4657-9385-e1ffeb34edea",
-      "HTTPHeaders": {
-        "transfer-encoding": "chunked",
-        "vary": "Accept-Encoding",
-        "server": "AmazonEC2",
-        "content-type": "text/xml;charset=UTF-8",
-        "date": "Wed, 03 May 2017 14:43:16 GMT"
-      }
-    },
+    "ResponseMetadata": {},
     "Volumes": [
       {
         "AvailabilityZone": "us-east-1b",
@@ -78,6 +67,14 @@
           {
             "Value": "FancyTestInstancePrivate",
             "Key": "Name"
+          },
+          {
+            "Key": "Stage",
+            "Value": "Dev"
+          },
+          {
+            "Key": "DoNotCopy",
+            "Value": "ThisTag"
           }
         ],
         "Encrypted": false,
@@ -96,21 +93,7 @@
           "day": 10,
           "minute": 41
         },
-        "Size": 8,
-        "Tags": [
-          {
-            "Value": "FancyTestInstancePrivate",
-            "Key": "Name"
-          },
-          {
-            "Key": "Stage",
-            "Value": "Dev"
-          },
-          {
-            "Key": "DoNotCopy",
-            "Value": "ThisTag"
-          }
-        ]
+        "Size": 8
       },
       {
         "AvailabilityZone": "us-east-1d",

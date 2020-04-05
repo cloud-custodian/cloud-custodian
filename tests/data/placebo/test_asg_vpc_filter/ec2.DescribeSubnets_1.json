@@ -1,31 +1,20 @@
 {
-    "status_code": 200, 
-    "data": {
-        "Subnets": [
-            {
-                "AvailabilityZone": "us-east-1d", 
-                "AvailableIpAddressCount": 4087, 
-                "DefaultForAz": true, 
-                "Ipv6CidrBlockAssociationSet": [], 
-                "VpcId": "vpc-d2d616b5", 
-                "State": "available", 
-                "MapPublicIpOnLaunch": true, 
-                "SubnetId": "subnet-3a334610", 
-                "CidrBlock": "172.31.48.0/20", 
-                "AssignIpv6AddressOnCreation": false
-            }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "2d321a65-5e42-4f11-b4af-925a3540d7dc", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 27 Jun 2017 18:14:52 GMT"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Subnets": [
+      {
+        "AvailabilityZone": "us-east-1d",
+        "AvailableIpAddressCount": 4087,
+        "DefaultForAz": true,
+        "Ipv6CidrBlockAssociationSet": [],
+        "VpcId": "vpc-d2d616b5",
+        "State": "available",
+        "MapPublicIpOnLaunch": true,
+        "SubnetId": "subnet-3a334610",
+        "CidrBlock": "172.31.48.0/20",
+        "AssignIpv6AddressOnCreation": false
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

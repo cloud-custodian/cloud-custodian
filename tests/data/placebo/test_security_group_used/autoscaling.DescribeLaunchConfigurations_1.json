@@ -1,17 +1,7 @@
 {
-    "status_code": 200, 
-    "data": {
-        "LaunchConfigurations": [], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "b0cef31f-a0eb-11e6-929f-0d02c9205ac2", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "b0cef31f-a0eb-11e6-929f-0d02c9205ac2", 
-                "date": "Wed, 02 Nov 2016 11:01:22 GMT", 
-                "content-length": "350", 
-                "content-type": "text/xml"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "LaunchConfigurations": [],
+    "ResponseMetadata": {}
+  }
 }

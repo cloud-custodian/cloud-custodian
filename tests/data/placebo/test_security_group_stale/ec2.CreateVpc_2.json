@@ -1,27 +1,16 @@
 {
-    "status_code": 200, 
-    "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "f123f93b-4811-483c-a2a4-626f9e1d8c58", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 27 Jun 2017 15:40:53 GMT"
-            }
-        }, 
-        "Vpc": {
-            "VpcId": "vpc-b9c27ac0", 
-            "InstanceTenancy": "default", 
-            "Tags": [], 
-            "Ipv6CidrBlockAssociationSet": [], 
-            "State": "pending", 
-            "DhcpOptionsId": "dopt-24ff1940", 
-            "CidrBlock": "10.5.0.0/16", 
-            "IsDefault": false
-        }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "Vpc": {
+      "VpcId": "vpc-b9c27ac0",
+      "InstanceTenancy": "default",
+      "Tags": [],
+      "Ipv6CidrBlockAssociationSet": [],
+      "State": "pending",
+      "DhcpOptionsId": "dopt-24ff1940",
+      "CidrBlock": "10.5.0.0/16",
+      "IsDefault": false
     }
+  }
 }

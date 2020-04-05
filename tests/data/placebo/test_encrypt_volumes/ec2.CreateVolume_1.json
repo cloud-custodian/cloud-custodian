@@ -1,35 +1,24 @@
 {
-    "status_code": 200, 
-    "data": {
-        "AvailabilityZone": "us-east-1a", 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "e3e139eb-1804-41af-9cd8-4dbc36e1512d", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 08 Jun 2017 18:23:18 GMT"
-            }
-        }, 
-        "Encrypted": true, 
-        "VolumeType": "gp2", 
-        "VolumeId": "vol-072dfa20eef03dd38", 
-        "State": "creating", 
-        "Iops": 100, 
-        "SnapshotId": "snap-0bd2772f3c7cafa62", 
-        "CreateTime": {
-            "hour": 18, 
-            "__class__": "datetime", 
-            "month": 6, 
-            "second": 18, 
-            "microsecond": 581000, 
-            "year": 2017, 
-            "day": 8, 
-            "minute": 23
-        }, 
-        "Size": 8
-    }
+  "status_code": 200,
+  "data": {
+    "AvailabilityZone": "us-east-1a",
+    "ResponseMetadata": {},
+    "Encrypted": true,
+    "VolumeType": "gp2",
+    "VolumeId": "vol-072dfa20eef03dd38",
+    "State": "creating",
+    "Iops": 100,
+    "SnapshotId": "snap-0bd2772f3c7cafa62",
+    "CreateTime": {
+      "hour": 18,
+      "__class__": "datetime",
+      "month": 6,
+      "second": 18,
+      "microsecond": 581000,
+      "year": 2017,
+      "day": 8,
+      "minute": 23
+    },
+    "Size": 8
+  }
 }

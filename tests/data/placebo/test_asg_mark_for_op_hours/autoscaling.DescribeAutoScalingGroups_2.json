@@ -47,9 +47,6 @@
         "NewInstancesProtectedFromScaleIn": false
       }
     ],
-    "ResponseMetadata": {
-      "RequestId": "f08f794b-4e73-11e8-94c9-85996aab7948",
-      "HTTPStatusCode": 200
-    }
+    "ResponseMetadata": {}
   }
 }

@@ -1,16 +1,7 @@
 {
-    "status_code": 200, 
-    "data": {
-        "KeyRotationEnabled": true, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "267dbeb7-06a7-11e8-928a-01d6f433cda2", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "267dbeb7-06a7-11e8-928a-01d6f433cda2", 
-                "content-length": "27", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "KeyRotationEnabled": true,
+    "ResponseMetadata": {}
+  }
 }

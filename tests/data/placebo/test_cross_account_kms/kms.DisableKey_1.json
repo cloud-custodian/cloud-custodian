@@ -1,15 +1,6 @@
 {
-    "status_code": 200, 
-    "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "da4a1e28-06ce-11e8-bd74-85377e02ac8a", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "da4a1e28-06ce-11e8-bd74-85377e02ac8a", 
-                "content-length": "0", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {}
+  }
 }

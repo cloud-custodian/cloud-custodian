@@ -1,22 +1,10 @@
 {
-    "status_code": 200, 
-    "data": {
-        "StreamNames": [
-            "test-yes-encrypt"
-        ], 
-        "HasMoreStreams": false, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "cafc466b-7c45-5203-98f5-4d8c6d80cd71", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "cafc466b-7c45-5203-98f5-4d8c6d80cd71", 
-                "content-length": "59", 
-                "x-amz-id-2": "Qwp7FcZJ1ClDm5TyClkxPjG94HLWLCI+ug2n14JYNB9/l6ZWLCExXujLF27KJKz8OcmlLuXfmHD7NqB5I6sVt9O/LfOSmGo1KUtPMqIO1Hw=", 
-                "server": "Apache-Coyote/1.1", 
-                "date": "Sat, 12 Aug 2017 13:59:03 GMT", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "StreamNames": [
+      "test-yes-encrypt"
+    ],
+    "HasMoreStreams": false,
+    "ResponseMetadata": {}
+  }
 }

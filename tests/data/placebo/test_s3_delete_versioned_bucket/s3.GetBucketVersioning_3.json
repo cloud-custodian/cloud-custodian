@@ -1,19 +1,7 @@
 {
-    "status_code": 200, 
-    "data": {
-        "Status": "Enabled", 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "3TvUkrNGjDrP5QfvCO5mMS2c/CcfSvcK/sG+sZhMopeoeU4ES0TdXg5xtn/f9fcdO5YIr5gl8jY=", 
-            "RequestId": "55E5268C767245B9", 
-            "HTTPHeaders": {
-                "x-amz-id-2": "3TvUkrNGjDrP5QfvCO5mMS2c/CcfSvcK/sG+sZhMopeoeU4ES0TdXg5xtn/f9fcdO5YIr5gl8jY=", 
-                "date": "Tue, 08 Nov 2016 23:19:22 GMT", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "55E5268C767245B9", 
-                "server": "AmazonS3"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Status": "Enabled",
+    "ResponseMetadata": {}
+  }
 }

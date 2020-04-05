@@ -1,35 +1,24 @@
 {
-    "status_code": 200, 
-    "data": {
-        "Description": "maid transient snapshot for encryption", 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "b4f4c742-2a09-4057-ab77-e07ce178632a", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Thu, 08 Jun 2017 18:18:55 GMT"
-            }
-        }, 
-        "Encrypted": false, 
-        "VolumeId": "vol-0f53c81b92b4ecfce", 
-        "State": "pending", 
-        "VolumeSize": 8, 
-        "Progress": "", 
-        "StartTime": {
-            "hour": 18, 
-            "__class__": "datetime", 
-            "month": 6, 
-            "second": 56, 
-            "microsecond": 0, 
-            "year": 2017, 
-            "day": 8, 
-            "minute": 18
-        }, 
-        "SnapshotId": "snap-09ab186abf23129b6", 
-        "OwnerId": "185106417252"
-    }
+  "status_code": 200,
+  "data": {
+    "Description": "maid transient snapshot for encryption",
+    "ResponseMetadata": {},
+    "Encrypted": false,
+    "VolumeId": "vol-0f53c81b92b4ecfce",
+    "State": "pending",
+    "VolumeSize": 8,
+    "Progress": "",
+    "StartTime": {
+      "hour": 18,
+      "__class__": "datetime",
+      "month": 6,
+      "second": 56,
+      "microsecond": 0,
+      "year": 2017,
+      "day": 8,
+      "minute": 18
+    },
+    "SnapshotId": "snap-09ab186abf23129b6",
+    "OwnerId": "185106417252"
+  }
 }

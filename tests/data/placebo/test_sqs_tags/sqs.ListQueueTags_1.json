@@ -1,19 +1,9 @@
 {
-    "status_code": 200,
-    "data": {
-        "Tags": {
-            "tag-this-queue": "This queue has been tagged"
-        },
-        "ResponseMetadata": {
-            "RequestId": "b7834bfb-7145-5db7-8046-1f2fbc64cec7",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "b7834bfb-7145-5db7-8046-1f2fbc64cec7",
-                "date": "Wed, 06 Feb 2019 11:54:09 GMT",
-                "content-type": "text/xml",
-                "content-length": "335"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Tags": {
+      "tag-this-queue": "This queue has been tagged"
+    },
+    "ResponseMetadata": {}
+  }
 }

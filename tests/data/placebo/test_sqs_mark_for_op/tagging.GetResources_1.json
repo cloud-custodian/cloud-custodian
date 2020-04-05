@@ -1,18 +1,8 @@
 {
-    "status_code": 200,
-    "data": {
-        "PaginationToken": "",
-        "ResourceTagMappingList": [],
-        "ResponseMetadata": {
-            "RequestId": "1ef1b1f8-2a05-11e9-9874-af8ef2a4e782",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "1ef1b1f8-2a05-11e9-9874-af8ef2a4e782",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "50",
-                "date": "Wed, 06 Feb 2019 11:48:28 GMT"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "PaginationToken": "",
+    "ResourceTagMappingList": [],
+    "ResponseMetadata": {}
+  }
 }

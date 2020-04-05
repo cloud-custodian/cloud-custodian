@@ -1,9 +1,6 @@
 {
-    "status_code": 204, 
-    "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 204, 
-            "RequestId": "d54295b3-2e2f-11e6-909c-bb8ab5480480"
-        }
-    }
+  "status_code": 204,
+  "data": {
+    "ResponseMetadata": {}
+  }
 }

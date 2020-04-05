@@ -1,45 +1,34 @@
 {
-    "status_code": 200, 
-    "data": {
-        "SecurityGroups": [
-            {
-                "IpPermissionsEgress": [
-                    {
-                        "PrefixListIds": [], 
-                        "FromPort": 443, 
-                        "IpRanges": [
-                            {
-                                "CidrIp": "10.42.0.0/16"
-                            }, 
-                            {
-                                "CidrIp": "10.42.1.0/24"
-                            }
-                        ], 
-                        "ToPort": 443, 
-                        "IpProtocol": "tcp", 
-                        "UserIdGroupPairs": [], 
-                        "Ipv6Ranges": []
-                    }
-                ], 
-                "Description": "unnecessarily large egress CIDR rule", 
-                "IpPermissions": [], 
-                "GroupName": "wide-egress", 
-                "VpcId": "vpc-43c37b3a", 
-                "OwnerId": "644160558196", 
-                "GroupId": "sg-58813429"
-            }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "c07bf7ae-1e60-4216-b414-72105b97029e", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Tue, 27 Jun 2017 15:50:24 GMT"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "SecurityGroups": [
+      {
+        "IpPermissionsEgress": [
+          {
+            "PrefixListIds": [],
+            "FromPort": 443,
+            "IpRanges": [
+              {
+                "CidrIp": "10.42.0.0/16"
+              },
+              {
+                "CidrIp": "10.42.1.0/24"
+              }
+            ],
+            "ToPort": 443,
+            "IpProtocol": "tcp",
+            "UserIdGroupPairs": [],
+            "Ipv6Ranges": []
+          }
+        ],
+        "Description": "unnecessarily large egress CIDR rule",
+        "IpPermissions": [],
+        "GroupName": "wide-egress",
+        "VpcId": "vpc-43c37b3a",
+        "OwnerId": "644160558196",
+        "GroupId": "sg-58813429"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

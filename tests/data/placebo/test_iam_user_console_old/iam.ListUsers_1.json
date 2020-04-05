@@ -1,149 +1,139 @@
 {
-    "status_code": 200, 
-    "data": {
-        "Users": [
-            {
-                "UserName": "andrew", 
-                "PasswordLastUsed": {
-                    "hour": 14, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 34, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 16, 
-                    "minute": 10
-                }, 
-                "CreateDate": {
-                    "hour": 17, 
-                    "__class__": "datetime", 
-                    "month": 8, 
-                    "second": 35, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 30, 
-                    "minute": 37
-                }, 
-                "UserId": "AIDAINLXB4P6J26AKFUC6", 
-                "Path": "/", 
-                "Arn": "arn:aws:iam::644160558196:user/andrew"
-            }, 
-            {
-                "UserName": "anthony", 
-                "PasswordLastUsed": {
-                    "hour": 13, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 37, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 26, 
-                    "minute": 14
-                }, 
-                "CreateDate": {
-                    "hour": 16, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 27, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 6, 
-                    "minute": 11
-                }, 
-                "UserId": "AIDAJ6YGUR7BFD3X5M3GS", 
-                "Path": "/", 
-                "Arn": "arn:aws:iam::644160558196:user/anthony"
-            }, 
-            {
-                "UserName": "chrissy", 
-                "PasswordLastUsed": {
-                    "hour": 17, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 20, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 6, 
-                    "minute": 8
-                }, 
-                "CreateDate": {
-                    "hour": 16, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 27, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 6, 
-                    "minute": 11
-                }, 
-                "UserId": "AIDAJOCIX26Q6LITP6WQG", 
-                "Path": "/", 
-                "Arn": "arn:aws:iam::644160558196:user/chrissy"
-            },
-            {
-                "UserName": "kapil", 
-                "PasswordLastUsed": {
-                    "hour": 19, 
-                    "__class__": "datetime", 
-                    "month": 11, 
-                    "second": 58, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 21, 
-                    "minute": 21
-                }, 
-                "CreateDate": {
-                    "hour": 19, 
-                    "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 36, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 16, 
-                    "minute": 3
-                }, 
-                "UserId": "AIDAJEZOTH6YPO3DY45QW", 
-                "Path": "/", 
-                "Arn": "arn:aws:iam::644160558196:user/kapil"
-            }, 	    
-            {
-                "UserName": "matt", 
-                "PasswordLastUsed": {
-                    "hour": 18, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 49, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 11, 
-                    "minute": 6
-                }, 
-                "CreateDate": {
-                    "hour": 16, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 27, 
-                    "microsecond": 0, 
-                    "year": 2016, 
-                    "day": 6, 
-                    "minute": 11
-                }, 
-                "UserId": "AIDAIZI7QSZIP42VCMOMK", 
-                "Path": "/", 
-                "Arn": "arn:aws:iam::644160558196:user/matt"
-            }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "d96c31ee-b30a-11e6-94f0-c9470421a190", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "d96c31ee-b30a-11e6-94f0-c9470421a190", 
-                "date": "Fri, 25 Nov 2016 12:29:45 GMT", 
-                "content-length": "6581", 
-                "content-type": "text/xml"
-            }
-        }, 
-        "IsTruncated": false
-    }
+  "status_code": 200,
+  "data": {
+    "Users": [
+      {
+        "UserName": "andrew",
+        "PasswordLastUsed": {
+          "hour": 14,
+          "__class__": "datetime",
+          "month": 11,
+          "second": 34,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 16,
+          "minute": 10
+        },
+        "CreateDate": {
+          "hour": 17,
+          "__class__": "datetime",
+          "month": 8,
+          "second": 35,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 30,
+          "minute": 37
+        },
+        "UserId": "AIDAINLXB4P6J26AKFUC6",
+        "Path": "/",
+        "Arn": "arn:aws:iam::644160558196:user/andrew"
+      },
+      {
+        "UserName": "anthony",
+        "PasswordLastUsed": {
+          "hour": 13,
+          "__class__": "datetime",
+          "month": 10,
+          "second": 37,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 26,
+          "minute": 14
+        },
+        "CreateDate": {
+          "hour": 16,
+          "__class__": "datetime",
+          "month": 10,
+          "second": 27,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 6,
+          "minute": 11
+        },
+        "UserId": "AIDAJ6YGUR7BFD3X5M3GS",
+        "Path": "/",
+        "Arn": "arn:aws:iam::644160558196:user/anthony"
+      },
+      {
+        "UserName": "chrissy",
+        "PasswordLastUsed": {
+          "hour": 17,
+          "__class__": "datetime",
+          "month": 10,
+          "second": 20,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 6,
+          "minute": 8
+        },
+        "CreateDate": {
+          "hour": 16,
+          "__class__": "datetime",
+          "month": 10,
+          "second": 27,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 6,
+          "minute": 11
+        },
+        "UserId": "AIDAJOCIX26Q6LITP6WQG",
+        "Path": "/",
+        "Arn": "arn:aws:iam::644160558196:user/chrissy"
+      },
+      {
+        "UserName": "kapil",
+        "PasswordLastUsed": {
+          "hour": 19,
+          "__class__": "datetime",
+          "month": 11,
+          "second": 58,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 21,
+          "minute": 21
+        },
+        "CreateDate": {
+          "hour": 19,
+          "__class__": "datetime",
+          "month": 5,
+          "second": 36,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 16,
+          "minute": 3
+        },
+        "UserId": "AIDAJEZOTH6YPO3DY45QW",
+        "Path": "/",
+        "Arn": "arn:aws:iam::644160558196:user/kapil"
+      },
+      {
+        "UserName": "matt",
+        "PasswordLastUsed": {
+          "hour": 18,
+          "__class__": "datetime",
+          "month": 10,
+          "second": 49,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 11,
+          "minute": 6
+        },
+        "CreateDate": {
+          "hour": 16,
+          "__class__": "datetime",
+          "month": 10,
+          "second": 27,
+          "microsecond": 0,
+          "year": 2016,
+          "day": 6,
+          "minute": 11
+        },
+        "UserId": "AIDAIZI7QSZIP42VCMOMK",
+        "Path": "/",
+        "Arn": "arn:aws:iam::644160558196:user/matt"
+      }
+    ],
+    "ResponseMetadata": {},
+    "IsTruncated": false
+  }
 }
