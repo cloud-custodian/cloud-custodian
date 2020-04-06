@@ -25,8 +25,6 @@ allowedProperties and enum extension).
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import Counter
 import json
 import inspect
@@ -468,7 +466,7 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
     return vocabulary
 
 
-class ElementSchema(object):
+class ElementSchema:
     """Utility functions for working with resource's filters and actions.
     """
 

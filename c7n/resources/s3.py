@@ -37,8 +37,6 @@ Actions:
    delivery.
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import copy
 import functools
 import json
@@ -1857,7 +1855,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
         return {'Name': b['Name'], 'State': 'PolicyAttached'}
 
 
-class BucketScanLog(object):
+class BucketScanLog:
     """Offload remediated key ids to a disk file in batches
 
     A bucket keyspace is effectively infinite, we need to store partial
@@ -3108,7 +3106,7 @@ class Lifecycle(BucketActionBase):
                 raise e
 
 
-class KMSKeyResolverMixin(object):
+class KMSKeyResolverMixin:
     """Builds a dictionary of region specific ARNs"""
 
     def __init__(self, data, manager=None):

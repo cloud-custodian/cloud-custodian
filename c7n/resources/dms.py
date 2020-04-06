@@ -21,7 +21,7 @@ from c7n.utils import local_session, chunks, type_schema, get_retry
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import FilterRegistry
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 
 
 @resources.register('dms-instance')
@@ -55,6 +55,10 @@ class DmsEndpoints(QueryResourceManager):
         enum_spec = ('describe_endpoints', 'Endpoints', None)
         arn = id = 'EndpointArn'
         name = 'EndpointIdentifier'
+        arn_type = 'endpoint'
+        universal_taggable = object()
+
+    augment = universal_augment
 
 
 class InstanceDescribe(DescribeSource):

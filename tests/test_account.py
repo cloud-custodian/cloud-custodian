@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from .common import BaseTest
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
@@ -60,7 +58,7 @@ class AccountTests(BaseTest):
 
         session_factory = self.replay_flight_data('test_account_missing_region_resource')
 
-        class SessionFactory(object):
+        class SessionFactory:
 
             def __init__(self, options):
                 self.region = options.region
@@ -846,6 +844,35 @@ class AccountTests(BaseTest):
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
+
+    def test_glue_datacat_put_encryption(self):
+        session_factory = self.replay_flight_data("test_glue_datacat_put_encryption")
+        p = self.load_policy(
+            {
+                "name": "glue-security-config",
+                "resource": "account",
+                'filters': [{
+                    'type': 'glue-security-config',
+                    'CatalogEncryptionMode': 'DISABLED'},
+                ],
+                "actions": [{
+                    "type": "set-glue-catalog-encryption",
+                    "attributes": {
+                        "EncryptionAtRest": {
+                            "CatalogEncryptionMode": "SSE-KMS",
+                            "SseAwsKmsKeyId": "alias/aws/glue"},
+                    },
+                }]
+            },
+            session_factory=session_factory,)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        datacatlog = client.get_data_catalog_encryption_settings()
+        self.assertEqual(datacatlog.get('DataCatalogEncryptionSettings').get(
+            'EncryptionAtRest'),
+            {'CatalogEncryptionMode': 'SSE-KMS', 'SseAwsKmsKeyId': 'alias/aws/glue'})
 
 
 class AccountDataEvents(BaseTest):

@@ -13,8 +13,6 @@
 # limitations under the License.
 """Data Pipeline
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction

@@ -14,8 +14,6 @@
 """
 Actions to take on resources
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import logging
 
 import jmespath
@@ -58,7 +56,7 @@ class ActionRegistry(PluginRegistry):
         return action_class(data, manager)
 
 
-class Action(object):
+class Action:
 
     permissions = ()
     metrics = ()

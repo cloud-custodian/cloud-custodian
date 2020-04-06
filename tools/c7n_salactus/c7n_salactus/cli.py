@@ -13,8 +13,6 @@
 # limitations under the License.
 """Salactus, eater of s3 buckets.
 """
-from __future__ import print_function
-
 from collections import Counter
 import csv
 from datetime import datetime

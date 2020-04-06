@@ -33,7 +33,7 @@ UTC = tzutc()
 log = logging.getLogger('sphere11.controller')
 
 
-class Controller(object):
+class Controller:
 
     supported_resources = set(('security-group', 'vpc'))
 

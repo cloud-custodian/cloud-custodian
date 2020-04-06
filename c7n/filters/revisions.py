@@ -16,8 +16,6 @@ Custodian support for diffing and patching across multiple versions
 of a resource.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import six
 
 from dateutil.parser import parse as parse_date

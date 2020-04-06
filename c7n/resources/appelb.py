@@ -14,8 +14,6 @@
 """
 Application Load Balancers
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import logging
 import six
@@ -489,7 +487,7 @@ class AppELBDeleteAction(BaseAction):
                 alb['LoadBalancerArn'], e)
 
 
-class AppELBListenerFilterBase(object):
+class AppELBListenerFilterBase:
     """ Mixin base class for filters that query LB listeners.
     """
     permissions = ("elasticloadbalancing:DescribeListeners",)
@@ -516,7 +514,7 @@ def parse_attribute_value(v):
     return v
 
 
-class AppELBAttributeFilterBase(object):
+class AppELBAttributeFilterBase:
     """ Mixin base class for filters that query LB attributes.
     """
 
@@ -624,7 +622,7 @@ class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
                             'access_logs.s3.prefix', None)))]
 
 
-class AppELBTargetGroupFilterBase(object):
+class AppELBTargetGroupFilterBase:
     """ Mixin base class for filters that query LB target groups.
     """
 

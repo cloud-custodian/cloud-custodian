@@ -54,7 +54,7 @@ log = logging.getLogger('c7n.policystream')
 EMPTY_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
-class TempDir(object):
+class TempDir:
 
     def __init__(self):
         self.path = None
@@ -69,7 +69,7 @@ class TempDir(object):
         shutil.rmtree(self.path)
 
 
-class ChangeType(object):
+class ChangeType:
 
     ADD = 1
     REMOVE = 2
@@ -105,7 +105,7 @@ GIT_DELTA = {
 GIT_DELTA_INVERT = {v: k for k, v in GIT_DELTA.items()}
 
 
-class PolicyChange(object):
+class PolicyChange:
     """References a policy change within a given commit.
     """
 
@@ -158,7 +158,7 @@ class PolicyChange(object):
         return d
 
 
-class CollectionDelta(object):
+class CollectionDelta:
     """Iterator over changes between two policy collections.
 
     With a given by url associated to a give commit.
@@ -260,7 +260,7 @@ def policy_path_matcher(path):
         return True
 
 
-class PolicyRepo(object):
+class PolicyRepo:
     """Models a git repository containing policy files.
     """
     def __init__(self, repo_uri, repo, matcher=None):
@@ -475,7 +475,7 @@ def parse_arn(arn):
     return result
 
 
-class Transport(object):
+class Transport:
 
     BUF_SIZE = 1
 

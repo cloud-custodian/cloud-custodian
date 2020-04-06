@@ -27,7 +27,7 @@ except ImportError:
     from backports.functools_lru_cache import lru_cache
 
 
-class StorageUtilities(object):
+class StorageUtilities:
 
     class Decorators:
         @staticmethod

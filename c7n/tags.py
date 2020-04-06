@@ -19,8 +19,6 @@ to ec2 (subnets, vpc, security-groups, volumes, instances,
 snapshots).
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import Counter
 from concurrent.futures import as_completed
 

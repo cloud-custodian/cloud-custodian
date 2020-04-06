@@ -609,7 +609,7 @@ class CosmosDBSaveStateAction(AzureBaseAction):
         pass
 
 
-class OfferHelper(object):
+class OfferHelper:
 
     @staticmethod
     def account_key(resource):
