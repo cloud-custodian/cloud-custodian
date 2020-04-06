@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from datetime import datetime
 import json
 import fnmatch
@@ -73,7 +71,7 @@ def load(options, path, format=None, validate=True, vars=None):
     return collection
 
 
-class PolicyCollection(object):
+class PolicyCollection:
 
     log = logging.getLogger('c7n.policies')
 
@@ -189,7 +187,7 @@ class PolicyCollection(object):
         return None
 
 
-class PolicyExecutionMode(object):
+class PolicyExecutionMode:
     """Policy execution semantics"""
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
@@ -786,7 +784,7 @@ class PolicyConditionNot(Not):
         return 'name'
 
 
-class PolicyConditions(object):
+class PolicyConditions:
 
     filter_registry = FilterRegistry('c7n.policy.filters')
     filter_registry.register('and', PolicyConditionAnd)
@@ -844,7 +842,7 @@ class PolicyConditions(object):
         return filters
 
 
-class Policy(object):
+class Policy:
 
     log = logging.getLogger('custodian.policy')
 

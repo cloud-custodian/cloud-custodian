@@ -30,6 +30,7 @@ policies:
       resource: aws.s3
 ```
  - Traceback: [if applicable, please exclude sensitive/account information]
+ - `custodian version --debug` output
 
 **Additional context**
 Add any other context about the problem here.

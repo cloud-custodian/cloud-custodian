@@ -1,37 +1,67 @@
-FROM ubuntu:disco
+FROM debian:10-slim as build-env
 
+# pre-requisite distro deps, and build env setup
+RUN adduser --disabled-login custodian
+RUN apt-get --yes update
+RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
+RUN python3 -m venv /usr/local
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
+
+WORKDIR /src
+
+# Add core & aws packages
+ADD pyproject.toml poetry.lock README.md /src/
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
+RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
+
+# Add provider packagees
+ADD tools/c7n_gcp /src/tools/c7n_gcp
+ADD tools/c7n_azure /src/tools/c7n_azure
+ADD tools/c7n_kube /src/tools/c7n_kube
+
+# Install requested providers
+ARG providers="azure gcp kube"
+RUN . /usr/local/bin/activate && for pkg in $providers; do cd tools/c7n_$pkg && $HOME/.poetry/bin/poetry install && cd ../../; done
+
+RUN mkdir /output
+
+# Compile libgit2
+RUN apt-get -y install wget cmake libssl-dev libffi-dev git
+RUN mkdir build && \
+	wget -q https://github.com/libgit2/libgit2/releases/download/v1.0.0/libgit2-1.0.0.tar.gz && \
+	cd build && \
+	tar xzf ../libgit2-1.0.0.tar.gz && \
+	cd libgit2-1.0.0 && \
+	mkdir build && cd build && \
+	cmake .. && \
+	make install && \
+        rm -Rf /src/build
+
+# Install c7n-policystream
+ADD tools/c7n_policystream /src/tools/c7n_policystream
+RUN . /usr/local/bin/activate && cd tools/c7n_policystream && $HOME/.poetry/bin/poetry install
+
+# Verify the install
+#  - policystream is not in ci due to libgit2 compilation needed
+#  - as a sanity check to distributing known good assets / we test here
+RUN . /usr/local/bin/activate && pytest tools/c7n_policystream
+
+
+# Distroless Container
+FROM gcr.io/distroless/python3-debian10
 LABEL name="policystream" \
       description="Custodian policy changes streamed from Git" \
       repository="http://github.com/cloud-custodian/cloud-custodian" \
       homepage="http://github.com/cloud-custodian/cloud-custodian" \
       maintainer="Kapil Thangavelu <http://twitter.com/kapilvt>"
 
-# Note this must be run from the root directory of the checkout
-# as we install custodian w/ aws, azure, and gcp support from the same
-# repo.
+COPY --from=build-env /src /src
+COPY --from=build-env /usr/local /usr/local
+COPY --from=build-env /etc/passwd /etc/passwd
+COPY --from=build-env /etc/group /etc/group
+COPY --from=build-env /output /output
 
-# Transfer Custodian source into container by directory
-# to minimize size
-ADD setup.py README.md requirements-dev.txt requirements.txt /src/
-ADD c7n /src/c7n/
-ADD tools /src/tools/
-
-WORKDIR /src
-RUN adduser --home /home/custodian --disabled-login custodian
-
-RUN apt-get --yes update && apt-get --yes upgrade \
-	&& apt-get --yes install build-essential libgit2-dev libffi-dev python3-pip \
-           python3-dev python3-setuptools python3-six python3-wheel \
-           python3-cryptography python3-idna \
-	&& pip3 install -r requirements-dev.txt  . \
-	&& pip3 install -r tools/c7n_policystream/requirements.txt tools/c7n_policystream \
-	&& apt-get --yes remove build-essential \
-	&& apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-	&& rm -Rf /var/cache/apt/ \
-	&& rm -Rf /var/lib/apt/lists/* \
-	&& rm -Rf /root/.cache/ \
-        && mkdir /output \
-        && chown custodian: /output
 
 USER custodian
 WORKDIR /home/custodian

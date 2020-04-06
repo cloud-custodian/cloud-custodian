@@ -444,7 +444,7 @@ class SetLogSettingsAction(AzureBaseAction):
                                                     log_settings, self.session, self.token)
 
 
-class StorageSettingsUtilities(object):
+class StorageSettingsUtilities:
 
     @staticmethod
     def _get_blob_client_from_storage_account(storage_account, token):

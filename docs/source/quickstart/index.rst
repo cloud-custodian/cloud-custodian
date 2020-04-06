@@ -173,10 +173,10 @@ First generate use custodian to generate a json schema file::
   custodian schema --json > schema.json
 
 Next install a YAML plug-in for your editor, like `YAML for Visual Studio Code
-<https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml>_` or
-`coc-yaml for coc.nvim <https://github.com/neoclide/coc-yaml>_`. Both plug-ins
+<https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml>`_ or
+`coc-yaml for coc.nvim <https://github.com/neoclide/coc-yaml>`_. Both plug-ins
 use the `yaml-language-server
-<https://github.com/redhat-developer/yaml-language-server>_` under the hood.
+<https://github.com/redhat-developer/yaml-language-server>`_ under the hood.
 
 You'll then need to configure your plug-in to use the generated `schema.json`
 as the schema for your policy files. For example in Visual Studio Code,

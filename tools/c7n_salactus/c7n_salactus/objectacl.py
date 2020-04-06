@@ -20,14 +20,14 @@ import logging
 log = logging.getLogger('salactus.acl')
 
 
-class Groups(object):
+class Groups:
 
     AllUsers = "http://acs.amazonaws.com/groups/global/AllUsers"
     AuthenticatedUsers = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
     LogDelivery = 'http://acs.amazonaws.com/groups/s3/LogDelivery'
 
 
-class Permissions(object):
+class Permissions:
 
     FullControl = 'FULL_CONTROL'
     Write = 'WRITE'
@@ -36,7 +36,7 @@ class Permissions(object):
     ReadAcp = 'READ_ACP'
 
 
-class ObjectAclCheck(object):
+class ObjectAclCheck:
 
     def __init__(self, data, record_users=False):
         self.data = data

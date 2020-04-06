@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import abc
 import six
 import importlib
@@ -25,7 +23,7 @@ clouds = PluginRegistry('c7n.providers')
 
 
 @six.add_metaclass(abc.ABCMeta)
-class Provider(object):
+class Provider:
     """Provider Base Class"""
 
     @abc.abstractproperty

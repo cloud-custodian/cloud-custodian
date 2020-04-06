@@ -16,8 +16,6 @@ Cloud Custodian Lambda Provisioning Support
 
 docs/lambda.rst
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import abc
 import base64
 import hashlib
@@ -51,7 +49,7 @@ log = logging.getLogger('custodian.serverless')
 LambdaRetry = get_retry(('InsufficientPermissionsException',), max_attempts=2)
 
 
-class PythonPackageArchive(object):
+class PythonPackageArchive:
     """Creates a zip file for python lambda functions.
 
     :param tuple modules: the Python modules to add to the archive
@@ -359,7 +357,7 @@ def custodian_archive(packages=None):
     return PythonPackageArchive(sorted(modules))
 
 
-class LambdaManager(object):
+class LambdaManager:
     """ Provides CRUD operations around lambda functions
     """
 
@@ -929,7 +927,7 @@ def zinfo(fname):
     return info
 
 
-class CloudWatchEventSource(object):
+class CloudWatchEventSource:
     """Subscribe a lambda to cloud watch events.
 
     Cloud watch events supports a number of different event
@@ -1167,7 +1165,7 @@ class CloudWatchEventSource(object):
             self.client.delete_rule(Name=func.name)
 
 
-class SecurityHubAction(object):
+class SecurityHubAction:
 
     def __init__(self, policy, session_factory):
         self.policy = policy
@@ -1239,7 +1237,7 @@ class SecurityHubAction(object):
         client.delete_action_target(ActionTargetArn=self._get_arn())
 
 
-class BucketLambdaNotification(object):
+class BucketLambdaNotification:
     """ Subscribe a lambda to bucket notifications directly. """
 
     def __init__(self, data, session_factory, bucket):
@@ -1329,7 +1327,7 @@ class BucketLambdaNotification(object):
             NotificationConfiguration=notifies)
 
 
-class CloudWatchLogSubscription(object):
+class CloudWatchLogSubscription:
     """ Subscribe a lambda to a log group[s]
     """
 
@@ -1387,7 +1385,7 @@ class CloudWatchLogSubscription(object):
                 pass
 
 
-class SQSSubscription(object):
+class SQSSubscription:
     """ Subscribe a lambda to one or more SQS queues.
     """
 
@@ -1445,7 +1443,7 @@ class SQSSubscription(object):
                 UUID=event_mappings[queue_arn]['UUID'])
 
 
-class SNSSubscription(object):
+class SNSSubscription:
     """ Subscribe a lambda to one or more SNS topics.
     """
 
@@ -1571,7 +1569,7 @@ class BucketSNSNotification(SNSSubscription):
         return topic_arns
 
 
-class ConfigRule(object):
+class ConfigRule:
     """Use a lambda as a custom config rule.
 
     """

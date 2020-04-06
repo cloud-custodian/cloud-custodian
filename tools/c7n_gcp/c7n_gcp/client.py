@@ -21,8 +21,6 @@
 # todo:
 # - consider forking googleapiclient to get rid of httplib2
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import logging
 import threading
 import os
@@ -139,7 +137,7 @@ def _build_http(http=None):
     return set_user_agent(http, user_agent)
 
 
-class Session(object):
+class Session:
     """Base class for API repository for a specified Cloud API."""
 
     def __init__(self,
@@ -234,7 +232,7 @@ class Session(object):
 
 
 # pylint: disable=too-many-instance-attributes, too-many-arguments
-class ServiceClient(object):
+class ServiceClient:
     """Base class for GCP APIs."""
 
     def __init__(self, gcp_service, credentials, component=None,

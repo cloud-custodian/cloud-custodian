@@ -18,8 +18,6 @@
 # - lazy load on datetime parse
 # - handle exported log record format
 
-from __future__ import print_function
-
 from datetime import datetime
 
 
@@ -29,7 +27,7 @@ SKIPDATA = 'SKIPDATA'
 NODATA = 'NODATA'
 
 
-class FlowRecord(object):
+class FlowRecord:
     """
     Given a VPC Flow Logs event dictionary, returns a Python object whose
     attributes match the field names in the event record. Integers are stored

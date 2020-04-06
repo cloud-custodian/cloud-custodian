@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import fnmatch
 import json
 import os
@@ -294,7 +292,7 @@ class PillTest(CustodianTestCore):
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)
 
-        class FakeFactory(object):
+        class FakeFactory:
 
             def __call__(fake, region=None, assume=None):
                 new_session = None
