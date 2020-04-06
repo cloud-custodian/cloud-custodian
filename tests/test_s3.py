@@ -1674,8 +1674,6 @@ class S3Test(BaseTest):
                     {"Name": bname},
                     {
                         "type": "check-public-block",
-                        "scope": "Any",
-                        "enabled": False
                     }
                 ],
                 "actions": [
@@ -1716,8 +1714,7 @@ class S3Test(BaseTest):
                     {"Name": bname},
                     {
                         "type": "check-public-block",
-                        "scope": "Any",
-                        "enabled": True
+                        "BlockPublicAcls": True
                     }
                 ],
                 "actions": [
@@ -1762,8 +1759,7 @@ class S3Test(BaseTest):
                     {"Name": bname},
                     {
                         "type": "check-public-block",
-                        "scope": "BlockPublicPolicy",
-                        "enabled": False
+                        "BlockPublicPolicy": False
                     }
                 ],
                 "actions": [
@@ -1805,8 +1801,7 @@ class S3Test(BaseTest):
                     {"Name": bname},
                     {
                         "type": "check-public-block",
-                        "scope": "IgnorePublicAcls",
-                        "enabled": True
+                        "IgnorePublicAcls": True
                     }
                 ],
                 "actions": [
@@ -1848,8 +1843,10 @@ class S3Test(BaseTest):
                     {"Name": bname},
                     {
                         "type": "check-public-block",
-                        "scope": "All",
-                        "enabled": False
+                        "BlockPublicAcls": False,
+                        "IgnorePublicAcls": False,
+                        "BlockPublicPolicy": False,
+                        "RestrictPublicBuckets": False
                     }
                 ]
             },

@@ -1376,10 +1376,11 @@ class SetBucketReplicationConfig(BucketActionBase):
 class FilterPublicBlock(Filter):
     """Filter for s3 bucket public blocks
 
-    `scope`: Optional: Defaults to Any
-    `enabled`: Optional: Defaults to False
-
-    The defaults essentially check to see if any public blocks are missing
+    If no block args are provided it checks
+    to see if any are False/Absent/Missing
+    If a block arg is provided, it checks to see
+    if it matches against it. For fine grained control
+    you will need to provide all block args. 
 
     :example:
 
@@ -1391,19 +1392,19 @@ class FilterPublicBlock(Filter):
                 region: us-east-1
                 filters:
                   - type: check-public-block
-                    scope: Any
-                    enabled: False
+                    # BlockPublicAcls: true <-- optional, if none provided sets all to true by default
 
     """
 
     schema = type_schema(
         'check-public-block',
-        scope={
-            'type': 'string',
-            'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
-                'BlockPublicPolicy', 'RestrictPublicBuckets', 'All', 'Any']},
-        enabled={'type': 'boolean'})
+        BlockPublicAcls={'type': 'boolean'},
+        IgnorePublicAcls={'type': 'boolean'},
+        BlockPublicPolicy={'type': 'boolean'},
+        RestrictPublicBuckets={'type': 'boolean'})
     permissions = ("s3:GetBucketPublicAccessBlock",)
+    keys = (
+        'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')    
 
     def process(self, buckets, event=None):
         results = list()
@@ -1418,35 +1419,26 @@ class FilterPublicBlock(Filter):
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        enabled = self.data.get('enabled', False)
-        scope = self.data.get('scope', 'Any')
+        config = {}
         try:
             config = s3.get_public_access_block(
                 Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                # Set config to none because NoSuchPublicAccessBlockConfiguration error
-                # was returned. This is important later because it is symbolic of
-                # all blocks being set to false. See if/else in matches_filter func
-                config = None
+                # When there is a None config, set all to false to be symbolic
+                for key in self.keys:
+                    config[key] = False
             else:
                 raise
-        if self.matches_filter(config, enabled, scope):
+        if self.matches_filter(config):
             return {"Name": bucket['Name'], "PublicAccessBlockConfiguration": config}
 
-    def matches_filter(self, config, enabled, scope):
-        if config:
-            if scope == 'All':
-                return all(config.values()) if enabled else not any(config.values())
-            elif scope == 'Any':
-                return any(config.values()) if enabled else not all(config.values())
-            else:
-                return config[scope] if enabled else not config[scope]
+    def matches_filter(self, config):
+        key_set = [key for key in self.keys if type(self.data.get(key)) is bool]
+        if key_set:
+            return all([self.data.get(key) is config[key] for key in key_set])
         else:
-            # When there is a null/none config, treat it as meaning no public blocks
-            # return False if checking for enabled=True because all are false
-            # return True if checking for enabled=False
-            return False if enabled else True
+            return not all(config.values())
 
 
 @actions.register('set-public-block')
