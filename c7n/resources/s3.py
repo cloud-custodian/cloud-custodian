@@ -1455,8 +1455,6 @@ class SetPublicBlock(BucketActionBase):
                 resource: s3
                 filters:
                   - type: check-public-block
-                    scope: Any
-                    enabled: False
                 actions:
                   - type: set-public-block
                   # BlockPublicAcls: true <-- optional, if none provided sets all to true by default
