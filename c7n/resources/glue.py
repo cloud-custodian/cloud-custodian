@@ -146,6 +146,7 @@ class GlueJob(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'job'
         universal_taggable = True
+        config_type = "AWS::Glue::Job"
 
     permissions = ('glue:GetJobs',)
     augment = universal_augment
