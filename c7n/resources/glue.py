@@ -297,7 +297,6 @@ class DeleteClassifier(BaseAction):
                 continue
 
 
-
 @resources.register('glue-ml-transform')
 class GlueMLTransform(QueryResourceManager):
 
@@ -309,8 +308,11 @@ class GlueMLTransform(QueryResourceManager):
         arn_type = 'mlTransform'
         universal_taggable = object()
 
-    permissions = ('glue:GetMLTransforms',)
     augment = universal_augment
+
+    def get_permissions(self):
+        return ('glue:GetMLTransforms',)
+
 
 
 @GlueMLTransform.action_registry.register('delete')
