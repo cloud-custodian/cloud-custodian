@@ -106,46 +106,9 @@ def serialize(obj):
     raise TypeError("Type not serializable")
 
 
-# We cannot serialize datetime by default in json dumps
-# use this method to override default behavior
-def datetime_converter(obj):
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-
-
-def save_response(self, service, operation, response_data,
-                  http_response=200):
-    """
-    Overrides the standard behavior for this function
-    so that it does not store response metadata and
-    account_ids are properly sanitized
-    """
-    pill.LOG.debug('save_response: %s.%s', service, operation)
-    filepath = self.get_new_file_path(service, operation)
-    pill.LOG.debug('save_response: path=%s', filepath)
-
-    # remove response metadata
-    if 'ResponseMetadata' in response_data:
-        response_data['ResponseMetadata'] = {}
-
-    # When there is owner info, set the name to a default
-    if 'Owner' in response_data and response_data['Owner']["DisplayName"] is not None:
-        response_data['Owner']["DisplayName"] = 'testrecording'
-
-    # sanitize account numbers using regex match for 12 digit values
-    response_data = json.dumps(response_data, default=datetime_converter)
-    response_data = re.sub("\d{12}", "123456789123", response_data)  # noqa
-    response_data = json.loads(response_data)
-    data = {'status_code': http_response,
-            'data': response_data}
-    with open(filepath, placebo.Format.write_mode(self.record_format)) as fp:
-        self._serializer(data, fp)
-
-
 pill.FakeHttpResponse.raw = None
 placebo.pill.serialize = serialize
 placebo.pill.deserialize = deserialize
-placebo.pill.Pill.save_response = save_response
 
 # END PLACEBO MONKEY
 ##########################################################################
@@ -291,6 +254,27 @@ def attach(session, data_path, prefix=None, debug=False):
     return pill
 
 
+class RedPill(pill.Pill):
+    def datetime_converter(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+
+    def save_response(self, service, operation, response_data,
+                    http_response=200):
+        """
+        Override to sanitize response metadata and account_ids
+        """
+        if 'ResponseMetadata' in response_data:
+            response_data['ResponseMetadata'] = {}
+
+        response_data = json.dumps(response_data, default=self.datetime_converter)
+        response_data = re.sub("\d{12}", "123456789123", response_data)  # noqa
+        response_data = json.loads(response_data)
+
+        super(RedPill, self).save_response(service, operation, response_data,
+                    http_response=200)
+
+
 class PillTest(CustodianTestCore):
 
     archive_path = os.path.join(
@@ -321,7 +305,8 @@ class PillTest(CustodianTestCore):
         session = boto3.Session()
         default_region = session.region_name
         if not zdata:
-            pill = placebo.attach(session, test_dir)
+            pill = RedPill()
+            pill.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, debug=True)
 
