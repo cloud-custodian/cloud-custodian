@@ -34,8 +34,6 @@ class GlueConnection(QueryResourceManager):
         date = 'CreationTime'
         arn_type = "connection"
 
-    permissions = ('glue:GetConnections',)
-
 
 @GlueConnection.filter_registry.register('subnet')
 class ConnectionSubnetFilter(SubnetFilter):
@@ -93,7 +91,6 @@ class GlueDevEndpoint(QueryResourceManager):
         arn_type = "devEndpoint"
         universal_taggable = True
 
-    permissions = ('glue:GetDevEndpoints',)
     augment = universal_augment
 
 
@@ -178,7 +175,6 @@ class GlueCrawler(QueryResourceManager):
         state_key = 'State'
         universal_taggable = True
 
-    permissions = ('glue:GetCrawlers',)
     augment = universal_augment
 
 
@@ -365,8 +361,6 @@ class GlueWorkflow(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'workflow'
         universal_taggable = object()
-
-    permissions = ('glue:ListWorkflows',)
 
     def augment(self, resources):
         return universal_augment(
