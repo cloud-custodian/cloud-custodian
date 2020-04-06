@@ -272,7 +272,7 @@ class RedPill(pill.Pill):
         response_data = json.loads(response_data)
 
         super(RedPill, self).save_response(service, operation, response_data,
-                    http_response=200)
+                    http_response)
 
 
 class PillTest(CustodianTestCore):
