@@ -22,7 +22,7 @@ from c7n_mailer.utils import decrypt
 from c7n_mailer.utils_email import get_mimetext_message, is_email
 
 
-class SendGridDelivery(object):
+class SendGridDelivery:
 
     def __init__(self, config, session, logger):
         self.config = config

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import csv
 import io
 import jmespath
@@ -32,7 +30,7 @@ log = logging.getLogger('custodian.resolver')
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
 
 
-class URIResolver(object):
+class URIResolver:
 
     def __init__(self, session_factory, cache):
         self.session_factory = session_factory
@@ -75,7 +73,7 @@ class URIResolver(object):
             return body.decode('utf-8')
 
 
-class ValuesFrom(object):
+class ValuesFrom:
     """Retrieve values from a url.
 
     Supports json, csv and line delimited text files and expressions

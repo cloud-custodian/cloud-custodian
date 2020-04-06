@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import calendar
 from datetime import datetime, timedelta
 from dateutil import tz
@@ -104,16 +102,16 @@ class TestNotFilter(unittest.TestCase):
 
         f = filters.factory({"not": [{"Architecture": "amd64"}]})
 
-        class Manager(object):
+        class Manager:
 
-            class resource_type(object):
+            class resource_type:
                 id = 'Color'
 
             @classmethod
             def get_model(cls):
                 return cls.resource_type
 
-        class FakeFilter(object):
+        class FakeFilter:
 
             def __init__(self):
                 self.invoked = False

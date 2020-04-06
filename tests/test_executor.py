@@ -11,14 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from c7n import executor
 
 import unittest
 
 
-class Foo(object):
+class Foo:
 
     def __init__(self, state):
         self.state = state
@@ -38,7 +36,7 @@ class Foo(object):
         return args, kw
 
 
-class ExecutorBase(object):
+class ExecutorBase:
 
     def test_map_instance(self):
         with self.executor_factory(max_workers=3) as w:

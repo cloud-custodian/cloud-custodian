@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from datetime import datetime
@@ -80,7 +78,7 @@ class DescribeTable(query.DescribeSource):
             super(DescribeTable, self).augment(resources))
 
 
-class StatusFilter(object):
+class StatusFilter:
     """Filter tables by status"""
 
     valid_states = ()

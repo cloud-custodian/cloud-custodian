@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "custodian-log-age",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-log-age",
+                "Runtime": "python3.7",
+                "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 567503,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2019-06-18T21:05:47.053+0000",
+                "CodeSha256": "ntfYchL2tf+xoRRXip+C2uEjAdWa73zdKFJMbRCrwJg=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": ""
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "51415854-cfdd-4461-ab71-e45bf9e6bc0e"
+            }
+        ]
+    }
+}

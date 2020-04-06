@@ -14,8 +14,6 @@
 """
 Resource Filtering Logic
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import copy
 import datetime
 from datetime import timedelta
@@ -170,7 +168,7 @@ class FilterRegistry(PluginRegistry):
 # Really should be an abstract base class (abc) or
 # zope.interface
 
-class Filter(object):
+class Filter:
 
     executor_factory = ThreadPoolExecutor
 
@@ -334,7 +332,7 @@ class Not(BooleanGroupFilter):
         return [resource_map[r_id] for r_id in results]
 
 
-class AnnotationSweeper(object):
+class AnnotationSweeper:
     """Support clearing annotations set within a block filter.
 
     See https://github.com/cloud-custodian/cloud-custodian/issues/2116
@@ -764,7 +762,7 @@ def parse_date(v, tz=None):
     return isinstance(v, datetime.datetime) and v or None
 
 
-class ValueRegex(object):
+class ValueRegex:
     """Allows filtering based on the output of a regex capture.
     This is useful for parsing data that has a weird format.
 

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import copy
 import logging
 import json
@@ -43,11 +41,11 @@ def dispatch(event, context):
 
 CORE_DEPS = [
     # core deps
-    'jinja2', 'markupsafe', 'ruamel', 'ldap3', 'pyasn1', 'redis', 'jmespath',
+    'jinja2', 'markupsafe', 'yaml', 'ldap3', 'pyasn1', 'redis', 'jmespath',
     # for other dependencies
     'pkg_resources',
     # transport datadog - recursive deps
-    'datadog', 'simplejson', 'decorator',
+    'datadog', 'decorator',
     # requests (recursive deps), needed by datadog, slackclient, splunk
     'requests', 'urllib3', 'idna', 'chardet', 'certifi',
     # used by splunk; also dependencies of c7n itself

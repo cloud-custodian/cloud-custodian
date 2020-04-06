@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import six
 
 from c7n.actions import BaseAction
@@ -141,7 +139,7 @@ class SagemakerTransformJob(QueryResourceManager):
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
 
 
-class QueryFilter(object):
+class QueryFilter:
 
     JOB_FILTERS = ('StatusEquals', 'NameContains',)
 
@@ -295,7 +293,7 @@ class Model(QueryResourceManager):
 Model.filter_registry.register('marked-for-op', TagActionFilter)
 
 
-class StateTransitionFilter(object):
+class StateTransitionFilter:
     """Filter instances by state.
 
     Try to simplify construction for policy authors by automatically

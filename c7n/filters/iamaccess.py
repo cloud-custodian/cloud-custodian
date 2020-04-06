@@ -34,8 +34,6 @@ References
   https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import fnmatch
 import logging
 import json
@@ -57,7 +55,7 @@ def _account(arn):
     return arn.split(':', 5)[4]
 
 
-class PolicyChecker(object):
+class PolicyChecker:
     """
     checker_config:
       - check_actions: only check one of the specified actions

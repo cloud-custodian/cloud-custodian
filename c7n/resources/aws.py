@@ -67,7 +67,7 @@ try:
     HAVE_XRAY = True
 except ImportError:
     HAVE_XRAY = False
-    class Context(object): pass  # NOQA
+    class Context: pass  # NOQA
 
 _profile_session = None
 
@@ -166,7 +166,7 @@ class Arn(namedtuple('_Arn', (
         return cls(*parts)
 
 
-class ArnResolver(object):
+class ArnResolver:
 
     def __init__(self, manager):
         self.manager = manager
@@ -285,7 +285,7 @@ class CloudWatchLogOutput(LogOutput):
             self.ctx.policy.name)
 
 
-class XrayEmitter(object):
+class XrayEmitter:
 
     def __init__(self):
         self.buf = []
@@ -326,7 +326,7 @@ class XrayContext(Context):
 
 
 @tracer_outputs.register('xray', condition=HAVE_XRAY)
-class XrayTracer(object):
+class XrayTracer:
 
     emitter = XrayEmitter()
 

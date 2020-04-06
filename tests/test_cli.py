@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import os
 import sys
@@ -105,12 +103,9 @@ class VersionTest(CliTest):
 
     def test_debug_version(self):
         output = self.get_output(["custodian", "version", "--debug"])
-        # Among other things, this should print sys.path
-        # Normalize double escaped backslashes for Windows
-        output = output.replace('\\\\', '\\')
-
         self.assertIn(version.version, output)
-        self.assertIn(sys.path[0], output)
+        self.assertIn('botocore==', output)
+        self.assertIn('python-dateutil==', output)
 
 
 class ValidateTest(CliTest):
@@ -444,7 +439,7 @@ class TabCompletionTest(CliTest):
 
     def test_schema_completer_wrapper(self):
 
-        class MockArgs(object):
+        class MockArgs:
             summary = False
 
         args = MockArgs()
@@ -611,7 +606,7 @@ class MetricsTest(CliTest):
         #
         # Test for defaults when --start is not supplied
         #
-        class FakeOptions(object):
+        class FakeOptions:
             start = end = None
             days = 5
 

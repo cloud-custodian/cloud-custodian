@@ -1,4 +1,37 @@
-FROM python:3.7-slim-stretch
+FROM debian:10-slim as build-env
+
+# pre-requisite distro deps, and build env setup
+RUN adduser --disabled-login custodian
+RUN apt-get --yes update
+RUN apt-get --yes install build-essential curl python3-venv python3-dev --no-install-recommends
+RUN python3 -m venv /usr/local
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
+
+WORKDIR /src
+
+# Add core & aws packages
+ADD pyproject.toml poetry.lock README.md /src/
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && $HOME/.poetry/bin/poetry install --no-dev
+RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
+
+# Add provider packagees
+ADD tools/c7n_gcp /src/tools/c7n_gcp
+ADD tools/c7n_azure /src/tools/c7n_azure
+ADD tools/c7n_kube /src/tools/c7n_kube
+
+# Install requested providers
+ARG providers="azure gcp kube"
+RUN . /usr/local/bin/activate && for pkg in $providers; do cd tools/c7n_$pkg && $HOME/.poetry/bin/poetry install && cd ../../; done
+
+RUN mkdir /output
+
+# Install c7n-org
+ADD tools/c7n_org /src/tools/c7n_org
+RUN . /usr/local/bin/activate && cd tools/c7n_org && $HOME/.poetry/bin/poetry install
+
+# Distroless Container
+FROM gcr.io/distroless/python3-debian10
 
 LABEL name="c7n-org" \
       description="Cloud Custodian Organization Runner" \
@@ -6,25 +39,11 @@ LABEL name="c7n-org" \
       homepage="http://github.com/cloud-custodian/cloud-custodian" \
       maintainer="Custodian Community <https://cloudcustodian.io>"
 
-# Transfer Custodian source into container by directory
-# to minimize size.
-# Note: build root is the root of the checkout.
-ADD setup.py README.md requirements-dev.txt requirements.txt /src/
-ADD c7n /src/c7n/
-ADD tools /src/tools/
-
-WORKDIR /src
-RUN adduser --disabled-login custodian
-RUN apt-get --yes update && apt-get --yes upgrade \
- && apt-get --yes install build-essential \
- && pip3 install -r requirements-dev.txt  . \
- && apt-get --yes remove build-essential \
- && apt-get purge --yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
- && rm -Rf /var/cache/apt/ \
- && rm -Rf /var/lib/apt/lists/* \
- && rm -Rf /root/.cache/ \
- && mkdir /output \
- && chown custodian: /output
+COPY --from=build-env /src /src
+COPY --from=build-env /usr/local /usr/local
+COPY --from=build-env /etc/passwd /etc/passwd
+COPY --from=build-env /etc/group /etc/group
+COPY --from=build-env /output /output
 
 USER custodian
 WORKDIR /home/custodian
@@ -32,4 +51,3 @@ ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 VOLUME ["/home/custodian"]
 ENTRYPOINT ["/usr/local/bin/c7n-org"]
 CMD ["--help"]
-

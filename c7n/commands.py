@@ -11,15 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
 import inspect
 import logging
 import os
-import pprint
 import sys
 
 import six
@@ -554,13 +551,14 @@ def metrics_cmd(options, policies):
 
 def version_cmd(options):
     from c7n.version import version
+    from c7n.resources import load_available
+    from c7n.mu import generate_requirements
 
     if not options.debug:
         print(version)
         return
 
     indent = 13
-    pp = pprint.PrettyPrinter(indent=indent)
 
     print("\nPlease copy/paste the following info along with any bug reports:\n")
     print("Custodian:  ", version)
@@ -571,9 +569,21 @@ def version_cmd(options):
         print("Platform:   ", os.uname())
     except Exception:  # pragma: no cover
         print("Platform:  ", sys.platform)
-    print("Using venv: ", hasattr(sys, 'real_prefix'))
 
+    is_venv = (
+        hasattr(sys, 'real_prefix') or
+        (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix))
+    print("Using venv: ", is_venv)
     in_container = os.path.exists('/.dockerenv')
     print("Docker: %s" % str(bool(in_container)))
-    print("PYTHONPATH: ")
-    pp.pprint(sys.path)
+    print("Installed: \n")
+
+    packages = ['c7n']
+    found = load_available(resources=False)
+    if 'gcp' in found:
+        packages.append('c7n_gcp')
+    if 'azure' in found:
+        packages.append('c7n_azure')
+    if 'k8s' in found:
+        packages.append('c7n_kube')
+    print(generate_requirements(packages))
