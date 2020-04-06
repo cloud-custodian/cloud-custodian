@@ -1378,7 +1378,7 @@ class FilterPublicBlock(Filter):
     to see if any are False/Absent/Missing
     If a block arg is provided, it checks to see
     if it matches against it. For fine grained control
-    you will need to provide all block args. 
+    you will need to provide all block args.
 
     :example:
 
@@ -1390,7 +1390,7 @@ class FilterPublicBlock(Filter):
                 region: us-east-1
                 filters:
                   - type: check-public-block
-                    # BlockPublicAcls: true <-- optional, if none provided sets all to true by default
+                  # BlockPublicAcls: true <-- optional, if none provided sets all to true by default
 
     """
 
@@ -1402,7 +1402,7 @@ class FilterPublicBlock(Filter):
         RestrictPublicBuckets={'type': 'boolean'})
     permissions = ("s3:GetBucketPublicAccessBlock",)
     keys = (
-        'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')    
+        'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
 
     def process(self, buckets, event=None):
         results = list()
