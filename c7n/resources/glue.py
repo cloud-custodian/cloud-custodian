@@ -314,7 +314,6 @@ class GlueMLTransform(QueryResourceManager):
         return ('glue:GetMLTransforms',)
 
 
-
 @GlueMLTransform.action_registry.register('delete')
 class DeleteMLTransform(BaseAction):
 
