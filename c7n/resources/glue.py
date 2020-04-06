@@ -292,6 +292,8 @@ class DeleteClassifier(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
         for r in resources:
+            # Extract the classifier from the resource, see below
+            # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/glue.html#Glue.Client.get_classifier
             classifier = list(r.values())[0]
             try:
                 client.delete_classifier(Name=classifier['Name'])
