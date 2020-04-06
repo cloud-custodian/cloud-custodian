@@ -297,6 +297,37 @@ class DeleteClassifier(BaseAction):
                 continue
 
 
+
+@resources.register('glue-ml-transform')
+class GlueMLTransform(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_ml_transforms', 'Transforms', None)
+        name = 'Name'
+        id = 'TransformId'
+        arn_type = 'mlTransform'
+        universal_taggable = object()
+
+    permissions = ('glue:GetMLTransforms',)
+    augment = universal_augment
+
+
+@GlueMLTransform.action_registry.register('delete')
+class DeleteMLTransform(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('glue:DeleteMLTransform',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+        for r in resources:
+            try:
+                client.delete_ml_transform(TransformId=r['TransformId'])
+            except client.exceptions.EntityNotFoundException:
+                continue
+
+
 @resources.register('glue-security-configuration')
 class GlueSecurityConfiguration(QueryResourceManager):
 

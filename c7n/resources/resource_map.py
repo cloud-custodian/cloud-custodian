@@ -70,6 +70,7 @@ ResourceMap = {
     "aws.glue-dev-endpoint": "c7n.resources.glue.GlueDevEndpoint",
     "aws.glue-job": "c7n.resources.glue.GlueJob",
     "aws.glue-classifier": "c7n.resources.glue.GlueClassifier",
+    "aws.glue-ml-transform": "c7n.resources.glue.GlueMLTransform",
     "aws.glue-security-configuration": "c7n.resources.glue.GlueSecurityConfiguration",
     "aws.glue-trigger": "c7n.resources.glue.GlueTrigger",
     "aws.glue-workflow": "c7n.resources.glue.GlueWorkflow",
