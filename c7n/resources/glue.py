@@ -284,8 +284,6 @@ class GlueClassifier(QueryResourceManager):
         date = 'CreationTime'
         arn_type = 'classifier'
 
-    permissions = ('glue:GetClassifiers',)
-
 
 @GlueClassifier.action_registry.register('delete')
 class DeleteClassifier(BaseAction):
@@ -296,7 +294,7 @@ class DeleteClassifier(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
         for r in resources:
-            classifier = next(iter(r.values()))
+            classifier = list(r.values())[0]
             try:
                 client.delete_classifier(Name=classifier['Name'])
             except client.exceptions.EntityNotFoundException:
@@ -312,8 +310,6 @@ class GlueSecurityConfiguration(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
-
-    permissions = ('glue:GetSecurityConfigurations',)
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')
@@ -341,7 +337,6 @@ class GlueTrigger(QueryResourceManager):
         arn_type = 'trigger'
         universal_taggable = object()
 
-    permissions = ('glue:GetTriggers',)
     augment = universal_augment
 
 
