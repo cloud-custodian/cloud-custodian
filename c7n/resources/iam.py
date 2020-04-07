@@ -1375,7 +1375,7 @@ class CredentialReport(Filter):
         for p, t in cls.list_sub_objects:
             obj = dict([(k[len(p):], info.pop(k))
                         for k in keys if k.startswith(p)])
-            if obj.get('active', False):
+            if obj.get('active', False) or obj.get('last_rotated', False):
                 info.setdefault(t, []).append(obj)
         return info
 
