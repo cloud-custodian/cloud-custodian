@@ -1342,7 +1342,7 @@ class SetBucketReplicationConfig(BucketActionBase):
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
-            errors = list()
+            errors = []
             for future in as_completed(futures):
                 bucket = futures[future]
                 try:
@@ -1405,7 +1405,7 @@ class FilterPublicBlock(Filter):
         'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
 
     def process(self, buckets, event=None):
-        results = list()
+        results = []
         with self.executor_factory(max_workers=2) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
             for future in as_completed(futures):
