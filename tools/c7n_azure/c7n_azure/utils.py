@@ -47,7 +47,7 @@ resource_group_regex = re.compile(r'/subscriptions/[^/]+/resourceGroups/[^/]+(/)
                                   re.IGNORECASE)
 
 
-class ResourceIdParser(object):
+class ResourceIdParser:
 
     @staticmethod
     def get_namespace(resource_id):
@@ -94,7 +94,7 @@ def is_resource_group(resource):
     return resource['type'] == constants.RESOURCE_GROUPS_TYPE
 
 
-class StringUtils(object):
+class StringUtils:
 
     @staticmethod
     def equal(a, b, case_insensitive=True):
@@ -210,7 +210,7 @@ class ThreadHelper:
         return results, list(set(exceptions))
 
 
-class Math(object):
+class Math:
 
     @staticmethod
     def mean(numbers):
@@ -233,7 +233,7 @@ class Math(object):
         return float(min(clean_numbers))
 
 
-class GraphHelper(object):
+class GraphHelper:
     log = logging.getLogger('custodian.azure.utils.GraphHelper')
 
     @staticmethod
@@ -291,7 +291,7 @@ class GraphHelper(object):
         return ''
 
 
-class PortsRangeHelper(object):
+class PortsRangeHelper:
 
     PortsRange = collections.namedtuple('PortsRange', 'start end')
 
@@ -420,7 +420,7 @@ class PortsRangeHelper(object):
         return ports
 
 
-class IpRangeHelper(object):
+class IpRangeHelper:
 
     @staticmethod
     def parse_ip_ranges(data, key):
@@ -447,7 +447,7 @@ class IpRangeHelper(object):
         return result
 
 
-class AppInsightsHelper(object):
+class AppInsightsHelper:
     log = logging.getLogger('custodian.azure.utils.AppInsightsHelper')
 
     @staticmethod
@@ -477,7 +477,7 @@ class AppInsightsHelper(object):
             return ''
 
 
-class ManagedGroupHelper(object):
+class ManagedGroupHelper:
 
     @staticmethod
     def get_subscriptions_list(managed_resource_group, credentials):
@@ -491,7 +491,7 @@ def generate_key_vault_url(name):
     return constants.TEMPLATE_KEYVAULT_URL.format(name)
 
 
-class RetentionPeriod(object):
+class RetentionPeriod:
 
     PATTERN = re.compile("^P([1-9][0-9]*)([DWMY])$")
 

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import calendar
 from datetime import datetime, timedelta
 from dateutil import tz
@@ -63,6 +61,44 @@ class TestFilter(unittest.TestCase):
         filter_instance = base_filters.Filter({})
         self.assertIsInstance(filter_instance, base_filters.Filter)
 
+    def test_merge_annotation(self):
+        filter_instance1 = base_filters.Filter({})
+        filter_instance2 = base_filters.Filter({})
+        filter_instance1.matched_annotation_key = 'c7n:matched-keys'
+        filter_instance2.matched_annotation_key = 'c7n:matched-keys'
+        filter_instance1.get_block_operator = lambda: 'and'
+        filter_instance2.get_block_operator = lambda: 'and'
+
+        resource1 = {'Arn': 'arn:aws:iam::123456789012:user/zscholl',
+                     'CreateDate': datetime(2020, 1, 2, 17, 53, 23, 976000, tzinfo=tz.tzutc()),
+                     'Path': '/',
+                     'UserId': 'xafegj4qjwfl3mpuvyj5',
+                     'UserName': 'zscholl'}
+        resource2 = {'Arn': 'arn:aws:iam::123456789012:user/zscholl',
+                     'CreateDate': datetime(2020, 1, 2, 17, 53, 23, 976000, tzinfo=tz.tzutc()),
+                     'Path': '/',
+                     'UserId': 'xafegj4qjwfl3mpuvyj5',
+                     'UserName': 'zscholl'}
+
+        value1 = {'active': True, 'c7n:match-type': 'credential',
+                 'last_rotated': '2019-01-04T17:53:24+00:00',
+                 'last_used_date': '2019-01-04T17:53:24+00:00',
+                 'last_used_region': 'not_supported',
+                 'last_used_service': 'not_supported'}
+
+        value2 = {'active': True, 'c7n:match-type': 'credential',
+                 'last_rotated': '2020-01-02T18:53:24+00:00',
+                 'last_used_date': '2020-01-04T17:53:24+00:00',
+                 'last_used_region': 'not_supported',
+                 'last_used_service': 'not_supported'}
+        filter_instance1.merge_annotation(resource1, 'c7n:matched-keys', [value1, value2])
+        filter_instance1.merge_annotation(resource1, 'c7n:matched-keys', [value1])
+
+        filter_instance2.merge_annotation(resource2, 'c7n:matched-keys', [value1])
+        filter_instance2.merge_annotation(resource2, 'c7n:matched-keys', [value1, value2])
+
+        self.assertEqual(resource1, resource2)
+
 
 class TestOrFilter(unittest.TestCase):
 
@@ -104,16 +140,16 @@ class TestNotFilter(unittest.TestCase):
 
         f = filters.factory({"not": [{"Architecture": "amd64"}]})
 
-        class Manager(object):
+        class Manager:
 
-            class resource_type(object):
+            class resource_type:
                 id = 'Color'
 
             @classmethod
             def get_model(cls):
                 return cls.resource_type
 
-        class FakeFilter(object):
+        class FakeFilter:
 
             def __init__(self):
                 self.invoked = False

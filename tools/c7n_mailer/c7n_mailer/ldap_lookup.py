@@ -26,7 +26,7 @@ from ldap3 import Connection
 from ldap3.core.exceptions import LDAPSocketOpenError
 
 
-class LdapLookup(object):
+class LdapLookup:
 
     def __init__(self, config, logger):
         self.log = logger
@@ -170,7 +170,7 @@ class LdapLookup(object):
 # as dependencies. This normalizes the methods to set/get functions, so you can interchangeable
 # decide which caching system to use, a local file, or memcache, redis, etc
 # If you don't want a redis dependency and aren't running the mailer in lambda this works well
-class LocalSqlite(object):
+class LocalSqlite:
     def __init__(self, local_filename, logger):
         self.log = logger
         self.sqlite = sqlite3.connect(local_filename)
@@ -193,7 +193,7 @@ class LocalSqlite(object):
 
 # redis can't write complex python objects like dictionaries as values (the way memcache can)
 # so we turn our dict into a json string when setting, and json.loads when getting
-class Redis(object):
+class Redis:
     def __init__(self, redis_host=None, redis_port=6379, db=0):
         self.connection = redis.StrictRedis(host=redis_host, port=redis_port, db=db)
 

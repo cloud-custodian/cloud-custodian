@@ -11,13 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import fnmatch
 import json
 import os
 import shutil
 import zipfile
+import re
 from datetime import datetime, timedelta, tzinfo
 from distutils.util import strtobool
 
@@ -255,6 +254,27 @@ def attach(session, data_path, prefix=None, debug=False):
     return pill
 
 
+class RedPill(pill.Pill):
+    def datetime_converter(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+
+    def save_response(self, service, operation, response_data,
+                    http_response=200):
+        """
+        Override to sanitize response metadata and account_ids
+        """
+        if 'ResponseMetadata' in response_data:
+            response_data['ResponseMetadata'] = {}
+
+        response_data = json.dumps(response_data, default=self.datetime_converter)
+        response_data = re.sub("\d{12}", "123456789123", response_data)  # noqa
+        response_data = json.loads(response_data)
+
+        super(RedPill, self).save_response(service, operation, response_data,
+                    http_response)
+
+
 class PillTest(CustodianTestCore):
 
     archive_path = os.path.join(
@@ -285,7 +305,8 @@ class PillTest(CustodianTestCore):
         session = boto3.Session()
         default_region = session.region_name
         if not zdata:
-            pill = placebo.attach(session, test_dir)
+            pill = RedPill()
+            pill.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, debug=True)
 
@@ -294,7 +315,7 @@ class PillTest(CustodianTestCore):
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)
 
-        class FakeFactory(object):
+        class FakeFactory:
 
             def __call__(fake, region=None, assume=None):
                 new_session = None

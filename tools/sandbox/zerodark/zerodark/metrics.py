@@ -43,7 +43,7 @@ CONFIG_SCHEMA['properties']['indexer'] = {'type': 'object'}
 MAX_RESULT_POINTS = 1440
 
 
-class Resource(object):
+class Resource:
 
     @classmethod
     def id(cls, r):
@@ -163,7 +163,7 @@ def get_indexer(config):
     raise ValueError("Unknown index type: %s" % itype)
 
 
-class DirIndexer(object):
+class DirIndexer:
 
     def __init__(self, config):
         self.config = config
@@ -179,7 +179,7 @@ class DirIndexer(object):
                 fh.write(dumps([r, rtype, m, point_set]))
 
 
-class SQLIndexer(object):
+class SQLIndexer:
 
     #  metadata = rdb.MetaData()
     #  table = rdb.Table(
@@ -193,7 +193,7 @@ class SQLIndexer(object):
         self.engine = self.config['indexer']['dsn']
 
 
-class InfluxIndexer(object):
+class InfluxIndexer:
 
     def __init__(self, config):
         self.config = config

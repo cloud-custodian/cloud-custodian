@@ -19,8 +19,6 @@ concurrent.futures implementation over sqs
 Scatter/Gather or Map/Reduce style over two sqs queues.
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import random
 import logging
 import inspect
@@ -101,7 +99,7 @@ class SQSExecutor(Executor):
         return False
 
 
-class MessageIterator(object):
+class MessageIterator:
 
     msg_attributes = ['sequence_id', 'op', 'ser']
 
@@ -138,7 +136,7 @@ class MessageIterator(object):
             ReceiptHandle=m['ReceiptHandle'])
 
 
-class SQSWorker(object):
+class SQSWorker:
 
     stopped = False
 

@@ -13,5 +13,5 @@
 # limitations under the License.
 
 
-class PolicyFilter(object):
+class PolicyFilter:
     pass

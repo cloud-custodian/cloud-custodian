@@ -16,8 +16,8 @@ install_requires = \
  'jsonschema>=3.2.0,<4.0.0',
  'ldap3>=2.6.1,<3.0.0',
  'python-dateutil>=2.8.1,<3.0.0',
+ 'pyyaml>=5.3,<6.0',
  'redis>=3.4.1,<4.0.0',
- 'ruamel.yaml>=0.16.7,<0.17.0',
  'sendgrid>=6.1.1,<7.0.0']
 
 entry_points = \

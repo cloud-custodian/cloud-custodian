@@ -51,8 +51,6 @@ OrgMode
    to sentry projects
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import argparse
 import base64
 from datetime import datetime

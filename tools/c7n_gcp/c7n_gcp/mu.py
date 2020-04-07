@@ -52,7 +52,7 @@ def custodian_archive(packages=None):
     return archive
 
 
-class CloudFunctionManager(object):
+class CloudFunctionManager:
 
     def __init__(self, session_factory, region):
         self.session_factory = session_factory
@@ -201,7 +201,7 @@ def delta_resource(old_config, new_config, ignore=()):
     return found
 
 
-class CloudFunction(object):
+class CloudFunction:
 
     def __init__(self, func_data, archive=None):
         self.func_data = func_data
@@ -341,7 +341,7 @@ class PolicyFunction(CloudFunction):
         return config
 
 
-class EventSource(object):
+class EventSource:
 
     def __init__(self, session, data=None):
         self.data = data

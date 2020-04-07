@@ -32,7 +32,7 @@ from c7n_mailer.utils import kms_decrypt
 DATA_MESSAGE = "maidmsg/1.0"
 
 
-class MailerSqsQueueIterator(object):
+class MailerSqsQueueIterator:
     # Copied from custodian to avoid runtime library dependency
     msg_attributes = ['sequence_id', 'op', 'ser']
 
@@ -75,7 +75,7 @@ class MailerSqsQueueIterator(object):
             ReceiptHandle=m['ReceiptHandle'])
 
 
-class MailerSqsQueueProcessor(object):
+class MailerSqsQueueProcessor:
 
     def __init__(self, config, session, logger, max_num_processes=16):
         self.config = config

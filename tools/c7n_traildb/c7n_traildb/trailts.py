@@ -16,8 +16,6 @@
 
 Todo: Consider direct processing trails here and bypass the traildb/sqlite.
 """
-from __future__ import print_function
-
 from collections import defaultdict
 import datetime
 import logging

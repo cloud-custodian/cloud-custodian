@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import copy
 import csv
 from datetime import datetime, timedelta
@@ -327,7 +325,9 @@ REGION_PARTITION_MAP = {
     'us-gov-east-1': 'aws-us-gov',
     'us-gov-west-1': 'aws-us-gov',
     'cn-north-1': 'aws-cn',
-    'cn-northwest-1': 'aws-cn'
+    'cn-northwest-1': 'aws-cn',
+    'us-isob-east-1': 'aws-iso-b',
+    'us-iso-east-1': 'aws-iso'
 }
 
 
@@ -564,7 +564,7 @@ def get_proxy_url(url):
     return None
 
 
-class FormatDate(object):
+class FormatDate:
     """a datetime wrapper with extended pyformat syntax"""
 
     date_increment = re.compile(r'\+[0-9]+[Mdh]')
@@ -600,7 +600,7 @@ class FormatDate(object):
         return d.__format__(fmt)
 
 
-class QueryParser(object):
+class QueryParser:
 
     QuerySchema = {}
     type_name = ''

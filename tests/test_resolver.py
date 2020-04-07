@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import csv
 import json
 import os
@@ -28,7 +26,7 @@ from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
 
 
-class FakeCache(object):
+class FakeCache:
 
     def __init__(self):
         self.state = {}
@@ -40,7 +38,7 @@ class FakeCache(object):
         self.state[key] = data
 
 
-class FakeResolver(object):
+class FakeResolver:
 
     def __init__(self, contents):
         if isinstance(contents, binary_type):

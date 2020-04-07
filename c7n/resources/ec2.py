@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import base64
 import itertools
 import operator
@@ -246,7 +244,7 @@ class StateTransitionAge(AgeFilter):
         return None
 
 
-class StateTransitionFilter(object):
+class StateTransitionFilter:
     """Filter instances by state.
 
     Try to simplify construction for policy authors by automatically
@@ -384,7 +382,7 @@ class DisableApiTermination(Filter):
         return attr_val['DisableApiTermination']['Value']
 
 
-class InstanceImageBase(object):
+class InstanceImageBase:
 
     def prefetch_instance_images(self, instances):
         image_ids = [i['ImageId'] for i in instances if 'c7n:instance-image' not in i]
@@ -1912,7 +1910,7 @@ EC2_VALID_FILTERS = {
     'vpc-id': str}
 
 
-class QueryFilter(object):
+class QueryFilter:
 
     @classmethod
     def parse(cls, data):

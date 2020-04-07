@@ -337,7 +337,7 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
     return {'stats': dict(stats)}
 
 
-class TrailDB(object):
+class TrailDB:
 
     def __init__(self, path):
         self.path = path
@@ -440,7 +440,7 @@ def process_bucket(session_factory, bucket_name, prefix, db_path):
     log.info("Finished %0.2f seconds stats:%s", time.time() - t, stats)
 
 
-class ResourceTagger(object):
+class ResourceTagger:
 
     def __init__(self, trail_db, exec_config, creator_tag, user_suffix, dryrun, types):
         self.trail_db = trail_db
