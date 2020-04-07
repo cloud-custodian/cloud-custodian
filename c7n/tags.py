@@ -903,7 +903,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
 
     batch_size = 20
     concurrency = 2
-    permissions = ('resourcegroupstaggingapi:TagResources',)
+    permissions = ('tag:TagResources',)
 
     def process(self, resources):
         self.tz = tzutil.gettz(
