@@ -333,7 +333,6 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
 @SNS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-
     """
     Filters SNS topic by kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
