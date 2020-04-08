@@ -19,7 +19,7 @@ from c7n.utils import local_session, type_schema
 
 class KmsRelatedFilter(RelatedResourceFilter):
     """
-    Filter a resource by its associcated kms key and optionally the aliasname
+    Filter a resource by its associated kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
 
     :example:
