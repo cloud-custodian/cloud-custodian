@@ -1390,7 +1390,7 @@ class FilterPublicBlock(Filter):
                 region: us-east-1
                 filters:
                   - type: check-public-block
-                  # BlockPublicAcls: true <-- optional, if none provided sets all to true by default
+                  # BlockPublicAcls: true <- optional, if none provided sets all to false by default
 
     """
 
