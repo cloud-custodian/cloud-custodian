@@ -499,6 +499,7 @@ class DeleteWorkflow(BaseAction):
             except client.exceptions.EntityNotFoundException:
                 continue
 
+
 @GlueWorkflow.filter_registry.register('security-config')
 class GlueWorkflowSecurityConfigFilter(SecurityConfigFilter):
     security_name_key = 'SecurityConfiguration'
