@@ -94,6 +94,12 @@ class GlueDevEndpoint(QueryResourceManager):
     augment = universal_augment
 
 
+@GlueDevEndpoint.filter_registry.register('subnet')
+class EndpointSubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = 'SubnetId'
+
+
 @GlueDevEndpoint.action_registry.register('delete')
 class DeleteDevEndpoint(BaseAction):
     """Deletes public Glue Dev Endpoints
