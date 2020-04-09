@@ -1418,18 +1418,19 @@ class FilterPublicBlock(Filter):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         config = {}
-        try:
-            config = s3.get_public_access_block(
-                Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                # When there is a None config, set all to false to be symbolic
-                for key in self.keys:
-                    config[key] = False
-            else:
-                raise
+        if not bucket.get('PublicAccessBlockConfiguration'):
+            try:
+                config = s3.get_public_access_block(
+                    Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
+                    # When there is a None config, set all to false to be symbolic
+                    config = {key: False for key in self.keys}
+                else:
+                    raise
         if self.matches_filter(config):
-            return {"Name": bucket['Name'], "PublicAccessBlockConfiguration": config}
+            bucket["PublicAccessBlockConfiguration"] = config
+            return bucket
 
     def matches_filter(self, config):
         key_set = [key for key in self.keys if type(self.data.get(key)) is bool]
@@ -1486,8 +1487,7 @@ class SetPublicBlock(BucketActionBase):
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
                 # When there is a None config, set all to false to be symbolic
-                for key in self.keys:
-                    config[key] = False
+                config = {key: False for key in self.keys}
             else:
                 raise
         key_set = [key for key in self.keys if type(self.data.get(key)) is bool]
