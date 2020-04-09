@@ -183,10 +183,12 @@ class IsLoggingEnabled(Filter):
 
         for r in resources:
             try:
-                config_data = distribution_client.get_distribution_config(Id=r['Id']).get('DistributionConfig')
+                config_data = distribution_client.get_distribution_config(Id=r['Id']) \
+                    .get('DistributionConfig')
                 if config_data['Logging']['Enabled'] == value:
                     results.append(r)
-            except (distribution_client.exceptions.NoSuchResource, distribution_client.exceptions.NoSuchDistribution):
+            except (distribution_client.exceptions.NoSuchResource,
+                    distribution_client.exceptions.NoSuchDistribution):
                 pass
             except Exception as e:
                 self.log.warning(
