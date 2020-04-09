@@ -442,7 +442,7 @@ class GlueDataCatalogEncryption(BaseAction):
     .. code-block:: yaml
             policies:
               - name: data-catalog-encryption
-                resource: account
+                resource: glue-catalog
                 filters:
                   - type: glue-security-config
                     CatalogEncryptionMode: DISABLED
