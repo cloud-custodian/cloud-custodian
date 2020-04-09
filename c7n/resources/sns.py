@@ -333,6 +333,22 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
 @SNS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
+    """
+    Filters SNS topic by kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: sns-encrypt-key-check
+                  resource: sns
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: alias/aws/sns
+    """
 
     RelatedIdsExpression = 'KmsMasterKeyId'
 

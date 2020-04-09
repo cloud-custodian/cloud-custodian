@@ -1342,7 +1342,7 @@ class SetBucketReplicationConfig(BucketActionBase):
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
-            errors = list()
+            errors = []
             for future in as_completed(futures):
                 bucket = futures[future]
                 try:
@@ -1374,10 +1374,9 @@ class SetBucketReplicationConfig(BucketActionBase):
 class FilterPublicBlock(Filter):
     """Filter for s3 bucket public blocks
 
-    `scope`: Optional: Defaults to Any
-    `enabled`: Optional: Defaults to False
+    If no filter paramaters are provided it checks to see if any are unset or False.
 
-    The defaults essentially check to see if any public blocks are missing
+    If parameters are provided only the provided ones are checked.
 
     :example:
 
@@ -1389,70 +1388,58 @@ class FilterPublicBlock(Filter):
                 region: us-east-1
                 filters:
                   - type: check-public-block
-                    scope: Any
-                    enabled: False
-
+                    BlockPublicAcls: true
+                    BlockPublicPolicy: true
     """
 
     schema = type_schema(
         'check-public-block',
-        scope={
-            'type': 'string',
-            'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
-                'BlockPublicPolicy', 'RestrictPublicBuckets', 'All', 'Any']},
-        enabled={'type': 'boolean'})
+        BlockPublicAcls={'type': 'boolean'},
+        IgnorePublicAcls={'type': 'boolean'},
+        BlockPublicPolicy={'type': 'boolean'},
+        RestrictPublicBuckets={'type': 'boolean'})
     permissions = ("s3:GetBucketPublicAccessBlock",)
+    keys = (
+        'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
+    annotation_key = 'c7n:PublicAccessBlock'
 
     def process(self, buckets, event=None):
-        results = list()
+        results = []
         with self.executor_factory(max_workers=2) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
-            for future in as_completed(futures):
-                if future.exception():
-                    raise future.exception()
-                if future.result():
-                    results.append(future.result())
+            for f in as_completed(futures):
+                if f.result():
+                    results.append(futures[f])
         return results
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        enabled = self.data.get('enabled', False)
-        scope = self.data.get('scope', 'Any')
-        try:
-            config = s3.get_public_access_block(
-                Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                # Set config to none because NoSuchPublicAccessBlockConfiguration error
-                # was returned. This is important later because it is symbolic of
-                # all blocks being set to false. See if/else in matches_filter func
-                config = None
-            else:
-                raise
-        if self.matches_filter(config, enabled, scope):
-            return {"Name": bucket['Name'], "publicblocks": config}
+        config = {key: False for key in self.keys}
+        if self.annotation_key not in bucket:
+            try:
+                config = s3.get_public_access_block(
+                    Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                    raise
+            bucket[self.annotation_key] = config
+        return self.matches_filter(config)
 
-    def matches_filter(self, config, enabled, scope):
-        if config:
-            if scope == 'All':
-                return all(config.values()) if enabled else not any(config.values())
-            elif scope == 'Any':
-                return any(config.values()) if enabled else not all(config.values())
-            else:
-                return config[scope] if enabled else not config[scope]
+    def matches_filter(self, config):
+        key_set = [key for key in self.keys if key in self.data]
+        if key_set:
+            return all([self.data.get(key) is config[key] for key in key_set])
         else:
-            # When there is a null/none config, treat it as meaning no public blocks
-            # return False if checking for enabled=True because all are false
-            # return True if checking for enabled=False
-            return False if enabled else True
+            return not all(config.values())
 
 
 @actions.register('set-public-block')
 class SetPublicBlock(BucketActionBase):
     """Action to update Public Access blocks on S3 buckets
 
-    `scope`: Optional: Defaults to All
-    `state`: Optional: Defaults to enable
+    if no action parameters are provided it will enable all public block configuration.
+
+    If a action parameters are provided, those will be set and other extant values preserved.
 
     :example:
 
@@ -1463,71 +1450,48 @@ class SetPublicBlock(BucketActionBase):
                 resource: s3
                 filters:
                   - type: check-public-block
-                    scope: BlockPublicAcls
-                    enabled: False
                 actions:
                   - type: set-public-block
-                    # scope: <------ optional (All by default)
-                    #   - BlockPublicAcls
-                    #   - IgnorePublicAcls
-                    # state: enable <------ optional (enable by default)
+                  # BlockPublicAcls: true <-- optional, if none provided sets all to true by default
+
     """
 
     schema = type_schema(
         'set-public-block',
-        scope={
-            'type': 'array',
-            'items': {'type': 'string',
-                     'enum': ['BlockPublicAcls', 'IgnorePublicAcls',
-                        'BlockPublicPolicy', 'RestrictPublicBuckets', 'All']}},
-        state={'type': 'string',
-               'enum': ['enable', 'disable']})
+        BlockPublicAcls={'type': 'boolean'},
+        IgnorePublicAcls={'type': 'boolean'},
+        BlockPublicPolicy={'type': 'boolean'},
+        RestrictPublicBuckets={'type': 'boolean'})
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
+    keys = FilterPublicBlock.keys
+    annotation_key = FilterPublicBlock.annotation_key
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
             for future in as_completed(futures):
-                if future.exception():
-                    raise future.exception()
+                future.result()
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        state = self.data.get('state', 'enable')
-        scopes = self.data.get('scope', ['All'])
-        try:
-            config = s3.get_public_access_block(
-                Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                # Set config to none because NoSuchPublicAccessBlockConfiguration error
-                # was returned. This is important later because it is symbolic of
-                # all blocks being set to false. See if/else statement below
-                config = None
-            else:
-                raise
-        if config:
-            if 'All' in scopes:
-                for key in config.keys():
-                    config[key] = True if state == 'enable' else False
-            else:
-                for scope in scopes:
-                    config[scope] = True if state == 'enable' else False
-            s3.put_public_access_block(
-                Bucket=bucket['Name'],
-                PublicAccessBlockConfiguration=config
-            )
+        config = dict(bucket.get(self.annotation_key, {key: False for key in self.keys}))
+        if self.annotation_key not in bucket:
+            try:
+                config = s3.get_public_access_block(
+                    Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                    raise
+
+        key_set = [key for key in self.keys if key in self.data]
+        if key_set:
+            for key in key_set:
+                config[key] = self.data.get(key)
         else:
-            s3.put_public_access_block(
-                Bucket=bucket['Name'],
-                PublicAccessBlockConfiguration={
-                    'BlockPublicAcls': True if state == 'enable' else False,
-                    'IgnorePublicAcls': True if state == 'enable' else False,
-                    'BlockPublicPolicy': True if state == 'enable' else False,
-                    'RestrictPublicBuckets': True if state == 'enable' else False
-                }
-            )
-        return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
+            for key in self.keys:
+                config[key] = True
+        s3.put_public_access_block(
+            Bucket=bucket['Name'], PublicAccessBlockConfiguration=config)
 
 
 @actions.register('toggle-versioning')

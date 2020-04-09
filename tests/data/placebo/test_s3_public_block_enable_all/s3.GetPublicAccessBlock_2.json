@@ -3,10 +3,10 @@
     "data": {
         "ResponseMetadata": {},
         "PublicAccessBlockConfiguration": {
-            "BlockPublicAcls": false,
+            "BlockPublicAcls": true,
             "IgnorePublicAcls": true,
-            "BlockPublicPolicy": false,
-            "RestrictPublicBuckets": false
+            "BlockPublicPolicy": true,
+            "RestrictPublicBuckets": true
         }
     }
 }
