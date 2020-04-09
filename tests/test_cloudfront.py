@@ -217,6 +217,31 @@ class CloudFront(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['c7n:mismatched-s3-origin'][0], 'c7n-idontexist')
 
+    def test_distribution_check_logging_enabled(self):
+        factory = self.replay_flight_data("test_distribution_check_logging_enabled")
+
+        p = self.load_policy(
+            {
+                "name": "test_distribution_logging_enabled",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "logging-enabled",
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(factory).client("cloudfront")
+        dist_id = resources[0]['Id']
+        resp = client.get_distribution_config(Id=dist_id)
+        self.assertEqual(resp['DistributionConfig']['Logging']['Enabled'], False)
+
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")
 

@@ -148,6 +148,46 @@ class IsWafEnabled(Filter):
                 results.append(r)
         return results
 
+@Distribution.filter_registry.register('logging-enabled')
+class IsLoggingEnabled(Filter):
+    """Check for existence of S3 bucket referenced by Cloudfront,
+       and verify whether owner is different from Cloudfront account owner.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: logging-enabled
+                resource: distribution
+                filters:
+                  - type: logging-enabled
+                    enabled: false
+   """
+
+    schema = type_schema(
+        'logging-enabled',
+        enabled={'type': 'boolean'})
+
+    permissions = ('cloudfront:getDistributionConfig',)
+
+    def process(self, resources, event=None):
+        results = []
+
+        distribution_client = local_session(self.manager.session_factory).client(
+            'cloudfront', region_name=self.manager.config.region)
+
+        # Default to filtering for distributions with logging disabled
+        enabled = self.data.get('enabled', False)
+
+        for r in resources:
+            # Logging is not included in default resource data, so get the config data
+            config_data = distribution_client.get_distribution_config(Id=r['Id']).get('DistributionConfig')
+            if config_data['Logging']['Enabled'] == enabled:
+                results.append(r)
+
+        return results
+
 
 @Distribution.filter_registry.register('mismatch-s3-origin')
 class MismatchS3Origin(Filter):
