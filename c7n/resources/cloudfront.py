@@ -162,12 +162,12 @@ class IsLoggingEnabled(Filter):
                 resource: distribution
                 filters:
                   - type: logging-enabled
-                    enabled: false
+                    value: false
    """
 
     schema = type_schema(
         'logging-enabled',
-        enabled={'type': 'boolean'})
+        value={'type': 'boolean'})
 
     permissions = ('cloudfront:GetDistributionConfig',)
 
@@ -177,14 +177,21 @@ class IsLoggingEnabled(Filter):
         distribution_client = local_session(self.manager.session_factory).client(
             'cloudfront', region_name=self.manager.config.region)
 
-        # Default to filtering for distributions with logging disabled
-        enabled = self.data.get('enabled', False)
+        # Default to filtering for distributions with logging enabled
+        value = self.data.get('value', True)
 
         for r in resources:
-            # Logging is not included in default resource data, so get the config data
-            config_data = distribution_client.get_distribution_config(Id=r['Id']).get('DistributionConfig')
-            if config_data['Logging']['Enabled'] == enabled:
-                results.append(r)
+            try:
+                config_data = distribution_client.get_distribution_config(Id=r['Id']).get('DistributionConfig')
+                if config_data['Logging']['Enabled'] == value:
+                    results.append(r)
+            except (distribution_client.exceptions.NoSuchResource, distribution_client.exceptions.NoSuchDistribution):
+                pass
+            except Exception as e:
+                self.log.warning(
+                    "Exception trying to get Distribution Config: %s error: %s",
+                    r['ARN'], e)
+                raise e
 
         return results
 

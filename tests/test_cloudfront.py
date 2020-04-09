@@ -240,7 +240,7 @@ class CloudFront(BaseTest):
         client = local_session(factory).client("cloudfront")
         dist_id = resources[0]['Id']
         resp = client.get_distribution_config(Id=dist_id)
-        self.assertEqual(resp['DistributionConfig']['Logging']['Enabled'], False)
+        self.assertEqual(resp['DistributionConfig']['Logging']['Enabled'], True)
 
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")

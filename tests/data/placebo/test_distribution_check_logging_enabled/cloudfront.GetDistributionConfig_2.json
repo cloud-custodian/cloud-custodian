@@ -7,9 +7,9 @@
             "Comment": "",
             "Enabled": true,
             "Logging": {
-                "Enabled": false,
-                "IncludeCookies": false,
-                "Bucket": "",
+                "Enabled": true,
+                "IncludeCookies": true,
+                "Bucket": "test.s3.amazonaws.com",
                 "Prefix": ""
             }
         }
