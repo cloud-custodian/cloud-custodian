@@ -159,7 +159,8 @@ class StorageSetFirewallAction(SetFirewallAction):
 
         # Add IP rules
         if self.data.get('ip-rules') is not None:
-            existing_ip = resource['properties']['networkAcls'].get('ipRules', [])
+            existing_ip = [r['value']
+                           for r in resource['properties']['networkAcls'].get('ipRules', [])]
             ip_rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
 
             # If the user has too many rules raise exception
