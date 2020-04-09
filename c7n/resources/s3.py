@@ -1401,6 +1401,7 @@ class FilterPublicBlock(Filter):
     permissions = ("s3:GetBucketPublicAccessBlock",)
     keys = (
         'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
+    annotation_key = 'c7n:PublicAccessBlock'
 
     def process(self, buckets, event=None):
         results = []
@@ -1414,14 +1415,14 @@ class FilterPublicBlock(Filter):
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         config = {key: False for key in self.keys}
-        if 'c7n:PublicAccessBlock' not in bucket:
+        if self.annotation_key not in bucket:
             try:
                 config = s3.get_public_access_block(
                     Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
             except ClientError as e:
                 if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
                     raise
-            bucket["c7n:PublicAccessBlock"] = config
+            bucket[self.annotation_key] = config
         return self.matches_filter(config)
 
     def matches_filter(self, config):
@@ -1463,6 +1464,7 @@ class SetPublicBlock(BucketActionBase):
         RestrictPublicBuckets={'type': 'boolean'})
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
     keys = FilterPublicBlock.keys
+    annotation_key = FilterPublicBlock.annotation_key
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
@@ -1472,8 +1474,8 @@ class SetPublicBlock(BucketActionBase):
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        config = bucket.get('c7n:PublicBlock', {key: False for key in self.keys})
-        if 'c7n:PublicBlock' not in bucket:
+        config = bucket.get(self.annotation_key, {key: False for key in self.keys})
+        if self.annotation_key not in bucket:
             try:
                 config = s3.get_public_access_block(
                     Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
