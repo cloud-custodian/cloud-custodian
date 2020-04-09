@@ -1444,8 +1444,9 @@ class FilterPublicBlock(Filter):
 class SetPublicBlock(BucketActionBase):
     """Action to update Public Access blocks on S3 buckets
 
-    `scope`: Optional: Defaults to All
-    `state`: Optional: Defaults to enable
+    If no block args are provided it will set all to True
+    If a block arg is provided, it will only update that one
+    and it will retain the others which have not been provided
 
     :example:
 
