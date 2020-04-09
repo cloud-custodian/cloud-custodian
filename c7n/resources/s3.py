@@ -1474,7 +1474,7 @@ class SetPublicBlock(BucketActionBase):
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        config = bucket.get(self.annotation_key, {key: False for key in self.keys})
+        config = dict(bucket.get(self.annotation_key, {key: False for key in self.keys}))
         if self.annotation_key not in bucket:
             try:
                 config = s3.get_public_access_block(

@@ -1774,12 +1774,15 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
-        self.assertEqual(resources[0]["PublicAccessBlockConfiguration"]["BlockPublicPolicy"], False)
+        self.assertEqual(resources[0]["c7n:PublicAccessBlock"]["BlockPublicPolicy"], False)
 
         # Make sure that BlockPublicAcls public block turned on now
-        response = client.get_public_access_block(
-            Bucket=bname)['PublicAccessBlockConfiguration']
-        self.assertEqual(response['BlockPublicPolicy'], True)
+        assert client.get_public_access_block(
+            Bucket=bname)['PublicAccessBlockConfiguration'] == {
+                "BlockPublicAcls": False,
+                "IgnorePublicAcls": False,
+                "BlockPublicPolicy": True,
+                "RestrictPublicBuckets": False}
 
     def test_set_public_block_disable_one(self):
         bname = 'mypublicblock'
@@ -1816,12 +1819,15 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
-        self.assertEqual(resources[0]["PublicAccessBlockConfiguration"]["IgnorePublicAcls"], True)
+        self.assertEqual(resources[0]["c7n:PublicAccessBlock"]["IgnorePublicAcls"], True)
 
         # Make sure that the IgnorePublicAcls public block set to off
-        response = client.get_public_access_block(
-            Bucket=bname)['PublicAccessBlockConfiguration']
-        self.assertEqual(response['IgnorePublicAcls'], False)
+        assert client.get_public_access_block(
+            Bucket=bname)['PublicAccessBlockConfiguration'] == {
+                'BlockPublicAcls': False,
+                'BlockPublicPolicy': True,
+                'IgnorePublicAcls': False,
+                'RestrictPublicBuckets': False}
 
     def test_set_public_block_throws_errors(self):
         bname = 'mypublicblock'
