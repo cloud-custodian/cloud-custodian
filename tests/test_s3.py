@@ -1846,6 +1846,9 @@ class S3Test(BaseTest):
                         "BlockPublicPolicy": False,
                         "RestrictPublicBuckets": False
                     }
+                ],
+                "actions": [
+                    {"type": "set-public-block"}
                 ]
             },
             session_factory=session_factory,
