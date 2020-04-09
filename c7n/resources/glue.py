@@ -13,7 +13,7 @@
 # limitations under the License.
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-
+from .aws import shape_validate
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
@@ -418,3 +418,63 @@ class DeleteWorkflow(BaseAction):
                 client.delete_workflow(Name=r['Name'])
             except client.exceptions.EntityNotFoundException:
                 continue
+
+
+@resources.register('glue-catalog')
+class GlueDataCatalog(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'glue'
+        enum_spec = ('get_data_catalog_encryption_settings', 'DataCatalogEncryptionSettings', None)
+        arn_type = 'catalog'
+        id = name = 'CatalogId'
+
+    permissions = ('glue:GetDataCatalogEncryptionSettings',)
+
+    def augment(self, resources):
+        resource = []
+        resource.append(resources)
+        return resource
+
+
+@GlueDataCatalog.action_registry.register('set-glue-catalog-encryption')
+class GlueDataCatalogEncryption(BaseAction):
+    """Modifies glue data catalog encryption based on specified parameter
+    As per docs, we can enable catalog encryption or only password encryption,
+    not both
+
+    :example:
+
+    .. code-block:: yaml
+            policies:
+              - name: data-catalog-encryption
+                resource: account
+                filters:
+                  - type: glue-security-config
+                    CatalogEncryptionMode: DISABLED
+                actions:
+                  - type: set-glue-catalog-encryption
+                    attributes:
+                        EncryptionAtRest:
+                            CatalogEncryptionMode: SSE-KMS
+                            SseAwsKmsKeyId: alias/aws/glue
+    """
+
+    schema = type_schema(
+        'set-glue-catalog-encryption',
+        attributes={'type': 'object', "minItems": 1},
+        required=('attributes',))
+
+    permissions = ('glue:PutDataCatalogEncryptionSettings',)
+    shape = 'PutDataCatalogEncryptionSettingsRequest'
+
+    def validate(self):
+        attrs = {}
+        attrs['DataCatalogEncryptionSettings'] = self.data['attributes']
+        return shape_validate(attrs, self.shape, 'glue')
+
+    def process(self, catalog):
+        client = local_session(self.manager.session_factory).client('glue')
+        # there is one glue data catalog per account
+        client.put_data_catalog_encryption_settings(
+            DataCatalogEncryptionSettings=self.data['attributes'])

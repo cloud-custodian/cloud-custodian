@@ -4,7 +4,7 @@
         "DataCatalogEncryptionSettings": {
             "EncryptionAtRest": {
                 "CatalogEncryptionMode": "SSE-KMS",
-                "SseAwsKmsKeyId": "alias/skunk/trails"
+                "SseAwsKmsKeyId": "alias/skunk/glue/encrypted"
             },
             "ConnectionPasswordEncryption": {
                 "ReturnConnectionPasswordEncrypted": false
