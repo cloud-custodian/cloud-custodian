@@ -491,6 +491,8 @@ class QueryResourceManager(ResourceManager):
         return None
 
     def get_resources(self, ids, cache=True, augment=True):
+        if not ids:
+            return []
         if cache:
             resources = self._get_cached_resources(ids)
             if resources is not None:
