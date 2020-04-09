@@ -444,8 +444,10 @@ class GlueDataCatalogEncryption(BaseAction):
               - name: data-catalog-encryption
                 resource: glue-catalog
                 filters:
-                  - type: glue-security-config
-                    CatalogEncryptionMode: DISABLED
+                  - type: value
+                    key: EncryptionAtRest.CatalogEncryptionMode
+                    value: DISABLED
+                    op: eq
                 actions:
                   - type: set-glue-catalog-encryption
                     attributes:
