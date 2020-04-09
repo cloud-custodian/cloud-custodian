@@ -169,7 +169,7 @@ class IsLoggingEnabled(Filter):
         'logging-enabled',
         enabled={'type': 'boolean'})
 
-    permissions = ('cloudfront:getDistributionConfig',)
+    permissions = ('cloudfront:GetDistributionConfig,)
 
     def process(self, resources, event=None):
         results = []
