@@ -1374,11 +1374,9 @@ class SetBucketReplicationConfig(BucketActionBase):
 class FilterPublicBlock(Filter):
     """Filter for s3 bucket public blocks
 
-    If no block args are provided it checks
-    to see if any are False/Absent/Missing
-    If a block arg is provided, it checks to see
-    if it matches against it. For fine grained control
-    you will need to provide all block args.
+    If no filter paramaters are provided it checks to see if any are unset or False.
+
+    If parameters are provided only the provided ones are checked.
 
     :example:
 
@@ -1390,8 +1388,8 @@ class FilterPublicBlock(Filter):
                 region: us-east-1
                 filters:
                   - type: check-public-block
-                  # BlockPublicAcls: true <- optional, if none provided sets all to false by default
-
+                    BlockPublicAcls: true
+                    BlockPublicPolicy: true
     """
 
     schema = type_schema(
@@ -1408,32 +1406,26 @@ class FilterPublicBlock(Filter):
         results = []
         with self.executor_factory(max_workers=2) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
-            for future in as_completed(futures):
-                if future.exception():
-                    raise future.exception()
-                if future.result():
-                    results.append(future.result())
+            for f in as_completed(futures):
+                if f.result():
+                    results.append(futures[f])
         return results
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        config = {}
-        if not bucket.get('PublicAccessBlockConfiguration'):
+        config = {key: False for key in self.keys}
+        if 'c7n:PublicAccessBlock' not in bucket:
             try:
                 config = s3.get_public_access_block(
                     Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
             except ClientError as e:
-                if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                    # When there is a None config, set all to false to be symbolic
-                    config = {key: False for key in self.keys}
-                else:
+                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
                     raise
-        if self.matches_filter(config):
-            bucket["PublicAccessBlockConfiguration"] = config
-            return bucket
+            bucket["c7n:PublicAccessBlock"] = config
+        return self.matches_filter(config)
 
     def matches_filter(self, config):
-        key_set = [key for key in self.keys if type(self.data.get(key)) is bool]
+        key_set = [key for key in self.keys if key in self.data]
         if key_set:
             return all([self.data.get(key) is config[key] for key in key_set])
         else:
@@ -1444,9 +1436,9 @@ class FilterPublicBlock(Filter):
 class SetPublicBlock(BucketActionBase):
     """Action to update Public Access blocks on S3 buckets
 
-    If no block args are provided it will set all to True
-    If a block arg is provided, it will only update that one
-    and it will retain the others which have not been provided
+    if no action parameters are provided it will enable all public block configuration.
+
+    If a action parameters are provided, those will be set and other extant values preserved.
 
     :example:
 
@@ -1460,6 +1452,7 @@ class SetPublicBlock(BucketActionBase):
                 actions:
                   - type: set-public-block
                   # BlockPublicAcls: true <-- optional, if none provided sets all to true by default
+
     """
 
     schema = type_schema(
@@ -1469,29 +1462,26 @@ class SetPublicBlock(BucketActionBase):
         BlockPublicPolicy={'type': 'boolean'},
         RestrictPublicBuckets={'type': 'boolean'})
     permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
-    keys = (
-        'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
+    keys = FilterPublicBlock.keys
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
             for future in as_completed(futures):
-                if future.exception():
-                    raise future.exception()
+                future.result()
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        config = {}
-        try:
-            config = s3.get_public_access_block(
-                Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'NoSuchPublicAccessBlockConfiguration':
-                # When there is a None config, set all to false to be symbolic
-                config = {key: False for key in self.keys}
-            else:
-                raise
-        key_set = [key for key in self.keys if type(self.data.get(key)) is bool]
+        config = bucket.get('c7n:PublicBlock', {key: False for key in self.keys})
+        if 'c7n:PublicBlock' not in bucket:
+            try:
+                config = s3.get_public_access_block(
+                    Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                    raise
+
+        key_set = [key for key in self.keys if key in self.data]
         if key_set:
             for key in key_set:
                 config[key] = self.data.get(key)
@@ -1499,10 +1489,7 @@ class SetPublicBlock(BucketActionBase):
             for key in self.keys:
                 config[key] = True
         s3.put_public_access_block(
-            Bucket=bucket['Name'],
-            PublicAccessBlockConfiguration=config
-        )
-        return {'Name': bucket['Name'], 'State': 'PublicBlocksUpdated'}
+            Bucket=bucket['Name'], PublicAccessBlockConfiguration=config)
 
 
 @actions.register('toggle-versioning')
