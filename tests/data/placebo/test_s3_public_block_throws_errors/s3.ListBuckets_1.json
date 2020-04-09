@@ -5,16 +5,7 @@
         "Buckets": [
             {
                 "Name": "mypublicblock",
-                "CreationDate": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 3,
-                    "day": 21,
-                    "hour": 21,
-                    "minute": 26,
-                    "second": 46,
-                    "microsecond": 0
-                }
+                "CreationDate": "2020-04-09T02:14:46+00:00"
             }
         ],
         "Owner": {
