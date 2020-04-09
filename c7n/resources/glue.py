@@ -14,14 +14,14 @@
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from .aws import shape_validate
-from c7n.manager import resources
+from c7n.manager import resources, ResourceManager
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
-from c7n.actions import BaseAction
+from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.tags import universal_augment
-from c7n.filters import StateTransitionFilter
-from c7n import query
+from c7n.filters import StateTransitionFilter, FilterRegistry
+from c7n import query, utils
 
 
 @resources.register('glue-connection')
@@ -415,23 +415,38 @@ class DeleteWorkflow(BaseAction):
 
 
 @resources.register('glue-catalog')
-class GlueDataCatalog(QueryResourceManager):
+class GlueDataCatalog(ResourceManager):
 
-    class resource_type(TypeInfo):
+    filter_registry = FilterRegistry('glue-catalog.filters')
+    action_registry = ActionRegistry('glue-catalog.actions')
+
+    class resource_type(query.TypeInfo):
         service = 'glue'
-        enum_spec = ('get_data_catalog_encryption_settings', 'DataCatalogEncryptionSettings', None)
         arn_type = 'catalog'
         id = name = 'CatalogId'
 
-    permissions = ('glue:GetDataCatalogEncryptionSettings',)
+    @classmethod
+    def get_permissions(cls):
+        return ('glue:GetDataCatalogEncryptionSettings',)
 
-    def augment(self, resources):
-        resource = []
-        resource.append(resources)
-        return resource
+    @classmethod
+    def has_arn(cls):
+        return True
+
+    def get_model(self):
+        return self.resource_type
+
+    def _get_catalog_encryption_settings(self):
+        client = utils.local_session(self.session_factory).client('glue')
+        settings = client.get_data_catalog_encryption_settings()
+        settings.pop('ResponseMetadata', None)
+        return [settings]
+
+    def resources(self):
+        return self.filter_resources(self._get_catalog_encryption_settings())
 
 
-@GlueDataCatalog.action_registry.register('set-glue-catalog-encryption')
+@GlueDataCatalog.action_registry.register('set-encryption')
 class GlueDataCatalogEncryption(BaseAction):
     """Modifies glue data catalog encryption based on specified parameter
     As per docs, we can enable catalog encryption or only password encryption,
@@ -446,11 +461,11 @@ class GlueDataCatalogEncryption(BaseAction):
                 resource: glue-catalog
                 filters:
                   - type: value
-                    key: EncryptionAtRest.CatalogEncryptionMode
+                    key: DataCatalogEncryptionSettings.EncryptionAtRest.CatalogEncryptionMode
                     value: DISABLED
                     op: eq
                 actions:
-                  - type: set-glue-catalog-encryption
+                  - type: set-encryption
                     attributes:
                         EncryptionAtRest:
                             CatalogEncryptionMode: SSE-KMS
@@ -458,7 +473,7 @@ class GlueDataCatalogEncryption(BaseAction):
     """
 
     schema = type_schema(
-        'set-glue-catalog-encryption',
+        'set-encryption',
         attributes={'type': 'object', "minItems": 1},
         required=('attributes',))
 

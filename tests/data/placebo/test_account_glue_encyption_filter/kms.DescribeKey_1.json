@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "d12e743c-a297-447c-9c13-8f3c08f4161c",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/d12e743c-a297-447c-9c13-8f3c08f4161c",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 2,
+                "day": 7,
+                "hour": 14,
+                "minute": 48,
+                "second": 17,
+                "microsecond": 795000
+            },
+            "Enabled": true,
+            "Description": "Default master key that protects my Glue data when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS"
+        },
+        "ResponseMetadata": {
+            "RequestId": "d9721340-9af9-4877-9eba-0962626453f8",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "d9721340-9af9-4877-9eba-0962626453f8",
+                "cache-control": "no-cache, no-store, must-revalidate, private",
+                "expires": "0",
+                "pragma": "no-cache",
+                "date": "Tue, 23 Jul 2019 01:20:06 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "434"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

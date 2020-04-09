@@ -462,12 +462,12 @@ class TestGlueDataCatalog(BaseTest):
                 "resource": "glue-catalog",
                 'filters': [{
                     'type': 'value',
-                    'key': 'EncryptionAtRest.SseAwsKmsKeyId',
+                    'key': 'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
                     'value': 'alias/skunk/trails',
                     'op': 'eq'},
                 ],
                 "actions": [{
-                    "type": "set-glue-catalog-encryption",
+                    "type": "set-encryption",
                     "attributes": {
                         "EncryptionAtRest": {
                             "CatalogEncryptionMode": "SSE-KMS",
