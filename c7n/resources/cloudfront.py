@@ -189,7 +189,7 @@ class IsLoggingEnabled(Filter):
                     results.append(r)
             except (distribution_client.exceptions.NoSuchResource,
                     distribution_client.exceptions.NoSuchDistribution):
-                pass
+                continue
             except Exception as e:
                 self.log.warning(
                     "Exception trying to get Distribution Config: %s error: %s",
