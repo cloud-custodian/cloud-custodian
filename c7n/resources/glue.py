@@ -440,6 +440,7 @@ class GlueDataCatalogEncryption(BaseAction):
     :example:
 
     .. code-block:: yaml
+
             policies:
               - name: data-catalog-encryption
                 resource: glue-catalog
