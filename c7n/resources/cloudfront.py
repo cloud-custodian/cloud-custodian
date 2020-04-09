@@ -148,6 +148,7 @@ class IsWafEnabled(Filter):
                 results.append(r)
         return results
 
+
 @Distribution.filter_registry.register('logging-enabled')
 class IsLoggingEnabled(Filter):
     """Check for existence of S3 bucket referenced by Cloudfront,
