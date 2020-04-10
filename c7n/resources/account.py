@@ -1419,8 +1419,10 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
         if self.annotation in resource:
             return resource[self.annotation]
         client = local_session(self.manager.session_factory).client('glue')
-        encryption_setting = client.get_data_catalog_encryption_settings().get(
-            'DataCatalogEncryptionSettings')
+        encryption_setting = resource.get('DataCatalogEncryptionSettings')
+        if str(self.manager.get_model()) != '<TypeInfo AWS::Glue::Catalog>':
+            encryption_setting = client.get_data_catalog_encryption_settings().get(
+                'DataCatalogEncryptionSettings')
         resource[self.annotation] = encryption_setting.get('EncryptionAtRest')
         resource[self.annotation].update(encryption_setting.get('ConnectionPasswordEncryption'))
 
