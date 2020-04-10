@@ -22,6 +22,7 @@ from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.tags import universal_augment
 from c7n.filters import StateTransitionFilter, FilterRegistry
 from c7n import query, utils
+from c7n.resources.account import GlueCatalogEncryptionEnabled
 
 
 @resources.register('glue-connection')
@@ -419,6 +420,7 @@ class GlueDataCatalog(ResourceManager):
 
     filter_registry = FilterRegistry('glue-catalog.filters')
     action_registry = ActionRegistry('glue-catalog.actions')
+    retry = staticmethod(QueryResourceManager.retry)
 
     class resource_type(query.TypeInfo):
         service = 'glue'
@@ -490,3 +492,21 @@ class GlueDataCatalogEncryption(BaseAction):
         # there is one glue data catalog per account
         client.put_data_catalog_encryption_settings(
             DataCatalogEncryptionSettings=self.data['attributes'])
+
+
+@GlueDataCatalog.filter_registry.register('glue-security-config')
+class GlueCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
+    """Filter aws account by its glue encryption status and KMS key
+
+    :example:
+
+    .. yaml:
+
+      policies:
+        - name: glue-security-config
+          resource: aws.glue-catalog
+          filters:
+            - type: glue-security-config
+              SseAwsKmsKeyId: alias/aws/glue
+
+    """

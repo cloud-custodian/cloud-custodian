@@ -1385,23 +1385,8 @@ class SetS3PublicBlock(BaseAction):
                 PublicAccessBlockConfiguration=config)
 
 
-@filters.register('glue-security-config')
-class GlueEncryptionEnabled(MultiAttrFilter):
-    """Filter aws account by its glue encryption status and KMS key """
+class GlueCatalogEncryptionEnabled(MultiAttrFilter):
 
-    """:example:
-
-    .. yaml:
-
-      policies:
-        - name: glue-security-config
-          resource: aws.account
-          filters:
-            - type: glue-security-config
-                key: SseAwsKmsKeyId
-                value: alias/aws/glue
-
-    """
     retry = staticmethod(QueryResourceManager.retry)
 
     schema = {
@@ -1428,7 +1413,7 @@ class GlueEncryptionEnabled(MultiAttrFilter):
                        'AwsKmsKeyId']:
                 attrs.add(key)
         self.multi_attrs = attrs
-        return super(GlueEncryptionEnabled, self).validate()
+        return super(GlueCatalogEncryptionEnabled, self).validate()
 
     def get_target(self, resource):
         if self.annotation in resource:
@@ -1451,3 +1436,21 @@ class GlueEncryptionEnabled(MultiAttrFilter):
                 return []
             resource[self.annotation][kmskey] = self.data[kmskey]
         return resource[self.annotation]
+
+
+@filters.register('glue-security-config')
+class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
+    """Filter aws account by its glue encryption status and KMS key
+
+    :example:
+
+    .. yaml:
+
+      policies:
+        - name: glue-security-config
+          resource: aws.account
+          filters:
+            - type: glue-security-config
+              SseAwsKmsKeyId: alias/aws/glue
+
+    """
