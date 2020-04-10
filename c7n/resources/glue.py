@@ -503,7 +503,7 @@ class GlueCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
     .. yaml:
 
       policies:
-        - name: glue-security-config
+        - name: glue-catalog-security-config
           resource: aws.glue-catalog
           filters:
             - type: glue-security-config
