@@ -1856,6 +1856,18 @@ class InternetGateway(query.QueryResourceManager):
         id_prefix = "igw-"
 
 
+@InternetGateway.action_registry.register('delete')
+class DeleteInternetGateway(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteInternetGateway',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
+
+
 @resources.register('nat-gateway')
 class NATGateway(query.QueryResourceManager):
 

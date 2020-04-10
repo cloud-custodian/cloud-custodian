@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "InternetGateways": [
+            {
+                "Attachments": [],
+                "InternetGatewayId": "igw-0063799594bfb34d3",
+                "OwnerId": "123456789123",
+                "Tags": [
+                    {
+                        "Key": "xyz",
+                        "Value": "hello world"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

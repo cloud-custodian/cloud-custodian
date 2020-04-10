@@ -2492,6 +2492,65 @@ class EndpointTest(BaseTest):
         self.assertEqual(violations[0]['Effect'], 'Allow')
 
 
+class InternetGatewayTest(BaseTest):
+
+    def test_query_internet_gateways(self):
+        factory = self.replay_flight_data("test_internet_gateways_query")
+        p = self.load_policy(
+            {"name": "get-internet-gateways", "resource": "internet-gateway"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_tag_internet_gateways(self):
+        factory = self.replay_flight_data("test_internet_gateways_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-internet-gateways",
+                "resource": "internet-gateway",
+                "filters": [{"tag:Name": "c7n-test"}],
+                "actions": [{"type": "tag", "key": "xyz", "value": "hello world"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "get-internet-gateways",
+                "resource": "internet-gateway",
+                "filters": [{"tag:xyz": "hello world"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_delete_internet_gateways(self):
+        factory = self.replay_flight_data("test_internet_gateways_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-internet-gateways",
+                "resource": "internet-gateway",
+                "filters": [{"tag:Name": "c7n-test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory(region="us-east-1").client("ec2")
+        internet_gateways = client.describe_internet_gateways(
+            Filters=[{"Name": "resource-id", "Values": [resources[0]["InternetGatewayId"]]}]
+        )[
+            "InternetGateways"
+        ]
+        self.assertFalse(internet_gateways)
+
+
 class NATGatewayTest(BaseTest):
 
     def test_query_nat_gateways(self):
