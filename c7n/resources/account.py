@@ -1440,9 +1440,9 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
 
 @filters.register('glue-security-config')
 class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
-    """Filter aws account by its glue encryption status and KMS key
+    """Filter aws account by its glue encryption status and KMS key"""
 
-    :example:
+    """:example:
 
     .. yaml:
 
