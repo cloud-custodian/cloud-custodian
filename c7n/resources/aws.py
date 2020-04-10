@@ -26,9 +26,11 @@ import shutil
 import sys
 import tempfile
 import time
+import threading
 import traceback
 
 import boto3
+import botocore.client
 
 from botocore.validate import ParamValidator
 
@@ -286,6 +288,7 @@ class CloudWatchLogOutput(LogOutput):
 
 
 class XrayEmitter:
+    # implement https://github.com/aws/aws-xray-sdk-python/issues/51
 
     def __init__(self):
         self.buf = []
@@ -301,18 +304,33 @@ class XrayEmitter:
         self.buf = []
         for segment_set in utils.chunks(buf, 50):
             self.client.put_trace_segments(
-                TraceSegmentDocuments=[
-                    s.serialize() for s in segment_set])
+                TraceSegmentDocuments=[s.serialize() for s in segment_set])
 
 
 class XrayContext(Context):
+    """Specialized XRay Context for Custodian.
+
+    A context is used as a segment storage stack for currently in
+    progress segments.
+
+    We use a customized context for custodian as policy execution
+    commonly uses a concurrent.futures threadpool pattern during
+    execution for api concurrency. Default xray semantics would use
+    thread local storage and treat each of those as separate trace
+    executions. We want to aggregate/associate all thread pool api
+    executions to the custoidan policy execution. XRay sdk supports
+    this via manual code for every thread pool usage, but we don't
+    want to explicitly couple xray integration everywhere across the
+    codebase. Instead we use a context that is aware of custodian
+    usage of threads and associates subsegments therein to the policy
+    execution active subsegment.
+    """
 
     def __init__(self, *args, **kw):
         super(XrayContext, self).__init__(*args, **kw)
-        # We want process global semantics as policy execution
-        # can span threads.
         self._local = Bag()
         self._current_subsegment = None
+        self._main_tid = threading.get_ident()
 
     def handle_context_missing(self):
         """Custodian has a few api calls out of band of policy execution.
@@ -323,6 +341,91 @@ class XrayContext(Context):
         Also we want to folks to optionally based on configuration using xray
         so default to disabling context missing output.
         """
+
+    # Annotate any segments/subsegments with their thread ids.
+    def put_segment(self, segment):
+        if getattr(segment, 'thread_id', None) is None:
+            segment.thread_id = threading.get_ident()
+        super().put_segment(segment)
+
+    def put_subsegment(self, subsegment):
+        if getattr(subsegment, 'thread_id', None) is None:
+            subsegment.thread_id = threading.get_ident()
+        super().put_subsegment(subsegment)
+
+    # Override since we're not just popping the end of the stack, we're removing
+    # the thread subsegment from the array by identity.
+    def end_subsegment(self, end_time):
+        subsegment = self.get_trace_entity()
+        if self._is_subsegment(subsegment):
+            subsegment.close(end_time)
+            self._local.entities.remove(subsegment)
+            return True
+        else:
+            log.warning("No subsegment to end.")
+            return False
+
+    # Override get trace identity, any worker thread will find its own subsegment
+    # on the stack, else will use the main thread's sub/segment
+    def get_trace_entity(self):
+        tid = threading.get_ident()
+        entities = self._local.get('entities', ())
+        for s in reversed(entities):
+            if s.thread_id == tid:
+                return s
+            # custodian main thread won't advance (create new segment)
+            # with worker threads still doing pool work.
+            elif s.thread_id == self._main_tid:
+                return s
+        return self.handle_context_missing()
+
+
+if HAVE_XRAY:  # pragma: no cover
+    # sigh, work around aws xray sdk issues, via monkey patch
+    # https://github.com/aws/aws-xray-sdk-python/issues/207
+
+    # we can't do a minimal monkey, due to namespace occlusion they
+    # do with function imports masking modules :-(
+
+    # all of this to add a PutTraceSegments to the exempted methods list.
+    import wrapt
+
+    from aws_xray_sdk.ext.boto_utils import inject_header, aws_meta_processor
+    from aws_xray_sdk.ext import botocore as xray_boto3
+
+    def _xray_traced_botocore(wrapped, instance, args, kwargs):
+        service = instance._service_model.metadata["endpointPrefix"]
+        if service == 'xray':
+            # skip tracing for SDK built-in sampling pollers
+            if ('GetSamplingRules' in args or
+                'GetSamplingTargets' in args or
+                    'PutTraceSegments' in args):
+                return wrapped(*args, **kwargs)
+        return xray_recorder.record_subsegment(
+            wrapped, instance, args, kwargs,
+            name=service,
+            namespace='aws',
+            meta_processor=aws_meta_processor,
+        )
+
+    def _xray_patch_botocore():
+        if hasattr(botocore.client, '_xray_enabled'):
+            return
+        setattr(botocore.client, '_xray_enabled', True)
+
+        wrapt.wrap_function_wrapper(
+            'botocore.client',
+            'BaseClient._make_api_call',
+            _xray_traced_botocore,
+        )
+
+        wrapt.wrap_function_wrapper(
+            'botocore.endpoint',
+            'Endpoint.prepare_request',
+            inject_header,
+        )
+
+    xray_boto3.patch = _xray_patch_botocore
 
 
 @tracer_outputs.register('xray', condition=HAVE_XRAY)
@@ -335,12 +438,13 @@ class XrayTracer:
     service_name = 'custodian'
 
     @classmethod
-    def initialize(cls):
+    def initialize(cls, config):
         context = XrayContext()
+        sampling = config.get('sample', 'true') == 'true' and True or False
         xray_recorder.configure(
             emitter=cls.use_daemon is False and cls.emitter or None,
             context=context,
-            sampling=True,
+            sampling=sampling,
             context_missing='LOG_ERROR')
         patch(['boto3', 'requests'])
         logging.getLogger('aws_xray_sdk.core').setLevel(logging.ERROR)
@@ -391,6 +495,9 @@ class XrayTracer:
         xray_recorder.end_segment()
         if not self.use_daemon:
             self.emitter.flush()
+            log.info(
+                ('View XRay Trace https://console.aws.amazon.com/xray/home?region=%s#/'
+                 'traces/%s' % (self.ctx.options.region, self.segment.trace_id)))
         self.metadata.clear()
 
 
@@ -517,7 +624,7 @@ class AWS(Provider):
         _default_region(options)
         _default_account_id(options)
         if options.tracer and options.tracer.startswith('xray') and HAVE_XRAY:
-            XrayTracer.initialize()
+            XrayTracer.initialize(utils.parse_url_config(options.tracer))
 
         return options
 

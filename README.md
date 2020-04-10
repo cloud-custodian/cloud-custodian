@@ -6,7 +6,7 @@ Cloud Custodian
 ---
 
 [![](https://badges.gitter.im/cloud-custodian/cloud-custodian.svg)](https://gitter.im/cloud-custodian/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-![CI](https://github.com/cloud-custodian/cloud-custodian/workflows/CI/badge.svg?event=push)
+[![CI](https://github.com/cloud-custodian/cloud-custodian/workflows/CI/badge.svg?event=push)](https://github.com/cloud-custodian/cloud-custodian/actions?query=workflow%3ACI+branch%3Amaster+event%3Apush)
 [![](https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/Custodian%20-%20CI?branchName=master)](https://dev.azure.com/cloud-custodian/cloud-custodian/_build)
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/master/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)

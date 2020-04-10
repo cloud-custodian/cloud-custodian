@@ -1,6 +1,6 @@
 # Load all project requirements
 
-# note all of these are generated from poetry lock/projects via `make pkg-gen-requirements`
+# Note all of these are generated from poetry lock/projects via `make pkg-gen-requirements`
 -r requirements.txt
 -r tools/c7n_azure/requirements.txt
 -r tools/c7n_gcp/requirements.txt
