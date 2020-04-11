@@ -19,6 +19,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
 from c7n.filters import StateTransitionFilter, ValueFilter
 from c7n import query
@@ -178,7 +179,7 @@ class GlueCrawler(QueryResourceManager):
     augment = universal_augment
 
 
-class SecurityConfigFilter(ValueFilter):
+class SecurityConfigFilter(RelatedResourceFilter):
     """Filters glue crawlers with security configurations
 
     :example:
@@ -197,9 +198,10 @@ class SecurityConfigFilter(ValueFilter):
     To find resources missing any security configuration all set `missing: true` on the filter.
     """
 
-    permissions = ('glue:GetSecurityConfiguration',)
-    annotation_key = 'c7n:SecurityConfiguration'
-    security_name_key = None  # set in subclass for particular resource
+    RelatedResource = "c7n.resources.glue.GlueSecurityConfiguration"
+    AnnotationKey = "matched-security-config"
+    RelatedIdsExpression = None
+
     schema = type_schema(
         'security-config',
         missing={'type': 'boolean', 'default': False},
@@ -207,61 +209,30 @@ class SecurityConfigFilter(ValueFilter):
 
     def validate(self):
         if self.data.get('missing'):
-            return
-        super().validate()
+            return self
+        else:
+            return super(SecurityConfigFilter, self).validate()
 
     def process(self, resources, event=None):
-        resources = self.initialize(resources)
         if self.data.get('missing'):
-            return resources
-        return super(ValueFilter, self).process(resources, event)
-
-    def __call__(self, r):
-        if self.annotation_key not in r:
-            return False
-        return self.match(r[self.annotation_key])
-
-    def initialize(self, resources):
-        if self.data.get('missing'):
-            return [r for r in resources if self.security_name_key not in r]
-
-        # fetch security configurations by name for the resources
-        client = local_session(self.manager.session_factory).client('glue')
-        # Get the security configurations that aren't already cached.
-        security_config_names = {
-            r.get(self.security_name_key) for r in resources
-            if self.annotation_key not in r}
-        if None in security_config_names:
-            security_config_names.remove(None)
-
-        security_config_map = {}
-        for n in security_config_names:
-            try:
-                security_config_map[n] = client.get_security_configuration(
-                    Name=n)['SecurityConfiguration']
-            except client.exceptions.EntityNotFoundException:
-                continue
-
-        for r in resources:
-            if self.security_name_key not in r or self.annotation_key in r:
-                continue
-            r[self.annotation_key] = security_config_map[r[self.security_name_key]]
-        return resources
+            return [r for r in resources if self.RelatedIdsExpression not in r]
+        return super(SecurityConfigFilter, self).process(resources, event=None)
 
 
 @GlueDevEndpoint.filter_registry.register('security-config')
 class DevEndpointSecurityConfigFilter(SecurityConfigFilter):
-    security_name_key = 'SecurityConfiguration'
+    RelatedIdsExpression = 'SecurityConfiguration'
 
 
 @GlueJob.filter_registry.register('security-config')
 class GlueJobSecurityConfigFilter(SecurityConfigFilter):
-    security_name_key = 'SecurityConfiguration'
+    RelatedIdsExpression = 'SecurityConfiguration'
 
 
 @GlueCrawler.filter_registry.register('security-config')
 class GlueCrawlerSecurityConfigFilter(SecurityConfigFilter):
-    security_name_key = 'CrawlerSecurityConfiguration'
+
+    RelatedIdsExpression = 'CrawlerSecurityConfiguration'
 
 
 @GlueCrawler.action_registry.register('delete')
@@ -502,4 +473,4 @@ class DeleteWorkflow(BaseAction):
 
 @GlueWorkflow.filter_registry.register('security-config')
 class GlueWorkflowSecurityConfigFilter(SecurityConfigFilter):
-    security_name_key = 'SecurityConfiguration'
+    RelatedIdsExpression = 'SecurityConfiguration'

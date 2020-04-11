@@ -333,7 +333,7 @@ class TestGlueCrawlers(BaseTest):
                      "op": "eq"},
                     {"type": "security-config",
                      "key": "EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn",
-                     "value": "arn:aws:kms:us-east-1:123456789000:key/358f7699-4ea5-455a-9c78-1c868301e5a8",  # noqa
+                     "value": "arn:aws:kms:us-east-1:123456789123:key/358f7699-4ea5-455a-9c78-1c868301e5a8", # noqa
                      "op": "eq"}
                 ],
             },
@@ -341,11 +341,6 @@ class TestGlueCrawlers(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['c7n:SecurityConfiguration']['EncryptionConfiguration']
-            ['CloudWatchEncryption']['CloudWatchEncryptionMode'],
-            'SSE-KMS'
-        )
         self.assertEqual(resources[0]['Name'], 'test-filter-crawler')
 
 

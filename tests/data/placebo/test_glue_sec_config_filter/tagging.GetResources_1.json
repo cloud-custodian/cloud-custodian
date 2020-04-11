@@ -3,16 +3,6 @@
     "data": {
         "PaginationToken": "",
         "ResourceTagMappingList": [],
-        "ResponseMetadata": {
-            "RequestId": "688e2138-be7d-4e39-9cbc-15a2b5517e3f",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "688e2138-be7d-4e39-9cbc-15a2b5517e3f",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "50",
-                "date": "Wed, 18 Mar 2020 15:35:18 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }
