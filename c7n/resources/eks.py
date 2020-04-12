@@ -17,7 +17,7 @@ from c7n.manager import resources
 from c7n import tags
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-
+from botocore.exceptions import ClientError
 from .aws import shape_validate
 
 
@@ -146,6 +146,20 @@ class Delete(Action):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('eks')
         for r in resources:
+            try:
+                nodegroups = client.list_nodegroups(clusterName=r['name'])['nodegroups']
+                fargateProfileNames = client.list_fargate_profiles(
+                    clusterName=r['name'])['fargateProfileNames']
+                if nodegroups:
+                    for nodegroup in nodegroups:
+                        client.delete_nodegroup(
+                            clusterName=r['name'], nodegroupName=nodegroup)
+                if fargateProfileNames:
+                    for fargateProfile in fargateProfileNames:
+                        client.delete_fargate_profile(
+                            clusterName=r['name'], fargateProfileName=fargateProfile)
+            except ClientError as e:
+                raise
             try:
                 client.delete_cluster(name=r['name'])
             except client.exceptions.ResourceNotFoundException:
