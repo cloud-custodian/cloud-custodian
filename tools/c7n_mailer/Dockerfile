@@ -1,1 +1,1 @@
-docker/mailer
+../../docker/mailer
