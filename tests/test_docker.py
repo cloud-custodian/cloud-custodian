@@ -74,6 +74,7 @@ def custodian_org_dir(tmpdir):
             )
         )
 
+    os.chmod(tmpdir, 0o777)
     return tmpdir
 
 
