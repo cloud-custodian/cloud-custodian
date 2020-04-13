@@ -190,9 +190,6 @@ $ docker run -it \
 # NOTE: We mount the ``.aws/credentials`` and ``.aws/config`` directories to
 # the docker container to support authentication to AWS using the same credentials
 # credentials that are available to the local user if authenticating with STS.
-# This exposes your container to additional credentials than may be necessary,
-# i.e. additional credentials may be available inside of the container than is
-# minimally necessary.
 
 $ docker run -it \
   -v $(pwd)/output:/home/custodian/output \
@@ -203,9 +200,10 @@ $ docker run -it \
   cloudcustodian/c7n run -v -s /home/custodian/output /home/custodian/policy.yml
 ```
 
-Custodian supports other useful subcommands and options, including
-outputs to S3, CloudWatch metrics, STS role assumption. Policies go
-together like Lego bricks with actions and filters.
+The [custodian cask
+tool](https://cloudcustodian.io/docs/tools/cask.html) is a go binary
+that provides a transparent front end to docker that mirors the regular
+custodian cli, but automatically takes care of mounting volumes.
 
 Consult the documentation for additional information, or reach out on gitter.
 

@@ -224,7 +224,11 @@ class Delete(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
         for r in resources:
-            client.delete_log_group(logGroupName=r['logGroupName'])
+            try:
+                self.manager.retry(
+                    client.delete_log_group, logGroupName=r['logGroupName'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
 
 
 @LogGroup.filter_registry.register('last-write')
