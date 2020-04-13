@@ -1873,7 +1873,7 @@ class DeleteInternetGateway(BaseAction):
             except Exception as e:
                 self.log.warning(
                     "Exception trying to delete Internet Gateway: %s error: %s",
-                    r['ARN'], e)
+                    r['InternetGatewayId'], e)
                 raise e
 
 
