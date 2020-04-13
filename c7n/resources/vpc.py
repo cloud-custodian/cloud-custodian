@@ -1863,9 +1863,18 @@ class DeleteInternetGateway(BaseAction):
     permissions = ('ec2:DeleteInternetGateway',)
 
     def process(self, resources):
+
         client = local_session(self.manager.session_factory).client('ec2')
         for r in resources:
-            client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
+            try:
+                client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
+            except (client.exceptions.NoSuchResource):
+                continue
+            except Exception as e:
+                self.log.warning(
+                    "Exception trying to delete Internet Gateway: %s error: %s",
+                    r['ARN'], e)
+                raise e
 
 
 @resources.register('nat-gateway')
