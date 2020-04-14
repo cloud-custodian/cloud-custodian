@@ -668,6 +668,17 @@ def get_annotation_prefix(s):
     return 'c7n:{}'.format(s)
 
 
+def merge_dict_list(dict_iter):
+    """take an list of dictionaries and merge them.
+
+    last dict wins/overwrites on keys.
+    """
+    result = {}
+    for d in dict_iter:
+        result.update(d)
+    return result
+
+
 def merge_dict(a, b):
     """Perform a merge of dictionaries a and b
 
