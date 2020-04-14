@@ -318,8 +318,8 @@ class PostFinding(Action):
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
         severity_label={
             "type": "string", 'default': 'INFORMATIONAL',
-            "enum": ["INFORMATIONAL","LOW","MEDIUM","HIGH","CRITICAL"],
-        }
+            "enum": ["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"],
+        },
         confidence={"type": "number", "min": 0, "max": 100},
         criticality={"type": "number", "min": 0, "max": 100},
         # Cross region aggregation
