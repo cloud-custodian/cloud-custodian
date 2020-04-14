@@ -31,6 +31,7 @@ class WAF(QueryResourceManager):
         permissions_augment = ('waf:GetWebACL',)
         universal_taggable = object()
 
+
 @resources.register('waf-regional')
 class RegionalWAF(QueryResourceManager):
 
