@@ -29,7 +29,7 @@ class WAF(QueryResourceManager):
         arn_type = "webacl"
         permissions_enum = ('waf:ListWebACLs',)
         permissions_augment = ('waf:GetWebACL',)
-
+        universal_taggable = object()
 
 @resources.register('waf-regional')
 class RegionalWAF(QueryResourceManager):
@@ -45,3 +45,4 @@ class RegionalWAF(QueryResourceManager):
         arn_type = "webacl"
         permissions_enum = ('waf-regional:ListWebACLs',)
         permissions_augment = ('waf-regional:GetWebACL',)
+        universal_taggable = object()

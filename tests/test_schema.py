@@ -224,24 +224,18 @@ class SchemaTest(BaseTest):
     def test_semantic_error_policy_scope(self):
         data = {
             'policies': [
-                {'actions': [{'key': 'TagPolicyCompliance',
-                              'type': 'tag',
-                              'value': 'This resource should have tags following policy'}],
-                 'description': 'Identify resources which lack our accounting tags',
-                 'filters': [{'tag:Environment': 'absent'},
-                             {'tag:Service': 'absent'},
-                             {'or': [{'tag:Owner': 'absent'},
-                                     {'tag:ResponsibleParty': 'absent'},
-                                     {'tag:Contact': 'absent'},
-                                     {'tag:Creator': 'absent'}]}],
-                 'name': 'tagging-compliance-waf',
+                {'actions': [{'key': 'AES3000',
+                              'type': 'encryption',
+                              'value': 'This resource should have AES3000 encryption'}],
+                 'description': 'Identify resources which lack our outrageous cipher',
+                 'name': 'bogus-policy',
                  'resource': 'aws.waf'}]}
         load_resources(('aws.waf',))
         validator = self.policy_loader.validator.gen_schema(('aws.waf',))
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 1)
         error = policy_error_scope(specific_error(errors[0]), data)
-        self.assertTrue("policy:tagging-compliance-waf" in error.message)
+        self.assertTrue("policy:bogus-policy" in error.message)
 
     def test_semantic_error(self):
         data = {
