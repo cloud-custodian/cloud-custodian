@@ -24,7 +24,7 @@ from c7n.filters import (
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema, chunks, merge_dict_list
 
 
 log = logging.getLogger('custodian.ami')
@@ -45,7 +45,10 @@ class AMI(QueryResourceManager):
         date = 'CreationDate'
 
     def resources(self, query=None):
-        query = query or {}
+        if query is None and 'query' in self.data:
+            query = merge_dict_list(self.data['query'])
+        elif query is None:
+            query = {}
         if query.get('Owners') is None:
             query['Owners'] = ['self']
         return super(AMI, self).resources(query=query)

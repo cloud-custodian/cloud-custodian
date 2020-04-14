@@ -131,6 +131,12 @@ class ProxyUrlTest(BaseTest):
 
 class UtilTest(BaseTest):
 
+    def test_merge_dict_list(self):
+
+        assert utils.merge_dict_list([
+            {'a': 1, 'x': 0}, {'b': 2, 'x': 0}, {'c': 3, 'x': 1}]) == {
+                'a': 1, 'b': 2, 'c': 3, 'x': 1}
+
     def test_merge_dict(self):
         a = {'detail': {'eventName': ['CreateSubnet'],
                     'eventSource': ['ec2.amazonaws.com']},

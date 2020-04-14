@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from .common import BaseTest, functional
+from unittest.mock import MagicMock
 
 
 class LogGroupTest(BaseTest):
@@ -87,6 +88,31 @@ class LogGroupTest(BaseTest):
             ],
             14,
         )
+
+    def test_log_group_delete_error(self):
+        factory = self.replay_flight_data("test_log_group_delete")
+        client = factory().client("logs")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'logs').exceptions.ResourceNotFoundException = (
+                client.exceptions.ResourceNotFoundException)
+        mock_factory().client('logs').delete_log_group.side_effect = (
+            client.exceptions.ResourceNotFoundException(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='delete_log_group'))
+        p = self.load_policy({
+            'name': 'delete-log-err',
+            'resource': 'log-group',
+            'actions': ['delete']},
+            session_factory=mock_factory)
+
+        try:
+            p.resource_manager.actions[0].process(
+                [{'logGroupName': 'abc'}])
+        except client.exceptions.ResourceNotFoundException:
+            self.fail('should not raise')
+        mock_factory().client('logs').delete_log_group.assert_called_once()
 
     @functional
     def test_delete(self):
