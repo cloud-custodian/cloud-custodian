@@ -502,11 +502,11 @@ class GlueDataCatalogEncryption(BaseAction):
 
 @GlueDataCatalog.filter_registry.register('glue-security-config')
 class GlueCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
-    """Filter aws account by its glue encryption status and KMS key"""
+    """Filter aws account by its glue encryption status and KMS key
 
-    """:example:
+    :example:
 
-    .. yaml:
+    .. code-block:: yaml
 
       policies:
         - name: glue-catalog-security-config
