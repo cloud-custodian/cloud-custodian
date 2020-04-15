@@ -256,19 +256,25 @@ class AutoTagUser(AutoTagBase):
 
     """
 
-    schema = type_schema('auto-tag-user', rinherit=AutoTagBase.schema)
+    schema = type_schema('auto-tag-user',
+                         rinherit=AutoTagBase.schema,
+                         **{
+                             'default-claim': {'enum': ['upn', 'name']}
+                         })
     log = logging.getLogger('custodian.azure.tagging.AutoTagUser')
 
     # compiled JMES paths
     service_admin_jmes_path = jmespath.compile(constants.EVENT_GRID_SERVICE_ADMIN_JMES_PATH)
     sp_jmes_path = jmespath.compile(constants.EVENT_GRID_SP_NAME_JMES_PATH)
     upn_jmes_path = jmespath.compile(constants.EVENT_GRID_UPN_CLAIM_JMES_PATH)
+    name_jmes_path = jmespath.compile(constants.EVENT_GRID_NAME_CLAIM_JMES_PATH)
     principal_role_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_ROLE_JMES_PATH)
     principal_type_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH)
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
         self.query_select = "eventTimestamp, operationName, caller, claims"
+        self.default_claim = self.data.get('default-claim', 'upn')
 
     def _get_tag_value_from_event(self, event):
         principal_role = self.principal_role_jmes_path.search(event)
@@ -281,21 +287,27 @@ class AutoTagUser(AutoTagBase):
         elif StringUtils.equal(principal_type, 'ServicePrincipal'):
             user = self.sp_jmes_path.search(event)
 
-        # Other types and main fallback (e.g. User, Office 365 Groups, and Security Groups)
-        if not user and self.upn_jmes_path.search(event):
-            user = self.upn_jmes_path.search(event)
+        if not user:
+            known_claims = {'upn': self.upn_jmes_path.search(event),
+                            'name': self.name_jmes_path.search(event)}
+            if known_claims[self.default_claim]:
+                user = known_claims[self.default_claim]
+            elif self.default_claim == 'upn' and known_claims['name']:
+                user = known_claims['name']
+            elif self.default_claim == 'name' and known_claims['upn']:
+                user = known_claims['upn']
 
         # Last effort search for an email address in the claims
         if not user:
-            claims = event['data']['claims']
+            claims = event['data'].get('claims', [])
             for c in claims:
                 value = claims[c]
                 if self._is_email(value):
                     user = value
+                    break
 
         if not user:
             self.log.error('Principal could not be determined.')
-
         return user
 
     def _is_email(self, target):
@@ -307,8 +319,8 @@ class AutoTagUser(AutoTagBase):
             return False
 
     def _get_tag_value_from_resource(self, resource):
-        first_op = self._get_first_event(resource)
-        return first_op.caller if first_op else None
+        first_op = self._get_first_event(resource).serialize(True)
+        return self._get_tag_value_from_event({'data': first_op})
 
 
 class AutoTagDate(AutoTagBase):
