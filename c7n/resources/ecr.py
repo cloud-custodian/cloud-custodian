@@ -174,7 +174,7 @@ LIFECYCLE_RULE_SCHEMA = {
         'selection': {
             'type': 'object',
             'addtionalProperties': False,
-            'required': ['countType', 'countUnit'],
+            'required': ['countType'],
             'properties': {
                 'tagStatus': {'enum': ['tagged', 'untagged', 'any']},
                 'tagPrefixList': {'type': 'array', 'items': {'type': 'string'}},
