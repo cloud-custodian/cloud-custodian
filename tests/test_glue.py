@@ -446,3 +446,41 @@ class TestGlueWorkflows(BaseTest):
         client = session_factory().client("glue")
         workflows = client.list_workflows()
         self.assertFalse("test" in [t.get("Name") for t in workflows.get("Workflows", [])])
+
+
+class TestGlueDataCatalog(BaseTest):
+
+    def test_glue_datacat_put_encryption(self):
+        session_factory = self.replay_flight_data("test_glue_datacat_put_encryption")
+        client = session_factory().client("glue")
+        cat_setting = client.get_data_catalog_encryption_settings()
+        self.assertEqual(cat_setting.get('DataCatalogEncryptionSettings').get(
+            'EncryptionAtRest').get('SseAwsKmsKeyId'), 'alias/skunk/trails')
+        p = self.load_policy(
+            {
+                "name": "glue-security-config",
+                "resource": "glue-catalog",
+                'filters': [{
+                    'type': 'value',
+                    'key': 'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+                    'value': 'alias/skunk/trails',
+                    'op': 'eq'},
+                ],
+                "actions": [{
+                    "type": "set-encryption",
+                    "attributes": {
+                        "EncryptionAtRest": {
+                            "CatalogEncryptionMode": "SSE-KMS",
+                            "SseAwsKmsKeyId": "alias/skunk/glue/encrypted"},
+                    },
+                }]
+            },
+            session_factory=session_factory,)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        datacatlog = client.get_data_catalog_encryption_settings()
+        self.assertEqual(datacatlog.get('DataCatalogEncryptionSettings').get(
+            'EncryptionAtRest'),
+            {'CatalogEncryptionMode': 'SSE-KMS', 'SseAwsKmsKeyId': 'alias/skunk/glue/encrypted'})
