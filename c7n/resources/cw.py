@@ -258,7 +258,8 @@ class LastWriteDays(Filter):
         return [r for r in resources if self.check_group(client, r)]
 
     def check_group(self, client, group):
-        streams = client.describe_log_streams(
+        streams = self.manager.retry(
+            client.describe_log_streams,
             logGroupName=group['logGroupName'],
             orderBy='LastEventTime',
             descending=True,

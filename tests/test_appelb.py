@@ -388,7 +388,7 @@ class AppELBTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['LoadBalancerName'], 'testing')
+        self.assertEqual(resources[0]['LoadBalancerName'], 'test')
 
     def test_appelb_waf(self):
         factory = self.replay_flight_data("test_appelb_waf")
@@ -398,9 +398,9 @@ class AppELBTest(BaseTest):
                 "name": "appelb-waf",
                 "resource": "app-elb",
                 "filters": [
-                    {"type": "waf-enabled", "web-acl": "waf-default", "state": False}
+                    {"type": "waf-enabled", "web-acl": "test", "state": False}
                 ],
-                "actions": [{"type": "set-waf", "web-acl": "waf-default"}],
+                "actions": [{"type": "set-waf", "web-acl": "test"}],
             },
             session_factory=factory,
         )
@@ -411,7 +411,7 @@ class AppELBTest(BaseTest):
                 "name": "appelb-waf",
                 "resource": "app-elb",
                 "filters": [
-                    {"type": "waf-enabled", "web-acl": "waf-default", "state": True}
+                    {"type": "waf-enabled", "web-acl": "test", "state": True}
                 ],
             },
             session_factory=factory,

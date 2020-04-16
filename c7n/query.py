@@ -438,7 +438,7 @@ class QueryResourceManager(ResourceManager):
             'q': query
         }
 
-    def resources(self, query=None):
+    def resources(self, query=None, augment=True):
         query = self.source.get_query_params(query)
         cache_key = self.get_cache_key(query)
         resources = None
@@ -456,8 +456,9 @@ class QueryResourceManager(ResourceManager):
                 query = {}
             with self.ctx.tracer.subsegment('resource-fetch'):
                 resources = self.source.resources(query)
-            with self.ctx.tracer.subsegment('resource-augment'):
-                resources = self.augment(resources)
+            if augment:
+                with self.ctx.tracer.subsegment('resource-augment'):
+                    resources = self.augment(resources)
             self._cache.save(cache_key, resources)
 
         resource_count = len(resources)
