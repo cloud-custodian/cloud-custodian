@@ -25,6 +25,7 @@ from c7n.utils import (
     local_session, type_schema, get_retry)
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
+from .aws import shape_validate
 
 filters = FilterRegistry('emr.filters')
 actions = ActionRegistry('emr.actions')
@@ -284,3 +285,78 @@ class QueryFilter:
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
+
+
+@resources.register('emr-block-public-access-configuration')
+class EMRBlockPublicAccessConfiguration(QueryResourceManager):
+    """Resource manager for EMR publi
+    """
+
+    class resource_type(TypeInfo):
+        service = 'emr'
+        arn_type = 'emr'
+        permission_prefix = 'elasticmapreduce'
+        cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
+        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
+        name = 'Name'
+        id = 'Id'
+        date = "Status.Timeline.CreationDateTime"
+
+@actions.register('get-block-public-access-configuration')
+class GetBlockPublicAccessConfiguration(BaseAction):
+    """Action to get the EMR block public access configuration for your AWS account in the current region
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: emr-get-block-public-access-configuration
+                resource: emr
+                actions:
+                  - get-public-block-access-configration
+    """
+
+    schema = type_schema('get-public-block-access-configration')
+    permissions = ("elasticmapreduce:GetBlockPublicAccessConfiguration",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('emr')
+
+        try:
+            response = client.get_block_public_access_configuration()
+        except ClientError as e:
+            raise e
+
+        return response
+
+
+
+
+@actions.register('put-block-public-access-configuration')
+class PutBlockPublicAccessConfiguration(BaseAction):
+    """Action to get the EMR block public access configuration for your AWS account in the current region
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: emr-get-block-public-access-configuration
+                resource: emr
+                actions:
+                  - put-public-block-access-configration
+    """
+
+    schema = type_schema('get-public-block-access-configration')
+    permissions = ("elasticmapreduce:GetBlockPublicAccessConfiguration",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('emr')
+
+        try:
+            client.put_block_public_access_configuration()
+        except ClientError as e:
+            raise e
+
+        return response
