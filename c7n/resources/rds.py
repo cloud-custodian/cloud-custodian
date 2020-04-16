@@ -1172,7 +1172,8 @@ class CrossAccountAccess(CrossAccountAccessFilter):
         results = []
         for r in resource_set:
             attrs = {t['AttributeName']: t['AttributeValues']
-             for t in client.describe_db_snapshot_attributes(
+             for t in self.manager.retry(
+                client.describe_db_snapshot_attributes,
                 DBSnapshotIdentifier=r['DBSnapshotIdentifier'])[
                     'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
             r['c7n:attributes'] = attrs
