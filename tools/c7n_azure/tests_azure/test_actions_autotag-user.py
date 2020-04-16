@@ -30,11 +30,15 @@ class ActionsAutotagUserTest(BaseTest):
             "TEST_VM/providers/Microsoft.Compute/virtualMachines/cctestvm"
 
     first_event = EventData.from_dict({
-        "caller": "cloud@custodian.com",
+        "caller": "cloud_caller@custodian.com",
         "id": vm_id + "/events/37bf930a-fbb8-4c8c-9cc7-057cc1805c04/ticks/636923208048336028",
         "operationName": {
             "value": "Microsoft.Compute/virtualMachines/write",
             "localizedValue": "Create or Update Virtual Machine"
+        },
+        "claims": {
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": "cloud_n@custodian.com",
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn": "cloud@custodian.com"
         },
         "eventTimestamp": "2019-05-01T15:20:04.8336028Z"
     })
@@ -147,6 +151,32 @@ class ActionsAutotagUserTest(BaseTest):
                                     'claim1': 'myemail@contoso.com'})
         self._test_event(event, 'cloud@custodian.com')
 
+    def test_auto_tag_user_event_grid_name(self):
+        event = self._get_event(evidence={'principalType': 'DoesNotMatter'},
+                                claims={
+                                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn':
+                                        'cloud@custodian.com',
+                                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name':
+                                        'name@custodian.com',
+                                    'claim1': 'myemail@contoso.com'})
+        self._test_event(event, 'name@custodian.com', default_claim='name')
+
+    def test_auto_tag_user_event_grid_missing_upn(self):
+        event = self._get_event(evidence={'principalType': 'DoesNotMatter'},
+                                claims={
+                                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name':
+                                        'name@custodian.com',
+                                    'claim1': 'myemail@contoso.com'})
+        self._test_event(event, 'name@custodian.com', default_claim='upn')
+
+    def test_auto_tag_user_event_grid_missing_name(self):
+        event = self._get_event(evidence={'principalType': 'DoesNotMatter'},
+                                claims={
+                                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn':
+                                        'cloud@custodian.com',
+                                    'claim1': 'myemail@contoso.com'})
+        self._test_event(event, 'cloud@custodian.com', default_claim='name')
+
     def test_auto_tag_user_event_grid_find_email_in_claims(self):
         event = self._get_event(evidence={'principalType': 'DoesNotMatter'},
                                 claims={'claim1': 'notEmailAddress',
@@ -182,8 +212,10 @@ class ActionsAutotagUserTest(BaseTest):
         }
 
     @patch('c7n_azure.tags.TagHelper.update_resource_tags')
-    def _test_event(self, event, expected_tag_value, update_resource_tags):
-        action = self._get_action({'tag': 'CreatorEmail', 'update': True})
+    def _test_event(self, event, expected_tag_value, update_resource_tags, default_claim='upn'):
+        action = self._get_action({'tag': 'CreatorEmail',
+                                   'update': True,
+                                   'default-claim': default_claim})
 
         resource = tools.get_resource(self.existing_tags)
         action.process(resources=[resource], event=event)

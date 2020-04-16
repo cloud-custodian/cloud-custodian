@@ -41,6 +41,8 @@ Event Grid Mode
 """
 EVENT_GRID_UPN_CLAIM_JMES_PATH = \
     'data.claims."http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"'
+EVENT_GRID_NAME_CLAIM_JMES_PATH = \
+    'data.claims."http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"'
 EVENT_GRID_SP_NAME_JMES_PATH = 'data.claims.appid'
 EVENT_GRID_SERVICE_ADMIN_JMES_PATH = \
     'data.claims."http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"'

@@ -13,6 +13,7 @@
 # limitations under the License.
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
+from c7n.tags import universal_augment
 
 
 @resources.register('directconnect')
@@ -25,3 +26,6 @@ class DirectConnect(QueryResourceManager):
         name = 'connectionName'
         filter_name = 'connectionId'
         arn_type = "dxcon"
+        universal_taggable = object()
+
+    augment = universal_augment

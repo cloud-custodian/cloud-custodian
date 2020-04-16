@@ -46,7 +46,7 @@ stages:
 
         # Skip some resources due to some restrictions with their provisioning using Service Principal account
         # We maintain those resources in the test subscription available for the tests
-        - script: /bin/bash tools/c7n_azure/tests_azure/templates/provision.sh --skip keyvault cost-management-export containerservice databricks
+        - script: /bin/bash tools/c7n_azure/tests_azure/templates/provision.sh --skip keyvault cost-management-export containerservice databricks postgresql
           displayName: "Provision Azure Resources"
           env:
             AZURE_CLIENT_ID: $(azure-client-id)
@@ -55,7 +55,7 @@ stages:
         - script: C7N_TEST_RUN=true C7N_FUNCTIONAL=yes pytest -v -m "not skiplive" tools/c7n_azure/tests_azure
           displayName: "Run Azure tests without cassettes"
 
-        - script: /bin/bash tools/c7n_azure/tests_azure/templates/cleanup.sh --skip keyvault cost-management-export containerservice databricks
+        - script: /bin/bash tools/c7n_azure/tests_azure/templates/cleanup.sh --skip keyvault cost-management-export containerservice databricks postgresql
           displayName: "Cleanup Azure Resources"
           condition: always()
 

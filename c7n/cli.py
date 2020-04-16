@@ -251,7 +251,7 @@ def setup_parser():
     run.add_argument(
         "--trace",
         dest="tracer",
-        help=argparse.SUPPRESS,
+        help="Tracing integration",
         default=None, nargs="?", const="default")
 
     schema_desc = ("Browse the available vocabularies (resources, filters, modes, and "
