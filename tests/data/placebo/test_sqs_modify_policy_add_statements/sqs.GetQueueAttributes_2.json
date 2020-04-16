@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789123:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"AddMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetQueueAttributes\"}]}"
+        },
+        "ResponseMetadata": {}
+    }
+}

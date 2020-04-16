@@ -17,7 +17,7 @@ import json
 import time
 from botocore.exceptions import ClientError
 from datetime import datetime, timedelta
-from .aws import shape_validate
+
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
@@ -1385,23 +1385,8 @@ class SetS3PublicBlock(BaseAction):
                 PublicAccessBlockConfiguration=config)
 
 
-@filters.register('glue-security-config')
-class GlueEncryptionEnabled(MultiAttrFilter):
-    """Filter aws account by its glue encryption status and KMS key """
+class GlueCatalogEncryptionEnabled(MultiAttrFilter):
 
-    """:example:
-
-    .. yaml:
-
-      policies:
-        - name: glue-security-config
-          resource: aws.account
-          filters:
-            - type: glue-security-config
-                key: SseAwsKmsKeyId
-                value: alias/aws/glue
-
-    """
     retry = staticmethod(QueryResourceManager.retry)
 
     schema = {
@@ -1428,14 +1413,16 @@ class GlueEncryptionEnabled(MultiAttrFilter):
                        'AwsKmsKeyId']:
                 attrs.add(key)
         self.multi_attrs = attrs
-        return super(GlueEncryptionEnabled, self).validate()
+        return super(GlueCatalogEncryptionEnabled, self).validate()
 
     def get_target(self, resource):
         if self.annotation in resource:
             return resource[self.annotation]
         client = local_session(self.manager.session_factory).client('glue')
-        encryption_setting = client.get_data_catalog_encryption_settings().get(
-            'DataCatalogEncryptionSettings')
+        encryption_setting = resource.get('DataCatalogEncryptionSettings')
+        if self.manager.type != 'glue-catalog':
+            encryption_setting = client.get_data_catalog_encryption_settings().get(
+                'DataCatalogEncryptionSettings')
         resource[self.annotation] = encryption_setting.get('EncryptionAtRest')
         resource[self.annotation].update(encryption_setting.get('ConnectionPasswordEncryption'))
 
@@ -1453,44 +1440,19 @@ class GlueEncryptionEnabled(MultiAttrFilter):
         return resource[self.annotation]
 
 
-@actions.register('set-glue-catalog-encryption')
-class GlueDataCatalogEncryption(BaseAction):
-    """Modifies glue data catalog encryption based on specified
-    parameter
+@filters.register('glue-security-config')
+class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
+    """Filter aws account by its glue encryption status and KMS key
 
     :example:
 
     .. code-block:: yaml
 
-            policies:
-              - name: data-catalog-encryption
-                resource: account
-                filters:
-                  - type: glue-security-config
-                    CatalogEncryptionMode: DISABLED
-                actions:
-                  - type: set-glue-catalog-encryption
-                    attributes:
-                        EncryptionAtRest:
-                            CatalogEncryptionMode: SSE-KMS
-                            SseAwsKmsKeyId: alias/aws/glue
+      policies:
+        - name: glue-security-config
+          resource: aws.account
+          filters:
+            - type: glue-security-config
+              SseAwsKmsKeyId: alias/aws/glue
+
     """
-
-    schema = type_schema(
-        'set-glue-catalog-encryption',
-        attributes={'type': 'object', "minItems": 1},
-        required=('attributes',))
-
-    permissions = ('glue:PutDataCatalogEncryptionSettings',)
-    shape = 'PutDataCatalogEncryptionSettingsRequest'
-
-    def validate(self):
-        attrs = {}
-        attrs['DataCatalogEncryptionSettings'] = self.data['attributes']
-        return shape_validate(attrs, self.shape, 'glue')
-
-    def process(self, catalog):
-        client = local_session(self.manager.session_factory).client('glue')
-        # there is one glue data catalog per account
-        client.put_data_catalog_encryption_settings(
-            DataCatalogEncryptionSettings=self.data['attributes'])
