@@ -21,7 +21,7 @@ from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
-from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry 
+from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
 
@@ -482,7 +482,7 @@ class DeleteWorkflow(BaseAction):
 class GlueWorkflowSecurityConfigFilter(SecurityConfigFilter):
     RelatedIdsExpression = 'SecurityConfiguration'
 
-    
+
 @resources.register('glue-catalog')
 class GlueDataCatalog(ResourceManager):
 
