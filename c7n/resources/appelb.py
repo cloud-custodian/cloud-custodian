@@ -200,8 +200,8 @@ class WafEnabled(Filter):
 
         name_id_map = {}
         resource_map = {}
-
-        wafs = self.manager.get_resource_manager('waf-regional').resources()
+        
+        wafs = self.manager.get_resource_manager('waf-regional').resources(None, False)
 
         for w in wafs:
             if 'c7n:AssociatedResources' not in w:
@@ -266,7 +266,7 @@ class SetWaf(BaseAction):
         return self
 
     def process(self, resources):
-        wafs = self.manager.get_resource_manager('waf-regional').resources()
+        wafs = self.manager.get_resource_manager('waf-regional').resources(None, False)
         name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
         target_acl = self.data.get('web-acl')
         target_acl_id = name_id_map.get(target_acl, target_acl)
@@ -629,7 +629,7 @@ class AppELBTargetGroupFilterBase:
     def initialize(self, albs):
         self.target_group_map = defaultdict(list)
         target_groups = self.manager.get_resource_manager(
-            'app-elb-target-group').resources()
+            'app-elb-target-group').resources(None, False)
         for target_group in target_groups:
             for load_balancer_arn in target_group['LoadBalancerArns']:
                 self.target_group_map[load_balancer_arn].append(target_group)
