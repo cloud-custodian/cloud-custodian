@@ -200,7 +200,7 @@ class WafEnabled(Filter):
 
         name_id_map = {}
         resource_map = {}
-        
+
         wafs = self.manager.get_resource_manager('waf-regional').resources(None, False)
 
         for w in wafs:
@@ -629,7 +629,7 @@ class AppELBTargetGroupFilterBase:
     def initialize(self, albs):
         self.target_group_map = defaultdict(list)
         target_groups = self.manager.get_resource_manager(
-            'app-elb-target-group').resources(None, False)
+            'app-elb-target-group').resources()
         for target_group in target_groups:
             for load_balancer_arn in target_group['LoadBalancerArns']:
                 self.target_group_map[load_balancer_arn].append(target_group)
