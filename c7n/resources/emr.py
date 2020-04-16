@@ -284,3 +284,43 @@ class QueryFilter:
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
+
+@resources.register('emr-security-configuration')
+class EMRSecurityConfiguration(QueryResourceManager):
+    """Resource manager for Elastic MapReduce clusters
+    """
+
+    class resource_type(TypeInfo):
+        service = 'emr'
+        arn_type = 'emr'
+        enum_spec = ('list_security_configurations', 'SecurityConfigurations', None)
+        detail_spec = ('describe_security_confgiration', 'Name', None, None)
+        id = name = 'Name'
+
+@EMRSecurityConfiguration.action_registry.register('delete')
+class DeleteEMRSecurityConfiguration(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('emr:DeleteSecurityConfiguration',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('emr')
+        for r in resources:
+            try:
+                client.delete_security_configuration(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
+
+@EMRSecurityConfiguration.action_registry.register('delete')
+class DeleteEMRSecurityConfiguration(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('emr:DeleteSecurityConfiguration',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('emr')
+        for r in resources:
+            try:
+                client.delete_security_configuration(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue
