@@ -30,7 +30,8 @@ from c7n.schema import ElementSchema, StructureParser, generate
 from c7n.utils import load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
 from c7n import provider
-from c7n.resources import load_resources, load_available
+from c7n.resources import (
+    load_resources, load_available, load_providers, PROVIDER_NAMES)
 
 
 log = logging.getLogger('custodian.commands')
@@ -379,10 +380,9 @@ def schema_cmd(options):
         schema.json_dump(options.resource)
         return
 
-    load_available()
-
-    resource_mapping = schema.resource_vocabulary()
     if options.summary:
+        load_available()
+        resource_mapping = schema.resource_vocabulary()
         schema.pprint_schema_summary(resource_mapping)
         return
 
@@ -412,21 +412,26 @@ def schema_cmd(options):
     # Format is [PROVIDER].RESOURCE.CATEGORY.ITEM
     # optional provider defaults to aws for compatibility
     components = options.resource.lower().split('.')
-    if len(components) == 1 and components[0] in provider.clouds.keys():
+
+    if len(components) == 1 and components[0] in PROVIDER_NAMES:
+        load_providers((components[0]))
         resource_list = {'resources': sorted(
-            provider.resources(cloud_provider=components[0]).keys())}
+            clouds[components[0]].resource_map.keys())}
         print(yaml_dump(resource_list))
         return
-    if components[0] in provider.clouds.keys():
+    if components[0] in PROVIDER_NAMES:
         cloud_provider = components.pop(0)
+        components[0] = '%s.%s' % (cloud_provider, components[0])
+        load_resources((components[0],))
         resource_mapping = schema.resource_vocabulary(
             cloud_provider)
-        components[0] = '%s.%s' % (cloud_provider, components[0])
-    elif components[0] in schema.resource_vocabulary().keys():
+    elif components[0] == 'mode':
+        load_available(resources=False)
         resource_mapping = schema.resource_vocabulary()
-    else:
-        resource_mapping = schema.resource_vocabulary('aws')
+    else:  # compatibility, aws is default for provider
         components[0] = 'aws.%s' % components[0]
+        load_resources((components[0],))
+        resource_mapping = schema.resource_vocabulary('aws')
 
     #
     # Handle mode
