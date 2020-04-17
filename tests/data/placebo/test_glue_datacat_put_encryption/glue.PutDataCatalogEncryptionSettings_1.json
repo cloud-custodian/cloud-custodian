@@ -1,6 +1,6 @@
 {
-  "status_code": 200,
-  "data": {
-    "ResponseMetadata": {}
-  }
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {}
+    }
 }

@@ -52,6 +52,9 @@ class KeyVaultStorageTest(BaseTest):
 
     @arm_template('keyvault.json')
     @cassette_name('common')
+    # Possible fail reasons:
+    #  - KeyVault auto-regenerated the active key, so current active key is 2.
+    #    Current auto-regenerate period was set to 720 days.
     def test_key_vault_storage_filter_active_key_name(self):
         p = self._get_policy([{'type': 'active-key-name', 'value': 'key1'}], [])
         resources = p.run()

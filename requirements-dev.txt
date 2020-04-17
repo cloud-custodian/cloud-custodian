@@ -1,6 +1,6 @@
 # Load all project requirements
 
-# note all of these are generated from poetry lock/projects via `make pkg-gen-requirements`
+# Note all of these are generated from poetry lock/projects via `make pkg-gen-requirements`
 -r requirements.txt
 -r tools/c7n_azure/requirements.txt
 -r tools/c7n_gcp/requirements.txt
@@ -24,5 +24,5 @@
 # we don't export dev requirements of subpackages (due to editable/distribution above)
 # so explicitly list them here.
 vcrpy-unittest==0.1.7
-parameterized==0.7.1
-fakeredis==1.2.1
+parameterized==0.7.4
+fakeredis==1.4.0

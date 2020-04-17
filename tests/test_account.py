@@ -845,35 +845,6 @@ class AccountTests(BaseTest):
 
         self.assertEqual(len(resources), 1)
 
-    def test_glue_datacat_put_encryption(self):
-        session_factory = self.replay_flight_data("test_glue_datacat_put_encryption")
-        p = self.load_policy(
-            {
-                "name": "glue-security-config",
-                "resource": "account",
-                'filters': [{
-                    'type': 'glue-security-config',
-                    'CatalogEncryptionMode': 'DISABLED'},
-                ],
-                "actions": [{
-                    "type": "set-glue-catalog-encryption",
-                    "attributes": {
-                        "EncryptionAtRest": {
-                            "CatalogEncryptionMode": "SSE-KMS",
-                            "SseAwsKmsKeyId": "alias/aws/glue"},
-                    },
-                }]
-            },
-            session_factory=session_factory,)
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        client = session_factory().client("glue")
-        datacatlog = client.get_data_catalog_encryption_settings()
-        self.assertEqual(datacatlog.get('DataCatalogEncryptionSettings').get(
-            'EncryptionAtRest'),
-            {'CatalogEncryptionMode': 'SSE-KMS', 'SseAwsKmsKeyId': 'alias/aws/glue'})
-
 
 class AccountDataEvents(BaseTest):
 

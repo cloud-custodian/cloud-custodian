@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import pytest
 from .azure_common import BaseTest, requires_arm_polling
 from c7n_azure import constants
 from c7n_azure.constants import FUNCTION_DOCKER_VERSION
@@ -26,6 +27,11 @@ from c7n.utils import local_session
 
 
 @requires_arm_polling
+# Due to the COVID-19 Azure hardened quota limits for internal subscriptions and some of the
+# tests in this module might fail.
+# It is not required during nightly live tests because we have e2e Azure Functions tests.
+# They test same scenario.
+@pytest.mark.skiplive
 class DeploymentUnitsTest(BaseTest):
 
     rg_name = 'cloud-custodian-test-deployment-units'
