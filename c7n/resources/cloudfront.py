@@ -167,7 +167,7 @@ class DistributionConfig(ValueFilter):
                     value: true
    """
 
-    schema = type_schema('logging-enabled', rinherit=ValueFilter.schema)
+    schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('cloudfront:GetDistributionConfig',)
     annotation_key = 'c7n:distribution-config'
