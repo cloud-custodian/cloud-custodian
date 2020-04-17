@@ -226,7 +226,9 @@ class CloudFront(BaseTest):
                 "resource": "distribution",
                 "filters": [
                     {
-                        "type": "logging-enabled",
+                        "type": "distribution-config",
+                        "key": "Logging.Enabled",
+                        "value": True
                     }
                 ]
             },
