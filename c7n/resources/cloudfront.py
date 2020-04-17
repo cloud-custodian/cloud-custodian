@@ -152,7 +152,7 @@ class IsWafEnabled(Filter):
 
 @Distribution.filter_registry.register('distribution-config')
 class DistributionConfig(ValueFilter):
-    """Check for Cloudfron distribution config values
+    """Check for Cloudfront distribution config values
 
     :example:
 
