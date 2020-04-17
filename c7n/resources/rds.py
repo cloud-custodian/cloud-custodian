@@ -1634,10 +1634,11 @@ class ModifyDb(BaseAction):
     def validate(self):
         if self.data.get('update'):
             update_dict = dict((i['property'], i['value']) for i in self.data.get('update'))
-            if 'MonitoringInterval' in  update_dict \
-                and update_dict['MonitoringInterval'] > 0 and 'MonitoringRoleARN' not in update_dict:
+            if ('MonitoringInterval' in update_dict and update_dict['MonitoringInterval'] > 0 and
+                    'MonitoringRoleARN' not in update_dict):
                 raise PolicyValidationError(
-                    "A MonitoringRoleARN value is required if you specify a MonitoringInterval value other than 0")
+                    "A MonitoringRoleARN value is required \
+                    if you specify a MonitoringInterval value other than 0")
         return self
 
     def process(self, resources):
