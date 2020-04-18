@@ -133,13 +133,13 @@ class BluePill(pill.Pill):
         )
 
     def get_next_file_path(self, service, operation):
-        fn = super(BluePill, self).get_next_file_path(service, operation)
+        fn, format = super(BluePill, self).get_next_file_path(service, operation)
         # couple of double use cases
         if fn in self._avail:
             self._avail.remove(fn)
         else:
             print("\ndouble use %s\n" % fn)
-        return fn
+        return (fn, format)
 
     def stop(self):
         result = super(BluePill, self).stop()
@@ -259,6 +259,7 @@ def attach(session, data_path, prefix=None, debug=False):
 
 
 class RedPill(pill.Pill):
+
     def datetime_converter(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()

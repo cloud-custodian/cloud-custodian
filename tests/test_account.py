@@ -369,22 +369,6 @@ class AccountTests(BaseTest):
             account.ServiceLimit.get_check_result(client, 'bogusid'),
             True)
 
-    def test_service_limit(self):
-        session_factory = self.replay_flight_data("test_account_service_limit")
-        p = self.load_policy(
-            {
-                "name": "service-limit",
-                "resource": "account",
-                "filters": [{"type": "service-limit", "threshold": 0}],
-            },
-            session_factory=session_factory,
-        )
-        # use this to prevent attempts at refreshing check
-        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
-            resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 37)
-
     def test_service_limit_specific_check(self):
         session_factory = self.replay_flight_data("test_account_service_limit")
         p = self.load_policy(
@@ -394,7 +378,7 @@ class AccountTests(BaseTest):
                 "filters": [
                     {
                         "type": "service-limit",
-                        "limits": ["DB parameter groups"],
+                        "names": ["RDS DB Instances"],
                         "threshold": 1.0,
                     }
                 ],
@@ -415,7 +399,7 @@ class AccountTests(BaseTest):
         )
         self.assertEqual(
             set([l["check"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["DB parameter groups"]),
+            set(["DB instances"]),
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 1)
 

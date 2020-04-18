@@ -570,7 +570,9 @@ class ServiceLimit(Filter):
 
     def get_available_checks(self, client, category='service_limits'):
         checks = client.describe_trusted_advisor_checks(language='en')
-        return [c for c in checks['checks'] if c['category'] == category]
+        return [c for c in checks['checks']
+                if c['category'] == category and
+                c['id'] not in self.deprecated_check_ids]
 
     def match_patterns_to_value(self, patterns, value):
         for p in patterns:
@@ -599,8 +601,6 @@ class ServiceLimit(Filter):
         checks = self.get_available_checks(client)
         exceeded = []
         for check in checks:
-            if check['id'] in self.deprecated_check_ids:
-                continue
             if self.should_process(check['name']):
                 exceeded.extend(self.process_check(client, check, resources, event))
         if exceeded:

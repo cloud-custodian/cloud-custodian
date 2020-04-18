@@ -2,11 +2,11 @@
   "status_code": 200,
   "data": {
     "result": {
-      "checkId": "0Xc6LMYG8P",
-      "timestamp": "2020-02-19T15:40:59Z",
+      "checkId": "XG0aXHpIEt",
+      "timestamp": "2020-02-06T05:30:11Z",
       "status": "ok",
       "resourcesSummary": {
-        "resourcesProcessed": 1,
+        "resourcesProcessed": 2,
         "resourcesFlagged": 0,
         "resourcesIgnored": 0,
         "resourcesSuppressed": 0
@@ -20,15 +20,29 @@
       "flaggedResources": [
         {
           "status": "ok",
+          "region": "us-east-1",
+          "resourceId": "rKsvlT0euZ7Ib6eMtRSdDopoy9BkqS5qathp2mSejik",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-1",
+            "RDS",
+            "DB instances",
+            "40",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
           "region": "us-west-2",
-          "resourceId": "lIi1cavxwxYc43BecsQMJtD9FidDK6rEhSg9lBOpM1o",
+          "resourceId": "cPBntUdd7Gtr6s0gt3ZwjJACcrIfxVklGO_MvmuIKLA",
           "isSuppressed": false,
           "metadata": [
             "us-west-2",
-            "EC2",
-            "On-Demand instances - Standard",
-            "68564",
-            "663",
+            "RDS",
+            "DB instances",
+            "200",
+            "59",
             "Green"
           ]
         }
