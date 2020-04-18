@@ -1611,6 +1611,7 @@ class ModifyDb(BaseAction):
                         'Domain',
                         'CopyTagsToSnapshot',
                         'MonitoringInterval',
+                        'MonitoringRoleARN',
                         'DBPortNumber',
                         'PubliclyAccessible',
                         'DomainIAMRoleName',
@@ -1629,6 +1630,16 @@ class ModifyDb(BaseAction):
         required=('update',))
 
     permissions = ('rds:ModifyDBInstance',)
+
+    def validate(self):
+        if self.data.get('update'):
+            update_dict = dict((i['property'], i['value']) for i in self.data.get('update'))
+            if ('MonitoringInterval' in update_dict and update_dict['MonitoringInterval'] > 0 and
+                    'MonitoringRoleARN' not in update_dict):
+                raise PolicyValidationError(
+                    "A MonitoringRoleARN value is required \
+                    if you specify a MonitoringInterval value other than 0")
+        return self
 
     def process(self, resources):
         c = local_session(self.manager.session_factory).client('rds')
