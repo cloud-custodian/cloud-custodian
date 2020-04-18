@@ -14,7 +14,7 @@
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
-import inspect
+import itertools
 import logging
 import os
 import sys
@@ -29,7 +29,6 @@ from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.schema import ElementSchema, StructureParser, generate
 from c7n.utils import load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
-from c7n import provider
 from c7n.resources import (
     load_resources, load_available, load_providers, PROVIDER_NAMES)
 
@@ -316,63 +315,6 @@ def logs(options, policies):
     sys.exit(1)
 
 
-def _schema_get_docstring(starting_class):
-    """ Given a class, return its docstring.
-
-    If no docstring is present for the class, search base classes in MRO for a
-    docstring.
-    """
-    for cls in inspect.getmro(starting_class):
-        if inspect.getdoc(cls):
-            return inspect.getdoc(cls)
-
-
-def schema_completer(prefix):
-    """ For tab-completion via argcomplete, return completion options.
-
-    For the given prefix so far, return the possible options.  Note that
-    filtering via startswith happens after this list is returned.
-    """
-    from c7n import schema
-    load_available()
-    components = prefix.split('.')
-
-    if components[0] in provider.clouds.keys():
-        cloud_provider = components.pop(0)
-        provider_resources = provider.resources(cloud_provider)
-    else:
-        cloud_provider = 'aws'
-        provider_resources = provider.resources('aws')
-        components[0] = "aws.%s" % components[0]
-
-    # Completions for resource
-    if len(components) == 1:
-        choices = [r for r in provider.resources().keys()
-                   if r.startswith(components[0])]
-        if len(choices) == 1:
-            choices += ['{}{}'.format(choices[0], '.')]
-        return choices
-
-    if components[0] not in provider_resources.keys():
-        return []
-
-    # Completions for category
-    if len(components) == 2:
-        choices = ['{}.{}'.format(components[0], x)
-                   for x in ('actions', 'filters') if x.startswith(components[1])]
-        if len(choices) == 1:
-            choices += ['{}{}'.format(choices[0], '.')]
-        return choices
-
-    # Completions for item
-    elif len(components) == 3:
-        resource_mapping = schema.resource_vocabulary(cloud_provider)
-        return ['{}.{}.{}'.format(components[0], components[1], x)
-                for x in resource_mapping[components[0]][components[1]]]
-
-    return []
-
-
 def schema_cmd(options):
     """ Print info about the resources, actions and filters available. """
     from c7n import schema
@@ -405,7 +347,9 @@ def schema_cmd(options):
     #   - Show class doc string and schema for supplied filter
 
     if not options.resource:
-        resource_list = {'resources': sorted(provider.resources().keys())}
+        load_available(resources=False)
+        resource_list = {'resources': sorted(itertools.chain(
+            *[clouds[p].resource_map.keys() for p in PROVIDER_NAMES]))}
         print(yaml_dump(resource_list))
         return
 
@@ -463,7 +407,7 @@ def schema_cmd(options):
         sys.exit(1)
 
     if len(components) == 1:
-        docstring = _schema_get_docstring(
+        docstring = ElementSchema.doc(
             resource_mapping[resource]['classes']['resource'])
         del(resource_mapping[resource]['classes'])
         if docstring:
@@ -511,7 +455,7 @@ def schema_cmd(options):
 
 def _print_cls_schema(cls):
     # Print docstring
-    docstring = _schema_get_docstring(cls)
+    docstring = ElementSchema.doc(cls)
     print("\nHelp\n----\n")
     if docstring:
         print(docstring)

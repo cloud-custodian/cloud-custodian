@@ -93,4 +93,7 @@ def load_providers(provider_types):
         from c7n_kube.entry import initialize_kube
         initialize_kube()
 
+    if should_load_provider('c7n', provider_types):
+        from c7n import data  # noqa
+
     LOADED.update(provider_types)
