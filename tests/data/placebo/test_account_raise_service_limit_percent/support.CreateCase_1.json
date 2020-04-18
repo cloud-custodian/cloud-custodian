@@ -1,18 +1,7 @@
 {
-    "status_code": 200, 
-    "data": {
-        "caseId": "case-644160558196-muen-2017-623459dbaf23ec2d", 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "932c654e-98cc-11e7-92a4-29a3cbb974f8", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "932c654e-98cc-11e7-92a4-29a3cbb974f8", 
-                "date": "Wed, 13 Sep 2017 21:43:27 GMT", 
-                "content-length": "57", 
-                "x-amzn-actiontrace": "amzn1.tr.932c8c29-98cc-11e7-a801-0a5bf94f0000.0..ptz4ja", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "caseId": "case-644160558196-muen-2017-623459dbaf23ec2d",
+    "ResponseMetadata": {}
+  }
 }

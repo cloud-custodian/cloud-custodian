@@ -604,6 +604,9 @@ class ServiceLimit(Filter):
                 continue
             matched = self.process_check(client, check, resources, event)
             if matched:
+                for m in matched:
+                    m['check_id'] = check['id']
+                    m['name'] = check['name']
                 exceeded.extend(matched)
         if exceeded:
             resources[0]['c7n:ServiceLimitsExceeded'] = exceeded

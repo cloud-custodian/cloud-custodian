@@ -1,260 +1,249 @@
 {
-    "status_code": 200,
-    "data": {
-        "result": {
-            "checkId": "jL7PP0l7J9",
-            "timestamp": "2020-02-21T01:32:42Z",
-            "status": "ok",
-            "resourcesSummary": {
-                "resourcesProcessed": 16,
-                "resourcesFlagged": 0,
-                "resourcesIgnored": 0,
-                "resourcesSuppressed": 0
-            },
-            "categorySpecificSummary": {
-                "costOptimizing": {
-                    "estimatedMonthlySavings": 0.0,
-                    "estimatedPercentMonthlySavings": 0.0
-                }
-            },
-            "flaggedResources": [
-                {
-                    "status": "ok",
-                    "region": "ca-central-1",
-                    "resourceId": "yQNoc5zyF4rigVpdNTsApeZV-ADWFaAvyreTL7TgvEk",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ca-central-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-2",
-                    "resourceId": "qVpJEwpwzQJYn6jMmAf_gfeB8pXsAU4S0QG99HZBBbg",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-2",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-1",
-                    "resourceId": "P4sT1eIxxklmEZsYyI0V6jE8J1ROFAtW7CNhSnjeTEc",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-1",
-                    "resourceId": "avvKEBoqypBNOebybZ18aSj_txWurcQZ9qb3KtDMgAQ",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-2",
-                    "resourceId": "-tTt_uF6hyvt1AfwF2eS4qrrGnuHE8ea26oZWDZnjPA",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-2",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-central-1",
-                    "resourceId": "CjAFxaYichaOjcGpd8qSPc5qCvAEEZq3Rx9Z7HEUjuM",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-central-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-east-1",
-                    "resourceId": "ElTQMkocn3SbvIpwYuLg8IBMIw9CKvVb-9P1s_oRVOA",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-east-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "us-west-2",
-                    "resourceId": "6uWfPHxxCO_2PBYFHYqOHIlVyiYe3-AF_BeT2jMzkzg",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "us-west-2",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "1",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-west-3",
-                    "resourceId": "suCCHR5p3zUlg4D1TGbF_kIBWdLHjwK50jrK1tudNpQ",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-west-3",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-1",
-                    "resourceId": "ZpKc6vF5jaAhIVjmf-CAjUritBMOzEfg9QN0mYNil6A",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-northeast-2",
-                    "resourceId": "CjTTdZeA89UBEXILRqUH84hGxBpa41O7szcL2hLmCt0",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-northeast-2",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "eu-north-1",
-                    "resourceId": "guFvHAoi0gdkukOnAahJcMTIAbmYMK_ZUK1Sig4S5qs",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "eu-north-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-2",
-                    "resourceId": "9DlhgxVnIfNeeVy9mEytvDOX3_sa5BkAcVPmKnR-oBc",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-2",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-southeast-1",
-                    "resourceId": "VXg8axaOViP8_tsbglwgoDaQm0LKXCbkHUQ0QANCOX4",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-southeast-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "sa-east-1",
-                    "resourceId": "pnD-DRLOeQ3CltgwngI9J0J06a8XpkEkr4w1gxptn0o",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "sa-east-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                },
-                {
-                    "status": "ok",
-                    "region": "ap-south-1",
-                    "resourceId": "9V-1bCaKBGuU1eJ5ucUlSvCebkANEYSTplpqb68_bzQ",
-                    "isSuppressed": false,
-                    "metadata": [
-                        "ap-south-1",
-                        "VPC",
-                        "VPCs",
-                        "5",
-                        "0",
-                        "Green"
-                    ]
-                }
-            ]
-        },
-        "ResponseMetadata": {
-            "RequestId": "36c0539d-c0eb-46c4-811b-2ef831cb812e",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "36c0539d-c0eb-46c4-811b-2ef831cb812e",
-                "x-amzn-actiontrace": "amzn1.tr.a737a684-5509-11ea-bada-0a5afee40000.0..0@aoKR",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "3122",
-                "date": "Sat, 22 Feb 2020 00:24:13 GMT"
-            },
-            "RetryAttempts": 0
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "jL7PP0l7J9",
+      "timestamp": "2020-02-21T01:32:42Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 16,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
         }
-    }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "region": "ca-central-1",
+          "resourceId": "yQNoc5zyF4rigVpdNTsApeZV-ADWFaAvyreTL7TgvEk",
+          "isSuppressed": false,
+          "metadata": [
+            "ca-central-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-east-2",
+          "resourceId": "qVpJEwpwzQJYn6jMmAf_gfeB8pXsAU4S0QG99HZBBbg",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-2",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-1",
+          "resourceId": "P4sT1eIxxklmEZsYyI0V6jE8J1ROFAtW7CNhSnjeTEc",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-1",
+          "resourceId": "avvKEBoqypBNOebybZ18aSj_txWurcQZ9qb3KtDMgAQ",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-2",
+          "resourceId": "-tTt_uF6hyvt1AfwF2eS4qrrGnuHE8ea26oZWDZnjPA",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-2",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-central-1",
+          "resourceId": "CjAFxaYichaOjcGpd8qSPc5qCvAEEZq3Rx9Z7HEUjuM",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-central-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-east-1",
+          "resourceId": "ElTQMkocn3SbvIpwYuLg8IBMIw9CKvVb-9P1s_oRVOA",
+          "isSuppressed": false,
+          "metadata": [
+            "us-east-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "us-west-2",
+          "resourceId": "6uWfPHxxCO_2PBYFHYqOHIlVyiYe3-AF_BeT2jMzkzg",
+          "isSuppressed": false,
+          "metadata": [
+            "us-west-2",
+            "VPC",
+            "VPCs",
+            "5",
+            "1",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-west-3",
+          "resourceId": "suCCHR5p3zUlg4D1TGbF_kIBWdLHjwK50jrK1tudNpQ",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-west-3",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-1",
+          "resourceId": "ZpKc6vF5jaAhIVjmf-CAjUritBMOzEfg9QN0mYNil6A",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-northeast-2",
+          "resourceId": "CjTTdZeA89UBEXILRqUH84hGxBpa41O7szcL2hLmCt0",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-northeast-2",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "eu-north-1",
+          "resourceId": "guFvHAoi0gdkukOnAahJcMTIAbmYMK_ZUK1Sig4S5qs",
+          "isSuppressed": false,
+          "metadata": [
+            "eu-north-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-2",
+          "resourceId": "9DlhgxVnIfNeeVy9mEytvDOX3_sa5BkAcVPmKnR-oBc",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-2",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-southeast-1",
+          "resourceId": "VXg8axaOViP8_tsbglwgoDaQm0LKXCbkHUQ0QANCOX4",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-southeast-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "sa-east-1",
+          "resourceId": "pnD-DRLOeQ3CltgwngI9J0J06a8XpkEkr4w1gxptn0o",
+          "isSuppressed": false,
+          "metadata": [
+            "sa-east-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        },
+        {
+          "status": "ok",
+          "region": "ap-south-1",
+          "resourceId": "9V-1bCaKBGuU1eJ5ucUlSvCebkANEYSTplpqb68_bzQ",
+          "isSuppressed": false,
+          "metadata": [
+            "ap-south-1",
+            "VPC",
+            "VPCs",
+            "5",
+            "0",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
 }
