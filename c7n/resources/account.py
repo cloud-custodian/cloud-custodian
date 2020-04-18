@@ -601,8 +601,11 @@ class ServiceLimit(Filter):
         checks = self.get_available_checks(client)
         exceeded = []
         for check in checks:
-            if self.should_process(check['name']):
-                exceeded.extend(self.process_check(client, check, resources, event))
+            if not self.should_process(check['name']):
+                continue
+            matched = self.process_check(client, check, resources, event)
+            if matched:
+                exceeded.extend(matched)
         if exceeded:
             resources[0]['c7n:ServiceLimitsExceeded'] = exceeded
             return resources
