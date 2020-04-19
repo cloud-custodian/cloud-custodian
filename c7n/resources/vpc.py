@@ -1225,53 +1225,33 @@ class Delete(BaseAction):
             client.delete_security_group(GroupId=r['GroupId'])
 
 
-@SecurityGroup.action_registry.register('set-permissions')
-class SetPermissions(BaseAction):
-    """Action to update ingress/egress rule(s) of a security group
+@SecurityGroup.action_registry.register('remove-permissions')
+class RemovePermissions(BaseAction):
+    """Action to remove ingress/egress rule(s) from a security group
 
     :example:
 
     .. code-block:: yaml
 
             policies:
-              - name: modify-security-group
+              - name: security-group-revoke-8080
                 resource: security-group
                 filters:
-                  - or:
-                        - type: ingress
-                          IpProtocol: "-1"
-                          Ports: [22, 3389]
-                          Cidr: "0.0.0.0/0"
-                        - type: ingress
-                          IpProtocol: "-1"
-                          Ports: [22, 3389]
-                          CidrV6: "::/0"
+                  - type: ingress
+                    IpProtocol: tcp
+                    Ports: [8080]
                 actions:
-                  - type: set-permissions
+                  - type: remove-permissions
                     ingress: matched
-                    PermissionType: "ingress"
-                    IpProtocol: "TCP"
-                    FromPort: 22
-                    ToPort: 22
-                    Cidr: ["1.1.1.1/32","2.2.2.2/32","3.3.3.3./32"]
 
     """
     schema = type_schema(
-        'set-permissions',
+        'remove-permissions',
         ingress={'type': 'string', 'enum': ['matched', 'all']},
-        egress={'type': 'string', 'enum': ['matched', 'all']},
-        PermissionType={'type': 'string', 'enum': ['ingress', 'egress']},
-        IpProtocol={'type': 'string', 'enum': ['-1', 'UDP', 'TCP', 'ICMP', 'ICMPV6']},
-        FromPort={'type': 'integer'},
-        ToPort={'type': 'integer'},
-        GroupId={'type': 'array', 'items': {'type': 'string'}},
-        CidrIpv6={'type': 'array', 'items': {'type': 'string'}},
-        Cidr={'type': 'array', 'items': {'type': 'string'}})
+        egress={'type': 'string', 'enum': ['matched', 'all']})
 
     permissions = ('ec2:RevokeSecurityGroupIngress',
-                   'ec2:RevokeSecurityGroupEgress',
-                   'ec2:AuthorizeSecurityGroupEgress',
-                   'ec2:AuthorizeSecurityGroupIngress')
+                   'ec2:RevokeSecurityGroupEgress')
 
     def process(self, resources):
         i_perms = self.data.get('ingress', 'matched')
@@ -1296,35 +1276,6 @@ class SetPermissions(BaseAction):
                     continue
                 method = getattr(client, 'revoke_security_group_%s' % label)
                 method(GroupId=r['GroupId'], IpPermissions=groups)
-
-            if self.data.get('PermissionType'):
-                p_type = self.data.get('PermissionType')
-                p_label = p_type
-                protocol = self.data.get('IpProtocol')
-                from_port = self.data.get('FromPort')
-                to_port = self.data.get('ToPort')
-
-                method = getattr(client, 'authorize_security_group_%s' % p_label)
-
-                try:
-                    for i in self.data.get('Cidr', []):
-                        method(GroupId=r['GroupId'],
-                               IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
-                                               'ToPort': to_port, 'IpRanges': [{'CidrIp': i}]}])
-                except ClientError as e:
-                    if e.response['Error']['Code'] != 'InvalidPermission.Duplicate':
-                        raise e
-
-                for i in self.data.get('GroupId', []):
-                    method(GroupId=r['GroupId'],
-                           IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
-                                           'ToPort': to_port,
-                                           'UserIdGroupPairs': [{'GroupId': i}]}])
-                for i in self.data.get('CidrIpv6', []):
-                    method(GroupId=r['GroupId'],
-                           IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
-                                           'ToPort': to_port, 'Ipv6Ranges': [{'CidrIpv6': i}]
-                                           }])
 
 
 @SecurityGroup.action_registry.register('post-finding')

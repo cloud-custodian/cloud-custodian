@@ -1435,7 +1435,7 @@ class SecurityGroupTest(BaseTest):
                     {"type": "ingress", "IpProtocol": "tcp", "FromPort": 0},
                     {"GroupName": "web-tier"},
                 ],
-                "actions": [{"type": "set-permissions", "ingress": "matched"}],
+                "actions": [{"type": "remove-permissions", "ingress": "matched"}],
             },
             session_factory=factory,
         )
@@ -1654,7 +1654,7 @@ class SecurityGroupTest(BaseTest):
                     }
                 ],
                 "actions": [
-                    {"type": "set-permissions", "ingress": "matched"}
+                    {"type": "remove-permissions", "ingress": "matched"}
                 ]
             },
             session_factory=factory,
