@@ -1,35 +1,61 @@
 trigger:
-- master
+  - master
 
 variables:
-- group: CustodianCoreCI
+  - group: CustodianCoreCI
 
 jobs:
+  - job: 'CustodianCask'
+    displayName: 'Tool Tests - Cask'
+    pool:
+      vmImage: 'Ubuntu-18.04'
+    steps:
+      - displayName: Checkout
+        checkout: self
+        fetchDepth: 1
+      - displayName: Setup GoLang
+        task: GoTool@0
+        inputs:
+          version: '1.12.6'
+      - displayName: Run Tests
+        script: make test
+        workingDirectory: tools/cask/
 
-- job: 'CustodianCask'
-  displayName: 'Tool Tests - Cask'
-  pool:
-    vmImage: 'Ubuntu-18.04'
+  - job: 'CustodianOmniSSM'
+    displayName: 'Tool Tests - OmniSSM'
+    pool:
+      vmImage: 'Ubuntu-18.04'
+    steps:
+      - displayName: Checkout
+        checkout: self
+        fetchDepth: 1
+      - displayName: Setup GoLang
+        task: GoTool@0
+        inputs:
+          version: '1.12.6'
+      - displayName: 'Run Tests'
+        workingDirectory: tools/omnissm/
+        script: make test
 
-  steps:
-  - task: GoTool@0
-    inputs:
-      version: '1.12.6'
-
-  - script: make test
-    workingDirectory: tools/cask/
-    displayName: 'Build for all platforms'
-
-
-- job: 'CustodianOmniSSM'
-  displayName: 'Tool Tests - OmniSSM'
-  pool:
-    vmImage: 'Ubuntu-18.04'
-
-  steps:
-  - task: GoTool@0
-    inputs:
-      version: '1.12.6'
-  - script: make test
-    workingDirectory: tools/omnissm/
-    displayName: 'Test'
+  - job: 'CustodianDockerBuild'
+    displayName: 'Docker Build'
+    pool:
+      vmImage: 'Ubuntu-18.04'
+    steps:
+      - displayName: Checkout
+        checkout: self
+        fetchDepth: 1
+      - displayName: Set up Python 3.8
+        uses: actions/setup-python@v1
+        inputs:
+          versionSpec: 3.8
+          architecture: 'x64'
+      - displayName: Install Docker Build Env
+        # bin directory is in .dockerignore
+        script: |
+          python -m pip install --upgrade pip
+          pip install docker click pytest pyyaml
+      - displayName: Build & Test Docker Image
+        # build a docker image and sanity test
+        script: |
+          python tools/dev/dockerpkg.py build --test -i cli-distroless

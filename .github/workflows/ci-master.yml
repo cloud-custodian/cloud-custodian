@@ -80,25 +80,6 @@ jobs:
           bash <(curl -s https://codecov.io/bash) -Z \
           -f coverage.xml
 
-  Test-Docker:
-    # sanity check on a docker build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-      - name: Install Docker Build Env
-        # bin directory is in .dockerignore
-        run: |
-          python -m pip install --upgrade pip
-          pip install docker click pytest pyyaml
-      # build a docker image and sanity test
-      - name: Build & Test Docker Image
-        run: |
-          python tools/dev/dockerpkg.py build --test -i cli-distroless
-
   Test-Windows:
     # windows can't use the fast cache technique we use in our matrix builds
     # where we cache the entire tox virtualenv directory, without error.
