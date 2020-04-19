@@ -6,7 +6,7 @@ variables:
 
 jobs:
   - job: 'CustodianCask'
-    displayName: 'Tool Tests - Cask'
+#    displayName: 'Tool Tests - Cask'
     pool:
       vmImage: 'Ubuntu-18.04'
     steps:
@@ -20,7 +20,7 @@ jobs:
         workingDirectory: tools/cask/
 
   - job: 'CustodianOmniSSM'
-    displayName: 'Tool Tests - OmniSSM'
+#    displayName: 'Tool Tests - OmniSSM'
     pool:
       vmImage: 'Ubuntu-18.04'
     steps:
@@ -34,7 +34,7 @@ jobs:
         script: make test
 
   - job: 'CustodianDockerBuild'
-    displayName: 'Docker Build'
+#    displayName: 'Docker Build'
     pool:
       vmImage: 'Ubuntu-18.04'
     steps:
@@ -45,12 +45,11 @@ jobs:
         inputs:
           versionSpec: 3.8
           architecture: 'x64'
-      - displayName: Install Docker Build Env
-        # bin directory is in .dockerignore
-        script: |
+      # bin directory is in .dockerignore
+      - script: |
           python -m pip install --upgrade pip
           pip install docker click pytest pyyaml
-      - displayName: Build & Test Docker Image
-        # build a docker image and sanity test
-        script: |
-          python tools/dev/dockerpkg.py build --test -i cli-distroless
+      # build a docker image and sanity test
+      - script: |
+          python tools/dev/dockerpkg.py build --test -i cli-distroless        
+
