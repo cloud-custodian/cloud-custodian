@@ -31,7 +31,6 @@ jobs:
   - script: make test
     workingDirectory: tools/omnissm/
 
-
 - job: 'CustodianDockerBuild'
   displayName: 'Docker Build'
   pool:
@@ -49,5 +48,5 @@ jobs:
       pip install docker click pytest pyyaml
   # build a docker image and sanity test
   - script: |
-      python tools/dev/dockerpkg.py build --test -i cli-distroless        
+      python tools/dev/dockerpkg.py build --verbose --test -i cli-distroless
 
