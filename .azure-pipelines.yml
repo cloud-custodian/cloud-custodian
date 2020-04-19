@@ -12,8 +12,7 @@ jobs:
     steps:
       - checkout: self
         fetchDepth: 1
-      - displayName: Setup GoLang
-        task: GoTool@0
+      - task: GoTool@0
         inputs:
           version: '1.12.6'
       - displayName: Run Tests
@@ -27,8 +26,7 @@ jobs:
     steps:
       - checkout: self
         fetchDepth: 1
-      - displayName: Setup GoLang
-        task: GoTool@0
+      - task: GoTool@0
         inputs:
           version: '1.12.6'
       - displayName: 'Run Tests'
@@ -43,7 +41,7 @@ jobs:
       - checkout: self
         fetchDepth: 1
       - displayName: Set up Python 3.8
-        uses: actions/setup-python@v1
+        task: UsePythonVersion@@
         inputs:
           versionSpec: 3.8
           architecture: 'x64'
