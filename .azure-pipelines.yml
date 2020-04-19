@@ -15,8 +15,7 @@ jobs:
       - task: GoTool@0
         inputs:
           version: '1.12.6'
-      - displayName: Run Tests
-        script: make test
+      - script: make test
         workingDirectory: tools/cask/
 
   - job: 'CustodianOmniSSM'
@@ -29,8 +28,7 @@ jobs:
       - task: GoTool@0
         inputs:
           version: '1.12.6'
-      - displayName: 'Run Tests'
-        workingDirectory: tools/omnissm/
+      - workingDirectory: tools/omnissm/
         script: make test
 
   - job: 'CustodianDockerBuild'
@@ -40,8 +38,7 @@ jobs:
     steps:
       - checkout: self
         fetchDepth: 1
-      - displayName: Set up Python 3.8
-        task: UsePythonVersion@@
+      - task: UsePythonVersion@@
         inputs:
           versionSpec: 3.8
           architecture: 'x64'
