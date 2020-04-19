@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Application Load Balancers
+Application & Network Load Balancers
 """
 import json
 import logging
@@ -31,6 +31,7 @@ from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeIn
 from c7n.utils import (
     local_session, chunks, type_schema, get_retry, set_annotation)
 
+from c7n.resources.aws import Arn
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 log = logging.getLogger('custodian.app-elb')
@@ -144,21 +145,44 @@ AppELB.action_registry.register('set-shield', SetShieldProtection)
 
 @AppELB.filter_registry.register('metrics')
 class AppElbMetrics(MetricsFilter):
-    """Filter app load balancer by metric values.
+    """Filter app/net load balancer by metric values.
 
-    See available metrics here
+    Note application and network load balancers use different Cloud
+    Watch metrics namespaces and metric names, the custodian app-elb
+    resource returns both types of load balancer, so an additional
+    filter should be used to ensure only targeting a particular
+    type. ie.  `- Type: application` or `- Type: network`
+
+    See available application load balancer metrics here
     https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html
 
-    Custodian defaults to specifying dimensions for the app elb only.
-    Target Group dimension not supported atm.
+    See available network load balancer metrics here.
+    https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.html
+
+
+    For network load balancer metrics, the metrics filter requires specifying
+    the namespace parameter to the filter.
+
+    .. code-block:: yaml
+
+      policies:
+        - name: net-lb-underutilized
+          resource: app-elb
+          filters:
+           - Type: network
+           - type: metrics
+             name: ActiveFlowCount
+             namespace: AWS/NetworkELB
+             statistics: Sum
+             days: 14
+             value: 100
+             op: less-than
     """
 
     def get_dimensions(self, resource):
         return [{
             'Name': self.model.dimension,
-            'Value': 'app/%s/%s' % (
-                resource[self.model.name],
-                resource[self.model.id].rsplit('/')[-1])}]
+            'Value': Arn.parse(resource['LoadBalancerArn']).resource}]
 
 
 @AppELB.filter_registry.register('security-group')

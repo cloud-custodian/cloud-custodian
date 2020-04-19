@@ -421,6 +421,28 @@ class AppELBTest(BaseTest):
             resources[0]["LoadBalancerArn"], post_resources[0]["LoadBalancerArn"]
         )
 
+    def test_appelb_net_metrics(self):
+        factory = self.replay_flight_data('test_netelb_metrics')
+        p = self.load_policy({
+            'name': 'netelb-metrics',
+            'resource': 'app-elb',
+            'filters': [
+                {'Type': 'network'},
+                {'type': 'metrics',
+                 'name': 'TCP_ELB_Reset_Count',
+                 'namespace': 'AWS/NetworkELB',
+                 'statistics': 'Sum',
+                 'value': 10,
+                 'op': 'greater-than',
+                 'days': 0.25}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LoadBalancerName'], 'nicnoc')
+        self.assertTrue(
+            'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum' in resources[
+                0]['c7n.metrics'])
+
 
 class AppELBHealthcheckProtocolMismatchTest(BaseTest):
 
