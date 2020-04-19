@@ -1278,6 +1278,72 @@ class RemovePermissions(BaseAction):
                 method(GroupId=r['GroupId'], IpPermissions=groups)
 
 
+@SecurityGroup.action_registry.register('add-permissions')
+class AddPermissions(BaseAction):
+    """Action to add ingress/egress rule(s) to a security group
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: add-security-group-rule
+                resource: security-group
+                filters:
+                  - or:
+                        - type: ingress
+                          IpProtocol: "-1"
+                          Ports: [22, 3389]
+                          Cidr: "0.0.0.0/0"
+                actions:
+                    - type: add-permissions
+                      PermissionType: "ingress"
+                      IpProtocol: "TCP"
+                      FromPort: 22
+                      ToPort: 22
+                      Cidr: ["1.1.1.1/32","2.2.2.2/32"]
+
+    """
+
+    schema = type_schema(
+        'add-permissions',
+        PermissionType={'type': 'string', 'enum': ['ingress', 'egress']},
+        IpProtocol={'type': 'string', 'enum': ['-1', 'UDP', 'TCP', 'ICMP', 'ICMPV6']},
+        FromPort={'type': 'integer'},
+        ToPort={'type': 'integer'},
+        GroupId={'type': 'array', 'items': {'type': 'string'}},
+        CidrIpv6={'type': 'array', 'items': {'type': 'string'}},
+        Cidr={'type': 'array', 'items': {'type': 'string'}})
+
+    permissions = ('ec2:AuthorizeSecurityGroupEgress', 'ec2:AuthorizeSecurityGroupIngress',)
+
+    def process(self, resources):
+        p_type = self.data.get('PermissionType')
+        label = p_type
+        protocol = self.data.get('IpProtocol')
+        from_port = self.data.get('FromPort')
+        to_port = self.data.get('ToPort')
+
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            method = getattr(client, 'authorize_security_group_%s' % label)
+
+            for i in self.data.get('Cidr', []):
+                method(GroupId=r['GroupId'],
+                       IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
+                                       'ToPort': to_port, 'IpRanges': [{'CidrIp': i}]}])
+            for i in self.data.get('GroupId', []):
+                method(GroupId=r['GroupId'],
+                       IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
+                                       'ToPort': to_port,
+                                       'UserIdGroupPairs': [{'GroupId': i}]}])
+            for i in self.data.get('CidrIpv6', []):
+                method(GroupId=r['GroupId'],
+                       IpPermissions=[{'IpProtocol': protocol, 'FromPort': from_port,
+                                       'ToPort': to_port, 'Ipv6Ranges': [{'CidrIpv6': i}]
+                                       }])
+
+
 @SecurityGroup.action_registry.register('post-finding')
 class SecurityGroupPostFinding(OtherResourcePostFinding):
 
