@@ -14,8 +14,6 @@
 """
 Application Load Balancers
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import logging
 import six
@@ -203,7 +201,7 @@ class WafEnabled(Filter):
         name_id_map = {}
         resource_map = {}
 
-        wafs = self.manager.get_resource_manager('waf-regional').resources()
+        wafs = self.manager.get_resource_manager('waf-regional').resources(augment=False)
 
         for w in wafs:
             if 'c7n:AssociatedResources' not in w:
@@ -268,7 +266,7 @@ class SetWaf(BaseAction):
         return self
 
     def process(self, resources):
-        wafs = self.manager.get_resource_manager('waf-regional').resources()
+        wafs = self.manager.get_resource_manager('waf-regional').resources(augment=False)
         name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
         target_acl = self.data.get('web-acl')
         target_acl_id = name_id_map.get(target_acl, target_acl)
@@ -489,7 +487,7 @@ class AppELBDeleteAction(BaseAction):
                 alb['LoadBalancerArn'], e)
 
 
-class AppELBListenerFilterBase(object):
+class AppELBListenerFilterBase:
     """ Mixin base class for filters that query LB listeners.
     """
     permissions = ("elasticloadbalancing:DescribeListeners",)
@@ -516,7 +514,7 @@ def parse_attribute_value(v):
     return v
 
 
-class AppELBAttributeFilterBase(object):
+class AppELBAttributeFilterBase:
     """ Mixin base class for filters that query LB attributes.
     """
 
@@ -616,15 +614,14 @@ class IsNotLoggingFilter(Filter, AppELBAttributeFilterBase):
         bucket_prefix = self.data.get('prefix', None)
 
         return [alb for alb in resources
-                if alb['Type'] == 'application' and (
-                    not alb['Attributes']['access_logs.s3.enabled'] or (
-                        bucket_name and bucket_name != alb['Attributes'].get(
-                            'access_logs.s3.bucket', None)) or (
-                        bucket_prefix and bucket_prefix != alb['Attributes'].get(
-                            'access_logs.s3.prefix', None)))]
+                if not alb['Attributes']['access_logs.s3.enabled'] or
+                (bucket_name and bucket_name != alb['Attributes'].get(
+                    'access_logs.s3.bucket', None)) or
+                (bucket_prefix and bucket_prefix != alb['Attributes'].get(
+                    'access_logs.s3.prefix', None))]
 
 
-class AppELBTargetGroupFilterBase(object):
+class AppELBTargetGroupFilterBase:
     """ Mixin base class for filters that query LB target groups.
     """
 

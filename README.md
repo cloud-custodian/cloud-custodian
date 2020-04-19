@@ -6,6 +6,7 @@ Cloud Custodian
 ---
 
 [![](https://badges.gitter.im/cloud-custodian/cloud-custodian.svg)](https://gitter.im/cloud-custodian/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![CI](https://github.com/cloud-custodian/cloud-custodian/workflows/CI/badge.svg?event=push)](https://github.com/cloud-custodian/cloud-custodian/actions?query=workflow%3ACI+branch%3Amaster+event%3Apush)
 [![](https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/Custodian%20-%20CI?branchName=master)](https://dev.azure.com/cloud-custodian/cloud-custodian/_build)
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![](https://codecov.io/gh/cloud-custodian/cloud-custodian/branch/master/graph/badge.svg)](https://codecov.io/gh/cloud-custodian/cloud-custodian)
@@ -102,8 +103,8 @@ As a quick walk through, below are some sample policies for AWS resources.
   1. will enforce that no S3 buckets have cross-account access enabled.
   1. will terminate any newly launched EC2 instance that do not have an encrypted EBS volume.
   1. will tag any EC2 instance that does not have the follow tags
-     "Environment", "AppId", and either "OwnerContact" or "DeptID" to be stopped
-	 in four days.
+     "Environment", "AppId", and either "OwnerContact" or "DeptID" to
+     be stopped in four days.
 
 ```yaml
 policies:
@@ -189,9 +190,6 @@ $ docker run -it \
 # NOTE: We mount the ``.aws/credentials`` and ``.aws/config`` directories to
 # the docker container to support authentication to AWS using the same credentials
 # credentials that are available to the local user if authenticating with STS.
-# This exposes your container to additional credentials than may be necessary,
-# i.e. additional credentials may be available inside of the container than is
-# minimally necessary.
 
 $ docker run -it \
   -v $(pwd)/output:/home/custodian/output \
@@ -202,9 +200,10 @@ $ docker run -it \
   cloudcustodian/c7n run -v -s /home/custodian/output /home/custodian/policy.yml
 ```
 
-Custodian supports other useful subcommands and options, including
-outputs to S3, CloudWatch metrics, STS role assumption. Policies go
-together like Lego bricks with actions and filters.
+The [custodian cask
+tool](https://cloudcustodian.io/docs/tools/cask.html) is a go binary
+that provides a transparent front end to docker that mirors the regular
+custodian cli, but automatically takes care of mounting volumes.
 
 Consult the documentation for additional information, or reach out on gitter.
 

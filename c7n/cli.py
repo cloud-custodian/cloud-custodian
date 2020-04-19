@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # PYTHON_ARGCOMPLETE_OK  (Must be in first 1024 bytes, so if tab completion
 # is failing, move this above the license)
 
@@ -33,7 +31,6 @@ except ImportError:
     def setproctitle(t):
         return None
 
-from c7n.commands import schema_completer
 from c7n.config import Config
 
 DEFAULT_REGION = 'us-east-1'
@@ -168,20 +165,11 @@ def _logs_options(p):
     )
 
 
-def _schema_tab_completer(prefix, parsed_args, **kwargs):
-    # If we are printing the summary we discard the resource
-    if parsed_args.summary:
-        return []
-
-    return schema_completer(prefix)
-
-
 def _schema_options(p):
     """ Add options specific to schema subcommand. """
 
     p.add_argument(
-        'resource', metavar='selector', nargs='?',
-        default=None).completer = _schema_tab_completer
+        'resource', metavar='selector', nargs='?', default=None)
     p.add_argument(
         '--summary', action="store_true",
         help="Summarize counts of available resources, actions and filters")
@@ -193,7 +181,7 @@ def _schema_options(p):
 
 def _dryrun_option(p):
     p.add_argument(
-        "-d", "--dryrun", action="store_true",
+        "-d", "--dryrun", "--dry-run", action="store_true",
         help="Don't execute actions but filter resources")
 
 
@@ -253,7 +241,7 @@ def setup_parser():
     run.add_argument(
         "--trace",
         dest="tracer",
-        help=argparse.SUPPRESS,
+        help="Tracing integration",
         default=None, nargs="?", const="default")
 
     schema_desc = ("Browse the available vocabularies (resources, filters, modes, and "
@@ -275,15 +263,12 @@ def setup_parser():
     report.set_defaults(command="c7n.commands.report")
     _report_options(report)
 
-    logs_desc = "Get policy execution logs"
     logs = subs.add_parser(
-        'logs', help=logs_desc, description=logs_desc)
+        'logs')
     logs.set_defaults(command="c7n.commands.logs")
     _logs_options(logs)
 
-    metrics_desc = "Retrieve policy execution metrics."
-    metrics = subs.add_parser(
-        'metrics', description=metrics_desc, help=metrics_desc)
+    metrics = subs.add_parser('metrics')
     metrics.set_defaults(command="c7n.commands.metrics_cmd")
     _metrics_options(metrics)
 

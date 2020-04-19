@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import six
 from azure.mgmt.eventgrid.models import EventSubscription, EventSubscriptionFilter
 from c7n_azure.session import Session
@@ -20,7 +18,7 @@ from c7n_azure.session import Session
 from c7n.utils import local_session
 
 
-class AzureEvents(object):
+class AzureEvents:
     """A mapping of resource types to events."""
 
     azure_events = {
@@ -136,7 +134,7 @@ class AzureEvents(object):
         return event_operations
 
 
-class AzureEventSubscription(object):
+class AzureEventSubscription:
 
     @staticmethod
     def create(destination, name, subscription_id, session=None, event_filter=None):

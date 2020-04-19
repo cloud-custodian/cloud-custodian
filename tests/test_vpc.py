@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from .common import BaseTest, functional, event_data
 
 from botocore.exceptions import ClientError as BotoClientError
@@ -866,6 +864,13 @@ class NetworkAddrTest(BaseTest):
         network_addr = ec2.allocate_address(Domain="vpc")
         self.addCleanup(self.release_if_still_present, ec2, network_addr)
         self.assert_policy_released(factory, ec2, network_addr)
+
+    def test_elasticip_alias(self):
+        try:
+            self.load_policy({'name': 'eip', 'resource': 'aws.elastic-ip'}, validate=True)
+        except PolicyValidationError:
+            raise
+            self.fail("elastic ip alias failed")
 
     def test_release_attached_ec2(self):
         factory = self.replay_flight_data("test_release_attached_ec2")
@@ -2689,3 +2694,34 @@ class FlowLogsTest(BaseTest):
             "FlowLogs"
         ]
         self.assertFalse(logs)
+
+    def test_vpc_set_flow_logs_maxaggrinterval(self):
+        session_factory = self.replay_flight_data("test_vpc_set_flow_logs_maxaggrinterval")
+        p = self.load_policy(
+            {
+                "name": "c7n-vpc-flow-logs-maxinterval",
+                "resource": "vpc",
+                "filters": [
+                    {'type': 'flow-logs', 'enabled': False}
+                ],
+                "actions": [
+                    {
+                        "type": "set-flow-log",
+                        "LogDestinationType": "s3",
+                        "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz",
+                        "MaxAggregationInterval": 60,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcId"], "vpc-d2d616b5")
+        client = session_factory(region="us-east-1").client("ec2")
+        logs = client.describe_flow_logs(
+            Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
+        )[
+            "FlowLogs"
+        ]
+        self.assertEqual(logs[0]["MaxAggregationInterval"], 60)

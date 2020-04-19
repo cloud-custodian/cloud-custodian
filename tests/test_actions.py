@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from botocore.exceptions import ClientError
 from c7n.exceptions import PolicyValidationError
 from c7n.actions import Action, ActionRegistry
@@ -23,6 +21,19 @@ class ActionTest(BaseTest):
 
     def test_process_unimplemented(self):
         self.assertRaises(NotImplementedError, Action().process, None)
+
+    def test_filter_resources(self):
+        a = Action()
+        a.type = 'set-x'
+        log_output = self.capture_logging('custodian.actions')
+        resources = [
+            {'app': 'X', 'state': {'status': 'running'}},
+            {'app': 'Y', 'state': {'status': 'stopped'}},
+            {'app': 'Z', 'state': {'status': 'running'}}]
+        assert {'X', 'Z'} == {r['app'] for r in a.filter_resources(
+            resources, 'state.status', ('running',))}
+        assert log_output.getvalue().strip() == (
+            'set-x implicitly filtered 2 of 3 resources key:state.status on running')
 
     def test_run_api(self):
         resp = {

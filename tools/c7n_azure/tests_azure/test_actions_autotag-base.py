@@ -11,13 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import copy
 
 from . import tools_tags as tools
 from azure.mgmt.monitor.models import EventData
 from .azure_common import BaseTest
+from c7n.resources import load_resources
 from c7n_azure.actions.tagging import AutoTagDate
 from mock import Mock
 
@@ -44,6 +43,7 @@ class ActionsAutotagBaseTest(BaseTest):
             event = EventData.from_dict(self.event_dict)
             event.id = event.id + str(i)
             self.events.append(event)
+        load_resources(['azure.vm'])
 
     def test_get_first_element_resource(self):
         client_mock = Mock()

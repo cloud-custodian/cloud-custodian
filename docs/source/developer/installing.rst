@@ -6,33 +6,34 @@ Installing for Developers
 Installing Prerequisites
 ------------------------
 
-Cloud Custodian supports Python 2.7, 3.6, and 3.7.
-To develop the Custodian, you will need to have a make/C toolchain, Python 3.7 and some basic Python tools.
+Cloud Custodian supports Python 3.6, 3.7, 3.8 and above. To develop the
+Custodian, you will need to have a make/C toolchain, Python3 and some
+basic Python tools.
 
-We strongly recommend any development be done in Python 3.
 
-Install Python 3.7
-~~~~~~~~~~~~~~~~~~
+Install Python 3
+~~~~~~~~~~~~~~~~
 
-You'll need to have a Python 3.7 environment set up.
+You'll need to have a Python 3 environment set up.
 You may have a preferred way of doing this.
 Here are instructions for a way to do it on Ubuntu and Mac OS X.
 
 On Ubuntu
 *********
 
-On most recent versions of Ubuntu, Python 3.6 is included by default.
-To get Python 3.7, first add the deadsnakes package repository:
+On most recent versions of Ubuntu, Python 3 is included by default.
+
+To get Python 3.8, first add the deadsnakes package repository:
 
 .. code-block:: bash
 
     $ sudo add-apt-repository ppa:deadsnakes/ppa
 
-Next, install python3.7 and the development headers for it:
+Next, install python3.8 and the development headers for it:
 
 .. code-block:: bash
 
-    $ sudo apt-get install python3.7 python3.7-dev
+    $ sudo apt-get install python3.8 python3.8-dev
 
 Then, install ``pip``:
 
@@ -44,8 +45,8 @@ When this is complete you should be able to check that you have pip properly ins
 
 .. code-block::
 
-    $ python3.7 -m pip --version
-    pip 9.0.1 from /usr/lib/python3/dist-packages (python 3.7)
+    $ python3.8 -m pip --version
+    pip 9.0.1 from /usr/lib/python3/dist-packages (python 3.8)
 
 (your exact version numbers will likely differ)
 
@@ -88,7 +89,7 @@ Then build the software with `tox <https://tox.readthedocs.io/en/latest/>`_:
 
     $ tox
 
-Tox creates a sandboxed "virtual environment" ("virtualenv") for each Python version, 2.7, 3.6, and 3.7.
+Tox creates a sandboxed "virtual environment" ("virtualenv") for each Python version, 3.6, 3.7, 3.8
 These are stored in the ``.tox/`` directory.
 It then runs the test suite under all versions of Python, per the ``tox.ini`` file.
 If tox is unable to find a Python executable on your system for one of the supported versions, it will fail for that environment.
@@ -98,7 +99,7 @@ You can run the test suite in a single enviroment with the ``-e`` flag:
 
 .. code-block:: bash
 
-    $ tox -e py37
+    $ tox -e py38
 
 To access the executables installed in one or the other virtual environment,
 source the virtualenv into your current shell, e.g.:
@@ -113,11 +114,13 @@ You should then have, e.g., the ``custodian`` command available:
 
     (py37)$ custodian -h
 
-You'll also be able to invoke `nosetests
-<http://nose.readthedocs.io/en/latest/>`_ or `pytest
-<https://docs.pytest.org/en/latest/>`_ directly with the arguments of your
-choosing, e.g.:
+You'll also be able to invoke `pytest <https://docs.pytest.org/en/latest/>`_ directly
+with the arguments of your choosing, e.g.:
 
 .. code-block:: bash
 
-    (py37) $ pytest tests/test_s3.py -x
+    (py37) $ pytest tests/test_s3.py -x -k replication
+
+Note you'll have to environment variables setup appropriately per the tox.ini
+for provider credentials.
+

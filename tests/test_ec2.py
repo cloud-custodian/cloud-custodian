@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import logging
 import unittest
 import time
@@ -259,6 +257,34 @@ class TestSsm(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 2)
         self.assertTrue('c7n:SsmState' in resources[0])
+        self.assertEqual(
+            [r['InstanceId'] for r in resources],
+            ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
+
+    def test_ssm_compliance(self):
+        session_factory = self.replay_flight_data('test_ec2_ssm_compliance_filter')
+        policy = self.load_policy({
+            'name': 'ec2-ssm-compliance',
+            'resource': 'aws.ec2',
+            'filters': [
+                {'type': 'ssm-compliance',
+                 'compliance_types': [
+                     'Association',
+                     'Patch'
+                 ],
+                 'severity': [
+                     'CRITICAL',
+                     'HIGH',
+                     'MEDIUM',
+                     'LOW',
+                     'UNSPECIFIED'
+                 ],
+                 'states': ['NON_COMPLIANT']}]},
+            session_factory=session_factory,
+            config={'region': 'us-east-2'})
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+        self.assertTrue('c7n:ssm-compliance' in resources[0])
         self.assertEqual(
             [r['InstanceId'] for r in resources],
             ['i-0dea82d960d56dc1d', 'i-0ba3874e85bb97244'])
@@ -849,6 +875,42 @@ class TestStop(BaseTest):
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ec2_stop_hibernate(self):
+        session_factory = self.replay_flight_data("test_ec2_stop_hibernate")
+        policy = self.load_policy(
+            {
+                "name": "ec2-test-stop-hibernate",
+                "resource": "ec2",
+                "query": [{"tag-key": "Testing"}],
+                "actions": [{"type": "stop", "hibernate": True}],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 2)
+
+        if self.recording:
+            time.sleep(25)
+
+        instances = utils.query_instances(
+            session_factory(), InstanceIds=[r["InstanceId"] for r in resources]
+        )
+
+        stopped = [
+            i
+            for i in instances
+            if i["StateReason"]["Code"] == "Client.UserInitiatedShutdown"
+        ]
+        hibernated = [
+            i
+            for i in instances
+            if i["StateReason"]["Code"] == "Client.UserInitiatedHibernate"
+        ]
+
+        self.assertEqual(len(stopped), 1)
+        self.assertEqual(len(hibernated), 1)
 
 
 class TestReboot(BaseTest):

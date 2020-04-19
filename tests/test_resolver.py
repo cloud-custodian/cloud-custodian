@@ -11,10 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import csv
 import json
+import pickle
 import os
 import tempfile
 import vcr
@@ -28,19 +27,23 @@ from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
 
 
-class FakeCache(object):
+class FakeCache:
 
     def __init__(self):
         self.state = {}
+        self.gets = 0
+        self.saves = 0
 
     def get(self, key):
-        return self.state.get(key)
+        self.gets += 1
+        return self.state.get(pickle.dumps(key))
 
     def save(self, key, data):
-        self.state[key] = data
+        self.saves += 1
+        self.state[pickle.dumps(key)] = data
 
 
-class FakeResolver(object):
+class FakeResolver:
 
     def __init__(self, contents):
         if isinstance(contents, binary_type):
@@ -74,7 +77,7 @@ class ResolverTest(BaseTest):
         uri = "s3://%s/resource.json?RequestPayer=requestor" % bname
         data = resolver.resolve(uri)
         self.assertEqual(content, data)
-        self.assertEqual(list(cache.state.keys()), [("uri-resolver", uri)])
+        self.assertEqual(list(cache.state.keys()), [pickle.dumps(("uri-resolver", uri))])
 
     def test_handle_content_encoding(self):
         session_factory = self.replay_flight_data("test_s3_resolver")
@@ -108,9 +111,9 @@ class UrlValueTest(BaseTest):
     def tearDown(self):
         os.chdir(self.old_dir)
 
-    def get_values_from(self, data, content):
+    def get_values_from(self, data, content, cache=None):
         config = Config.empty(account_id=ACCOUNT_ID)
-        mgr = Bag({"session_factory": None, "_cache": None, "config": config})
+        mgr = Bag({"session_factory": None, "_cache": cache, "config": config})
         values = ValuesFrom(data, mgr)
         values.resolver = FakeResolver(content)
         return values
@@ -183,3 +186,16 @@ class UrlValueTest(BaseTest):
         )
         self.assertEqual(values.get_values(), ["east-resource"])
         self.assertEqual(values.data.get("url", ""), ACCOUNT_ID)
+
+    def test_value_from_caching(self):
+        cache = FakeCache()
+        values = self.get_values_from(
+            {"url": "", "expr": '["{region}"][]', "format": "json"},
+            json.dumps({"us-east-1": "east-resource"}),
+            cache=cache,
+        )
+        self.assertEqual(values.get_values(), ["east-resource"])
+        self.assertEqual(values.get_values(), ["east-resource"])
+        self.assertEqual(values.get_values(), ["east-resource"])
+        self.assertEqual(cache.saves, 1)
+        self.assertEqual(cache.gets, 3)

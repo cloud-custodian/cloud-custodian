@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import datetime
 import os
@@ -119,6 +117,36 @@ class UserCredentialReportTest(BaseTest):
             p.resource_manager.get_arns(resources),
             ["arn:aws:iam::644160558196:user/kapil"])
 
+    def test_credential_access_key_reverse_filter_delete(self):
+        factory = self.replay_flight_data(
+            'test_iam_user_credential_reverse_filter_delete'
+        )
+        p = self.load_policy({
+            'name': 'user-cred-multi-reverse',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'zscholl'},
+                {"type": "credential",
+                 "report_max_age": 1585865564,
+                 "key": "access_keys.last_used_date",
+                 "value": 90,
+                 'op': 'gte',
+                 "value_type": "age"},
+                {"type": "credential",
+                 "report_max_age": 1585865564,
+                 "key": "access_keys.last_rotated",
+                 "value": 90,
+                 "op": "gte",
+                 'value_type': 'age'}],
+            'actions': [
+                {'type': 'remove-keys',
+                 'disable': True,
+                 'matched': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
+
     def test_access_key_last_service(self):
         # Note we're reusing the old console users flight records
         session_factory = self.replay_flight_data("test_iam_user_console_old")
@@ -206,6 +234,54 @@ class UserCredentialReportTest(BaseTest):
         self.assertEqual(
             info,
             {
+                "arn": "arn:aws:iam::644160558196:user/anthony",
+                "mfa_active": True,
+                "password_enabled": True,
+                "password_last_changed": "2016-10-26T13:15:33+00:00",
+                "password_last_used": "2016-10-26T13:14:37+00:00",
+                "password_next_rotation": "2017-01-24T13:15:33+00:00",
+                "user": "anthony",
+                "user_creation_time": "2016-10-06T16:11:27+00:00",
+            },
+        )
+
+    def test_record_transform_with_keys(self):
+        info = {
+            "access_key_2_active": "false",
+            "password_next_rotation": "2017-01-24T13:15:33+00:00",
+            "access_key_2_last_rotated": "N/A",
+            "mfa_active": "true",
+            "cert_1_active": "false",
+            "cert_1_last_rotated": "N/A",
+            "access_key_1_last_used_date": "N/A",
+            "arn": "arn:aws:iam::644160558196:user/anthony",
+            "cert_2_active": "false",
+            "password_enabled": "true",
+            "access_key_2_last_used_region": "N/A",
+            "password_last_changed": "2016-10-26T13:15:33+00:00",
+            "access_key_1_last_rotated": "2019-12-04T13:22:47+00:00",
+            "user_creation_time": "2016-10-06T16:11:27+00:00",
+            "access_key_1_last_used_service": "N/A",
+            "user": "anthony",
+            "password_last_used": "2016-10-26T13:14:37+00:00",
+            "cert_2_last_rotated": "N/A",
+            "access_key_2_last_used_date": "N/A",
+            "access_key_2_last_used_service": "N/A",
+            "access_key_1_last_used_region": "N/A",
+            "access_key_1_active": "false",
+        }
+        credential = UserCredentialReport({}, None)
+        credential.process_user_record(info)
+        self.assertEqual(
+            info,
+            {
+                "access_keys": [{
+                    "active": False,
+                    "last_rotated": "2019-12-04T13:22:47+00:00",
+                    "last_used_date": None,
+                    "last_used_region": None,
+                    "last_used_service": None
+                }],
                 "arn": "arn:aws:iam::644160558196:user/anthony",
                 "mfa_active": True,
                 "password_enabled": True,

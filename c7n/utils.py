@@ -11,13 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import copy
 import csv
 from datetime import datetime, timedelta
 import json
 import itertools
+import ipaddress
 import logging
 import os
 import random
@@ -30,7 +29,7 @@ import six
 from six.moves.urllib import parse as urlparse
 from six.moves.urllib.request import getproxies
 
-from c7n import ipaddress, config
+from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
 
 # Try to play nice in a serverless environment, where we don't require yaml
@@ -326,7 +325,9 @@ REGION_PARTITION_MAP = {
     'us-gov-east-1': 'aws-us-gov',
     'us-gov-west-1': 'aws-us-gov',
     'cn-north-1': 'aws-cn',
-    'cn-northwest-1': 'aws-cn'
+    'cn-northwest-1': 'aws-cn',
+    'us-isob-east-1': 'aws-iso-b',
+    'us-iso-east-1': 'aws-iso'
 }
 
 
@@ -347,6 +348,8 @@ def generate_arn(
     arn = 'arn:%s:%s:%s:%s:' % (
         partition, service, region if region else '', account_id if account_id else '')
     if resource_type:
+        if resource.startswith(separator):
+            separator = ''
         arn = arn + '%s%s%s' % (resource_type, separator, resource)
     else:
         arn = arn + resource
@@ -435,6 +438,23 @@ class IPv4Network(ipaddress.IPv4Network):
         if isinstance(other, ipaddress._BaseNetwork):
             return self.supernet_of(other)
         return super(IPv4Network, self).__contains__(other)
+
+    if (sys.version_info.major == 3 and sys.version_info.minor <= 6):  # pragma: no cover
+        @staticmethod
+        def _is_subnet_of(a, b):
+            try:
+                # Always false if one is v4 and the other is v6.
+                if a._version != b._version:
+                    raise TypeError(f"{a} and {b} are not of the same version")
+                return (b.network_address <= a.network_address and
+                        b.broadcast_address >= a.broadcast_address)
+            except AttributeError:
+                raise TypeError(f"Unable to test subnet containment "
+                                f"between {a} and {b}")
+
+        def supernet_of(self, other):
+            """Return True if this network is a supernet of other."""
+            return self._is_subnet_of(other, self)
 
 
 def reformat_schema(model):
@@ -544,13 +564,17 @@ def get_proxy_url(url):
     return None
 
 
-class FormatDate(object):
+class FormatDate:
     """a datetime wrapper with extended pyformat syntax"""
 
     date_increment = re.compile(r'\+[0-9]+[Mdh]')
 
     def __init__(self, d=None):
         self._d = d
+
+    @property
+    def datetime(self):
+        return self._d
 
     @classmethod
     def utcnow(cls):
@@ -576,7 +600,7 @@ class FormatDate(object):
         return d.__format__(fmt)
 
 
-class QueryParser(object):
+class QueryParser:
 
     QuerySchema = {}
     type_name = ''
@@ -642,3 +666,32 @@ class QueryParser(object):
 
 def get_annotation_prefix(s):
     return 'c7n:{}'.format(s)
+
+
+def merge_dict_list(dict_iter):
+    """take an list of dictionaries and merge them.
+
+    last dict wins/overwrites on keys.
+    """
+    result = {}
+    for d in dict_iter:
+        result.update(d)
+    return result
+
+
+def merge_dict(a, b):
+    """Perform a merge of dictionaries a and b
+
+    Any subdictionaries will be recursively merged.
+    Any leaf elements in the form of a list or scalar will use the value from a
+    """
+    d = {}
+    for k, v in a.items():
+        if k not in b:
+            d[k] = v
+        elif isinstance(v, dict) and isinstance(b[k], dict):
+            d[k] = merge_dict(v, b[k])
+    for k, v in b.items():
+        if k not in d:
+            d[k] = v
+    return d

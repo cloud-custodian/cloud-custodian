@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import itertools
 import operator
 import zlib
@@ -518,7 +516,7 @@ class SecurityGroupDiffFilter(Diff):
         return differ.diff(source, target)
 
 
-class SecurityGroupDiff(object):
+class SecurityGroupDiff:
     """Diff two versions of a security group
 
     Immutable: GroupId, GroupName, Description, VpcId, OwnerId
@@ -625,7 +623,7 @@ class SecurityGroupApplyPatch(BaseAction):
             patcher.apply_delta(client, r, d)
 
 
-class SecurityGroupPatch(object):
+class SecurityGroupPatch:
 
     RULE_TYPE_MAP = {
         'egress': ('IpPermissionsEgress',
@@ -1801,7 +1799,7 @@ class AclAwsS3Cidrs(Filter):
         return results
 
 
-@resources.register('network-addr')
+@resources.register('elastic-ip', aliases=('network-addr',))
 class NetworkAddress(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
@@ -2046,6 +2044,7 @@ class CreateFlowLogs(BaseAction):
             'LogGroupName': {'type': 'string'},
             'LogDestination': {'type': 'string'},
             'LogFormat': {'type': 'string'},
+            'MaxAggregationInterval': {'type': 'integer'},
             'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
             'TrafficType': {
                 'type': 'string',
@@ -2130,6 +2129,7 @@ class CreateFlowLogs(BaseAction):
 
         params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
         params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
+        params['MaxAggregationInterval'] = self.data.get('MaxAggregationInterval', 600)
 
         try:
             results = client.create_flow_logs(**params)

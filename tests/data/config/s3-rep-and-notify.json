@@ -16,7 +16,7 @@
 "configurationItemMD5Hash": "84f5d190d354d3cad4f7a531e8d80b82", 
 "supplementaryConfiguration": {
 "BucketAccelerateConfiguration": "{\"status\":null}", 
-"BucketReplicationConfiguration": "{\"roleARN\":\"arn:aws:iam::644160558196:role/custodian-replicated-custodian-replicated-west-s3-repl-role\",\"rules\":{\"testing-99\":{\"prefix\":\"\",\"status\":\"Enabled\",\"destinationConfig\":{\"bucketARN\":\"arn:aws:s3:::testing-west\",\"storageClass\":null}}}}", 
+"BucketReplicationConfiguration": "{\"roleARN\":\"arn:aws:iam::644160558196:role/custodian-replicated-custodian-replicated-west-s3-repl-role\",\"rules\":{\"testing-99\":{\"prefix\":\"\",\"status\":\"Enabled\",\"destinationConfig\":{\"Account\":\"000111222333\",\"bucketARN\":\"arn:aws:s3:::testing-west\",\"storageClass\":null}}}}", 
 "AccessControlList": "\"{\\\"grantSet\\\":null,\\\"grantList\\\":[{\\\"grantee\\\":{\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\",\\\"displayName\\\":\\\"mandeep.bal\\\"},\\\"permission\\\":\\\"FullControl\\\"},{\\\"grantee\\\":\\\"AllUsers\\\",\\\"permission\\\":\\\"Read\\\"}],\\\"owner\\\":{\\\"displayName\\\":\\\"mandeep.bal\\\",\\\"id\\\":\\\"e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15\\\"},\\\"isRequesterCharged\\\":false}\"", 
 "BucketLoggingConfiguration": "{\"destinationBucketName\":null,\"logFilePrefix\":null}", 
 "IsRequesterPaysEnabled": "false", 

@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2018-07-25T16:07:17.000Z",
+                "ImageId": "ami-b04847cf",
+                "ImageLocation": "123456789123/ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20180724",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "123456789123",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-03eeb5be1266fe28d",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2",
+                            "Encrypted": false
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/sdb",
+                        "VirtualName": "ephemeral0"
+                    },
+                    {
+                        "DeviceName": "/dev/sdc",
+                        "VirtualName": "ephemeral1"
+                    }
+                ],
+                "Description": "Canonical, Ubuntu, 18.04 LTS, amd64 bionic image build on 2018-07-24",
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20180724",
+                "RootDeviceName": "/dev/sda1",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

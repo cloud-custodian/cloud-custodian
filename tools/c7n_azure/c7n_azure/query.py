@@ -36,7 +36,7 @@ from c7n.utils import local_session
 log = logging.getLogger('custodian.azure.query')
 
 
-class ResourceQuery(object):
+class ResourceQuery:
 
     def __init__(self, session_factory):
         self.session_factory = session_factory
@@ -77,7 +77,7 @@ class ResourceQuery(object):
 
 
 @sources.register('describe-azure')
-class DescribeSource(object):
+class DescribeSource:
     resource_query_factory = ResourceQuery
 
     def __init__(self, manager):
@@ -98,7 +98,7 @@ class DescribeSource(object):
 
 
 @sources.register('resource-graph')
-class ResourceGraphSource(object):
+class ResourceGraphSource:
 
     def __init__(self, manager):
         self.manager = manager
@@ -186,7 +186,7 @@ class TypeMeta(type):
 
 
 @six.add_metaclass(TypeMeta)
-class TypeInfo(object):
+class TypeInfo:
     doc_groups = None
 
     """api client construction information"""
@@ -261,7 +261,9 @@ class QueryResourceManager(ResourceManager):
         return self.get_session().client(service)
 
     def get_cache_key(self, query):
-        return {'source_type': self.source_type, 'query': query}
+        return {'source_type': self.source_type,
+                'query': query,
+                'resource': str(self.__class__.__name__)}
 
     @classmethod
     def get_model(cls):

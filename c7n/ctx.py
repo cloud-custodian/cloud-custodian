@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import time
 import uuid
 import os
@@ -30,7 +28,7 @@ from c7n.utils import reset_session_cache, dumps, local_session
 from c7n.version import version
 
 
-class ExecutionContext(object):
+class ExecutionContext:
     """Policy Execution Context."""
 
     def __init__(self, session_factory, policy, options):
@@ -61,7 +59,7 @@ class ExecutionContext(object):
 
         # Always do file/blob storage outputs
         self.output_logs = None
-        if not isinstance(self.logs, log_outputs['default']):
+        if not isinstance(self.logs, (log_outputs['default'], log_outputs['null'])):
             self.output_logs = log_outputs.select(None, self)
 
         # Look for customizations, but fallback to default

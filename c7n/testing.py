@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import datetime
 import functools
 import io
@@ -43,7 +41,7 @@ skip_if_not_validating = unittest.skipIf(
 functional = pytest.mark.functional
 
 
-class CustodianTestCore(object):
+class CustodianTestCore:
 
     custodian_schema = None
     # thread local? tests are single threaded, multiprocess execution
@@ -86,18 +84,21 @@ class CustodianTestCore(object):
         return ctx
 
     def load_policy(
-        self,
-        data,
-        config=None,
-        session_factory=None,
-        validate=C7N_VALIDATE,
-        output_dir=None,
-        cache=False,
+            self,
+            data,
+            config=None,
+            session_factory=None,
+            validate=C7N_VALIDATE,
+            output_dir='null://',
+            log_group='null://',
+            cache=False,
     ):
         pdata = {'policies': [data]}
         if not (config and isinstance(config, Config)):
             config = self._get_policy_config(
-                output_dir=output_dir, cache=cache, **(config or {}))
+                log_group=log_group,
+                output_dir=output_dir,
+                cache=cache, **(config or {}))
         collection = self.policy_loader.load_data(
             pdata, validate=validate,
             file_uri="memory://test",
@@ -109,7 +110,8 @@ class CustodianTestCore(object):
 
     def _get_policy_config(self, **kw):
         config = kw
-        config["output_dir"] = temp_dir = self.get_temp_dir()
+        if kw.get('output_dir') is None or config.get('cache'):
+            config["output_dir"] = temp_dir = self.get_temp_dir()
         if config.get('cache'):
             config["cache"] = os.path.join(temp_dir, "c7n.cache")
             config["cache_period"] = 300

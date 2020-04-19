@@ -110,6 +110,13 @@ class OrgTest(TestUtils):
         self.patch(org, 'logging', logger)
         self.patch(org, 'run_account', run_account)
         self.change_cwd(run_dir)
+        runner = CliRunner()
+        result = runner.invoke(
+            org.cli,
+            ['run', '-c', 'accounts.yml', '-u', 'policies.yml',
+             '--debug', '-s', 'output', '--cache-path', 'cache'],
+            catch_exceptions=False)
+        self.assertEqual(result.exit_code, 0)
 
     def test_cli_run_aws(self):
         run_dir = self.setup_run_dir()

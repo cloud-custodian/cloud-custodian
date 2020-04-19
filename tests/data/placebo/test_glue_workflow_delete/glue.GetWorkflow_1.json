@@ -1,0 +1,30 @@
+{
+  "status_code": 200,
+  "data": {
+    "Workflow": {
+      "Name": "test",
+      "DefaultRunProperties": {},
+      "CreatedOn": {
+        "__class__": "datetime",
+        "year": 2020,
+        "month": 4,
+        "day": 3,
+        "hour": 16,
+        "minute": 9,
+        "second": 59,
+        "microsecond": 381000
+      },
+      "LastModifiedOn": {
+        "__class__": "datetime",
+        "year": 2020,
+        "month": 4,
+        "day": 3,
+        "hour": 16,
+        "minute": 9,
+        "second": 59,
+        "microsecond": 381000
+      }
+    },
+    "ResponseMetadata": {}
+  }
+}

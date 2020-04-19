@@ -14,16 +14,16 @@
 """
 Resource Filtering Logic
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import copy
 import datetime
 from datetime import timedelta
 import fnmatch
+import ipaddress
 import logging
 import operator
 import re
 import sys
+import os
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
@@ -31,7 +31,6 @@ from distutils import version
 import jmespath
 import six
 
-from c7n import ipaddress
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
@@ -169,7 +168,7 @@ class FilterRegistry(PluginRegistry):
 # Really should be an abstract base class (abc) or
 # zope.interface
 
-class Filter(object):
+class Filter:
 
     executor_factory = ThreadPoolExecutor
 
@@ -221,11 +220,6 @@ class Filter(object):
         if not values and block_op != 'or':
             return
 
-        r_matched = r.setdefault(self.matched_annotation_key, [])
-        for k in values:
-            if k not in r_matched:
-                r_matched.append(k)
-
 
 def intersect_list(a, b):
     if b is None:
@@ -252,6 +246,10 @@ class BooleanGroupFilter(Filter):
             f.validate()
         return self
 
+    def get_resource_type_id(self):
+        resource_type = self.manager.get_model()
+        return resource_type.id
+
 
 class Or(BooleanGroupFilter):
 
@@ -268,12 +266,12 @@ class Or(BooleanGroupFilter):
         return False
 
     def process_set(self, resources, event):
-        resource_type = self.manager.get_model()
-        resource_map = {r[resource_type.id]: r for r in resources}
+        rtype_id = self.get_resource_type_id()
+        resource_map = {r[rtype_id]: r for r in resources}
         results = set()
         for f in self.filters:
             results = results.union([
-                r[resource_type.id] for r in f.process(resources, event)])
+                r[rtype_id] for r in f.process(resources, event)])
         return [resource_map[r_id] for r_id in results]
 
 
@@ -281,7 +279,7 @@ class And(BooleanGroupFilter):
 
     def process(self, resources, events=None):
         if self.manager:
-            sweeper = AnnotationSweeper(self.manager.get_model().id, resources)
+            sweeper = AnnotationSweeper(self.get_resource_type_id(), resources)
 
         for f in self.filters:
             resources = f.process(resources, events)
@@ -312,9 +310,9 @@ class Not(BooleanGroupFilter):
         return False
 
     def process_set(self, resources, event):
-        resource_type = self.manager.get_model()
-        resource_map = {r[resource_type.id]: r for r in resources}
-        sweeper = AnnotationSweeper(resource_type.id, resources)
+        rtype_id = self.get_resource_type_id()
+        resource_map = {r[rtype_id]: r for r in resources}
+        sweeper = AnnotationSweeper(rtype_id, resources)
 
         for f in self.filters:
             resources = f.process(resources, event)
@@ -322,14 +320,14 @@ class Not(BooleanGroupFilter):
                 break
 
         before = set(resource_map.keys())
-        after = set([r[resource_type.id] for r in resources])
+        after = set([r[rtype_id] for r in resources])
         results = before - after
         sweeper.sweep([])
 
         return [resource_map[r_id] for r_id in results]
 
 
-class AnnotationSweeper(object):
+class AnnotationSweeper:
     """Support clearing annotations set within a block filter.
 
     See https://github.com/cloud-custodian/cloud-custodian/issues/2116
@@ -737,19 +735,29 @@ def parse_date(v, tz=None):
     if isinstance(v, six.string_types):
         try:
             return cast_tz(parse(v), tz)
-        except (AttributeError, TypeError, ValueError):
+        except (AttributeError, TypeError, ValueError, OverflowError):
             pass
+
+    # OSError on windows -- https://bugs.python.org/issue36439
+    exceptions = (ValueError, OSError) if os.name == "nt" else (ValueError)
 
     if isinstance(v, (int, float) + six.string_types):
         try:
             v = cast_tz(datetime.datetime.fromtimestamp(float(v)), tz)
-        except ValueError:
+        except exceptions:
+            pass
+
+    if isinstance(v, (int, float) + six.string_types):
+        try:
+            # try interpreting as milliseconds epoch
+            v = cast_tz(datetime.datetime.fromtimestamp(float(v) / 1000), tz)
+        except exceptions:
             pass
 
     return isinstance(v, datetime.datetime) and v or None
 
 
-class ValueRegex(object):
+class ValueRegex:
     """Allows filtering based on the output of a regex capture.
     This is useful for parsing data that has a weird format.
 

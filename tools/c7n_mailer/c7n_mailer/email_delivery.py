@@ -16,6 +16,7 @@ from itertools import chain
 import six
 from c7n_mailer.smtp_delivery import SmtpDelivery
 from c7n_mailer.utils_email import is_email, get_mimetext_message
+import c7n_mailer.azure_mailer.sendgrid_delivery as sendgrid
 
 from .ldap_lookup import LdapLookup
 from .utils import (
@@ -23,7 +24,7 @@ from .utils import (
     kms_decrypt, get_aws_username_from_event)
 
 
-class EmailDelivery(object):
+class EmailDelivery:
 
     def __init__(self, config, session, logger):
         self.config = config
@@ -42,8 +43,9 @@ class EmailDelivery(object):
     def get_valid_emails_from_list(self, targets):
         emails = []
         for target in targets:
-            if is_email(target):
-                emails.append(target)
+            for email in target.split(':'):
+                if is_email(target):
+                    emails.append(target)
         return emails
 
     def get_event_owner_email(self, targets, event):
@@ -212,7 +214,15 @@ class EmailDelivery(object):
                                              session=self.session,
                                              logger=self.logger)
                 smtp_delivery.send_message(message=mimetext_msg, to_addrs=email_to_addrs)
-            # if smtp_server isn't set in mailer.yml, use aws ses normally.
+            elif 'sendgrid_api_key' in self.config:
+                sendgrid_delivery = sendgrid.SendGridDelivery(config=self.config,
+                                                             session=self.session,
+                                                             logger=self.logger)
+                sendgrid_delivery.sendgrid_handler(
+                    sqs_message,
+                    self.get_to_addrs_email_messages_map(sqs_message)
+                )
+            # if smtp_server or sendgrid_api_key isn't set in mailer.yml, use aws ses normally.
             else:
                 self.aws_ses.send_raw_email(RawMessage={'Data': mimetext_msg.as_string()})
         except Exception as error:

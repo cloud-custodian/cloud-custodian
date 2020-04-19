@@ -23,7 +23,7 @@ from copy import deepcopy
 from .utils import get_aws_username_from_event
 
 
-class SplunkHecDelivery(object):
+class SplunkHecDelivery:
     """
     Delivery class to send c7n message from SQS to Splunk HTTP Event Collector
     """

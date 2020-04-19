@@ -28,8 +28,8 @@ Finds storage accounts with no ip rules and modifies them to:
           default-action: Deny
           bypass: [Logging, Metrics]
           ip-rules:
-              - ip-address-or-range: 11.12.13.14
-              - ip-address-or-range: 21.22.23.24
+              - 11.12.13.14
+              - 21.22.23.24
           virtual-network-rules:
               - virtual-network-resource-id: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/subnet1
               - virtual-network-resource-id: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet2/subnets/subnet2
@@ -62,5 +62,5 @@ the ``default-action`` is set to Deny.
           default-action: Allow
           bypass: [Logging, Metrics]
           ip-rules:
-              - ip-address-or-range: 11.12.13.14
-              - ip-address-or-range: 21.22.23.24
+              - 11.12.13.14
+              - 21.22.23.24

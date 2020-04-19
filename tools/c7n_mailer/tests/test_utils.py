@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
 import unittest
+import jinja2
+import logging
 from mock import Mock, patch
 
 from c7n_mailer import utils
+from common import MAILER_CONFIG, SQS_MESSAGE_1, RESOURCE_1
 
 
 class FormatStruct(unittest.TestCase):
@@ -24,6 +27,37 @@ class StripPrefix(unittest.TestCase):
         self.assertEqual(utils.strip_prefix('nothing', 'aws.'), 'nothing')
         self.assertEqual(utils.strip_prefix('azure.azserver', 'azure.'), 'azserver')
         self.assertEqual(utils.strip_prefix('', 'aws.'), '')
+
+
+def test_config_defaults():
+    config = {}
+    utils.setup_defaults(config)
+    for k, v in list(config.items()):
+        if v is None:
+            config.pop(k)
+    assert config == dict(
+        region='us-east-1',
+        ses_region='us-east-1',
+        memory=1024,
+        timeout=300,
+        runtime='python3.7',
+        contact_tags=[])
+
+
+class GetResourceTagTargets(unittest.TestCase):
+
+    def test_target_tag_list(self):
+        self.assertEqual(
+            utils.get_resource_tag_targets(
+                {'Tags': [{'Key': 'Creator', 'Value': 'alice'}]},
+                ['Creator']),
+            ['alice'])
+
+    def test_target_tag_map(self):
+        r = {'Tags': {'Creator': 'Bob'}}
+        self.assertEqual(
+            utils.get_resource_tag_targets(r, ['Creator']),
+            ['Bob'])
 
 
 class ResourceFormat(unittest.TestCase):
@@ -266,3 +300,77 @@ class DecryptTests(unittest.TestCase):
     def test_decrypt_none(self):
         self.assertEqual(utils.decrypt({'queue_url': 'aws'}, Mock(), Mock(), 'test'), None)
         self.assertEqual(utils.decrypt({'queue_url': 'asq://'}, Mock(), Mock(), 'test'), None)
+
+
+class OtherTests(unittest.TestCase):
+
+    def test_config_defaults(self):
+        config = MAILER_CONFIG
+        utils.setup_defaults(config)
+        self.assertEqual(
+            [
+                config.get('region'),
+                config.get('ses_region'),
+                config.get('memory'),
+                config.get('runtime'),
+                config.get('timeout'),
+                config.get('subnets'),
+                config.get('security_groups'),
+                config.get('contact_tags'),
+                config.get('ldap_uri'),
+                config.get('ldap_bind_dn'),
+                config.get('ldap_bind_user'),
+                config.get('ldap_bind_password'),
+                config.get('datadog_api_key'),
+                config.get('slack_token'),
+                config.get('slack_webhook'),
+                config.get('queue_url')
+            ],
+            [
+                'us-east-1',
+                config.get('region'),
+                1024,
+                'python3.7',
+                300,
+                None,
+                None,
+                MAILER_CONFIG['contact_tags'],
+                MAILER_CONFIG['ldap_uri'],
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                MAILER_CONFIG['queue_url']
+            ]
+        )
+
+    def test_get_jinja_env(self):
+        env = utils.get_jinja_env(MAILER_CONFIG['templates_folders'])
+        self.assertEqual(env.__class__, jinja2.environment.Environment)
+
+    def test_get_rendered_jinja(self):
+        # Jinja paths must always be forward slashes regardless of operating system
+        template_abs_filename = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), 'example.jinja'))
+        template_abs_filename = template_abs_filename.replace('\\', '/')
+        SQS_MESSAGE_1['action']['template'] = template_abs_filename
+        body = utils.get_rendered_jinja(
+            ["test@test.com"], SQS_MESSAGE_1, [RESOURCE_1],
+            logging.getLogger('c7n_mailer.utils.email'),
+            'template', 'default', MAILER_CONFIG['templates_folders'])
+        self.assertIsNotNone(body)
+
+    def test_get_message_subject(self):
+        subject = utils.get_message_subject(SQS_MESSAGE_1)
+        self.assertEqual(subject,
+        SQS_MESSAGE_1['action']['subject'].replace('{{ account }}', SQS_MESSAGE_1['account']))
+
+    def test_kms_decrypt(self):
+        config = {'test': {'secret': 'mysecretpassword'}}
+        session_mock = Mock()
+        session_mock.client().get_secret().value = 'value'
+        session_mock.get_session_for_resource.return_value = session_mock
+
+        self.assertEqual(utils.kms_decrypt(config, Mock(), session_mock, 'test'), config['test'])

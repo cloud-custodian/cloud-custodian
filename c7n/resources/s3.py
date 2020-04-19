@@ -37,8 +37,6 @@ Actions:
    delivery.
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import copy
 import functools
 import json
@@ -71,6 +69,7 @@ from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter)
 from c7n.manager import resources
+from c7n.output import NullBlobOutput
 from c7n import query
 from c7n.resources.securityhub import PostFinding
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
@@ -332,6 +331,7 @@ class ConfigS3(query.ConfigSource):
                 'Status': r['status'],
                 'Prefix': r['prefix'],
                 'Destination': {
+                    'Account': r['destinationConfig']['Account'],
                     'Bucket': r['destinationConfig']['bucketARN']}
             }
             if r['destinationConfig']['storageClass']:
@@ -1308,6 +1308,215 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
 
 
+@actions.register('set-replication')
+class SetBucketReplicationConfig(BucketActionBase):
+    """Action to add or remove replication configuration statement from S3 buckets
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-unapproved-account-replication
+                resource: s3
+                filters:
+                  - type: value
+                    key: Replication.ReplicationConfiguration.Rules[].Destination.Account
+                    value: present
+                  - type: value
+                    key: Replication.ReplicationConfiguration.Rules[].Destination.Account
+                    value_from:
+                      url: 's3:///path/to/file.json'
+                      format: json
+                      expr: "approved_accounts.*"
+                    op: ni
+                actions:
+                  - type: set-replication
+                    state: enable
+    """
+    schema = type_schema(
+        'set-replication',
+        state={'type': 'string', 'enum': ['enable', 'disable', 'remove']})
+    permissions = ("s3:GetReplicationConfiguration", "s3:PutReplicationConfiguration")
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            errors = []
+            for future in as_completed(futures):
+                bucket = futures[future]
+                try:
+                    future.result()
+                except ClientError as e:
+                    errors.append("Message: %s Bucket: %s", e, bucket['Name'])
+            if errors:
+                raise Exception('\n'.join(map(str, errors)))
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+        state = self.data.get('state')
+        if state is not None:
+            if state == 'remove':
+                s3.delete_bucket_replication(Bucket=bucket['Name'])
+                return {'Name': bucket['Name'], 'State': 'ReplicationConfigRemoved'}
+            if state in ('enable', 'disable'):
+                config = s3.get_bucket_replication(Bucket=bucket['Name'])
+                for rule in config['ReplicationConfiguration']['Rules']:
+                    rule['Status'] = 'Enabled' if state == 'enable' else 'Disabled'
+                s3.put_bucket_replication(
+                    Bucket=bucket['Name'],
+                    ReplicationConfiguration=config['ReplicationConfiguration']
+                )
+                return {'Name': bucket['Name'], 'State': 'ReplicationConfigUpdated'}
+
+
+@filters.register('check-public-block')
+class FilterPublicBlock(Filter):
+    """Filter for s3 bucket public blocks
+
+    If no filter paramaters are provided it checks to see if any are unset or False.
+
+    If parameters are provided only the provided ones are checked.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: CheckForPublicAclBlock-Off
+                resource: s3
+                region: us-east-1
+                filters:
+                  - type: check-public-block
+                    BlockPublicAcls: true
+                    BlockPublicPolicy: true
+    """
+
+    schema = type_schema(
+        'check-public-block',
+        BlockPublicAcls={'type': 'boolean'},
+        IgnorePublicAcls={'type': 'boolean'},
+        BlockPublicPolicy={'type': 'boolean'},
+        RestrictPublicBuckets={'type': 'boolean'})
+    permissions = ("s3:GetBucketPublicAccessBlock",)
+    keys = (
+        'BlockPublicPolicy', 'BlockPublicAcls', 'IgnorePublicAcls', 'RestrictPublicBuckets')
+    annotation_key = 'c7n:PublicAccessBlock'
+
+    def process(self, buckets, event=None):
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            for f in as_completed(futures):
+                if f.result():
+                    results.append(futures[f])
+        return results
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+        config = dict(bucket.get(self.annotation_key, {key: False for key in self.keys}))
+        if self.annotation_key not in bucket:
+            try:
+                config = s3.get_public_access_block(
+                    Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                    raise
+            bucket[self.annotation_key] = config
+        return self.matches_filter(config)
+
+    def matches_filter(self, config):
+        key_set = [key for key in self.keys if key in self.data]
+        if key_set:
+            return all([self.data.get(key) is config[key] for key in key_set])
+        else:
+            return not all(config.values())
+
+
+@actions.register('set-public-block')
+class SetPublicBlock(BucketActionBase):
+    """Action to update Public Access blocks on S3 buckets
+
+    If no action parameters are provided all settings will be set to the `state`, which defaults
+
+    If action parameters are provided, those will be set and other extant values preserved.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-public-block-enable-all
+                resource: s3
+                filters:
+                  - type: check-public-block
+                actions:
+                  - type: set-public-block
+
+            policies:
+              - name: s3-public-block-disable-all
+                resource: s3
+                filters:
+                  - type: check-public-block
+                actions:
+                  - type: set-public-block
+                    state: false
+
+            policies:
+              - name: s3-public-block-enable-some
+                resource: s3
+                filters:
+                  - or:
+                    - type: check-public-block
+                      BlockPublicAcls: false
+                    - type: check-public-block
+                      BlockPublicPolicy: false
+                actions:
+                  - type: set-public-block
+                    BlockPublicAcls: true
+                    BlockPublicPolicy: true
+
+    """
+
+    schema = type_schema(
+        'set-public-block',
+        state={'type': 'boolean', 'default': True},
+        BlockPublicAcls={'type': 'boolean'},
+        IgnorePublicAcls={'type': 'boolean'},
+        BlockPublicPolicy={'type': 'boolean'},
+        RestrictPublicBuckets={'type': 'boolean'})
+    permissions = ("s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock")
+    keys = FilterPublicBlock.keys
+    annotation_key = FilterPublicBlock.annotation_key
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            for future in as_completed(futures):
+                future.result()
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+        config = dict(bucket.get(self.annotation_key, {key: False for key in self.keys}))
+        if self.annotation_key not in bucket:
+            try:
+                config = s3.get_public_access_block(
+                    Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                    raise
+
+        key_set = [key for key in self.keys if key in self.data]
+        if key_set:
+            for key in key_set:
+                config[key] = self.data.get(key)
+        else:
+            for key in self.keys:
+                config[key] = self.data.get('state', True)
+        s3.put_public_access_block(
+            Bucket=bucket['Name'], PublicAccessBlockConfiguration=config)
+
+
 @actions.register('toggle-versioning')
 class ToggleVersioning(BucketActionBase):
     """Action to enable/suspend versioning on a S3 bucket
@@ -1649,7 +1858,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
         return {'Name': b['Name'], 'State': 'PolicyAttached'}
 
 
-class BucketScanLog(object):
+class BucketScanLog:
     """Offload remediated key ids to a disk file in batches
 
     A bucket keyspace is effectively infinite, we need to store partial
@@ -1768,7 +1977,9 @@ class ScanBucket(BucketActionBase):
         return results
 
     def write_denied_buckets_file(self):
-        if self.denied_buckets and self.manager.ctx.log_dir:
+        if (self.denied_buckets and
+                self.manager.ctx.log_dir and
+                not isinstance(self.manager.ctx.output, NullBlobOutput)):
             with open(
                     os.path.join(
                         self.manager.ctx.log_dir, 'denied.json'), 'w') as fh:
@@ -2898,7 +3109,7 @@ class Lifecycle(BucketActionBase):
                 raise e
 
 
-class KMSKeyResolverMixin(object):
+class KMSKeyResolverMixin:
     """Builds a dictionary of region specific ARNs"""
 
     def __init__(self, data, manager=None):

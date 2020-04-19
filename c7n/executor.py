@@ -11,36 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-from concurrent.futures import (
-    ProcessPoolExecutor, ThreadPoolExecutor)
-
-from c7n.registry import PluginRegistry
+from concurrent.futures import (ProcessPoolExecutor, ThreadPoolExecutor)  # noqa
 
 import threading
 
 
-class ExecutorRegistry(PluginRegistry):
-
-    def __init__(self, plugin_type):
-        super(ExecutorRegistry, self).__init__(plugin_type)
-
-        self.register('process', ProcessPoolExecutor)
-        self.register('thread', ThreadPoolExecutor)
-        self.register('main', MainThreadExecutor)
-
-
-def executor(name, **kw):
-    factory = executors.get(name)
-    # post element refactoring
-    # factory.validate(kw)
-    if factory is None:
-        raise ValueError("No Such Executor %s" % name)
-    return factory(**kw)
-
-
-class MainThreadExecutor(object):
+class MainThreadExecutor:
     """ For running tests.
 
     c7n_async == True  -> catch exceptions and store them in the future.
@@ -73,7 +49,7 @@ class MainThreadExecutor(object):
         return False
 
 
-class MainThreadFuture(object):
+class MainThreadFuture:
     # For Dev/Unit Testing with concurrent.futures
 
     def __init__(self, value, exception=None):
@@ -103,7 +79,3 @@ class MainThreadFuture(object):
 
     def add_done_callback(self, fn):
         return fn(self)
-
-
-executors = ExecutorRegistry('executor')
-executors.load_plugins()

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import logging
 
 from concurrent.futures import as_completed
@@ -64,13 +62,15 @@ class Delete(BaseAction):
     permissions = ("cloudformation:DeleteStack",)
 
     def process(self, stacks):
-        with self.executor_factory(max_workers=10) as w:
+        with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_stacks, stacks))
 
     def process_stacks(self, stack):
         client = local_session(
             self.manager.session_factory).client('cloudformation')
-        client.delete_stack(StackName=stack['StackName'])
+        self.manager.retry(
+            client.delete_stack,
+            StackName=stack['StackName'])
 
 
 @CloudFormation.action_registry.register('set-protection')
@@ -114,7 +114,8 @@ class SetProtection(BaseAction):
                         s['StackName'], f.exception())
 
     def process_stacks(self, client, stack):
-        client.update_termination_protection(
+        self.manager.retry(
+            client.update_termination_protection,
             EnableTerminationProtection=self.data.get('state', False),
             StackName=stack['StackName'])
 

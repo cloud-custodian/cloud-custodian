@@ -79,7 +79,7 @@ def process_trail_set(
     return previous
 
 
-class TrailDB(object):
+class TrailDB:
 
     def __init__(self, path):
         self.path = path

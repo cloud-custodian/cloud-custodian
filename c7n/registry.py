@@ -11,10 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 
-class PluginRegistry(object):
+class PluginRegistry:
     """A plugin registry
 
     Custodian is intended to be innately pluggable both internally and
@@ -56,8 +55,6 @@ class PluginRegistry(object):
 
     def subscribe(self, func):
         self._subscribers.append(func)
-        for p in self.values():
-            func(self, p)
 
     def register(self, name, klass=None, condition=True,
                  condition_message="Missing dependency for {}",
@@ -69,7 +66,6 @@ class PluginRegistry(object):
             klass.type = name
             klass.type_aliases = aliases
             self._factories[name] = klass
-            self.notify(klass)
             return klass
 
         # invoked as class decorator
@@ -79,7 +75,6 @@ class PluginRegistry(object):
             self._factories[name] = klass
             klass.type = name
             klass.type_aliases = aliases
-            self.notify(klass)
             return klass
         return _register_class
 
@@ -121,17 +116,3 @@ class PluginRegistry(object):
 
     def items(self):
         return self._factories.items()
-
-    def load_plugins(self):
-        """ Load external plugins.
-
-        Custodian is intended to interact with internal and external systems
-        that are not suitable for embedding into the custodian code base.
-        """
-        try:
-            from pkg_resources import iter_entry_points
-        except ImportError:
-            return
-        for ep in iter_entry_points(group="custodian.%s" % self.plugin_type):
-            f = ep.load()
-            f()

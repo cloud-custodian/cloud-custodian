@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import abc
 import six
 import importlib
@@ -25,7 +23,7 @@ clouds = PluginRegistry('c7n.providers')
 
 
 @six.add_metaclass(abc.ABCMeta)
-class Provider(object):
+class Provider:
     """Provider Base Class"""
 
     @abc.abstractproperty
@@ -64,7 +62,11 @@ class Provider(object):
     @classmethod
     def get_resource_types(cls, resource_types):
         """Return the resource classes for the given type names"""
-        return import_resource_classes(cls.resource_map, resource_types)
+        resource_classes, not_found = import_resource_classes(
+            cls.resource_map, resource_types)
+        for r in resource_classes:
+            cls.resources.notify(r)
+        return resource_classes, not_found
 
 
 def import_resource_classes(resource_map, resource_types):
@@ -73,11 +75,12 @@ def import_resource_classes(resource_map, resource_types):
 
     mod_map = {}
     rmods = set()
-    not_found = []
+    not_found = set()
+    found = []
 
     for r in resource_types:
         if r not in resource_map:
-            not_found.append(r)
+            not_found.add(r)
             continue
         rmodule, rclass = resource_map[r].rsplit('.', 1)
         rmods.add(rmodule)
@@ -85,10 +88,16 @@ def import_resource_classes(resource_map, resource_types):
     for rmodule in rmods:
         mod_map[rmodule] = importlib.import_module(rmodule)
 
-    return [getattr(mod_map[rmodule], rclass, None) for
-            rmodule, rclass in [
-                resource_map[r].rsplit('.', 1) for r in resource_types
-                if r in resource_map]], not_found
+    for rtype in resource_types:
+        if rtype in not_found:
+            continue
+        rmodule, rclass = resource_map[rtype].rsplit('.', 1)
+        r = getattr(mod_map[rmodule], rclass, None)
+        if r is None:
+            not_found.add(rtype)
+        else:
+            found.append(r)
+    return found, list(not_found)
 
 
 # nosetests seems to think this function is a test
@@ -110,14 +119,16 @@ def get_resource_class(resource_type):
         provider_name, resource = resource_type.split('.', 1)
     else:
         provider_name, resource = 'aws', resource_type
+        resource_type = '%s.%s' % (provider_name, resource_type)
 
     provider = clouds.get(provider_name)
     if provider is None:
         raise KeyError(
             "Invalid cloud provider: %s" % provider_name)
 
-    factory = provider.resources.get(resource)
-    if factory is None:
+    if resource_type not in provider.resource_map:
         raise KeyError("Invalid resource: %s for provider: %s" % (
             resource, provider_name))
+    factory = provider.resources.get(resource)
+    assert factory, "Resource:%s not loaded" % resource_type
     return factory

@@ -25,8 +25,6 @@ allowedProperties and enum extension).
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import Counter
 import json
 import inspect
@@ -214,10 +212,27 @@ def generate(resource_types=()):
                 'name': {
                     'type': 'string',
                     'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]+)*$"},
+                'conditions': {
+                    'type': 'array',
+                    'items': {'anyOf': [
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'or': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'not': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'and': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'$ref': '#/definitions/filters/value'},
+                        {'$ref': '#/definitions/filters/event'},
+                        {'$ref': '#/definitions/filters/valuekv'}]}},
+                # these should be deprecated for conditions
                 'region': {'type': 'string'},
                 'tz': {'type': 'string'},
                 'start': {'format': 'date-time'},
                 'end': {'format': 'date-time'},
+
                 'resource': {'type': 'string'},
                 'max-resources': {'anyOf': [
                     {'type': 'integer', 'minimum': 1},
@@ -229,7 +244,8 @@ def generate(resource_types=()):
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'mode': {'$ref': '#/definitions/policy-mode'},
-                'source': {'enum': ['describe', 'config', 'resource-graph']},
+                'source': {'enum': ['describe', 'config',
+                                    'resource-graph', 'disk', 'static']},
                 'actions': {
                     'type': 'array',
                 },
@@ -314,6 +330,9 @@ def generate(resource_types=()):
         }
     }
 
+    # allow empty policies with lazy load
+    if not resource_refs:
+        schema['properties']['policies']['items'] = {'type': 'object'}
     return schema
 
 
@@ -448,7 +467,7 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
     return vocabulary
 
 
-class ElementSchema(object):
+class ElementSchema:
     """Utility functions for working with resource's filters and actions.
     """
 

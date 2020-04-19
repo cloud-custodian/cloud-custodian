@@ -11,13 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import fnmatch
 import json
 import os
 import shutil
 import zipfile
+import re
 from datetime import datetime, timedelta, tzinfo
 from distutils.util import strtobool
 
@@ -28,6 +27,10 @@ from placebo import pill
 from six import StringIO
 
 from c7n.testing import CustodianTestCore
+
+# Custodian Test Account. This is used only for testing.
+# Access is available for community project maintainers.
+ACCOUNT_ID = "644160558196"
 
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH
@@ -107,6 +110,7 @@ def serialize(obj):
     raise TypeError("Type not serializable")
 
 
+pill.FakeHttpResponse.raw = None
 placebo.pill.serialize = serialize
 placebo.pill.deserialize = deserialize
 
@@ -129,13 +133,13 @@ class BluePill(pill.Pill):
         )
 
     def get_next_file_path(self, service, operation):
-        fn = super(BluePill, self).get_next_file_path(service, operation)
+        fn, format = super(BluePill, self).get_next_file_path(service, operation)
         # couple of double use cases
         if fn in self._avail:
             self._avail.remove(fn)
         else:
             print("\ndouble use %s\n" % fn)
-        return fn
+        return (fn, format)
 
     def stop(self):
         result = super(BluePill, self).stop()
@@ -254,6 +258,28 @@ def attach(session, data_path, prefix=None, debug=False):
     return pill
 
 
+class RedPill(pill.Pill):
+
+    def datetime_converter(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+
+    def save_response(self, service, operation, response_data,
+                    http_response=200):
+        """
+        Override to sanitize response metadata and account_ids
+        """
+        if 'ResponseMetadata' in response_data:
+            response_data['ResponseMetadata'] = {}
+
+        response_data = json.dumps(response_data, default=self.datetime_converter)
+        response_data = re.sub("\d{12}", ACCOUNT_ID, response_data)  # noqa
+        response_data = json.loads(response_data)
+
+        super(RedPill, self).save_response(service, operation, response_data,
+                    http_response)
+
+
 class PillTest(CustodianTestCore):
 
     archive_path = os.path.join(
@@ -284,7 +310,8 @@ class PillTest(CustodianTestCore):
         session = boto3.Session()
         default_region = session.region_name
         if not zdata:
-            pill = placebo.attach(session, test_dir)
+            pill = RedPill()
+            pill.attach(session, test_dir)
         else:
             pill = attach(session, self.archive_path, test_case, debug=True)
 
@@ -293,7 +320,7 @@ class PillTest(CustodianTestCore):
         self.addCleanup(pill.stop)
         self.addCleanup(self.cleanUp)
 
-        class FakeFactory(object):
+        class FakeFactory:
 
             def __call__(fake, region=None, assume=None):
                 new_session = None

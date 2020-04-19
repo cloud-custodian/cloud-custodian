@@ -159,7 +159,8 @@ class StorageSetFirewallAction(SetFirewallAction):
 
         # Add IP rules
         if self.data.get('ip-rules') is not None:
-            existing_ip = resource['properties']['networkAcls'].get('ipRules', [])
+            existing_ip = [r['value']
+                           for r in resource['properties']['networkAcls'].get('ipRules', [])]
             ip_rules = self._build_ip_rules(existing_ip, self.data.get('ip-rules', []))
 
             # If the user has too many rules raise exception
@@ -283,7 +284,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     .. code-block:: yaml
 
-        policies
+        policies:
           - name: find-load-balancers-with-logs-enabled
             resource: azure.loadbalancer
             filters:
@@ -304,7 +305,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     .. code-block:: yaml
 
-        policies
+        policies:
           - name: find-keyvaults-with-logs-enabled
             resource: azure.keyvault
             filters:
@@ -444,7 +445,7 @@ class SetLogSettingsAction(AzureBaseAction):
                                                     log_settings, self.session, self.token)
 
 
-class StorageSettingsUtilities(object):
+class StorageSettingsUtilities:
 
     @staticmethod
     def _get_blob_client_from_storage_account(storage_account, token):

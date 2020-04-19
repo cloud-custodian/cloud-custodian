@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from datetime import datetime, timedelta
 import json
 import logging
@@ -24,7 +22,7 @@ from c7n import policy, manager
 from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
-from c7n.resources import aws, load_resources
+from c7n.resources import aws, load_available
 from c7n.resources.aws import AWS
 from c7n.resources.ec2 import EC2
 from c7n.schema import generate, JsonSchemaValidator
@@ -43,7 +41,7 @@ class DummyResource(manager.ResourceManager):
     @property
     def actions(self):
 
-        class _a(object):
+        class _a:
 
             def name(self):
                 return self.f.__name__
@@ -67,7 +65,7 @@ class PolicyMetaLint(BaseTest):
 
     def setUp(self):
         # we need to load all resources for the linting meta tests.
-        load_resources()
+        load_available()
 
     def test_policy_missing_provider_session(self):
         self.assertRaises(
@@ -708,65 +706,6 @@ class TestPolicy(BaseTest):
     def test_file_not_found(self):
         self.assertRaises(IOError, policy.load, Config.empty(), "/asdf12")
 
-    def test_lambda_policy_metrics(self):
-        session_factory = self.replay_flight_data("test_lambda_policy_metrics")
-        p = self.load_policy(
-            {
-                "name": "ec2-tag-compliance-v6",
-                "resource": "ec2",
-                "mode": {"type": "ec2-instance-state", "events": ["running"]},
-                "filters": [
-                    {"tag:custodian_status": "absent"},
-                    {
-                        "or": [
-                            {"tag:App": "absent"},
-                            {"tag:Env": "absent"},
-                            {"tag:Owner": "absent"},
-                        ]
-                    },
-                ],
-            },
-            session_factory=session_factory,
-        )
-        end = datetime.utcnow()
-        start = end - timedelta(14)
-        period = 24 * 60 * 60 * 14
-        self.assertEqual(
-            json.loads(dumps(p.get_metrics(start, end, period), indent=2)),
-            {
-                u"Durations": [],
-                u"Errors": [
-                    {
-                        u"Sum": 0.0,
-                        u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                        u"Unit": u"Count",
-                    }
-                ],
-                u"Invocations": [
-                    {
-                        u"Sum": 4.0,
-                        u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                        u"Unit": u"Count",
-                    }
-                ],
-                u"ResourceCount": [
-                    {
-                        u"Average": 1.0,
-                        u"Sum": 2.0,
-                        u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                        u"Unit": u"Count",
-                    }
-                ],
-                u"Throttles": [
-                    {
-                        u"Sum": 0.0,
-                        u"Timestamp": u"2016-05-30T10:50:00+00:00",
-                        u"Unit": u"Count",
-                    }
-                ],
-            },
-        )
-
     def test_policy_resource_limits(self):
         session_factory = self.replay_flight_data(
             "test_policy_resource_limits")
@@ -859,67 +798,6 @@ class TestPolicy(BaseTest):
         resources = p.run()
         self.assertTrue(resources)
 
-    def test_policy_metrics(self):
-        session_factory = self.replay_flight_data("test_policy_metrics")
-        p = self.load_policy(
-            {
-                "name": "s3-encrypt-keys",
-                "resource": "s3",
-                "actions": [{"type": "encrypt-keys"}],
-            },
-            session_factory=session_factory,
-        )
-
-        end = datetime.now().replace(hour=0, minute=0, microsecond=0)
-        start = end - timedelta(14)
-        period = 24 * 60 * 60 * 14
-        self.maxDiff = None
-        self.assertEqual(
-            json.loads(dumps(p.get_metrics(start, end, period), indent=2)),
-            {
-                "ActionTime": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 8541.752702140668,
-                        "Sum": 128126.29053211001,
-                        "Unit": "Seconds",
-                    }
-                ],
-                "Total Keys": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 1575708.7333333334,
-                        "Sum": 23635631.0,
-                        "Unit": "Count",
-                    }
-                ],
-                "ResourceTime": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 8.682969363532667,
-                        "Sum": 130.24454045299,
-                        "Unit": "Seconds",
-                    }
-                ],
-                "ResourceCount": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 23.6,
-                        "Sum": 354.0,
-                        "Unit": "Count",
-                    }
-                ],
-                "Unencrypted": [
-                    {
-                        "Timestamp": "2016-05-30T00:00:00+00:00",
-                        "Average": 10942.266666666666,
-                        "Sum": 164134.0,
-                        "Unit": "Count",
-                    }
-                ],
-            },
-        )
-
     def test_get_resource_manager(self):
         collection = self.load_policy_set(
             {
@@ -934,28 +812,6 @@ class TestPolicy(BaseTest):
         )
         p = collection.policies[0]
         self.assertTrue(isinstance(p.load_resource_manager(), EC2))
-
-    def test_get_logs_from_group(self):
-        p_data = {
-            "name": "related-rds-test",
-            "resource": "rds",
-            "filters": [
-                {"key": "GroupName", "type": "security-group", "value": "default"}
-            ],
-            "actions": [{"days": 10, "type": "retention"}],
-        }
-        session_factory = self.replay_flight_data("test_logs_from_group")
-        config = {"log_group": "test-logs"}
-        policy = self.load_policy(p_data, config, session_factory)
-        logs = list(policy.get_logs("2016-11-01 00:00:00", "2016-11-30 11:59:59"))
-        self.assertEqual(len(logs), 6)
-        # entries look reasonable
-        entry = logs[1]
-        self.assertIn("timestamp", entry)
-        self.assertIn("message", entry)
-        # none in range
-        logs = list(policy.get_logs("2016-10-01 00:00:00", "2016-10-31 11:59:59"))
-        self.assertEqual(len(logs), 0)
 
     def xtest_policy_run(self):
         manager.resources.register("dummy", DummyResource)
@@ -1022,6 +878,69 @@ class TestPolicy(BaseTest):
         p = self.load_policy(data)
         result = p.validate_policy_start_stop()
         self.assertEqual(result, None)
+
+
+class PolicyConditionsTest(BaseTest):
+
+    def test_env_var_extension(self):
+        p = self.load_policy({
+            'name': 'profx',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account.name',
+                'value': 'deputy'}]})
+        p.conditions.env_vars['account'] = {'name': 'deputy'}
+        self.assertTrue(p.is_runnable())
+        p.conditions.env_vars['account'] = {'name': 'mickey'}
+        self.assertFalse(p.is_runnable())
+
+    def test_event_filter(self):
+        p = self.load_policy({
+            'name': 'profx',
+            'resource': 'aws.ec2',
+            'conditions': [{
+                'type': 'event',
+                'key': 'detail.userIdentity.userName',
+                'value': 'deputy'}]})
+        self.assertTrue(
+            p.conditions.evaluate(
+                {'detail': {'userIdentity': {'userName': 'deputy'}}}))
+
+        # event filters pass if we don't have an event.
+        self.assertTrue(p.is_runnable())
+        self.assertFalse(p.is_runnable({}))
+        self.assertFalse(p.is_runnable(
+            {'detail': {'userIdentity': {'userName': 'mike'}}}))
+
+    def test_boolean_or_blocks(self):
+        p = self.load_policy({
+            'name': 'magenta',
+            'resource': 'aws.codebuild',
+            'conditions': [{
+                'or': [
+                    {'region': 'us-east-1'},
+                    {'region': 'us-west-2'}]}]})
+        self.assertTrue(p.is_runnable())
+
+    def test_boolean_and_blocks(self):
+        p = self.load_policy({
+            'name': 'magenta',
+            'resource': 'aws.codebuild',
+            'conditions': [{
+                'and': [
+                    {'region': 'us-east-1'},
+                    {'region': 'us-west-2'}]}]})
+        self.assertFalse(p.is_runnable())
+
+    def test_boolean_not_blocks(self):
+        p = self.load_policy({
+            'name': 'magenta',
+            'resource': 'aws.codebuild',
+            'conditions': [{
+                'not': [
+                    {'region': 'us-east-1'}]}]})
+        self.assertFalse(p.is_runnable())
 
 
 class PolicyExecutionModeTest(BaseTest):
@@ -1101,7 +1020,7 @@ class PullModeTest(BaseTest):
 
         lines = log_file.getvalue().strip().split("\n")
         self.assertIn(
-            "Skipping policy:{} target-region:us-east-1 current-region:us-west-2".format(
+            "Skipping policy:{} due to execution conditions".format(
                 policy_name
             ),
             lines,
@@ -1114,8 +1033,7 @@ class PullModeTest(BaseTest):
              'region': 'us-east-1'},
             config={'region': 'us-west-2', 'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), False)
+        self.assertEqual(p.is_runnable(), False)
 
     def test_is_runnable_dates(self):
         p = self.load_policy(
@@ -1125,8 +1043,7 @@ class PullModeTest(BaseTest):
              'start': '2018-3-29'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
 
         tomorrow_date = str(datetime.date(datetime.utcnow()) + timedelta(days=1))
         p = self.load_policy(
@@ -1136,8 +1053,7 @@ class PullModeTest(BaseTest):
              'start': tomorrow_date},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), False)
+        self.assertEqual(p.is_runnable(), False)
 
         p = self.load_policy(
             {'name': 'good-end-date',
@@ -1146,8 +1062,7 @@ class PullModeTest(BaseTest):
              'end': tomorrow_date},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
 
         p = self.load_policy(
             {'name': 'bad-end-date',
@@ -1156,8 +1071,7 @@ class PullModeTest(BaseTest):
              'end': '2018-3-29'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), False)
+        self.assertEqual(p.is_runnable(), False)
 
         p = self.load_policy(
             {'name': 'bad-start-end-date',
@@ -1167,8 +1081,7 @@ class PullModeTest(BaseTest):
              'end': '2018-3-29'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), False)
+        self.assertEqual(p.is_runnable(), False)
 
     def test_is_runnable_parse_dates(self):
         p = self.load_policy(
@@ -1178,8 +1091,7 @@ class PullModeTest(BaseTest):
              'start': 'March 3 2018'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
 
         p = self.load_policy(
             {'name': 'parse-date-policy',
@@ -1188,8 +1100,7 @@ class PullModeTest(BaseTest):
              'start': 'March 3rd 2018'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
 
         p = self.load_policy(
             {'name': 'parse-date-policy',
@@ -1198,8 +1109,7 @@ class PullModeTest(BaseTest):
              'start': '28 March 2018'},
             config={'validate': True},
             session_factory=None)
-        pull_mode = policy.PullMode(p)
-        self.assertEqual(pull_mode.is_runnable(), True)
+        self.assertEqual(p.is_runnable(), True)
 
 
 class PhdModeTest(BaseTest):
