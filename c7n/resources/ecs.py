@@ -800,21 +800,21 @@ class DeregisterInstances(BaseAction):
                     - 'tag:Name': 'c7n'
                 actions:
                     - type: deregister-instances
-                      DeleteCapacityProvider: True
+                      include_provider: True
                       force: True
     """
 
     schema = type_schema(
         'deregister-instances',
         force={'type': 'boolean'},
-        DeleteCapacityProvider={'type': 'boolean'})
+        include_provider={'type': 'boolean'})
     permissions = ('ecs:DeregisterContainerInstance', "autoscaling:DeleteAutoScalingGroup",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         error = None
         for r in resources:
-            if self.data.get('DeleteCapacityProvider', False):
+            if self.data.get('include_provider', False):
                 self.delete_capacity_provider_asgs(client, self.data.get('force', False), r)
             instance_arns = client.list_container_instances(
                 cluster=r['clusterArn']).get('containerInstanceArns')
@@ -877,7 +877,7 @@ class DeleteEcsCluster(BaseAction):
         error = None
         if self.data.get('force', False):
             dereg_instance = self.manager.action_registry['deregister-instances'](
-                {'force': True, 'DeleteCapacityProvider': True}, self.manager)
+                {'force': True, 'include_provider': True}, self.manager)
             dereg_instance.process(resources)
         for r in resources:
             if self.data.get('force', False):
