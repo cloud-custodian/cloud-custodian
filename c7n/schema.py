@@ -244,7 +244,8 @@ def generate(resource_types=()):
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'mode': {'$ref': '#/definitions/policy-mode'},
-                'source': {'enum': ['describe', 'config', 'resource-graph']},
+                'source': {'enum': ['describe', 'config',
+                                    'resource-graph', 'disk', 'static']},
                 'actions': {
                     'type': 'array',
                 },

@@ -66,6 +66,7 @@ ResourceMap = {
     "aws.glacier": "c7n.resources.glacier.Glacier",
     "aws.glue-connection": "c7n.resources.glue.GlueConnection",
     "aws.glue-crawler": "c7n.resources.glue.GlueCrawler",
+    "aws.glue-catalog": "c7n.resources.glue.GlueDataCatalog",
     "aws.glue-database": "c7n.resources.glue.GlueDatabase",
     "aws.glue-dev-endpoint": "c7n.resources.glue.GlueDevEndpoint",
     "aws.glue-job": "c7n.resources.glue.GlueJob",

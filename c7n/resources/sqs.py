@@ -15,7 +15,7 @@ from botocore.exceptions import ClientError
 
 import json
 
-from c7n.actions import RemovePolicyBase
+from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
@@ -191,6 +191,62 @@ class RemovePolicyStatement(RemovePolicyBase):
         return {'Name': resource['QueueUrl'],
                 'State': 'PolicyRemoved',
                 'Statements': found}
+
+
+@SQS.action_registry.register('modify-policy')
+class ModifyPolicyStatement(ModifyPolicyBase):
+    """Action to modify SQS Queue IAM policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+           policies:
+              - name: sqs-yank-cross-account
+                resource: sqs
+                filters:
+                  - type: cross-account
+                actions:
+                  - type: modify-policy
+                    add-statements: [{
+                        "Sid": "ReplaceWithMe",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": ["sqs:GetQueueAttributes"],
+                        "Resource": queue_url,
+                            }]
+                    remove-statements: '*'
+    """
+    permissions = ('sqs:SetQueueAttributes', 'sqs:GetQueueAttributes')
+
+    def process(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('sqs')
+        for r in resources:
+            policy = json.loads(r.get('Policy') or '{}')
+            policy_statements = policy.setdefault('Statement', [])
+
+            new_policy, removed = self.remove_statements(
+                policy_statements, r, CrossAccountAccessFilter.annotation_key)
+            if new_policy is None:
+                new_policy = policy_statements
+            new_policy, added = self.add_statements(new_policy)
+
+            if not removed and not added:
+                continue
+
+            results += {
+                'Name': r['QueueUrl'],
+                'State': 'PolicyModified',
+                'Statements': new_policy
+            }
+
+            policy['Statement'] = new_policy
+            client.set_queue_attributes(
+                QueueUrl=r['QueueUrl'],
+                Attributes={'Policy': json.dumps(policy)}
+            )
+        return results
 
 
 @SQS.action_registry.register('delete')

@@ -639,7 +639,7 @@ class AWS(Provider):
         """Return a set of policies targetted to the given regions.
 
         Supports symbolic regions like 'all'. This will automatically
-        filter out policies if their being targetted to a region that
+        filter out policies if they are being targetted to a region that
         does not support the service. Global services will target a
         single region (us-east-1 if only all specified, else first
         region in the list).
@@ -705,6 +705,8 @@ class AWS(Provider):
 
 
 def join_output(output_dir, suffix):
+    if '{region}' in output_dir:
+        return output_dir.rstrip('/')
     if output_dir.endswith('://'):
         return output_dir + suffix
     return output_dir.rstrip('/') + '/%s' % suffix

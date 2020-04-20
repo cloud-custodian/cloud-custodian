@@ -24,5 +24,5 @@
 # we don't export dev requirements of subpackages (due to editable/distribution above)
 # so explicitly list them here.
 vcrpy-unittest==0.1.7
-parameterized==0.7.1
-fakeredis==1.2.1
+parameterized==0.7.4
+fakeredis==1.4.0

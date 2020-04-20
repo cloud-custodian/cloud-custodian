@@ -49,6 +49,9 @@ def should_load_provider(name, provider_types):
     return False
 
 
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s')
+
+
 def load_available(resources=True):
     """Load available installed providers
 
@@ -56,7 +59,7 @@ def load_available(resources=True):
     providers.
     """
     found = []
-    for provider in ('aws', 'azure', 'gcp', 'k8s'):
+    for provider in PROVIDER_NAMES:
         try:
             load_providers((provider,))
         except ImportError as e: # pragma: no cover
@@ -89,5 +92,8 @@ def load_providers(provider_types):
     if should_load_provider('k8s', provider_types):
         from c7n_kube.entry import initialize_kube
         initialize_kube()
+
+    if should_load_provider('c7n', provider_types):
+        from c7n import data  # noqa
 
     LOADED.update(provider_types)

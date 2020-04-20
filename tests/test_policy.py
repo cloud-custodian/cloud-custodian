@@ -478,7 +478,8 @@ class TestPolicyCollection(BaseTest):
             config=Config.empty(regions=["us-east-1", "us-west-2"]),
         )
 
-        collection = AWS().initialize_policies(original, Config.empty(regions=["all"]))
+        collection = AWS().initialize_policies(
+            original, Config.empty(regions=["all"], output_dir="/test/output/"))
         self.assertEqual(len(collection.resource_types), 2)
         s3_regions = [p.options.region for p in collection if p.resource_type == "s3"]
         self.assertTrue("us-east-1" in s3_regions)
@@ -486,13 +487,23 @@ class TestPolicyCollection(BaseTest):
         iam = [p for p in collection if p.resource_type == "iam-user"]
         self.assertEqual(len(iam), 1)
         self.assertEqual(iam[0].options.region, "us-east-1")
+        self.assertEqual(iam[0].options.output_dir, "/test/output/us-east-1")
+
+        # Don't append region when it's already in the path.
+        collection = AWS().initialize_policies(
+            original, Config.empty(regions=["all"], output_dir="/test/{region}/output/"))
+        self.assertEqual(len(collection.resource_types), 2)
+        iam = [p for p in collection if p.resource_type == "iam-user"]
+        self.assertEqual(iam[0].options.region, "us-east-1")
+        self.assertEqual(iam[0].options.output_dir, "/test/{region}/output")
 
         collection = AWS().initialize_policies(
-            original, Config.empty(regions=["eu-west-1", "eu-west-2"])
+            original, Config.empty(regions=["eu-west-1", "eu-west-2"], output_dir="/test/output/")
         )
         iam = [p for p in collection if p.resource_type == "iam-user"]
         self.assertEqual(len(iam), 1)
         self.assertEqual(iam[0].options.region, "eu-west-1")
+        self.assertEqual(iam[0].options.output_dir, "/test/output/eu-west-1")
         self.assertEqual(len(collection), 3)
 
 

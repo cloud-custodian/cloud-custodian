@@ -149,6 +149,16 @@ def test_cli_providers_available():
 
 
 @pytest.mark.skipif(
+    not (TEST_DOCKER and CUSTODIAN_IMAGE), reason="docker testing not requested"
+)
+def test_cli_version_debug():
+    client = docker.from_env()
+    output = client.containers.run(CUSTODIAN_IMAGE, "version --debug", stderr=True).decode('utf8')
+    assert "Docker: True" in output
+    assert "boto3==" in output
+
+
+@pytest.mark.skipif(
     not (TEST_DOCKER and CUSTODIAN_IMAGE and get_env_creds(check_aws=True)),
     reason="docker testing not requested",
 )

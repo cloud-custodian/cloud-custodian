@@ -1,55 +1,37 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "LoadBalancers": [
             {
-                "IpAddressType": "ipv4", 
-                "VpcId": "vpc-d2d616b5", 
-                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/testing/1e0e18b15fe2aefa", 
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:123456789123:loadbalancer/app/test/433ae0ba96204181",
+                "DNSName": "test-1231241576.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K",
+                "CreatedTime": "2020-04-15T02:00:16.010000+00:00",
+                "LoadBalancerName": "test",
+                "Scheme": "internet-facing",
+                "VpcId": "vpc-d2d616b5",
                 "State": {
                     "Code": "active"
-                }, 
-                "DNSName": "testing-1299752078.us-east-1.elb.amazonaws.com", 
-                "SecurityGroups": [
-                    "sg-3839ec4b", 
-                    "sg-6c7fa917"
-                ], 
-                "LoadBalancerName": "testing", 
-                "CreatedTime": {
-                    "hour": 12, 
-                    "__class__": "datetime", 
-                    "month": 10, 
-                    "second": 32, 
-                    "microsecond": 180000, 
-                    "year": 2017, 
-                    "day": 5, 
-                    "minute": 43
-                }, 
-                "Scheme": "internet-facing", 
-                "Type": "application", 
-                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K", 
+                },
+                "Type": "application",
                 "AvailabilityZones": [
                     {
-                        "SubnetId": "subnet-3a334610", 
-                        "ZoneName": "us-east-1d"
-                    }, 
+                        "ZoneName": "us-east-1a",
+                        "SubnetId": "subnet-914763e7",
+                        "LoadBalancerAddresses": []
+                    },
                     {
-                        "SubnetId": "subnet-914763e7", 
-                        "ZoneName": "us-east-1a"
+                        "ZoneName": "us-east-1b",
+                        "SubnetId": "subnet-efbcccb7",
+                        "LoadBalancerAddresses": []
                     }
-                ]
+                ],
+                "SecurityGroups": [
+                    "sg-6c7fa917"
+                ],
+                "IpAddressType": "ipv4"
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "27342d3c-a9cd-11e7-9637-9dcdb769de86", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "27342d3c-a9cd-11e7-9637-9dcdb769de86", 
-                "date": "Thu, 05 Oct 2017 13:00:24 GMT", 
-                "content-length": "1436", 
-                "content-type": "text/xml"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }
