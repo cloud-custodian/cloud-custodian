@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://queue.amazonaws.com/123456789123/test_sqs_modify_policy_add_statements"
+        ],
+        "ResponseMetadata": {}
+    }
+}

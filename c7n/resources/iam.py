@@ -38,7 +38,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
-from c7n.utils import local_session, type_schema, chunks, filter_empty, QueryParser
+from c7n.utils import (
+    get_partition, local_session, type_schema, chunks, filter_empty, QueryParser)
 
 from c7n.resources.aws import Arn
 from c7n.resources.securityhub import OtherResourcePostFinding
@@ -146,6 +147,59 @@ class RoleRemoveTag(RemoveTag):
                     client.untag_role, RoleName=role['RoleName'], TagKeys=tags)
             except client.exceptions.NoSuchEntityException:
                 continue
+
+
+class SetBoundary(BaseAction):
+    """Set IAM Permission boundary on an IAM Role or User.
+
+    A role or user can only have a single permission boundary set.
+    """
+
+    schema = type_schema(
+        'set-boundary',
+        state={'enum': ['present', 'absent']},
+        policy={'type': 'string'})
+
+    def validate(self):
+        state = self.data.get('state', 'present') == 'present'
+        if state and not self.data.get('policy'):
+            raise PolicyValidationError("set-boundary requires policy arn")
+
+    def process(self, resources):
+        state = self.data.get('state', 'present') == 'present'
+        client = self.manager.session_factory().client('iam')
+        policy = self.data.get('policy')
+        if policy and not policy.startswith('arn'):
+            policy = 'arn:{}:iam::{}:policy/{}'.format(
+                get_partition(self.manager.config.region),
+                self.manager.account_id, policy)
+        for r in resources:
+            method, params = self.get_method(client, state, policy, r)
+            try:
+                self.manager.retry(method, **params)
+            except client.exceptions.NoSuchEntityException:
+                continue
+
+    def get_method(self, client, state, policy, resource):
+        raise NotImplementedError()
+
+
+@Role.action_registry.register('set-boundary')
+class RoleSetBoundary(SetBoundary):
+
+    def get_permissions(self):
+        if self.data.get('state', True):
+            return ('iam:PutRolePermissionsBoundary',)
+        return ('iam:DeleteRolePermissionsBoundary',)
+
+    def get_method(self, client, state, policy, resource):
+        if state:
+            return client.put_role_permissions_boundary, {
+                'RoleName': resource['RoleName'],
+                'PermissionsBoundary': policy}
+        else:
+            return client.delete_role_permissions_boundary, {
+                'RoleName': resource['RoleName']}
 
 
 @resources.register('iam-user')
@@ -264,6 +318,24 @@ class SetGroups(BaseAction):
                 op_map[state](GroupName=group_name, UserName=r['UserName'])
             except client.exceptions.NoSuchEntityException:
                 continue
+
+
+@User.action_registry.register('set-boundary')
+class UserSetBoundary(SetBoundary):
+
+    def get_permissions(self):
+        if self.data.get('state', True):
+            return ('iam:PutUserPermissionsBoundary',)
+        return ('iam:DeleteUserPermissionsBoundary',)
+
+    def get_method(self, client, state, policy, resource):
+        if state:
+            return client.put_user_permissions_boundary, {
+                'UserName': resource['UserName'],
+                'PermissionsBoundary': policy}
+        else:
+            return client.delete_user_permissions_boundary, {
+                'UserName': resource['UserName']}
 
 
 @resources.register('iam-policy')
