@@ -18,7 +18,7 @@ from c7n.utils import format_event
 log = logging.getLogger('sphere11.db')
 
 
-class LockDb(object):
+class LockDb:
 
     STATE_LOCKED = "locked"
     STATE_UNLOCKED = "unlocked"

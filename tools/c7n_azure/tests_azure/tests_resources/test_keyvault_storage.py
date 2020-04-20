@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import azure.keyvault.http_bearer_challenge_cache as kv_cache
 from ..azure_common import BaseTest, arm_template, cassette_name
 from mock import patch
@@ -54,6 +52,9 @@ class KeyVaultStorageTest(BaseTest):
 
     @arm_template('keyvault.json')
     @cassette_name('common')
+    # Possible fail reasons:
+    #  - KeyVault auto-regenerated the active key, so current active key is 2.
+    #    Current auto-regenerate period was set to 720 days.
     def test_key_vault_storage_filter_active_key_name(self):
         p = self._get_policy([{'type': 'active-key-name', 'value': 'key1'}], [])
         resources = p.run()

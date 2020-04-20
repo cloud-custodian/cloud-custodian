@@ -16,8 +16,6 @@ Cloud Custodian Lambda Provisioning Support
 
 docs/lambda.rst
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import abc
 import base64
 import hashlib
@@ -31,7 +29,6 @@ import time
 import tempfile
 import zipfile
 
-from concurrent.futures import ThreadPoolExecutor
 
 # We use this for freezing dependencies for serverless environments
 # that support service side building.
@@ -45,7 +42,6 @@ except (ImportError, FileNotFoundError):
 # Static event mapping to help simplify cwe rules creation
 from c7n.exceptions import ClientError
 from c7n.cwe import CloudWatchEvents
-from c7n.logs_support import _timestamp_from_string
 from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 
 log = logging.getLogger('custodian.serverless')
@@ -53,7 +49,7 @@ log = logging.getLogger('custodian.serverless')
 LambdaRetry = get_retry(('InsufficientPermissionsException',), max_attempts=2)
 
 
-class PythonPackageArchive(object):
+class PythonPackageArchive:
     """Creates a zip file for python lambda functions.
 
     :param tuple modules: the Python modules to add to the archive
@@ -338,8 +334,8 @@ def _package_deps(package, deps=None, ignore=()):
 def custodian_archive(packages=None):
     """Create a lambda code archive for running custodian.
 
-    Lambda archive currently always includes `c7n` and
-    `pkg_resources`. Add additional packages in the mode block.
+    Lambda archive currently always includes `c7n`.  Add additional
+    packages via function parameters, or in policy via mode block.
 
     Example policy that includes additional packages
 
@@ -355,13 +351,13 @@ def custodian_archive(packages=None):
     packages: List of additional packages to include in the lambda archive.
 
     """
-    modules = {'c7n', 'pkg_resources'}
+    modules = {'c7n'}
     if packages:
         modules = filter(None, modules.union(packages))
     return PythonPackageArchive(sorted(modules))
 
 
-class LambdaManager(object):
+class LambdaManager:
     """ Provides CRUD operations around lambda functions
     """
 
@@ -407,60 +403,6 @@ class LambdaManager(object):
             self.client.delete_function(FunctionName=func.name)
         except self.client.exceptions.ResourceNotFoundException:
             pass
-
-    def metrics(self, funcs, start, end, period=5 * 60):
-
-        def func_metrics(f):
-            metrics = local_session(self.session_factory).client('cloudwatch')
-            values = {}
-            for m in ('Errors', 'Invocations', 'Durations', 'Throttles'):
-                values[m] = metrics.get_metric_statistics(
-                    Namespace="AWS/Lambda",
-                    Dimensions=[{
-                        'Name': 'FunctionName',
-                        'Value': (
-                                isinstance(f, dict) and f['FunctionName'] or f.name)}],
-                    Statistics=["Sum"],
-                    StartTime=start,
-                    EndTime=end,
-                    Period=period,
-                    MetricName=m)['Datapoints']
-            return values
-
-        with ThreadPoolExecutor(max_workers=3) as w:
-            results = list(w.map(func_metrics, funcs))
-            for m, f in zip(results, funcs):
-                if isinstance(f, dict):
-                    f['Metrics'] = m
-        return results
-
-    def logs(self, func, start, end):
-        logs = self.session_factory().client('logs')
-        group_name = "/aws/lambda/%s" % func.name
-        log.info("Fetching logs from group: %s" % group_name)
-        try:
-            logs.describe_log_groups(
-                logGroupNamePrefix=group_name)
-        except logs.exceptions.ResourceNotFoundException:
-            pass
-
-        try:
-            log_streams = logs.describe_log_streams(
-                logGroupName=group_name,
-                orderBy="LastEventTime", limit=3, descending=True)
-        except logs.exceptions.ResourceNotFoundException:
-            return
-
-        start = _timestamp_from_string(start)
-        end = _timestamp_from_string(end)
-        for s in reversed(log_streams['logStreams']):
-            result = logs.get_log_events(
-                logGroupName=group_name,
-                logStreamName=s['logStreamName'],
-                startTime=start,
-                endTime=end)
-            for e in result['events']:
-                yield e
 
     @staticmethod
     def delta_function(old_config, new_config):
@@ -985,7 +927,7 @@ def zinfo(fname):
     return info
 
 
-class CloudWatchEventSource(object):
+class CloudWatchEventSource:
     """Subscribe a lambda to cloud watch events.
 
     Cloud watch events supports a number of different event
@@ -1223,7 +1165,7 @@ class CloudWatchEventSource(object):
             self.client.delete_rule(Name=func.name)
 
 
-class SecurityHubAction(object):
+class SecurityHubAction:
 
     def __init__(self, policy, session_factory):
         self.policy = policy
@@ -1295,7 +1237,7 @@ class SecurityHubAction(object):
         client.delete_action_target(ActionTargetArn=self._get_arn())
 
 
-class BucketLambdaNotification(object):
+class BucketLambdaNotification:
     """ Subscribe a lambda to bucket notifications directly. """
 
     def __init__(self, data, session_factory, bucket):
@@ -1385,7 +1327,7 @@ class BucketLambdaNotification(object):
             NotificationConfiguration=notifies)
 
 
-class CloudWatchLogSubscription(object):
+class CloudWatchLogSubscription:
     """ Subscribe a lambda to a log group[s]
     """
 
@@ -1443,7 +1385,7 @@ class CloudWatchLogSubscription(object):
                 pass
 
 
-class SQSSubscription(object):
+class SQSSubscription:
     """ Subscribe a lambda to one or more SQS queues.
     """
 
@@ -1501,7 +1443,7 @@ class SQSSubscription(object):
                 UUID=event_mappings[queue_arn]['UUID'])
 
 
-class SNSSubscription(object):
+class SNSSubscription:
     """ Subscribe a lambda to one or more SNS topics.
     """
 
@@ -1627,7 +1569,7 @@ class BucketSNSNotification(SNSSubscription):
         return topic_arns
 
 
-class ConfigRule(object):
+class ConfigRule:
     """Use a lambda as a custom config rule.
 
     """

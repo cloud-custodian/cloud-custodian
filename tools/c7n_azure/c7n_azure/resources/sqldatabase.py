@@ -74,7 +74,7 @@ class SqlDatabase(ChildArmResourceManager):
                     'server_name': parent_resource['name']}
 
 
-class BackupRetentionPolicyHelper(object):
+class BackupRetentionPolicyHelper:
 
     SHORT_TERM_SQL_OPERATIONS = 'backup_short_term_retention_policies'
     LONG_TERM_SQL_OPERATIONS = 'backup_long_term_retention_policies'

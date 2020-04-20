@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 
 from c7n.actions import RemovePolicyBase, Action
@@ -176,7 +174,7 @@ LIFECYCLE_RULE_SCHEMA = {
         'selection': {
             'type': 'object',
             'addtionalProperties': False,
-            'required': ['countType', 'countUnit'],
+            'required': ['countType', 'countNumber', 'tagStatus'],
             'properties': {
                 'tagStatus': {'enum': ['tagged', 'untagged', 'any']},
                 'tagPrefixList': {'type': 'array', 'items': {'type': 'string'}},
@@ -199,7 +197,7 @@ def lifecycle_rule_validate(policy, rule):
     if (rule['selection']['tagStatus'] == 'tagged' and
             'tagPrefixList' not in rule['selection']):
         raise PolicyValidationError(
-            ("{} has invalid lifecycle rule {} tagprefixlist "
+            ("{} has invalid lifecycle rule {} tagPrefixList "
              "required for tagStatus: tagged").format(
                  policy.name, rule))
     if (rule['selection']['countType'] == 'sinceImagePushed' and
@@ -207,6 +205,12 @@ def lifecycle_rule_validate(policy, rule):
         raise PolicyValidationError(
             ("{} has invalid lifecycle rule {} countUnit "
              "required for countType: sinceImagePushed").format(
+                 policy.name, rule))
+    if (rule['selection']['countType'] == 'imageCountMoreThan' and
+            'countUnit' in rule['selection']):
+        raise PolicyValidationError(
+            ("{} has invalid lifecycle rule {} countUnit "
+             "invalid for countType: imageCountMoreThan").format(
                  policy.name, rule))
 
 

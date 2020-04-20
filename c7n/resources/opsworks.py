@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
@@ -22,7 +20,7 @@ from c7n.utils import local_session, type_schema
 from c7n import utils
 
 
-class StateTransitionFilter(object):
+class StateTransitionFilter:
     """Filter instances by state.
 
     Try to simplify construction for policy authors by automatically

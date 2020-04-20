@@ -21,7 +21,7 @@ from kubernetes.client import Configuration, ApiClient
 log = logging.getLogger('custodian.k8s.client')
 
 
-class Session(object):
+class Session:
     def __init__(self, config_file=None):
         self.config_file = config_file
         self.http_proxy = os.getenv('HTTPS_PROXY')

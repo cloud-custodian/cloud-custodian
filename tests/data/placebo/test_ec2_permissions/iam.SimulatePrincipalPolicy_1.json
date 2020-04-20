@@ -1,38 +1,28 @@
 {
-    "status_code": 200,
-    "data": {
-        "EvaluationResults": [
-            {
-                "EvalActionName": "lambda:CreateFunction",
-                "EvalResourceName": "*",
-                "EvalDecision": "allowed",
-                "MatchedStatements": [
-                    {
-                        "SourcePolicyId": "AdministratorAccess",
-                        "StartPosition": {
-                            "Line": 3,
-                            "Column": 17
-                        },
-                        "EndPosition": {
-                            "Line": 8,
-                            "Column": 6
-                        }
-                    }
-                ],
-                "MissingContextValues": []
-            }
-        ],
-        "IsTruncated": false,
-        "ResponseMetadata": {
-            "RequestId": "0de7c754-3b65-11e9-8491-8fd0be1cf9c2",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "0de7c754-3b65-11e9-8491-8fd0be1cf9c2",
-                "content-type": "text/xml",
-                "content-length": "995",
-                "date": "Thu, 28 Feb 2019 14:28:01 GMT"
+  "status_code": 200,
+  "data": {
+    "EvaluationResults": [
+      {
+        "EvalActionName": "lambda:CreateFunction",
+        "EvalResourceName": "*",
+        "EvalDecision": "allowed",
+        "MatchedStatements": [
+          {
+            "SourcePolicyId": "AdministratorAccess",
+            "StartPosition": {
+              "Line": 3,
+              "Column": 17
             },
-            "RetryAttempts": 0
-        }
-    }
+            "EndPosition": {
+              "Line": 8,
+              "Column": 6
+            }
+          }
+        ],
+        "MissingContextValues": []
+      }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {}
+  }
 }

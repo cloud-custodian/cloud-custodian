@@ -19,8 +19,6 @@ to ec2 (subnets, vpc, security-groups, volumes, instances,
 snapshots).
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import Counter
 from concurrent.futures import as_completed
 
@@ -904,8 +902,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
     """
 
     batch_size = 20
-    concurrency = 2
-    permissions = ('resourcegroupstaggingapi:TagResources',)
+    concurrency = 1
 
     def process(self, resources):
         self.tz = tzutil.gettz(
@@ -1069,10 +1066,12 @@ class CopyRelatedResourceTag(Tag):
                     if k in tag_keys and resource_tags.get(k) != v}
         if not tags:
             return
+        if not isinstance(tag_action, UniversalTag):
+            tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
         tag_action.process_resource_set(
             client,
             resource_set=[r],
-            tags=[{'Key': k, 'Value': v} for k, v in tags.items()])
+            tags=tags)
         return True
 
     def get_resource_tag_map(self, r_type, ids):

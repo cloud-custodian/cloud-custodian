@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import ipaddress
 import os
@@ -132,6 +130,12 @@ class ProxyUrlTest(BaseTest):
 
 
 class UtilTest(BaseTest):
+
+    def test_merge_dict_list(self):
+
+        assert utils.merge_dict_list([
+            {'a': 1, 'x': 0}, {'b': 2, 'x': 0}, {'c': 3, 'x': 1}]) == {
+                'a': 1, 'b': 2, 'c': 3, 'x': 1}
 
     def test_merge_dict(self):
         a = {'detail': {'eventName': ['CreateSubnet'],
@@ -382,7 +386,7 @@ class UtilTest(BaseTest):
         # Not a real schema, just doing a smoke test of the function
         # properties = 'target'
 
-        class FakeResource(object):
+        class FakeResource:
             schema = {
                 "additionalProperties": False,
                 "properties": {

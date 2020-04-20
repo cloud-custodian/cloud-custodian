@@ -141,7 +141,7 @@ def cli():
     """custodian organization multi-account runner."""
 
 
-class LogFilter(object):
+class LogFilter:
     """We want to keep the main c7n-org cli output to be readable.
 
     We previously did so via squelching custodian's log output via
@@ -554,10 +554,6 @@ def run_account(account, region, policies_config, output_path,
             # Variable expansion and non schema validation (not optional)
             p.expand_variables(p.get_variables(account.get('vars', {})))
             p.validate()
-
-            if p.region and p.region != region:
-                continue
-
             log.debug(
                 "Running policy:%s account:%s region:%s",
                 p.name, account['name'], region)

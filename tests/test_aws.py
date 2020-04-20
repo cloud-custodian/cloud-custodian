@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import json
+import threading
 
 from mock import Mock
 
@@ -22,6 +23,10 @@ from c7n.resources import aws
 from c7n import output
 
 from .common import BaseTest
+
+
+from aws_xray_sdk.core.models.segment import Segment
+from aws_xray_sdk.core.models.subsegment import Subsegment
 
 
 class TraceDoc(Bag):
@@ -139,13 +144,47 @@ class UtilTest(BaseTest):
 
 class TracerTest(BaseTest):
 
+    def test_context(self):
+        store = aws.XrayContext()
+        self.assertEqual(store.handle_context_missing(), None)
+        x = Segment('foo')
+        y = Segment('foo')
+        a = Subsegment('bar', 'boo', x)
+        b = Subsegment('bar', 'boo', x)
+        b.thread_id = '123'
+        store.put_segment(x)
+        store.put_subsegment(a)
+        store.put_subsegment(b)
+
+        self.assertEqual(store._local.entities, [x, a, b])
+        self.assertEqual(store.get_trace_entity(), a)
+        store.end_subsegment(a)
+        self.assertEqual(store.get_trace_entity(), x)
+        store.put_segment(y)
+        self.assertEqual(store._local.entities, [y])
+        self.assertEqual(store.get_trace_entity(), y)
+        self.assertFalse(store.end_subsegment(42))
+
+    def test_context_worker_thread_main_acquire(self):
+        store = aws.XrayContext()
+        x = Segment('foo')
+        a = Subsegment('bar', 'boo', x)
+        store.put_segment(x)
+        store.put_subsegment(a)
+
+        def get_ident():
+            return 42
+
+        self.patch(threading, 'get_ident', get_ident)
+        self.assertEqual(store.get_trace_entity(), a)
+
     def test_tracer(self):
         session_factory = self.replay_flight_data('output-xray-trace')
         policy = Bag(name='test', resource_type='ec2')
         ctx = Bag(
             policy=policy,
             session_factory=session_factory,
-            options=Bag(account_id='644160558196'))
+            options=Bag(account_id='644160558196', region='us-east-1',))
         ctx.get_metadata = lambda *args: {}
         config = Bag()
         tracer = aws.XrayTracer(ctx, config)

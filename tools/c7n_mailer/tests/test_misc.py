@@ -1,0 +1,54 @@
+# -*- coding: utf-8 -*-
+import argparse
+import unittest
+import logging
+import boto3
+
+from c7n_mailer import replay
+from c7n_mailer import handle
+from c7n_mailer import sqs_queue_processor
+from c7n_mailer import cli
+from common import MAILER_CONFIG
+
+
+class AWSMailerTests(unittest.TestCase):
+
+    def test_replay_parser_creation(self):
+        parser = replay.setup_parser()
+        self.assertIs(parser.__class__, argparse.ArgumentParser)
+
+    def test_mailer_handle(self):
+        handle.start_c7n_mailer(logging.getLogger('c7n_mailer'), MAILER_CONFIG, False)
+        http_proxy = 'username:password@my.proxy.com:80'
+        https_proxy = 'username:password@my.proxy.com:443'
+        MAILER_CONFIG['http_proxy'] = http_proxy
+        MAILER_CONFIG['https_proxy'] = https_proxy
+        config = handle.config_setup(MAILER_CONFIG)
+        self.assertEqual(
+            [
+                config.get('http_proxy'),
+                config.get('https_proxy')
+            ],
+            [
+                http_proxy,
+                https_proxy
+            ]
+        )
+
+    def test_sqs_queue_processor(self):
+        mailer_sqs_queue_processor = sqs_queue_processor.MailerSqsQueueProcessor(
+            MAILER_CONFIG, boto3.Session(), logging.getLogger('c7n_mailer'))
+        self.assertIs(mailer_sqs_queue_processor.__class__,
+        sqs_queue_processor.MailerSqsQueueProcessor)
+
+    def test_cli_run(self):
+        # Generate loggers and make sure they have the right class, for codecov
+        self.assertEqual(cli.get_logger().__class__, logging.Logger)
+        self.assertEqual(cli.get_logger(True).__class__, logging.Logger)
+        parser = cli.get_c7n_mailer_parser()
+        self.assertIs(parser.__class__, argparse.ArgumentParser)
+        session = cli.session_factory(MAILER_CONFIG)
+        self.assertEqual(
+            [session.region_name, session.profile_name],
+            ['us-east-1', 'default']
+        )

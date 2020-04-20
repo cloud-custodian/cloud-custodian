@@ -50,7 +50,7 @@ except ImportError:
 log = logging.getLogger('custodian.azure.session')
 
 
-class Session(object):
+class Session:
 
     def __init__(self, subscription_id=None, authorization_file=None,
                  resource=constants.RESOURCE_ACTIVE_DIRECTORY):

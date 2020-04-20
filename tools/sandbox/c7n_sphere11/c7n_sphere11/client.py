@@ -27,7 +27,7 @@ logging.getLogger('botocore').setLevel(logging.WARNING)
 log = logging.getLogger('sphere11.client')
 
 
-class Client(object):
+class Client:
 
     def __init__(self, endpoint, account_id=None, role=None, http=None, session=None):
         self.endpoint = endpoint

@@ -20,7 +20,7 @@ from dateutil.parser import parse
 from c7n_salactus.worker import connection as conn
 
 
-class Database(object):
+class Database:
 
     def __init__(self, path=None):
         if path:
@@ -59,7 +59,7 @@ def db(dbpath=None):
     return Database(dbpath)
 
 
-class Account(object):
+class Account:
 
     __slots__ = ('name', 'buckets')
 
@@ -95,7 +95,7 @@ class Account(object):
         return min(float(self.scanned) / (size or 1) * 100.0, 100.0)
 
 
-class Bucket(object):
+class Bucket:
 
     def __init__(self, bucket_id, data):
         self.bucket_id = bucket_id

@@ -18,8 +18,6 @@ a variety of sinks.
 See docs/usage/outputs.rst
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import contextlib
 from datetime import datetime
 import json
@@ -94,7 +92,7 @@ sys_stats_outputs = OutputRegistry('c7n.output.sys_stats')
 
 
 @tracer_outputs.register('default')
-class NullTracer(object):
+class NullTracer:
     """Tracing provides for detailed analytics of a policy execution.
 
     Uses native cloud provider integration (xray, stack driver trace).
@@ -118,7 +116,7 @@ class NullTracer(object):
         """
 
 
-class DeltaStats(object):
+class DeltaStats:
     """Capture stats (dictionary of string->integer) as a stack.
 
     Popping the stack automatically creates a delta of the last
@@ -150,7 +148,7 @@ class DeltaStats(object):
 
 @sys_stats_outputs.register('default')
 @api_stats_outputs.register('default')
-class NullStats(object):
+class NullStats:
     """Execution statistics/metrics collection.
 
     Encompasses concrete implementations over system stats (memory, cpu, cache size)
@@ -248,7 +246,7 @@ class SystemStats(DeltaStats):
         return snapshot
 
 
-class Metrics(object):
+class Metrics:
 
     permissions = ()
     namespace = DEFAULT_NAMESPACE
@@ -323,7 +321,7 @@ class LogMetrics(Metrics):
         return res
 
 
-class LogOutput(object):
+class LogOutput:
 
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
@@ -394,7 +392,7 @@ class NullLog(LogOutput):
 
 
 @blob_outputs.register('null')
-class NullBlobOutput(object):
+class NullBlobOutput:
     # default - for unit tests
 
     def __init__(self, ctx, config):
@@ -414,7 +412,7 @@ class NullBlobOutput(object):
 
 @blob_outputs.register('file')
 @blob_outputs.register('default')
-class DirectoryOutput(object):
+class DirectoryOutput:
 
     permissions = ()
 

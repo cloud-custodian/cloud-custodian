@@ -24,7 +24,7 @@ from .utils import (
     kms_decrypt, get_aws_username_from_event)
 
 
-class EmailDelivery(object):
+class EmailDelivery:
 
     def __init__(self, config, session, logger):
         self.config = config

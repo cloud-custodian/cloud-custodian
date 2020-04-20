@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from datetime import datetime
 import json
 import fnmatch
@@ -73,7 +71,7 @@ def load(options, path, format=None, validate=True, vars=None):
     return collection
 
 
-class PolicyCollection(object):
+class PolicyCollection:
 
     log = logging.getLogger('c7n.policies')
 
@@ -189,7 +187,7 @@ class PolicyCollection(object):
         return None
 
 
-class PolicyExecutionMode(object):
+class PolicyExecutionMode:
     """Policy execution semantics"""
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
@@ -336,42 +334,6 @@ class PullMode(PolicyExecutionMode):
                 "ActionTime", time.time() - at, "Seconds", Scope="Policy")
             return resources
 
-    def get_logs(self, start, end):
-        from c7n import logs_support
-        log_source = self.policy.ctx.output
-        log_gen = ()
-        if self.policy.options.log_group is not None:
-            session = utils.local_session(self.policy.session_factory)
-            log_gen = logs_support.log_entries_from_group(
-                session,
-                self.policy.options.log_group,
-                start,
-                end,
-            )
-        elif log_source.type == 's3':
-            raw_entries = logs_support.log_entries_from_s3(
-                self.policy.session_factory,
-                log_source,
-                start,
-                end,
-            )
-            # log files can be downloaded out of order, so sort on timestamp
-            # log_gen isn't really a generator once we do this, but oh well
-            log_gen = sorted(
-                logs_support.normalized_log_entries(raw_entries),
-                key=lambda e: e.get('timestamp', 0),
-            )
-        else:
-            log_path = os.path.join(log_source.root_dir, 'custodian-run.log')
-            with open(log_path) as log_fh:
-                raw_entries = log_fh.readlines()
-                log_gen = logs_support.normalized_log_entries(raw_entries)
-        return logs_support.log_entries_in_range(
-            log_gen,
-            start,
-            end,
-        )
-
 
 class LambdaMode(ServerlessExecutionMode):
     """A policy that runs/executes in lambda."""
@@ -421,15 +383,6 @@ class LambdaMode(ServerlessExecutionMode):
                 'Custodian reserves policy lambda '
                 'tags starting with custodian - policy specifies %s' % (
                     ', '.join(reserved_overlap))))
-
-    def get_metrics(self, start, end, period):
-        from c7n.mu import LambdaManager, PolicyLambda
-        manager = LambdaManager(self.policy.session_factory)
-        values = manager.metrics(
-            [PolicyLambda(self.policy)], start, end, period)[0]
-        values.update(
-            super(LambdaMode, self).get_metrics(start, end, period))
-        return values
 
     def get_member_account_id(self, event):
         return event.get('account')
@@ -561,16 +514,6 @@ class LambdaMode(ServerlessExecutionMode):
             return manager.publish(
                 mu.PolicyLambda(self.policy),
                 role=self.policy.options.assume_role)
-
-    def get_logs(self, start, end):
-        from c7n import mu, logs_support
-        manager = mu.LambdaManager(self.policy.session_factory)
-        log_gen = manager.logs(mu.PolicyLambda(self.policy), start, end)
-        return logs_support.log_entries_in_range(
-            log_gen,
-            start,
-            end,
-        )
 
 
 @execution.register('periodic')
@@ -841,7 +784,7 @@ class PolicyConditionNot(Not):
         return 'name'
 
 
-class PolicyConditions(object):
+class PolicyConditions:
 
     filter_registry = FilterRegistry('c7n.policy.filters')
     filter_registry.register('and', PolicyConditionAnd)
@@ -899,7 +842,7 @@ class PolicyConditions(object):
         return filters
 
 
-class Policy(object):
+class Policy:
 
     log = logging.getLogger('custodian.policy')
 
@@ -1070,14 +1013,6 @@ class Policy(object):
         """Query resources and apply policy."""
         mode = self.get_execution_mode()
         return mode.run()
-
-    def get_logs(self, start, end):
-        mode = self.get_execution_mode()
-        return mode.get_logs(start, end)
-
-    def get_metrics(self, start, end, period):
-        mode = self.get_execution_mode()
-        return mode.get_metrics(start, end, period)
 
     def get_permissions(self):
         """get permissions needed by this policy"""
