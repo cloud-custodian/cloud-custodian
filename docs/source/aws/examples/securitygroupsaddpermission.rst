@@ -10,14 +10,16 @@ auto-remediation action (typically within a minute) of the security group change
 Having such a quick auto-remediation action greatly reduces any attack window!
 User defined rule is added to the filtered results.
 
+
 .. code-block:: yaml
 
    policies:
      - name: sg-add-permission
        resource: security-group
        description: |
-         Add rule to a security group. Filter any security group that allows 0.0.0.0/0 or ::/0 (IPv6) ingress
-         on port 22, remove the rule and add user defined sg rule
+         Add rule to a security group. Filter any security group that
+         allows 0.0.0.0/0 or ::/0 (IPv6) ingress on port 22, remove
+         the rule and add user defined sg rule
        mode:
            type: cloudtrail
            events:
@@ -38,11 +40,18 @@ User defined rule is added to the filtered results.
                   Ports: [22]
                   CidrV6: "::/0"
        actions:
-        - type: remove-permissions
-          ingress: matched
-        - type: add-permissions
-          PermissionType: "ingress"
-          IpProtocol: "TCP"
-          FromPort: 22
-          ToPort: 22
-          Cidr: ["2.2.2.2/32","1.1.1.1/32"]
+         - type: set-permissions
+           # remove the permission matched by a previous ingress filter.
+           remove-ingress: matched
+           # add a list of permissions to the group.
+           add-ingress:
+             # full syntax/parameters to authorize can be used.
+             - IpPermissions:
+               - IpProtocol: TCP
+                 FromPort: 22
+                 ToPort: 22
+                 IpRanges:
+                   - Description: Ops SSH Access
+                     CidrIp: "1.1.1.1/32"
+                   - Description: Security SSH Access
+                     CidrIp: "2.2.2.2/32"
