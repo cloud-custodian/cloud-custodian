@@ -520,7 +520,7 @@ class GlueCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
 
 @GlueDataCatalog.filter_registry.register('cross-account')
 class GlueCatalogCrossAccount(CrossAccountAccessFilter):
-    """Filter glue catalog if its has cross account permissions
+    """Filter glue catalog if it has cross account permissions
 
     :example:
 
