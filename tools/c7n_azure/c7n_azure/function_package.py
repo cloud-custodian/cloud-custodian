@@ -45,7 +45,7 @@ class AzurePythonPackageArchive(PythonPackageArchive):
         return info
 
 
-class FunctionPackage(object):
+class FunctionPackage:
     log = logging.getLogger('custodian.azure.function_package.FunctionPackage')
 
     def __init__(self, name, function_path=None, target_sub_ids=None, cache_override_path=None):

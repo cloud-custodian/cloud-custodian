@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
@@ -61,7 +59,7 @@ class JobDefinition(QueryResourceManager):
             'describe_job_definitions', 'jobDefinitions', None)
 
 
-class StateTransitionFilter(object):
+class StateTransitionFilter:
     """Filter resources by state.
 
     Try to simplify construction for policy authors by automatically

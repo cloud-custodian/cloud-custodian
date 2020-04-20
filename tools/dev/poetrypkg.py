@@ -1,14 +1,13 @@
 """
-Supplemental tooling for managing custodian depgraph
+Supplemental tooling for managing custodian packaging.
 
+Has various workarounds for poetry
 """
 import click
 import os
 import sys
 
 from collections import defaultdict
-from pathlib import Path
-from pip._internal.utils import appdirs
 
 
 @click.group()
@@ -20,37 +19,6 @@ def cli():
     # If there is a global installation of poetry, prefer that.
     poetry_python_lib = os.path.expanduser('~/.poetry/lib')
     sys.path.append(os.path.realpath(poetry_python_lib))
-
-
-@cli.command()
-@click.option('--cache', default=appdirs.user_cache_dir('pip'))
-@click.option('--link-dir', type=click.Path())
-def gen_links(cache, link_dir):
-    # wheel only
-    #
-    # generate a find links directory to perform an install offline.
-    # note there we still need to download any packages needed for
-    # an offline install. this is effectively an alternative to
-    # pip download -d to utilize already cached wheel resources.
-    #
-    found = {}
-    link_dir = Path(link_dir)
-    wrote = 0
-    for root, dirs, files in os.walk(cache):
-        for f in files:
-            if not f.endswith('whl'):
-                continue
-            found[f] = os.path.join(root, f)
-    if not link_dir.exists():
-        link_dir.mkdir()
-    entries = {f.name for f in link_dir.iterdir()}
-    for f, src in found.items():
-        if f in entries:
-            continue
-        os.symlink(src, link_dir / f)
-        wrote += 1
-    if wrote:
-        print('Updated %d Find Links' % wrote)
 
 
 # Override the poetry base template as all our readmes files
@@ -133,8 +101,6 @@ def gen_frozensetup(package_dir, output):
 
     sdist.SETUP = SETUP_TEMPLATE
 
-    # the alternative to monkey patching is carrying forward a
-    # 100 line method. See SETUP_TEMPLATE comments above.
     class FrozenBuilder(sdist.SdistBuilder):
 
         @classmethod

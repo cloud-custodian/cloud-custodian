@@ -45,4 +45,5 @@ def test_package_metadata(package):
         'Topic :: System :: Systems Administration',
         'Topic :: System :: Distributed Computing']
     assert md.get('readme', '').endswith('md')
+    assert (p.parent / md['readme']).exists()
     assert 'description' in md

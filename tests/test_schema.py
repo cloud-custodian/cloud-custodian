@@ -11,19 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import mock
 import sys
 from jsonschema.exceptions import best_match
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter
+from c7n.registry import PluginRegistry
 from c7n.resources import load_resources
 from c7n.schema import (
     StructureParser, ElementSchema, resource_vocabulary,
     JsonSchemaValidator, validate, generate,
     specific_error, policy_error_scope)
+from c7n import schema
 from .common import BaseTest
 
 
@@ -140,6 +140,14 @@ class SchemaTest(BaseTest):
                 {"policies": []}),
             [])
 
+    def test_empty_with_lazy_load(self):
+        empty_registry = PluginRegistry('stuff')
+        self.patch(schema, 'clouds', empty_registry)
+        policy_schema = generate()
+        self.assertEqual(
+            policy_schema['properties']['policies']['items'],
+            {'type': 'object'})
+
     def test_duplicate_policies(self):
         data = {
             "policies": [
@@ -216,24 +224,18 @@ class SchemaTest(BaseTest):
     def test_semantic_error_policy_scope(self):
         data = {
             'policies': [
-                {'actions': [{'key': 'TagPolicyCompliance',
-                              'type': 'tag',
-                              'value': 'This resource should have tags following policy'}],
-                 'description': 'Identify resources which lack our accounting tags',
-                 'filters': [{'tag:Environment': 'absent'},
-                             {'tag:Service': 'absent'},
-                             {'or': [{'tag:Owner': 'absent'},
-                                     {'tag:ResponsibleParty': 'absent'},
-                                     {'tag:Contact': 'absent'},
-                                     {'tag:Creator': 'absent'}]}],
-                 'name': 'tagging-compliance-waf',
+                {'actions': [{'key': 'AES3000',
+                              'type': 'encryption',
+                              'value': 'This resource should have AES3000 encryption'}],
+                 'description': 'Identify resources which lack our outrageous cipher',
+                 'name': 'bogus-policy',
                  'resource': 'aws.waf'}]}
         load_resources(('aws.waf',))
         validator = self.policy_loader.validator.gen_schema(('aws.waf',))
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 1)
         error = policy_error_scope(specific_error(errors[0]), data)
-        self.assertTrue("policy:tagging-compliance-waf" in error.message)
+        self.assertTrue("policy:bogus-policy" in error.message)
 
     def test_semantic_error(self):
         data = {
@@ -275,7 +277,7 @@ class SchemaTest(BaseTest):
         mock_specific_error.side_effect = ValueError(
             "The specific error crapped out hard"
         )
-
+        load_resources(('aws.ec2',))
         resp = validate(data)
         # if it is 2, then we know we got the exception from specific_error
         self.assertEqual(len(resp), 2)
@@ -293,6 +295,7 @@ class SchemaTest(BaseTest):
                      'skip_missing': True,
                      'key': 'VolumeId',
                      'tags': 'Team'}]}]}
+        load_resources(('aws.ebs',))
         validator = self.get_validator(data)
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 1)
@@ -304,6 +307,7 @@ class SchemaTest(BaseTest):
             "vars": {"alpha": 1, "beta": 2},
             "policies": [{"name": "test", "resource": "ec2", "tags": ["controls"]}],
         }
+        load_resources(('aws.ec2',))
         validator = self.get_validator(data)
         self.assertEqual(list(validator.iter_errors(data)), [])
 
@@ -374,14 +378,23 @@ class SchemaTest(BaseTest):
                 }
             ]
         }
-        errors = list(self.validator.iter_errors(data))
+
+        load_resources(('aws.ec2',))
+        validator = self.policy_loader.validator.gen_schema(('aws.ec2',))
+        errors = list(validator.iter_errors(data))
         self.assertEqual(errors, [])
 
     def test_bool_operator_child_validation(self):
         data = {'policies': [
-            {'name': 'test', 'resource': 'ec2', 'filters': [
-                {'or': [{'type': 'imagex', 'key': 'tag:Foo', 'value': 'a'}]}]}]}
-        errors = list(self.validator.iter_errors(data))
+            {'name': 'test',
+             'resource': 'ec2',
+             'filters': [
+                 {'or': [
+                     {'type': 'imagex', 'key': 'tag:Foo', 'value': 'a'}
+                 ]}]}]}
+        load_resources(('aws.ec2',))
+        validator = self.policy_loader.validator.gen_schema(('aws.ec2',))
+        errors = list(validator.iter_errors(data))
         self.assertTrue(errors)
 
     def test_value_filter_short_form(self):
@@ -523,10 +536,10 @@ class SchemaTest(BaseTest):
 
     def test_element_doc(self):
 
-        class A(object):
+        class A:
             pass
 
-        class B(object):
+        class B:
             """Hello World
 
             xyz

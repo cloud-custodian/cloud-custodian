@@ -1,6 +1,6 @@
 alabaster==0.7.12
 babel==2.8.0
-certifi==2019.11.28
+certifi==2020.4.5.1
 chardet==3.0.4
 colorama==0.4.3; sys_platform == "win32"
 commonmark==0.9.1
@@ -12,7 +12,7 @@ markdown==3.0.1
 markupsafe==1.1.1
 packaging==20.3
 pygments==2.6.1
-pyparsing==2.4.6
+pyparsing==2.4.7
 pytz==2019.3
 recommonmark==0.6.0
 requests==2.23.0

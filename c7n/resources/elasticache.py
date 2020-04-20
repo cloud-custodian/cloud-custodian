@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from datetime import datetime
 import re
 
@@ -458,3 +456,16 @@ def _cluster_eligible_for_snapshot(cluster):
         cluster['Engine'] != 'memcached' and not
         TTYPE.match(cluster['CacheNodeType'])
     )
+
+
+@resources.register('elasticache-group')
+class ElastiCacheReplicationGroup(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = "elasticache"
+        enum_spec = ('describe_replication_groups',
+                     'ReplicationGroups[]', None)
+        arn_type = 'replicationgroup'
+        id = name = dimension = 'ReplicationGroupId'
+
+    permissions = ('elasticache:DescribeReplicationGroups',)

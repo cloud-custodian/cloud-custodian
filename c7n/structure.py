@@ -18,7 +18,7 @@ import six
 from c7n.exceptions import PolicyValidationError
 
 
-class StructureParser(object):
+class StructureParser:
     """Provide fast validation and inspection of a policy file.
 
     Intent is to provide more humane validation for top level errors

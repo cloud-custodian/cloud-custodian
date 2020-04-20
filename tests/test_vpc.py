@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from .common import BaseTest, functional, event_data
 
 from botocore.exceptions import ClientError as BotoClientError
@@ -866,6 +864,13 @@ class NetworkAddrTest(BaseTest):
         network_addr = ec2.allocate_address(Domain="vpc")
         self.addCleanup(self.release_if_still_present, ec2, network_addr)
         self.assert_policy_released(factory, ec2, network_addr)
+
+    def test_elasticip_alias(self):
+        try:
+            self.load_policy({'name': 'eip', 'resource': 'aws.elastic-ip'}, validate=True)
+        except PolicyValidationError:
+            raise
+            self.fail("elastic ip alias failed")
 
     def test_release_attached_ec2(self):
         factory = self.replay_flight_data("test_release_attached_ec2")

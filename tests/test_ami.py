@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import jmespath
 
 from c7n.exceptions import ClientError
@@ -38,6 +36,20 @@ class TestAMI(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ami_ssq(self):
+        factory = self.replay_flight_data('test_ami_sse')
+        p = self.load_policy({
+            'name': 'ubuntu-bionic',
+            'resource': 'aws.ami',
+            'query': [
+                {'Owners': ["123456789123"]},
+                {'Filters': [
+                    {'Name': 'name',
+                     'Values': ["ubuntu/images/hvm-ssd/ubuntu-bionic*"]}]}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(resources[0]['OwnerId'], '123456789123')
 
     def test_err_ami(self):
         factory = self.replay_flight_data("test_ami_not_found_err")

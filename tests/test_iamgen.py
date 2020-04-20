@@ -14,7 +14,7 @@
 
 from .common import BaseTest, load_data
 from c7n.config import Config, Bag
-from c7n import manager
+from c7n import manager, resources
 import fnmatch
 
 
@@ -46,6 +46,7 @@ class TestIamGen(BaseTest):
         all_invalid = []
 
         perms = load_data('iam-actions.json')
+        resources.load_available()
 
         for k, v in manager.resources.items():
             p = Bag({'name': 'permcheck', 'resource': k, 'provider_name': 'aws'})

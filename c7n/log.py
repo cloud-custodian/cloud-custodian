@@ -22,8 +22,6 @@ std logging does default lock acquisition around handler emit).
 also uses a single thread for all outbound. Background thread
 uses a separate session.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from c7n.exceptions import ClientError
 
 import itertools
@@ -45,7 +43,7 @@ SHUTDOWN_MARKER = object()
 EMPTY = Queue.Empty
 
 
-class Error(object):
+class Error:
 
     AlreadyAccepted = "DataAlreadyAcceptedException"
     InvalidToken = "InvalidSequenceTokenException"
@@ -165,7 +163,7 @@ class CloudWatchLogHandler(logging.Handler):
         self.buf = []
 
 
-class Transport(object):
+class Transport:
 
     def __init__(self, queue, batch_size, batch_interval, session_factory):
         self.queue = queue

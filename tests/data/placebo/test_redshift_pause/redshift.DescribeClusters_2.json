@@ -1,0 +1,87 @@
+{
+  "status_code": 200,
+  "data": {
+    "Clusters": [
+      {
+        "ClusterIdentifier": "redshift-cluster-1",
+        "NodeType": "dc2.large",
+        "ClusterStatus": "pausing",
+        "ClusterAvailabilityStatus": "Modifying",
+        "MasterUsername": "awsuser",
+        "DBName": "dev",
+        "Endpoint": {
+          "Address": "redshift-cluster-1.clalcef7utom.us-east-1.redshift.amazonaws.com",
+          "Port": 5439
+        },
+        "ClusterCreateTime": {
+          "__class__": "datetime",
+          "year": 2020,
+          "month": 3,
+          "day": 28,
+          "hour": 12,
+          "minute": 50,
+          "second": 31,
+          "microsecond": 67000
+        },
+        "AutomatedSnapshotRetentionPeriod": 1,
+        "ManualSnapshotRetentionPeriod": -1,
+        "ClusterSecurityGroups": [],
+        "VpcSecurityGroups": [
+          {
+            "VpcSecurityGroupId": "sg-6c7fa917",
+            "Status": "active"
+          }
+        ],
+        "ClusterParameterGroups": [
+          {
+            "ParameterGroupName": "default.redshift-1.0",
+            "ParameterApplyStatus": "in-sync"
+          }
+        ],
+        "ClusterSubnetGroupName": "default",
+        "VpcId": "vpc-d2d616b5",
+        "AvailabilityZone": "us-east-1a",
+        "PreferredMaintenanceWindow": "sun:00:00-sun:00:30",
+        "PendingModifiedValues": {},
+        "ClusterVersion": "1.0",
+        "AllowVersionUpgrade": true,
+        "NumberOfNodes": 1,
+        "PubliclyAccessible": false,
+        "Encrypted": false,
+        "RestoreStatus": {
+          "Status": "completed",
+          "CurrentRestoreRateInMegaBytesPerSecond": 0.0703125,
+          "SnapshotSizeInMegaBytes": 9,
+          "ProgressInMegaBytes": 9,
+          "ElapsedTimeInSeconds": 128,
+          "EstimatedTimeToCompletionInSeconds": 0
+        },
+        "ClusterPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCieUHuoHl91Z1zk0Nj1NYldKeg3Tn50fN6B/L/0rkHQvBKbBB2JBH8BWGgzPcxR6nXostVy+6wkAbVLBcHHhCDnf11AhOFvVRQXKyyq31l1b6SUuryRxCk2RA8ZLuFKqVmnrsfM6hqAmtYdKvwKV3utEASVQFIHMeeGCardo/9lanBIFzzsqpspwKY0wUvGEvHKS5XEgyh3Wchasug0ss7iKsh5UdoLBGaKkeVEtjSThW2ZcVUbcOf62Qt9+ltP/i7B6V6niT1hAf0K8OU0ZqbR2o0phikKQKjutCIxfWdLhuhBeGVU95EzaBRawtp8y9VSZa1p/vqH7MVwrx2s7s1 Amazon-Redshift\n",
+        "ClusterNodes": [
+          {
+            "NodeRole": "SHARED",
+            "PrivateIPAddress": "172.31.15.193",
+            "PublicIPAddress": "18.207.29.120"
+          }
+        ],
+        "ClusterRevisionNumber": "14104",
+        "Tags": [],
+        "EnhancedVpcRouting": false,
+        "IamRoles": [],
+        "MaintenanceTrackName": "current",
+        "DeferredMaintenanceWindows": [],
+        "NextMaintenanceWindowStartTime": {
+          "__class__": "datetime",
+          "year": 2020,
+          "month": 3,
+          "day": 29,
+          "hour": 0,
+          "minute": 0,
+          "second": 0,
+          "microsecond": 0
+        }
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

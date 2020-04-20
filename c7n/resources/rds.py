@@ -42,8 +42,6 @@ Find rds instances that are not encrypted
            op: ne
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import functools
 import itertools
 import logging
@@ -1174,7 +1172,8 @@ class CrossAccountAccess(CrossAccountAccessFilter):
         results = []
         for r in resource_set:
             attrs = {t['AttributeName']: t['AttributeValues']
-             for t in client.describe_db_snapshot_attributes(
+             for t in self.manager.retry(
+                client.describe_db_snapshot_attributes,
                 DBSnapshotIdentifier=r['DBSnapshotIdentifier'])[
                     'DBSnapshotAttributesResult']['DBSnapshotAttributes']}
             r['c7n:attributes'] = attrs
@@ -1612,6 +1611,7 @@ class ModifyDb(BaseAction):
                         'Domain',
                         'CopyTagsToSnapshot',
                         'MonitoringInterval',
+                        'MonitoringRoleARN',
                         'DBPortNumber',
                         'PubliclyAccessible',
                         'DomainIAMRoleName',
@@ -1630,6 +1630,16 @@ class ModifyDb(BaseAction):
         required=('update',))
 
     permissions = ('rds:ModifyDBInstance',)
+
+    def validate(self):
+        if self.data.get('update'):
+            update_dict = dict((i['property'], i['value']) for i in self.data.get('update'))
+            if ('MonitoringInterval' in update_dict and update_dict['MonitoringInterval'] > 0 and
+                    'MonitoringRoleARN' not in update_dict):
+                raise PolicyValidationError(
+                    "A MonitoringRoleARN value is required \
+                    if you specify a MonitoringInterval value other than 0")
+        return self
 
     def process(self, resources):
         c = local_session(self.manager.session_factory).client('rds')

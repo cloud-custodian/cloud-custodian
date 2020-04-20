@@ -32,7 +32,7 @@ from c7n.structure import StructureParser
 from c7n.utils import load_file
 
 
-class SchemaValidator(object):
+class SchemaValidator:
 
     def __init__(self):
         # mostly useful for interactive debugging
@@ -85,7 +85,7 @@ class SchemaValidator(object):
         return schema.JsonSchemaValidator(rt_schema)
 
 
-class PolicyLoader(object):
+class PolicyLoader:
 
     default_schema_validate = bool(schema)
     default_schema_class = SchemaValidator

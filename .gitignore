@@ -34,6 +34,7 @@ results.xml
 .vscode/
 !.vscode/*.sample
 .pytest_cache/
+pip-wheel-metadata/
 pyvenv.cfg
 junit
 /.vs

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import gzip
 import json
 import logging
@@ -23,16 +21,12 @@ from c7n.config import Bag
 
 from c7n.testing import TestUtils, TextTestIO, functional # NOQA
 
-from .zpill import PillTest
+from .zpill import PillTest, ACCOUNT_ID
 
 
 logging.getLogger("placebo.pill").setLevel(logging.DEBUG)
 logging.getLogger("botocore").setLevel(logging.WARNING)
 
-
-# Custodian Test Account. This is used only for testing.
-# Access is available for community project maintainers.
-ACCOUNT_ID = "644160558196"
 
 C7N_VALIDATE = bool(os.environ.get("C7N_VALIDATE", ""))
 
@@ -145,6 +139,10 @@ def placebo_dir(name):
     return os.path.join(os.path.dirname(__file__), "data", "placebo", name)
 
 
+def data_path(*parts):
+    return os.path.join(os.path.dirname(__file__), 'data', *parts)
+
+
 def event_data(name, event_type="cwe"):
     with open(os.path.join(os.path.dirname(__file__), "data", event_type, name)) as fh:
         return json.load(fh)
@@ -175,7 +173,7 @@ class Reservation(Bag):
     pass
 
 
-class Client(object):
+class Client:
 
     def __init__(self, instances):
         self.instances = instances

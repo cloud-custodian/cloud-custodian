@@ -15,8 +15,6 @@
 #
 # AWS resources to manage
 #
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from c7n.provider import clouds
 
 LOADED = set()
@@ -51,21 +49,26 @@ def should_load_provider(name, provider_types):
     return False
 
 
-def load_available():
+PROVIDER_NAMES = ('aws', 'azure', 'gcp', 'k8s')
+
+
+def load_available(resources=True):
     """Load available installed providers
 
     Unlike load_resources() this will catch ImportErrors on uninstalled
     providers.
     """
     found = []
-    for provider in ('aws', 'azure', 'gcp', 'k8s'):
+    for provider in PROVIDER_NAMES:
         try:
             load_providers((provider,))
         except ImportError as e: # pragma: no cover
             continue
         else:
             found.append(provider)
-    load_resources(['%s.*' % s for s in found])
+    if resources:
+        load_resources(['%s.*' % s for s in found])
+    return found
 
 
 def load_providers(provider_types):
@@ -89,5 +92,8 @@ def load_providers(provider_types):
     if should_load_provider('k8s', provider_types):
         from c7n_kube.entry import initialize_kube
         initialize_kube()
+
+    if should_load_provider('c7n', provider_types):
+        from c7n import data  # noqa
 
     LOADED.update(provider_types)

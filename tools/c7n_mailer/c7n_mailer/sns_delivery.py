@@ -19,7 +19,7 @@ from .utils import (
     get_message_subject, get_resource_tag_targets, get_rendered_jinja)
 
 
-class SnsDelivery(object):
+class SnsDelivery:
 
     def __init__(self, config, session, logger):
         self.config = config

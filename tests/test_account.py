@@ -11,14 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from .common import BaseTest
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session
 from c7n.resources import account
+from c7n.testing import mock_datetime_now
 
 import datetime
 from dateutil import parser
@@ -26,7 +25,6 @@ import json
 import mock
 import time
 
-from .test_offhours import mock_datetime_now
 from .common import functional
 
 TRAIL = "nosetest"
@@ -60,7 +58,7 @@ class AccountTests(BaseTest):
 
         session_factory = self.replay_flight_data('test_account_missing_region_resource')
 
-        class SessionFactory(object):
+        class SessionFactory:
 
             def __init__(self, options):
                 self.region = options.region
@@ -368,22 +366,8 @@ class AccountTests(BaseTest):
 
         self.patch(account.time, 'sleep', time_sleep)
         self.assertEqual(
-            account.ServiceLimit.get_check_result(client, account.ServiceLimit.check_id),
+            account.ServiceLimit.get_check_result(client, 'bogusid'),
             True)
-
-    def test_service_limit(self):
-        session_factory = self.replay_flight_data("test_account_service_limit")
-        p = self.load_policy(
-            {
-                "name": "service-limit",
-                "resource": "account",
-                "filters": [{"type": "service-limit", "threshold": 0}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 10)
 
     def test_service_limit_specific_check(self):
         session_factory = self.replay_flight_data("test_account_service_limit")
@@ -394,14 +378,16 @@ class AccountTests(BaseTest):
                 "filters": [
                     {
                         "type": "service-limit",
-                        "limits": ["DB security groups"],
+                        "names": ["RDS DB Instances"],
                         "threshold": 1.0,
                     }
                 ],
             },
             session_factory=session_factory,
         )
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             set([l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
@@ -413,24 +399,26 @@ class AccountTests(BaseTest):
         )
         self.assertEqual(
             set([l["check"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["DB security groups"]),
+            set(["DB instances"]),
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 1)
 
     def test_service_limit_specific_service(self):
-        session_factory = self.replay_flight_data("test_account_service_limit")
+        session_factory = self.replay_flight_data("test_account_service_limit_specific_service")
         p = self.load_policy(
             {
                 "name": "service-limit",
                 "resource": "account",
                 "region": "us-east-1",
                 "filters": [
-                    {"type": "service-limit", "services": ["IAM"], "threshold": 1.0}
+                    {"type": "service-limit", "services": ["IAM"], "threshold": 0.1}
                 ],
             },
             session_factory=session_factory,
         )
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             set([l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
@@ -457,7 +445,9 @@ class AccountTests(BaseTest):
             },
             session_factory=session_factory,
         )
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 0)
 
     def test_account_virtual_mfa(self):
@@ -593,7 +583,9 @@ class AccountTests(BaseTest):
             session_factory=session_factory,
         )
 
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
         # Validate that a case was created
@@ -635,7 +627,9 @@ class AccountTests(BaseTest):
             session_factory=session_factory,
         )
 
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
         # Validate that a case was created
@@ -683,7 +677,9 @@ class AccountTests(BaseTest):
             session_factory=session_factory,
         )
 
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
         # Validate that a case was created

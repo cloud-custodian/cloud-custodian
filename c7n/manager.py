@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import deque
 import logging
 
@@ -30,7 +28,7 @@ except ImportError:
 from c7n.utils import dumps
 
 
-class ResourceManager(object):
+class ResourceManager:
     """
     A Cloud Custodian resource
     """

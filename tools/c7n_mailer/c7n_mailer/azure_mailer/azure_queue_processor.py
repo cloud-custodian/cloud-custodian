@@ -33,7 +33,7 @@ except ImportError:
     pass
 
 
-class MailerAzureQueueProcessor(object):
+class MailerAzureQueueProcessor:
 
     def __init__(self, config, logger, session=None, max_num_processes=16):
         if StorageUtilities is None:
