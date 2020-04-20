@@ -546,7 +546,3 @@ class GlueCatalogCrossAccount(CrossAccountAccessFilter):
             policy = {}
         r[self.policy_annotation] = policy
         return policy
-
-    def __call__(self, r):
-        if self.get_resource_policy(r):
-            return True
