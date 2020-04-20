@@ -526,3 +526,43 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
                 groups = ['sg-12121212', 'sg-34343434']
                 updatefunc(FunctionName='badname', VpcConfig={'SecurityGroupIds': groups})
                 updatefunc.assert_called_once()
+
+    def test_lambda_kms_alias(self):
+        session_factory = self.replay_flight_data("test_lambda_kms_key_filter")
+
+        p = self.load_policy(
+            {
+                "name": "lambda-kms-alias",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "or": [
+                            {
+                                "type": "value",
+                                "key": "KMSKeyArn",
+                                "value": "^(alias/lambda)",
+                                "op": "regex"
+                            },
+                            {
+                                "type": "kms-key",
+                                "key": "c7n:AliasName",
+                                "value": "^(alias/lambda)",
+                                "op": "regex"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(2, len(resources))
+        for r in resources:
+            self.assertTrue(r['KMSKeyArn'] in [
+                u'alias/aws/lambda',
+                u'arn:aws:kms:us-east-1:644160558196:key/a69548f6-9637-4325-b511-ac59056e7302'
+            ])
+            self.assertTrue(r['FunctionArn'] in [
+                u'arn:aws:lambda:us-east-1:644160558196:function:test',
+                u'arn:aws:lambda:us-east-1:644160558196:function:test2'
+            ])
