@@ -30,6 +30,7 @@ from c7n.resources.securityhub import OtherResourcePostFinding
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
 
+from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 
@@ -1276,6 +1277,112 @@ class RemovePermissions(BaseAction):
                     continue
                 method = getattr(client, 'revoke_security_group_%s' % label)
                 method(GroupId=r['GroupId'], IpPermissions=groups)
+
+
+@SecurityGroup.action_registry.register('set-permissions')
+class SetPermissions(BaseAction):
+    """Action to add/remove ingress/egress rule(s) to a security group
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: ops-access-via
+           resource: aws.security-group
+           filters:
+             - type: ingress
+               IpProtocol: "-1"
+               Ports: [22, 3389]
+               Cidr: "0.0.0.0/0"
+           actions:
+            - type: set-permissions
+              # remove the permission matched by a previous ingress filter.
+              remove-ingress: matched
+              # remove permissions by specifying them fully, ie remove default outbound
+              # access.
+              remove-egress:
+                 - IpProtocol: "-1"
+                   Cidr: "0.0.0.0/0"
+
+              # add a list of permissions to the group.
+              add-ingress:
+                # full syntax/parameters to authorize can be used.
+                - IpPermissions:
+                   - IpProtocol: TCP
+                     FromPort: 22
+                     ToPort: 22
+                     IpRanges:
+                       - Description: Ops SSH Access
+                         CidrIp: "1.1.1.1/32"
+                       - Description: Security SSH Access
+                         CidrIp: "2.2.2.2/32"
+              # add a list of egress permissions to a security group
+              add-egress:
+                 - IpProtocol: "TCP"
+                   FromPort: 5044
+                   ToPort: 5044
+                   CidrIp: "192.168.1.2/32"
+
+    """
+    schema = type_schema(
+        'set-permissions',
+        **{'add-ingress': {'type': 'array', 'items': {'type': 'object', 'minProperties': 1}},
+           'remove-ingress': {'oneOf': [
+               {'enum': ['all', 'matched']},
+               {'type': 'array', 'items': {'type': 'object', 'minProperties': 2}}]},
+           'add-egress': {'type': 'array', 'items': {'type': 'object', 'minProperties': 1}},
+           'remove-egress': {'oneOf': [
+               {'enum': ['all', 'matched']},
+               {'type': 'array', 'items': {'type': 'object', 'minProperties': 2}}]}}
+    )
+    permissions = (
+        'ec2:AuthorizeSecurityGroupEgress',
+        'ec2:AuthorizeSecurityGroupIngress',)
+
+    ingress_shape = "AuthorizeSecurityGroupIngressRequest"
+    egress_shape = "AuthorizeSecurityGroupEgressRequest"
+
+    def validate(self):
+        request_template = {'GroupId': 'sg-06bc5ce18a2e5d57a'}
+        for perm_type, shape in (
+                ('egress', self.egress_shape), ('ingress', self.ingress_shape)):
+            for perm in self.data.get('add-%s' % type, ()):
+                params = dict(request_template)
+                params.update(perm)
+                shape_validate(params, shape, 'ec2')
+
+    def get_permissions(self):
+        perms = ()
+        if 'add-ingress' in self.data:
+            perms += ('ec2:AuthorizeSecurityGroupIngress',)
+        if 'add-egress' in self.data:
+            perms += ('ec2:AuthorizeSecurityGroupEgress',)
+        if 'remove-ingress' in self.data or 'remove-egress' in self.data:
+            perms += RemovePermissions.permissions
+        if not perms:
+            perms = self.permissions + RemovePermissions.permissions
+        return perms
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            for method, permissions in (
+                    (client.authorize_security_group_egress, self.data.get('add-egress', ())),
+                    (client.authorize_security_group_ingress, self.data.get('add-ingress', ()))):
+                for p in permissions:
+                    p = dict(p)
+                    p['GroupId'] = r['GroupId']
+                    try:
+                        method(**p)
+                    except ClientError as e:
+                        if e.response['Error']['Code'] != 'InvalidPermission.Duplicate':
+                            raise
+
+        remover = RemovePermissions(
+            {'ingress': self.data.get('remove-ingress', ()),
+             'egress': self.data.get('remove-egress', ())}, self.manager)
+        remover.process(resources)
 
 
 @SecurityGroup.action_registry.register('post-finding')

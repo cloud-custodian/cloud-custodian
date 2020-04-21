@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import time
 from .common import BaseTest, functional, event_data
 
 from botocore.exceptions import ClientError as BotoClientError
@@ -2490,6 +2491,71 @@ class EndpointTest(BaseTest):
         self.assertEqual(violations[0]['Action'], '*')
         self.assertEqual(violations[0]['Resource'], '*')
         self.assertEqual(violations[0]['Effect'], 'Allow')
+
+    def test_set_permission(self):
+        session_factory = self.replay_flight_data(
+            'test_security_group_set_permissions')
+        p = self.load_policy({
+            'name': 'security-group',
+            'resource': 'aws.security-group',
+            'source': 'config',
+            'query': [
+                {'clause': "resourceId ='sg-04ececeaf1ed666cb'"}],
+            'filters': [
+                {'type': 'ingress',
+                 'Ports': [22],
+                 'Cidr': '0.0.0.0/0'}],
+            'actions': [
+                {'type': 'set-permissions',
+                 'remove-egress': [{
+                     "IpProtocol": "-1",
+                     "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                 }],
+                 'remove-ingress': [{
+                     'IpProtocol': 'TCP',
+                     'IpRanges': [{'CidrIp': '0.0.0.0/0'}],
+                     'FromPort': 22,
+                     'ToPort': 22}],
+                 'add-ingress': [
+                     # try to add a duplicate, before we remove
+                     {'CidrIp': '0.0.0.0/0',
+                      'IpProtocol': 'TCP',
+                      'FromPort': 22,
+                      'ToPort': 22},
+                     {'IpPermissions': [{
+                         'IpProtocol': 'TCP',
+                         'FromPort': 443,
+                         'ToPort': 443,
+                         'IpRanges': [{
+                             'Description': 'SSL To The World',
+                             'CidrIp': '0.0.0.0/0'}]
+                     }]}]}
+            ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        if self.recording:
+            time.sleep(2)
+
+        client = session_factory().client('ec2')
+        group = client.describe_security_groups(
+            GroupIds=[resources[0]['GroupId']]).get('SecurityGroups')[0]
+        self.assertEqual(group['IpPermissionsEgress'], [])
+        self.assertEqual(group['IpPermissions'], [{
+            'FromPort': 443,
+            'IpProtocol': 'tcp',
+            'IpRanges': [{'CidrIp': '0.0.0.0/0',
+                          'Description': 'SSL To The World'}],
+            'Ipv6Ranges': [],
+            'PrefixListIds': [],
+            'ToPort': 443,
+            'UserIdGroupPairs': []}])
+        self.assertEqual(
+            p.resource_manager.actions[0].get_permissions(),
+            ('ec2:AuthorizeSecurityGroupIngress',
+             'ec2:RevokeSecurityGroupIngress',
+             'ec2:RevokeSecurityGroupEgress'))
 
 
 class NATGatewayTest(BaseTest):
