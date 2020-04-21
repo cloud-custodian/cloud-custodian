@@ -30,7 +30,6 @@ import threading
 import traceback
 
 import boto3
-import botocore.client
 
 from botocore.validate import ParamValidator
 
@@ -378,54 +377,6 @@ class XrayContext(Context):
             elif s.thread_id == self._main_tid:
                 return s
         return self.handle_context_missing()
-
-
-if HAVE_XRAY:  # pragma: no cover
-    # sigh, work around aws xray sdk issues, via monkey patch
-    # https://github.com/aws/aws-xray-sdk-python/issues/207
-
-    # we can't do a minimal monkey, due to namespace occlusion they
-    # do with function imports masking modules :-(
-
-    # all of this to add a PutTraceSegments to the exempted methods list.
-    import wrapt
-
-    from aws_xray_sdk.ext.boto_utils import inject_header, aws_meta_processor
-    from aws_xray_sdk.ext import botocore as xray_boto3
-
-    def _xray_traced_botocore(wrapped, instance, args, kwargs):
-        service = instance._service_model.metadata["endpointPrefix"]
-        if service == 'xray':
-            # skip tracing for SDK built-in sampling pollers
-            if ('GetSamplingRules' in args or
-                'GetSamplingTargets' in args or
-                    'PutTraceSegments' in args):
-                return wrapped(*args, **kwargs)
-        return xray_recorder.record_subsegment(
-            wrapped, instance, args, kwargs,
-            name=service,
-            namespace='aws',
-            meta_processor=aws_meta_processor,
-        )
-
-    def _xray_patch_botocore():
-        if hasattr(botocore.client, '_xray_enabled'):
-            return
-        setattr(botocore.client, '_xray_enabled', True)
-
-        wrapt.wrap_function_wrapper(
-            'botocore.client',
-            'BaseClient._make_api_call',
-            _xray_traced_botocore,
-        )
-
-        wrapt.wrap_function_wrapper(
-            'botocore.endpoint',
-            'Endpoint.prepare_request',
-            inject_header,
-        )
-
-    xray_boto3.patch = _xray_patch_botocore
 
 
 @tracer_outputs.register('xray', condition=HAVE_XRAY)

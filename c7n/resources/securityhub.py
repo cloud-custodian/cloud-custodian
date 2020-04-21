@@ -316,6 +316,10 @@ class PostFinding(Action):
             'policy.description, or if not defined in policy then policy.name'},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
+        severity_label={
+            "type": "string", 'default': 'INFORMATIONAL',
+            "enum": ["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"],
+        },
         confidence={"type": "number", "min": 0, "max": 100},
         criticality={"type": "number", "min": 0, "max": 100},
         # Cross region aggregation
@@ -472,9 +476,12 @@ class PostFinding(Action):
             "RecordState": "ACTIVE",
         }
 
-        severity = {'Product': 0, 'Normalized': 0}
+        severity = {'Product': 0, 'Normalized': 0, 'Label': 'INFORMATIONAL'}
         if self.data.get("severity") is not None:
             severity["Product"] = self.data["severity"]
+        if self.data.get("severity_label") is not None:
+            severity["Label"] = self.data["severity_label"]
+        # severity_normalized To be deprecated per https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html#asff-severity # NOQA
         if self.data.get("severity_normalized") is not None:
             severity["Normalized"] = self.data["severity_normalized"]
         if severity:
