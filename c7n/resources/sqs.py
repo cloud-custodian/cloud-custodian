@@ -377,7 +377,7 @@ class HasStatementFilter(PolicyStatementFilter):
 
             policies:
               - name: sqs-bucket-has-statement
-                resource: sqs
+                resource: aws.sqs
                 filters:
                   - type: has-statement
                     statement_ids:
@@ -386,7 +386,7 @@ class HasStatementFilter(PolicyStatementFilter):
 
             policies:
               - name: sqs-public-policy
-                resource: sqs
+                resource: aws.sqs
                 filters:
                   - type: has-statement
                     statements:
