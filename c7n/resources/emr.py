@@ -286,6 +286,7 @@ class QueryFilter:
 
         return {'Name': self.key, 'Values': value}
 
+
 @resources.register('emr-security-configuration')
 class EMRSecurityConfiguration(QueryResourceManager):
     """Resource manager for Elastic MapReduce clusters
@@ -308,6 +309,7 @@ class EMRSecurityConfiguration(QueryResourceManager):
         # Describe notebook-instance & then list tags
         resources = super(EMRSecurityConfiguration, self).augment(resources)
         return list(map(_augment, resources))
+
 
 @EMRSecurityConfiguration.action_registry.register('delete')
 class DeleteEMRSecurityConfiguration(BaseAction):
