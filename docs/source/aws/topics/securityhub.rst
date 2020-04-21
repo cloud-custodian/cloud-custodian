@@ -138,6 +138,9 @@ The Amazon Security Finding Format is documented at https://docs.aws.amazon.com/
    * - Hardcoded Fixed Value: "2018-10-08"
      - SchemaVersion
      - Only Valid value
+   * - metadata.json policy.actions.severity_label
+     - Severity.Label
+     - User supplied value in policy configuration
    * - metadata.json policy.actions.severity_normalized
      - Severity.Normalized
      - User supplied value in policy configuration

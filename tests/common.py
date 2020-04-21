@@ -139,6 +139,10 @@ def placebo_dir(name):
     return os.path.join(os.path.dirname(__file__), "data", "placebo", name)
 
 
+def data_path(*parts):
+    return os.path.join(os.path.dirname(__file__), 'data', *parts)
+
+
 def event_data(name, event_type="cwe"):
     with open(os.path.join(os.path.dirname(__file__), "data", event_type, name)) as fh:
         return json.load(fh)

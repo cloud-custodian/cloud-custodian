@@ -31,7 +31,6 @@ except ImportError:
     def setproctitle(t):
         return None
 
-from c7n.commands import schema_completer
 from c7n.config import Config
 
 DEFAULT_REGION = 'us-east-1'
@@ -166,20 +165,11 @@ def _logs_options(p):
     )
 
 
-def _schema_tab_completer(prefix, parsed_args, **kwargs):
-    # If we are printing the summary we discard the resource
-    if parsed_args.summary:
-        return []
-
-    return schema_completer(prefix)
-
-
 def _schema_options(p):
     """ Add options specific to schema subcommand. """
 
     p.add_argument(
-        'resource', metavar='selector', nargs='?',
-        default=None).completer = _schema_tab_completer
+        'resource', metavar='selector', nargs='?', default=None)
     p.add_argument(
         '--summary', action="store_true",
         help="Summarize counts of available resources, actions and filters")

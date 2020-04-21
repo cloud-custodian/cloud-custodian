@@ -20,7 +20,7 @@ from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.tags import universal_augment
-from c7n.filters import StateTransitionFilter, FilterRegistry
+from c7n.filters import StateTransitionFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
 
@@ -516,3 +516,33 @@ class GlueCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
               SseAwsKmsKeyId: alias/aws/glue
 
     """
+
+
+@GlueDataCatalog.filter_registry.register('cross-account')
+class GlueCatalogCrossAccount(CrossAccountAccessFilter):
+    """Filter glue catalog if it has cross account permissions
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: catalog-cross-account
+          resource: aws.glue-catalog
+          filters:
+            - type: cross-account
+
+    """
+    permissions = ('glue:GetResourcePolicy',)
+    policy_annotation = "c7n:AccessPolicy"
+
+    def get_resource_policy(self, r):
+        client = local_session(self.manager.session_factory).client('glue')
+        if self.policy_annotation in r:
+            return r[self.policy_annotation]
+        try:
+            policy = client.get_resource_policy().get('PolicyInJson')
+        except client.exceptions.EntityNotFoundException:
+            policy = {}
+        r[self.policy_annotation] = policy
+        return policy

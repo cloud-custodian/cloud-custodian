@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.tags import universal_augment
 
 
 @resources.register('waf')
@@ -45,3 +46,14 @@ class RegionalWAF(QueryResourceManager):
         arn_type = "webacl"
         permissions_enum = ('waf-regional:ListWebACLs',)
         permissions_augment = ('waf-regional:GetWebACL',)
+        universal_taggable = object()
+
+    def get_source(self, source_type):
+        if source_type == 'describe':
+            return DescribeRegionalWaf(self)
+        return super(RegionalWAF, self).get_source(source_type)
+
+
+class DescribeRegionalWaf(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)

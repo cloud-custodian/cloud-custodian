@@ -1066,10 +1066,12 @@ class CopyRelatedResourceTag(Tag):
                     if k in tag_keys and resource_tags.get(k) != v}
         if not tags:
             return
+        if not isinstance(tag_action, UniversalTag):
+            tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
         tag_action.process_resource_set(
             client,
             resource_set=[r],
-            tags=[{'Key': k, 'Value': v} for k, v in tags.items()])
+            tags=tags)
         return True
 
     def get_resource_tag_map(self, r_type, ids):

@@ -25,6 +25,7 @@ from .test_offhours import mock_datetime_now
 from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
+from c7n.executor import MainThreadExecutor
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
@@ -49,8 +50,6 @@ from c7n.resources.iam import (
     NoSpecificIamRoleManagedPolicy,
     PolicyQueryParser
 )
-
-from c7n.executor import MainThreadExecutor
 
 
 class UserCredentialReportTest(BaseTest):
@@ -376,7 +375,7 @@ class IAMMFAFilter(BaseTest):
         self.assertEqual(len(resources), 2)
 
 
-class IamRoleFilterUsage(BaseTest):
+class IamRoleTest(BaseTest):
 
     def test_iam_role_inuse(self):
         session_factory = self.replay_flight_data("test_iam_role_inuse")
@@ -417,9 +416,6 @@ class IamRoleFilterUsage(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['RoleId'], "AROAIGK7B2VUDZL4I73HK")
 
-
-class IamRoleTag(BaseTest):
-
     def test_iam_role_actions(self):
         factory = self.replay_flight_data('test_iam_role_tags')
         p = self.load_policy({
@@ -452,8 +448,105 @@ class IamRoleTag(BaseTest):
             {'Application'},
             {t['Key'] for t in role['Tags']})
 
+    def test_iam_role_set_boundary(self):
+        factory = self.replay_flight_data('test_iam_role_set_boundary')
+        p = self.load_policy({
+            'name': 'boundary',
+            'resource': 'iam-role',
+            'filters': [
+                {'RoleName': 'accountmgr-dev'},
+                {'PermissionsBoundary': 'absent'}
+            ],
+            'actions': [{
+                'type': 'set-boundary',
+                'policy': 'arn:aws:iam::644160558196:policy/BlackListIamList'
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['RoleName'] == 'accountmgr-dev'
+        if self.recording:
+            time.sleep(2)
+        client = factory().client('iam')
+        assert client.get_role(RoleName='accountmgr-dev')[
+            'Role'].get('PermissionsBoundary', {}) == {
+                'PermissionsBoundaryType': 'Policy',
+                'PermissionsBoundaryArn': 'arn:aws:iam::644160558196:policy/BlackListIamList',
+        }
+
+    def test_iam_role_remove_boundary(self):
+        factory = self.replay_flight_data('test_iam_role_remove_boundary')
+        p = self.load_policy({
+            'name': 'boundary',
+            'resource': 'iam-role',
+            'filters': [
+                {'RoleName': 'accountmgr-dev'},
+                {'PermissionsBoundary': 'present'}
+            ],
+            'actions': [{
+                'type': 'set-boundary',
+                'state': 'absent',
+            }]},
+            session_factory=factory)
+        p.resource_manager.execution_factory = MainThreadExecutor
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['RoleName'] == 'accountmgr-dev'
+        if self.recording:
+            time.sleep(5)
+        client = factory().client('iam')
+        assert client.get_role(RoleName='accountmgr-dev')[
+            'Role'].get('PermissionsBoundary', {}) == {}
+
 
 class IamUserTest(BaseTest):
+
+    def test_iam_user_set_boundary(self):
+        factory = self.replay_flight_data('test_iam_user_set_boundary')
+        p = self.load_policy({
+            'name': 'boundary',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'devbot'},
+                {'PermissionsBoundary': 'absent'}],
+            'actions': [{
+                'type': 'set-boundary',
+                'policy': 'arn:aws:iam::644160558196:policy/BlackListIamList',
+            }]},
+            session_factory=factory)
+
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['UserName'] == 'devbot'
+
+        if self.recording:
+            time.sleep(1)
+        client = factory().client('iam')
+        assert client.get_user(UserName='devbot')['User'].get('PermissionsBoundary', {}) == {
+            'PermissionsBoundaryType': 'Policy',
+            'PermissionsBoundaryArn': 'arn:aws:iam::644160558196:policy/BlackListIamList'
+        }
+
+    def test_iam_user_boundary_remove(self):
+        factory = self.replay_flight_data('test_iam_user_remove_boundary')
+        p = self.load_policy({
+            'name': 'boundary',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'devbot'},
+                {'PermissionsBoundary': 'present'}],
+            'actions': [{
+                'type': 'set-boundary', 'state': 'absent'}]},
+            session_factory=factory)
+
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['UserName'] == 'devbot'
+
+        if self.recording:
+            time.sleep(1)
+        client = factory().client('iam')
+        assert client.get_user(UserName='devbot')['User'].get('PermissionsBoundary', {}) == {}
 
     def test_iam_user_usage_no_such_entity(self):
         p = self.load_policy({

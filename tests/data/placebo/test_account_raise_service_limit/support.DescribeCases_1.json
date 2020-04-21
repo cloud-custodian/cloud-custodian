@@ -1,45 +1,34 @@
 {
-    "status_code": 200, 
-    "data": {
-        "cases": [
+  "status_code": 200,
+  "data": {
+    "cases": [
+      {
+        "status": "unassigned",
+        "recentCommunications": {
+          "communications": [
             {
-                "status": "unassigned", 
-                "recentCommunications": {
-                    "communications": [
-                        {
-                            "body": "Please raise the account limit of EBS by 50%\n\n", 
-                            "attachmentSet": [], 
-                            "caseId": "case-644160558196-muen-2017-db7503fb7487ee2c", 
-                            "timeCreated": "2017-04-14T13:46:50.000Z", 
-                            "submittedBy": "foo@example.com (IAM) <foo@example.com>"
-                        }
-                    ]
-                }, 
-                "ccEmailAddresses": [
-                    "bar@example.com"
-                ], 
-                "timeCreated": "2017-04-14T13:46:50.000Z", 
-                "caseId": "case-644160558196-muen-2017-db7503fb7487ee2c", 
-                "severityCode": "normal", 
-                "language": "en", 
-                "categoryCode": "general-guidance", 
-                "serviceCode": "amazon-elastic-block-store", 
-                "submittedBy": "foo@example.com", 
-                "displayId": "2155741311", 
-                "subject": "Programmatic test"
+              "body": "Please raise the account limit of EBS by 50%\n\n",
+              "attachmentSet": [],
+              "caseId": "case-644160558196-muen-2017-db7503fb7487ee2c",
+              "timeCreated": "2017-04-14T13:46:50.000Z",
+              "submittedBy": "foo@example.com (IAM) <foo@example.com>"
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "d0728ff4-2118-11e7-8a1d-03599c571d36", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "d0728ff4-2118-11e7-8a1d-03599c571d36", 
-                "date": "Fri, 14 Apr 2017 13:46:51 GMT", 
-                "content-length": "4082", 
-                "x-amzn-actiontrace": "amzn1.tr.d072909f-2118-11e7-8e3e-0a5b60ee0000.0..ywQFl8", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
-    }
+          ]
+        },
+        "ccEmailAddresses": [
+          "bar@example.com"
+        ],
+        "timeCreated": "2017-04-14T13:46:50.000Z",
+        "caseId": "case-644160558196-muen-2017-db7503fb7487ee2c",
+        "severityCode": "normal",
+        "language": "en",
+        "categoryCode": "general-guidance",
+        "serviceCode": "amazon-elastic-block-store",
+        "submittedBy": "foo@example.com",
+        "displayId": "2155741311",
+        "subject": "Programmatic test"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

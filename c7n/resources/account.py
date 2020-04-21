@@ -15,9 +15,9 @@
 """
 import json
 import time
+import datetime
 from botocore.exceptions import ClientError
-from datetime import datetime, timedelta
-
+from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzutc
 
@@ -33,6 +33,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
+
 
 filters = FilterRegistry('aws.account.filters')
 actions = ActionRegistry('aws.account.actions')
@@ -430,44 +431,71 @@ class ServiceLimit(Filter):
     Supported limits are per trusted advisor, which is variable based
     on usage in the account and support level enabled on the account.
 
-      - service: AutoScaling limit: Auto Scaling groups
-      - service: AutoScaling limit: Launch configurations
-      - service: EBS limit: Active snapshots
-      - service: EBS limit: Active volumes
-      - service: EBS limit: General Purpose (SSD) volume storage (GiB)
-      - service: EBS limit: Magnetic volume storage (GiB)
-      - service: EBS limit: Provisioned IOPS
-      - service: EBS limit: Provisioned IOPS (SSD) storage (GiB)
-      - service: EC2 limit: Elastic IP addresses (EIPs)
+    The `names` attribute lets you filter which checks to query limits
+    about.  This is a case-insensitive globbing match on a check name.
+    You can specify a name exactly or use globbing wildcards like `VPC*`.
 
-      # Note this is extant for each active instance type in the account
-      # however the total value is against sum of all instance types.
-      # see issue https://github.com/cloud-custodian/cloud-custodian/issues/516
+    The names are exactly what's shown on the trusted advisor page:
 
-      - service: EC2 limit: On-Demand instances - m3.medium
+        https://console.aws.amazon.com/trustedadvisor/home#/category/service-limits
 
-      - service: EC2 limit: Reserved Instances - purchase limit (monthly)
-      - service: ELB limit: Active load balancers
-      - service: IAM limit: Groups
-      - service: IAM limit: Instance profiles
-      - service: IAM limit: Roles
-      - service: IAM limit: Server certificates
-      - service: IAM limit: Users
-      - service: RDS limit: DB instances
-      - service: RDS limit: DB parameter groups
-      - service: RDS limit: DB security groups
-      - service: RDS limit: DB snapshots per user
-      - service: RDS limit: Storage quota (GB)
-      - service: RDS limit: Internet gateways
-      - service: SES limit: Daily sending quota
-      - service: VPC limit: VPCs
-      - service: VPC limit: VPC Elastic IP addresses (EIPs)
+    or via the awscli:
+
+        aws --region us-east-1 support describe-trusted-advisor-checks --language en \
+            --query 'checks[?category==`service_limits`].[name]' --output text
+
+    While you can target individual checks via the `names` attribute, and
+    that should be the preferred method, the following are provided for
+    backward compatibility with the old style of checks:
+
+    - `services`
+
+        The resulting limit's `service` field must match one of these.
+        These are case-insensitive globbing matches.
+
+        Note: If you haven't specified any `names` to filter, then
+        these service names are used as a case-insensitive prefix match on
+        the check name.  This helps limit the number of API calls we need
+        to make.
+
+    - `limits`
+
+        The resulting limit's `Limit Name` field must match one of these.
+        These are case-insensitive globbing matches.
+
+    Some example names and their corresponding service and limit names:
+
+    Check Name                          Service         Limit Name
+    ----------------------------------  --------------  ---------------------------------
+    Auto Scaling Groups                 AutoScaling     Auto Scaling groups
+    Auto Scaling Launch Configurations  AutoScaling     Launch configurations
+    CloudFormation Stacks               CloudFormation  Stacks
+    ELB Application Load Balancers      ELB             Active Application Load Balancers
+    ELB Classic Load Balancers          ELB             Active load balancers
+    ELB Network Load Balancers          ELB             Active Network Load Balancers
+    VPC                                 VPC             VPCs
+    VPC Elastic IP Address              VPC             VPC Elastic IP addresses (EIPs)
+    VPC Internet Gateways               VPC             Internet gateways
+
+    Note: Some service limits checks are being migrated to service quotas,
+    which is expected to largely replace service limit checks in trusted
+    advisor.  In this case, some of these checks have no results.
 
     :example:
 
     .. code-block:: yaml
 
             policies:
+              - name: specific-account-service-limits
+                resource: account
+                filters:
+                  - type: service-limit
+                    names:
+                      - IAM Policies
+                      - IAM Roles
+                      - "VPC*"
+                    threshold: 1.0
+
               - name: increase-account-service-limits
                 resource: account
                 filters:
@@ -475,6 +503,7 @@ class ServiceLimit(Filter):
                     services:
                       - EC2
                     threshold: 1.0
+
               - name: specify-region-for-global-service
                 region: us-east-1
                 resource: account
@@ -491,13 +520,18 @@ class ServiceLimit(Filter):
         threshold={'type': 'number'},
         refresh_period={'type': 'integer',
                         'title': 'how long should a check result be considered fresh'},
+        names={'type': 'array', 'items': {'type': 'string'}},
         limits={'type': 'array', 'items': {'type': 'string'}},
         services={'type': 'array', 'items': {
-            'enum': ['EC2', 'ELB', 'VPC', 'AutoScaling',
-                     'RDS', 'EBS', 'SES', 'IAM']}})
+            'enum': ['AutoScaling', 'CloudFormation',
+                     'DynamoDB', 'EBS', 'EC2', 'ELB',
+                     'IAM', 'RDS', 'Route53', 'SES', 'VPC']}})
 
-    permissions = ('support:DescribeTrustedAdvisorCheckResult',)
-    check_id = 'eW7HH0l7J9'
+    permissions = ('support:DescribeTrustedAdvisorCheckRefreshStatuses',
+                   'support:DescribeTrustedAdvisorCheckResult',
+                   'support:DescribeTrustedAdvisorChecks',
+                   'support:RefreshTrustedAdvisorCheck')
+    deprecated_check_ids = ['eW7HH0l7J9']
     check_limit = ('region', 'service', 'check', 'limit', 'extant', 'color')
 
     # When doing a refresh, how long to wait for the check to become ready.
@@ -533,44 +567,95 @@ class ServiceLimit(Filter):
                     break
         return checks
 
+    def get_available_checks(self, client, category='service_limits'):
+        checks = client.describe_trusted_advisor_checks(language='en')
+        return [c for c in checks['checks']
+                if c['category'] == category and
+                c['id'] not in self.deprecated_check_ids]
+
+    def match_patterns_to_value(self, patterns, value):
+        for p in patterns:
+            if fnmatch(value.lower(), p.lower()):
+                return True
+        return False
+
+    def should_process(self, name):
+        # if names specified, limit to these names
+        patterns = self.data.get('names')
+        if patterns:
+            return self.match_patterns_to_value(patterns, name)
+
+        # otherwise, if services specified, limit to those prefixes
+        services = self.data.get('services')
+        if services:
+            patterns = ["{}*".format(i) for i in services]
+            return self.match_patterns_to_value(patterns, name.replace(' ', ''))
+
+        return True
+
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'support', region_name='us-east-1')
-        checks = self.get_check_result(client, self.check_id)
 
-        region = self.manager.config.region
-        checks['flaggedResources'] = [r for r in checks['flaggedResources']
-            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')]
-        resources[0]['c7n:ServiceLimits'] = checks
-
-        delta = timedelta(self.data.get('refresh_period', 1))
-        check_date = parse_date(checks['timestamp'])
-        if datetime.now(tz=tzutc()) - delta > check_date:
-            client.refresh_trusted_advisor_check(checkId=self.check_id)
-        threshold = self.data.get('threshold')
-
-        services = self.data.get('services')
-        limits = self.data.get('limits')
+        checks = self.get_available_checks(client)
         exceeded = []
-
-        for resource in checks['flaggedResources']:
-            if threshold is None and resource['status'] == 'ok':
+        for check in checks:
+            if not self.should_process(check['name']):
                 continue
-            limit = dict(zip(self.check_limit, resource['metadata']))
-            if services and limit['service'] not in services:
-                continue
-            if limits and limit['check'] not in limits:
-                continue
-            limit['status'] = resource['status']
-            limit['percentage'] = float(limit['extant'] or 0) / float(
-                limit['limit']) * 100
-            if threshold and limit['percentage'] < threshold:
-                continue
-            exceeded.append(limit)
+            matched = self.process_check(client, check, resources, event)
+            if matched:
+                for m in matched:
+                    m['check_id'] = check['id']
+                    m['name'] = check['name']
+                exceeded.extend(matched)
         if exceeded:
             resources[0]['c7n:ServiceLimitsExceeded'] = exceeded
             return resources
         return []
+
+    def process_check(self, client, check, resources, event=None):
+        region = self.manager.config.region
+        results = self.get_check_result(client, check['id'])
+
+        # trim to only results for this region
+        results['flaggedResources'] = [
+            r
+            for r in results.get('flaggedResources', [])
+            if r['metadata'][0] == region or (r['metadata'][0] == '-' and region == 'us-east-1')
+        ]
+
+        # save all raw limit results to the account resource
+        if 'c7n:ServiceLimits' not in resources[0]:
+            resources[0]['c7n:ServiceLimits'] = []
+        resources[0]['c7n:ServiceLimits'].append(results)
+
+        # check if we need to refresh the check for next time
+        delta = datetime.timedelta(self.data.get('refresh_period', 1))
+        check_date = parse_date(results['timestamp'])
+        if datetime.datetime.now(tz=tzutc()) - delta > check_date:
+            client.refresh_trusted_advisor_check(checkId=check['id'])
+
+        services = self.data.get('services')
+        limits = self.data.get('limits')
+        threshold = self.data.get('threshold')
+        exceeded = []
+
+        for resource in results['flaggedResources']:
+            if threshold is None and resource['status'] == 'ok':
+                continue
+            limit = dict(zip(self.check_limit, resource['metadata']))
+            if services and not self.match_patterns_to_value(services, limit['service']):
+                continue
+            if limits and not self.match_patterns_to_value(limits, limit['check']):
+                continue
+            limit['status'] = resource['status']
+            limit['percentage'] = (
+                float(limit['extant'] or 0) / float(limit['limit']) * 100
+            )
+            if threshold and limit['percentage'] < threshold:
+                continue
+            exceeded.append(limit)
+        return exceeded
 
 
 @actions.register('request-limit-increase')
@@ -626,14 +711,17 @@ class RequestLimitIncrease(BaseAction):
 
     service_code_mapping = {
         'AutoScaling': 'auto-scaling',
-        'ELB': 'elastic-load-balancing',
+        'CloudFormation': 'aws-cloudformation',
+        'DynamoDB': 'amazon-dynamodb',
         'EBS': 'amazon-elastic-block-store',
         'EC2': 'amazon-elastic-compute-cloud-linux',
-        'RDS': 'amazon-relational-database-service-aurora',
-        'VPC': 'amazon-virtual-private-cloud',
+        'ELB': 'elastic-load-balancing',
         'IAM': 'aws-identity-and-access-management',
-        'CloudFormation': 'aws-cloudformation',
         'Kinesis': 'amazon-kinesis',
+        'RDS': 'amazon-relational-database-service-aurora',
+        'Route53': 'amazon-route53',
+        'SES': 'amazon-simple-email-service',
+        'VPC': 'amazon-virtual-private-cloud',
     }
 
     def process(self, resources):

@@ -22,7 +22,7 @@ from c7n import cli, version, commands
 from c7n.resolver import ValuesFrom
 from c7n.resources import aws
 from c7n.schema import ElementSchema, generate
-from c7n.utils import yaml_dump
+from c7n.utils import yaml_dump, yaml_load
 
 from .common import BaseTest, TextTestIO
 
@@ -171,7 +171,9 @@ class SchemaTest(CliTest):
     def test_schema(self):
 
         # no options
-        self.run_and_expect_success(["custodian", "schema"])
+        stdout, stderr = self.run_and_expect_success(["custodian", "schema"])
+        data = yaml_load(stdout)
+        assert data['resources']
 
         # summary option
         self.run_and_expect_success(["custodian", "schema", "--summary"])
@@ -423,30 +425,6 @@ class LogsTest(CliTest):
         yaml_file = self.write_policy_file({"policies": [p_data]})
         output_dir = os.path.join(os.path.dirname(__file__), "data", "logs")
         self.run_and_expect_failure(["custodian", "logs", "-s", output_dir, yaml_file], 1)
-
-
-class TabCompletionTest(CliTest):
-    """ Tests for argcomplete tab completion. """
-
-    def test_schema_completer(self):
-        self.assertIn("aws.rds", cli.schema_completer("rd"))
-        self.assertIn("aws.s3.", cli.schema_completer("s3"))
-        self.assertListEqual([], cli.schema_completer("invalidResource."))
-        self.assertIn("aws.rds.actions", cli.schema_completer("rds."))
-        self.assertIn("aws.s3.filters.", cli.schema_completer("s3.filters"))
-        self.assertIn("aws.s3.filters.event", cli.schema_completer("s3.filters.eve"))
-        self.assertListEqual([], cli.schema_completer("rds.actions.foo.bar"))
-
-    def test_schema_completer_wrapper(self):
-
-        class MockArgs:
-            summary = False
-
-        args = MockArgs()
-        self.assertIn("aws.rds", cli._schema_tab_completer("rd", args))
-
-        args.summary = True
-        self.assertListEqual([], cli._schema_tab_completer("rd", args))
 
 
 class RunTest(CliTest):
