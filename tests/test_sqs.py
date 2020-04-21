@@ -635,10 +635,10 @@ class TestSqsAction(BaseTest):
                             {
                                 "type": "has-statement",
                                 "statements": [
-                                    {"Effect": "Deny"},
-                                    {"Principal": "*"},
-                                    {"Action": "sqs:*"},
                                     {
+                                        "Effect": "Deny",
+                                        "Principal": "*",
+                                        "Action": "sqs:*",
                                         "Condition": {
                                             "StringNotEquals": {
                                                 "aws:PrincipalOrgID": "o-4amkskbcf1"
