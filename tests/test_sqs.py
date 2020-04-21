@@ -624,14 +624,13 @@ class TestSqsAction(BaseTest):
 
     def test_sqs_has_statements(self):
         session = self.replay_flight_data("test_sqs_has_statements")
-        client = session(region="us-east-1").client("sqs")
         p = self.load_policy(
             {
                 "name": "sqs-has_statements",
                 "resource": "aws.sqs",
                 "filters": [
-                    {"QueueArn":"arn:aws:sqs:us-east-1:644160558196:test"},
-                    { 
+                    {"QueueArn": "arn:aws:sqs:us-east-1:644160558196:test"},
+                    {
                         "not": [
                             {
                                 "type": "has-statement",
@@ -656,8 +655,8 @@ class TestSqsAction(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        assert( 
-            "\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"SQS:*\"" 
+        assert(
+            "\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"SQS:*\""
             not in resources[0]["Policy"]
         )
         assert(

@@ -394,4 +394,3 @@ class HasStatementFilter(PolicyStatementFilter):
                         Action: 'sqs:*'
                         Principal: '*'
     """
-
