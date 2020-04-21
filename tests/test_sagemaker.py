@@ -251,6 +251,7 @@ class TestNotebookInstance(BaseTest):
         aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 
+
 class TestModelInstance(BaseTest):
 
     def test_list_model(self):
