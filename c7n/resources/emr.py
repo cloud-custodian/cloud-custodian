@@ -13,6 +13,7 @@
 # limitations under the License.
 import logging
 import time
+import json
 
 import six
 
@@ -294,22 +295,19 @@ class EMRSecurityConfiguration(QueryResourceManager):
         service = 'emr'
         arn_type = 'emr'
         enum_spec = ('list_security_configurations', 'SecurityConfigurations', None)
-        detail_spec = ('describe_security_confgiration', 'Name', None, None)
+        detail_spec = ('describe_security_configuration', 'Name', 'Name', None)
         id = name = 'Name'
 
-@EMRSecurityConfiguration.action_registry.register('delete')
-class DeleteEMRSecurityConfiguration(BaseAction):
+    def augment(self, resources):
 
-    schema = type_schema('delete')
-    permissions = ('emr:DeleteSecurityConfiguration',)
+        def _augment(r):
+            # Convert the json string to dict
+            r['SecurityConfiguration'] = json.loads(r['SecurityConfiguration'])
+            return r
 
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('emr')
-        for r in resources:
-            try:
-                client.delete_security_configuration(Name=r['Name'])
-            except client.exceptions.EntityNotFoundException:
-                continue
+        # Describe notebook-instance & then list tags
+        resources = super(EMRSecurityConfiguration, self).augment(resources)
+        return list(map(_augment, resources))
 
 @EMRSecurityConfiguration.action_registry.register('delete')
 class DeleteEMRSecurityConfiguration(BaseAction):

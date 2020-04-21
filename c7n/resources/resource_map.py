@@ -55,6 +55,7 @@ ResourceMap = {
     "aws.elasticsearch": "c7n.resources.elasticsearch.ElasticSearchDomain",
     "aws.elb": "c7n.resources.elb.ELB",
     "aws.emr": "c7n.resources.emr.EMRCluster",
+    "aws.emr-security-configuration": "c7n.resources.emr.EMRSecurityConfiguration",
     "aws.eni": "c7n.resources.vpc.NetworkInterface",
     "aws.event-rule": "c7n.resources.cw.EventRule",
     "aws.event-rule-target": "c7n.resources.cw.EventRuleTarget",
