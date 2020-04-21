@@ -593,24 +593,26 @@ class NotebookKmsFilter(KmsRelatedFilter):
     """
     Filter a resource by its associcated kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
+
     :example:
+
         .. code-block:: yaml
 
-            policies:
-              - name: sagemaker-kms-key-filters
-                resource: aws.sagemaker-notebook
-                filters:
-                  - type: kms-key
-                    key: c7n:AliasName
-                    value: "^(alias/aws/sagemaker)"
-                    op: regex
+        policies:
+            - name: sagemaker-kms-key-filters
+            resource: aws.sagemaker-notebook
+            filters:
+                - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/sagemaker)"
+                op: regex
 
-              - name: sagemaker-endpoint-kms-key-filters
-                resource: aws.sagemaker-endpoint-config
-                filters:
-                  - type: kms-key
-                    key: c7n:AliasName
-                    value: "alias/aws/sagemaker"
+            - name: sagemaker-endpoint-kms-key-filters
+            resource: aws.sagemaker-endpoint-config
+            filters:
+                - type: kms-key
+                key: c7n:AliasName
+                value: "alias/aws/sagemaker"
     """
     RelatedIdsExpression = "KmsKeyId"
 
