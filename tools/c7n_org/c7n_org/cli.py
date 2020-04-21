@@ -202,7 +202,8 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
 def resolve_regions(regions):
     if 'all' in regions:
-        client = boto3.client('ec2')
+        client = boto3.client('ec2', region_name=os.environ.get(
+            'AWS_REGION', os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')))
         return [region['RegionName'] for region in client.describe_regions()['Regions']]
     if not regions:
         return ('us-east-1', 'us-west-2')
