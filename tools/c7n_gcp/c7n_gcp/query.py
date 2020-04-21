@@ -282,6 +282,10 @@ class TypeInfo:
     labels = False
     labels_op = 'setLabels'
 
+    # required for reporting
+    id = None
+    name = None
+
 
 class ChildTypeInfo(TypeInfo):
 
