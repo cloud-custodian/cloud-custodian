@@ -596,7 +596,7 @@ class NotebookKmsFilter(KmsRelatedFilter):
 
     :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
         policies:
             - name: sagemaker-kms-key-filters
