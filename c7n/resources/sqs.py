@@ -18,6 +18,7 @@ import json
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase
 from c7n.filters import CrossAccountAccessFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.iamaccess import PolicyStatementFilter
 from c7n.manager import resources
 from c7n.utils import local_session
 from c7n.query import QueryResourceManager, TypeInfo
@@ -364,3 +365,33 @@ class SetRetentionPeriod(BaseAction):
                 QueueUrl=q['QueueUrl'],
                 Attributes={
                     'MessageRetentionPeriod': period})
+
+
+@SQS.filter_registry.register('has-statement')
+class HasStatementFilter(PolicyStatementFilter):
+    """Find queues with set of policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sqs-bucket-has-statement
+                resource: sqs
+                filters:
+                  - type: has-statement
+                    statement_ids:
+                      - DeleteQueue
+
+
+            policies:
+              - name: sqs-public-policy
+                resource: sqs
+                filters:
+                  - type: has-statement
+                    statements:
+                      - Effect: Allow
+                        Action: 'sqs:*'
+                        Principal: '*'
+    """
+
