@@ -270,7 +270,7 @@ class KmsFilter(KmsRelatedFilter):
 
             policies:
                 - name: lambda-kms-key-filters
-                  resource: lambda
+                  resource: aws.lambda
                   filters:
                     - type: kms-key
                       key: c7n:AliasName
