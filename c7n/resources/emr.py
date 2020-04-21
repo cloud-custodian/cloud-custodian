@@ -333,14 +333,13 @@ class PutBlockPublicAccessConfiguration(BaseAction):
     permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
 
     def validate(self):
-        blockPublicAccessConfiguration = dict(self.data.get('BlockPublicAccessConfiguration'))
-        if not (blockPublicAccessConfiguration['BlockPublicSecurityGroupRules']):
-            raise PolicyValidationError('')
-        if blockPublicAccessConfiguration['PermittedPublicSecurityGroupRuleRanges']:
-            for ruleRange in blockPublicAccessConfiguration
-                ['PermittedPublicSecurityGroupRuleRanges']:
+        config = dict(self.data.get('BlockPublicAccessConfiguration'))
+        if not (config['BlockPublicSecurityGroupRules']):
+            raise PolicyValidationError('Missing parameter: BlockPublicSecurityGroupRules')
+        if config['PermittedPublicSecurityGroupRuleRanges']:
+            for ruleRange in config['PermittedPublicSecurityGroupRuleRanges']:
                     if not ruleRange['MinRange']:
-                        raise PolicyValidationError('')
+                        raise PolicyValidationError('Missing Parameter: MinRange')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
