@@ -25,7 +25,6 @@ from c7n.utils import (
     local_session, type_schema, get_retry)
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
-from .aws import shape_validate
 
 filters = FilterRegistry('emr.filters')
 actions = ActionRegistry('emr.actions')
@@ -299,7 +298,6 @@ class EMRBlockPublicAccessConfiguration(QueryResourceManager):
         date = "BlockPublicAccessConfigurationMetadata.CreationDateTime"
 
     def augment(self, resource):
-        client = local_session(self.session_factory).client('emr')
         config = resource
         config.pop('ResponseMetadata')
         config = [config]
@@ -308,7 +306,8 @@ class EMRBlockPublicAccessConfiguration(QueryResourceManager):
 
 @EMRBlockPublicAccessConfiguration.action_registry.register('put-block-public-access-configuration')
 class PutBlockPublicAccessConfiguration(BaseAction):
-    """Action to put/update the EMR block public access configuration for your AWS account in the current region
+    """Action to put/update the EMR block public access configuration for your
+       AWS account in the current region
 
     :example:
 
@@ -338,9 +337,10 @@ class PutBlockPublicAccessConfiguration(BaseAction):
         if not (blockPublicAccessConfiguration['BlockPublicSecurityGroupRules']):
             raise PolicyValidationError('')
         if blockPublicAccessConfiguration['PermittedPublicSecurityGroupRuleRanges']:
-            for ruleRange in blockPublicAccessConfiguration['PermittedPublicSecurityGroupRuleRanges']:
-                if not ruleRange['MinRange']:
-                    raise PolicyValidationError('')
+            for ruleRange in blockPublicAccessConfiguration
+                ['PermittedPublicSecurityGroupRuleRanges']:
+                    if not ruleRange['MinRange']:
+                        raise PolicyValidationError('')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
