@@ -2,17 +2,7 @@
     "status_code": 200,
     "data": {
         "PaginationToken": "",
-        "ResourceTagMappingList": [
-            {
-                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/3f2ab3af-cc4e-427b-b96d-d4356f9764c4",
-                "Tags": [
-                    {
-                        "Key": "Test",
-                        "Value": "Test"
-                    }
-                ]
-            }
-        ],
+        "ResourceTagMappingList": [],
         "ResponseMetadata": {}
     }
 }

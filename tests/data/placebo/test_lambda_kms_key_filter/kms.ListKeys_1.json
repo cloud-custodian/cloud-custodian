@@ -3,8 +3,8 @@
     "data": {
         "Keys": [
             {
-                "KeyId": "a69548f6-9637-4325-b511-ac59056e7302",
-                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/a69548f6-9637-4325-b511-ac59056e7302"
+                "KeyId": "36812ccf-daaf-49b1-a24b-0eef254ffe41",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/36812ccf-daaf-49b1-a24b-0eef254ffe41"
             }
         ],
         "Truncated": false,
