@@ -336,10 +336,9 @@ class PutBlockPublicAccessConfiguration(BaseAction):
         config = dict(self.data.get('BlockPublicAccessConfiguration'))
         if not (config['BlockPublicSecurityGroupRules']):
             raise PolicyValidationError('Missing parameter: BlockPublicSecurityGroupRules')
-        if config['PermittedPublicSecurityGroupRuleRanges']:
-            for ruleRange in config['PermittedPublicSecurityGroupRuleRanges']:
-                    if not ruleRange['MinRange']:
-                        raise PolicyValidationError('Missing Parameter: MinRange')
+        for ruleRange in config.get('PermittedPublicSecurityGroupRuleRanges', []):
+            if not ruleRange['MinRange']:
+                raise PolicyValidationError('Missing Parameter: MinRange')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
