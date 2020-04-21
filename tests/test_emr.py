@@ -17,6 +17,7 @@ from c7n.config import Config
 from c7n.exceptions import PolicyValidationError
 from c7n.resources import emr
 from c7n.resources.emr import actions, QueryFilter
+from c7n.utils import local_session
 
 from .common import BaseTest, Bag
 
@@ -230,3 +231,45 @@ class TestActions(unittest.TestCase):
     def test_action_construction(self):
 
         self.assertIsInstance(actions.factory("terminate", None), emr.Terminate)
+
+
+class EMRBlockPublicAccessConfiguration(BaseTest):
+    def test_emr_block_public_access_configuration(self):
+        session_factory = self.replay_flight_data("test_emr_block_public_access_configuration")
+        p = self.load_policy(
+            {
+                'name': 'emr',
+                'resource': 'emr-block-public-access-configuration',
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(resources[0]["BlockPublicAccessConfigurationMetadata"]['CreatedByArn'],
+             "arn:aws:iam::12345678901:user/test")
+
+    def test_put_emr_block_public_access_configuration(self):
+        session_factory = self.replay_flight_data("test_put_emr_block_public_access_configuration")
+        p = self.load_policy(
+            {
+                'name': 'emr',
+                'resource': 'emr-block-public-access-configuration',
+                'actions': [{"type": "put-block-public-access-configuration",
+                    "BlockPublicAccessConfiguration": {
+                        "BlockPublicSecurityGroupRules": True,
+                        "PermittedPublicSecurityGroupRuleRanges": [{
+                            "MinRange": 23,
+                            "MaxRange": 23
+                        }]
+                    }
+                }]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(session_factory).client("emr")
+        resp = client.get_block_public_access_configuration()
+
+        self.assertEqual(resp["BlockPublicAccessConfiguration"]
+            ["PermittedPublicSecurityGroupRuleRanges"][0]['MinRange'], 23)
+        self.assertEqual(resp["BlockPublicAccessConfiguration"]
+            ["PermittedPublicSecurityGroupRuleRanges"][0]['MaxRange'], 23)

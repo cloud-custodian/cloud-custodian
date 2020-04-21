@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "BlockPublicAccessConfiguration": {
+            "BlockPublicSecurityGroupRules": true,
+            "PermittedPublicSecurityGroupRuleRanges": [
+                {
+                    "MinRange": 22,
+                    "MaxRange": 22
+                }
+            ]
+        },
+        "BlockPublicAccessConfigurationMetadata": {
+            "CreationDateTime": "2020-04-20T19:21:11.318000-04:00",
+            "CreatedByArn": "arn:aws:iam::12345678901:user/test"
+        },
+        "ResponseMetadata": {}
+    }
+}

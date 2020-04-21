@@ -289,74 +289,68 @@ class QueryFilter:
 
 @resources.register('emr-block-public-access-configuration')
 class EMRBlockPublicAccessConfiguration(QueryResourceManager):
-    """Resource manager for EMR publi
+    """Resource manager for EMR block public access configuration
     """
 
     class resource_type(TypeInfo):
         service = 'emr'
-        arn_type = 'emr'
         permission_prefix = 'elasticmapreduce'
-        cluster_states = ['WAITING', 'BOOTSTRAPPING', 'RUNNING', 'STARTING']
-        enum_spec = ('list_clusters', 'Clusters', {'ClusterStates': cluster_states})
-        name = 'Name'
-        id = 'Id'
-        date = "Status.Timeline.CreationDateTime"
+        enum_spec = ('get_block_public_access_configuration', None, None)
+        date = "BlockPublicAccessConfigurationMetadata.CreationDateTime"
 
-@actions.register('get-block-public-access-configuration')
-class GetBlockPublicAccessConfiguration(BaseAction):
-    """Action to get the EMR block public access configuration for your AWS account in the current region
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: emr-get-block-public-access-configuration
-                resource: emr
-                actions:
-                  - get-public-block-access-configration
-    """
-
-    schema = type_schema('get-public-block-access-configration')
-    permissions = ("elasticmapreduce:GetBlockPublicAccessConfiguration",)
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('emr')
-
-        try:
-            response = client.get_block_public_access_configuration()
-        except ClientError as e:
-            raise e
-
-        return response
+    def augment(self, resource):
+        client = local_session(self.session_factory).client('emr')
+        config = resource
+        config.pop('ResponseMetadata')
+        config = [config]
+        return config
 
 
-
-
-@actions.register('put-block-public-access-configuration')
+@EMRBlockPublicAccessConfiguration.action_registry.register('put-block-public-access-configuration')
 class PutBlockPublicAccessConfiguration(BaseAction):
-    """Action to get the EMR block public access configuration for your AWS account in the current region
+    """Action to put/update the EMR block public access configuration for your AWS account in the current region
 
     :example:
 
     .. code-block:: yaml
 
             policies:
-              - name: emr-get-block-public-access-configuration
+              - name: emr-put-block-public-access-configuration
                 resource: emr
                 actions:
                   - put-public-block-access-configration
+                    BlockPublicAccessConfiguration:
+                        BlockPublicSecurityGroupRules: True
+                        PermittedPublicSecurityGroupRuleRanges:
+                            - MinRange: 22
+                              MaxRange: 22
+                            - MinRange: 23
+                              MaxRange: 23
     """
 
-    schema = type_schema('get-public-block-access-configration')
-    permissions = ("elasticmapreduce:GetBlockPublicAccessConfiguration",)
+    schema = type_schema('put-block-public-access-configuration',
+                         BlockPublicAccessConfiguration={"type": "object"},
+                         required=('BlockPublicAccessConfiguration',))
+    permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
+
+    def validate(self):
+        blockPublicAccessConfiguration = dict(self.data.get('BlockPublicAccessConfiguration'))
+        if not (blockPublicAccessConfiguration['BlockPublicSecurityGroupRules']):
+            raise PolicyValidationError('')
+        if blockPublicAccessConfiguration['PermittedPublicSecurityGroupRuleRanges']:
+            for ruleRange in blockPublicAccessConfiguration['PermittedPublicSecurityGroupRuleRanges']:
+                if not ruleRange['MinRange']:
+                    raise PolicyValidationError('')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
+        config = self.data['BlockPublicAccessConfiguration']
 
         try:
-            client.put_block_public_access_configuration()
-        except ClientError as e:
-            raise e
+            response = client.put_block_public_access_configuration(
+                BlockPublicAccessConfiguration=config
+            )
+        except Exception as e:
+            self.log.warning("Exception trying to PutBlockPublicAccessConfiguration, error: %s", e)
 
         return response

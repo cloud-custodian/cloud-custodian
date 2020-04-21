@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "BlockPublicAccessConfiguration": {
+            "BlockPublicSecurityGroupRules": true,
+            "PermittedPublicSecurityGroupRuleRanges": [
+                {
+                    "MinRange": 23,
+                    "MaxRange": 23
+                }
+            ]
+        },
+        "BlockPublicAccessConfigurationMetadata": {
+            "CreationDateTime": "2020-04-20T20:03:08.408000-04:00"
+        },
+        "ResponseMetadata": {}
+    }
+}
