@@ -601,6 +601,13 @@ class NotebookKmsFilter(KmsRelatedFilter):
                   filters:
                     - type: kms-key
                       key: c7n:AliasName
+                      value: "^(alias/aws/sagemaker)"
+                      op: regex
+                - name: sagemaker-endpoint-kms-key-filters
+                  resource: aws.sagemaker-endpoint-config
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
                       value: "alias/aws/sagemaker"
     """
     RelatedIdsExpression = "KmsKeyId"
