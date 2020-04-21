@@ -293,9 +293,10 @@ class EMRBlockPublicAccessConfiguration(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'emr'
-        permission_prefix = 'elasticmapreduce'
         enum_spec = ('get_block_public_access_configuration', None, None)
         date = "BlockPublicAccessConfigurationMetadata.CreationDateTime"
+        name = id = ''
+        arn_type = 'emr'
 
     def augment(self, resource):
         config = resource
