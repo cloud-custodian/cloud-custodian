@@ -269,12 +269,12 @@ class KmsFilter(KmsRelatedFilter):
         .. code-block:: yaml
 
             policies:
-                - name: dynamodb-kms-key-filters
-                  resource: dynamodb-table
+                - name: lambda-kms-key-filters
+                  resource: lambda
                   filters:
                     - type: kms-key
                       key: c7n:AliasName
-                      value: "^(alias/aws/dynamodb)"
+                      value: "^(alias/aws/lambda)"
                       op: regex
     """
     RelatedIdsExpression = 'KMSKeyArn'
