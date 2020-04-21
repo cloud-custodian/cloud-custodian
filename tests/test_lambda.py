@@ -535,15 +535,15 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
                 "name": "lambda-kms-alias",
                 "resource": "lambda",
                 "filters": [
-                            {
-                                'FunctionName': "test"
-                            },
-                            {
-                                "type": "kms-key",
-                                "key": "c7n:AliasName",
-                                "value": "alias/skunk/trails",
-                            }
-                        ]
+                    {
+                        'FunctionName': "test"
+                    },
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/skunk/trails",
+                    }
+                ]
             },
             session_factory=session_factory,
         )
