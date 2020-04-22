@@ -474,8 +474,7 @@ class SetAccountPasswordPolicy(BaseAction):
     )
 
     def validate(self):
-        policy = dict({item['key']: item['value'] for item in self.data['policy']})
-        attrs = policy
+        attrs = dict({item['key']: item['value'] for item in self.data['policy']})
         return shape_validate(
             attrs,
             self.shape,
@@ -488,21 +487,14 @@ class SetAccountPasswordPolicy(BaseAction):
             try:
                 account['c7n:password_policy'] = client.get_account_password_policy().get(
                     'PasswordPolicy', {})
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'NoSuchEntity':
+            except client.exceptions.NoSuchEntityException:
                     account['c7n:password_policy'] = {}
-                else:
-                    raise
         for item in self.data.get('policy'):
             account['c7n:password_policy'][item['key']] = item['value']
         account['c7n:password_policy'] = {
             k: v for (k, v) in account['c7n:password_policy'].items() if k in self.policy_whitelist
         }
-        try:
-            client.update_account_password_policy(**account['c7n:password_policy'])
-        except Exception:
-            raise
-        return {'Account_id': account['account_id'], 'State': 'AccountPasswordPolicyUpdated'}
+        client.update_account_password_policy(**account['c7n:password_policy'])
 
 
 @filters.register('service-limit')
