@@ -252,15 +252,16 @@ class EMRBlockPublicAccessConfiguration(BaseTest):
             {
                 'name': 'emr',
                 'resource': 'emr-block-public-access-configuration',
-                'actions': [{"type": "put-block-public-access-configuration",
+                'actions': [{
+                    "type": "put-block-public-access-configuration",
                     "BlockPublicAccessConfiguration": {
                         "BlockPublicSecurityGroupRules": True,
                         "PermittedPublicSecurityGroupRuleRanges": [{
                             "MinRange": 23,
-                            "MaxRange": 23
+                            "MaxRange": 23,
                         }]
                     }
-                }]
+                }],
             },
             session_factory=session_factory)
         resources = p.run()

@@ -317,7 +317,7 @@ class PutBlockPublicAccessConfiguration(BaseAction):
 
             policies:
               - name: emr-put-block-public-access-configuration
-                resource: emr
+                resource: emr-block-public-access-configuration
                 actions:
                   - type: put-block-public-access-configuration
                     BlockPublicAccessConfiguration:
