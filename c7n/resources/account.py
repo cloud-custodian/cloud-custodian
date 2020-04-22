@@ -488,7 +488,7 @@ class SetAccountPasswordPolicy(BaseAction):
                 account['c7n:password_policy'] = client.get_account_password_policy().get(
                     'PasswordPolicy', {})
             except client.exceptions.NoSuchEntityException:
-                    account['c7n:password_policy'] = {}
+                account['c7n:password_policy'] = {}
         for item in self.data.get('policy'):
             account['c7n:password_policy'][item['key']] = item['value']
         account['c7n:password_policy'] = {
