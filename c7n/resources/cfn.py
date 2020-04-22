@@ -13,6 +13,7 @@
 # limitations under the License.
 import logging
 
+from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
@@ -21,29 +22,34 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag
 
-log = logging.getLogger('custodian.cfn')
+log = logging.getLogger("custodian.cfn")
 
 
-@resources.register('cfn')
+@resources.register("cfn")
 class CloudFormation(QueryResourceManager):
-
     class resource_type(TypeInfo):
-        service = 'cloudformation'
-        arn_type = 'stack'
-        enum_spec = ('describe_stacks', 'Stacks[]', None)
-        id = 'StackName'
-        filter_name = 'StackName'
-        filter_type = 'scalar'
-        name = 'StackName'
-        date = 'CreationTime'
-        config_type = 'AWS::CloudFormation::Stack'
+        service = "cloudformation"
+        arn_type = "stack"
+        enum_spec = ("describe_stacks", "Stacks[]", None)
+        id = "StackName"
+        filter_name = "StackName"
+        filter_type = "scalar"
+        name = "StackName"
+        date = "CreationTime"
+        config_type = "AWS::CloudFormation::Stack"
 
 
-@CloudFormation.action_registry.register('delete')
+@CloudFormation.action_registry.register("delete")
 class Delete(BaseAction):
     """Action to delete cloudformation stacks
 
     It is recommended to use a filter to avoid unwanted deletion of stacks
+
+    If you enable the `force` option, it will automatically disable
+    termination protection if required.  This is useful because you cannot
+    filter on EnableTerminationProtection since that field is only
+    included by AWS when the DescribeStacks API is called with a specific
+    stack name or id.
 
     :example:
 
@@ -55,25 +61,41 @@ class Delete(BaseAction):
                 filters:
                   - StackStatus: ROLLBACK_COMPLETE
                 actions:
-                  - delete
+                  - type: delete
+                    force: true
     """
 
-    schema = type_schema('delete')
-    permissions = ("cloudformation:DeleteStack",)
+    schema = type_schema("delete", state={"force": "boolean", "default": False})
+    permissions = ("cloudformation:DeleteStack", "cloudformation:UpdateStack")
 
     def process(self, stacks):
         with self.executor_factory(max_workers=3) as w:
             list(w.map(self.process_stacks, stacks))
 
     def process_stacks(self, stack):
-        client = local_session(
-            self.manager.session_factory).client('cloudformation')
-        self.manager.retry(
-            client.delete_stack,
-            StackName=stack['StackName'])
+        client = local_session(self.manager.session_factory).client("cloudformation")
+        try:
+            self.manager.retry(client.delete_stack, StackName=stack["StackName"])
+        except ClientError as e:
+            code = e.response["Error"]["Code"]
+            msg = e.response["Error"]["Message"]
+            if (
+                code == "ValidationException"
+                and "cannot be deleted while TerminationProtection is enabled" in msg
+                and self.data.get("force", False)
+            ):
+                # forced delete, so disable termination protection and try again
+                self.manager.retry(
+                    client.update_termination_protection,
+                    EnableTerminationProtection=False,
+                    StackName=stack["StackName"],
+                )
+                self.manager.retry(client.delete_stack, StackName=stack["StackName"])
+            else:
+                raise
 
 
-@CloudFormation.action_registry.register('set-protection')
+@CloudFormation.action_registry.register("set-protection")
 class SetProtection(BaseAction):
     """Action to disable termination protection
 
@@ -93,14 +115,12 @@ class SetProtection(BaseAction):
                     state: False
     """
 
-    schema = type_schema(
-        'set-protection', state={'type': 'boolean', 'default': False})
+    schema = type_schema("set-protection", state={"type": "boolean", "default": False})
 
-    permissions = ('cloudformation:UpdateStack',)
+    permissions = ("cloudformation:UpdateStack",)
 
     def process(self, stacks):
-        client = local_session(
-            self.manager.session_factory).client('cloudformation')
+        client = local_session(self.manager.session_factory).client("cloudformation")
 
         with self.executor_factory(max_workers=3) as w:
             futures = {}
@@ -111,16 +131,19 @@ class SetProtection(BaseAction):
                 if f.exception():
                     self.log.error(
                         "Error updating protection stack:%s error:%s",
-                        s['StackName'], f.exception())
+                        s["StackName"],
+                        f.exception(),
+                    )
 
     def process_stacks(self, client, stack):
         self.manager.retry(
             client.update_termination_protection,
-            EnableTerminationProtection=self.data.get('state', False),
-            StackName=stack['StackName'])
+            EnableTerminationProtection=self.data.get("state", False),
+            StackName=stack["StackName"],
+        )
 
 
-@CloudFormation.action_registry.register('tag')
+@CloudFormation.action_registry.register("tag")
 class CloudFormationAddTag(Tag):
     """Action to tag a cloudformation stack
 
@@ -138,7 +161,8 @@ class CloudFormationAddTag(Tag):
                 tags:
                   DesiredTag: DesiredValue
     """
-    permissions = ('cloudformation:UpdateStack',)
+
+    permissions = ("cloudformation:UpdateStack",)
 
     def process_resource_set(self, client, stacks, tags):
         for s in stacks:
@@ -147,37 +171,36 @@ class CloudFormationAddTag(Tag):
 
 def _tag_stack(client, s, add=(), remove=()):
 
-    tags = {t['Key']: t['Value'] for t in s.get('Tags')}
+    tags = {t["Key"]: t["Value"] for t in s.get("Tags")}
     for t in remove:
         tags.pop(t, None)
 
     for t in add:
-        tags[t['Key']] = t['Value']
+        tags[t["Key"]] = t["Value"]
 
     params = []
-    for p in s.get('Parameters', []):
-        params.append(
-            {'ParameterKey': p['ParameterKey'],
-             'UsePreviousValue': True})
+    for p in s.get("Parameters", []):
+        params.append({"ParameterKey": p["ParameterKey"], "UsePreviousValue": True})
 
     capabilities = []
-    for c in s.get('Capabilities', []):
+    for c in s.get("Capabilities", []):
         capabilities.append(c)
 
     notifications = []
-    for n in s.get('NotificationArns', []):
+    for n in s.get("NotificationArns", []):
         notifications.append(n)
 
     client.update_stack(
-        StackName=s['StackName'],
+        StackName=s["StackName"],
         UsePreviousTemplate=True,
         Capabilities=capabilities,
         Parameters=params,
         NotificationARNs=notifications,
-        Tags=[{'Key': k, 'Value': v} for k, v in tags.items()])
+        Tags=[{"Key": k, "Value": v} for k, v in tags.items()],
+    )
 
 
-@CloudFormation.action_registry.register('remove-tag')
+@CloudFormation.action_registry.register("remove-tag")
 class CloudFormationRemoveTag(RemoveTag):
     """Action to remove tags from a cloudformation stack
 

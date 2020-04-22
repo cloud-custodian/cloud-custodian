@@ -1,0 +1,7 @@
+{
+  "status_code": 200,
+  "data": {
+    "StackId": "arn:aws:cloudformation:us-east-2:644160558196:stack/mytopic/7efb2d40-3a5d-11e8-8c44-500cef930ce6",
+    "ResponseMetadata": {}
+  }
+}

@@ -13,6 +13,7 @@
 # limitations under the License.
 from .common import BaseTest
 
+import time
 
 class TestCFN(BaseTest):
 
@@ -33,6 +34,34 @@ class TestCFN(BaseTest):
             sorted([r["StackName"] for r in resources]),
             ["sphere11-db-1", "sphere11-db-2", "sphere11-db-3"],
         )
+
+    def test_delete_force(self):
+        factory = self.replay_flight_data("test_cfn_delete_force")
+        client = factory().client("cloudformation")
+        stacks = client.describe_stacks(StackName="mytopic").get("Stacks")
+        self.assertEqual(stacks[0].get("EnableTerminationProtection"), True)
+        p = self.load_policy(
+            {
+                "name": "cfn-delete-force",
+                "resource": "cfn",
+                "filters": [{"StackName": "mytopic"}],
+                "actions": [{"type": "delete", "force": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # make sure delete has time to complete
+        if self.recording:
+            time.sleep(20)
+
+        client = factory().client("cloudformation")
+        stacks = client.describe_stacks(StackName=resources[0]["StackName"]).get(
+            "Stacks"
+        )
+        self.assertEqual(stacks[0].get("EnableTerminationProtection"), False)
+        self.assertEqual(stacks[0].get("StackStatus"), "DELETE_COMPLETE")
 
     def test_query(self):
         factory = self.replay_flight_data("test_cfn_query")
