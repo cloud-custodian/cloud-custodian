@@ -507,6 +507,74 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+        assert(
+            resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
+        )
+
+
+    def test_account_password_policy_update(self):
+        factory = self.replay_flight_data("test_account_password_policy_update")
+        p = self.load_policy(
+            {
+                "name": "set-password-policy",
+                "resource": "account",
+                "filters": [
+                    {
+                        "or":[
+                            {
+                                "not": [
+                                    {
+                                        "type": "password-policy",
+                                        "key": "MinimumPasswordLength",
+                                        "value": 12,
+                                        "op": "ge"
+                                    },
+                                    {
+                                        "type": "password-policy",
+                                        "key": "RequireSymbols",
+                                        "value": True
+                                    },
+                                    {
+                                        "type": "password-policy",
+                                        "key": "RequireNumbers",
+                                        "value": True
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-password-policy",
+                        "policy":[
+                            {
+                                "key": "MinimumPasswordLength",
+                                "value": 12
+                            },
+                            {
+                                "key": "RequireSymbols",
+                                "value": True
+                            },
+                            {
+                                "key": "RequireNumbers",
+                                "value": True
+                            }
+                        ]
+                    }                           
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)        
+        client = local_session(factory).client('iam')
+        policy = client.get_account_password_policy().get('PasswordPolicy')
+        assert(
+            policy['MinimumPasswordLength'] is 12
+        )
+
     def test_create_trail(self):
         factory = self.replay_flight_data("test_cloudtrail_create")
         p = self.load_policy(
