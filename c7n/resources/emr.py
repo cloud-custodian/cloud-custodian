@@ -319,8 +319,8 @@ class PutBlockPublicAccessConfiguration(BaseAction):
               - name: emr-put-block-public-access-configuration
                 resource: emr
                 actions:
-                  - put-public-block-access-configration
-                    BlockPublicAccessConfiguration
+                  - type: put-public-block-access-configration
+                    BlockPublicAccessConfiguration:
                         BlockPublicSecurityGroupRules: True
                         PermittedPublicSecurityGroupRuleRanges:
                             - MinRange: 22
