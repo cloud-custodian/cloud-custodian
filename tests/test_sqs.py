@@ -663,3 +663,27 @@ class TestSqsAction(BaseTest):
             "\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalOrgID\":\"o-4amkskbcf1\"}}"
             not in resources[0]["Policy"]
         )
+
+    def test_sqs_has_required_statements(self):
+        session = self.replay_flight_data("test_sqs_has_required_statements")
+        p = self.load_policy(
+            {
+                "name": "sqs-has_statements",
+                "resource": "aws.sqs",
+                "filters": [
+                    {"QueueArn": "arn:aws:sqs:us-east-1:644160558196:test"},
+                    {
+                        "type": "has-statement",
+                        "statement_ids": [
+                            "ApprovedDeleteStatement"
+                        ]
+                    }
+                ]
+            },
+            session_factory=session,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert(
+            "\"Sid\":\"ApprovedDeleteStatement\"" in resources[0]["Policy"]
+        )
