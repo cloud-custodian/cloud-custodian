@@ -465,6 +465,7 @@ class SetAccountPasswordPolicy(BaseAction):
         })
     shape = 'PasswordPolicy'
     permissions = ('iam:GetAccountPasswordPolicy','iam:PutAccountPasswordPolicy')
+    # We need to whitelist the values accepted by the update call as it is not available via shape
     policy_whitelist = (
         "MinimumPasswordLength","RequireSymbols","RequireNumbers","RequireUppercaseCharacters",
         "RequireLowercaseCharacters","AllowUsersToChangePassword","MaxPasswordAge",
