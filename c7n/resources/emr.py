@@ -289,7 +289,7 @@ class QueryFilter:
 
 @resources.register('emr-security-configuration')
 class EMRSecurityConfiguration(QueryResourceManager):
-    """Resource manager for Elastic MapReduce clusters
+    """Resource manager for EMR Security Configuration
     """
 
     class resource_type(TypeInfo):
@@ -298,6 +298,8 @@ class EMRSecurityConfiguration(QueryResourceManager):
         enum_spec = ('list_security_configurations', 'SecurityConfigurations', None)
         detail_spec = ('describe_security_configuration', 'Name', 'Name', None)
         id = name = 'Name'
+
+    permissions = ('emr:ListSecurityConfigurations','emr:DescirbeSecurityConfiguration')
 
     def augment(self, resources):
 
