@@ -299,7 +299,8 @@ class EMRSecurityConfiguration(QueryResourceManager):
         detail_spec = ('describe_security_configuration', 'Name', 'Name', None)
         id = name = 'Name'
 
-    permissions = ('elasticmapreduce:ListSecurityConfigurations', 'elasticmapreduce:DescirbeSecurityConfiguration',)
+    permissions = ('elasticmapreduce:ListSecurityConfigurations',
+                  'elasticmapreduce:DescirbeSecurityConfiguration',)
 
     def augment(self, resources):
 
