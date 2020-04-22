@@ -424,12 +424,13 @@ class AccountPasswordPolicy(ValueFilter):
             return resources
         return []
 
+
 @actions.register('set-password-policy')
 class SetAccountPasswordPolicy(BaseAction):
     """Set an account's password policy.
 
     This only changes the policy for the items provided.
-    If this is the first time setting a password policy and an item is not provided it will be 
+    If this is the first time setting a password policy and an item is not provided it will be
     set to the defaults defined in the boto docs for IAM.Client.update_account_password_policy
 
     :example:
@@ -464,12 +465,12 @@ class SetAccountPasswordPolicy(BaseAction):
             }
         })
     shape = 'PasswordPolicy'
-    permissions = ('iam:GetAccountPasswordPolicy','iam:UpdateAccountPasswordPolicy')
+    permissions = ('iam:GetAccountPasswordPolicy', 'iam:UpdateAccountPasswordPolicy')
     # We need to whitelist the values accepted by the update call as it is not available via shape
     policy_whitelist = (
-        "MinimumPasswordLength","RequireSymbols","RequireNumbers","RequireUppercaseCharacters",
-        "RequireLowercaseCharacters","AllowUsersToChangePassword","MaxPasswordAge",
-        "PasswordReusePrevention","HardExpiry"
+        "MinimumPasswordLength", "RequireSymbols", "RequireNumbers", "RequireUppercaseCharacters",
+        "RequireLowercaseCharacters", "AllowUsersToChangePassword", "MaxPasswordAge",
+        "PasswordReusePrevention", "HardExpiry"
     )
 
     def validate(self):
@@ -485,7 +486,8 @@ class SetAccountPasswordPolicy(BaseAction):
         account = resources[0]
         if not account.get('c7n:password_policy'):
             try:
-                account['c7n:password_policy'] = client.get_account_password_policy().get('PasswordPolicy', {})
+                account['c7n:password_policy'] = client.get_account_password_policy().get(
+                    'PasswordPolicy', {})
             except ClientError as e:
                 if e.response['Error']['Code'] == 'NoSuchEntity':
                     account['c7n:password_policy'] = {}
@@ -494,7 +496,7 @@ class SetAccountPasswordPolicy(BaseAction):
         for item in self.data.get('policy'):
             account['c7n:password_policy'][item['key']] = item['value']
         account['c7n:password_policy'] = {
-            k:v for (k,v) in account['c7n:password_policy'].items() if k in self.policy_whitelist
+            k: v for (k, v) in account['c7n:password_policy'].items() if k in self.policy_whitelist
         }
         try:
             client.update_account_password_policy(**account['c7n:password_policy'])

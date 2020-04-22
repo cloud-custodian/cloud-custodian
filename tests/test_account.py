@@ -511,7 +511,6 @@ class AccountTests(BaseTest):
             resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
         )
 
-
     def test_account_password_policy_update(self):
         factory = self.replay_flight_data("test_account_password_policy_update")
         p = self.load_policy(
@@ -520,7 +519,7 @@ class AccountTests(BaseTest):
                 "resource": "account",
                 "filters": [
                     {
-                        "or":[
+                        "or": [
                             {
                                 "not": [
                                     {
@@ -547,7 +546,7 @@ class AccountTests(BaseTest):
                 "actions": [
                     {
                         "type": "set-password-policy",
-                        "policy":[
+                        "policy": [
                             {
                                 "key": "MinimumPasswordLength",
                                 "value": 12
@@ -561,14 +560,14 @@ class AccountTests(BaseTest):
                                 "value": True
                             }
                         ]
-                    }                           
+                    }
                 ]
             },
             session_factory=factory,
         )
 
         resources = p.run()
-        self.assertEqual(len(resources), 1)        
+        self.assertEqual(len(resources), 1)
         client = local_session(factory).client('iam')
         policy = client.get_account_password_policy().get('PasswordPolicy')
         self.assertEqual(
@@ -600,13 +599,13 @@ class AccountTests(BaseTest):
                 "actions": [
                     {
                         "type": "set-password-policy",
-                        "policy":[
+                        "policy": [
                             {
                                 "key": "MinimumPasswordLength",
                                 "value": 12
                             }
                         ]
-                    }                           
+                    }
                 ]
             },
             session_factory=factory,
@@ -616,7 +615,7 @@ class AccountTests(BaseTest):
         client = local_session(factory).client('iam')
         policy = client.get_account_password_policy().get('PasswordPolicy')
         assert(
-            policy['MinimumPasswordLength'] is 12
+            policy['MinimumPasswordLength'] == 12
         )
         # assert defaults being set
         self.assertEqual(
@@ -635,7 +634,6 @@ class AccountTests(BaseTest):
                 False,
             ]
         )
-
 
     def test_create_trail(self):
         factory = self.replay_flight_data("test_cloudtrail_create")
