@@ -299,7 +299,7 @@ class EMRSecurityConfiguration(QueryResourceManager):
         detail_spec = ('describe_security_configuration', 'Name', 'Name', None)
         id = name = 'Name'
 
-    permissions = ('emr:ListSecurityConfigurations','emr:DescirbeSecurityConfiguration')
+    permissions = ('emr:ListSecurityConfigurations', 'emr:DescirbeSecurityConfiguration',)
 
     def augment(self, resources):
 
