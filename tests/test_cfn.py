@@ -15,8 +15,8 @@ from .common import BaseTest
 
 import time
 
-class TestCFN(BaseTest):
 
+class TestCFN(BaseTest):
     def test_delete(self):
         factory = self.replay_flight_data("test_cfn_delete")
         p = self.load_policy(
@@ -100,20 +100,22 @@ class TestCFN(BaseTest):
                 "name": "cfn-add-tag",
                 "resource": "cfn",
                 "filters": [{"StackName": "mosdef2"}],
-                "actions": [
-                    {"type": "tag", "tags": {'App': 'Ftw'}}
-                ],
+                "actions": [{"type": "tag", "tags": {"App": "Ftw"}}],
             },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("cloudformation")
-        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
-        self.assertEqual(rtags, {'Env': 'Dev'})
-        tags = {t['Key']: t['Value'] for t in client.describe_stacks(
-            StackName=resources[0]["StackName"])["Stacks"][0]["Tags"]}
-        self.assertEqual(tags, {'Env': 'Dev', 'App': 'Ftw'})
+        rtags = {t["Key"]: t["Value"] for t in resources[0]["Tags"]}
+        self.assertEqual(rtags, {"Env": "Dev"})
+        tags = {
+            t["Key"]: t["Value"]
+            for t in client.describe_stacks(StackName=resources[0]["StackName"])[
+                "Stacks"
+            ][0]["Tags"]
+        }
+        self.assertEqual(tags, {"Env": "Dev", "App": "Ftw"})
 
     def test_cfn_add_tag(self):
         session_factory = self.replay_flight_data("test_cfn_add_tag")
