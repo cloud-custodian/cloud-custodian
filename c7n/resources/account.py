@@ -455,7 +455,7 @@ class SetAccountPasswordPolicy(BaseAction):
                 'type': 'object',
                 'properties': {
                     'key': {'type': 'string'},
-                    'value': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
+                    'value': {'oneOf': [{'type': 'integer'}, {'type': 'boolean'}]}
                 }
             }
         })
