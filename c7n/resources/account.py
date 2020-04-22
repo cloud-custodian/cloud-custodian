@@ -480,7 +480,7 @@ class SetAccountPasswordPolicy(BaseAction):
             config[k] = v
         config = shape_strip(
             config,
-            self.shape, 
+            self.shape,
             self.service)
         client.update_account_password_policy(**config)
 
