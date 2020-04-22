@@ -65,7 +65,7 @@ class Delete(BaseAction):
                     force: true
     """
 
-    schema = type_schema("delete", state={"force": "boolean", "default": False})
+    schema = type_schema("delete", force={"type": "boolean", "default": False})
     permissions = ("cloudformation:DeleteStack", "cloudformation:UpdateStack")
 
     def process(self, stacks):
