@@ -423,6 +423,58 @@ class AccountPasswordPolicy(ValueFilter):
             return resources
         return []
 
+@actions.register('set-password-policy')
+class SetAccountPasswordPolicy(BaseAction):
+    """Set an account's password policy.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-account-password-policy
+                resource: account
+                filters:
+                  - not:
+                    - type: password-policy
+                      key: MinimumPasswordLength
+                      value: 10
+                      op: ge
+                actions:
+                    - type: set-password-policy
+                      policy:
+                        - key: MinimumPasswordLength
+                          value: 10
+    """
+    schema = type_schema(
+        'set-password-policy',
+        policy={
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'key': {'type': 'string'},
+                    'value': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
+                }
+            }
+        })
+    permissions = ('iam:GetAccountPasswordPolicy','iam:PutAccountPasswordPolicy')
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        account = resources[0]
+        if not account.get('c7n:password_policy'):
+            try:
+                account['c7n:password_policy'] = client.get_account_password_policy().get('PasswordPolicy', {})
+            except Exception:
+                raise     
+        for item in self.data.get('policy'):
+            account['c7n:password_policy'][item['key']] = item['value']
+        try:
+            client.update_account_password_policy()
+        except Exception:
+            raise
+        return {'Account_id': account['account_id'], 'State': 'AcountPasswordPolicyUpdated'}
+
 
 @filters.register('service-limit')
 class ServiceLimit(Filter):
