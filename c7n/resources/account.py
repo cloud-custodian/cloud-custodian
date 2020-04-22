@@ -34,6 +34,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
 
+from .aws import shape_validate
 
 filters = FilterRegistry('aws.account.filters')
 actions = ActionRegistry('aws.account.actions')
@@ -444,7 +445,7 @@ class SetAccountPasswordPolicy(BaseAction):
                     - type: set-password-policy
                       policy:
                         - key: MinimumPasswordLength
-                          value: 10
+                          value: 20
     """
     schema = type_schema(
         'set-password-policy',
@@ -458,7 +459,18 @@ class SetAccountPasswordPolicy(BaseAction):
                 }
             }
         })
+    shape = 'PasswordPolicy'
     permissions = ('iam:GetAccountPasswordPolicy','iam:PutAccountPasswordPolicy')
+
+    def validate(self):
+        policy = dict({item['key']: item['value'] for item in self.data['policy']})
+        print(policy)
+        attrs = policy
+        return shape_validate(
+            attrs,
+            self.shape,
+            'iam')
+
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         account = resources[0]
@@ -470,7 +482,8 @@ class SetAccountPasswordPolicy(BaseAction):
         for item in self.data.get('policy'):
             account['c7n:password_policy'][item['key']] = item['value']
         try:
-            client.update_account_password_policy()
+            pass
+            # client.update_account_password_policy()
         except Exception:
             raise
         return {'Account_id': account['account_id'], 'State': 'AcountPasswordPolicyUpdated'}
