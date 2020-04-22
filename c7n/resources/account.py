@@ -428,6 +428,10 @@ class AccountPasswordPolicy(ValueFilter):
 class SetAccountPasswordPolicy(BaseAction):
     """Set an account's password policy.
 
+    This only changes the policy for the items provided.
+    If this is the first time setting a password policy and an item is not provided it will be 
+    set to the defaults defined in the boto docs for IAM.Client.update_account_password_policy
+
     :example:
 
     .. code-block:: yaml
