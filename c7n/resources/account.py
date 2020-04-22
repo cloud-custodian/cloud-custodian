@@ -465,7 +465,11 @@ class SetAccountPasswordPolicy(BaseAction):
         })
     shape = 'PasswordPolicy'
     permissions = ('iam:GetAccountPasswordPolicy','iam:PutAccountPasswordPolicy')
-    policy_blacklist = ("ExpirePasswords",)
+    policy_whitelist = (
+        "MinimumPasswordLength","RequireSymbols","RequireNumbers","RequireUppercaseCharacters",
+        "RequireLowercaseCharacters","AllowUsersToChangePassword","MaxPasswordAge",
+        "PasswordReusePrevention","HardExpiry"
+    )
 
     def validate(self):
         policy = dict({item['key']: item['value'] for item in self.data['policy']})
@@ -488,9 +492,9 @@ class SetAccountPasswordPolicy(BaseAction):
                     raise
         for item in self.data.get('policy'):
             account['c7n:password_policy'][item['key']] = item['value']
-        for blacklist_item in self.policy_blacklist:
-            if blacklist_item in account['c7n:password_policy']:
-                del account['c7n:password_policy'][blacklist_item]
+        account['c7n:password_policy'] = {
+            k:v for (k,v) in account['c7n:password_policy'].items() if k in self.policy_whitelist
+        }
         try:
             client.update_account_password_policy(**account['c7n:password_policy'])
         except Exception:
