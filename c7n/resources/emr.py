@@ -301,7 +301,7 @@ class EMRSecurityConfiguration(QueryResourceManager):
         id = name = 'Name'
 
     permissions = ('elasticmapreduce:ListSecurityConfigurations',
-                  'elasticmapreduce:DescirbeSecurityConfiguration',)
+                  'elasticmapreduce:DescribeSecurityConfiguration',)
 
     def augment(self, resources):
 
@@ -319,7 +319,7 @@ class EMRSecurityConfiguration(QueryResourceManager):
 class DeleteEMRSecurityConfiguration(BaseAction):
 
     schema = type_schema('delete')
-    permissions = ('emr:DeleteSecurityConfiguration',)
+    permissions = ('elasticmapreduce:DeleteSecurityConfiguration',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
