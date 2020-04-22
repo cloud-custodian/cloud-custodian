@@ -297,6 +297,7 @@ class EMRBlockPublicAccessConfiguration(QueryResourceManager):
         date = "BlockPublicAccessConfigurationMetadata.CreationDateTime"
         name = id = ''
         arn_type = 'emr'
+        permission_prefix = 'elasticmapreduce'
 
     def augment(self, resource):
         config = resource
