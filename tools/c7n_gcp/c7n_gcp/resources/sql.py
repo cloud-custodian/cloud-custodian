@@ -34,7 +34,9 @@ class SqlInstance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]
 
         @staticmethod
         def get(client, resource_info):
@@ -83,13 +85,14 @@ class SqlUser(ChildResourceManager):
         version = 'v1beta4'
         component = 'users'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
         parent_spec = {
             'resource': 'sql-instance',
             'child_enum_params': [
                 ('name', 'instance')
             ]
         }
+        default_report_fields = ["name", "project", "instance"]
 
 
 class SqlInstanceChildWithSelfLink(ChildResourceManager):
