@@ -295,6 +295,7 @@ class EMRSecurityConfiguration(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'emr'
         arn_type = 'emr'
+        permission_prefix = 'elasticmapreduce'
         enum_spec = ('list_security_configurations', 'SecurityConfigurations', None)
         detail_spec = ('describe_security_configuration', 'Name', 'Name', None)
         id = name = 'Name'
