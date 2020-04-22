@@ -464,7 +464,7 @@ class SetAccountPasswordPolicy(BaseAction):
             }
         })
     shape = 'PasswordPolicy'
-    permissions = ('iam:GetAccountPasswordPolicy','iam:PutAccountPasswordPolicy')
+    permissions = ('iam:GetAccountPasswordPolicy','iam:UpdateAccountPasswordPolicy')
     # We need to whitelist the values accepted by the update call as it is not available via shape
     policy_whitelist = (
         "MinimumPasswordLength","RequireSymbols","RequireNumbers","RequireUppercaseCharacters",
@@ -500,7 +500,7 @@ class SetAccountPasswordPolicy(BaseAction):
             client.update_account_password_policy(**account['c7n:password_policy'])
         except Exception:
             raise
-        return {'Account_id': account['account_id'], 'State': 'AcountPasswordPolicyUpdated'}
+        return {'Account_id': account['account_id'], 'State': 'AccountPasswordPolicyUpdated'}
 
 
 @filters.register('service-limit')
