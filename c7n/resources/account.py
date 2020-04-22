@@ -481,8 +481,11 @@ class SetAccountPasswordPolicy(BaseAction):
         if not account.get('c7n:password_policy'):
             try:
                 account['c7n:password_policy'] = client.get_account_password_policy().get('PasswordPolicy', {})
-            except Exception:
-                raise
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'NoSuchEntity':
+                    account['c7n:password_policy'] = {}
+                else:
+                    raise
         for item in self.data.get('policy'):
             account['c7n:password_policy'][item['key']] = item['value']
         for blacklist_item in self.policy_blacklist:
