@@ -34,7 +34,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
 
-from .aws import shape_validate
+from .aws import shape_validate, shape_strip
 
 filters = FilterRegistry('aws.account.filters')
 actions = ActionRegistry('aws.account.actions')
@@ -449,52 +449,39 @@ class SetAccountPasswordPolicy(BaseAction):
                 actions:
                     - type: set-password-policy
                       policy:
-                        - key: MinimumPasswordLength
-                          value: 20
+                        MinimumPasswordLength: 20
     """
     schema = type_schema(
         'set-password-policy',
         policy={
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'key': {'type': 'string'},
-                    'value': {'oneOf': [{'type': 'integer'}, {'type': 'boolean'}]}
-                }
-            }
+            'type': 'object'
         })
-    shape = 'PasswordPolicy'
+    shape = 'UpdateAccountPasswordPolicyRequest'
+    service = 'iam'
     permissions = ('iam:GetAccountPasswordPolicy', 'iam:UpdateAccountPasswordPolicy')
-    # We need to whitelist the values accepted by the update call as it is not available via shape
-    policy_whitelist = (
-        "MinimumPasswordLength", "RequireSymbols", "RequireNumbers", "RequireUppercaseCharacters",
-        "RequireLowercaseCharacters", "AllowUsersToChangePassword", "MaxPasswordAge",
-        "PasswordReusePrevention", "HardExpiry"
-    )
 
     def validate(self):
-        attrs = dict({item['key']: item['value'] for item in self.data['policy']})
         return shape_validate(
-            attrs,
+            self.data.get('policy', {}),
             self.shape,
-            'iam')
+            self.service)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('iam')
         account = resources[0]
-        if not account.get('c7n:password_policy'):
+        if account.get('c7n:password_policy'):
+            config = account['c7n:password_policy']
+        else:
             try:
-                account['c7n:password_policy'] = client.get_account_password_policy().get(
-                    'PasswordPolicy', {})
+                config = client.get_account_password_policy().get('PasswordPolicy')
             except client.exceptions.NoSuchEntityException:
-                account['c7n:password_policy'] = {}
-        for item in self.data.get('policy'):
-            account['c7n:password_policy'][item['key']] = item['value']
-        account['c7n:password_policy'] = {
-            k: v for (k, v) in account['c7n:password_policy'].items() if k in self.policy_whitelist
-        }
-        client.update_account_password_policy(**account['c7n:password_policy'])
+                config = {}
+        for k, v in self.data.get('policy').items():
+            config[k] = v
+        config = shape_strip(
+            config,
+            self.shape, self.service)
+        client.update_account_password_policy(**config)
 
 
 @filters.register('service-limit')

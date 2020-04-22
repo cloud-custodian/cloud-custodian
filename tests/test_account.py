@@ -546,20 +546,11 @@ class AccountTests(BaseTest):
                 "actions": [
                     {
                         "type": "set-password-policy",
-                        "policy": [
-                            {
-                                "key": "MinimumPasswordLength",
-                                "value": 12
-                            },
-                            {
-                                "key": "RequireSymbols",
-                                "value": True
-                            },
-                            {
-                                "key": "RequireNumbers",
-                                "value": True
-                            }
-                        ]
+                        "policy": {
+                            "MinimumPasswordLength": 12,
+                            "RequireSymbols": True,
+                            "RequireNumbers": True
+                        }
                     }
                 ]
             },
@@ -599,12 +590,9 @@ class AccountTests(BaseTest):
                 "actions": [
                     {
                         "type": "set-password-policy",
-                        "policy": [
-                            {
-                                "key": "MinimumPasswordLength",
-                                "value": 12
-                            }
-                        ]
+                        "policy": {
+                            "MinimumPasswordLength": 12
+                        }
                     }
                 ]
             },
