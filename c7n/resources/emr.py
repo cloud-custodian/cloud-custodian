@@ -295,7 +295,7 @@ class EMRBlockPublicAccessConfiguration(QueryResourceManager):
         service = 'emr'
         enum_spec = ('get_block_public_access_configuration', None, None)
         date = "BlockPublicAccessConfigurationMetadata.CreationDateTime"
-        name = id = ''
+        name = id = 'BlockPublicAccessConfigurationMetadata.CreatedByArn'
         arn_type = 'emr'
         permission_prefix = 'elasticmapreduce'
 
