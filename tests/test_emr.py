@@ -17,7 +17,6 @@ from c7n.config import Config
 from c7n.exceptions import PolicyValidationError
 from c7n.resources import emr
 from c7n.resources.emr import actions, QueryFilter
-from c7n.utils import local_session
 
 from .common import BaseTest, Bag
 
