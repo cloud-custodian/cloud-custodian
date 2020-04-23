@@ -1414,7 +1414,7 @@ class FilterPublicBlock(Filter):
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
-        config = {key: False for key in self.keys}
+        config = dict(bucket.get(self.annotation_key, {key: False for key in self.keys}))
         if self.annotation_key not in bucket:
             try:
                 config = s3.get_public_access_block(
@@ -1437,27 +1437,50 @@ class FilterPublicBlock(Filter):
 class SetPublicBlock(BucketActionBase):
     """Action to update Public Access blocks on S3 buckets
 
-    if no action parameters are provided it will enable all public block configuration.
+    If no action parameters are provided all settings will be set to the `state`, which defaults
 
-    If a action parameters are provided, those will be set and other extant values preserved.
+    If action parameters are provided, those will be set and other extant values preserved.
 
     :example:
 
     .. code-block:: yaml
 
             policies:
-              - name: s3-dont-ignore-public-acls
+              - name: s3-public-block-enable-all
                 resource: s3
                 filters:
                   - type: check-public-block
                 actions:
                   - type: set-public-block
-                  # BlockPublicAcls: true <-- optional, if none provided sets all to true by default
+
+            policies:
+              - name: s3-public-block-disable-all
+                resource: s3
+                filters:
+                  - type: check-public-block
+                actions:
+                  - type: set-public-block
+                    state: false
+
+            policies:
+              - name: s3-public-block-enable-some
+                resource: s3
+                filters:
+                  - or:
+                    - type: check-public-block
+                      BlockPublicAcls: false
+                    - type: check-public-block
+                      BlockPublicPolicy: false
+                actions:
+                  - type: set-public-block
+                    BlockPublicAcls: true
+                    BlockPublicPolicy: true
 
     """
 
     schema = type_schema(
         'set-public-block',
+        state={'type': 'boolean', 'default': True},
         BlockPublicAcls={'type': 'boolean'},
         IgnorePublicAcls={'type': 'boolean'},
         BlockPublicPolicy={'type': 'boolean'},
@@ -1489,7 +1512,7 @@ class SetPublicBlock(BucketActionBase):
                 config[key] = self.data.get(key)
         else:
             for key in self.keys:
-                config[key] = True
+                config[key] = self.data.get('state', True)
         s3.put_public_access_block(
             Bucket=bucket['Name'], PublicAccessBlockConfiguration=config)
 

@@ -37,6 +37,11 @@ class URIResolver:
         self.cache = cache
 
     def resolve(self, uri):
+        if self.cache:
+            contents = self.cache.get(("uri-resolver", uri))
+            if contents is not None:
+                return contents
+
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
         else:
@@ -46,7 +51,8 @@ class URIResolver:
             with closing(urlopen(req)) as response:
                 contents = self.handle_response_encoding(response)
 
-        self.cache.save(("uri-resolver", uri), contents)
+        if self.cache:
+            self.cache.save(("uri-resolver", uri), contents)
         return contents
 
     def handle_response_encoding(self, response):
@@ -93,7 +99,7 @@ class ValuesFrom:
          url: s3://bucket/xyz/foo.json
          expr: [].AppId
 
-      values_from:
+      value_from:
          url: http://foobar.com/mydata
          format: json
          expr: Region."us-east-1"[].ImageId
@@ -129,6 +135,7 @@ class ValuesFrom:
         }
         self.data = format_string_values(data, **config_args)
         self.manager = manager
+        self.cache = manager._cache
         self.resolver = URIResolver(manager.session_factory, manager._cache)
 
     def get_contents(self):
@@ -147,6 +154,21 @@ class ValuesFrom:
         return contents, format
 
     def get_values(self):
+        if self.cache:
+            # use these values as a key to cache the result so if we have
+            # the same filter happening across many resources, we can reuse
+            # the results.
+            key = [self.data.get(i) for i in ('url', 'format', 'expr')]
+            contents = self.cache.get(("value-from", key))
+            if contents is not None:
+                return contents
+
+        contents = self._get_values()
+        if self.cache:
+            self.cache.save(("value-from", key), contents)
+        return contents
+
+    def _get_values(self):
         contents, format = self.get_contents()
 
         if format == 'json':

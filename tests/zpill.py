@@ -28,6 +28,10 @@ from six import StringIO
 
 from c7n.testing import CustodianTestCore
 
+# Custodian Test Account. This is used only for testing.
+# Access is available for community project maintainers.
+ACCOUNT_ID = "644160558196"
+
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH
 #
@@ -268,7 +272,7 @@ class RedPill(pill.Pill):
             response_data['ResponseMetadata'] = {}
 
         response_data = json.dumps(response_data, default=self.datetime_converter)
-        response_data = re.sub("\d{12}", "123456789123", response_data)  # noqa
+        response_data = re.sub("\d{12}", ACCOUNT_ID, response_data)  # noqa
         response_data = json.loads(response_data)
 
         super(RedPill, self).save_response(service, operation, response_data,

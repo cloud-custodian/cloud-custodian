@@ -1,7 +1,15 @@
 import pytest
 
-from .zpill import PillTest
-from c7n.testing import PyTestUtils, reset_session_cache
+try:
+    from .zpill import PillTest
+    from c7n.testing import PyTestUtils, reset_session_cache
+except ImportError: # noqa
+    # docker tests run with minimial deps
+    class PyTestUtils:
+        pass
+
+    class PillTest:
+        pass
 
 
 class CustodianAWSTesting(PyTestUtils, PillTest):

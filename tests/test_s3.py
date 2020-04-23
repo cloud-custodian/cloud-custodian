@@ -1733,7 +1733,49 @@ class S3Test(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], bname)
 
-        # Make sure that the public blocks are enabled on the buckets
+        # Make sure that the public blocks are disabled on the buckets
+        response = client.get_public_access_block(
+            Bucket=bname)['PublicAccessBlockConfiguration']
+        for key in response.keys():
+            self.assertEqual(response[key], False)
+
+    def test_set_public_block_disable_all_via_state(self):
+        bname = 'mypublicblock'
+
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+
+        session_factory = self.replay_flight_data("test_s3_public_block_disable_all")
+        session = session_factory()
+        client = session.client("s3")
+
+        p = self.load_policy(
+            {
+                "name": "CheckForPublicBlocks-Present",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {
+                        "type": "check-public-block",
+                        "BlockPublicAcls": True
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-public-block",
+                        "state": False
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+
+        # Test that there was a bucket with missing public blocks
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], bname)
+
+        # Make sure that the public blocks are disabled on the buckets
         response = client.get_public_access_block(
             Bucket=bname)['PublicAccessBlockConfiguration']
         for key in response.keys():

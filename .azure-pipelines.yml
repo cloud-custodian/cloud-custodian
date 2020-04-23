@@ -3,150 +3,11 @@ trigger:
 
 variables:
 - group: CustodianCoreCI
-- name: WINDOWS_CACHE_DIR
-  value: $(LOCALAPPDATA)\pip\cache
 
 jobs:
 
-- job: 'Lint'
-  pool:
-    vmImage: 'Ubuntu-18.04'
-  steps:
-    - checkout: self
-      fetchDepth: 1
-
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.7'
-        architecture: 'x64'
-
-    - script: python -m pip install --upgrade pip && pip install flake8
-      displayName: "Install Dependencies"
-
-    - script: make lint
-      displayName: "Flake8 Lint"
-
-
-- job: 'Docs'
-  pool:
-    vmImage: 'Ubuntu-18.04'
-  steps:
-  - checkout: self
-    fetchDepth: 1
-
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.7'
-      architecture: 'x64'
-
-  - script: python -m pip install --upgrade pip && pip install tox
-    displayName: 'Install Test Runner'
-
-  - script: TOXENV=docs tox --notest
-    displayName: 'Install Dependencies'
-
-  - script: TOXENV=docs tox
-    displayName: "Docs Build"
-
-
-- job: 'Test'
-  pool:
-    vmImage: 'Ubuntu-18.04'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-        TOXENV: py36-cov
-    maxParallel: 4
-
-  steps:
-  - checkout: self
-    fetchDepth: 2
-
-  - task: UsePythonVersion@0
-    displayName: "Set Python Version"
-    inputs:
-      versionSpec: '$(python.version)'
-      architecture: 'x64'
-
-  - script: python -m pip install --upgrade pip && pip install tox codecov
-    displayName: 'Install Test Runner'
-
-  - script: tox --notest
-    displayName: 'Install Dependencies'
-
-  - script: tox
-    displayName: 'Tox'
-
-  - script: |
-      ./.tox/$TOXENV/bin/coverage xml && \
-      bash <(curl -s https://codecov.io/bash) -Z \
-       -X gcov -X coveragepy -X search -X xcode -X gcovout -X fix \
-       -f coverage.xml
-    displayName: 'Publish Code Coverage'
-    condition: "eq(variables['python.version'], '3.6')"
-    env:
-      CODECOV_TOKEN: $(CODECOV_TOKEN)
-
-  - task: PublishTestResults@2
-    displayName: "Publish Test Results Azure"
-    inputs:
-      testResultsFiles: '**/test-results.xml'
-      testRunTitle: 'Python $(python.version)'
-    condition: succeededOrFailed()
-
-- job: 'TestWindows'
-  displayName: 'Test Win2019'
-  pool:
-    vmImage: 'windows-2019'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-        TOXENV: py36
-      Python37:
-        python.version: '3.7'
-        TOXENV: py37-windows
-    maxParallel: 3
-
-  steps:
-  - checkout: self
-    fetchDepth: 2
-
-  - powershell: |
-      $date=$(Get-Date).DayOfYear;
-      Write-Host "##vso[task.setvariable variable=DAY_OF_YEAR]$date"
-    displayName:  Set cache date key
-
-  - task: CacheBeta@0
-    inputs:
-      key: '"c7n-tox" | "$(python.version)" | "$(Agent.OS)" | "$(DAY_OF_YEAR)"'
-      path: $(WINDOWS_CACHE_DIR)
-
-  - task: UsePythonVersion@0
-    displayName: "Set Python Version"
-    inputs:
-      versionSpec: '$(python.version)'
-      architecture: 'x64'
-
-  - script: python -m pip install --upgrade pip && pip install tox
-    displayName: 'Install Test Runner'
-
-  - script: tox --notest
-    displayName: 'Install Dependencies'
-
-  - script: tox
-    displayName: 'Tox'
-
-  - task: PublishTestResults@2
-    displayName: "Publish Test Results Azure"
-    inputs:
-      testResultsFiles: '**/test-results.xml'
-      testRunTitle: 'Python $(python.version) Windows'
-    condition: succeededOrFailed()
-
 - job: 'CustodianCask'
-  displayName: 'Container Cask'
+  displayName: 'Tool Tests - Cask'
   pool:
     vmImage: 'Ubuntu-18.04'
 
@@ -155,6 +16,20 @@ jobs:
     inputs:
       version: '1.12.6'
 
-  - script: make release
+  - script: make test
     workingDirectory: tools/cask/
     displayName: 'Build for all platforms'
+
+
+- job: 'CustodianOmniSSM'
+  displayName: 'Tool Tests - OmniSSM'
+  pool:
+    vmImage: 'Ubuntu-18.04'
+
+  steps:
+  - task: GoTool@0
+    inputs:
+      version: '1.12.6'
+  - script: make test
+    workingDirectory: tools/omnissm/
+    displayName: 'Test'

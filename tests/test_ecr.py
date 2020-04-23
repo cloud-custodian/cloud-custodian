@@ -13,11 +13,28 @@
 # limitations under the License.
 import json
 
-from .common import BaseTest, functional
+from .common import BaseTest, functional, Bag
 from botocore.exceptions import ClientError
+
+from c7n.exceptions import PolicyValidationError
+from c7n.resources.ecr import lifecycle_rule_validate
 
 
 class TestECR(BaseTest):
+
+    def test_rule_validation(self):
+        policy = Bag(name='xyz')
+        with self.assertRaises(PolicyValidationError) as ecm:
+            lifecycle_rule_validate(
+                policy, {'selection': {'tagStatus': 'tagged'}})
+        self.assertIn('tagPrefixList required', str(ecm.exception))
+        with self.assertRaises(PolicyValidationError) as ecm:
+            lifecycle_rule_validate(
+                policy, {'selection': {
+                    'tagStatus': 'untagged',
+                    'countNumber': 10, 'countUnit': 'days',
+                    'countType': 'imageCountMoreThan'}})
+        self.assertIn('countUnit invalid', str(ecm.exception))
 
     def create_repository(self, client, name):
         """ Create the named repository. Delete existing one first if applicable. """
