@@ -271,10 +271,11 @@ class CloudFront(BaseTest):
         )
 
         try:
-            p.run()
-        except client.exceptions.ResourceNotFoundException:
+            p.resource_manager.filters[0].process(
+                [{'Id': 'abc'}])
+        except client.exceptions.NoSuchDistribution:
             self.fail('should not raise')
-        mock_factory().client('cloudfront').get_distribution_config.assert_not_called()
+        mock_factory().client('cloudfront').get_distribution_config.assert_called_once()
 
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")
