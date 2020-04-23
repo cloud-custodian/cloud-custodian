@@ -855,7 +855,6 @@ class AccountTests(BaseTest):
             },
             session_factory=session_factory)
         resources = p.run()
-        print(resources)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["BlockPublicAccessConfigurationMetadata"]['CreatedByArn'],
              "arn:aws:iam::12345678901:user/test")
