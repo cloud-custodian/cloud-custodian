@@ -1621,7 +1621,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
         config = self.data['BlockPublicAccessConfiguration']
 
         try:
-            resp = client.put_block_public_access_configuration(
+            client.put_block_public_access_configuration(
                 BlockPublicAccessConfiguration=config
             )
         except Exception as e:
