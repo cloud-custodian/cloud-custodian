@@ -30,10 +30,10 @@ from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema, generate_arn
 from c7n.query import QueryResourceManager, TypeInfo
-from .aws import shape_validate
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
+from .aws import shape_validate
 
 
 filters = FilterRegistry('aws.account.filters')
