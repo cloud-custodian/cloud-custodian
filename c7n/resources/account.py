@@ -34,7 +34,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
 
-from .aws import shape_validate, shape_strip
+from .aws import shape_validate
 
 filters = FilterRegistry('aws.account.filters')
 actions = ActionRegistry('aws.account.actions')
@@ -478,10 +478,8 @@ class SetAccountPasswordPolicy(BaseAction):
                 config = {}
         params = dict(self.data['policy'])
         config.update(params)
-        config = shape_strip(
-            config,
-            self.shape,
-            self.service)
+        config = {k: v for (k, v) in config.items() if k not in ('ExpirePasswords',
+            'PasswordPolicyConfigured')}
         client.update_account_password_policy(**config)
 
 

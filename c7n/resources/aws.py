@@ -135,13 +135,6 @@ def shape_validate(params, shape_name, service):
         raise PolicyValidationError(report.generate_report())
 
 
-def shape_strip(params, shape_name, service):
-    session = fake_session()._session
-    model = session.get_service_model(service)
-    shape = model.shape_for(shape_name)
-    return {k: v for (k, v) in params.items() if k in shape._shape_model['members']}
-
-
 class Arn(namedtuple('_Arn', (
         'arn', 'partition', 'service', 'region',
         'account_id', 'resource', 'resource_type', 'separator'))):
