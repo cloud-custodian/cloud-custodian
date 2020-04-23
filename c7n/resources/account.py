@@ -476,8 +476,8 @@ class SetAccountPasswordPolicy(BaseAction):
                 config = client.get_account_password_policy().get('PasswordPolicy')
             except client.exceptions.NoSuchEntityException:
                 config = {}
-        for k, v in self.data.get('policy').items():
-            config[k] = v
+        params = dict(self.data['policy'])
+        config.update(params)
         config = shape_strip(
             config,
             self.shape,
