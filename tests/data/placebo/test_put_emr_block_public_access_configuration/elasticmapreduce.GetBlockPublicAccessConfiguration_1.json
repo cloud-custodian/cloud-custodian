@@ -5,13 +5,13 @@
             "BlockPublicSecurityGroupRules": true,
             "PermittedPublicSecurityGroupRuleRanges": [
                 {
-                    "MinRange": 22,
-                    "MaxRange": 22
+                    "MinRange": 23,
+                    "MaxRange": 23
                 }
             ]
         },
         "BlockPublicAccessConfigurationMetadata": {
-            "CreationDateTime": "2020-04-20T20:02:04.623000-04:00"
+            "CreatedByArn": "arn:aws:iam::12345678901:user/test"
         },
         "ResponseMetadata": {}
     }

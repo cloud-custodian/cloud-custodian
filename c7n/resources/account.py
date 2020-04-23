@@ -1544,3 +1544,85 @@ class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
               SseAwsKmsKeyId: alias/aws/glue
 
     """
+
+
+@filters.register('emr-block-public-access-configuration')
+class GetAccountBlockPublicAccessConfiguration(Filter):
+    """Check for EMR block public access configuration on an account
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: get-emr-block-public-access-configuration
+                resource: account
+                filters:
+                  - type: emr-block-public-access-configuration
+    """
+
+    schema = type_schema('emr-block-public-access-configuration',)
+    permissions = ("elasticmapreduce:GetBlockPublicAccessConfiguration",)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('emr')
+
+        try:
+            response = client.get_block_public_access_configuration()
+            response.pop('ResponseMetadata')
+            response = [response]
+        except Exception as e:
+            self.log.warning("Exception trying to GetBlockPublicAccessConfiguration, error: %s", e)
+
+        return response
+
+
+@actions.register('put-emr-block-public-access-configuration')
+class PutAccountBlockPublicAccessConfiguration(BaseAction):
+    """Action to put/update the EMR block public access configuration for your
+       AWS account in the current region
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: put-emr-block-public-access-configuration
+                resource: account
+                actions:
+                  - type: put-emr-block-public-access-configuration
+                    BlockPublicAccessConfiguration:
+                        BlockPublicSecurityGroupRules: True
+                        PermittedPublicSecurityGroupRuleRanges:
+                            - MinRange: 22
+                              MaxRange: 22
+                            - MinRange: 23
+                              MaxRange: 23
+    """
+
+    schema = type_schema('put-emr-block-public-access-configuration',
+                         BlockPublicAccessConfiguration={"type": "object"},
+                         required=('BlockPublicAccessConfiguration',))
+    permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
+
+    def validate(self):
+
+        config = self.data['BlockPublicAccessConfiguration']
+        if config.get('BlockPublicSecurityGroupRules', None) is False and config:
+            raise PolicyValidationError(
+                "Missing parameter: BlockPublicSecurityGroupRules")
+
+        for ruleRange in config.get('PermittedPublicSecurityGroupRuleRanges', []):
+            if not ruleRange['MinRange']:
+                raise PolicyValidationError('Missing Parameter: MinRange')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('emr')
+        config = self.data['BlockPublicAccessConfiguration']
+
+        try:
+            resp = client.put_block_public_access_configuration(
+                BlockPublicAccessConfiguration=config
+            )
+        except Exception as e:
+            self.log.warning("Exception trying to PutBlockPublicAccessConfiguration, error: %s", e)
