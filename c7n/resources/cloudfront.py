@@ -176,7 +176,7 @@ class DistributionConfig(ValueFilter):
     def process(self, resources, event=None):
 
         self.augment([r for r in resources if self.annotation_key not in r])
-        return super(DistributionConfig, self).process(resources, event)
+        return super().process(resources, event)
 
     def augment(self, resources):
 
@@ -187,7 +187,7 @@ class DistributionConfig(ValueFilter):
             try:
                 r[self.annotation_key] = client.get_distribution_config(Id=r['Id']) \
                     .get('DistributionConfig')
-            except (client.exceptions.NoSuchResource, client.exceptions.NoSuchDistribution):
+            except (client.exceptions.NoSuchDistribution):
                 r[self.annotation_key] = {}
             except Exception as e:
                 self.log.warning(
