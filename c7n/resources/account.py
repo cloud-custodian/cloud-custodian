@@ -16,7 +16,6 @@
 import json
 import time
 import datetime
-from .aws import shape_validate
 from botocore.exceptions import ClientError
 from fnmatch import fnmatch
 from dateutil.parser import parse as parse_date
@@ -34,7 +33,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
-
+from .aws import shape_validate # noqa: E811
 
 
 filters = FilterRegistry('aws.account.filters')
@@ -1607,7 +1606,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
 
     def validate(self):
         config = {'BlockPublicAccessConfiguration': self.data['BlockPublicAccessConfiguration']}
-        return shape_validate(config, self.shape, 'emr')
+        return aws.shape_validate(config, self.shape, 'emr')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
