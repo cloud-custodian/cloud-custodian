@@ -1868,13 +1868,9 @@ class DeleteInternetGateway(BaseAction):
         for r in resources:
             try:
                 client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
-            except (client.exceptions.NoSuchResource):
-                continue
-            except Exception as e:
-                self.log.warning(
-                    "Exception trying to delete Internet Gateway: %s error: %s",
-                    r['InternetGatewayId'], e)
-                raise e
+            except ClientError as err:
+                if not err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
+                    raise
 
 
 @resources.register('nat-gateway')

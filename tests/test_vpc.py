@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from .common import BaseTest, functional, event_data
+from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
@@ -2515,6 +2516,29 @@ class InternetGatewayTest(BaseTest):
             "InternetGateways"
         ]
         self.assertFalse(internet_gateways)
+
+    def test_delete_internet_gateways_error(self):
+        factory = self.replay_flight_data("test_internet_gateways_delete")
+        client = factory().client("ec2")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().ClientError = (BotoClientError)
+        mock_factory().client('ec2').delete_internet_gateway.side_effect = (
+            BotoClientError(
+                {'Error': {'Code': 'InvalidInternetGatewayId.NotFound'}},
+                operation_name='delete_internet_gateway'))
+        p = self.load_policy({
+            'name': 'delete-internet-gateway',
+            'resource': 'internet-gateway',
+            "actions": [{"type": "delete"}],
+        }, session_factory=mock_factory)
+
+        try:
+            p.resource_manager.actions[0].process(
+                [{'InternetGatewayId': 'abc'}])
+        except BotoClientError:
+            self.fail('should not raise')
+        mock_factory().client('ec2').delete_internet_gateway.assert_called_once()
 
 
 class NATGatewayTest(BaseTest):
