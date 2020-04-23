@@ -28,8 +28,10 @@ class DataflowJob(QueryResourceManager):
         component = 'projects.jobs'
         enum_spec = ('aggregated', 'jobs[]', None)
         scope_key = 'projectId'
-        id = 'name'
+        name = id = 'name'
         get_requires_event = True
+        default_report_fields = [
+            'name', 'currentState', 'createTime', 'location']
 
         @staticmethod
         def get(client, event):

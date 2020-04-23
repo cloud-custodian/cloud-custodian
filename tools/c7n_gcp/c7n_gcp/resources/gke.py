@@ -33,7 +33,10 @@ class KubernetesCluster(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
-        id = "name"
+        name = id = "name"
+        default_report_fields = [
+            'name', 'description', 'status', 'currentMasterVersion', 'currentNodeVersion',
+            'currentNodeCount', 'location']
 
         @staticmethod
         def get(client, resource_info):
@@ -79,6 +82,8 @@ class KubernetesClusterNodePool(ChildResourceManager):
         scope = 'global'
         id = 'name'
         parent_spec = {'resource': 'gke-cluster'}
+
+        default_report_fields = ['name', 'status', 'version']
 
         @staticmethod
         def get(client, resource_info):
