@@ -311,7 +311,7 @@ class EMRSecurityConfiguration(QueryResourceManager):
             return r
 
         # Describe notebook-instance & then list tags
-        resources = super(EMRSecurityConfiguration, self).augment(resources)
+        resources = super().augment(resources)
         return list(map(_augment, resources))
 
 
