@@ -2519,7 +2519,6 @@ class InternetGatewayTest(BaseTest):
 
     def test_delete_internet_gateways_error(self):
         factory = self.replay_flight_data("test_internet_gateways_delete")
-        client = factory().client("ec2")
         mock_factory = MagicMock()
         mock_factory.region = 'us-east-1'
         mock_factory().ClientError = (BotoClientError)
