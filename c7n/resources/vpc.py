@@ -2109,7 +2109,7 @@ class CreateFlowLogs(BaseAction):
                 DeliverLogsPermissionArn: arn:iam:role
                 LogGroupName: /custodian/vpc/flowlogs/
     """
-    permissions = ('ec2:CreateFlowLogs',)
+    permissions = ('ec2:CreateFlowLogs', 'logs:DescribeLogGroups', 'logs:CreateLogGroup',)
     schema = {
         'type': 'object',
         'additionalProperties': False,
@@ -2206,7 +2206,8 @@ class CreateFlowLogs(BaseAction):
         params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
         params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
         params['MaxAggregationInterval'] = self.data.get('MaxAggregationInterval', 600)
-
+        if self.data.get('LogDestinationType') != 's3':
+            self.process_log_group(self.data.get('LogGroupName'))
         try:
             results = client.create_flow_logs(**params)
 
@@ -2220,4 +2221,13 @@ class CreateFlowLogs(BaseAction):
                     'Exception: create flow-log: %s',
                     e.response['Error']['Message'])
             else:
+                raise
+
+    def process_log_group(self, logroup):
+        client = local_session(self.manager.session_factory).client('logs')
+        lg = client.describe_log_groups(logGroupNamePrefix=logroup)
+        if lg.get('logGroups') == []:
+            try:
+                client.create_log_group(logGroupName=logroup)
+            except client.exceptions.InvalidParameterException:
                 raise
