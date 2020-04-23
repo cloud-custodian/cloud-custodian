@@ -31,7 +31,8 @@ class Function(QueryResourceManager):
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
         name = id = "name"
-        default_report_fields = ['name', 'runtime', 'eventTrigger.eventType', 'status', 'updateTime']
+        default_report_fields = [
+            'name', 'runtime', 'eventTrigger.eventType', 'status', 'updateTime']
 
         events = {
             'create': 'google.cloud.functions.v1.CloudFunctionsService.CreateFunction',
