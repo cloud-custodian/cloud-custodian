@@ -32,7 +32,7 @@ custodian filters.
 
   policies:
     - name: dynamdb-checker
-      resource: aws.dynamodb
+      resource: aws.dynamodb-table
       source: config
       query:
         - clause: "resourceId = 'MyTable'"
