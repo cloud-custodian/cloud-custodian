@@ -30,6 +30,7 @@ from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema, generate_arn
 from c7n.query import QueryResourceManager, TypeInfo
+from .aws import shape_validate
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
@@ -1567,12 +1568,9 @@ class GetAccountBlockPublicAccessConfiguration(Filter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('emr')
 
-        try:
-            response = client.get_block_public_access_configuration()
-            response.pop('ResponseMetadata')
-            response = [response]
-        except Exception as e:
-            self.log.warning("Exception trying to GetBlockPublicAccessConfiguration, error: %s", e)
+        response = client.get_block_public_access_configuration()
+        response.pop('ResponseMetadata')
+        response = [response]
 
         return response
 
@@ -1604,17 +1602,11 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                          BlockPublicAccessConfiguration={"type": "object"},
                          required=('BlockPublicAccessConfiguration',))
     permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
+    shape = 'PutBlockPublicAccessConfigurationInput'
 
     def validate(self):
-
-        config = self.data['BlockPublicAccessConfiguration']
-        if config.get('BlockPublicSecurityGroupRules', None) is False and config:
-            raise PolicyValidationError(
-                "Missing parameter: BlockPublicSecurityGroupRules")
-
-        for ruleRange in config.get('PermittedPublicSecurityGroupRuleRanges', []):
-            if not ruleRange['MinRange']:
-                raise PolicyValidationError('Missing Parameter: MinRange')
+        config = {'BlockPublicAccessConfiguration': self.data['BlockPublicAccessConfiguration']}
+        return shape_validate(config, self.shape, 'emr')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
