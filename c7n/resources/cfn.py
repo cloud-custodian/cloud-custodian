@@ -80,7 +80,7 @@ class Delete(BaseAction):
             code = e.response['Error']['Code']
             msg = e.response['Error']['Message']
             if (
-                code == 'ValidationException'
+                code == 'ValidationError'
                 and 'cannot be deleted while TerminationProtection is enabled' in msg
             ):
                 if self.data.get('force', False):

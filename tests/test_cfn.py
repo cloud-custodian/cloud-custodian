@@ -14,6 +14,7 @@
 from .common import BaseTest
 
 import time
+import json
 
 
 class TestCFN(BaseTest):
@@ -35,16 +36,68 @@ class TestCFN(BaseTest):
             ["sphere11-db-1", "sphere11-db-2", "sphere11-db-3"],
         )
 
-    def test_delete_force(self):
-        factory = self.replay_flight_data("test_cfn_delete_force")
+    def test_delete_with_protection(self):
+        stack_name = "c7n-test-delete-with-protection"
+
+        factory = self.replay_flight_data("test_cfn_delete_with_protection")
         client = factory().client("cloudformation")
-        stacks = client.describe_stacks(StackName="mytopic").get("Stacks")
+        cfn_template = {"Resources": {"MyTopic": {"Type": "AWS::SNS::Topic"}}}
+        client.create_stack(
+            StackName=stack_name,
+            TemplateBody=json.dumps(cfn_template),
+            EnableTerminationProtection=True,
+        )
+        self.addCleanup(client.delete_stack, StackName=stack_name)
+        self.addCleanup(
+            client.update_termination_protection,
+            StackName=stack_name,
+            EnableTerminationProtection=False,
+        )
+        if self.recording:
+            time.sleep(30)
+
+        stacks = client.describe_stacks(StackName=stack_name).get("Stacks")
         self.assertEqual(stacks[0].get("EnableTerminationProtection"), True)
         p = self.load_policy(
             {
                 "name": "cfn-delete-force",
                 "resource": "cfn",
-                "filters": [{"StackName": "mytopic"}],
+                "filters": [{"StackName": stack_name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # this should have done nothing.
+        stacks = client.describe_stacks(StackName=stack_name).get(
+            "Stacks"
+        )
+        self.assertEqual(stacks[0].get("EnableTerminationProtection"), True)
+        self.assertEqual(stacks[0].get("StackStatus"), "CREATE_COMPLETE")
+
+    def test_delete_force(self):
+        stack_name = "c7n-test-delete-force"
+
+        factory = self.replay_flight_data("test_cfn_delete_force")
+        client = factory().client("cloudformation")
+        cfn_template = {"Resources": {"MyTopic": {"Type": "AWS::SNS::Topic"}}}
+        client.create_stack(
+            StackName=stack_name,
+            TemplateBody=json.dumps(cfn_template),
+            EnableTerminationProtection=True,
+        )
+        if self.recording:
+            time.sleep(30)
+
+        stacks = client.describe_stacks(StackName=stack_name).get("Stacks")
+        self.assertEqual(stacks[0].get("EnableTerminationProtection"), True)
+        p = self.load_policy(
+            {
+                "name": "cfn-delete-force",
+                "resource": "cfn",
+                "filters": [{"StackName": stack_name}],
                 "actions": [{"type": "delete", "force": True}],
             },
             session_factory=factory,
@@ -54,13 +107,12 @@ class TestCFN(BaseTest):
 
         # make sure delete has time to complete
         if self.recording:
-            time.sleep(20)
+            time.sleep(30)
 
-        client = factory().client("cloudformation")
-        stacks = client.describe_stacks(StackName=resources[0]["StackName"]).get(
+        # deleted stacks must be referenced by StackId
+        stacks = client.describe_stacks(StackName=resources[0]["StackId"]).get(
             "Stacks"
         )
-        self.assertEqual(stacks[0].get("EnableTerminationProtection"), False)
         self.assertEqual(stacks[0].get("StackStatus"), "DELETE_COMPLETE")
 
     def test_query(self):

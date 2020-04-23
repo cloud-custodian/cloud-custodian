@@ -4,7 +4,7 @@
         "Error": {
             "Type": "Sender",
             "Code": "ValidationError",
-            "Message": "Stack [c7n-test-delete-force] cannot be deleted while TerminationProtection is enabled"
+            "Message": "Stack [c7n-test-delete-with-protection] cannot be deleted while TerminationProtection is enabled"
         },
         "ResponseMetadata": {}
     }

@@ -1,28 +1,40 @@
 {
-  "status_code": 200,
-  "data": {
-    "Stacks": [
-      {
-        "StackId": "arn:aws:cloudformation:us-east-2:644160558196:stack/mytopic/7efb2d40-3a5d-11e8-8c44-500cef930ce6",
-        "StackName": "mytopic",
-        "CreationTime": {
-          "__class__": "datetime",
-          "year": 2018,
-          "month": 4,
-          "day": 7,
-          "hour": 12,
-          "minute": 16,
-          "second": 27,
-          "microsecond": 160000
-        },
-        "RollbackConfiguration": {},
-        "StackStatus": "DELETE_COMPLETE",
-        "DisableRollback": false,
-        "NotificationARNs": [],
-        "Tags": [],
-        "EnableTerminationProtection": false
-      }
-    ],
-    "ResponseMetadata": {}
-  }
+    "status_code": 200,
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-test-delete-force/4e14aae0-84f6-11ea-89fb-0e3b177c99d5",
+                "StackName": "c7n-test-delete-force",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 23,
+                    "hour": 0,
+                    "minute": 6,
+                    "second": 39,
+                    "microsecond": 536000
+                },
+                "DeletionTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 23,
+                    "hour": 0,
+                    "minute": 7,
+                    "second": 11,
+                    "microsecond": 683000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "DELETE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Tags": [],
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
 }
