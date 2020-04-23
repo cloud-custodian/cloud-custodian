@@ -1,42 +1,60 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Vpcs": [
             {
-                "VpcId": "vpc-7af45101", 
-                "InstanceTenancy": "default", 
-                "Tags": [
-                    {
-                        "Value": "FlowLogTest", 
-                        "Key": "Name"
-                    }
-                ], 
+                "CidrBlock": "10.205.0.0/18",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-03005fb9b8740263d",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
                 "CidrBlockAssociationSet": [
                     {
-                        "AssociationId": "vpc-cidr-assoc-7c1eb811", 
-                        "CidrBlock": "10.0.16.0/24", 
+                        "AssociationId": "vpc-cidr-assoc-0f6765530d80dc044",
+                        "CidrBlock": "10.205.0.0/18",
                         "CidrBlockState": {
                             "State": "associated"
                         }
                     }
-                ], 
-                "State": "available", 
-                "DhcpOptionsId": "dopt-4d4c3035", 
-                "CidrBlock": "10.0.16.0/24", 
-                "IsDefault": false
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "faizan.ahmed@capitalone.com"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "testing-vpc"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "172.31.0.0/16",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-d2d616b5",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-33669f5a",
+                        "CidrBlock": "172.31.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": true,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FlowLogTest"
+                    }
+                ]
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "e667839a-e438-453c-877a-4c75c0c26add", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Fri, 06 Apr 2018 16:51:44 GMT"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }
