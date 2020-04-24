@@ -15,10 +15,14 @@ import jmespath
 
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.actions import MethodAction
+from c7n.utils import type_schema, local_session
 
 
 @resources.register('ml-model')
 class MLModel(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/ml-engine/reference/rest/v1/projects.models
+    """
 
     class resource_type(TypeInfo):
         service = 'ml'
@@ -39,8 +43,93 @@ class MLModel(QueryResourceManager):
                 )})
 
 
+@MLModel.action_registry.register('set')
+class MLModelSet(MethodAction):
+    """The action is used for ML projects.models patch description field.
+
+    GCP action is https://cloud.google.com/ml-engine/reference/rest/v1/projects.models/patch
+
+    Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ml-model-update-description
+            resource: gcp.ml-model
+            filters:
+              - type: value
+                key: name
+                value: projects/cloud-custodian/models/test
+            actions:
+              - type: set
+                description: Custom description
+                labels:
+                  type: new
+    """
+
+    schema = type_schema(
+        'set',
+        **{
+            'description': {
+                'type': 'string'
+            },
+            'labels': {
+                'type': 'object',
+                'additionalProperties': {
+                    'type': 'string'
+                }
+            }
+        }
+    )
+
+    method_spec = {'op': 'patch'}
+
+    def get_resource_params(self, model, resource):
+        body = {}
+        if 'description' in self.data:
+            body['description'] = self.data['description']
+        if 'labels' in self.data:
+            body['labels'] = self.data['labels']
+
+        return {
+            'name': resource['name'],
+            'updateMask': ','.join(body.keys()),
+            'body': body
+        }
+
+
+@MLModel.action_registry.register('delete')
+class MLModelDelete(MethodAction):
+    """The action is used for ML projects.models delete model.
+
+    GCP action is https://cloud.google.com/ml-engine/reference/rest/v1/projects.models/delete
+
+    Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ml-model-delete
+            resource: gcp.ml-model
+            filters:
+              - type: value
+                key: name
+                value: projects/cloud-custodian/models/test
+            actions:
+              - type: delete
+    """
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, model, resource):
+        return {'name': resource['name']}
+
+
 @resources.register('ml-job')
 class MLJob(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/ml-engine/reference/rest/v1/projects.jobs
+    """
 
     class resource_type(TypeInfo):
         service = 'ml'
@@ -59,3 +148,57 @@ class MLJob(QueryResourceManager):
                 'get', {'name': 'projects/{}/jobs/{}'.format(
                     jmespath.search('resource.labels.project_id', event),
                     jmespath.search('protoPayload.response.jobId', event))})
+
+
+@MLJob.action_registry.register('set')
+class MLJobSet(MethodAction):
+    """The action is used for ML projects.jobs patch.
+
+    GCP action is https://cloud.google.com/ml-engine/reference/rest/v1/projects.jobs/patch
+
+    Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ml-job-set-labels
+            resource: gcp.ml-job
+            filters:
+              - type: value
+                key: jobId
+                value: test_job
+            actions:
+              - type: set
+                labels:
+                  type: new
+    """
+
+    schema = type_schema(
+        'set',
+        **{
+            'labels': {
+                'type': 'object',
+                'additionalProperties': {
+                    'type': 'string'
+                }
+            }
+        }
+    )
+
+    method_spec = {'op': 'patch'}
+
+    def get_resource_params(self, model, resource):
+        session = local_session(self.manager.session_factory)
+        name = 'projects/{}/jobs/{}'.format(
+            session.get_default_project(),
+            resource['jobId'])
+
+        body = {}
+        if 'labels' in self.data:
+            body['labels'] = self.data['labels']
+
+        return {
+            'name': name,
+            'updateMask': ','.join(body.keys()),
+            'body': body
+        }

@@ -1,0 +1,36 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 09 Jul 2019 12:52:21 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "584",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/operations/update_test_1562676741288",
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.ml.v1.OperationMetadata",
+      "createTime": "2019-07-09T12:52:21Z",
+      "operationType": "UPDATE_MODEL",
+      "modelName": "projects/cloud-custodian/models/test"
+    },
+    "done": true,
+    "response": {
+      "@type": "type.googleapis.com/google.cloud.ml.v1.Model",
+      "name": "projects/cloud-custodian/models/test",
+      "description": "Custom description",
+      "regions": [
+        "us-central1"
+      ],
+      "etag": "mA5uX99yMhw="
+    }
+  }
+}

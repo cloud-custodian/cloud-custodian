@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 09 Jul 2019 13:36:05 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "320",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "projects/cloud-custodian/operations/delete_model_test-1562679364",
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.ml.v1.OperationMetadata",
+      "createTime": "2019-07-09T13:36:04Z",
+      "operationType": "DELETE_MODEL",
+      "modelName": "projects/cloud-custodian/models/test"
+    }
+  }
+}
