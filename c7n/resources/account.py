@@ -1663,7 +1663,6 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
     shape = 'PutBlockPublicAccessConfigurationInput'
 
     def validate(self):
-        from c7n.resources import aws
         config = {'BlockPublicAccessConfiguration': self.data['BlockPublicAccessConfiguration']}
         return shape_validate(config, self.shape, 'emr')
 
