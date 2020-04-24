@@ -285,6 +285,7 @@ class TypeInfo:
     # required for reporting
     id = None
     name = None
+    default_report_fields = ()
 
 
 class ChildTypeInfo(TypeInfo):

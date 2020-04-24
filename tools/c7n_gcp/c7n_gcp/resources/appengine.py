@@ -80,7 +80,7 @@ class AppEngineCertificate(ChildResourceManager):
 @resources.register('app-engine-domain')
 class AppEngineDomain(ChildResourceManager):
     """GCP resource:
-    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedDomains
+    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedDomains/list#AuthorizedDomain
     """
     class resource_type(ChildTypeInfo):
         service = 'appengine'
@@ -89,6 +89,8 @@ class AppEngineDomain(ChildResourceManager):
         enum_spec = ('list', 'domains[]', None)
         scope = None
         id = 'id'
+        name = "name"
+        default_report_fields = [id, name]
         parent_spec = {
             'resource': 'app-engine',
             'child_enum_params': {
@@ -112,7 +114,9 @@ class AppEngineDomainMapping(ChildResourceManager):
         component = 'apps.domainMappings'
         enum_spec = ('list', 'domainMappings[]', None)
         scope = None
-        name = id = 'id'
+        name = "name"
+        id = 'id'
+        default_report_fields = [id, name]
         parent_spec = {
             'resource': 'app-engine',
             'child_enum_params': {

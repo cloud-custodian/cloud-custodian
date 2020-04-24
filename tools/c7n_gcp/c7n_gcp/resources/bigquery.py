@@ -73,7 +73,7 @@ class BigQueryJob(QueryResourceManager):
         get_requires_event = True
         scope = 'project'
         scope_key = 'projectId'
-        id = 'id'
+        name = id = 'id'
         default_report_fields = ["id", "user_email", "status.state"]
 
         @staticmethod
@@ -96,8 +96,9 @@ class BigQueryProject(QueryResourceManager):
         component = 'projects'
         enum_spec = ('list', 'projects[]', None)
         scope = 'global'
-        name = id = 'id'
-        default_report_fields = []
+        id = 'id'
+        name = "friendlyName"
+        default_report_fields = [id, name]
 
 
 @resources.register('bq-table')
@@ -112,6 +113,9 @@ class BigQueryTable(ChildResourceManager):
         enum_spec = ('list', 'tables[]', None)
         scope_key = 'projectId'
         id = 'id'
+        name = "friendlyName"
+        default_report_fields = [
+            id, name, "description", "creationTime", "lastModifiedTime", "numRows", "numBytes"]
         parent_spec = {
             'resource': 'bq-dataset',
             'child_enum_params': [

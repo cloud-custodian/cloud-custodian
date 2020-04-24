@@ -157,7 +157,10 @@ class Image(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'images'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "sourceType", "status", "creationTimestamp",
+            "storageLocation", "diskSizeGb", "family"]
 
         @staticmethod
         def get(client, resource_info):
@@ -322,7 +325,10 @@ class InstanceTemplate(QueryResourceManager):
         component = 'instanceTemplates'
         scope = 'zone'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "creationTimestamp",
+            "properties.machineType", "properties.description"]
 
         @staticmethod
         def get(client, resource_info):

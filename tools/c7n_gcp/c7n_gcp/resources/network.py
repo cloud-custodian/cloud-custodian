@@ -122,7 +122,10 @@ class Firewall(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'firewalls'
-        id = "name"
+        name = id = "name"
+        default_report_fields = [
+            name, "description", "network", "priority", "creationTimestamp",
+            "logConfig.enabled", "disabled"]
 
         @staticmethod
         def get(client, resource_info):
@@ -211,7 +214,7 @@ class Interconnect(QueryResourceManager):
         component = 'interconnects'
         enum_spec = ('list', 'items[]', None)
         name = id = 'name'
-        deafult_report_fields = [
+        default_report_fields = [
             "name", "description", "creationTimestamp", "operationalStatus",
             "linkType", "location"]
 
