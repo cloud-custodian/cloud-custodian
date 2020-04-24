@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityConfigurations": [
+            {
+                "Name": "full-encryption",
+                "CreatedTimeStamp": "2020-03-18T10:52:32.544000-04:00",
+                "EncryptionConfiguration": {
+                    "S3Encryption": [
+                        {
+                            "S3EncryptionMode": "SSE-KMS",
+                            "KmsKeyArn": "arn:aws:kms:us-east-1:123456789123:key/ec3b9189-1247-4ecc-8bfd-c492f07621db"
+                        }
+                    ],
+                    "CloudWatchEncryption": {
+                        "CloudWatchEncryptionMode": "SSE-KMS",
+                        "KmsKeyArn": "arn:aws:kms:us-east-1:123456789123:key/358f7699-4ea5-455a-9c78-1c868301e5a8"
+                    },
+                    "JobBookmarksEncryption": {
+                        "JobBookmarksEncryptionMode": "CSE-KMS",
+                        "KmsKeyArn": "arn:aws:kms:us-east-1:123456789123:key/358f7699-4ea5-455a-9c78-1c868301e5a8"
+                    }
+                }
+            }
+        ],
+        "NextToken": "",
+        "ResponseMetadata": {}
+    }
+}

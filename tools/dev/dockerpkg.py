@@ -18,7 +18,7 @@ Build Docker Artifacts
 On build this is loosely modeled after https://github.com/docker/build-push-action
   - same in that we auto add labels from github action metadata.
   - differs in that we use `dev` for latest.
-  - differs in thta latest refers to last tagged image.
+  - differs in that latest refers to last tagged revision.
 
 We also support running functional tests and image cve scanning before pushing.
 """
@@ -269,7 +269,7 @@ def cli():
 @click.option(
     "-r", "--registry", multiple=True, help="Registries for image repo on tag and push"
 )
-@click.option("--tag", help="Static tag for the image")
+@click.option("-t", "--tag", help="Static tag for the image")
 @click.option("--push", is_flag=True, help="Push images to registries")
 @click.option(
     "--test", help="Run lightweight functional tests with image", is_flag=True
@@ -299,10 +299,10 @@ def build(provider, registry, tag, image, quiet, push, test, scan, verbose):
     # of registry / repo name, that will be applied to all images.
     #
     # ie. Build out some common suffixes for the image
-    image_tags = get_env_tags()
-    # If given an explicit tag, just use it
-    if tag:
-        image_tags = [tag]
+    #
+    # Note there's a bit of custodian specific logic in how we get env tags.
+    # see the function docstring for more details.
+    image_tags = get_env_tags(tag)
 
     build_args = None
     if provider not in (None, ()):
@@ -333,6 +333,10 @@ def get_labels(image):
         "org.opencontainers.image.title": image.metadata["name"],
         "org.opencontainers.image.description": image.metadata["description"],
     }
+
+    if not hub_env:
+        hub_env = get_git_env()
+
     if hub_env.get("repository"):
         labels["org.opencontainers.image.source"] = hub_env["repository"]
     if hub_env.get("sha"):
@@ -359,6 +363,13 @@ def get_github_env():
     }
 
 
+def get_git_env():
+    return {
+        "sha": subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("utf8"),
+        "repository": "https://github.com/cloud-custodian/cloud-custodian",
+    }
+
+
 def get_image_repo_tags(image, registries, tags):
     results = []
     # get a local tag with name
@@ -370,24 +381,52 @@ def get_image_repo_tags(image, registries, tags):
     return results
 
 
-def get_env_tags():
+def get_env_tags(cli_tag):
+    """So we're encoding quite a bit of custodian release workflow logic here.
+
+    Github actions product -dev and release images from same action workflow.
+
+    Azure pipelines runs functional tests and produces nightly images.
+
+    End result is intended to be
+
+    |name|label|frequency|mutability|testing|
+    |----|-----|---------|----------|-------|
+    |c7n |latest |release |mutable |light-functional|
+    |c7n |0.9.1 |release |immutable |light-functional|
+    |c7n |nightly |daily |mutable |functional|
+    |c7n |2020-04-01 |daily |immutable |functional|
+    |c7n |dev |per-commit |mutable |light-functional|
+    |c7n |distroless-dev |per-commit|mutable |light-functional|
+    |c7n |distroless-latest |release |mutable |functional|
+    |c7n |distroless-2020-04-01 |daily |immutable |functional|
+    |c7n |distroless-0.9.1 |release |immutable |light-functional|
+
+    This function encodes that the github logic by checking github env vars
+    if passed --tag=auto on the cli to distinguish dev/release images.
+
+    It also handles the azure workflow by checking for --tag=nightly and
+    adding a date tag.
+    """
     image_tags = []
     hub_env = get_github_env()
 
-    if "sha" in hub_env:
-        image_tags.append("sha-{}".format(hub_env["sha"][:7]))
-
-    image_tags.append(datetime.utcnow().strftime("%Y-%m-%d"))
-
-    if "ref" in hub_env:
+    if "ref" in hub_env and cli_tag == "auto":
         _, rtype, rvalue = hub_env["ref"].split("/", 2)
         if rtype == "tags":
             image_tags.append("latest")
             image_tags.append(rvalue)
         elif rtype == "heads" and rvalue == "master":
             image_tags.append("dev")
-        elif rtype == "heads":
+        elif rtype == "heads":  # branch
             image_tags.append(rvalue)
+
+    if cli_tag == "nightly":
+        image_tags.append(cli_tag)
+        image_tags.append(datetime.utcnow().strftime("%Y-%m-%d"))
+
+    if cli_tag not in ("nightly", "auto"):
+        image_tags = [cli_tag]
 
     return list(filter(None, image_tags))
 
@@ -429,13 +468,21 @@ def test_image(image_id, image_name, providers):
 
 def push_image(client, image_id, image_refs):
     if "HUB_TOKEN" in os.environ and "HUB_USER" in os.environ:
-        client.login(os.environ["HUB_USER"], os.environ["HUB_TOKEN"])
+        log.info("docker hub login %s" % os.environ["HUB_USER"])
+        result = client.login(os.environ["HUB_USER"], os.environ["HUB_TOKEN"])
+        if result["Status"] != "Login Succeeded":
+            raise RuntimeError("Docker Login failed %s" % (result,))
 
     for (repo, tag) in image_refs:
         log.info(f"Pushing image {repo}:{tag}")
         for line in client.images.push(repo, tag, stream=True, decode=True):
             if "status" in line:
                 log.debug("%s id:%s" % (line["status"], line.get("id", "n/a")))
+            elif "error" in line:
+                log.warning("Push error %s" % (line,))
+                raise RuntimeError("Docker Push Failed\n %s" % (line,))
+            else:
+                log.info("other %s" % (line,))
 
 
 def build_image(client, image_name, image_def, dfile_path, build_args):

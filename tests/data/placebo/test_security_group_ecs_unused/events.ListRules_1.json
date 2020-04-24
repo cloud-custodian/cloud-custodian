@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Rules": [
+            {
+                "Name": "apichanges-build",
+                "Arn": "arn:aws:events:us-east-1:644160558196:rule/apichanges-build",
+                "State": "ENABLED",
+                "Description": "Runs fargate task apichanges: rate(6 hours)",
+                "ScheduleExpression": "rate(6 hours)",
+                "EventBusName": "default"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
