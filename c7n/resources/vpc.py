@@ -1859,6 +1859,19 @@ class InternetGateway(query.QueryResourceManager):
 @InternetGateway.action_registry.register('delete')
 class DeleteInternetGateway(BaseAction):
 
+    """Action to delete Internet Gateway
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-interet-gateway
+                resource: internet-gateway
+                actions:
+                  - type: delete
+    """
+
     schema = type_schema('delete')
     permissions = ('ec2:DeleteInternetGateway',)
 
