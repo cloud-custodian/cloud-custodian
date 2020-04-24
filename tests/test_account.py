@@ -975,14 +975,14 @@ class AccountTests(BaseTest):
         self.assertEqual(resources[0]["BlockPublicAccessConfigurationMetadata"]['CreatedByArn'],
              "arn:aws:iam::12345678901:user/test")
 
-    def test_put_emr_block_public_access_configuration(self):
-        session_factory = self.replay_flight_data("test_put_emr_block_public_access_configuration")
+    def test_set_emr_block_public_access_configuration(self):
+        session_factory = self.replay_flight_data("test_set_emr_block_public_access_configuration")
         p = self.load_policy(
             {
                 'name': 'emr',
                 'resource': 'account',
                 'actions': [{
-                    "type": "put-emr-block-public-access-configuration",
+                    "type": "set-emr-block-public-access-configuration",
                     "BlockPublicAccessConfiguration": {
                         "BlockPublicSecurityGroupRules": True,
                         "PermittedPublicSecurityGroupRuleRanges": [{

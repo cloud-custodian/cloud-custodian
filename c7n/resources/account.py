@@ -1643,10 +1643,10 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: put-emr-block-public-access-configuration
+              - name: set-emr-block-public-access-configuration
                 resource: account
                 actions:
-                  - type: put-emr-block-public-access-configuration
+                  - type: set-emr-block-public-access-configuration
                     BlockPublicAccessConfiguration:
                         BlockPublicSecurityGroupRules: True
                         PermittedPublicSecurityGroupRuleRanges:
@@ -1656,7 +1656,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                               MaxRange: 23
     """
 
-    schema = type_schema('put-emr-block-public-access-configuration',
+    schema = type_schema('set-emr-block-public-access-configuration',
                          BlockPublicAccessConfiguration={"type": "object"},
                          required=('BlockPublicAccessConfiguration',))
     permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
