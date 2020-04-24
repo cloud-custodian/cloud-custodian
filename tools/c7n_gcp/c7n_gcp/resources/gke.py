@@ -80,7 +80,7 @@ class KubernetesClusterNodePool(ChildResourceManager):
         component = 'projects.locations.clusters.nodePools'
         enum_spec = ('list', 'nodePools[]', None)
         scope = 'global'
-        id = 'name'
+        name = id = 'name'
         parent_spec = {'resource': 'gke-cluster'}
 
         default_report_fields = ['name', 'status', 'version']
