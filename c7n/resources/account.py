@@ -1633,7 +1633,7 @@ class GetAccountBlockPublicAccessConfiguration(Filter):
         return response
 
 
-@actions.register('put-emr-block-public-access-configuration')
+@actions.register('set-emr-block-public-access-configuration')
 class PutAccountBlockPublicAccessConfiguration(BaseAction):
     """Action to put/update the EMR block public access configuration for your
        AWS account in the current region
