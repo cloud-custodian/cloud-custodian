@@ -1603,9 +1603,9 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
     shape = 'PutBlockPublicAccessConfigurationInput'
 
     def validate(self):
-        from .aws import shape_validate
+        from c7n.resources import aws
         config = {'BlockPublicAccessConfiguration': self.data['BlockPublicAccessConfiguration']}
-        return shape_validate(config, self.shape, 'emr')
+        return aws.shape_validate(config, self.shape, 'emr')
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
