@@ -1866,7 +1866,7 @@ class DeleteInternetGateway(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: delete-interet-gateway
+              - name: delete-internet-gateway
                 resource: internet-gateway
                 actions:
                   - type: delete
