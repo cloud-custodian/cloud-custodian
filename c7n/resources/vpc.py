@@ -2227,7 +2227,4 @@ class CreateFlowLogs(BaseAction):
         client = local_session(self.manager.session_factory).client('logs')
         lg = client.describe_log_groups(logGroupNamePrefix=logroup)
         if lg.get('logGroups') == []:
-            try:
-                client.create_log_group(logGroupName=logroup)
-            except client.exceptions.InvalidParameterException:
-                raise
+            client.create_log_group(logGroupName=logroup)
