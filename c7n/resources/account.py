@@ -33,8 +33,6 @@ from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
-from .aws import shape_validate
-
 
 filters = FilterRegistry('aws.account.filters')
 actions = ActionRegistry('aws.account.actions')
@@ -1605,6 +1603,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
     shape = 'PutBlockPublicAccessConfigurationInput'
 
     def validate(self):
+        from .aws import shape_validate
         config = {'BlockPublicAccessConfiguration': self.data['BlockPublicAccessConfiguration']}
         return shape_validate(config, self.shape, 'emr')
 
