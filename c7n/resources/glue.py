@@ -19,8 +19,9 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
-from c7n.filters import StateTransitionFilter, FilterRegistry, CrossAccountAccessFilter
+from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
 
@@ -183,6 +184,62 @@ class GlueCrawler(QueryResourceManager):
         universal_taggable = True
 
     augment = universal_augment
+
+
+class SecurityConfigFilter(RelatedResourceFilter):
+    """Filters glue crawlers with security configurations
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: need-kms-cloudwatch
+                resource: glue-crawler
+                filters:
+                  - type: security-config
+                    key: EncryptionConfiguration.CloudWatchEncryption.CloudWatchEncryptionMode
+                    op: ne
+                    value: SSE-KMS
+
+    To find resources missing any security configuration all set `missing: true` on the filter.
+    """
+
+    RelatedResource = "c7n.resources.glue.GlueSecurityConfiguration"
+    AnnotationKey = "matched-security-config"
+    RelatedIdsExpression = None
+
+    schema = type_schema(
+        'security-config',
+        missing={'type': 'boolean', 'default': False},
+        rinherit=ValueFilter.schema)
+
+    def validate(self):
+        if self.data.get('missing'):
+            return self
+        else:
+            return super(SecurityConfigFilter, self).validate()
+
+    def process(self, resources, event=None):
+        if self.data.get('missing'):
+            return [r for r in resources if self.RelatedIdsExpression not in r]
+        return super(SecurityConfigFilter, self).process(resources, event=None)
+
+
+@GlueDevEndpoint.filter_registry.register('security-config')
+class DevEndpointSecurityConfigFilter(SecurityConfigFilter):
+    RelatedIdsExpression = 'SecurityConfiguration'
+
+
+@GlueJob.filter_registry.register('security-config')
+class GlueJobSecurityConfigFilter(SecurityConfigFilter):
+    RelatedIdsExpression = 'SecurityConfiguration'
+
+
+@GlueCrawler.filter_registry.register('security-config')
+class GlueCrawlerSecurityConfigFilter(SecurityConfigFilter):
+
+    RelatedIdsExpression = 'CrawlerSecurityConfiguration'
 
 
 @GlueCrawler.action_registry.register('delete')
@@ -419,6 +476,11 @@ class DeleteWorkflow(BaseAction):
                 client.delete_workflow(Name=r['Name'])
             except client.exceptions.EntityNotFoundException:
                 continue
+
+
+@GlueWorkflow.filter_registry.register('security-config')
+class GlueWorkflowSecurityConfigFilter(SecurityConfigFilter):
+    RelatedIdsExpression = 'SecurityConfiguration'
 
 
 @resources.register('glue-catalog')

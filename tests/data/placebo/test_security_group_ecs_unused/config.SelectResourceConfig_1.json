@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"configuration\":{\"groupName\":\"apichanges-task\",\"groupId\":\"sg-0f026884bba48e350\",\"vpcId\":\"vpc-39831640\",\"ipPermissionsEgress\":[{\"ipRanges\":[\"0.0.0.0/0\"],\"prefixListIds\":[],\"userIdGroupPairs\":[],\"ipProtocol\":\"-1\",\"ipv4Ranges\":[{\"description\":\"Allows task to establish connections to all resources\",\"cidrIp\":\"0.0.0.0/0\"}],\"ipv6Ranges\":[]}],\"description\":\"Limit connections from internal resources while allowing apichanges-task to connect to all external resources\",\"ownerId\":\"644160558196\",\"ipPermissions\":[],\"tags\":[{\"value\":\"AWSAPIChanges\",\"key\":\"App\"}]},\"supplementaryConfiguration\":{}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

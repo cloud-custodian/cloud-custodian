@@ -423,6 +423,64 @@ class AccountPasswordPolicy(ValueFilter):
         return []
 
 
+@actions.register('set-password-policy')
+class SetAccountPasswordPolicy(BaseAction):
+    """Set an account's password policy.
+
+    This only changes the policy for the items provided.
+    If this is the first time setting a password policy and an item is not provided it will be
+    set to the defaults defined in the boto docs for IAM.Client.update_account_password_policy
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-account-password-policy
+                resource: account
+                filters:
+                  - not:
+                    - type: password-policy
+                      key: MinimumPasswordLength
+                      value: 10
+                      op: ge
+                actions:
+                    - type: set-password-policy
+                      policy:
+                        MinimumPasswordLength: 20
+    """
+    schema = type_schema(
+        'set-password-policy',
+        policy={
+            'type': 'object'
+        })
+    shape = 'UpdateAccountPasswordPolicyRequest'
+    service = 'iam'
+    permissions = ('iam:GetAccountPasswordPolicy', 'iam:UpdateAccountPasswordPolicy')
+
+    def validate(self):
+        return shape_validate(
+            self.data.get('policy', {}),
+            self.shape,
+            self.service)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        account = resources[0]
+        if account.get('c7n:password_policy'):
+            config = account['c7n:password_policy']
+        else:
+            try:
+                config = client.get_account_password_policy().get('PasswordPolicy')
+            except client.exceptions.NoSuchEntityException:
+                config = {}
+        params = dict(self.data['policy'])
+        config.update(params)
+        config = {k: v for (k, v) in config.items() if k not in ('ExpirePasswords',
+            'PasswordPolicyConfigured')}
+        client.update_account_password_policy(**config)
+
+
 @filters.register('service-limit')
 class ServiceLimit(Filter):
     """Check if account's service limits are past a given threshold.
