@@ -445,6 +445,7 @@ class DeleteTopic(BaseAction):
             except client.exceptions.NotFoundException:
                 continue
 
+
 @SNS.filter_registry.register('has-statement')
 class HasStatementFilter(PolicyStatementFilter):
     """Find queues with set of policy statements.
