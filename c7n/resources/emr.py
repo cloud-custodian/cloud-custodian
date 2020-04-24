@@ -304,15 +304,10 @@ class EMRSecurityConfiguration(QueryResourceManager):
                   'elasticmapreduce:DescribeSecurityConfiguration',)
 
     def augment(self, resources):
-
-        def _augment(r):
-            # Convert the json string to dict
-            r['SecurityConfiguration'] = json.loads(r['SecurityConfiguration'])
-            return r
-
-        # Describe notebook-instance & then list tags
         resources = super().augment(resources)
-        return list(map(_augment, resources))
+        for r in resources:
+            r['SecurityConfiguration'] = json.loads(r['SecurityConfiguration'])
+        return resources
 
 
 @EMRSecurityConfiguration.action_registry.register('delete')
