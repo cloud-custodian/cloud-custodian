@@ -681,3 +681,27 @@ class TestSNS(BaseTest):
         client = session_factory().client("sns")
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
         self.assertTrue(tags[0]["Key"], "custodian_cleanup")
+
+    def test_sns_has_required_statements(self):
+        session = self.replay_flight_data("test_sns_has_required_statements")
+        p = self.load_policy(
+            {
+                "name": "sns-has_statements",
+                "resource": "aws.sns",
+                "filters": [
+                    {"TopicArn": "arn:aws:sns:us-east-1:644160558196:test"},
+                    {
+                        "type": "has-statement",
+                        "statement_ids": [
+                            "__default_statement_ID"
+                        ]
+                    }
+                ]
+            },
+            session_factory=session,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert(
+            "\"Sid\":\"__default_statement_ID\"" in resources[0]["Policy"]
+        )

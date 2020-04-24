@@ -16,6 +16,7 @@ import json
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
 from c7n.filters import CrossAccountAccessFilter, PolicyChecker
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.iamaccess import PolicyStatementFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom
@@ -443,3 +444,31 @@ class DeleteTopic(BaseAction):
                 client.delete_topic(TopicArn=r['TopicArn'])
             except client.exceptions.NotFoundException:
                 continue
+
+@SNS.filter_registry.register('has-statement')
+class HasStatementFilter(PolicyStatementFilter):
+    """Find queues with set of policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sns-bucket-has-statement
+                resource: aws.sns
+                filters:
+                  - type: has-statement
+                    statement_ids:
+                      - DeleteQueue
+
+
+            policies:
+              - name: sns-public-policy
+                resource: aws.sns
+                filters:
+                  - type: has-statement
+                    statements:
+                      - Effect: Allow
+                        Action: 'sns:*'
+                        Principal: '*'
+    """
