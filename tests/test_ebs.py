@@ -160,16 +160,22 @@ class SnapshotErrorHandler(BaseTest):
             },
             session_factory=factory
         )
-        resources = p.run()
+        try:
+            resources = p.run()
+        except ClientError as e:
+            # it should filter missing volume and not throw an error            
+            self.fail("This should have been handled in ErrorHandler.extract_bad_volume")
         self.assertEqual(len(resources), 1)
         try:
             factory().client("ec2").describe_volumes(
                 VolumeIds=[resources[0]["VolumeId"]]
             )
         except ClientError as e:
-            msg = f"The volume '{resources[0]['VolumeId']}' does not exist."
-            self.assertEqual(e.response["Error"]["Code"], "InvalidVolume.NotFound")
-            self.assertEqual(e.response["Error"]["Message"], msg)
+            # this should not filter missing volume and will throw an error 
+            msg = e.response["Error"]["Message"]
+            err = e.response["Error"]["Code"]
+        self.assertEqual(err, "InvalidVolume.NotFound")
+        self.assertEqual(msg, f"The volume '{resources[0]['VolumeId']}' does not exist.")
 
 
 class SnapshotAccessTest(BaseTest):
