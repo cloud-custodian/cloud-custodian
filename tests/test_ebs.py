@@ -233,7 +233,7 @@ class SnapshotCopyTest(BaseTest):
         self.assertEqual(tags["ASV"], "RoadKill")
 
     def test_snapshot_copy_related_tags_missing_volumes(self):
-        session_factory = self.replay_flight_data(
+        factory = self.replay_flight_data(
             "test_ebs_snapshot_copy_related_tags_missing_volumes")
         p = self.load_policy(
             {
@@ -249,15 +249,18 @@ class SnapshotCopyTest(BaseTest):
                     }
                 ]
             },
-            session_factory=session_factory
+            session_factory=factory
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        # msg = f"The volume {resources[0]['VolumeId']} does not exist."
-        # assert(
-        #     resources[0]["Error"]["Code"] is "InvalidVolume.NotFound",
-        #     msg in resources[0]["Error"]["Message"]
-        # )
+        try:
+            factory().client("ec2").describe_volumes(
+                VolumeIds=[resources[0]["VolumeId"]]
+            )
+        except ClientError as e:
+            msg = f"The volume '{resources[0]['VolumeId']}' does not exist."
+            self.assertEqual(e.response["Error"]["Code"], "InvalidVolume.NotFound")
+            self.assertEqual(e.response["Error"]["Message"], msg)      
 
 
 class SnapshotAmiSnapshotTest(BaseTest):
