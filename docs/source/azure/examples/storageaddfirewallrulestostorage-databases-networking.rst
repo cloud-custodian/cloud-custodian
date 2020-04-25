@@ -34,7 +34,7 @@ Finds storage accounts with no ip rules and modifies them to:
               - virtual-network-resource-id: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/subnet1
               - virtual-network-resource-id: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet2/subnets/subnet2
 
-Finds storage acocunt with no ip rules and modifies it to:
+Finds storage account with no ip rules and modifies it to:
 - Enable Logging and Metrics access to the database
 - Allow access from the location specified by ``ip-rules``
 

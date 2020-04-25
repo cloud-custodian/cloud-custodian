@@ -234,7 +234,7 @@ Lambda Configuration
 Custodian lambdas support configuring all lambda options via keys on the lambda
 mode in the YAML.  See AWS'
 `AWS Lambda Function Configuration <https://docs.aws.amazon.com/lambda/latest/dg/resource-model.html>`_
-page for the full list of configuration options avaible on a Lambda.
+page for the full list of configuration options available on a Lambda.
 
 Refer to :ref:`aws_modes` for detailed explanation of the different ``type``
 values and the corresponding additional configuration options each requires.

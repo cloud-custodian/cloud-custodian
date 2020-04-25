@@ -297,7 +297,7 @@ def report(options, policies):
         log.error('Error: must supply at least one policy')
         sys.exit(1)
 
-    resources = set([p.resource_type for p in policies])
+    resources = {p.resource_type for p in policies}
     if len(resources) > 1:
         log.error('Error: Report subcommand can accept multiple policies, '
                   'but they must all be for the same resource.')
