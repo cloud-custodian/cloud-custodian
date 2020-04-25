@@ -300,7 +300,7 @@ class ImageUnusedFilter(Filter):
 
     def _pull_ec2_images(self):
         ec2_manager = self.manager.get_resource_manager('ec2')
-        return set([i['ImageId'] for i in ec2_manager.resources()])
+        return {i['ImageId'] for i in ec2_manager.resources()}
 
     def process(self, resources, event=None):
         images = self._pull_ec2_images().union(self._pull_asg_images())

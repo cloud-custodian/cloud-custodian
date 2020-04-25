@@ -1525,14 +1525,14 @@ class CrossAccountChecker(TestCase):
             ],
         }
 
-        checker = PolicyChecker({"allowed_accounts": set(["221800032964"])})
+        checker = PolicyChecker({"allowed_accounts": {"221800032964"}})
 
         self.assertTrue(bool(checker.check(policy)))
 
     def test_sqs_policies(self):
         policies = load_data("iam/sqs-policies.json")
 
-        checker = PolicyChecker({"allowed_accounts": set(["221800032964"])})
+        checker = PolicyChecker({"allowed_accounts": {"221800032964"}})
         for p, expected in zip(
             policies, [False, True, True, False, False, False, False, False]
         ):
@@ -1543,9 +1543,9 @@ class CrossAccountChecker(TestCase):
         policies = load_data("iam/s3-policies.json")
         checker = PolicyChecker(
             {
-                "allowed_accounts": set(["123456789012"]),
-                "allowed_vpc": set(["vpc-12345678"]),
-                "allowed_vpce": set(["vpce-12345678", "vpce-87654321"]),
+                "allowed_accounts": {"123456789012"},
+                "allowed_vpc": {"vpc-12345678"},
+                "allowed_vpce": {"vpce-12345678", "vpce-87654321"},
             }
         )
         for p, expected in zip(
@@ -1572,7 +1572,7 @@ class CrossAccountChecker(TestCase):
 
     def test_s3_policies_vpc(self):
         policies = load_data("iam/s3-policies.json")
-        checker = PolicyChecker({"allowed_accounts": set(["123456789012"])})
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
         for p, expected in zip(
             policies,
             [
@@ -1599,8 +1599,8 @@ class CrossAccountChecker(TestCase):
         policies = load_data("iam/s3-conditions.json")
         checker = PolicyChecker(
             {
-                "allowed_accounts": set(["123456789012"]),
-                "allowed_vpc": set(["vpc-12345678"]),
+                "allowed_accounts": {"123456789012"},
+                "allowed_vpc": {"vpc-12345678"},
             }
         )
         for p, expected in zip(policies, [False, True]):
@@ -1618,7 +1618,7 @@ class CrossAccountChecker(TestCase):
         policies = load_data("iam/s3-orgid.json")
         checker = PolicyChecker(
             {
-                "allowed_orgid": set(["o-goodorg"])
+                "allowed_orgid": {"o-goodorg"}
             }
         )
         for p, expected in zip(policies, [False, True]):

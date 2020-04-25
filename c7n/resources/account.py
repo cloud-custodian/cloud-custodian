@@ -597,7 +597,7 @@ class ServiceLimit(Filter):
     # Max wait here is 5 * 10 ~ 50 seconds.
     poll_interval = 5
     poll_max_intervals = 10
-    global_services = set(['IAM'])
+    global_services = {'IAM'}
 
     def validate(self):
         region = self.manager.data.get('region', '')
