@@ -141,6 +141,36 @@ class SnapshotErrorHandler(BaseTest):
         vol = ErrorHandler.extract_bad_volume(e)
         self.assertEqual(vol, "vol-notfound")
 
+    def test_snapshot_copy_related_tags_missing_volumes(self):
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_copy_related_tags_missing_volumes")
+        p = self.load_policy(
+            {
+                "name": "copy-related-tags",
+                "resource": "aws.ebs-snapshot",
+                "filters": [{"tag:Test": "Test"}],
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "resource": "ebs",
+                        "key": "VolumeId",
+                        "tags": "*"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        try:
+            factory().client("ec2").describe_volumes(
+                VolumeIds=[resources[0]["VolumeId"]]
+            )
+        except ClientError as e:
+            msg = f"The volume '{resources[0]['VolumeId']}' does not exist."
+            self.assertEqual(e.response["Error"]["Code"], "InvalidVolume.NotFound")
+            self.assertEqual(e.response["Error"]["Message"], msg)
+
 
 class SnapshotAccessTest(BaseTest):
 
@@ -231,36 +261,6 @@ class SnapshotCopyTest(BaseTest):
         ]
         tags = {t["Key"]: t["Value"] for t in tags}
         self.assertEqual(tags["ASV"], "RoadKill")
-
-    def test_snapshot_copy_related_tags_missing_volumes(self):
-        factory = self.replay_flight_data(
-            "test_ebs_snapshot_copy_related_tags_missing_volumes")
-        p = self.load_policy(
-            {
-                "name": "copy-related-tags",
-                "resource": "aws.ebs-snapshot",
-                "filters": [{"tag:Test": "Test"}],
-                "actions": [
-                    {
-                        "type": "copy-related-tag",
-                        "resource": "ebs",
-                        "key": "VolumeId",
-                        "tags": "*"
-                    }
-                ]
-            },
-            session_factory=factory
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        try:
-            factory().client("ec2").describe_volumes(
-                VolumeIds=[resources[0]["VolumeId"]]
-            )
-        except ClientError as e:
-            msg = f"The volume '{resources[0]['VolumeId']}' does not exist."
-            self.assertEqual(e.response["Error"]["Code"], "InvalidVolume.NotFound")
-            self.assertEqual(e.response["Error"]["Message"], msg)
 
 
 class SnapshotAmiSnapshotTest(BaseTest):
