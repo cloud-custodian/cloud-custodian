@@ -260,7 +260,7 @@ class SnapshotCopyTest(BaseTest):
         except ClientError as e:
             msg = f"The volume '{resources[0]['VolumeId']}' does not exist."
             self.assertEqual(e.response["Error"]["Code"], "InvalidVolume.NotFound")
-            self.assertEqual(e.response["Error"]["Message"], msg)      
+            self.assertEqual(e.response["Error"]["Message"], msg)
 
 
 class SnapshotAmiSnapshotTest(BaseTest):
