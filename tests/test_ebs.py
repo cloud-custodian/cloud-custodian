@@ -162,8 +162,8 @@ class SnapshotErrorHandler(BaseTest):
         )
         try:
             resources = p.run()
-        except ClientError as e:
-            # it should filter missing volume and not throw an error            
+        except ClientError:
+            # it should filter missing volume and not throw an error
             self.fail("This should have been handled in ErrorHandler.extract_bad_volume")
         self.assertEqual(len(resources), 1)
         try:
@@ -171,7 +171,7 @@ class SnapshotErrorHandler(BaseTest):
                 VolumeIds=[resources[0]["VolumeId"]]
             )
         except ClientError as e:
-            # this should not filter missing volume and will throw an error 
+            # this should not filter missing volume and will throw an error
             msg = e.response["Error"]["Message"]
             err = e.response["Error"]["Code"]
         self.assertEqual(err, "InvalidVolume.NotFound")

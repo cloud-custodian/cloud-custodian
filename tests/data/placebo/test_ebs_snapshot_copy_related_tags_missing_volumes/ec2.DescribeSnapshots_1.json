@@ -27,26 +27,6 @@
                         "Value": "Test"
                     }
                 ]
-            },
-            {
-                "Description": "Created by CreateImage(i-0c42a3120a1d4a236) for ami-0bb2558585a6d1b06 from vol-0008646d16275289b",
-                "Encrypted": false,
-                "OwnerId": "644160558196",
-                "Progress": "100%",
-                "SnapshotId": "snap-03ed69e2c00783291",
-                "StartTime": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 4,
-                    "day": 22,
-                    "hour": 13,
-                    "minute": 38,
-                    "second": 56,
-                    "microsecond": 913000
-                },
-                "State": "completed",
-                "VolumeId": "vol-0008646d16275289b",
-                "VolumeSize": 8
             }
         ],
         "ResponseMetadata": {}
