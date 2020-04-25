@@ -1724,7 +1724,7 @@ class AttachLambdaEncrypt(BucketActionBase):
             None, self.data.get('role', self.manager.config.assume_role),
             account_id=account_id, tags=self.data.get('tags'))
 
-        regions = set([get_region(b) for b in buckets])
+        regions = {get_region(b) for b in buckets}
 
         # session managers by region
         region_sessions = {}
@@ -2393,7 +2393,7 @@ class LogTarget(Filter):
     def get_cloud_trail_locations(self, buckets):
         session = local_session(self.manager.session_factory)
         client = session.client('cloudtrail')
-        names = set([b['Name'] for b in buckets])
+        names = {b['Name'] for b in buckets}
         for t in client.describe_trails().get('trailList', ()):
             if t.get('S3BucketName') in names:
                 yield (t['S3BucketName'], t.get('S3KeyPrefix', ''))

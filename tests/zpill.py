@@ -165,7 +165,7 @@ class ZippedPill(pill.Pill):
         self.archive = zipfile.ZipFile(self.path, "a", zipfile.ZIP_DEFLATED)
         self._files = set()
 
-        files = set([n for n in self.archive.namelist() if n.startswith(self.prefix)])
+        files = {n for n in self.archive.namelist() if n.startswith(self.prefix)}
 
         if not files:
             return super(ZippedPill, self).record()

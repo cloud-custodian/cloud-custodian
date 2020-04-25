@@ -270,23 +270,23 @@ class ConfigValidFilter(Filter):
 
     def get_subnets(self):
         manager = self.manager.get_resource_manager('subnet')
-        return set([s['SubnetId'] for s in manager.resources()])
+        return {s['SubnetId'] for s in manager.resources()}
 
     def get_security_groups(self):
         manager = self.manager.get_resource_manager('security-group')
-        return set([s['GroupId'] for s in manager.resources()])
+        return {s['GroupId'] for s in manager.resources()}
 
     def get_key_pairs(self):
         manager = self.manager.get_resource_manager('key-pair')
-        return set([k['KeyName'] for k in manager.resources()])
+        return {k['KeyName'] for k in manager.resources()}
 
     def get_elbs(self):
         manager = self.manager.get_resource_manager('elb')
-        return set([e['LoadBalancerName'] for e in manager.resources()])
+        return {e['LoadBalancerName'] for e in manager.resources()}
 
     def get_appelb_target_groups(self):
         manager = self.manager.get_resource_manager('app-elb-target-group')
-        return set([a['TargetGroupArn'] for a in manager.resources()])
+        return {a['TargetGroupArn'] for a in manager.resources()}
 
     def get_images(self):
         images = self.launch_info.get_image_map()
@@ -310,9 +310,8 @@ class ConfigValidFilter(Filter):
                     continue
                 snaps.add(bd['Ebs']['SnapshotId'].strip())
         manager = self.manager.get_resource_manager('ebs-snapshot')
-        return set([
-            s['SnapshotId'] for s in manager.get_resources(
-                list(snaps), cache=False)])
+        return {s['SnapshotId'] for s in manager.get_resources(
+                list(snaps), cache=False)}
 
     def process(self, asgs, event=None):
         self.initialize(asgs)
@@ -1680,9 +1679,8 @@ class UnusedLaunchConfig(Filter):
 
     def process(self, configs, event=None):
         asgs = self.manager.get_resource_manager('asg').resources()
-        used = set([
-            a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
-            for a in asgs if not a.get('LaunchTemplate')])
+        used = {a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
+                for a in asgs if not a.get('LaunchTemplate')}
         return [c for c in configs if c['LaunchConfigurationName'] not in used]
 
 

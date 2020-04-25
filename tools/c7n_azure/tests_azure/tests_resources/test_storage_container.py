@@ -51,7 +51,7 @@ class StorageContainerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(2, len(resources))
-        self.assertEqual({'containerone', 'containertwo'}, set([c['name'] for c in resources]))
+        self.assertEqual({'containerone', 'containertwo'}, {c['name'] for c in resources})
 
     @arm_template('storage.json')
     @cassette_name('containers')

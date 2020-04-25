@@ -374,8 +374,8 @@ def orgreplay(options):
         "@" in dsn.netloc and dsn.netloc.rsplit('@', 1)[1] or dsn.netloc)
 
     log.info("sentry endpoint: %s", endpoint)
-    teams = set([t['slug'] for t in sget(
-        endpoint + "organizations/%s/teams/" % options.sentry_org).json()])
+    teams = {t['slug'] for t in sget(
+             endpoint + "organizations/%s/teams/" % options.sentry_org).json()}
     projects = {p['name']: p for p in sget(endpoint + "projects/").json()}
 
     def process_account(a):

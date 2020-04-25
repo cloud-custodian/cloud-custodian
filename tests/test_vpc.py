@@ -1122,8 +1122,8 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 3)
         self.assertEqual(
-            set(["sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7"]),
-            set([r["GroupId"] for r in resources]),
+            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7"},
+            {r["GroupId"] for r in resources},
         )
 
     def test_unused_ecs(self):
