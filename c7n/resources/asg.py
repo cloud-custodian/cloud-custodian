@@ -121,12 +121,12 @@ class LaunchInfo:
 
         lid = asg.get('LaunchTemplate')
         if lid is not None:
-            return (lid['LaunchTemplateId'], lid['Version'])
+            return (lid['LaunchTemplateId'], lid.get('Version', '$Default'))
 
         if 'MixedInstancesPolicy' in asg:
             mip_spec = asg['MixedInstancesPolicy'][
                 'LaunchTemplate']['LaunchTemplateSpecification']
-            return (mip_spec['LaunchTemplateId'], mip_spec['Version'])
+            return (mip_spec['LaunchTemplateId'], mip_spec.get('Version', '$Default'))
 
         # we've noticed some corner cases where the asg name is the lc name, but not
         # explicitly specified as launchconfiguration attribute.
