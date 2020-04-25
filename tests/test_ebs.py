@@ -233,7 +233,8 @@ class SnapshotCopyTest(BaseTest):
         self.assertEqual(tags["ASV"], "RoadKill")
 
     def test_snapshot_copy_related_tags_missing_volumes(self):
-        session_factory = self.replay_flight_data("test_ebs_snapshot_copy_related_tags_missing_volumes")
+        session_factory = self.replay_flight_data(
+            "test_ebs_snapshot_copy_related_tags_missing_volumes")
         p = self.load_policy(
             {
                 "name": "copy-related-tags",
@@ -252,9 +253,10 @@ class SnapshotCopyTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        # msg = f"The volume {resources[0]['VolumeId']} does not exist."
         # assert(
         #     resources[0]["Error"]["Code"] is "InvalidVolume.NotFound",
-        #     f"The volume {resources[0]['VolumeId']} does not exist." in resources[0]["Error"]["Message"]
+        #     msg in resources[0]["Error"]["Message"]
         # )
 
 
