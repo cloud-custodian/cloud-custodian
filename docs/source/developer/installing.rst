@@ -95,7 +95,7 @@ It then runs the test suite under all versions of Python, per the ``tox.ini`` fi
 If tox is unable to find a Python executable on your system for one of the supported versions, it will fail for that environment.
 You can safely ignore these failures when developing locally.
 
-You can run the test suite in a single enviroment with the ``-e`` flag:
+You can run the test suite in a single environment with the ``-e`` flag:
 
 .. code-block:: bash
 
