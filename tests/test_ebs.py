@@ -117,6 +117,30 @@ class SnapshotErrorHandler(BaseTest):
         snap = ErrorHandler.extract_bad_snapshot(e)
         self.assertEqual(snap, "snap-notfound")
 
+    def test_get_bad_volume_malformed(self):
+        operation_name = "DescribeVolumes"
+        error_response = {
+            "Error": {
+                "Message": 'Invalid id: "vol-malformedvolume"',
+                "Code": "InvalidVolumeID.Malformed",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        vol = ErrorHandler.extract_bad_volume(e)
+        self.assertEqual(vol, "vol-malformedvolume")
+
+    def test_get_bad_volume_notfound(self):
+        operation_name = "DescribeVolumes"
+        error_response = {
+            "Error": {
+                "Message": "The volume 'vol-notfound' does not exist.",
+                "Code": "InvalidVolume.NotFound",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        vol = ErrorHandler.extract_bad_volume(e)
+        self.assertEqual(vol, "vol-notfound")
+
 
 class SnapshotAccessTest(BaseTest):
 
