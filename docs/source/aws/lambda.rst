@@ -236,7 +236,7 @@ mode in the YAML.  See AWS'
 `AWS Lambda Function Configuration <https://docs.aws.amazon.com/lambda/latest/dg/resource-model.html>`_
 page for the full list of configuration options avaible on a Lambda.
 
-Refer to :ref:`aws-modes` for detailed explanation of the different ``type``
+Refer to :ref:`aws_modes` for detailed explanation of the different ``type``
 values and the corresponding additional configuration options each requires.
 
 Here is an example YAML fragment that shows the options you are most likely to want or need to configure on a

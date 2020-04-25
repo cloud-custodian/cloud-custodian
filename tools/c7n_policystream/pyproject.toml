@@ -27,7 +27,7 @@ boto3 = "^1.12.0"
 jmespath = "^0.9.4"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.3.5"
+pytest = "~5.3.5"
 c7n = {path = "../..", develop = true}
 mock = "^4.0.2"
 

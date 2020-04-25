@@ -29,7 +29,9 @@ class DMDeployment(QueryResourceManager):
         version = 'v2'
         component = 'deployments'
         enum_spec = ('list', 'deployments[]', None)
-        id = 'name'
+        name = id = 'name'
+
+        default_report_fields = ['name', 'description', 'insertTime', 'updateTime']
 
         @staticmethod
         def get(client, resource_info):

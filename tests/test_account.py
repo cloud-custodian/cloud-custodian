@@ -507,6 +507,122 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+        assert(
+            resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
+        )
+
+    def test_account_password_policy_update(self):
+        factory = self.replay_flight_data("test_account_password_policy_update")
+        p = self.load_policy(
+            {
+                "name": "set-password-policy",
+                "resource": "account",
+                "filters": [
+                    {
+                        "or": [
+                            {
+                                "not": [
+                                    {
+                                        "type": "password-policy",
+                                        "key": "MinimumPasswordLength",
+                                        "value": 12,
+                                        "op": "ge"
+                                    },
+                                    {
+                                        "type": "password-policy",
+                                        "key": "RequireSymbols",
+                                        "value": True
+                                    },
+                                    {
+                                        "type": "password-policy",
+                                        "key": "RequireNumbers",
+                                        "value": True
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-password-policy",
+                        "policy": {
+                            "MinimumPasswordLength": 12,
+                            "RequireSymbols": True,
+                            "RequireNumbers": True
+                        }
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(factory).client('iam')
+        policy = client.get_account_password_policy().get('PasswordPolicy')
+        self.assertEqual(
+            [
+                policy['MinimumPasswordLength'],
+                policy['RequireSymbols'],
+                policy['RequireNumbers'],
+            ],
+            [
+                12,
+                True,
+                True,
+            ]
+        )
+
+    def test_account_password_policy_update_first_time(self):
+        factory = self.replay_flight_data("test_account_password_policy_update_first_time")
+        p = self.load_policy(
+            {
+                "name": "set-password-policy",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "password-policy",
+                        "key": "PasswordPolicyConfigured",
+                        "value": False,
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-password-policy",
+                        "policy": {
+                            "MinimumPasswordLength": 12
+                        }
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(factory).client('iam')
+        policy = client.get_account_password_policy().get('PasswordPolicy')
+        assert(
+            policy['MinimumPasswordLength'] == 12
+        )
+        # assert defaults being set
+        self.assertEqual(
+            [
+                policy['RequireSymbols'],
+                policy['RequireNumbers'],
+                policy['RequireUppercaseCharacters'],
+                policy['RequireLowercaseCharacters'],
+                policy['AllowUsersToChangePassword']
+            ],
+            [
+                False,
+                False,
+                False,
+                False,
+                False,
+            ]
+        )
+
     def test_create_trail(self):
         factory = self.replay_flight_data("test_cloudtrail_create")
         p = self.load_policy(

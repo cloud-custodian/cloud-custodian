@@ -21,6 +21,7 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query
@@ -255,6 +256,28 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
             client, self.executor_factory, resources, self.log)
         return super(LambdaCrossAccountAccessFilter, self).process(
             resources, event)
+
+
+@AWSLambda.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: lambda-kms-key-filters
+                  resource: aws.lambda
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: "^(alias/aws/lambda)"
+                      op: regex
+    """
+    RelatedIdsExpression = 'KMSKeyArn'
 
 
 @AWSLambda.action_registry.register('remove-statements')

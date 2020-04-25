@@ -215,6 +215,7 @@ class SecurityHubTest(BaseTest):
                     "type": "post-finding",
                     "severity": 10,
                     "severity_normalized": 10,
+                    "severity_label": "INFORMATIONAL",
                     "types": [
                         "Software and Configuration Checks/AWS Security Best Practices"
                     ],

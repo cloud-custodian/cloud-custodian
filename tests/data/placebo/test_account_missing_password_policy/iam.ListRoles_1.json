@@ -22,15 +22,6 @@
                 "Arn": "arn:aws:iam::644160558196:role/service-role/config-role-us-east-1"
             }
         ], 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RequestId": "385288c8-5cf3-11e6-aa11-47a89bac11fb", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "385288c8-5cf3-11e6-aa11-47a89bac11fb", 
-                "date": "Sun, 07 Aug 2016 23:03:57 GMT", 
-                "content-length": "1003", 
-                "content-type": "text/xml"
-            }
-        }
+        "ResponseMetadata": {}
     }
 }

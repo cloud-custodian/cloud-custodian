@@ -19,7 +19,7 @@ kubernetes = "^10.0.1"
 
 [tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}
-pytest = "^5.3.5"
+pytest = "~5.3"
 vcrpy = "^4.0.2"
 
 [build-system]

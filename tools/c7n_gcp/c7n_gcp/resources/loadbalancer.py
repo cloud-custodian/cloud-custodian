@@ -27,7 +27,10 @@ class LoadBalancingAddress(QueryResourceManager):
         component = 'addresses'
         enum_spec = ('aggregatedList', 'items.*.addresses[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "address", "status", "region", "addressType"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -62,7 +65,10 @@ class LoadBalancingUrlMap(QueryResourceManager):
         component = 'urlMaps'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "region", "defaultService"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -82,7 +88,10 @@ class LoadBalancingTargetTcpProxy(QueryResourceManager):
         component = 'targetTcpProxies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "service"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -102,7 +111,10 @@ class LoadBalancingTargetSslProxy(QueryResourceManager):
         component = 'targetSslProxies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "service", "sslPolicy"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -122,7 +134,10 @@ class LoadBalancingSslPolicy(QueryResourceManager):
         component = 'sslPolicies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "profile", "minTlsVersion"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -172,7 +187,10 @@ class LoadBalancingSslCertificate(QueryResourceManager):
         component = 'sslCertificates'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "type", "region", "expireTime"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -191,7 +209,10 @@ class LoadBalancingTargetHttpsProxy(QueryResourceManager):
         component = 'targetHttpsProxies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "creationTimestamp", "sslPolicy", "urlMap"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -211,7 +232,10 @@ class LoadBalancingBackendBucket(QueryResourceManager):
         component = 'backendBuckets'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "bucketName", "enableCdn"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -261,7 +285,9 @@ class LoadBalancingHttpsHealthCheck(QueryResourceManager):
         component = 'httpsHealthChecks'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "host", "port", "requestPath", "checkIntervalSec"]
 
         @staticmethod
         def get(client, resource_info):
@@ -281,7 +307,9 @@ class LoadBalancingHttpHealthCheck(QueryResourceManager):
         component = 'httpHealthChecks'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "host", "port", "requestPath", "checkIntervalSec"]
 
         @staticmethod
         def get(client, resource_info):
@@ -301,7 +329,10 @@ class LoadBalancingHealthCheck(QueryResourceManager):
         component = 'healthChecks'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "checkIntervalSec",
+            "healthyThreshold", "unhealthyThreshold", "timeoutSec"]
 
         @staticmethod
         def get(client, resource_info):
@@ -321,7 +352,9 @@ class LoadBalancingTargetHttpProxy(QueryResourceManager):
         component = 'targetHttpProxies'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "region", "urlMap"]
 
         @staticmethod
         def get(client, resource_info):
@@ -341,7 +374,9 @@ class LoadBalancingBackendService(QueryResourceManager):
         component = 'backendServices'
         enum_spec = ('aggregatedList', 'items.*.backendServices[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "region", "network"]
 
         @staticmethod
         def get(client, resource_info):
@@ -361,7 +396,9 @@ class LoadBalancingTargetInstance(QueryResourceManager):
         component = 'targetInstances'
         enum_spec = ('aggregatedList', 'items.*.targetInstances[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "creationTimestamp", "zone", "natPolicy", "instance"]
 
         @staticmethod
         def get(client, resource_info):
@@ -382,7 +419,11 @@ class LoadBalancingTargetPool(QueryResourceManager):
         component = 'targetPools'
         enum_spec = ('aggregatedList', 'items.*.targetPools[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "region",
+            "failoverRatio", "sessionAffinity", "backupPool"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -403,7 +444,11 @@ class LoadBalancingForwardingRule(QueryResourceManager):
         component = 'forwardingRules'
         enum_spec = ('aggregatedList', 'items.*.forwardingRules[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "region", "IPAddress", "IPProtocol", "target",
+            "loadBalancerScheme", "serviceName",
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -423,7 +468,11 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
         component = 'globalForwardingRules'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "network",
+            "networkTier", "loadBalancerScheme", "subnetwork", "allowGlobalAccess"
+        ]
 
         @staticmethod
         def get(client, resource_info):
@@ -442,7 +491,10 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
         component = 'globalAddresses'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "status", "creationTimestamp", "address", "region"
+        ]
 
         @staticmethod
         def get(client, resource_info):

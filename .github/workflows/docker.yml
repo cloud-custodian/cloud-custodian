@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    tags:
+      # todo: update for 1.0
+      - 0.*
 
 jobs:
 
@@ -38,28 +41,28 @@ jobs:
           HUB_USER: c7nbuild
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         run: |
-          python tools/dev/dockerpkg.py build --scan --test -r cloudcustodian -i cli
+          python tools/dev/dockerpkg.py build --test --scan --push -t auto -r cloudcustodian -i cli
 
       - name: org
         env:
           HUB_USER: c7nbuild
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         run: |
-          python tools/dev/dockerpkg.py build --scan --test -r cloudcustodian -i org
+          python tools/dev/dockerpkg.py build --test --scan --push -t auto -r cloudcustodian -i org
 
       - name: mailer
         env:
           HUB_USER: c7nbuild
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         run: |
-          python tools/dev/dockerpkg.py build --scan --test -r cloudcustodian -i mailer
+          python tools/dev/dockerpkg.py build --test --scan --push -t auto -r cloudcustodian -i mailer
 
       - name: policystream
         env:
           HUB_USER: c7nbuild
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         run: |
-          python tools/dev/dockerpkg.py build --scan --test -r cloudcustodian -i policystream
+          python tools/dev/dockerpkg.py build --test --scan --push -t auto -r cloudcustodian -i policystream
 
 
   "Publish_Distroless":
@@ -93,25 +96,25 @@ jobs:
           HUB_USER: c7nbuild
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         run: |
-          python tools/dev/dockerpkg.py build --test --scan --push  -r cloudcustodian -i cli-distroless
+          python tools/dev/dockerpkg.py build --test --scan --push -t auto -r cloudcustodian -i cli-distroless
 
       - name: org - distroless
         env:
           HUB_USER: c7nbuild
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         run: |
-          python tools/dev/dockerpkg.py build --test --scan --push -r cloudcustodian -i org-distroless
+          python tools/dev/dockerpkg.py build --test --scan --push -t auto -r cloudcustodian -i org-distroless
 
       - name: mailer - distroless
         env:
           HUB_USER: c7nbuild
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         run: |
-          python tools/dev/dockerpkg.py build --test --scan --push -r cloudcustodian -i mailer-distroless
+          python tools/dev/dockerpkg.py build --test --scan --push -t auto -r cloudcustodian -i mailer-distroless
 
       - name: policystream - distroless
         env:
           HUB_USER: c7nbuild
           HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
         run: |
-          python tools/dev/dockerpkg.py build --test --scan --push -r cloudcustodian -i policystream-distroless
+          python tools/dev/dockerpkg.py build --test --scan --push -t auto -r cloudcustodian -i policystream-distroless

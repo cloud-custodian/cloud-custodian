@@ -27,6 +27,9 @@ class Organization(QueryResourceManager):
         scope = 'global'
         enum_spec = ('search', 'organizations[]', {'body': {}})
         id = 'name'
+        name = 'displayName'
+        default_report_fields = [
+            "name", "displayName", "creationTime", "lifecycleState"]
 
 
 @Organization.action_registry.register('set-iam-policy')
@@ -50,7 +53,9 @@ class Folder(QueryResourceManager):
         component = 'folders'
         scope = 'global'
         enum_spec = ('list', 'folders', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "displayName", "lifecycleState", "createTime", "parent"]
 
     def get_resource_query(self):
         if 'query' in self.data:
@@ -69,7 +74,9 @@ class Project(QueryResourceManager):
         component = 'projects'
         scope = 'global'
         enum_spec = ('list', 'projects', None)
-        id = 'projectId'
+        name = id = 'projectId'
+        default_report_fields = [
+            "name", "displayName", "lifecycleState", "createTime", "parent"]
 
 
 @Project.action_registry.register('set-iam-policy')

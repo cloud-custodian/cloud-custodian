@@ -30,6 +30,7 @@ from c7n.resources.securityhub import OtherResourcePostFinding
 from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr)
 
+from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
 
@@ -687,7 +688,7 @@ class SGUsage(Filter):
         return list(itertools.chain(
             *[self.manager.get_resource_manager(m).get_permissions()
              for m in
-             ['lambda', 'eni', 'launch-config', 'security-group']]))
+             ['lambda', 'eni', 'launch-config', 'security-group', 'event-rule-target']]))
 
     def filter_peered_refs(self, resources):
         if not resources:
@@ -704,14 +705,18 @@ class SGUsage(Filter):
             "%d of %d groups w/ peered refs", len(peered_ids), len(resources))
         return [r for r in resources if r['GroupId'] not in peered_ids]
 
+    def get_scanners(self):
+        return (
+            ("nics", self.get_eni_sgs),
+            ("sg-perm-refs", self.get_sg_refs),
+            ('lambdas', self.get_lambda_sgs),
+            ("launch-configs", self.get_launch_config_sgs),
+            ("ecs-cwe", self.get_ecs_cwe_sgs)
+        )
+
     def scan_groups(self):
         used = set()
-        for kind, scanner in (
-                ("nics", self.get_eni_sgs),
-                ("sg-perm-refs", self.get_sg_refs),
-                ('lambdas', self.get_lambda_sgs),
-                ("launch-configs", self.get_launch_config_sgs),
-        ):
+        for kind, scanner in self.get_scanners():
             sg_ids = scanner()
             new_refs = sg_ids.difference(used)
             used = used.union(sg_ids)
@@ -734,7 +739,7 @@ class SGUsage(Filter):
 
     def get_lambda_sgs(self):
         sg_ids = set()
-        for func in self.manager.get_resource_manager('lambda').resources():
+        for func in self.manager.get_resource_manager('lambda').resources(augment=False):
             if 'VpcConfig' not in func:
                 continue
             for g in func['VpcConfig']['SecurityGroupIds']:
@@ -757,6 +762,16 @@ class SGUsage(Filter):
                         sg_ids.add(g['GroupId'])
         return sg_ids
 
+    def get_ecs_cwe_sgs(self):
+        sg_ids = set()
+        expr = jmespath.compile(
+            'EcsParameters.NetworkConfiguration.awsvpcConfiguration.SecurityGroups[]')
+        for rule in self.manager.get_resource_manager('event-rule-target').resources():
+            ids = expr.search(rule)
+            if ids:
+                sg_ids.update(ids)
+        return sg_ids
+
 
 @SecurityGroup.filter_registry.register('unused')
 class UnusedSecurityGroup(SGUsage):
@@ -767,7 +782,10 @@ class UnusedSecurityGroup(SGUsage):
     lambdas as they may not have extant resources in the vpc at a
     given moment. We also find any security group with references from
     other security group either within the vpc or across peered
-    connections.
+    connections. Also checks cloud watch event targeting ecs.
+
+    Checks - enis, lambda, launch-configs, sg rule refs, and ecs cwe
+    targets.
 
     Note this filter does not support classic security groups atm.
 
@@ -780,6 +798,7 @@ class UnusedSecurityGroup(SGUsage):
                 resource: security-group
                 filters:
                   - unused
+
     """
     schema = type_schema('unused')
 
@@ -974,14 +993,53 @@ class SGPermission(Filter):
             - "::/0"
           op: in
 
+    `SGReferences` can be used to filter out SG references in rules.
+    In this example we want to block ingress rules that reference a SG
+    that is tagged with `Access: Public`.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        SGReferences:
+          key: "tag:Access"
+          value: "Public"
+          op: equal
+
+    We can also filter SG references based on the VPC that they are
+    within. In this example we want to ensure that our outbound rules
+    that reference SGs are only referencing security groups within a
+    specified VPC.
+
+    .. code-block:: yaml
+
+      - type: egress
+        SGReferences:
+          key: 'VpcId'
+          value: 'vpc-11a1a1aa'
+          op: equal
+
+    Likewise, we can also filter SG references by their description.
+    For example, we can prevent egress rules from referencing any
+    SGs that have a description of "default - DO NOT USE".
+
+    .. code-block:: yaml
+
+      - type: egress
+        SGReferences:
+          key: 'Description'
+          value: 'default - DO NOT USE'
+          op: equal
 
     """
 
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference', 'Description'))
+    filter_attrs = set((
+        'Cidr', 'CidrV6', 'Ports', 'OnlyPorts',
+        'SelfReference', 'Description', 'SGReferences'))
     attrs = perm_attrs.union(filter_attrs)
+    attrs.add('match-operator')
     attrs.add('match-operator')
 
     def validate(self):
@@ -1094,6 +1152,25 @@ class SGPermission(Filter):
                 found = True
         return found
 
+    def process_sg_references(self, perm, owner_id):
+        sg_refs = self.data.get('SGReferences')
+        if not sg_refs:
+            return None
+
+        sg_perm = perm.get('UserIdGroupPairs', [])
+        if not sg_perm:
+            return False
+
+        sg_group_ids = [p['GroupId'] for p in sg_perm if p['UserId'] == owner_id]
+        sg_resources = self.manager.get_resources(sg_group_ids)
+        vf = ValueFilter(sg_refs, self.manager)
+        vf.annotate = False
+
+        for sg in sg_resources:
+            if vf(sg):
+                return True
+        return False
+
     def expand_permissions(self, permissions):
         """Expand each list of cidr, prefix list, user id group pair
         by port/protocol as an individual rule.
@@ -1121,6 +1198,7 @@ class SGPermission(Filter):
     def __call__(self, resource):
         matched = []
         sg_id = resource['GroupId']
+        owner_id = resource['OwnerId']
         match_op = self.data.get('match-operator', 'and') == 'and' and all or any
         for perm in self.expand_permissions(resource[self.ip_permissions_key]):
             perm_matches = {}
@@ -1130,6 +1208,7 @@ class SGPermission(Filter):
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
+            perm_matches['sg-refs'] = self.process_sg_references(perm, owner_id)
             perm_match_values = list(filter(
                 lambda x: x is not None, perm_matches.values()))
 
@@ -1169,6 +1248,7 @@ SGPermissionSchema = {
     'Description': {},
     'Cidr': {},
     'CidrV6': {},
+    'SGReferences': {}
 }
 
 
@@ -1276,6 +1356,112 @@ class RemovePermissions(BaseAction):
                     continue
                 method = getattr(client, 'revoke_security_group_%s' % label)
                 method(GroupId=r['GroupId'], IpPermissions=groups)
+
+
+@SecurityGroup.action_registry.register('set-permissions')
+class SetPermissions(BaseAction):
+    """Action to add/remove ingress/egress rule(s) to a security group
+
+    :example:
+
+    .. code-block:: yaml
+
+       policies:
+         - name: ops-access-via
+           resource: aws.security-group
+           filters:
+             - type: ingress
+               IpProtocol: "-1"
+               Ports: [22, 3389]
+               Cidr: "0.0.0.0/0"
+           actions:
+            - type: set-permissions
+              # remove the permission matched by a previous ingress filter.
+              remove-ingress: matched
+              # remove permissions by specifying them fully, ie remove default outbound
+              # access.
+              remove-egress:
+                 - IpProtocol: "-1"
+                   Cidr: "0.0.0.0/0"
+
+              # add a list of permissions to the group.
+              add-ingress:
+                # full syntax/parameters to authorize can be used.
+                - IpPermissions:
+                   - IpProtocol: TCP
+                     FromPort: 22
+                     ToPort: 22
+                     IpRanges:
+                       - Description: Ops SSH Access
+                         CidrIp: "1.1.1.1/32"
+                       - Description: Security SSH Access
+                         CidrIp: "2.2.2.2/32"
+              # add a list of egress permissions to a security group
+              add-egress:
+                 - IpProtocol: "TCP"
+                   FromPort: 5044
+                   ToPort: 5044
+                   CidrIp: "192.168.1.2/32"
+
+    """
+    schema = type_schema(
+        'set-permissions',
+        **{'add-ingress': {'type': 'array', 'items': {'type': 'object', 'minProperties': 1}},
+           'remove-ingress': {'oneOf': [
+               {'enum': ['all', 'matched']},
+               {'type': 'array', 'items': {'type': 'object', 'minProperties': 2}}]},
+           'add-egress': {'type': 'array', 'items': {'type': 'object', 'minProperties': 1}},
+           'remove-egress': {'oneOf': [
+               {'enum': ['all', 'matched']},
+               {'type': 'array', 'items': {'type': 'object', 'minProperties': 2}}]}}
+    )
+    permissions = (
+        'ec2:AuthorizeSecurityGroupEgress',
+        'ec2:AuthorizeSecurityGroupIngress',)
+
+    ingress_shape = "AuthorizeSecurityGroupIngressRequest"
+    egress_shape = "AuthorizeSecurityGroupEgressRequest"
+
+    def validate(self):
+        request_template = {'GroupId': 'sg-06bc5ce18a2e5d57a'}
+        for perm_type, shape in (
+                ('egress', self.egress_shape), ('ingress', self.ingress_shape)):
+            for perm in self.data.get('add-%s' % type, ()):
+                params = dict(request_template)
+                params.update(perm)
+                shape_validate(params, shape, 'ec2')
+
+    def get_permissions(self):
+        perms = ()
+        if 'add-ingress' in self.data:
+            perms += ('ec2:AuthorizeSecurityGroupIngress',)
+        if 'add-egress' in self.data:
+            perms += ('ec2:AuthorizeSecurityGroupEgress',)
+        if 'remove-ingress' in self.data or 'remove-egress' in self.data:
+            perms += RemovePermissions.permissions
+        if not perms:
+            perms = self.permissions + RemovePermissions.permissions
+        return perms
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            for method, permissions in (
+                    (client.authorize_security_group_egress, self.data.get('add-egress', ())),
+                    (client.authorize_security_group_ingress, self.data.get('add-ingress', ()))):
+                for p in permissions:
+                    p = dict(p)
+                    p['GroupId'] = r['GroupId']
+                    try:
+                        method(**p)
+                    except ClientError as e:
+                        if e.response['Error']['Code'] != 'InvalidPermission.Duplicate':
+                            raise
+
+        remover = RemovePermissions(
+            {'ingress': self.data.get('remove-ingress', ()),
+             'egress': self.data.get('remove-egress', ())}, self.manager)
+        remover.process(resources)
 
 
 @SecurityGroup.action_registry.register('post-finding')
@@ -1759,7 +1945,7 @@ class NetworkAddress(query.QueryResourceManager):
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
-        filter_name = 'PublicIps'
+        filter_name = 'AllocationId'
         filter_type = 'list'
         config_type = "AWS::EC2::EIP"
 
@@ -1854,6 +2040,36 @@ class InternetGateway(query.QueryResourceManager):
         filter_type = 'list'
         config_type = "AWS::EC2::InternetGateway"
         id_prefix = "igw-"
+
+
+@InternetGateway.action_registry.register('delete')
+class DeleteInternetGateway(BaseAction):
+
+    """Action to delete Internet Gateway
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-internet-gateway
+                resource: internet-gateway
+                actions:
+                  - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteInternetGateway',)
+
+    def process(self, resources):
+
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
+            except ClientError as err:
+                if not err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
+                    raise
 
 
 @resources.register('nat-gateway')

@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "ValidationError",
+            "Message": "Stack [c7n-test-delete-force] cannot be deleted while TerminationProtection is enabled"
+        },
+        "ResponseMetadata": {}
+    }
+}
