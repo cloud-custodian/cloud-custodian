@@ -232,6 +232,31 @@ class SnapshotCopyTest(BaseTest):
         tags = {t["Key"]: t["Value"] for t in tags}
         self.assertEqual(tags["ASV"], "RoadKill")
 
+    def test_snapshot_copy_related_tags_missing_volumes(self):
+        session_factory = self.replay_flight_data("test_ebs_snapshot_copy_related_tags_missing_volumes")
+        p = self.load_policy(
+            {
+                "name": "copy-related-tags",
+                "resource": "aws.ebs-snapshot",
+                "filters": [{"tag:Test": "Test"}],
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "resource": "ebs",
+                        "key": "VolumeId",
+                        "tags": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        # assert(
+        #     resources[0]["Error"]["Code"] is "InvalidVolume.NotFound",
+        #     f"The volume {resources[0]['VolumeId']} does not exist." in resources[0]["Error"]["Message"]
+        # )
+
 
 class SnapshotAmiSnapshotTest(BaseTest):
 
