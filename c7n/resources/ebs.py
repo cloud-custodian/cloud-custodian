@@ -122,6 +122,20 @@ class ErrorHandler:
             log.warning("Snapshot id malformed %s" % e_snap_id)
         return e_snap_id
 
+    @staticmethod
+    def extract_bad_volume(e):
+        """Handle various client side errors when describing volumes"""
+        msg = e.response['Error']['Message']
+        error = e.response['Error']['Code']
+        e_vol_id = None
+        if error == 'InvalidVolume.NotFound':
+            e_vol_id = msg[msg.find("'") + 1:msg.rfind("'")]
+            log.warning("Volume not found %s" % e_vol_id)
+        elif error == 'InvalidVolumeID.Malformed':
+            e_vol_id = msg[msg.find('"') + 1:msg.rfind('"')]
+            log.warning("Volume id malformed %s" % e_vol_id)
+        return e_vol_id
+
 
 class SnapshotQueryParser(QueryParser):
 
@@ -530,6 +544,22 @@ class EBS(QueryResourceManager):
             'VolumeType',
             'KmsKeyId'
         )
+
+    def get_resources(self, ids, cache=True, augment=True):
+        if cache:
+            resources = self._get_cached_resources(ids)
+            if resources is not None:
+                return resources
+        while ids:
+            try:
+                return self.source.get_resources(ids)
+            except ClientError as e:
+                bad_vol = ErrorHandler.extract_bad_volume(e)
+                if bad_vol:
+                    ids.remove(bad_vol)
+                    continue
+                raise
+        return []
 
 
 @EBS.action_registry.register('detach')

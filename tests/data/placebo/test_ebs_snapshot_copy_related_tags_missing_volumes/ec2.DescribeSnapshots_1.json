@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "Description": "",
+                "Encrypted": false,
+                "OwnerId": "644160558196",
+                "Progress": "100%",
+                "SnapshotId": "snap-083a14886f4681675",
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 25,
+                    "hour": 17,
+                    "minute": 58,
+                    "second": 2,
+                    "microsecond": 497000
+                },
+                "State": "completed",
+                "VolumeId": "vol-04c1b309bb8d18d71",
+                "VolumeSize": 8,
+                "Tags": [
+                    {
+                        "Key": "Test",
+                        "Value": "Test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
