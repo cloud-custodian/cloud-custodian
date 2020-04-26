@@ -4,8 +4,8 @@
         "ResponseMetadata": {},
         "nodegroup": {
             "nodegroupName": "test",
-            "nodegroupArn": "arn:aws:eks:us-east-1:644160558196:nodegroup/test/test/92b8dc01-9086-b0d9-97dc-10aa90cf5a5c",
-            "clusterName": "test",
+            "nodegroupArn": "arn:aws:eks:us-east-1:644160558196:nodegroup/test_f1/test/acb8dc29-f47c-d8b7-71f9-268f44fdbeb0",
+            "clusterName": "test_f1",
             "version": "1.15",
             "releaseVersion": "1.15.10-20200228",
             "createdAt": {
@@ -13,20 +13,20 @@
                 "year": 2020,
                 "month": 4,
                 "day": 26,
-                "hour": 15,
-                "minute": 42,
-                "second": 25,
-                "microsecond": 638000
+                "hour": 17,
+                "minute": 10,
+                "second": 39,
+                "microsecond": 731000
             },
             "modifiedAt": {
                 "__class__": "datetime",
                 "year": 2020,
                 "month": 4,
                 "day": 26,
-                "hour": 15,
-                "minute": 45,
-                "second": 38,
-                "microsecond": 820000
+                "hour": 17,
+                "minute": 32,
+                "second": 15,
+                "microsecond": 477000
             },
             "status": "DELETING",
             "scalingConfig": {
@@ -38,8 +38,7 @@
                 "t3.medium"
             ],
             "subnets": [
-                "subnet-efbcccb7",
-                "subnet-914763e7"
+                "subnet-023db907202d61c00"
             ],
             "remoteAccess": {
                 "ec2SshKey": "pikachus"
@@ -50,10 +49,10 @@
             "resources": {
                 "autoScalingGroups": [
                     {
-                        "name": "eks-92b8dc01-9086-b0d9-97dc-10aa90cf5a5c"
+                        "name": "eks-acb8dc29-f47c-d8b7-71f9-268f44fdbeb0"
                     }
                 ],
-                "remoteAccessSecurityGroup": "sg-03e85a15cddbbbc87"
+                "remoteAccessSecurityGroup": "sg-029bee2954d1815fc"
             },
             "diskSize": 4,
             "health": {
