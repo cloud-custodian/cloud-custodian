@@ -61,14 +61,14 @@ cffi==1.14.0
 chardet==3.0.4
 click==7.1.1
 colorama==0.4.3
-cryptography==2.9
+cryptography==2.9.2
 distlib==0.3.0
 humanfriendly==4.18
 idna==2.9
 importlib-metadata==1.6.0
 isodate==0.6.0
 jmespath==0.9.5
-jsonpickle==1.4
+jsonpickle==1.4.1
 knack==0.6.3
 msrest==0.6.13
 msrestazure==0.6.3

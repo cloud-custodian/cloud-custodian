@@ -371,7 +371,7 @@ class SQLServerFirewallActionTest(BaseTest):
         self.assertEqual(IPSet(expected_add), added)
 
         # Removed IP's
-        self.assertEqual(set(expected_remove), set([args[2] for _, args, _ in delete.mock_calls]))
+        self.assertEqual(set(expected_remove), {args[2] for _, args, _ in delete.mock_calls})
 
     @patch('azure.mgmt.sql.operations._firewall_rules_operations.'
            'FirewallRulesOperations.create_or_update')

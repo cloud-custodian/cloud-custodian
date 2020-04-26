@@ -13,6 +13,7 @@
 # limitations under the License.
 import time
 from .common import BaseTest, functional, event_data
+from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
@@ -1121,8 +1122,8 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 3)
         self.assertEqual(
-            set(["sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7"]),
-            set([r["GroupId"] for r in resources]),
+            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7"},
+            {r["GroupId"] for r in resources},
         )
 
     def test_unused_ecs(self):
@@ -2082,6 +2083,52 @@ class SecurityGroupTest(BaseTest):
         manager = p.load_resource_manager()
         self.assertEqual(len(manager.filter_resources(resources)), 1)
 
+    def test_security_group_reference_ingress_filter(self):
+        factory = self.replay_flight_data("test_security_group_reference_ingress_filter")
+        p = self.load_policy(
+            {
+                "name": "security_group_reference_ingress_filter",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "ingress",
+                        "SGReferences": {
+                            "key": "tag:SampleTagKey",
+                            "value": "SampleTagValue",
+                            "op": "equal"
+                        }
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
+    def test_security_group_reference_egress_filter(self):
+        factory = self.replay_flight_data("test_security_group_reference_egress_filter")
+        p = self.load_policy(
+            {
+                "name": "security_group_reference_egress_filter",
+                "resource": "security-group",
+                "filters": [
+                    {
+                        "type": "egress",
+                        "SGReferences": {
+                            "key": "tag:SampleTagKey",
+                            "value": "SampleTagValue",
+                            "op": "equal"
+                        }
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+
     def test_egress_ipv6(self):
         p = self.load_policy({
             "name": "ipv6-test",
@@ -2574,6 +2621,52 @@ class EndpointTest(BaseTest):
             ('ec2:AuthorizeSecurityGroupIngress',
              'ec2:RevokeSecurityGroupIngress',
              'ec2:RevokeSecurityGroupEgress'))
+
+
+class InternetGatewayTest(BaseTest):
+
+    def test_delete_internet_gateways(self):
+        factory = self.replay_flight_data("test_internet_gateways_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-internet-gateways",
+                "resource": "internet-gateway",
+                "filters": [{"tag:Name": "c7n-test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = factory(region="us-east-1").client("ec2")
+        internet_gateways = client.describe_internet_gateways(
+            Filters=[{"Name": "resource-id", "Values": [resources[0]["InternetGatewayId"]]}]
+        )[
+            "InternetGateways"
+        ]
+        self.assertFalse(internet_gateways)
+
+    def test_delete_internet_gateways_error(self):
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().ClientError = (BotoClientError)
+        mock_factory().client('ec2').delete_internet_gateway.side_effect = (
+            BotoClientError(
+                {'Error': {'Code': 'InvalidInternetGatewayId.NotFound'}},
+                operation_name='delete_internet_gateway'))
+        p = self.load_policy({
+            'name': 'delete-internet-gateway',
+            'resource': 'internet-gateway',
+            "actions": [{"type": "delete"}],
+        }, session_factory=mock_factory)
+
+        try:
+            p.resource_manager.actions[0].process(
+                [{'InternetGatewayId': 'abc'}])
+        except BotoClientError:
+            self.fail('should not raise')
+        mock_factory().client('ec2').delete_internet_gateway.assert_called_once()
 
 
 class NATGatewayTest(BaseTest):

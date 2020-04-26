@@ -1017,7 +1017,7 @@ class CopyRelatedResourceTag(Tag):
         for rrid, r in zip(jmespath.search('[].[%s]' % self.data['key'], resources),
                            resources):
             related_resources.append((rrid[0], r))
-        related_ids = set([r[0] for r in related_resources])
+        related_ids = {r[0] for r in related_resources}
         missing = False
         if None in related_ids:
             missing = True
@@ -1170,20 +1170,20 @@ def coalesce_copy_user_tags(resource, copy_tags, user_tags):
 
     if isinstance(copy_tags, list):
         if '*' in copy_tags:
-            copy_keys = set([t['Key'] for t in r_tags])
+            copy_keys = {t['Key'] for t in r_tags}
         else:
             copy_keys = set(copy_tags)
 
     if isinstance(copy_tags, bool):
         if copy_tags is True:
-            copy_keys = set([t['Key'] for t in r_tags])
+            copy_keys = {t['Key'] for t in r_tags}
         else:
             copy_keys = set()
 
     if isinstance(user_tags, dict):
         user_tags = [{'Key': k, 'Value': v} for k, v in user_tags.items()]
 
-    user_keys = set([t['Key'] for t in user_tags])
+    user_keys = {t['Key'] for t in user_tags}
     tags_diff = list(copy_keys.difference(user_keys))
     resource_tags_to_copy = [t for t in r_tags if t['Key'] in tags_diff]
     user_tags.extend(resource_tags_to_copy)

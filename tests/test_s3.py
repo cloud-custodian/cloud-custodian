@@ -545,7 +545,7 @@ class BucketDelete(BaseTest):
 
         session = session_factory()
         client = session.client("s3")
-        buckets = set([b["Name"] for b in client.list_buckets()["Buckets"]])
+        buckets = {b["Name"] for b in client.list_buckets()["Buckets"]}
         self.assertFalse(bname in buckets)
 
     @functional
@@ -595,7 +595,7 @@ class BucketDelete(BaseTest):
         if self.recording:
             time.sleep(60)
         self.assertEqual(len(resources), 1)
-        buckets = set([b["Name"] for b in client.list_buckets()["Buckets"]])
+        buckets = {b["Name"] for b in client.list_buckets()["Buckets"]}
         self.assertFalse(bname in buckets)
 
     @functional
@@ -626,7 +626,7 @@ class BucketDelete(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        buckets = set([b["Name"] for b in client.list_buckets()["Buckets"]])
+        buckets = {b["Name"] for b in client.list_buckets()["Buckets"]}
         self.assertFalse(bname in buckets)
 
     def test_delete_bucket_with_failure(self):
@@ -669,7 +669,7 @@ class BucketDelete(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        buckets = set([b["Name"] for b in client.list_buckets()["Buckets"]])
+        buckets = {b["Name"] for b in client.list_buckets()["Buckets"]}
         self.assertIn(bname, buckets)
 
         # Make sure file got written
@@ -681,7 +681,7 @@ class BucketDelete(BaseTest):
         client.delete_bucket_policy(Bucket=bname)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        buckets = set([b["Name"] for b in client.list_buckets()["Buckets"]])
+        buckets = {b["Name"] for b in client.list_buckets()["Buckets"]}
         self.assertFalse(bname in buckets)
 
 
@@ -3558,7 +3558,7 @@ class S3LifecycleTest(BaseTest):
         # Make a bucket
         client.create_bucket(Bucket=bname)
         self.addCleanup(destroyBucket, client, bname)
-        buckets = set([b["Name"] for b in client.list_buckets()["Buckets"]])
+        buckets = {b["Name"] for b in client.list_buckets()["Buckets"]}
         self.assertIn(bname, buckets)
 
         def get_policy(**kwargs):
@@ -3605,8 +3605,8 @@ class S3LifecycleTest(BaseTest):
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
         self.assertEqual(len(lifecycle["Rules"]), 2)
         self.assertSetEqual(
-            set([x["ID"] for x in lifecycle["Rules"]]),
-            set([lifecycle_id1, lifecycle_id2]),
+            {x["ID"] for x in lifecycle["Rules"]},
+            {lifecycle_id1, lifecycle_id2},
         )
 
         #
@@ -3619,8 +3619,8 @@ class S3LifecycleTest(BaseTest):
         lifecycle = client.get_bucket_lifecycle_configuration(Bucket=bname)
         self.assertEqual(len(lifecycle["Rules"]), 2)
         self.assertSetEqual(
-            set([x["ID"] for x in lifecycle["Rules"]]),
-            set([lifecycle_id1, lifecycle_id2]),
+            {x["ID"] for x in lifecycle["Rules"]},
+            {lifecycle_id1, lifecycle_id2},
         )
 
         for rule in lifecycle["Rules"]:

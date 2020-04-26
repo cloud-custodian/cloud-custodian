@@ -518,7 +518,10 @@ class LambdaMode(ServerlessExecutionMode):
 
 @execution.register('periodic')
 class PeriodicMode(LambdaMode, PullMode):
-    """A policy that runs in pull mode within lambda."""
+    """A policy that runs in pull mode within lambda.
+
+    Runs Custodian in AWS lambda at user defined cron interval.
+    """
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
@@ -531,7 +534,15 @@ class PeriodicMode(LambdaMode, PullMode):
 
 @execution.register('phd')
 class PHDMode(LambdaMode):
-    """Personal Health Dashboard event based policy execution."""
+    """Personal Health Dashboard event based policy execution.
+
+    PHD events are triggered by changes in the operations health of
+    AWS services and data center resources,
+
+    See `Personal Health Dashboard
+    <https://aws.amazon.com/premiumsupport/technology/personal-health-dashboard/>`_
+    for more details.
+    """
 
     schema = utils.type_schema(
         'phd',
@@ -624,7 +635,9 @@ class EC2InstanceState(LambdaMode):
     """
     A lambda policy that executes on ec2 instance state changes.
 
-    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
+    See `EC2 lifecycles
+    <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_
+    for more details.
     """
 
     schema = utils.type_schema(
@@ -636,7 +649,12 @@ class EC2InstanceState(LambdaMode):
 
 @execution.register('asg-instance-state')
 class ASGInstanceState(LambdaMode):
-    """a lambda policy that executes on an asg's ec2 instance state changes."""
+    """a lambda policy that executes on an asg's ec2 instance state changes.
+
+    See `ASG Events
+    <https://docs.aws.amazon.com/autoscaling/ec2/userguide/cloud-watch-events.html>`_
+    for more details.
+    """
 
     schema = utils.type_schema(
         'asg-instance-state', rinherit=LambdaMode.schema,
@@ -649,7 +667,11 @@ class ASGInstanceState(LambdaMode):
 class GuardDutyMode(LambdaMode):
     """Incident Response for AWS Guard Duty.
 
-    This policy fires on guard duty events for the given resource type.
+    AWS Guard Duty is a threat detection service that continuously
+    monitors for malicious activity and unauthorized behavior. This
+    mode allows you to execute polcies when various alerts are created
+    by AWS Guard Duty for automated incident response. See `Guard Duty
+    <https://aws.amazon.com/guardduty/>`_ for more details.
     """
 
     schema = utils.type_schema('guard-duty', rinherit=LambdaMode.schema)
@@ -694,7 +716,10 @@ class GuardDutyMode(LambdaMode):
 @execution.register('config-rule')
 class ConfigRuleMode(LambdaMode):
     """a lambda policy that executes as a config service rule.
-        http://docs.aws.amazon.com/config/latest/APIReference/API_PutConfigRule.html
+
+    The policy is invoked on configuration changes to resources.
+
+    See `AWS Config <https://aws.amazon.com/config/>`_ for more details.
     """
     cfg_event = None
     schema = utils.type_schema('config-rule', rinherit=LambdaMode.schema)

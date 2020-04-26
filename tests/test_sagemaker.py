@@ -226,6 +226,31 @@ class TestNotebookInstance(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["NotebookInstanceName"], nb)
 
+    def test_sagemaker_notebook_kms_alias(self):
+        session_factory = self.replay_flight_data("test_sagemaker_notebook_kms_key_filter")
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                "name": "sagemaker-kms-alias",
+                "resource": "aws.sagemaker-notebook",
+                "filters": [
+                    {
+                        'NotebookInstanceName': "test-kms"
+                    },
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/skunk/trails",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
 
 class TestModelInstance(BaseTest):
 
@@ -745,3 +770,28 @@ class TestSagemakerEndpointConfig(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_sagemaker_endpoint_config_kms_alias(self):
+        session_factory = self.replay_flight_data("test_sagemaker_endpoint_config_kms_key_filter")
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                "name": "sagemaker-kms-alias",
+                "resource": "aws.sagemaker-endpoint-config",
+                "filters": [
+                    {
+                        "EndpointConfigName": "kms-test"
+                    },
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/skunk/trails",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')

@@ -18,7 +18,7 @@ recommonmark==0.6.0
 requests==2.23.0
 six==1.14.0
 snowballstemmer==2.0.0
-sphinx==2.3.1
+sphinx==3.0.2
 sphinx-markdown-tables==0.0.12
 sphinx-rtd-theme==0.4.3
 sphinxcontrib-applehelp==1.0.2

@@ -603,12 +603,12 @@ class AWS(Provider):
         service_region_map, resource_service_map = get_service_region_map(
             options.regions, policy_collection.resource_types)
         if 'all' in options.regions:
-            enabled_regions = set([
+            enabled_regions = {
                 r['RegionName'] for r in
                 get_profile_session(options).client('ec2').describe_regions(
                     Filters=[{'Name': 'opt-in-status',
                               'Values': ['opt-in-not-required', 'opted-in']}]
-                ).get('Regions')])
+                ).get('Regions')}
         for p in policy_collection:
             if 'aws.' in p.resource_type:
                 _, resource_type = p.resource_type.split('.', 1)

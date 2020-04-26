@@ -4,7 +4,7 @@ EC2 - Power On For Scheduled Patching
 =====================================
 
 The following example policies will automatically create CloudWatch cron rate
-triggered Lambda functions in your account and region. The Lambda funtions will
+triggered Lambda functions in your account and region. The Lambda functions will
 be triggered on the cron rate expression schedule you provide in the mode section
 of the policy. The following example policies find all EC2 instances that are
 both in a stopped state, and have a tag called ``Patch Group`` with a value of

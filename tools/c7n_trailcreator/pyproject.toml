@@ -22,7 +22,6 @@ python = "^3.6"
 click = "^7.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.3.5"
 c7n_org = {path = "../c7n_org", develop = true}
 c7n = {path = "../..", develop = true}
 

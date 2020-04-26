@@ -13,9 +13,11 @@
 # limitations under the License.
 from .common import BaseTest
 
+import time
+import json
+
 
 class TestCFN(BaseTest):
-
     def test_delete(self):
         factory = self.replay_flight_data("test_cfn_delete")
         p = self.load_policy(
@@ -33,6 +35,85 @@ class TestCFN(BaseTest):
             sorted([r["StackName"] for r in resources]),
             ["sphere11-db-1", "sphere11-db-2", "sphere11-db-3"],
         )
+
+    def test_delete_with_protection(self):
+        stack_name = "c7n-test-delete-with-protection"
+
+        factory = self.replay_flight_data("test_cfn_delete_with_protection")
+        client = factory().client("cloudformation")
+        cfn_template = {"Resources": {"MyTopic": {"Type": "AWS::SNS::Topic"}}}
+        client.create_stack(
+            StackName=stack_name,
+            TemplateBody=json.dumps(cfn_template),
+            EnableTerminationProtection=True,
+        )
+        self.addCleanup(client.delete_stack, StackName=stack_name)
+        self.addCleanup(
+            client.update_termination_protection,
+            StackName=stack_name,
+            EnableTerminationProtection=False,
+        )
+        if self.recording:
+            time.sleep(30)
+
+        stacks = client.describe_stacks(StackName=stack_name).get("Stacks")
+        self.assertEqual(stacks[0].get("EnableTerminationProtection"), True)
+        p = self.load_policy(
+            {
+                "name": "cfn-delete-force",
+                "resource": "cfn",
+                "filters": [{"StackName": stack_name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # this should have done nothing.
+        stacks = client.describe_stacks(StackName=stack_name).get(
+            "Stacks"
+        )
+        self.assertEqual(stacks[0].get("EnableTerminationProtection"), True)
+        self.assertEqual(stacks[0].get("StackStatus"), "CREATE_COMPLETE")
+
+    def test_delete_force(self):
+        stack_name = "c7n-test-delete-force"
+
+        factory = self.replay_flight_data("test_cfn_delete_force")
+        client = factory().client("cloudformation")
+        cfn_template = {"Resources": {"MyTopic": {"Type": "AWS::SNS::Topic"}}}
+        client.create_stack(
+            StackName=stack_name,
+            TemplateBody=json.dumps(cfn_template),
+            EnableTerminationProtection=True,
+        )
+        if self.recording:
+            time.sleep(30)
+
+        stacks = client.describe_stacks(StackName=stack_name).get("Stacks")
+        self.assertEqual(stacks[0].get("EnableTerminationProtection"), True)
+        p = self.load_policy(
+            {
+                "name": "cfn-delete-force",
+                "resource": "cfn",
+                "filters": [{"StackName": stack_name}],
+                "actions": [{"type": "delete", "force": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        # make sure delete has time to complete
+        if self.recording:
+            time.sleep(30)
+
+        # deleted stacks must be referenced by StackId
+        stacks = client.describe_stacks(StackName=resources[0]["StackId"]).get(
+            "Stacks"
+        )
+        self.assertEqual(stacks[0].get("StackStatus"), "DELETE_COMPLETE")
 
     def test_query(self):
         factory = self.replay_flight_data("test_cfn_query")
@@ -71,20 +152,22 @@ class TestCFN(BaseTest):
                 "name": "cfn-add-tag",
                 "resource": "cfn",
                 "filters": [{"StackName": "mosdef2"}],
-                "actions": [
-                    {"type": "tag", "tags": {'App': 'Ftw'}}
-                ],
+                "actions": [{"type": "tag", "tags": {"App": "Ftw"}}],
             },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("cloudformation")
-        rtags = {t['Key']: t['Value'] for t in resources[0]['Tags']}
-        self.assertEqual(rtags, {'Env': 'Dev'})
-        tags = {t['Key']: t['Value'] for t in client.describe_stacks(
-            StackName=resources[0]["StackName"])["Stacks"][0]["Tags"]}
-        self.assertEqual(tags, {'Env': 'Dev', 'App': 'Ftw'})
+        rtags = {t["Key"]: t["Value"] for t in resources[0]["Tags"]}
+        self.assertEqual(rtags, {"Env": "Dev"})
+        tags = {
+            t["Key"]: t["Value"]
+            for t in client.describe_stacks(StackName=resources[0]["StackName"])[
+                "Stacks"
+            ][0]["Tags"]
+        }
+        self.assertEqual(tags, {"Env": "Dev", "App": "Ftw"})
 
     def test_cfn_add_tag(self):
         session_factory = self.replay_flight_data("test_cfn_add_tag")

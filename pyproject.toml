@@ -47,3 +47,5 @@ psutil = "^5.7.0"
 twine = "^3.1.1"
 pytest-sugar = "^0.9.2"
 
+[tool.black]
+skip-string-normalization = true

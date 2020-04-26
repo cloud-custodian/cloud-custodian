@@ -18,7 +18,9 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('project-role')
 class ProjectRole(QueryResourceManager):
-
+    """GCP Project Role
+    https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles#Role
+    """
     class resource_type(TypeInfo):
         service = 'iam'
         version = 'v1'
@@ -27,7 +29,8 @@ class ProjectRole(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = "name"
+        name = id = "name"
+        default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
 
         @staticmethod
         def get(client, resource_info):
@@ -50,6 +53,8 @@ class ServiceAccount(QueryResourceManager):
         scope_key = 'name'
         scope_template = 'projects/{}'
         id = "name"
+        name = 'email'
+        default_report_fields = ['name', 'displayName', 'email', 'description', 'disabled']
 
         @staticmethod
         def get(client, resource_info):
@@ -62,14 +67,17 @@ class ServiceAccount(QueryResourceManager):
 
 @resources.register('iam-role')
 class Role(QueryResourceManager):
-
+    """GCP Organization Role
+    https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles#Role
+    """
     class resource_type(TypeInfo):
         service = 'iam'
         version = 'v1'
         component = 'roles'
         enum_spec = ('list', 'roles[]', None)
         scope = "global"
-        id = "name"
+        name = id = "name"
+        default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
 
         @staticmethod
         def get(client, resource_info):

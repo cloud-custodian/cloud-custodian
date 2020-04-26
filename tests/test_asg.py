@@ -645,7 +645,7 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        s = set([x[0] for x in resources[0]["Invalid"]])
+        s = {x[0] for x in resources[0]["Invalid"]}
         self.assertTrue("invalid-subnet" in s)
         self.assertTrue("invalid-security-group" in s)
 

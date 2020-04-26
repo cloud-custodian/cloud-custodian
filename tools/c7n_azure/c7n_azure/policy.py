@@ -306,7 +306,7 @@ class AzureModeCommon:
 
 @execution.register(FUNCTION_TIME_TRIGGER_MODE)
 class AzurePeriodicMode(AzureFunctionMode, PullMode):
-    """A policy that runs/execute s in azure functions at specified
+    """A policy that runs/executes in azure functions at specified
     time intervals."""
     # Based on NCRONTAB used by Azure Functions:
     # https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer
