@@ -3,31 +3,31 @@
     "data": {
         "ResponseMetadata": {},
         "cluster": {
-            "name": "test",
-            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/test",
+            "name": "test_f",
+            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/test_f",
             "createdAt": {
                 "__class__": "datetime",
                 "year": 2020,
                 "month": 4,
                 "day": 26,
-                "hour": 15,
-                "minute": 30,
-                "second": 7,
-                "microsecond": 828000
+                "hour": 16,
+                "minute": 35,
+                "second": 38,
+                "microsecond": 749000
             },
             "version": "1.15",
-            "endpoint": "https://C92FA4505C352FC7DEA11F487657DD8D.gr7.us-east-1.eks.amazonaws.com",
+            "endpoint": "https://063A282BD17C29734512B34842900584.gr7.us-east-1.eks.amazonaws.com",
             "roleArn": "arn:aws:iam::644160558196:role/EKS-signaldancer-ServiceR-AWSServiceRoleForAmazonE-69A4RAE40IF6",
             "resourcesVpcConfig": {
                 "subnetIds": [
-                    "subnet-efbcccb7",
-                    "subnet-914763e7"
+                    "subnet-068dfbf3f275a6ae8",
+                    "subnet-03ec1a55eadb55221"
                 ],
                 "securityGroupIds": [
-                    "sg-007e9ef58b28a8050"
+                    "sg-0d30141b566cfa039"
                 ],
-                "clusterSecurityGroupId": "sg-0ddc2dad3e414d61c",
-                "vpcId": "vpc-d2d616b5",
+                "clusterSecurityGroupId": "sg-02cd34a089ca06602",
+                "vpcId": "vpc-072f438c953672ace",
                 "endpointPublicAccess": true,
                 "endpointPrivateAccess": false,
                 "publicAccessCidrs": [
@@ -50,7 +50,7 @@
             },
             "identity": {
                 "oidc": {
-                    "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/C92FA4505C352FC7DEA11F487657DD8D"
+                    "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/063A282BD17C29734512B34842900584"
                 }
             },
             "status": "DELETING",

@@ -100,8 +100,8 @@ class EKS(BaseTest):
         self.assertEqual(cluster['status'], 'DELETING')        
 
     def test_delete_eks_with_fargate(self):
-        name = "test"
-        factory = self.record_flight_data("test_eks_delete_with_fargate")
+        name = "test_f"
+        factory = self.replay_flight_data("test_eks_delete_with_fargate")
         client = factory().client("eks")              
         fargateProfileNames = client.list_fargate_profiles(
                 clusterName=name)['fargateProfileNames']
