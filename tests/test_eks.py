@@ -80,7 +80,7 @@ class EKS(BaseTest):
     def test_delete_eks_with_nodegroup(self):
         name = "test"
         factory = self.replay_flight_data("test_eks_delete_with_nodegroup")
-        client = factory().client("eks")              
+        client = factory().client("eks")
         nodegroupNames = client.list_nodegroups(clusterName=name)['nodegroups']
         self.assertEqual(len(nodegroupNames), 1)
         p = self.load_policy(
@@ -97,14 +97,14 @@ class EKS(BaseTest):
         nodegroupNames = client.list_nodegroups(clusterName=resources[0]['name'])['nodegroups']
         self.assertEqual(len(nodegroupNames), 0)
         cluster = client.describe_cluster(name=name).get('cluster')
-        self.assertEqual(cluster['status'], 'DELETING')        
+        self.assertEqual(cluster['status'], 'DELETING')
 
     def test_delete_eks_with_fargate(self):
         name = "test_f"
         factory = self.replay_flight_data("test_eks_delete_with_fargate")
-        client = factory().client("eks")              
+        client = factory().client("eks")
         fargateProfileNames = client.list_fargate_profiles(
-                clusterName=name)['fargateProfileNames']
+            clusterName=name)['fargateProfileNames']
         self.assertEqual(len(fargateProfileNames), 1)
         p = self.load_policy(
             {
@@ -118,19 +118,19 @@ class EKS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         fargateProfileNames = client.list_fargate_profiles(
-                clusterName=resources[0]['name'])['fargateProfileNames']
+            clusterName=resources[0]['name'])['fargateProfileNames']
         self.assertEqual(len(fargateProfileNames), 0)
         cluster = client.describe_cluster(name=name).get('cluster')
-        self.assertEqual(cluster['status'], 'DELETING')    
+        self.assertEqual(cluster['status'], 'DELETING')
 
     def test_delete_eks_with_both(self):
         name = "test_f1"
         factory = self.replay_flight_data("test_eks_delete_with_both")
-        client = factory().client("eks")    
+        client = factory().client("eks")
         nodegroupNames = client.list_nodegroups(clusterName=name)['nodegroups']
-        self.assertEqual(len(nodegroupNames), 1)                  
+        self.assertEqual(len(nodegroupNames), 1)
         fargateProfileNames = client.list_fargate_profiles(
-                clusterName=name)['fargateProfileNames']
+            clusterName=name)['fargateProfileNames']
         self.assertEqual(len(fargateProfileNames), 1)
         p = self.load_policy(
             {
@@ -144,12 +144,12 @@ class EKS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         nodegroupNames = client.list_nodegroups(clusterName=resources[0]['name'])['nodegroups']
-        self.assertEqual(len(nodegroupNames), 0)        
+        self.assertEqual(len(nodegroupNames), 0)
         fargateProfileNames = client.list_fargate_profiles(
-                clusterName=resources[0]['name'])['fargateProfileNames']
-        self.assertEqual(len(fargateProfileNames), 0)                
+            clusterName=resources[0]['name'])['fargateProfileNames']
+        self.assertEqual(len(fargateProfileNames), 0)
         cluster = client.describe_cluster(name=name).get('cluster')
-        self.assertEqual(cluster['status'], 'DELETING')  
+        self.assertEqual(cluster['status'], 'DELETING')
 
     def test_tag_and_remove_tag(self):
         factory = self.replay_flight_data('test_eks_tag_and_remove_tag')

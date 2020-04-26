@@ -17,7 +17,6 @@ from c7n.manager import resources
 from c7n import tags
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-from botocore.exceptions import ClientError, WaiterError
 from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 
@@ -159,19 +158,19 @@ class Delete(Action):
                     # It takes about 3 minutes to delete 1 and there is a maximum of 10
                     waiter.config.max_attempts = 60
                     waiter.wait(
-                        clusterName=r['name'], nodegroupName=nodegroup)                          
+                        clusterName=r['name'], nodegroupName=nodegroup)
             if fargateProfileNames:
                 for fargateProfile in fargateProfileNames:
                     client.delete_fargate_profile(
                         clusterName=r['name'], fargateProfileName=fargateProfile)
                     waiter = self.fargate_delete_waiter(client)
                     waiter.wait(
-                        clusterName=r['name'], fargateProfileName=fargateProfile)                     
+                        clusterName=r['name'], fargateProfileName=fargateProfile)
             try:
                 client.delete_cluster(name=r['name'])
             except client.exceptions.ResourceNotFoundException:
                 continue
-    
+
     def fargate_delete_waiter(self, client):
         # Fargate profiles seem to delete faster @ roughly 2 minutes each so keeping defaults
         config = {
@@ -197,4 +196,4 @@ class Delete(Action):
                 }
             }
         }
-        return create_waiter_with_client("FargateProfileDeleted",WaiterModel(config),client)
+        return create_waiter_with_client("FargateProfileDeleted", WaiterModel(config), client)
