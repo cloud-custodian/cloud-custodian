@@ -146,13 +146,21 @@ class Delete(Action):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('eks')
         for r in resources:
+            try:
+                self.delete_associated(r, client)
+                client.delete_cluster(name=r['name'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+    def delete_associated(self, r, client):
             nodegroups = client.list_nodegroups(clusterName=r['name'])['nodegroups']
             fargateProfileNames = client.list_fargate_profiles(
                 clusterName=r['name'])['fargateProfileNames']
             if nodegroups:
                 for nodegroup in nodegroups:
-                    client.delete_nodegroup(
-                        clusterName=r['name'], nodegroupName=nodegroup)
+                    self.manager.retry(
+                        client.delete_nodegroup, clusterName=r['name'], nodegroupName=nodegroup)
+                for nodegroup in nodegroups:                        
                     waiter = client.get_waiter('nodegroup_deleted')
                     # Set max attempts to 60 to give 30 minutes to delete (60 retry @ 30 sec each)
                     # It takes about 3 minutes to delete 1 and there is a maximum of 10
@@ -161,15 +169,13 @@ class Delete(Action):
                         clusterName=r['name'], nodegroupName=nodegroup)
             if fargateProfileNames:
                 for fargateProfile in fargateProfileNames:
-                    client.delete_fargate_profile(
+                    self.manager.retry(
+                        client.delete_fargate_profile, 
                         clusterName=r['name'], fargateProfileName=fargateProfile)
+                for fargateProfile in fargateProfileNames:                        
                     waiter = self.fargate_delete_waiter(client)
                     waiter.wait(
                         clusterName=r['name'], fargateProfileName=fargateProfile)
-            try:
-                client.delete_cluster(name=r['name'])
-            except client.exceptions.ResourceNotFoundException:
-                continue
 
     def fargate_delete_waiter(self, client):
         # Fargate profiles seem to delete faster @ roughly 2 minutes each so keeping defaults
