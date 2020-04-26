@@ -14,6 +14,8 @@ import logging
 import os
 import zlib
 import yaml
+import uuid
+from datetime import datetime
 
 import boto3
 import jsonschema
@@ -27,22 +29,25 @@ logger = logging.getLogger(__name__)
 
 class MailerTester:
 
-    def __init__(self, msg_file, config, msg_plain=False, json_dump_file=None):
-        if not os.path.exists(msg_file):
-            raise RuntimeError("File does not exist: %s" % msg_file)
-        logger.debug('Reading message from: %s', msg_file)
-        with open(msg_file, 'r') as fh:
-            raw = fh.read()
-        logger.debug('Read %d byte message', len(raw))
-        if msg_plain:
-            raw = raw.strip()
+    def __init__(self, config, raw=None, msg_file=None, msg_plain=False, json_dump_file=None):
+        if msg_file:
+            if not os.path.exists(msg_file):
+                raise RuntimeError("File does not exist: %s" % msg_file)
+            logger.debug('Reading message from: %s', msg_file)
+            with open(msg_file, 'r') as fh:
+                raw = fh.read()
+            logger.debug('Read %d byte message', len(raw))
+            if msg_plain:
+                raw = raw.strip()
+            else:
+                logger.debug('base64-decoding and zlib decompressing message')
+                raw = zlib.decompress(base64.b64decode(raw))
+                if json_dump_file is not None:
+                    with open(json_dump_file, 'wb') as fh:  # pragma: no cover
+                        fh.write(raw)
+            self.data = json.loads(raw)
         else:
-            logger.debug('base64-decoding and zlib decompressing message')
-            raw = zlib.decompress(base64.b64decode(raw))
-            if json_dump_file is not None:
-                with open(json_dump_file, 'wb') as fh:  # pragma: no cover
-                    fh.write(raw)
-        self.data = json.loads(raw)
+            self.data = raw
         logger.debug('Loaded message JSON')
         self.config = config
         self.session = boto3.Session()
@@ -76,7 +81,7 @@ class MailerTester:
 def setup_parser():
     parser = argparse.ArgumentParser('Test c7n-mailer templates and mail')
     parser.add_argument('-c', '--config', required=True)
-    parser.add_argument('-d', '--dry-run', dest='dry_run', action='store_true',
+    parser.add_argument('-d', '--dryrun', '--dry-run', dest='dry_run', action='store_true',
                         default=False,
                         help='Log messages that would be sent, but do not send')
     parser.add_argument('-T', '--template-print', dest='print_only',
@@ -93,8 +98,21 @@ def setup_parser():
                         type=str, action='store', default=None,
                         help='If dump JSON of MESSAGE_FILE to this path; '
                              'useful to base64-decode and gunzip a message')
-    parser.add_argument('MESSAGE_FILE', type=str,
+    parser.add_argument('MESSAGE_FILE', type=str, nargs="?",
                         help='Path to SQS message dump/content file')
+    parser.add_argument('-f', '--policy-file', type=str,
+                        help='Policy file to mimic MESSAGE_FILE')
+    parser.add_argument(
+        '--policy-name', type=str,
+        help='Policy name if multiple policies to mimic MESSAGE_FILE. Defaults to the first.'
+    )
+    parser.add_argument('-s', '--output-dir', type=str,
+                        help='Directory for policy output to mimic MESSAGE_FILE')
+    parser.add_argument(
+        '-n', '--notify-index', type=int, default=0,
+        help='Index of notify action if multiple notifies exist to mimic MESSAGE_FILE. '
+             'Defaults to 0.'
+    )
     return parser
 
 
@@ -102,6 +120,59 @@ def session_factory(config):
     return boto3.Session(
         region_name=config['region'],
         profile_name=config.get('profile'))
+
+
+def mimic_sqs(region, policy_file, policy_name, notify_index, output_dir):
+    template = {
+        "event": None,
+        "account_id": "snip",
+        "account": "snip",
+        "region": region,
+        "execution_id": str(uuid.uuid4()),
+        "execution_start": datetime.utcnow().timestamp(),
+    }
+
+    with open(policy_file, "r") as f:
+        data = yaml.load(f.read(), Loader=yaml.BaseLoader)
+    policies = data['policies']
+
+    # if there is only one policy, select it
+    # otherwise choose the one using the name as the unique identifier
+    policy = None
+    if len(data['policies']) == 1 or policy_name is None:
+        policy = data['policies'][0]
+        policy_name = policy['name']
+    else:
+        assert policy_name, "For multiple policies we need a policy name"
+        for pol in policies:
+            if pol['name'] == policy_name:
+                policy = pol
+                break
+    assert policy
+
+    template['policy'] = policy
+
+    action = None
+    notify_idx = 0
+    for act in policy['actions']:
+        if act['type'] == 'notify':
+            if notify_index == notify_idx:
+                action = act
+                break
+            notify_idx += 1
+
+    template['action'] = action
+
+    resources_path = '{}/{}/resources.json'.format(
+        output_dir,
+        policy_name
+    )
+    with open(resources_path, "r") as f:
+        resources = json.loads(f.read())
+
+    template['resources'] = resources
+
+    return template
 
 
 def main():
@@ -131,10 +202,32 @@ def main():
     setup_defaults(config)
     config['templates_folders'] = default_templates
 
-    tester = MailerTester(
-        options.MESSAGE_FILE, config, msg_plain=options.plain,
-        json_dump_file=options.json_dump_file
-    )
+    if options.MESSAGE_FILE:
+        msg_file = options.MESSAGE_FILE
+        tester = MailerTester(
+            config,
+            msg_file=msg_file,
+            msg_plain=options.plain,
+            json_dump_file=options.json_dump_file
+        )
+    else:
+        try:
+            region = config['region']
+        except KeyError:
+            region = os.environ['AWS_REGION']
+        except KeyError:
+            region = 'us-east-1'
+        raw = mimic_sqs(
+            region,
+            options.policy_file,
+            options.policy_name,
+            options.notify_index,
+            options.output_dir
+        )
+        tester = MailerTester(
+            config, raw
+        )
+
     tester.run(options.dry_run, options.print_only)
 
 
