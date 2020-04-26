@@ -155,6 +155,9 @@ class Delete(Action):
                     client.delete_nodegroup(
                         clusterName=r['name'], nodegroupName=nodegroup)
                     waiter = client.get_waiter('nodegroup_deleted')
+                    # Set max attempts to 60 to give 30 minutes to delete (60 retry @ 30 sec each)
+                    # It takes about 3 minutes to delete 1 and there is a maximum of 10
+                    waiter.config.max_attempts = 60
                     waiter.wait(
                         clusterName=r['name'], nodegroupName=nodegroup)                          
             if fargateProfileNames:
@@ -170,6 +173,7 @@ class Delete(Action):
                 continue
     
     def fargate_delete_waiter(self, client):
+        # Fargate profiles seem to delete faster @ roughly 2 minutes each so keeping defaults
         config = {
             'version': 2,
             'waiters': {
