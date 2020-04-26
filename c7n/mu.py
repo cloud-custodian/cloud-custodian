@@ -47,7 +47,7 @@ from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 log = logging.getLogger('custodian.serverless')
 
 LambdaRetry = get_retry(('InsufficientPermissionsException',), max_attempts=2)
-RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=5)
+RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=2)
 
 
 class PythonPackageArchive:
@@ -1130,7 +1130,7 @@ class CloudWatchEventSource:
         log.debug('Creating cwe rule target for %s on func:%s' % (
             self, func_arn))
 
-        RuleRetry(self.client.put_targets,
+        self.client.put_targets(
             Rule=func.name, Targets=[{"Id": func.name, "Arn": func_arn}])
 
         return True
@@ -1154,7 +1154,7 @@ class CloudWatchEventSource:
         if self.get(func.name):
             log.info("Removing cwe targets and rule %s", func.name)
             try:
-                targets = RuleRetry(self.client.list_targets_by_rule,
+                targets = self.client.list_targets_by_rule(
                                     Rule=func.name)['Targets']
                 if targets:
                     self.client.remove_targets(
