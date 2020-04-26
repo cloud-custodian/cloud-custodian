@@ -17,7 +17,8 @@ from c7n.manager import resources
 from c7n import tags
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, WaiterError
+from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 
 
@@ -160,8 +161,36 @@ class Delete(Action):
                 for fargateProfile in fargateProfileNames:
                     client.delete_fargate_profile(
                         clusterName=r['name'], fargateProfileName=fargateProfile)
+                    waiter = self.fargate_delete_waiter(client)
+                    waiter.wait(
+                        clusterName=r['name'], fargateProfileName=fargateProfile)                     
             try:
                 client.delete_cluster(name=r['name'])
             except client.exceptions.ResourceNotFoundException:
                 continue
-
+    
+    def fargate_delete_waiter(self, client):
+        config = {
+            'version': 2,
+            'waiters': {
+                "FargateProfileDeleted": {
+                    'operation': 'DescribeFargateProfile',
+                    'delay': 30,
+                    'maxAttempts': 40,
+                    'acceptors': [
+                        {
+                            "expected": "DELETE_FAILED",
+                            "matcher": "path",
+                            "state": "failure",
+                            "argument": "fargateprofile.status"
+                        },
+                        {
+                            "expected": "ResourceNotFoundException",
+                            "matcher": "error",
+                            "state": "success"
+                        }
+                    ]
+                }
+            }
+        }
+        return create_waiter_with_client("FargateProfileDeleted",WaiterModel(config),client)

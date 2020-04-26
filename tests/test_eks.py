@@ -99,29 +99,29 @@ class EKS(BaseTest):
         cluster = client.describe_cluster(name=name).get('cluster')
         self.assertEqual(cluster['status'], 'DELETING')        
 
-    # def test_delete_eks_with_fargate(self):
-    #     name = "test"
-    #     factory = self.replay_flight_data("test_eks_delete_with_fargate")
-    #     client = factory().client("eks")              
-    #     fargateProfileNames = client.list_fargate_profiles(
-    #             clusterName=name)['fargateProfileNames']
-    #     self.assertEqual(len(fargateProfileNames), 1)
-    #     p = self.load_policy(
-    #         {
-    #             "name": "eks-delete",
-    #             "resource": "eks",
-    #             "filters": [{"name": name}],
-    #             "actions": ["delete"],
-    #         },
-    #         session_factory=factory,
-    #     )
-    #     resources = p.run()
-    #     self.assertEqual(len(resources), 1)
-    #     fargateProfileNames = client.list_fargate_profiles(
-    #             clusterName=name)['fargateProfileNames']
-    #     self.assertEqual(len(fargateProfileNames), 0)
-    #     cluster = client.describe_cluster(name=name).get('cluster')
-    #     self.assertEqual(cluster['status'], 'DELETING')    
+    def test_delete_eks_with_fargate(self):
+        name = "test"
+        factory = self.record_flight_data("test_eks_delete_with_fargate")
+        client = factory().client("eks")              
+        fargateProfileNames = client.list_fargate_profiles(
+                clusterName=name)['fargateProfileNames']
+        self.assertEqual(len(fargateProfileNames), 1)
+        p = self.load_policy(
+            {
+                "name": "eks-delete",
+                "resource": "eks",
+                "filters": [{"name": name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        fargateProfileNames = client.list_fargate_profiles(
+                clusterName=name)['fargateProfileNames']
+        self.assertEqual(len(fargateProfileNames), 0)
+        cluster = client.describe_cluster(name=name).get('cluster')
+        self.assertEqual(cluster['status'], 'DELETING')    
 
     # def test_delete_eks_with_both(self):
     #     pass
