@@ -19,6 +19,7 @@ import boto3
 import jsonschema
 from c7n_mailer.cli import CONFIG_SCHEMA
 from c7n_mailer.email_delivery import EmailDelivery
+from c7n_mailer.slack_delivery import SlackDelivery
 from c7n_mailer.utils import setup_defaults
 from c7n_mailer.utils_email import get_mimetext_message
 
@@ -48,29 +49,48 @@ class MailerTester:
         self.session = boto3.Session()
 
     def run(self, dry_run=False, print_only=False):
-        emd = EmailDelivery(self.config, self.session, logger)
-        addrs_to_msgs = emd.get_to_addrs_email_messages_map(self.data)
-        logger.info('Would send email to: %s', addrs_to_msgs.keys())
-        if print_only:
-            mime = get_mimetext_message(
-                self.config,
-                logger,
-                self.data,
-                self.data['resources'],
-                ['foo@example.com']
-            )
-            logger.info('Send mail with subject: "%s"', mime['Subject'])
-            print(mime.get_payload(None, True).decode('utf-8'))
-            return
-        if dry_run:
+        is_slack = self.data["action"].get("slack_template") is not None
+        if is_slack:
+            sd = SlackDelivery(self.config, self.session, logger)
+            addrs_to_msgs = sd.get_to_addrs_slack_messages_map(self.data)
+            logger.info('Would send to: %s', addrs_to_msgs.keys())
+
+            if print_only:
+                print(list(addrs_to_msgs.values())[0])
+                return
+            if dry_run:
+                for to_addrs, body in addrs_to_msgs.items():
+                    print('-> SEND MESSAGE TO: %s' % to_addrs)
+                    print(body)
+                return
+            for to_addrs, body in addrs_to_msgs.items():
+                logger.info('Actually sending to: %s', to_addrs)
+                sd.send_slack_msg(to_addrs, body)
+        else:
+            emd = EmailDelivery(self.config, self.session, logger)
+            addrs_to_msgs = emd.get_to_addrs_email_messages_map(self.data)
+            logger.info('Would send to: %s', addrs_to_msgs.keys())
+
+            if print_only:
+                mime = get_mimetext_message(
+                    self.config,
+                    logger,
+                    self.data,
+                    self.data['resources'],
+                    ['foo@example.com']
+                )
+                logger.info('Send mail with subject: "%s"', mime['Subject'])
+                print(mime.get_payload(None, True).decode('utf-8'))
+                return
+            if dry_run:
+                for to_addrs, mimetext_msg in addrs_to_msgs.items():
+                    print('-> SEND MESSAGE TO: %s' % '; '.join(to_addrs))
+                    print(mimetext_msg.get_payload(None, True).decode('utf-8'))
+                return
+            # else actually send the message...
             for to_addrs, mimetext_msg in addrs_to_msgs.items():
-                print('-> SEND MESSAGE TO: %s' % '; '.join(to_addrs))
-                print(mimetext_msg.get_payload(None, True).decode('utf-8'))
-            return
-        # else actually send the message...
-        for to_addrs, mimetext_msg in addrs_to_msgs.items():
-            logger.info('Actually sending mail to: %s', to_addrs)
-            emd.send_c7n_email(self.data, list(to_addrs), mimetext_msg)
+                logger.info('Actually sending to: %s', to_addrs)
+                emd.send_c7n_email(self.data, list(to_addrs), mimetext_msg)
 
 
 def setup_parser():
