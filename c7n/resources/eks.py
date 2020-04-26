@@ -146,21 +146,22 @@ class Delete(Action):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('eks')
         for r in resources:
-            try:
-                nodegroups = client.list_nodegroups(clusterName=r['name'])['nodegroups']
-                fargateProfileNames = client.list_fargate_profiles(
-                    clusterName=r['name'])['fargateProfileNames']
-                if nodegroups:
-                    for nodegroup in nodegroups:
-                        client.delete_nodegroup(
-                            clusterName=r['name'], nodegroupName=nodegroup)
-                if fargateProfileNames:
-                    for fargateProfile in fargateProfileNames:
-                        client.delete_fargate_profile(
-                            clusterName=r['name'], fargateProfileName=fargateProfile)
-            except ClientError as e:
-                raise
+            nodegroups = client.list_nodegroups(clusterName=r['name'])['nodegroups']
+            fargateProfileNames = client.list_fargate_profiles(
+                clusterName=r['name'])['fargateProfileNames']
+            if nodegroups:
+                for nodegroup in nodegroups:
+                    client.delete_nodegroup(
+                        clusterName=r['name'], nodegroupName=nodegroup)
+                    waiter = client.get_waiter('nodegroup_deleted')
+                    waiter.wait(
+                        clusterName=r['name'], nodegroupName=nodegroup)                          
+            if fargateProfileNames:
+                for fargateProfile in fargateProfileNames:
+                    client.delete_fargate_profile(
+                        clusterName=r['name'], fargateProfileName=fargateProfile)
             try:
                 client.delete_cluster(name=r['name'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+

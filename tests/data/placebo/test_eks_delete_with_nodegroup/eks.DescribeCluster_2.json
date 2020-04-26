@@ -1,0 +1,55 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "cluster": {
+            "name": "test_f",
+            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/test_f",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 4,
+                "day": 26,
+                "hour": 15,
+                "minute": 40,
+                "second": 58,
+                "microsecond": 28000
+            },
+            "version": "1.15",
+            "roleArn": "arn:aws:iam::644160558196:role/EKS-signaldancer-ServiceR-AWSServiceRoleForAmazonE-69A4RAE40IF6",
+            "resourcesVpcConfig": {
+                "subnetIds": [
+                    "subnet-efbcccb7",
+                    "subnet-914763e7"
+                ],
+                "securityGroupIds": [
+                    "sg-007e9ef58b28a8050"
+                ],
+                "vpcId": "vpc-d2d616b5",
+                "endpointPublicAccess": true,
+                "endpointPrivateAccess": false,
+                "publicAccessCidrs": [
+                    "0.0.0.0/0"
+                ]
+            },
+            "logging": {
+                "clusterLogging": [
+                    {
+                        "types": [
+                            "api",
+                            "audit",
+                            "authenticator",
+                            "controllerManager",
+                            "scheduler"
+                        ],
+                        "enabled": false
+                    }
+                ]
+            },
+            "status": "CREATING",
+            "certificateAuthority": {},
+            "platformVersion": "eks.2",
+            "tags": {}
+        }
+    }
+}

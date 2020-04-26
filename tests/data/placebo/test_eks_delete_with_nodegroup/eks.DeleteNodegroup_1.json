@@ -1,0 +1,65 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "nodegroup": {
+            "nodegroupName": "test",
+            "nodegroupArn": "arn:aws:eks:us-east-1:644160558196:nodegroup/test/test/92b8dc01-9086-b0d9-97dc-10aa90cf5a5c",
+            "clusterName": "test",
+            "version": "1.15",
+            "releaseVersion": "1.15.10-20200228",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 4,
+                "day": 26,
+                "hour": 15,
+                "minute": 42,
+                "second": 25,
+                "microsecond": 638000
+            },
+            "modifiedAt": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 4,
+                "day": 26,
+                "hour": 15,
+                "minute": 45,
+                "second": 38,
+                "microsecond": 820000
+            },
+            "status": "DELETING",
+            "scalingConfig": {
+                "minSize": 1,
+                "maxSize": 1,
+                "desiredSize": 1
+            },
+            "instanceTypes": [
+                "t3.medium"
+            ],
+            "subnets": [
+                "subnet-efbcccb7",
+                "subnet-914763e7"
+            ],
+            "remoteAccess": {
+                "ec2SshKey": "johns"
+            },
+            "amiType": "AL2_x86_64",
+            "nodeRole": "arn:aws:iam::644160558196:role/eksctl-devk8s-nodegroup-ng-2f0ad2-NodeInstanceRole-1P2388MLET9O",
+            "labels": {},
+            "resources": {
+                "autoScalingGroups": [
+                    {
+                        "name": "eks-92b8dc01-9086-b0d9-97dc-10aa90cf5a5c"
+                    }
+                ],
+                "remoteAccessSecurityGroup": "sg-03e85a15cddbbbc87"
+            },
+            "diskSize": 4,
+            "health": {
+                "issues": []
+            },
+            "tags": {}
+        }
+    }
+}

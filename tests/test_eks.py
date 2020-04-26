@@ -77,6 +77,55 @@ class EKS(BaseTest):
         cluster = client.describe_cluster(name='dev').get('cluster')
         self.assertEqual(cluster['status'], 'DELETING')
 
+    def test_delete_eks_with_nodegroup(self):
+        name = "test"
+        factory = self.replay_flight_data("test_eks_delete_with_nodegroup")
+        client = factory().client("eks")              
+        nodegroupNames = client.list_nodegroups(clusterName=name)['nodegroups']
+        self.assertEqual(len(nodegroupNames), 1)
+        p = self.load_policy(
+            {
+                "name": "eks-delete",
+                "resource": "eks",
+                "filters": [{"name": name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        nodegroupNames = client.list_nodegroups(clusterName=resources[0]['name'])['nodegroups']
+        self.assertEqual(len(nodegroupNames), 0)
+        cluster = client.describe_cluster(name=name).get('cluster')
+        self.assertEqual(cluster['status'], 'DELETING')        
+
+    # def test_delete_eks_with_fargate(self):
+    #     name = "test"
+    #     factory = self.replay_flight_data("test_eks_delete_with_fargate")
+    #     client = factory().client("eks")              
+    #     fargateProfileNames = client.list_fargate_profiles(
+    #             clusterName=name)['fargateProfileNames']
+    #     self.assertEqual(len(fargateProfileNames), 1)
+    #     p = self.load_policy(
+    #         {
+    #             "name": "eks-delete",
+    #             "resource": "eks",
+    #             "filters": [{"name": name}],
+    #             "actions": ["delete"],
+    #         },
+    #         session_factory=factory,
+    #     )
+    #     resources = p.run()
+    #     self.assertEqual(len(resources), 1)
+    #     fargateProfileNames = client.list_fargate_profiles(
+    #             clusterName=name)['fargateProfileNames']
+    #     self.assertEqual(len(fargateProfileNames), 0)
+    #     cluster = client.describe_cluster(name=name).get('cluster')
+    #     self.assertEqual(cluster['status'], 'DELETING')    
+
+    # def test_delete_eks_with_both(self):
+    #     pass
+
     def test_tag_and_remove_tag(self):
         factory = self.replay_flight_data('test_eks_tag_and_remove_tag')
         p = self.load_policy({
