@@ -1155,7 +1155,7 @@ class CloudWatchEventSource:
             log.info("Removing cwe targets and rule %s", func.name)
             try:
                 targets = self.client.list_targets_by_rule(
-                                    Rule=func.name)['Targets']
+                    Rule=func.name)['Targets']
                 if targets:
                     self.client.remove_targets(
                         Rule=func.name,
