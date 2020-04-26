@@ -48,7 +48,7 @@
                     }
                 ]
             },
-            "status": "CREATING",
+            "status": "DELETING",
             "certificateAuthority": {},
             "platformVersion": "eks.2",
             "tags": {}
