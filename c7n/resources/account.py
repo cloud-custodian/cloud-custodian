@@ -1606,7 +1606,7 @@ class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
 
 
 @filters.register('emr-block-public-access-configuration')
-class GetAccountBlockPublicAccessConfiguration(Filter):
+class GetAccountBlockPublicAccessConfiguration(ValueFilter):
     """Check for EMR block public access configuration on an account
 
     :example:
@@ -1620,17 +1620,29 @@ class GetAccountBlockPublicAccessConfiguration(Filter):
                   - type: emr-block-public-access-configuration
     """
 
-    schema = type_schema('emr-block-public-access-configuration',)
+    annotation_key = 'c7n:emr-block-public-access-configuration'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('emr-block-public-access-configuration', rinherit=ValueFilter.schema)
+    schema_alias = False
     permissions = ("elasticmapreduce:GetBlockPublicAccessConfiguration",)
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('emr')
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
 
-        response = client.get_block_public_access_configuration()
-        response.pop('ResponseMetadata')
-        response = [response]
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            'emr', region_name=self.manager.config.region)
 
-        return response
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_block_public_access_configuration()
+                r[self.annotation_key].pop('ResponseMetadata')
+            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                r[self.annotation_key] = {}
+
+    def __call__(self, r):
+        return super(GetAccountBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])
 
 
 @actions.register('set-emr-block-public-access-configuration')
@@ -1668,11 +1680,15 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
-        config = self.data['BlockPublicAccessConfiguration']
 
-        try:
-            client.put_block_public_access_configuration(
-                BlockPublicAccessConfiguration=config
-            )
-        except Exception as e:
-            self.log.warning("Exception trying to PutBlockPublicAccessConfiguration, error: %s", e)
+        res = client.get_block_public_access_configuration()
+        res.pop('ResponseMetadata')
+        config = res['BlockPublicAccessConfiguration']
+        updatedConfig = {**config, **self.data['BlockPublicAccessConfiguration']}
+
+        if config == updatedConfig:
+            return
+
+        client.put_block_public_access_configuration(
+            BlockPublicAccessConfiguration=updatedConfig
+        )

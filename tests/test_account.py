@@ -967,13 +967,17 @@ class AccountTests(BaseTest):
                 'resource': 'account',
                 'filters': [{
                     'type': 'emr-block-public-access-configuration',
+                    'key': 'BlockPublicAccessConfiguration',
+                    'value': 'not-null'
                 }]
             },
             session_factory=session_factory)
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["BlockPublicAccessConfigurationMetadata"]['CreatedByArn'],
-             "arn:aws:iam::12345678901:user/test")
+        self.assertEqual(resources[0]["c7n:emr-block-public-access-configuration"]
+            ['BlockPublicAccessConfigurationMetadata']['CreatedByArn'],
+            "arn:aws:iam::12345678901:user/test")
 
     def test_set_emr_block_public_access_configuration(self):
         session_factory = self.replay_flight_data("test_set_emr_block_public_access_configuration")

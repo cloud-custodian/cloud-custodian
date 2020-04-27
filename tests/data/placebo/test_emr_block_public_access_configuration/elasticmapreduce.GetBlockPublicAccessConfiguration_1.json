@@ -11,6 +11,16 @@
             ]
         },
         "BlockPublicAccessConfigurationMetadata": {
+            "CreationDateTime": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 4,
+                "day": 23,
+                "hour": 14,
+                "minute": 39,
+                "second": 59,
+                "microsecond": 509000
+            },
             "CreatedByArn": "arn:aws:iam::12345678901:user/test"
         },
         "ResponseMetadata": {}
