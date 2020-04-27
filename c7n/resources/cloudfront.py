@@ -19,6 +19,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
+from c7n.filters import ValueFilter
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 
@@ -147,6 +148,55 @@ class IsWafEnabled(Filter):
             elif not state and target_acl_id and r['WebACLId'] != target_acl_id:
                 results.append(r)
         return results
+
+
+@Distribution.filter_registry.register('distribution-config')
+class DistributionConfig(ValueFilter):
+    """Check for Cloudfront distribution config values
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: logging-enabled
+                resource: distribution
+                filters:
+                  - type: distribution-config
+                    key: Logging.Enabled
+                    value: true
+   """
+
+    schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('cloudfront:GetDistributionConfig',)
+    annotation_key = 'c7n:distribution-config'
+    annotate = False
+
+    def process(self, resources, event=None):
+
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+
+        client = local_session(self.manager.session_factory).client(
+            'cloudfront', region_name=self.manager.config.region)
+
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_distribution_config(Id=r['Id']) \
+                    .get('DistributionConfig')
+            except (client.exceptions.NoSuchDistribution):
+                r[self.annotation_key] = {}
+            except Exception as e:
+                self.log.warning(
+                    "Exception trying to get Distribution Config: %s error: %s",
+                    r['ARN'], e)
+                raise e
+
+    def __call__(self, r):
+        return super(DistributionConfig, self).__call__(r[self.annotation_key])
 
 
 @Distribution.filter_registry.register('mismatch-s3-origin')

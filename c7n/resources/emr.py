@@ -13,6 +13,7 @@
 # limitations under the License.
 import logging
 import time
+import json
 
 import six
 
@@ -284,3 +285,41 @@ class QueryFilter:
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
+
+
+@resources.register('emr-security-configuration')
+class EMRSecurityConfiguration(QueryResourceManager):
+    """Resource manager for EMR Security Configuration
+    """
+
+    class resource_type(TypeInfo):
+        service = 'emr'
+        arn_type = 'emr'
+        permission_prefix = 'elasticmapreduce'
+        enum_spec = ('list_security_configurations', 'SecurityConfigurations', None)
+        detail_spec = ('describe_security_configuration', 'Name', 'Name', None)
+        id = name = 'Name'
+
+    permissions = ('elasticmapreduce:ListSecurityConfigurations',
+                  'elasticmapreduce:DescribeSecurityConfiguration',)
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        for r in resources:
+            r['SecurityConfiguration'] = json.loads(r['SecurityConfiguration'])
+        return resources
+
+
+@EMRSecurityConfiguration.action_registry.register('delete')
+class DeleteEMRSecurityConfiguration(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('elasticmapreduce:DeleteSecurityConfiguration',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('emr')
+        for r in resources:
+            try:
+                client.delete_security_configuration(Name=r['Name'])
+            except client.exceptions.EntityNotFoundException:
+                continue

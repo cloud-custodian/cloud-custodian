@@ -2725,6 +2725,7 @@ class FlowLogsTest(BaseTest):
 
     def test_vpc_create_flow_logs(self):
         session_factory = self.replay_flight_data("test_vpc_create_flow_logs")
+        # creates log group
         p = self.load_policy(
             {
                 "name": "c7n-create-vpc-flow-logs",
@@ -2737,7 +2738,7 @@ class FlowLogsTest(BaseTest):
                     {
                         "type": "set-flow-log",
                         "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole",
-                        "LogGroupName": "/custodian/vpc_logs/",
+                        "LogGroupName": "/custodian/vpc_log/",
                         "TrafficType": "ALL",
                     }
                 ],
@@ -2746,14 +2747,40 @@ class FlowLogsTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VpcId"], "vpc-7af45101")
+        self.assertEqual(resources[0]["VpcId"], "vpc-d2d616b5")
         client = session_factory(region="us-east-1").client("ec2")
         logs = client.describe_flow_logs(
             Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
-        )[
-            "FlowLogs"
-        ]
+        )["FlowLogs"]
         self.assertEqual(logs[0]["ResourceId"], resources[0]["VpcId"])
+        # p1 has same log group name
+        p1 = self.load_policy(
+            {
+                "name": "c7n-create-vpc-flow-logs",
+                "resource": "vpc",
+                "filters": [
+                    {"tag:Name": "testing-vpc"},
+                    {"type": "flow-logs", "enabled": False}
+                ],
+                "actions": [
+                    {
+                        "type": "set-flow-log",
+                        "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole",
+                        "LogGroupName": "/custodian/vpc_log/",
+                        "TrafficType": "ALL",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        res = p1.run()
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["VpcId"], "vpc-03005fb9b8740263d")
+        client = session_factory(region="us-east-1").client("ec2")
+        lgs = client.describe_flow_logs(
+            Filters=[{"Name": "resource-id", "Values": [res[0]["VpcId"]]}]
+        )["FlowLogs"]
+        self.assertEqual(lgs[0]["ResourceId"], res[0]["VpcId"])
 
     def test_vpc_flow_log_destination(self):
         session_factory = self.replay_flight_data('test_vpc_flow_filter_destination')

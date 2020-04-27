@@ -2112,7 +2112,7 @@ class LaunchTemplate(query.QueryResourceManager):
                 continue
             templates.setdefault(
                 (t['LaunchTemplateId'],
-                 t.get('Version', None)), []).append(a['AutoScalingGroupName'])
+                 t.get('Version', '$Default')), []).append(a['AutoScalingGroupName'])
         return templates
 
 

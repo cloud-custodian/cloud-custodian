@@ -1,9 +1,9 @@
 {
     "status_code": 200,
     "data": {
-        "ClientToken": "6zPNON5jQ9rEuL4pDVwzJlm70HqAQcYDkaOEHQr9gos=",
+        "ClientToken": "JuutuXS0nHXAfsQ1lOWaMAL6+tpqT5mqHMnEGPdD90I=",
         "FlowLogIds": [
-            "fl-041cdc74dc6435446"
+            "fl-0c28f7d7b5cd29477"
         ],
         "Unsuccessful": [],
         "ResponseMetadata": {}

@@ -14,6 +14,7 @@
 import jmespath
 from .common import BaseTest
 from c7n.utils import local_session
+from unittest.mock import MagicMock
 
 
 class CloudFrontWaf(BaseTest):
@@ -216,6 +217,65 @@ class CloudFront(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['c7n:mismatched-s3-origin'][0], 'c7n-idontexist')
+
+    def test_distribution_check_logging_enabled(self):
+        factory = self.replay_flight_data("test_distribution_check_logging_enabled")
+
+        p = self.load_policy(
+            {
+                "name": "test_distribution_logging_enabled",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "distribution-config",
+                        "key": "Logging.Enabled",
+                        "value": True
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:distribution-config']['Logging']['Enabled'], True)
+
+    def test_distribution_check_logging_enabled_error(self):
+        factory = self.replay_flight_data("test_distribution_check_logging_enabled")
+
+        client = factory().client("cloudfront")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'cloudfront').exceptions.NoSuchDistribution = (
+                client.exceptions.NoSuchDistribution)
+
+        mock_factory().client('cloudfront').get_distribution_config.side_effect = (
+            client.exceptions.NoSuchDistribution(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='get_distribution_config'))
+        p = self.load_policy(
+            {
+                "name": "test_distribution_logging_enabled",
+                "resource": "distribution",
+                "filters": [
+                    {
+                        "type": "distribution-config",
+                        "key": "Logging.Enabled",
+                        "value": True
+                    }
+                ]
+            },
+            session_factory=mock_factory,
+        )
+
+        try:
+            p.resource_manager.filters[0].process(
+                [{'Id': 'abc'}])
+        except client.exceptions.NoSuchDistribution:
+            self.fail('should not raise')
+        mock_factory().client('cloudfront').get_distribution_config.assert_called_once()
 
     def test_distribution_tag(self):
         factory = self.replay_flight_data("test_distrbution_tag")
