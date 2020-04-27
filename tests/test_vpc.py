@@ -2738,7 +2738,7 @@ class FlowLogsTest(BaseTest):
                     {
                         "type": "set-flow-log",
                         "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole",
-                        "LogGroupName": "/custodian/vpc_logs/",
+                        "LogGroupName": "/custodian/vpc_log/",
                         "TrafficType": "ALL",
                     }
                 ],
@@ -2766,7 +2766,7 @@ class FlowLogsTest(BaseTest):
                     {
                         "type": "set-flow-log",
                         "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole",
-                        "LogGroupName": "/custodian/vpc_logs/",
+                        "LogGroupName": "/custodian/vpc_log/",
                         "TrafficType": "ALL",
                     }
                 ],
