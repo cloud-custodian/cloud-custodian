@@ -1642,7 +1642,8 @@ class GetAccountBlockPublicAccessConfiguration(ValueFilter):
                 r[self.annotation_key] = {}
 
     def __call__(self, r):
-        return super(GetAccountBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])
+        return super(GetAccountBlockPublicAccessConfiguration, self).__call__ \
+            (r[self.annotation_key])
 
 
 @actions.register('set-emr-block-public-access-configuration')
