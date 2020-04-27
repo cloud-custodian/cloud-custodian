@@ -1606,7 +1606,7 @@ class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
 
 
 @filters.register('emr-block-public-access-configuration')
-class GetAccountBlockPublicAccessConfiguration(ValueFilter):
+class EMRBlockPublicAccessConfiguration(ValueFilter):
     """Check for EMR block public access configuration on an account
 
     :example:
@@ -1642,8 +1642,7 @@ class GetAccountBlockPublicAccessConfiguration(ValueFilter):
                 r[self.annotation_key] = {}
 
     def __call__(self, r):
-        return super(GetAccountBlockPublicAccessConfiguration, self).__call__\
-            (r[self.annotation_key])
+        return super(EMRBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])
 
 
 @actions.register('set-emr-block-public-access-configuration')
