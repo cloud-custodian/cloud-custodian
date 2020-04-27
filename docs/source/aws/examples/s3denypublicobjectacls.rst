@@ -9,7 +9,7 @@ in these buckets from being set to public-read, public-read-write
 ,or authenticated-read (Any authenticated AWS user, not just local to account).
 Being that S3 object permissions can be hard to track and restrict due to the huge
 amount of S3 objects usually present in accounts, this policy allows you to prevent
-the issue from occuring in the first place and helps maintain tighter S3 security
+the issue from occurring in the first place and helps maintain tighter S3 security
 to avoid accidentally setting sensitive S3 objects to public.  Note the S3 bucket
 policy has a NotPrincipal statement with several "AWS": arns.  These arns are owned
 by AWS and they are used for the AWS logging services for Log Delivery Group, ELB Logs,

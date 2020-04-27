@@ -107,7 +107,9 @@ stages:
               versionSpec: '3.8'
               architecture: 'x64'
 
-          - script: python -m pip install --upgrade pip && pip install click docker pytest
+          - script: |
+              python -m pip install --upgrade pip
+              pip install click docker pytest pyyaml
             displayName: "Install Dependencies"
 
           - task: Docker@2
@@ -117,17 +119,17 @@ stages:
               containerRegistry: dockerServiceConnection
 
           # cli
-          - script: python tools/dev/dockerpkg.py --test --push --tag nightly -r cloudcustodian -i cli -i cli-distroless 
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i cli -i cli-distroless 
             displayName: build, test, push custodian cli nightlies
 
           # cli-org
-          - script: python tools/dev/dockerpkg.py --test --push --tag nightly -r cloudcustodian -i org -i org-distroless 
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i org -i org-distroless 
             displayName: build, test, push custodian org nightlies
 
           # mailer
-          - script: python tools/dev/dockerpkg.py --test --push --tag nightly -r cloudcustodian -i mailer -i mailer-distroless 
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i mailer -i mailer-distroless 
             displayName: build, test, push custodian mailer nightlies
 
           # mailer
-          - script: python tools/dev/dockerpkg.py --test --push --tag nightly -r cloudcustodian -i policystream -i policystream-distroless
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i policystream -i policystream-distroless
             displayName: build, test, push custodian policystream nightlies

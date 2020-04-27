@@ -390,16 +390,16 @@ class AccountTests(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            set([l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["RDS"]),
+            {l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"RDS"},
         )
         self.assertEqual(
-            set([l["region"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["us-east-1"]),
+            {l["region"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"us-east-1"},
         )
         self.assertEqual(
-            set([l["check"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["DB instances"]),
+            {l["check"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"DB instances"},
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 1)
 
@@ -421,8 +421,8 @@ class AccountTests(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            set([l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["IAM"]),
+            {l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"IAM"},
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 2)
 
@@ -965,7 +965,7 @@ class AccountDataEvents(BaseTest):
     def make_bucket(self, session_factory, name):
         client = session_factory().client("s3")
 
-        buckets = set([b["Name"] for b in client.list_buckets()["Buckets"]])
+        buckets = {b["Name"] for b in client.list_buckets()["Buckets"]}
         if name in buckets:
             self.destroyBucket(client, name)
 

@@ -54,8 +54,7 @@ def test_generate_requirements():
     for l in lines.split('\n'):
         pkg_name, version = l.split('==')
         packages.append(pkg_name)
-    assert set(packages) == set([
-        'botocore', 'jmespath', 'python-dateutil'])
+    assert set(packages) == {'botocore', 'jmespath', 'python-dateutil'}
 
 
 class Publish(BaseTest):

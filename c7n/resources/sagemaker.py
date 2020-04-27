@@ -20,6 +20,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('sagemaker-notebook')
@@ -584,6 +585,36 @@ class NotebookSecurityGroupFilter(SecurityGroupFilter):
 class NotebookSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "SubnetId"
+
+
+@NotebookInstance.filter_registry.register('kms-key')
+@SagemakerEndpointConfig.filter_registry.register('kms-key')
+class NotebookKmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-kms-key-filters
+            resource: aws.sagemaker-notebook
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/sagemaker)"
+                op: regex
+
+          - name: sagemaker-endpoint-kms-key-filters
+            resource: aws.sagemaker-endpoint-config
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "alias/aws/sagemaker"
+    """
+    RelatedIdsExpression = "KmsKeyId"
 
 
 @Model.action_registry.register('delete')

@@ -333,7 +333,7 @@ class PortsRangeHelper:
         """ Converts array of port ranges to the set of integers
             Example: [(10-12), (20,20)] -> {10, 11, 12, 20}
         """
-        return set([i for r in ranges for i in range(r.start, r.end + 1)])
+        return {i for r in ranges for i in range(r.start, r.end + 1)}
 
     @staticmethod
     def validate_ports_string(ports):

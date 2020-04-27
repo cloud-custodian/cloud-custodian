@@ -34,8 +34,9 @@ class Instance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('aggregatedList', 'items.*.instances[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
         labels = True
+        default_report_fields = ['name', 'status', 'creationTimestamp', 'machineType', 'zone']
 
         @staticmethod
         def get(client, resource_info):
@@ -156,7 +157,10 @@ class Image(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'images'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "sourceType", "status", "creationTimestamp",
+            "storageLocation", "diskSizeGb", "family"]
 
         @staticmethod
         def get(client, resource_info):
@@ -187,8 +191,9 @@ class Disk(QueryResourceManager):
         component = 'disks'
         scope = 'zone'
         enum_spec = ('aggregatedList', 'items.*.disks[]', None)
-        id = 'name'
+        name = id = 'name'
         labels = True
+        default_report_fields = ["name", "sizeGb", "status", "zone"]
 
         @staticmethod
         def get(client, resource_info):
@@ -286,7 +291,8 @@ class Snapshot(QueryResourceManager):
         version = 'v1'
         component = 'snapshots'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = ["name", "status", "diskSizeGb", "creationTimestamp"]
 
         @staticmethod
         def get(client, resource_info):
@@ -319,7 +325,10 @@ class InstanceTemplate(QueryResourceManager):
         component = 'instanceTemplates'
         scope = 'zone'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "creationTimestamp",
+            "properties.machineType", "properties.description"]
 
         @staticmethod
         def get(client, resource_info):
@@ -365,8 +374,10 @@ class Autoscaler(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'autoscalers'
-        id = 'name'
+        name = id = 'name'
         enum_spec = ('aggregatedList', 'items.*.autoscalers[]', None)
+        default_report_fields = [
+            "name", "description", "status", "target", "recommendedSize"]
 
         @staticmethod
         def get(client, resource_info):

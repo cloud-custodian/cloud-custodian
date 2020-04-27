@@ -23,6 +23,9 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('log-project-sink')
 class LogProjectSink(QueryResourceManager):
+    """
+    https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.sinks
+    """
 
     class resource_type(TypeInfo):
         service = 'logging'
@@ -31,7 +34,9 @@ class LogProjectSink(QueryResourceManager):
         enum_spec = ('list', 'sinks[]', None)
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "destination", "filter", "writerIdentity", "createTime"]
 
         @staticmethod
         def get(client, resource_info):
@@ -54,7 +59,9 @@ class DeletePubSubTopic(MethodAction):
 
 @resources.register('log-project-metric')
 class LogProjectMetric(QueryResourceManager):
-
+    """
+    https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.metrics
+    """
     class resource_type(TypeInfo):
         service = 'logging'
         version = 'v2'
@@ -62,7 +69,9 @@ class LogProjectMetric(QueryResourceManager):
         enum_spec = ('list', 'metrics[]', None)
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "createTime", "filter"]
 
         @staticmethod
         def get(client, resource_info):
@@ -75,7 +84,9 @@ class LogProjectMetric(QueryResourceManager):
 
 @resources.register('log-exclusion')
 class LogExclusion(QueryResourceManager):
-
+    """
+    https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.exclusions
+    """
     class resource_type(TypeInfo):
         service = 'logging'
         version = 'v2'
@@ -83,7 +94,8 @@ class LogExclusion(QueryResourceManager):
         enum_spec = ('list', 'exclusions[]', None)
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = ["name", "description", "createTime", "disabled", "filter"]
 
         @staticmethod
         def get(client, resource_info):

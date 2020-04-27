@@ -834,7 +834,7 @@ class UsedSecurityGroup(SGUsage):
         unused = [
             r for r in resources
             if r['GroupId'] not in used and 'VpcId' in r]
-        unused = set([g['GroupId'] for g in self.filter_peered_refs(unused)])
+        unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
         return [r for r in resources if r['GroupId'] not in unused]
 
 
@@ -863,7 +863,7 @@ class Stale(Filter):
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('ec2')
-        vpc_ids = set([r['VpcId'] for r in resources if 'VpcId' in r])
+        vpc_ids = {r['VpcId'] for r in resources if 'VpcId' in r}
         group_map = {r['GroupId']: r for r in resources}
         results = []
         self.log.debug("Querying %d vpc for stale refs", len(vpc_ids))
@@ -993,14 +993,53 @@ class SGPermission(Filter):
             - "::/0"
           op: in
 
+    `SGReferences` can be used to filter out SG references in rules.
+    In this example we want to block ingress rules that reference a SG
+    that is tagged with `Access: Public`.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        SGReferences:
+          key: "tag:Access"
+          value: "Public"
+          op: equal
+
+    We can also filter SG references based on the VPC that they are
+    within. In this example we want to ensure that our outbound rules
+    that reference SGs are only referencing security groups within a
+    specified VPC.
+
+    .. code-block:: yaml
+
+      - type: egress
+        SGReferences:
+          key: 'VpcId'
+          value: 'vpc-11a1a1aa'
+          op: equal
+
+    Likewise, we can also filter SG references by their description.
+    For example, we can prevent egress rules from referencing any
+    SGs that have a description of "default - DO NOT USE".
+
+    .. code-block:: yaml
+
+      - type: egress
+        SGReferences:
+          key: 'Description'
+          value: 'default - DO NOT USE'
+          op: equal
 
     """
 
     perm_attrs = set((
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
         'IpRanges', 'PrefixListIds'))
-    filter_attrs = set(('Cidr', 'CidrV6', 'Ports', 'OnlyPorts', 'SelfReference', 'Description'))
+    filter_attrs = set((
+        'Cidr', 'CidrV6', 'Ports', 'OnlyPorts',
+        'SelfReference', 'Description', 'SGReferences'))
     attrs = perm_attrs.union(filter_attrs)
+    attrs.add('match-operator')
     attrs.add('match-operator')
 
     def validate(self):
@@ -1113,6 +1152,25 @@ class SGPermission(Filter):
                 found = True
         return found
 
+    def process_sg_references(self, perm, owner_id):
+        sg_refs = self.data.get('SGReferences')
+        if not sg_refs:
+            return None
+
+        sg_perm = perm.get('UserIdGroupPairs', [])
+        if not sg_perm:
+            return False
+
+        sg_group_ids = [p['GroupId'] for p in sg_perm if p['UserId'] == owner_id]
+        sg_resources = self.manager.get_resources(sg_group_ids)
+        vf = ValueFilter(sg_refs, self.manager)
+        vf.annotate = False
+
+        for sg in sg_resources:
+            if vf(sg):
+                return True
+        return False
+
     def expand_permissions(self, permissions):
         """Expand each list of cidr, prefix list, user id group pair
         by port/protocol as an individual rule.
@@ -1140,6 +1198,7 @@ class SGPermission(Filter):
     def __call__(self, resource):
         matched = []
         sg_id = resource['GroupId']
+        owner_id = resource['OwnerId']
         match_op = self.data.get('match-operator', 'and') == 'and' and all or any
         for perm in self.expand_permissions(resource[self.ip_permissions_key]):
             perm_matches = {}
@@ -1149,6 +1208,7 @@ class SGPermission(Filter):
             perm_matches['ports'] = self.process_ports(perm)
             perm_matches['cidrs'] = self.process_cidrs(perm)
             perm_matches['self-refs'] = self.process_self_reference(perm, sg_id)
+            perm_matches['sg-refs'] = self.process_sg_references(perm, owner_id)
             perm_match_values = list(filter(
                 lambda x: x is not None, perm_matches.values()))
 
@@ -1188,6 +1248,7 @@ SGPermissionSchema = {
     'Description': {},
     'Cidr': {},
     'CidrV6': {},
+    'SGReferences': {}
 }
 
 
@@ -1979,6 +2040,36 @@ class InternetGateway(query.QueryResourceManager):
         filter_type = 'list'
         config_type = "AWS::EC2::InternetGateway"
         id_prefix = "igw-"
+
+
+@InternetGateway.action_registry.register('delete')
+class DeleteInternetGateway(BaseAction):
+
+    """Action to delete Internet Gateway
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-internet-gateway
+                resource: internet-gateway
+                actions:
+                  - type: delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ec2:DeleteInternetGateway',)
+
+    def process(self, resources):
+
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
+            except ClientError as err:
+                if not err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
+                    raise
 
 
 @resources.register('nat-gateway')

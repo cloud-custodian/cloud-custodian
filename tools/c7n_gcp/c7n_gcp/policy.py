@@ -63,6 +63,12 @@ class FunctionMode(ServerlessExecutionMode):
 
 @execution.register('gcp-periodic')
 class PeriodicMode(FunctionMode, PullMode):
+    """Deploy a policy as a Cloud Functions triggered by Cloud Scheduler
+    at user defined cron interval via Pub/Sub.
+
+    Default region the function is deployed to is ``us-central1``. In
+    case you want to change that, use the cli ``--region`` flag.
+    """
 
     schema = type_schema(
         'gcp-periodic',
@@ -99,7 +105,18 @@ class PeriodicMode(FunctionMode, PullMode):
 
 @execution.register('gcp-audit')
 class ApiAuditMode(FunctionMode):
-    """Custodian policy execution on gcp api audit logs
+    """Custodian policy execution on gcp api audit logs events.
+
+    Deploys as a Cloud Function triggered by api calls. This allows
+    you to apply your policies as soon as an api call occurs. Audit
+    logs creates an event for every api call that occurs in your gcp
+    account. See `GCP Audit Logs
+    <https://cloud.google.com/logging/docs/audit/>`_ for more
+    details.
+
+    Default region the function is deployed to is
+    ``us-central1``. In case you want to change that, use the cli
+    ``--region`` flag.
     """
 
     schema = type_schema(

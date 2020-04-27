@@ -11,11 +11,11 @@ package_data = \
 
 install_requires = \
 ['Pygments>=2.6.1,<3.0.0',
- 'Sphinx>=2.3,<2.4',
+ 'Sphinx>=3.0,<3.1',
  'argcomplete (>=1.11.1,<2.0.0)',
  'attrs (>=19.3.0,<20.0.0)',
- 'boto3 (>=1.12.31,<2.0.0)',
- 'botocore (>=1.15.31,<2.0.0)',
+ 'boto3 (>=1.12.46,<2.0.0)',
+ 'botocore (>=1.15.46,<2.0.0)',
  'c7n (>=0.9.0,<0.10.0)',
  'docutils (>=0.15.2,<0.16.0)',
  'importlib-metadata (>=1.6.0,<2.0.0)',
@@ -30,7 +30,7 @@ install_requires = \
  'sphinx_markdown_tables>=0.0.12,<0.0.13',
  'sphinx_rtd_theme>=0.4.3,<0.5.0',
  'tabulate (>=0.8.7,<0.9.0)',
- 'urllib3 (>=1.25.8,<2.0.0)',
+ 'urllib3 (>=1.25.9,<2.0.0)',
  'zipp (>=3.1.0,<4.0.0)']
 
 entry_points = \

@@ -11,7 +11,7 @@ install-poetry:
 
 pkg-update:
 	poetry update
-	for pkg in $(PKG_SET); do cd $$pkg && poetry update && cd ../..; done
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry update && cd ../..; done
 
 pkg-show-update:
 	poetry show -o
@@ -56,7 +56,8 @@ ftest:
 	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 ./bin/py.test -m functional tests
 
 sphinx:
-	make -f docs/Makefile.sphinx clean && \
+# if this errors either tox -e docs or cd tools/c7n_sphinext && poetry install
+	which c7n-sphinxext
 	make -f docs/Makefile.sphinx html
 
 ghpages:
