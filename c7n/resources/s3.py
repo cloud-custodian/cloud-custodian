@@ -2686,6 +2686,9 @@ class Inventory(ValueFilter):
 class SetInventory(BucketActionBase):
     """Configure bucket inventories for an s3 bucket.
     """
+    schema = type_schema('set-inventory',
+                        required=['name', 'destination'])
+
     permissions = ('s3:PutInventoryConfiguration', 's3:GetInventoryConfiguration')
     shape = 'InventoryConfiguration'
 
