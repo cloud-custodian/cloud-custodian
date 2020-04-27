@@ -22,7 +22,7 @@
                 "Tags": [
                     {
                         "Key": "Owner",
-                        "Value": "faizan.ahmed@capitalone.com"
+                        "Value": "c7n"
                     },
                     {
                         "Key": "Name",
@@ -51,6 +51,30 @@
                     {
                         "Key": "Name",
                         "Value": "FlowLogTest"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "10.0.0.0/16",
+                "DhcpOptionsId": "dopt-24ff1940",
+                "State": "available",
+                "VpcId": "vpc-072f438c953672ace",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0194dd85e1c73db14",
+                        "CidrBlock": "10.0.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "public with private"
                     }
                 ]
             }
