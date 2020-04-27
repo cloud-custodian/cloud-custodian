@@ -76,6 +76,7 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, filter_empty,
     dumps, format_string_values, get_account_alias_from_sts)
+from .aws import shape_validate
 
 
 log = logging.getLogger('custodian.s3')
@@ -2685,25 +2686,49 @@ class Inventory(ValueFilter):
 class SetInventory(BucketActionBase):
     """Configure bucket inventories for an s3 bucket.
     """
-    schema = type_schema(
-        'set-inventory',
-        required=['name', 'destination'],
-        state={'enum': ['enabled', 'disabled', 'absent']},
-        name={'type': 'string', 'description': 'Name of inventory'},
-        destination={'type': 'string', 'description': 'Name of destination bucket'},
-        prefix={'type': 'string', 'description': 'Destination prefix'},
-        encryption={'enum': ['SSES3', 'SSEKMS']},
-        key_id={'type': 'string', 'description': 'Optional Customer KMS KeyId for SSE-KMS'},
-        versions={'enum': ['All', 'Current']},
-        schedule={'enum': ['Daily', 'Weekly']},
-        format={'enum': ['CSV', 'ORC', 'Parquet']},
-        fields={'type': 'array', 'items': {'enum': [
-            'Size', 'LastModifiedDate', 'StorageClass', 'ETag',
-            'IsMultipartUploaded', 'ReplicationStatus', 'EncryptionStatus',
-            'ObjectLockRetainUntilDate', 'ObjectLockMode', 'ObjectLockLegalHoldStatus',
-            'IntelligentTieringAccessTier']}})
-
     permissions = ('s3:PutInventoryConfiguration', 's3:GetInventoryConfiguration')
+    shape = 'InventoryConfiguration'
+
+    def validate(self):
+        inventory_name = self.data.get('name')
+        destination = self.data.get('destination')
+        prefix = self.data.get('prefix', '')
+        schedule = self.data.get('schedule', 'Daily')
+        fields = self.data.get('fields', ['LastModifiedDate', 'Size'])
+        versions = self.data.get('versions', 'Current')
+        state = self.data.get('state', 'enabled')
+        encryption = self.data.get('encryption')
+        inventory_format = self.data.get('format', 'CSV')
+
+        bucket = {
+            'Bucket': "arn:aws:s3:::%s" % destination,
+            'Format': inventory_format
+        }
+
+        inventory = {
+            'Destination': {
+                'S3BucketDestination': bucket
+            },
+            'IsEnabled': state == 'enabled' and True or False,
+            'Id': inventory_name,
+            'OptionalFields': fields,
+            'IncludedObjectVersions': versions,
+            'Schedule': {
+                'Frequency': schedule
+            }
+        }
+
+        if prefix:
+            bucket['Prefix'] = prefix
+
+        if encryption:
+            bucket['Encryption'] = {encryption: {}}
+            if encryption == 'SSEKMS' and self.data.get('key_id'):
+                bucket['Encryption'] = {encryption: {
+                    'KeyId': self.data['key_id']
+                }}
+
+        return shape_validate(inventory, self.shape, 's3')
 
     def process(self, buckets):
         with self.executor_factory(max_workers=2) as w:
