@@ -154,28 +154,28 @@ class Delete(Action):
 
     def delete_associated(self, r, client):
         nodegroups = client.list_nodegroups(clusterName=r['name'])['nodegroups']
-        fargateProfileNames = client.list_fargate_profiles(
+        fargate_profiles = client.list_fargate_profiles(
             clusterName=r['name'])['fargateProfileNames']
+        waiters = []
         if nodegroups:
             for nodegroup in nodegroups:
                 self.manager.retry(
                     client.delete_nodegroup, clusterName=r['name'], nodegroupName=nodegroup)
-            for nodegroup in nodegroups:
-                waiter = client.get_waiter('nodegroup_deleted')
-                # Set max attempts to 60 to give 30 minutes to delete (60 retry @ 30 sec each)
-                # It takes about 3 minutes to delete 1 and there is a maximum of 10
-                waiter.config.max_attempts = 60
-                waiter.wait(
-                    clusterName=r['name'], nodegroupName=nodegroup)
-        if fargateProfileNames:
-            for fargateProfile in fargateProfileNames:
+                # Nodegroup supports parallel delete so process in parallel, check these later on
+                waiters.append({"clusterName": r['name'], "nodegroupName": nodegroup})
+        if fargate_profiles:
+            waiter = self.fargate_delete_waiter(client)
+            for profile in fargate_profiles:
                 self.manager.retry(
                     client.delete_fargate_profile,
-                    clusterName=r['name'], fargateProfileName=fargateProfile)
-            for fargateProfile in fargateProfileNames:
-                waiter = self.fargate_delete_waiter(client)
+                    clusterName=r['name'], fargateProfileName=profile)
+                # Fargate profiles don't support parallel deletes so process serially
                 waiter.wait(
-                    clusterName=r['name'], fargateProfileName=fargateProfile)
+                    clusterName=r['name'], fargateProfileName=profile)
+        if waiters:
+            waiter = client.get_waiter('nodegroup_deleted')
+            for w in waiters:
+                waiter.wait(**w)
 
     def fargate_delete_waiter(self, client):
         # Fargate profiles seem to delete faster @ roughly 2 minutes each so keeping defaults
