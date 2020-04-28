@@ -57,11 +57,11 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-#      - name: Set up cache
-#        uses: actions/cache@v1
-#        with:
-#          path: .tox/${{ matrix.tox-target }}
-#          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/requirement*.txt') }}
+      - name: Set up cache
+        uses: actions/cache@v1
+        with:
+          path: .tox/${{ matrix.tox-target }}
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/requirement*.txt') }}
       - name: Install Test Runner
         run: |
           python -m pip install --upgrade pip
@@ -92,11 +92,11 @@ jobs:
       - uses: actions/setup-python@v1
         with:
           python-version: 3.8
-#      - name: Set up cache
-#        uses: actions/cache@v1
-#        with:
-#          path: ~\AppData\Local\pip\Cache
-#          key: pip-${{ 3.8 }}-${{ hashFiles('**/requirement*.txt') }}
+      - name: Set up cache
+        uses: actions/cache@v1
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: pip-${{ 3.8 }}-${{ hashFiles('**/requirement*.txt') }}
       - name: Install Test Runner
         run: |
           python -m pip install pip
@@ -117,11 +117,11 @@ jobs:
       - uses: actions/setup-python@v1
         with:
           python-version: 3.8
-#      - name: Set up cache
-#        uses: actions/cache@v1
-#        with:
-#          path: "~/.cache/pip"
-#          key: docs-${{ runner.os }}-${{ 3.8 }}-${{ hashFiles('**/requirement*.txt') }}
+      - name: Set up cache
+        uses: actions/cache@v1
+        with:
+          path: "~/.cache/pip"
+          key: docs-${{ runner.os }}-${{ 3.8 }}-${{ hashFiles('**/requirement*.txt') }}
       - name: Install Tox
         run: |
           python -m pip install --upgrade pip
