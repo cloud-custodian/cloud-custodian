@@ -1657,6 +1657,10 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
             policies:
               - name: set-emr-block-public-access-configuration
                 resource: account
+                filters:
+                  - type: emr-block-public-access-configuration
+                    key: BlockPublicAccessConfiguration.BlockPublicSecurityGroupRules
+                    value: False
                 actions:
                   - type: set-emr-block-public-access-configuration
                     BlockPublicAccessConfiguration:
@@ -1666,6 +1670,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                               MaxRange: 22
                             - MinRange: 23
                               MaxRange: 23
+
     """
 
     schema = type_schema('set-emr-block-public-access-configuration',
@@ -1680,10 +1685,19 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
+        r = resources[0]
 
-        res = client.get_block_public_access_configuration()
-        res.pop('ResponseMetadata')
-        config = res['BlockPublicAccessConfiguration']
+        base = {}
+        if EMRBlockPublicAccessConfiguration.annotation_key in r:
+            base = r[EMRBlockPublicAccessConfiguration.annotation_key]
+        else:
+            try:
+                base = client.get_block_public_access_configuration()
+                base.pop('ResponseMetadata')
+            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                base = {}
+
+        config = base['BlockPublicAccessConfiguration']
         updatedConfig = {**config, **self.data['BlockPublicAccessConfiguration']}
 
         if config == updatedConfig:
