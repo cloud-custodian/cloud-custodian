@@ -1458,13 +1458,9 @@ class UnusedRDSSubnetGroup(Filter):
         self.used = set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName', rds))
         self.used.union(
             set(
-                jmespath.search('DBClusters[].DBSubnetGroup.DBSubnetGroupName',
-                self.get_rds_clusters())))
+                jmespath.search('[].DBSubnetGroup.DBSubnetGroupName',
+                self.manager.get_resource_manager('rds-cluster').resources(augment=False))))
         return super(UnusedRDSSubnetGroup, self).process(configs)
-
-    def get_rds_clusters(self):
-        client = local_session(self.manager.session_factory).client('rds')
-        return client.describe_db_clusters()
 
     def __call__(self, config):
         return config['DBSubnetGroupName'] not in self.used

@@ -52,7 +52,7 @@
                                 "Name": "us-east-1a"
                             },
                             "SubnetStatus": "Active"
-                        }s
+                        }
                     ]
                 },
                 "PreferredMaintenanceWindow": "sat:09:37-sat:10:07",
@@ -62,8 +62,8 @@
                     "year": 2020,
                     "month": 4,
                     "day": 29,
-                    "hour": 20,
-                    "minute": 50,
+                    "hour": 21,
+                    "minute": 10,
                     "second": 0,
                     "microsecond": 0
                 },
@@ -263,9 +263,9 @@
                     "year": 2020,
                     "month": 4,
                     "day": 29,
-                    "hour": 20,
-                    "minute": 51,
-                    "second": 16,
+                    "hour": 21,
+                    "minute": 11,
+                    "second": 18,
                     "microsecond": 0
                 },
                 "MultiAZ": false,
