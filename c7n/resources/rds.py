@@ -46,6 +46,7 @@ import functools
 import itertools
 import logging
 import operator
+import jmespath
 import re
 from decimal import Decimal as D, ROUND_HALF_UP
 
@@ -1454,9 +1455,7 @@ class UnusedRDSSubnetGroup(Filter):
 
     def process(self, configs, event=None):
         rds = self.manager.get_resource_manager('rds').resources()
-        self.used = {
-            r.get('DBSubnetGroup', r['DBInstanceIdentifier']).get('DBSubnetGroupName')
-            for r in rds}
+        self.used = set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName', rds))
         return super(UnusedRDSSubnetGroup, self).process(configs)
 
     def __call__(self, config):
