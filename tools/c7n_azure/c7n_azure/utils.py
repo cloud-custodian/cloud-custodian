@@ -482,7 +482,7 @@ class ManagedGroupHelper:
     class serialize(JSONEncoder):
         def default(self, o):
             return o.__dict__
-    
+
     @staticmethod
     def filter_subscriptions(key, dictionary):
         for k, v in dictionary.items():
@@ -506,6 +506,7 @@ class ManagedGroupHelper:
         subscriptions = ManagedGroupHelper.filter_subscriptions('type', groups)
         subscriptions = [subscription['name'] for subscription in subscriptions]
         return subscriptions
+
 
 def generate_key_vault_url(name):
     return constants.TEMPLATE_KEYVAULT_URL.format(name)
