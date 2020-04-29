@@ -14,16 +14,7 @@
                     "HostedZoneId": "Z2R2ITUGPM61AM"
                 },
                 "AllocatedStorage": 22,
-                "InstanceCreateTime": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 4,
-                    "day": 17,
-                    "hour": 20,
-                    "minute": 26,
-                    "second": 1,
-                    "microsecond": 34000
-                },
+                "InstanceCreateTime": {},
                 "PreferredBackupWindow": "04:18-04:48",
                 "BackupRetentionPeriod": 7,
                 "DBSecurityGroups": [],
@@ -57,16 +48,7 @@
                 },
                 "PreferredMaintenanceWindow": "sat:09:37-sat:10:07",
                 "PendingModifiedValues": {},
-                "LatestRestorableTime": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 4,
-                    "day": 29,
-                    "hour": 21,
-                    "minute": 10,
-                    "second": 0,
-                    "microsecond": 0
-                },
+                "LatestRestorableTime": {},
                 "MultiAZ": false,
                 "EngineVersion": "8.0.17",
                 "AutoMinorVersionUpgrade": true,
@@ -106,16 +88,7 @@
                     "HostedZoneId": "Z2R2ITUGPM61AM"
                 },
                 "AllocatedStorage": 1,
-                "InstanceCreateTime": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 4,
-                    "day": 29,
-                    "hour": 20,
-                    "minute": 37,
-                    "second": 5,
-                    "microsecond": 851000
-                },
+                "InstanceCreateTime": {},
                 "PreferredBackupWindow": "04:42-05:12",
                 "BackupRetentionPeriod": 1,
                 "DBSecurityGroups": [],
@@ -137,36 +110,7 @@
                     "DBSubnetGroupDescription": "default",
                     "VpcId": "vpc-d2d616b5",
                     "SubnetGroupStatus": "Complete",
-                    "Subnets": [
-                        {
-                            "SubnetIdentifier": "subnet-914763e7",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-east-1a"
-                            },
-                            "SubnetStatus": "Active"
-                        },
-                        {
-                            "SubnetIdentifier": "subnet-e3b194de",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-east-1e"
-                            },
-                            "SubnetStatus": "Active"
-                        },
-                        {
-                            "SubnetIdentifier": "subnet-efbcccb7",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-east-1b"
-                            },
-                            "SubnetStatus": "Active"
-                        },
-                        {
-                            "SubnetIdentifier": "subnet-3a334610",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-east-1d"
-                            },
-                            "SubnetStatus": "Active"
-                        }
-                    ]
+                    "Subnets": []
                 },
                 "PreferredMaintenanceWindow": "sun:08:35-sun:09:05",
                 "PendingModifiedValues": {},
@@ -215,16 +159,7 @@
                     "HostedZoneId": "Z2R2ITUGPM61AM"
                 },
                 "AllocatedStorage": 20,
-                "InstanceCreateTime": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 4,
-                    "day": 29,
-                    "hour": 0,
-                    "minute": 55,
-                    "second": 14,
-                    "microsecond": 745000
-                },
+                "InstanceCreateTime": {},
                 "PreferredBackupWindow": "08:52-09:22",
                 "BackupRetentionPeriod": 7,
                 "DBSecurityGroups": [],
@@ -258,16 +193,7 @@
                 },
                 "PreferredMaintenanceWindow": "tue:03:06-tue:03:36",
                 "PendingModifiedValues": {},
-                "LatestRestorableTime": {
-                    "__class__": "datetime",
-                    "year": 2020,
-                    "month": 4,
-                    "day": 29,
-                    "hour": 21,
-                    "minute": 11,
-                    "second": 18,
-                    "microsecond": 0
-                },
+                "LatestRestorableTime": {},
                 "MultiAZ": false,
                 "EngineVersion": "12.2",
                 "AutoMinorVersionUpgrade": true,
