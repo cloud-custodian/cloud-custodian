@@ -11,15 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from concurrent.futures import as_completed
+
 from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import Filter
 from c7n.manager import resources
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.utils import local_session, type_schema, get_retry, chunks
 from .aws import shape_validate
 
 
@@ -39,8 +41,27 @@ class ElasticFileSystem(QueryResourceManager):
         filter_type = 'scalar'
         universal_taggable = True
 
-    augment = universal_augment
+    def get_source(self, source_type):
+        return DescribeElasticFileSystem(self)
 
+class DescribeElasticFileSystem(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('efs')
+
+        with self.manager.executor_factory(max_workers=min((10, len(resources) + 1))) as exec_factory:
+            futures = []
+            for resource_set in chunks(resources, 10):
+                futures.append(exec_factory.submit(self._add_policy_to_resource, client, resource_set))
+
+        return resources
+
+    def _add_policy_to_resource(self, client, resources):
+        for r in resources:
+          try:
+              r['Policy'] = client.describe_file_system_policy(FileSystemId=r['FileSystemId'])['Policy']
+          except Exception as err:
+              self.manager.log.error('Failed to retrieve EFS resource policy: %s', err)
 
 @resources.register('efs-mount-target')
 class ElasticFileSystemMountTarget(ChildResourceManager):
