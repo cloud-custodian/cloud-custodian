@@ -11,17 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import Counter, defaultdict
 from datetime import timedelta, datetime
 from functools import wraps
-import inspect
+import itertools
 import logging
 import os
-import pprint
 import sys
-import time
 
 import six
 import yaml
@@ -31,10 +27,10 @@ from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.provider import clouds
 from c7n.policy import Policy, PolicyCollection, load as policy_load
 from c7n.schema import ElementSchema, StructureParser, generate
-from c7n.utils import dumps, load_file, local_session, SafeLoader, yaml_dump
+from c7n.utils import load_file, local_session, SafeLoader, yaml_dump
 from c7n.config import Bag, Config
-from c7n import provider
-from c7n.resources import load_resources
+from c7n.resources import (
+    load_resources, load_available, load_providers, PROVIDER_NAMES)
 
 
 log = logging.getLogger('custodian.commands')
@@ -52,7 +48,6 @@ def policy_command(f):
         if not validate:
             log.debug('Policy validation disabled')
 
-        load_resources()
         vars = _load_vars(options)
 
         errors = 0
@@ -201,17 +196,17 @@ class DuplicateKeyCheckLoader(SafeLoader):
 
 def validate(options):
     from c7n import schema
-    load_resources()
+
     if len(options.configs) < 1:
         log.error('no config files specified')
         sys.exit(1)
 
     used_policy_names = set()
-    schm = schema.generate()
     structure = StructureParser()
     errors = []
 
     for config_file in options.configs:
+
         config_file = os.path.expanduser(config_file)
         if not os.path.exists(config_file):
             raise ValueError("Invalid path for config %r" % config_file)
@@ -233,6 +228,9 @@ def validate(options):
             log.error("%s" % e)
             errors.append(e)
             continue
+
+        load_resources(structure.get_resource_types(data))
+        schm = schema.generate()
         errors += schema.validate(data, schm)
         conf_policy_names = {
             p.get('name', 'unknown') for p in data.get('policies', ())}
@@ -299,7 +297,7 @@ def report(options, policies):
         log.error('Error: must supply at least one policy')
         sys.exit(1)
 
-    resources = set([p.resource_type for p in policies])
+    resources = {p.resource_type for p in policies}
     if len(resources) > 1:
         log.error('Error: Report subcommand can accept multiple policies, '
                   'but they must all be for the same resource.')
@@ -313,76 +311,8 @@ def report(options, policies):
 
 @policy_command
 def logs(options, policies):
-    if len(policies) != 1:
-        log.error("Log subcommand requires exactly one policy")
-        sys.exit(1)
-
-    policy = policies.pop()
-    # initialize policy execution context for access to outputs
-    policy.ctx.initialize()
-
-    for e in policy.get_logs(options.start, options.end):
-        print("%s: %s" % (
-            time.strftime(
-                "%Y-%m-%d %H:%M:%S", time.localtime(e['timestamp'] / 1000)),
-            e['message']))
-
-
-def _schema_get_docstring(starting_class):
-    """ Given a class, return its docstring.
-
-    If no docstring is present for the class, search base classes in MRO for a
-    docstring.
-    """
-    for cls in inspect.getmro(starting_class):
-        if inspect.getdoc(cls):
-            return inspect.getdoc(cls)
-
-
-def schema_completer(prefix):
-    """ For tab-completion via argcomplete, return completion options.
-
-    For the given prefix so far, return the possible options.  Note that
-    filtering via startswith happens after this list is returned.
-    """
-    from c7n import schema
-    load_resources()
-    components = prefix.split('.')
-
-    if components[0] in provider.clouds.keys():
-        cloud_provider = components.pop(0)
-        provider_resources = provider.resources(cloud_provider)
-    else:
-        cloud_provider = 'aws'
-        provider_resources = provider.resources('aws')
-        components[0] = "aws.%s" % components[0]
-
-    # Completions for resource
-    if len(components) == 1:
-        choices = [r for r in provider.resources().keys()
-                   if r.startswith(components[0])]
-        if len(choices) == 1:
-            choices += ['{}{}'.format(choices[0], '.')]
-        return choices
-
-    if components[0] not in provider_resources.keys():
-        return []
-
-    # Completions for category
-    if len(components) == 2:
-        choices = ['{}.{}'.format(components[0], x)
-                   for x in ('actions', 'filters') if x.startswith(components[1])]
-        if len(choices) == 1:
-            choices += ['{}{}'.format(choices[0], '.')]
-        return choices
-
-    # Completions for item
-    elif len(components) == 3:
-        resource_mapping = schema.resource_vocabulary(cloud_provider)
-        return ['{}.{}.{}'.format(components[0], components[1], x)
-                for x in resource_mapping[components[0]][components[1]]]
-
-    return []
+    log.warning("logs command has been removed")
+    sys.exit(1)
 
 
 def schema_cmd(options):
@@ -392,10 +322,9 @@ def schema_cmd(options):
         schema.json_dump(options.resource)
         return
 
-    load_resources()
-
-    resource_mapping = schema.resource_vocabulary()
     if options.summary:
+        load_available()
+        resource_mapping = schema.resource_vocabulary()
         schema.pprint_schema_summary(resource_mapping)
         return
 
@@ -418,28 +347,35 @@ def schema_cmd(options):
     #   - Show class doc string and schema for supplied filter
 
     if not options.resource:
-        resource_list = {'resources': sorted(provider.resources().keys())}
+        load_available(resources=False)
+        resource_list = {'resources': sorted(itertools.chain(
+            *[clouds[p].resource_map.keys() for p in PROVIDER_NAMES if p in clouds]))}
         print(yaml_dump(resource_list))
         return
 
     # Format is [PROVIDER].RESOURCE.CATEGORY.ITEM
     # optional provider defaults to aws for compatibility
     components = options.resource.lower().split('.')
-    if len(components) == 1 and components[0] in provider.clouds.keys():
+
+    if len(components) == 1 and components[0] in PROVIDER_NAMES:
+        load_providers((components[0]))
         resource_list = {'resources': sorted(
-            provider.resources(cloud_provider=components[0]).keys())}
+            clouds[components[0]].resource_map.keys())}
         print(yaml_dump(resource_list))
         return
-    if components[0] in provider.clouds.keys():
+    if components[0] in PROVIDER_NAMES:
         cloud_provider = components.pop(0)
+        components[0] = '%s.%s' % (cloud_provider, components[0])
+        load_resources((components[0],))
         resource_mapping = schema.resource_vocabulary(
             cloud_provider)
-        components[0] = '%s.%s' % (cloud_provider, components[0])
-    elif components[0] in schema.resource_vocabulary().keys():
+    elif components[0] == 'mode':
+        load_available(resources=False)
         resource_mapping = schema.resource_vocabulary()
-    else:
-        resource_mapping = schema.resource_vocabulary('aws')
+    else:  # compatibility, aws is default for provider
         components[0] = 'aws.%s' % components[0]
+        load_resources((components[0],))
+        resource_mapping = schema.resource_vocabulary('aws')
 
     #
     # Handle mode
@@ -471,7 +407,7 @@ def schema_cmd(options):
         sys.exit(1)
 
     if len(components) == 1:
-        docstring = _schema_get_docstring(
+        docstring = ElementSchema.doc(
             resource_mapping[resource]['classes']['resource'])
         del(resource_mapping[resource]['classes'])
         if docstring:
@@ -519,7 +455,7 @@ def schema_cmd(options):
 
 def _print_cls_schema(cls):
     # Print docstring
-    docstring = _schema_get_docstring(cls)
+    docstring = ElementSchema.doc(cls)
     print("\nHelp\n----\n")
     if docstring:
         print(docstring)
@@ -558,25 +494,20 @@ def _metrics_get_endpoints(options):
 
 @policy_command
 def metrics_cmd(options, policies):
-    log.warning("metrics command is deprecated, and will be removed in future")
-    policies = [p for p in policies if p.provider_name == 'aws']
-    start, end = _metrics_get_endpoints(options)
-    data = {}
-    for p in policies:
-        log.info('Getting %s metrics', p)
-        data[p.name] = p.get_metrics(start, end, options.period)
-    print(dumps(data, indent=2))
+    log.warning("metrics command has been removed")
+    sys.exit(1)
 
 
 def version_cmd(options):
     from c7n.version import version
+    from c7n.resources import load_available
+    from c7n.mu import generate_requirements
 
     if not options.debug:
         print(version)
         return
 
     indent = 13
-    pp = pprint.PrettyPrinter(indent=indent)
 
     print("\nPlease copy/paste the following info along with any bug reports:\n")
     print("Custodian:  ", version)
@@ -587,9 +518,21 @@ def version_cmd(options):
         print("Platform:   ", os.uname())
     except Exception:  # pragma: no cover
         print("Platform:  ", sys.platform)
-    print("Using venv: ", hasattr(sys, 'real_prefix'))
 
+    is_venv = (
+        hasattr(sys, 'real_prefix') or
+        (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix))
+    print("Using venv: ", is_venv)
     in_container = os.path.exists('/.dockerenv')
     print("Docker: %s" % str(bool(in_container)))
-    print("PYTHONPATH: ")
-    pp.pprint(sys.path)
+    print("Installed: \n")
+
+    packages = ['c7n']
+    found = load_available(resources=False)
+    if 'gcp' in found:
+        packages.append('c7n_gcp')
+    if 'azure' in found:
+        packages.append('c7n_azure')
+    if 'k8s' in found:
+        packages.append('c7n_kube')
+    print(generate_requirements(packages))

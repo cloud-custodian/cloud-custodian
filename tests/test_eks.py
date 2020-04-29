@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import time
 from .common import BaseTest
 
@@ -77,6 +75,34 @@ class EKS(BaseTest):
         self.assertEqual(len(resources), 1)
         client = factory().client("eks")
         cluster = client.describe_cluster(name='dev').get('cluster')
+        self.assertEqual(cluster['status'], 'DELETING')
+
+    def test_delete_eks_with_both(self):
+        name = "test_f1"
+        factory = self.replay_flight_data("test_eks_delete_with_both")
+        client = factory().client("eks")
+        nodegroupNames = client.list_nodegroups(clusterName=name)['nodegroups']
+        self.assertEqual(len(nodegroupNames), 1)
+        fargateProfileNames = client.list_fargate_profiles(
+            clusterName=name)['fargateProfileNames']
+        self.assertEqual(len(fargateProfileNames), 1)
+        p = self.load_policy(
+            {
+                "name": "eks-delete",
+                "resource": "eks",
+                "filters": [{"name": name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        nodegroupNames = client.list_nodegroups(clusterName=resources[0]['name'])['nodegroups']
+        self.assertEqual(len(nodegroupNames), 0)
+        fargateProfileNames = client.list_fargate_profiles(
+            clusterName=resources[0]['name'])['fargateProfileNames']
+        self.assertEqual(len(fargateProfileNames), 0)
+        cluster = client.describe_cluster(name=name).get('cluster')
         self.assertEqual(cluster['status'], 'DELETING')
 
     def test_tag_and_remove_tag(self):

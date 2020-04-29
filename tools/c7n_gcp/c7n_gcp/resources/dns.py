@@ -26,6 +26,8 @@ class DnsManagedZone(QueryResourceManager):
         enum_spec = ('list', 'managedZones[]', None)
         scope = 'project'
         id = 'id'
+        name = 'name'
+        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
 
         @staticmethod
         def get(client, resource_info):
@@ -45,6 +47,8 @@ class DnsPolicy(QueryResourceManager):
         enum_spec = ('list', 'policies[]', None)
         scope = 'project'
         id = 'id'
+        name = 'name'
+        default_report_fields = ['id', 'name', 'description', 'enableLogging']
 
         @staticmethod
         def get(client, resource_info):

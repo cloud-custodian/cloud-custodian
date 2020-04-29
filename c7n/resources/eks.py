@@ -11,15 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
 from c7n import tags
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-
+from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
 
 
@@ -149,6 +147,59 @@ class Delete(Action):
         client = local_session(self.manager.session_factory).client('eks')
         for r in resources:
             try:
+                self.delete_associated(r, client)
                 client.delete_cluster(name=r['name'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+    def delete_associated(self, r, client):
+        nodegroups = client.list_nodegroups(clusterName=r['name'])['nodegroups']
+        fargate_profiles = client.list_fargate_profiles(
+            clusterName=r['name'])['fargateProfileNames']
+        waiters = []
+        if nodegroups:
+            for nodegroup in nodegroups:
+                self.manager.retry(
+                    client.delete_nodegroup, clusterName=r['name'], nodegroupName=nodegroup)
+                # Nodegroup supports parallel delete so process in parallel, check these later on
+                waiters.append({"clusterName": r['name'], "nodegroupName": nodegroup})
+        if fargate_profiles:
+            waiter = self.fargate_delete_waiter(client)
+            for profile in fargate_profiles:
+                self.manager.retry(
+                    client.delete_fargate_profile,
+                    clusterName=r['name'], fargateProfileName=profile)
+                # Fargate profiles don't support parallel deletes so process serially
+                waiter.wait(
+                    clusterName=r['name'], fargateProfileName=profile)
+        if waiters:
+            waiter = client.get_waiter('nodegroup_deleted')
+            for w in waiters:
+                waiter.wait(**w)
+
+    def fargate_delete_waiter(self, client):
+        # Fargate profiles seem to delete faster @ roughly 2 minutes each so keeping defaults
+        config = {
+            'version': 2,
+            'waiters': {
+                "FargateProfileDeleted": {
+                    'operation': 'DescribeFargateProfile',
+                    'delay': 30,
+                    'maxAttempts': 40,
+                    'acceptors': [
+                        {
+                            "expected": "DELETE_FAILED",
+                            "matcher": "path",
+                            "state": "failure",
+                            "argument": "fargateprofile.status"
+                        },
+                        {
+                            "expected": "ResourceNotFoundException",
+                            "matcher": "error",
+                            "state": "success"
+                        }
+                    ]
+                }
+            }
+        }
+        return create_waiter_with_client("FargateProfileDeleted", WaiterModel(config), client)

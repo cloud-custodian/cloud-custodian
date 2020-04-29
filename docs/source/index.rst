@@ -47,7 +47,6 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
 
    aws/gettingstarted
    aws/examples/index
-   aws/aws-modes
    aws/usage
    aws/lambda
    aws/topics/index
@@ -68,7 +67,6 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    :caption: GCP
 
    gcp/gettingstarted
-   gcp/gcp-modes
    gcp/examples/index
    gcp/policy/index
    gcp/contribute
@@ -99,5 +97,5 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    developer/installing.rst
    developer/tests.rst
    developer/documentation.rst
-
+   developer/packaging.rst
 

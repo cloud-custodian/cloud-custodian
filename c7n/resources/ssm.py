@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import hashlib
 import operator
@@ -350,13 +348,12 @@ class OpsItemFilter(Filter):
         return {'OpsItemFilters': q}
 
     @classmethod
-    def register(cls, registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.filter_registry.register('ops-item', cls)
+    def register_resource(cls, registry, resource_class):
+        if 'ops-item' not in resource_class.filter_registry:
+            resource_class.filter_registry.register('ops-item', cls)
 
 
-resources.subscribe(resources.EVENT_FINAL, OpsItemFilter.register)
+resources.subscribe(OpsItemFilter.register_resource)
 
 
 class PostItem(Action):
@@ -590,10 +587,9 @@ class PostItem(Action):
         return filter_empty(i)
 
     @classmethod
-    def register(cls, registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.action_registry.register('post-item', cls)
+    def register_resource(cls, registry, resource_class):
+        if 'post-item' not in resource_class.action_registry:
+            resource_class.action_registry.register('post-item', cls)
 
 
-resources.subscribe(resources.EVENT_FINAL, PostItem.register)
+resources.subscribe(PostItem.register_resource)

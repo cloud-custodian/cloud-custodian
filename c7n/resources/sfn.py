@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 
 from c7n.actions import Action
 from c7n.manager import resources
@@ -119,12 +117,12 @@ class InvokeStepFunction(Action):
                 r['c7n:execution-arn'] = exec_arn
 
     @classmethod
-    def register(cls, registry, key):
-        for _, r in registry.items():
-            r.action_registry.register('invoke-sfn', cls)
+    def register_resources(cls, registry, resource_class):
+        if 'invoke-sfn' not in resource_class.action_registry:
+            resource_class.action_registry.register('invoke-sfn', cls)
 
 
-resources.subscribe(resources.EVENT_FINAL, InvokeStepFunction.register)
+resources.subscribe(InvokeStepFunction.register_resources)
 
 
 @StepFunction.action_registry.register('tag')

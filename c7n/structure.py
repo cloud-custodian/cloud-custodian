@@ -18,7 +18,7 @@ import six
 from c7n.exceptions import PolicyValidationError
 
 
-class StructureParser(object):
+class StructureParser:
     """Provide fast validation and inspection of a policy file.
 
     Intent is to provide more humane validation for top level errors
@@ -29,9 +29,9 @@ class StructureParser(object):
     allowed_policy_keys = set(
         ('name', 'resource', 'title', 'description', 'mode',
          'tags', 'max-resources', 'source', 'query',
-         'filters', 'actions', 'source', 'tags',
+         'filters', 'actions', 'source', 'tags', 'conditions',
          # legacy keys subject to deprecation.
-         'region', 'start', 'end', 'max-resources-percent',
+         'region', 'start', 'end', 'tz', 'max-resources-percent',
          'comments', 'comment'))
 
     def validate(self, data):

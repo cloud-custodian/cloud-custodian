@@ -11,9 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 from azure.cosmos.cosmos_client import CosmosClient
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.resources.cosmos_db import (CosmosDBChildResource, CosmosDBFirewallRulesFilter,
@@ -522,8 +519,8 @@ class CosmosDBFirewallActionTest(BaseTest):
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
         self.assertEqual(
             {'id1', 'id2'},
-            set([r.id for r in
-                 kwargs['create_update_parameters']['properties']['virtualNetworkRules']]))
+            {r.id for r in
+             kwargs['create_update_parameters']['properties']['virtualNetworkRules']})
 
 
 class CosmosDBThroughputActionsTest(BaseTest):

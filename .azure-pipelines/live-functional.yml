@@ -13,7 +13,7 @@ variables:
 
 stages:
   - stage: azure_live_functional
-    displayName: Azure Live Functional Tests
+    displayName: Custodian Live Functional Tests
 
     jobs:
     - job: 'azure_nightly_test_run'
@@ -22,7 +22,7 @@ stages:
       cancelTimeoutInMinutes: 0
 
       pool:
-        vmImage: 'Ubuntu-16.04'
+        vmImage: 'Ubuntu-18.04'
 
       steps:
         - checkout: self
@@ -30,7 +30,7 @@ stages:
 
         - task: UsePythonVersion@0
           inputs:
-            versionSpec: '3.7'
+            versionSpec: '3.8'
             architecture: 'x64'
 
         - script: python -m pip install --upgrade pip && pip install . && pip install -r requirements-dev.txt
@@ -46,7 +46,7 @@ stages:
 
         # Skip some resources due to some restrictions with their provisioning using Service Principal account
         # We maintain those resources in the test subscription available for the tests
-        - script: /bin/bash tools/c7n_azure/tests_azure/templates/provision.sh --skip keyvault cost-management-export containerservice databricks
+        - script: /bin/bash tools/c7n_azure/tests_azure/templates/provision.sh --skip keyvault cost-management-export containerservice databricks postgresql
           displayName: "Provision Azure Resources"
           env:
             AZURE_CLIENT_ID: $(azure-client-id)
@@ -55,7 +55,7 @@ stages:
         - script: C7N_TEST_RUN=true C7N_FUNCTIONAL=yes pytest -v -m "not skiplive" tools/c7n_azure/tests_azure
           displayName: "Run Azure tests without cassettes"
 
-        - script: /bin/bash tools/c7n_azure/tests_azure/templates/cleanup.sh --skip keyvault cost-management-export containerservice databricks
+        - script: /bin/bash tools/c7n_azure/tests_azure/templates/cleanup.sh --skip keyvault cost-management-export containerservice databricks postgresql
           displayName: "Cleanup Azure Resources"
           condition: always()
 
@@ -65,7 +65,7 @@ stages:
       cancelTimeoutInMinutes: 0
 
       pool:
-        vmImage: 'Ubuntu-16.04'
+        vmImage: 'Ubuntu-18.04'
 
       steps:
         - checkout: self
@@ -73,7 +73,7 @@ stages:
 
         - task: UsePythonVersion@0
           inputs:
-            versionSpec: '3.7'
+            versionSpec: '3.8'
             architecture: 'x64'
 
         - script: python -m pip install --upgrade pip && pip install . && pip install -r requirements-dev.txt
@@ -99,34 +99,37 @@ stages:
         displayName: 'Push Nightly Docker Image'
 
         pool:
-          vmImage: 'Ubuntu-16.04'
+          vmImage: 'Ubuntu-18.04'
 
         steps:
-          - bash: |
-              printf -v TAG_DATE '%(%Y%m%d)T\n' -1
-              echo "##vso[task.setvariable variable=TAG_DATE]$TAG_DATE"
-
-          # C7N
-          - task: Docker@2
-            displayName: Build and Push C7N Nightly
+          - task: UsePythonVersion@0
             inputs:
-              command: buildAndPush
-              Dockerfile: Dockerfile
-              containerRegistry: dockerServiceConnection
-              repository: cloudcustodian/c7n
-              tags: |
-                nightly
-                $(TAG_DATE)-nightly
+              versionSpec: '3.8'
+              architecture: 'x64'
 
-          # Mailer
+          - script: |
+              python -m pip install --upgrade pip
+              pip install click docker pytest pyyaml
+            displayName: "Install Dependencies"
+
           - task: Docker@2
-            displayName: Build and Push Mailer Nightly
+            displayName: Login to Docker Hub
             inputs:
-              command: buildAndPush
-              Dockerfile: tools/c7n_mailer/Dockerfile
-              buildContext: $(Build.Repository.LocalPath)
+              command: login
               containerRegistry: dockerServiceConnection
-              repository: cloudcustodian/mailer
-              tags: |
-                nightly
-                $(TAG_DATE)-nightly
+
+          # cli
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i cli -i cli-distroless 
+            displayName: build, test, push custodian cli nightlies
+
+          # cli-org
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i org -i org-distroless 
+            displayName: build, test, push custodian org nightlies
+
+          # mailer
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i mailer -i mailer-distroless 
+            displayName: build, test, push custodian mailer nightlies
+
+          # mailer
+          - script: python tools/dev/dockerpkg.py build --test --push --tag nightly -r cloudcustodian -i policystream -i policystream-distroless
+            displayName: build, test, push custodian policystream nightlies

@@ -11,13 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from azure.mgmt.storage.models import StorageAccount
 from c7n_azure.constants import FUNCTION_EVENT_TRIGGER_MODE, FUNCTION_TIME_TRIGGER_MODE, \
     CONTAINER_EVENT_TRIGGER_MODE, CONTAINER_TIME_TRIGGER_MODE
 from c7n_azure.policy import AzureEventGridMode, AzureFunctionMode, AzureModeCommon
-from jsonschema import ValidationError
 from mock import mock, patch, Mock
 
 from c7n.exceptions import PolicyValidationError
@@ -53,7 +50,7 @@ class AzurePolicyModeTest(BaseTest):
 
     def test_azure_function_event_mode_too_many_events_throws(self):
         with self.sign_out_patch():
-            with self.assertRaises(ValidationError):
+            with self.assertRaises(PolicyValidationError):
                 self.load_policy({
                     'name': 'test-azure-serverless-mode',
                     'resource': 'azure.vm',
@@ -215,7 +212,7 @@ class AzurePolicyModeTest(BaseTest):
 
         for invalid_schedule in invalid_schedules:
             policy['mode']['schedule'] = invalid_schedule
-            with self.assertRaises(ValidationError):
+            with self.assertRaises(PolicyValidationError):
                 self.load_policy(policy, validate=True)
 
     def test_container_periodic_schema_schedule_valid(self):
@@ -260,7 +257,7 @@ class AzurePolicyModeTest(BaseTest):
 
         for invalid_schedule in invalid_schedules:
             policy['mode']['schedule'] = invalid_schedule
-            with self.assertRaises(ValidationError):
+            with self.assertRaises(PolicyValidationError):
                 self.load_policy(policy, validate=True)
 
     def test_container_event_mode_schema_validation(self):

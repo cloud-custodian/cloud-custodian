@@ -1,0 +1,66 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "cluster": {
+            "name": "test_f2",
+            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/test_f2",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 4,
+                "day": 26,
+                "hour": 16,
+                "minute": 47,
+                "second": 1,
+                "microsecond": 383000
+            },
+            "version": "1.15",
+            "endpoint": "https://A18EEC7FA5E4E32FED8AAF0D0125F869.gr7.us-east-1.eks.amazonaws.com",
+            "roleArn": "arn:aws:iam::644160558196:role/EKS-signaldancer-ServiceR-AWSServiceRoleForAmazonE-69A4RAE40IF6",
+            "resourcesVpcConfig": {
+                "subnetIds": [
+                    "subnet-068dfbf3f275a6ae8",
+                    "subnet-023db907202d61c00",
+                    "subnet-03ec1a55eadb55221"
+                ],
+                "securityGroupIds": [
+                    "sg-02cd34a089ca06602",
+                    "sg-0d30141b566cfa039"
+                ],
+                "clusterSecurityGroupId": "sg-0632d8642bffeb988",
+                "vpcId": "vpc-072f438c953672ace",
+                "endpointPublicAccess": true,
+                "endpointPrivateAccess": false,
+                "publicAccessCidrs": [
+                    "0.0.0.0/0"
+                ]
+            },
+            "logging": {
+                "clusterLogging": [
+                    {
+                        "types": [
+                            "api",
+                            "audit",
+                            "authenticator",
+                            "controllerManager",
+                            "scheduler"
+                        ],
+                        "enabled": false
+                    }
+                ]
+            },
+            "identity": {
+                "oidc": {
+                    "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/A18EEC7FA5E4E32FED8AAF0D0125F869"
+                }
+            },
+            "status": "DELETING",
+            "certificateAuthority": {
+                "data": "blank"
+            },
+            "platformVersion": "eks.2",
+            "tags": {}
+        }
+    }
+}

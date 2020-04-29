@@ -38,7 +38,7 @@ from c7n.config import Config
 from c7n.credentials import SessionFactory
 from c7n.policy import PolicyCollection as BaseCollection
 from c7n.policy import Policy as BasePolicy
-from c7n.resources import load_resources
+from c7n.resources import load_available
 from c7n.utils import get_retry
 
 import boto3
@@ -54,7 +54,7 @@ log = logging.getLogger('c7n.policystream')
 EMPTY_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
-class TempDir(object):
+class TempDir:
 
     def __init__(self):
         self.path = None
@@ -69,7 +69,7 @@ class TempDir(object):
         shutil.rmtree(self.path)
 
 
-class ChangeType(object):
+class ChangeType:
 
     ADD = 1
     REMOVE = 2
@@ -105,7 +105,7 @@ GIT_DELTA = {
 GIT_DELTA_INVERT = {v: k for k, v in GIT_DELTA.items()}
 
 
-class PolicyChange(object):
+class PolicyChange:
     """References a policy change within a given commit.
     """
 
@@ -158,7 +158,7 @@ class PolicyChange(object):
         return d
 
 
-class CollectionDelta(object):
+class CollectionDelta:
     """Iterator over changes between two policy collections.
 
     With a given by url associated to a give commit.
@@ -260,7 +260,7 @@ def policy_path_matcher(path):
         return True
 
 
-class PolicyRepo(object):
+class PolicyRepo:
     """Models a git repository containing policy files.
     """
     def __init__(self, repo_uri, repo, matcher=None):
@@ -287,7 +287,7 @@ class PolicyRepo(object):
         while q:
             t, prefix = q.popleft()
             for fent in t:
-                if fent.type == 'tree':
+                if fent.type == pygit2.GIT_OBJ_TREE:
                     q.append((
                         self.repo.get(fent.id),
                         os.path.join(prefix, fent.name)))
@@ -475,7 +475,7 @@ def parse_arn(arn):
     return result
 
 
-class Transport(object):
+class Transport:
 
     BUF_SIZE = 1
 
@@ -862,12 +862,12 @@ def diff(repo_uri, source, target, output, verbose):
         repo_uri = pygit2.discover_repository(os.getcwd())
 
     repo = pygit2.Repository(repo_uri)
-    load_resources()
+    load_available()
 
     # If on master show diff between last commit to current head
     if repo.head.shorthand == 'master':
         if source is None:
-            source = 'master@{1}'
+            source = 'HEAD^1'
         if target is None:
             target = 'master'
     # Else show difference between master and current head
@@ -934,7 +934,7 @@ def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None)
             repo = pygit2.clone_repository(repo_uri, temp_dir.path)
         else:
             repo = pygit2.Repository(repo_uri)
-        load_resources()
+        load_available()
         policy_repo = PolicyRepo(repo_uri, repo)
         change_count = 0
 

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from botocore.client import ClientError
 
 from collections import Counter
@@ -73,7 +71,7 @@ ASG.filter_registry.register('marked-for-op', TagActionFilter)
 ASG.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
-class LaunchInfo(object):
+class LaunchInfo:
 
     permissions = ("ec2:DescribeLaunchTemplateVersions",
                    "autoscaling:DescribeLaunchConfigurations",)
@@ -123,12 +121,12 @@ class LaunchInfo(object):
 
         lid = asg.get('LaunchTemplate')
         if lid is not None:
-            return (lid['LaunchTemplateId'], lid['Version'])
+            return (lid['LaunchTemplateId'], lid.get('Version', '$Default'))
 
         if 'MixedInstancesPolicy' in asg:
             mip_spec = asg['MixedInstancesPolicy'][
                 'LaunchTemplate']['LaunchTemplateSpecification']
-            return (mip_spec['LaunchTemplateId'], mip_spec['Version'])
+            return (mip_spec['LaunchTemplateId'], mip_spec.get('Version', '$Default'))
 
         # we've noticed some corner cases where the asg name is the lc name, but not
         # explicitly specified as launchconfiguration attribute.
@@ -272,23 +270,23 @@ class ConfigValidFilter(Filter):
 
     def get_subnets(self):
         manager = self.manager.get_resource_manager('subnet')
-        return set([s['SubnetId'] for s in manager.resources()])
+        return {s['SubnetId'] for s in manager.resources()}
 
     def get_security_groups(self):
         manager = self.manager.get_resource_manager('security-group')
-        return set([s['GroupId'] for s in manager.resources()])
+        return {s['GroupId'] for s in manager.resources()}
 
     def get_key_pairs(self):
         manager = self.manager.get_resource_manager('key-pair')
-        return set([k['KeyName'] for k in manager.resources()])
+        return {k['KeyName'] for k in manager.resources()}
 
     def get_elbs(self):
         manager = self.manager.get_resource_manager('elb')
-        return set([e['LoadBalancerName'] for e in manager.resources()])
+        return {e['LoadBalancerName'] for e in manager.resources()}
 
     def get_appelb_target_groups(self):
         manager = self.manager.get_resource_manager('app-elb-target-group')
-        return set([a['TargetGroupArn'] for a in manager.resources()])
+        return {a['TargetGroupArn'] for a in manager.resources()}
 
     def get_images(self):
         images = self.launch_info.get_image_map()
@@ -312,9 +310,8 @@ class ConfigValidFilter(Filter):
                     continue
                 snaps.add(bd['Ebs']['SnapshotId'].strip())
         manager = self.manager.get_resource_manager('ebs-snapshot')
-        return set([
-            s['SnapshotId'] for s in manager.get_resources(
-                list(snaps), cache=False)])
+        return {s['SnapshotId'] for s in manager.get_resources(
+                list(snaps), cache=False)}
 
     def process(self, asgs, event=None):
         self.initialize(asgs)
@@ -1395,6 +1392,7 @@ class MarkForOp(TagDelayedAction):
         key={'type': 'string'},
         tag={'type': 'string'},
         tz={'type': 'string'},
+        msg={'type': 'string'},
         message={'type': 'string'},
         days={'type': 'number', 'minimum': 0},
         hours={'type': 'number', 'minimum': 0})
@@ -1406,7 +1404,7 @@ class MarkForOp(TagDelayedAction):
         d = {
             'op': self.data.get('op', 'stop'),
             'tag': self.data.get('key', self.data.get('tag', DEFAULT_TAG)),
-            'msg': self.data.get('message', self.default_template),
+            'msg': self.data.get('message', self.data.get('msg', self.default_template)),
             'tz': self.data.get('tz', 'utc'),
             'days': self.data.get('days', 0),
             'hours': self.data.get('hours', 0)}
@@ -1681,9 +1679,8 @@ class UnusedLaunchConfig(Filter):
 
     def process(self, configs, event=None):
         asgs = self.manager.get_resource_manager('asg').resources()
-        used = set([
-            a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
-            for a in asgs if not a.get('LaunchTemplate')])
+        used = {a.get('LaunchConfigurationName', a['AutoScalingGroupName'])
+                for a in asgs if not a.get('LaunchTemplate')}
         return [c for c in configs if c['LaunchConfigurationName'] not in used]
 
 

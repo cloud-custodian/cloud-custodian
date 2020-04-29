@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import six
 
 from c7n.actions import BaseAction
@@ -22,6 +20,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('sagemaker-notebook')
@@ -141,7 +140,7 @@ class SagemakerTransformJob(QueryResourceManager):
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
 
 
-class QueryFilter(object):
+class QueryFilter:
 
     JOB_FILTERS = ('StatusEquals', 'NameContains',)
 
@@ -295,7 +294,7 @@ class Model(QueryResourceManager):
 Model.filter_registry.register('marked-for-op', TagActionFilter)
 
 
-class StateTransitionFilter(object):
+class StateTransitionFilter:
     """Filter instances by state.
 
     Try to simplify construction for policy authors by automatically
@@ -586,6 +585,36 @@ class NotebookSecurityGroupFilter(SecurityGroupFilter):
 class NotebookSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = "SubnetId"
+
+
+@NotebookInstance.filter_registry.register('kms-key')
+@SagemakerEndpointConfig.filter_registry.register('kms-key')
+class NotebookKmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-kms-key-filters
+            resource: aws.sagemaker-notebook
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/sagemaker)"
+                op: regex
+
+          - name: sagemaker-endpoint-kms-key-filters
+            resource: aws.sagemaker-endpoint-config
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "alias/aws/sagemaker"
+    """
+    RelatedIdsExpression = "KmsKeyId"
 
 
 @Model.action_registry.register('delete')

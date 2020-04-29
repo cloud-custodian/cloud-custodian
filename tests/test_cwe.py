@@ -11,12 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import jmespath
 from unittest import TestCase
 
-from .common import event_data, BaseTest, TestConfig as Config
+from .common import event_data, BaseTest
 
 from c7n.cwe import CloudWatchEvents
 
@@ -33,7 +31,6 @@ class CloudWatchRuleTarget(BaseTest):
                 "filters": [{"type": "cross-account"}],
                 "actions": ["delete"],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
         resources = policy.run()
@@ -45,8 +42,6 @@ class CloudWatchRuleTarget(BaseTest):
 
 
 class CloudWatchEventsFacadeTest(TestCase):
-
-    # DISABLED / Record flight data
 
     def test_get_ids(self):
         self.assertEqual(

@@ -18,8 +18,8 @@ import mock
 from .azure_common import BaseTest, arm_template
 from c7n_azure.actions.logic_app import LogicAppAction
 from c7n_azure.session import Session
-from jsonschema.exceptions import ValidationError
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
 
 
@@ -71,7 +71,7 @@ class LogicAppTest(BaseTest):
             ],
         }
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(PolicyValidationError):
             self.load_policy(data=policy, validate=True)
 
         # Extra URL parameter
@@ -87,7 +87,7 @@ class LogicAppTest(BaseTest):
             ],
         }
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(PolicyValidationError):
             self.load_policy(data=policy, validate=True)
 
     @arm_template('logic-app.json')

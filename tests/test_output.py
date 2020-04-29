@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import datetime
 import gzip
 import logging
@@ -23,11 +21,12 @@ import os
 from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
+from c7n.config import Config
 from c7n.output import DirectoryOutput, LogFile, metrics_outputs
 from c7n.resources.aws import S3Output, MetricsOutput
 from c7n.testing import mock_datetime_now, TestUtils
 
-from .common import Bag, BaseTest, TestConfig as Config
+from .common import Bag, BaseTest
 
 
 class MetricsTest(BaseTest):

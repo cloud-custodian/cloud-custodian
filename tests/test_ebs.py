@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import logging
 import sys
 
@@ -30,7 +28,7 @@ from c7n.resources.ebs import (
     SnapshotQueryParser as QueryParser
 )
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class SnapshotQueryParse(BaseTest):
@@ -119,6 +117,66 @@ class SnapshotErrorHandler(BaseTest):
         snap = ErrorHandler.extract_bad_snapshot(e)
         self.assertEqual(snap, "snap-notfound")
 
+    def test_get_bad_volume_malformed(self):
+        operation_name = "DescribeVolumes"
+        error_response = {
+            "Error": {
+                "Message": 'Invalid id: "vol-malformedvolume"',
+                "Code": "InvalidVolumeID.Malformed",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        vol = ErrorHandler.extract_bad_volume(e)
+        self.assertEqual(vol, "vol-malformedvolume")
+
+    def test_get_bad_volume_notfound(self):
+        operation_name = "DescribeVolumes"
+        error_response = {
+            "Error": {
+                "Message": "The volume 'vol-notfound' does not exist.",
+                "Code": "InvalidVolume.NotFound",
+            }
+        }
+        e = ClientError(error_response, operation_name)
+        vol = ErrorHandler.extract_bad_volume(e)
+        self.assertEqual(vol, "vol-notfound")
+
+    def test_snapshot_copy_related_tags_missing_volumes(self):
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_copy_related_tags_missing_volumes")
+        p = self.load_policy(
+            {
+                "name": "copy-related-tags",
+                "resource": "aws.ebs-snapshot",
+                "filters": [{"tag:Test": "Test"}],
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "resource": "ebs",
+                        "key": "VolumeId",
+                        "tags": "*"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        try:
+            resources = p.run()
+        except ClientError:
+            # it should filter missing volume and not throw an error
+            self.fail("This should have been handled in ErrorHandler.extract_bad_volume")
+        self.assertEqual(len(resources), 1)
+        try:
+            factory().client("ec2").describe_volumes(
+                VolumeIds=[resources[0]["VolumeId"]]
+            )
+        except ClientError as e:
+            # this should not filter missing volume and will throw an error
+            msg = e.response["Error"]["Message"]
+            err = e.response["Error"]["Code"]
+        self.assertEqual(err, "InvalidVolume.NotFound")
+        self.assertEqual(msg, f"The volume '{resources[0]['VolumeId']}' does not exist.")
+
 
 class SnapshotAccessTest(BaseTest):
 
@@ -134,7 +192,6 @@ class SnapshotAccessTest(BaseTest):
                 "resource": "ebs-snapshot",
                 "filters": ["cross-account"],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -159,7 +216,7 @@ class SnapshotDetachTest(BaseTest):
                         'type': 'detach'
                     }
                 ]
-            }, config=Config.empty(), session_factory=factory)
+            }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -194,7 +251,7 @@ class SnapshotCopyTest(BaseTest):
                     }
                 ],
             },
-            Config.empty(region="us-west-2"),
+            config=dict(region="us-west-2"),
             session_factory=factory,
         )
         resources = p.run()

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import time
 
@@ -179,6 +177,21 @@ class TestSSM(BaseTest):
             InstanceId=resources[0]['InstanceId'],
             CommandId=resources[0]['c7n:SendCommand'][0])
         self.assertEqual(result['Status'], 'Success')
+
+    def test_ssm_parameter_tag_arn(self):
+        session_factory = self.replay_flight_data("test_ssm_parameter_tag_arn")
+        p = self.load_policy({
+            'name': 'ssm-param-tags',
+            'resource': 'ssm-parameter',
+            'filters': [{'tag:Env': 'present'}]},
+            config={'account_id': '123456789123'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(['/gittersearch/token'])
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]['Tags'],
+            [{'Key': 'App', 'Value': 'GitterSearch'},
+             {'Key': 'Env', 'Value': 'Dev'}])
 
     @functional
     def test_ssm_parameter_not_secure(self):

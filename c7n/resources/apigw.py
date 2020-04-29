@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
 import functools
 from botocore.exceptions import ClientError
 
@@ -37,7 +36,7 @@ class RestAccount(ResourceManager):
     filter_registry = FilterRegistry('rest-account.filters')
     action_registry = ActionRegistry('rest-account.actions')
 
-    class resource_type(object):
+    class resource_type(query.TypeInfo):
         service = 'apigateway'
         name = id = 'account_id'
         dimension = None

@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
+from c7n.exceptions import PolicyValidationError
 
-from .common import BaseTest, functional, TestConfig as Config
+from .common import BaseTest, functional
 
 import uuid
 import time
@@ -41,7 +41,6 @@ class ElasticFileSystem(BaseTest):
                 "resource": "efs",
                 "filters": [{"FileSystemId": fs_id}, {"tag:Name": "Somewhere"}],
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()
@@ -124,3 +123,113 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(
             resources[0]['KmsKeyId'],
             'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5') # NOQA
+
+    def test_enable_lifecycle_policy(self):
+        factory = self.replay_flight_data("test_enable_lifecycle_policy")
+        client = factory().client("efs")
+        res = client.describe_lifecycle_configuration(FileSystemId="fs-fac23c7a")
+        self.assertEqual(res.get('LifecyclePolicies'), [])
+        p = self.load_policy(
+            {
+                "name": "efs-lifecycle-policy",
+                "resource": "efs",
+                "filters": [{"Name": "c7n-test"}],
+                "actions": [
+                    {
+                        "type": "configure-lifecycle-policy",
+                        "state": "enable",
+                        "rules": [{'TransitionToIA': 'AFTER_7_DAYS'}],
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "c7n-test")
+        self.assertEqual(resources[0]["FileSystemId"], "fs-fac23c7a")
+        response = client.describe_lifecycle_configuration(FileSystemId="fs-fac23c7a")
+        self.assertEqual(response.get('LifecyclePolicies'), [{'TransitionToIA': 'AFTER_7_DAYS'}])
+
+    def test_disable_lifecycle_policy(self):
+        factory = self.replay_flight_data("test_disable_lifecycle_policy")
+        client = factory().client("efs")
+        res = client.describe_lifecycle_configuration(FileSystemId="fs-fac23c7a")
+        self.assertEqual(res.get('LifecyclePolicies'), [{'TransitionToIA': 'AFTER_7_DAYS'}])
+        p = self.load_policy(
+            {
+                "name": "efs-lifecycle-policy-disable",
+                "resource": "efs",
+                "filters": [{"Name": "c7n-test"}],
+                "actions": [
+                    {
+                        "type": "configure-lifecycle-policy",
+                        "state": "disable",
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "c7n-test")
+        self.assertEqual(resources[0]["FileSystemId"], "fs-fac23c7a")
+        response = client.describe_lifecycle_configuration(FileSystemId="fs-fac23c7a")
+        self.assertEqual(response.get('LifecyclePolicies'), [])
+
+    def test_lifecycle_policy_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "efs-lifecycle",
+                "resource": "efs",
+                "filters": [{"Name": "c7n-test"}],
+                "actions": [{"type": "configure-lifecycle-policy", "state": "enable"}],
+            }
+        )
+
+    def test_filter_lifecycle_policy_present(self):
+        factory = self.replay_flight_data("test_filter_lifecycle_policy_present")
+        p = self.load_policy(
+            {
+                "name": "efs-lifecycle-policy-enabled",
+                "resource": "efs",
+                "filters": [{"type": "lifecycle-policy",
+                            "state": "present"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-5f61b0df")
+
+    def test_filter_lifecycle_policy_absent(self):
+        factory = self.replay_flight_data("test_filter_lifecycle_policy_absent")
+        p = self.load_policy(
+            {
+                "name": "efs-lifecycle-policy-disabled",
+                "resource": "efs",
+                "filters": [{"type": "lifecycle-policy",
+                            "state": "absent"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-a4cc1c24")
+
+    def test_filter_lifecycle_policy_value(self):
+        factory = self.replay_flight_data("test_filter_lifecycle_policy_value")
+        p = self.load_policy(
+            {
+                "name": "efs-lifecycle-policy-enabled",
+                "resource": "efs",
+                "filters": [{"type": "lifecycle-policy",
+                            "state": "present", "value": "AFTER_7_DAYS"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FileSystemId"], "fs-5f61b0df")

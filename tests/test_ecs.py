@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from .common import BaseTest
 
 import fnmatch
@@ -341,7 +339,7 @@ class TestEcsTask(BaseTest):
         self.assertEqual(len(resources), 2)
         client = session_factory().client("ecs")
         tasks = client.list_tasks(cluster=resources[0]["clusterArn"])["taskArns"]
-        self.assertFalse(set([r["taskArn"] for r in resources]).intersection(tasks))
+        self.assertFalse({r["taskArn"] for r in resources}.intersection(tasks))
 
 
 class TestEcsContainerInstance(BaseTest):

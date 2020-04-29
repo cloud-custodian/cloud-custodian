@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from .common import BaseTest
 
 from c7n.exceptions import PolicyValidationError
@@ -172,7 +170,7 @@ class HealthCheckProtocolMismatchTest(BaseTest):
         self.assertEqual(len(resources), 3)
 
         # make sure we matched the right load balcners
-        elb_names = set([elb["LoadBalancerName"] for elb in resources])
+        elb_names = {elb["LoadBalancerName"] for elb in resources}
         self.assertEqual(
             elb_names,
             set(

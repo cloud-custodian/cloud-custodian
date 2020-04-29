@@ -34,7 +34,7 @@ MANAGEMENT_GROUP_TYPE = '/providers/Microsoft.Management/managementGroups'
 SUBSCRIPTION_TYPE = '/subscriptions'
 
 
-class Deployment(object):
+class Deployment:
 
     def __init__(self, ctx):
         self.dry_run = ctx.parent.params.get('dry_run')

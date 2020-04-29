@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import re
 
 from . import tools_tags as tools
@@ -40,17 +38,17 @@ class TagsTest(BaseTest):
                 validate=True))
 
         with self.assertRaises(FilterValidationError):
-            # Space must be btwn 0 and 15
+            # Space must be btwn 0 and 50
             self.load_policy(tools.get_policy([
                 {'type': 'tag-trim',
                  'space': -1}
             ]))
 
         with self.assertRaises(FilterValidationError):
-            # Space must be btwn 0 and 15
+            # Space must be btwn 0 and 50
             self.load_policy(tools.get_policy([
                 {'type': 'tag-trim',
-                 'space': 16}
+                 'space': 51}
             ]))
 
     @patch('c7n_azure.tags.TagHelper.update_resource_tags')
@@ -70,10 +68,10 @@ class TagsTest(BaseTest):
     def test_tag_trim_removes_tags_for_space(self, update_resource_tags):
         """Verifies tag trim removes tags when the space value
         and number of tags on the resource are greater than the max
-        tag value (15)
+        tag value (50)
         """
 
-        action = self._get_action({'space': 15 - len(self.existing_tags),
+        action = self._get_action({'space': 50 - len(self.existing_tags),
                                    'preserve': [k for k in self.existing_tags.keys()]})
 
         tags = self.existing_tags.copy()
@@ -97,7 +95,7 @@ class TagsTest(BaseTest):
                                    'preserve': [k for k in self.existing_tags.keys()]})
 
         tags = self.existing_tags.copy()
-        tags.update({'tag-to-trim1': 'value1', 'tag-to-trim2': 'value2', 'tag-to-trim-3': 'value3'})
+        tags.update({'tag-to-trim': 'value1', 'tag-to-trim2': 'value2', 'tag-to-trim-3': 'value3'})
         resource = tools.get_resource(tags)
 
         action.process([resource])

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.storage_utils import StorageUtilities
 from mock import patch
@@ -53,7 +51,7 @@ class StorageContainerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(2, len(resources))
-        self.assertEqual({'containerone', 'containertwo'}, set([c['name'] for c in resources]))
+        self.assertEqual({'containerone', 'containertwo'}, {c['name'] for c in resources})
 
     @arm_template('storage.json')
     @cassette_name('containers')

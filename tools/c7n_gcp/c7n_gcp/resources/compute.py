@@ -34,8 +34,9 @@ class Instance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('aggregatedList', 'items.*.instances[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
         labels = True
+        default_report_fields = ['name', 'status', 'creationTimestamp', 'machineType', 'zone']
 
         @staticmethod
         def get(client, resource_info):
@@ -104,6 +105,51 @@ class Delete(InstanceAction):
     method_spec = {'op': 'delete'}
 
 
+@Instance.action_registry.register('detach-disks')
+class DetachDisks(MethodAction):
+    """
+    `Detaches <https://cloud.google.com/compute/docs/reference/rest/v1/instances/detachDisk>`_
+    all disks from instance. The action does not specify any parameters.
+
+    It may be useful to be used before deleting instances to not delete disks
+    that are set to auto delete.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gcp-instance-detach-disks
+            resource: gcp.instance
+            filters:
+              - type: value
+                key: name
+                value: instance-template-to-detahc
+            actions:
+              - type: detach-disks
+    """
+    schema = type_schema('detach-disks')
+    attr_filter = ('status', ('TERMINATED',))
+
+    def validate(self):
+        pass
+
+    def process_resource_set(self, client, model, resources):
+        for resource in resources:
+            self.process_resource(client, resource)
+
+    def process_resource(self, client, resource):
+        op_name = 'detachDisk'
+        path_param_re = re.compile(
+            '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
+        project, zone, instance = path_param_re.match(resource['selfLink']).groups()
+
+        base_params = {'project': project, 'zone': zone, 'instance': instance}
+        for disk in resource.get('disks', []):
+            params = dict(base_params, deviceName=disk['deviceName'])
+            self.invoke_api(client, op_name, params)
+
+
 @resources.register('image')
 class Image(QueryResourceManager):
 
@@ -111,7 +157,10 @@ class Image(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'images'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "sourceType", "status", "creationTimestamp",
+            "storageLocation", "diskSizeGb", "family"]
 
         @staticmethod
         def get(client, resource_info):
@@ -142,8 +191,9 @@ class Disk(QueryResourceManager):
         component = 'disks'
         scope = 'zone'
         enum_spec = ('aggregatedList', 'items.*.disks[]', None)
-        id = 'name'
+        name = id = 'name'
         labels = True
+        default_report_fields = ["name", "sizeGb", "status", "zone"]
 
         @staticmethod
         def get(client, resource_info):
@@ -241,7 +291,8 @@ class Snapshot(QueryResourceManager):
         version = 'v1'
         component = 'snapshots'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = ["name", "status", "diskSizeGb", "creationTimestamp"]
 
         @staticmethod
         def get(client, resource_info):
@@ -274,7 +325,10 @@ class InstanceTemplate(QueryResourceManager):
         component = 'instanceTemplates'
         scope = 'zone'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            name, "description", "creationTimestamp",
+            "properties.machineType", "properties.description"]
 
         @staticmethod
         def get(client, resource_info):
@@ -320,8 +374,10 @@ class Autoscaler(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'autoscalers'
-        id = 'name'
+        name = id = 'name'
         enum_spec = ('aggregatedList', 'items.*.autoscalers[]', None)
+        default_report_fields = [
+            "name", "description", "status", "target", "recommendedSize"]
 
         @staticmethod
         def get(client, resource_info):

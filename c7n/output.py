@@ -18,8 +18,6 @@ a variety of sinks.
 See docs/usage/outputs.rst
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import contextlib
 from datetime import datetime
 import json
@@ -94,7 +92,7 @@ sys_stats_outputs = OutputRegistry('c7n.output.sys_stats')
 
 
 @tracer_outputs.register('default')
-class NullTracer(object):
+class NullTracer:
     """Tracing provides for detailed analytics of a policy execution.
 
     Uses native cloud provider integration (xray, stack driver trace).
@@ -118,7 +116,7 @@ class NullTracer(object):
         """
 
 
-class DeltaStats(object):
+class DeltaStats:
     """Capture stats (dictionary of string->integer) as a stack.
 
     Popping the stack automatically creates a delta of the last
@@ -150,7 +148,7 @@ class DeltaStats(object):
 
 @sys_stats_outputs.register('default')
 @api_stats_outputs.register('default')
-class NullStats(object):
+class NullStats:
     """Execution statistics/metrics collection.
 
     Encompasses concrete implementations over system stats (memory, cpu, cache size)
@@ -248,7 +246,7 @@ class SystemStats(DeltaStats):
         return snapshot
 
 
-class Metrics(object):
+class Metrics:
 
     permissions = ()
     namespace = DEFAULT_NAMESPACE
@@ -323,7 +321,7 @@ class LogMetrics(Metrics):
         return res
 
 
-class LogOutput(object):
+class LogOutput:
 
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
@@ -347,12 +345,16 @@ class LogOutput(object):
 
     def join_log(self):
         self.handler = self.get_handler()
+        if self.handler is None:
+            return
         self.handler.setLevel(logging.DEBUG)
         self.handler.setFormatter(logging.Formatter(self.log_format))
         mlog = logging.getLogger('custodian')
         mlog.addHandler(self.handler)
 
     def leave_log(self):
+        if self.handler is None:
+            return
         mlog = logging.getLogger('custodian')
         mlog.removeHandler(self.handler)
         self.handler.flush()
@@ -374,9 +376,43 @@ class LogFile(LogOutput):
         return logging.FileHandler(self.log_path)
 
 
+@log_outputs.register('null')
+class NullLog(LogOutput):
+    # default - for unit tests
+
+    def __repr__(self):
+        return "<Null Log>"
+
+    @property
+    def log_path(self):
+        return "xyz/log.txt"
+
+    def get_handler(self):
+        return None
+
+
+@blob_outputs.register('null')
+class NullBlobOutput:
+    # default - for unit tests
+
+    def __init__(self, ctx, config):
+        self.ctx = ctx
+        self.config = config
+        self.root_dir = 'xyz'
+
+    def __repr__(self):
+        return "<null blob output>"
+
+    def __enter__(self):
+        return
+
+    def __exit__(self, exc_type=None, exc_value=None, exc_traceback=None):
+        return
+
+
 @blob_outputs.register('file')
 @blob_outputs.register('default')
-class DirectoryOutput(object):
+class DirectoryOutput:
 
     permissions = ()
 

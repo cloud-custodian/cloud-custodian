@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
@@ -335,6 +333,22 @@ class ModifyPolicyStatement(ModifyPolicyBase):
 
 @SNS.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
+    """
+    Filters SNS topic by kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: sns-encrypt-key-check
+                  resource: sns
+                  filters:
+                    - type: kms-key
+                      key: c7n:AliasName
+                      value: alias/aws/sns
+    """
 
     RelatedIdsExpression = 'KmsMasterKeyId'
 

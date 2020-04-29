@@ -34,7 +34,9 @@ class SqlInstance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]
 
         @staticmethod
         def get(client, resource_info):
@@ -83,13 +85,14 @@ class SqlUser(ChildResourceManager):
         version = 'v1beta4'
         component = 'users'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
         parent_spec = {
             'resource': 'sql-instance',
             'child_enum_params': [
                 ('name', 'instance')
             ]
         }
+        default_report_fields = ["name", "project", "instance"]
 
 
 class SqlInstanceChildWithSelfLink(ChildResourceManager):
@@ -108,14 +111,18 @@ class SqlInstanceChildWithSelfLink(ChildResourceManager):
 
 @resources.register('sql-backup-run')
 class SqlBackupRun(SqlInstanceChildWithSelfLink):
-
+    """GCP Resource
+    https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/backupRuns
+    """
     class resource_type(ChildTypeInfo):
         service = 'sqladmin'
         version = 'v1beta4'
         component = 'backupRuns'
         enum_spec = ('list', 'items[]', None)
         get_requires_event = True
-        id = 'id'
+        name = id = 'id'
+        default_report_fields = [
+            name, "status", "instance", "location", "enqueuedTime", "startTime", "endTime"]
         parent_spec = {
             'resource': 'sql-instance',
             'child_enum_params': [
@@ -149,7 +156,9 @@ class SqlBackupRun(SqlInstanceChildWithSelfLink):
 
 @resources.register('sql-ssl-cert')
 class SqlSslCert(SqlInstanceChildWithSelfLink):
-
+    """GCP Resource
+    https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/sslCerts
+    """
     class resource_type(ChildTypeInfo):
         service = 'sqladmin'
         version = 'v1beta4'
@@ -157,6 +166,9 @@ class SqlSslCert(SqlInstanceChildWithSelfLink):
         enum_spec = ('list', 'items[]', None)
         get_requires_event = True
         id = 'sha1Fingerprint'
+        name = "commonName"
+        default_report_fields = [
+            id, name, "instance", "expirationTime"]
         parent_spec = {
             'resource': 'sql-instance',
             'child_enum_params': [

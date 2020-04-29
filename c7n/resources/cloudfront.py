@@ -1,4 +1,4 @@
-# Copyright 2016-2017 Capital One Services, LLC
+# Copyright 2016-2019 Capital One Services, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import re
 
 from c7n.actions import BaseAction
@@ -21,6 +19,9 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
+from c7n.filters import ValueFilter
+from .aws import shape_validate
+from c7n.exceptions import PolicyValidationError
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 
@@ -147,6 +148,55 @@ class IsWafEnabled(Filter):
             elif not state and target_acl_id and r['WebACLId'] != target_acl_id:
                 results.append(r)
         return results
+
+
+@Distribution.filter_registry.register('distribution-config')
+class DistributionConfig(ValueFilter):
+    """Check for Cloudfront distribution config values
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: logging-enabled
+                resource: distribution
+                filters:
+                  - type: distribution-config
+                    key: Logging.Enabled
+                    value: true
+   """
+
+    schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('cloudfront:GetDistributionConfig',)
+    annotation_key = 'c7n:distribution-config'
+    annotate = False
+
+    def process(self, resources, event=None):
+
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+
+        client = local_session(self.manager.session_factory).client(
+            'cloudfront', region_name=self.manager.config.region)
+
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_distribution_config(Id=r['Id']) \
+                    .get('DistributionConfig')
+            except (client.exceptions.NoSuchDistribution):
+                r[self.annotation_key] = {}
+            except Exception as e:
+                self.log.warning(
+                    "Exception trying to get Distribution Config: %s error: %s",
+                    r['ARN'], e)
+                raise e
+
+    def __call__(self, r):
+        return super(DistributionConfig, self).__call__(r[self.annotation_key])
 
 
 @Distribution.filter_registry.register('mismatch-s3-origin')
@@ -436,3 +486,109 @@ class DistributionSSLAction(BaseAction):
                 "Exception trying to force ssl on Distribution: %s error: %s",
                 distribution['ARN'], e)
             return
+
+
+@Distribution.action_registry.register('set-attributes')
+class DistributionUpdateAction(BaseAction):
+    """Action to update the attributes of a distribution
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: enforce-distribution-logging
+          resource: distribution
+          filters:
+            - type: value
+              key: "Logging.Enabled"
+              value: null
+          actions:
+            - type: set-attributes
+              attributes:
+                Comment: ""
+                Enabled: true
+                Logging:
+                    Enabled: true
+                    IncludeCookies: false
+                    Bucket: 'test-enable-logging-c7n.s3.amazonaws.com'
+                    Prefix: ''
+    """
+    schema = type_schema('set-attributes',
+                        attributes={"type": "object"},
+                        required=('attributes',))
+
+    permissions = ("cloudfront:UpdateDistribution",
+                   "cloudfront:GetDistributionConfig",)
+    shape = 'UpdateDistributionRequest'
+
+    def validate(self):
+        attrs = dict(self.data.get('attributes'))
+        if attrs.get('CallerReference'):
+            raise PolicyValidationError('CallerReference field cannot be updated')
+
+        # Set default values for required fields if they are not present
+        attrs["CallerReference"] = ""
+        self.set_required_update_fields(attrs)
+        request = {
+            "DistributionConfig": attrs,
+            "Id": "sample_id",
+            "IfMatch": "sample_string",
+        }
+        return shape_validate(request, self.shape, 'cloudfront')
+
+    def set_required_update_fields(self, config):
+        if 'Origins' not in config:
+            config["Origins"] = {
+                "Quantity": 0,
+                "Items": [
+                    {
+                        "Id": "",
+                        "DomainName": ""
+                    }
+                ],
+            }
+        if 'DefaultCacheBehavior' not in config:
+            config["DefaultCacheBehavior"] = {
+                "TargetOriginId": "",
+                "ForwardedValues": {
+                    "QueryString": True,
+                    "Cookies": {
+                        "Forward": ""
+                    }
+                },
+                "TrustedSigners": {
+                    "Enabled": True,
+                    "Quantity": 0,
+                },
+                "ViewerProtocolPolicy": "",
+                "MinTTL": 0
+            }
+
+    def process(self, distributions):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service)
+        for d in distributions:
+            self.process_distribution(client, d)
+
+    def process_distribution(self, client, distribution):
+        try:
+            res = client.get_distribution_config(
+                Id=distribution[self.manager.get_model().id])
+            config = res['DistributionConfig']
+            updatedConfig = {**config, **self.data['attributes']}
+            self.set_required_update_fields(updatedConfig)
+            if config == updatedConfig:
+                return
+            res = client.update_distribution(
+                Id=distribution[self.manager.get_model().id],
+                IfMatch=res['ETag'],
+                DistributionConfig=updatedConfig
+            )
+        except (client.exceptions.NoSuchResource, client.exceptions.NoSuchDistribution):
+            pass
+        except Exception as e:
+            self.log.warning(
+                "Exception trying to update Distribution: %s error: %s",
+                distribution['ARN'], e)
+            raise e

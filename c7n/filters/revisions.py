@@ -16,8 +16,6 @@ Custodian support for diffing and patching across multiple versions
 of a resource.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import six
 
 from dateutil.parser import parse as parse_date
@@ -189,11 +187,10 @@ class JsonDiff(Diff):
         We watch for new resource types being registered and if they
         support aws config, automatically register the jsondiff filter.
         """
-        config_type = getattr(resource_class.resource_type, 'config_type', None)
-        if config_type is None:
+        if resource_class.resource_type.config_type is None:
             return
         resource_class.filter_registry.register('json-diff', klass)
 
 
 if HAVE_JSONPATH:
-    resources.subscribe(resources.EVENT_REGISTER, JsonDiff.register_resources)
+    resources.subscribe(JsonDiff.register_resources)

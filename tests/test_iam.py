@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import json
 import datetime
 import os
@@ -21,12 +19,13 @@ import tempfile
 import time
 
 from unittest import TestCase
-from .common import load_data, BaseTest, functional, TestConfig as Config
+from .common import load_data, BaseTest, functional
 from .test_offhours import mock_datetime_now
 
 from dateutil import parser
 
 from c7n.exceptions import PolicyValidationError
+from c7n.executor import MainThreadExecutor
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
@@ -51,8 +50,6 @@ from c7n.resources.iam import (
     NoSpecificIamRoleManagedPolicy,
     PolicyQueryParser
 )
-
-from c7n.executor import MainThreadExecutor
 
 
 class UserCredentialReportTest(BaseTest):
@@ -118,6 +115,36 @@ class UserCredentialReportTest(BaseTest):
         self.assertEqual(
             p.resource_manager.get_arns(resources),
             ["arn:aws:iam::644160558196:user/kapil"])
+
+    def test_credential_access_key_reverse_filter_delete(self):
+        factory = self.replay_flight_data(
+            'test_iam_user_credential_reverse_filter_delete'
+        )
+        p = self.load_policy({
+            'name': 'user-cred-multi-reverse',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'zscholl'},
+                {"type": "credential",
+                 "report_max_age": 1585865564,
+                 "key": "access_keys.last_used_date",
+                 "value": 90,
+                 'op': 'gte',
+                 "value_type": "age"},
+                {"type": "credential",
+                 "report_max_age": 1585865564,
+                 "key": "access_keys.last_rotated",
+                 "value": 90,
+                 "op": "gte",
+                 'value_type': 'age'}],
+            'actions': [
+                {'type': 'remove-keys',
+                 'disable': True,
+                 'matched': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]['c7n:matched-keys']), 1)
 
     def test_access_key_last_service(self):
         # Note we're reusing the old console users flight records
@@ -217,6 +244,54 @@ class UserCredentialReportTest(BaseTest):
             },
         )
 
+    def test_record_transform_with_keys(self):
+        info = {
+            "access_key_2_active": "false",
+            "password_next_rotation": "2017-01-24T13:15:33+00:00",
+            "access_key_2_last_rotated": "N/A",
+            "mfa_active": "true",
+            "cert_1_active": "false",
+            "cert_1_last_rotated": "N/A",
+            "access_key_1_last_used_date": "N/A",
+            "arn": "arn:aws:iam::644160558196:user/anthony",
+            "cert_2_active": "false",
+            "password_enabled": "true",
+            "access_key_2_last_used_region": "N/A",
+            "password_last_changed": "2016-10-26T13:15:33+00:00",
+            "access_key_1_last_rotated": "2019-12-04T13:22:47+00:00",
+            "user_creation_time": "2016-10-06T16:11:27+00:00",
+            "access_key_1_last_used_service": "N/A",
+            "user": "anthony",
+            "password_last_used": "2016-10-26T13:14:37+00:00",
+            "cert_2_last_rotated": "N/A",
+            "access_key_2_last_used_date": "N/A",
+            "access_key_2_last_used_service": "N/A",
+            "access_key_1_last_used_region": "N/A",
+            "access_key_1_active": "false",
+        }
+        credential = UserCredentialReport({}, None)
+        credential.process_user_record(info)
+        self.assertEqual(
+            info,
+            {
+                "access_keys": [{
+                    "active": False,
+                    "last_rotated": "2019-12-04T13:22:47+00:00",
+                    "last_used_date": None,
+                    "last_used_region": None,
+                    "last_used_service": None
+                }],
+                "arn": "arn:aws:iam::644160558196:user/anthony",
+                "mfa_active": True,
+                "password_enabled": True,
+                "password_last_changed": "2016-10-26T13:15:33+00:00",
+                "password_last_used": "2016-10-26T13:14:37+00:00",
+                "password_next_rotation": "2017-01-24T13:15:33+00:00",
+                "user": "anthony",
+                "user_creation_time": "2016-10-06T16:11:27+00:00",
+            },
+        )
+
 
 class IamUserTag(BaseTest):
 
@@ -300,7 +375,7 @@ class IAMMFAFilter(BaseTest):
         self.assertEqual(len(resources), 2)
 
 
-class IamRoleFilterUsage(BaseTest):
+class IamRoleTest(BaseTest):
 
     def test_iam_role_inuse(self):
         session_factory = self.replay_flight_data("test_iam_role_inuse")
@@ -341,9 +416,6 @@ class IamRoleFilterUsage(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['RoleId'], "AROAIGK7B2VUDZL4I73HK")
 
-
-class IamRoleTag(BaseTest):
-
     def test_iam_role_actions(self):
         factory = self.replay_flight_data('test_iam_role_tags')
         p = self.load_policy({
@@ -376,8 +448,105 @@ class IamRoleTag(BaseTest):
             {'Application'},
             {t['Key'] for t in role['Tags']})
 
+    def test_iam_role_set_boundary(self):
+        factory = self.replay_flight_data('test_iam_role_set_boundary')
+        p = self.load_policy({
+            'name': 'boundary',
+            'resource': 'iam-role',
+            'filters': [
+                {'RoleName': 'accountmgr-dev'},
+                {'PermissionsBoundary': 'absent'}
+            ],
+            'actions': [{
+                'type': 'set-boundary',
+                'policy': 'arn:aws:iam::644160558196:policy/BlackListIamList'
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['RoleName'] == 'accountmgr-dev'
+        if self.recording:
+            time.sleep(2)
+        client = factory().client('iam')
+        assert client.get_role(RoleName='accountmgr-dev')[
+            'Role'].get('PermissionsBoundary', {}) == {
+                'PermissionsBoundaryType': 'Policy',
+                'PermissionsBoundaryArn': 'arn:aws:iam::644160558196:policy/BlackListIamList',
+        }
+
+    def test_iam_role_remove_boundary(self):
+        factory = self.replay_flight_data('test_iam_role_remove_boundary')
+        p = self.load_policy({
+            'name': 'boundary',
+            'resource': 'iam-role',
+            'filters': [
+                {'RoleName': 'accountmgr-dev'},
+                {'PermissionsBoundary': 'present'}
+            ],
+            'actions': [{
+                'type': 'set-boundary',
+                'state': 'absent',
+            }]},
+            session_factory=factory)
+        p.resource_manager.execution_factory = MainThreadExecutor
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['RoleName'] == 'accountmgr-dev'
+        if self.recording:
+            time.sleep(5)
+        client = factory().client('iam')
+        assert client.get_role(RoleName='accountmgr-dev')[
+            'Role'].get('PermissionsBoundary', {}) == {}
+
 
 class IamUserTest(BaseTest):
+
+    def test_iam_user_set_boundary(self):
+        factory = self.replay_flight_data('test_iam_user_set_boundary')
+        p = self.load_policy({
+            'name': 'boundary',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'devbot'},
+                {'PermissionsBoundary': 'absent'}],
+            'actions': [{
+                'type': 'set-boundary',
+                'policy': 'arn:aws:iam::644160558196:policy/BlackListIamList',
+            }]},
+            session_factory=factory)
+
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['UserName'] == 'devbot'
+
+        if self.recording:
+            time.sleep(1)
+        client = factory().client('iam')
+        assert client.get_user(UserName='devbot')['User'].get('PermissionsBoundary', {}) == {
+            'PermissionsBoundaryType': 'Policy',
+            'PermissionsBoundaryArn': 'arn:aws:iam::644160558196:policy/BlackListIamList'
+        }
+
+    def test_iam_user_boundary_remove(self):
+        factory = self.replay_flight_data('test_iam_user_remove_boundary')
+        p = self.load_policy({
+            'name': 'boundary',
+            'resource': 'iam-user',
+            'filters': [
+                {'UserName': 'devbot'},
+                {'PermissionsBoundary': 'present'}],
+            'actions': [{
+                'type': 'set-boundary', 'state': 'absent'}]},
+            session_factory=factory)
+
+        resources = p.run()
+        assert len(resources) == 1
+        assert resources[0]['UserName'] == 'devbot'
+
+        if self.recording:
+            time.sleep(1)
+        client = factory().client('iam')
+        assert client.get_user(UserName='devbot')['User'].get('PermissionsBoundary', {}) == {}
 
     def test_iam_user_usage_no_such_entity(self):
         p = self.load_policy({
@@ -1269,7 +1438,6 @@ class SNSCrossAccount(BaseTest):
 
         p = self.load_policy(
             {"name": "sns-cross", "resource": "sns", "filters": ["cross-account"]},
-            config=Config.empty(),
             session_factory=session_factory,
         )
 
@@ -1316,7 +1484,6 @@ class SNSCrossAccount(BaseTest):
                 "resource": "sns",
                 "filters": [{"TopicArn": arn}, "cross-account"],
             },
-            config=Config.empty(),
             session_factory=session_factory,
         )
 
@@ -1358,14 +1525,14 @@ class CrossAccountChecker(TestCase):
             ],
         }
 
-        checker = PolicyChecker({"allowed_accounts": set(["221800032964"])})
+        checker = PolicyChecker({"allowed_accounts": {"221800032964"}})
 
         self.assertTrue(bool(checker.check(policy)))
 
     def test_sqs_policies(self):
         policies = load_data("iam/sqs-policies.json")
 
-        checker = PolicyChecker({"allowed_accounts": set(["221800032964"])})
+        checker = PolicyChecker({"allowed_accounts": {"221800032964"}})
         for p, expected in zip(
             policies, [False, True, True, False, False, False, False, False]
         ):
@@ -1376,9 +1543,9 @@ class CrossAccountChecker(TestCase):
         policies = load_data("iam/s3-policies.json")
         checker = PolicyChecker(
             {
-                "allowed_accounts": set(["123456789012"]),
-                "allowed_vpc": set(["vpc-12345678"]),
-                "allowed_vpce": set(["vpce-12345678", "vpce-87654321"]),
+                "allowed_accounts": {"123456789012"},
+                "allowed_vpc": {"vpc-12345678"},
+                "allowed_vpce": {"vpce-12345678", "vpce-87654321"},
             }
         )
         for p, expected in zip(
@@ -1405,7 +1572,7 @@ class CrossAccountChecker(TestCase):
 
     def test_s3_policies_vpc(self):
         policies = load_data("iam/s3-policies.json")
-        checker = PolicyChecker({"allowed_accounts": set(["123456789012"])})
+        checker = PolicyChecker({"allowed_accounts": {"123456789012"}})
         for p, expected in zip(
             policies,
             [
@@ -1432,8 +1599,8 @@ class CrossAccountChecker(TestCase):
         policies = load_data("iam/s3-conditions.json")
         checker = PolicyChecker(
             {
-                "allowed_accounts": set(["123456789012"]),
-                "allowed_vpc": set(["vpc-12345678"]),
+                "allowed_accounts": {"123456789012"},
+                "allowed_vpc": {"vpc-12345678"},
             }
         )
         for p, expected in zip(policies, [False, True]):
@@ -1451,7 +1618,7 @@ class CrossAccountChecker(TestCase):
         policies = load_data("iam/s3-orgid.json")
         checker = PolicyChecker(
             {
-                "allowed_orgid": set(["o-goodorg"])
+                "allowed_orgid": {"o-goodorg"}
             }
         )
         for p, expected in zip(policies, [False, True]):

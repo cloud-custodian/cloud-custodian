@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import deque
 import logging
 
@@ -20,6 +18,7 @@ from c7n import cache
 from c7n.executor import ThreadPoolExecutor
 from c7n.provider import clouds
 from c7n.registry import PluginRegistry
+from c7n.resources import load_resources
 try:
     from c7n.resources.aws import AWS
     resources = AWS.resources
@@ -29,7 +28,7 @@ except ImportError:
 from c7n.utils import dumps
 
 
-class ResourceManager(object):
+class ResourceManager:
     """
     A Cloud Custodian resource
     """
@@ -83,6 +82,8 @@ class ResourceManager(object):
         else:
             provider_name = self.ctx.policy.provider_name
 
+        # check and load
+        load_resources(('%s.%s' % (provider_name, resource_type),))
         provider_resources = clouds[provider_name].resources
         klass = provider_resources.get(resource_type)
         if klass is None:

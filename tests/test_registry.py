@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import unittest
 
 from c7n.registry import PluginRegistry
@@ -46,15 +44,24 @@ class RegistryTest(unittest.TestCase):
             observed.append(args)
 
         registry = PluginRegistry('dummy')
-        registry.subscribe(PluginRegistry.EVENT_REGISTER, observer)
 
-        @registry.register('water')
-        class _plugin_impl:
+        @registry.register('hot')
+        class _plugin_impl1:
             pass
 
-        self.assertEqual(observed[0], (registry, _plugin_impl))
-        self.assertEqual(list(registry.keys()), ['water'])
-        self.assertRaises(ValueError, registry.subscribe, 'foo', observer)
+        registry.subscribe(observer)
+
+        @registry.register('water')
+        class _plugin_impl2:
+            pass
+
+        self.assertEqual(observed, [])
+
+        registry.notify(_plugin_impl1)
+        registry.notify(_plugin_impl2)
+
+        self.assertEqual(observed[1], (registry, _plugin_impl2))
+        self.assertEqual(list(sorted(registry.keys())), ['hot', 'water'])
 
     def test_condition(self):
 

@@ -12,8 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
@@ -25,7 +23,6 @@ import logging
 from c7n.actions import Action
 from c7n.filters import Filter
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
-from c7n.manager import resources
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
     local_session, type_schema,
@@ -79,54 +76,31 @@ class SecurityHubFindingFilter(Filter):
 
         SecurityHub Findings Filter
         """
-        for rtype, resource_manager in registry.items():
-            if not resource_manager.has_arn():
-                continue
-            if 'post-finding' in resource_manager.action_registry:
-                continue
-            resource_class.filter_registry.register('finding', klass)
+        if 'post-finding' not in resource_class.action_registry:
+            return
+        if not resource_class.has_arn():
+            return
+        resource_class.filter_registry.register('finding', klass)
 
 
-resources.subscribe(resources.EVENT_REGISTER, SecurityHubFindingFilter.register_resources)
-
-
-@execution.register('hub-action')
 @execution.register('hub-finding')
 class SecurityHub(LambdaMode):
-    """
-    Execute a policy lambda in response to security hub finding event or action.
+    """Deploy a policy lambda that executes on security hub finding ingestion events.
 
     .. example:
 
-    This policy will provision a lambda and security hub custom action.
-    The action can be invoked on a finding or insight result (collection
-    of findings). The action name will have the resource type prefixed as
-    custodian actions are resource specific.
+    This policy will provision a lambda that will process findings from
+    guard duty (note custodian also has support for guard duty events directly)
+    on iam users by removing access keys.
 
-    .. code-block: yaml
+    .. code-block:: yaml
 
        policy:
          - name: remediate
-           resource: aws.ec2
+           resource: aws.iam-user
            mode:
-             type: hub-action
+             type: hub-finding
              role: MyRole
-           actions:
-            - snapshot
-            - type: set-instance-profile
-              name: null
-            - stop
-
-    .. example:
-
-    This policy will provision a lambda that will process high alert findings from
-    guard duty (note custodian also has support for guard duty events directly).
-
-    .. code-block: yaml
-
-       policy:
-         - name: remediate
-           resource: aws.iam
            filters:
              - type: event
                key: detail.findings[].ProductFields.aws/securityhub/ProductName
@@ -141,6 +115,7 @@ class SecurityHub(LambdaMode):
     so these modes work for resources that security hub doesn't natively support.
 
     https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cloudwatch-events.html
+
     """
 
     schema = type_schema(
@@ -261,6 +236,34 @@ class SecurityHub(LambdaMode):
         return resources
 
 
+@execution.register('hub-action')
+class SecurityHubAction(SecurityHub):
+    """Deploys a policy lambda as a Security Hub Console Action.
+
+    .. example:
+
+    This policy will provision a lambda and security hub custom
+    action. The action can be invoked on a finding or insight result
+    (collection of findings) from within the console. The action name
+    will have the resource type prefixed as custodian actions are
+    resource specific.
+
+    .. code-block:: yaml
+
+       policy:
+         - name: remediate
+           resource: aws.ec2
+           mode:
+             type: hub-action
+             role: MyRole
+           actions:
+            - snapshot
+            - type: set-instance-profile
+              name: null
+            - stop
+    """
+
+
 FindingTypes = {
     "Software and Configuration Checks",
     "TTPs",
@@ -310,7 +313,6 @@ class PostFinding(Action):
     """ # NOQA
 
     FindingVersion = "2018-10-08"
-    ProductName = "default"
 
     permissions = ('securityhub:BatchImportFindings',)
 
@@ -323,6 +325,10 @@ class PostFinding(Action):
             'policy.description, or if not defined in policy then policy.name'},
         severity={"type": "number", 'default': 0},
         severity_normalized={"type": "number", "min": 0, "max": 100, 'default': 0},
+        severity_label={
+            "type": "string", 'default': 'INFORMATIONAL',
+            "enum": ["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"],
+        },
         confidence={"type": "number", "min": 0, "max": 100},
         criticality={"type": "number", "min": 0, "max": 100},
         # Cross region aggregation
@@ -456,11 +462,9 @@ class PostFinding(Action):
                         'utf8')).hexdigest())
         finding = {
             "SchemaVersion": self.FindingVersion,
-            "ProductArn": "arn:aws:securityhub:{}:{}:product/{}/{}".format(
-                region,
-                self.manager.config.account_id,
-                self.manager.config.account_id,
-                self.ProductName,
+            "ProductArn": "arn:{}:securityhub:{}::product/cloud-custodian/cloud-custodian".format(
+                get_partition(self.manager.config.region),
+                region
             ),
             "AwsAccountId": self.manager.config.account_id,
             # Long search chain for description values, as this was
@@ -479,9 +483,12 @@ class PostFinding(Action):
             "RecordState": "ACTIVE",
         }
 
-        severity = {'Product': 0, 'Normalized': 0}
+        severity = {'Product': 0, 'Normalized': 0, 'Label': 'INFORMATIONAL'}
         if self.data.get("severity") is not None:
             severity["Product"] = self.data["severity"]
+        if self.data.get("severity_label") is not None:
+            severity["Label"] = self.data["severity_label"]
+        # severity_normalized To be deprecated per https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html#asff-severity # NOQA
         if self.data.get("severity_normalized") is not None:
             severity["Normalized"] = self.data["severity_normalized"]
         if severity:
@@ -578,15 +585,10 @@ class OtherResourcePostFinding(PostFinding):
         return other
 
     @classmethod
-    def register_resource(klass, registry, event):
-        for rtype, resource_manager in registry.items():
-            if not resource_manager.has_arn():
-                continue
-            if 'post-finding' in resource_manager.action_registry:
-                continue
-            resource_manager.action_registry.register('post-finding', klass)
+    def register_resource(klass, registry, resource_class):
+        if 'post-finding' not in resource_class.action_registry:
+            resource_class.action_registry.register('post-finding', klass)
 
 
-AWS.resources.subscribe(
-    AWS.resources.EVENT_FINAL,
-    OtherResourcePostFinding.register_resource)
+AWS.resources.subscribe(OtherResourcePostFinding.register_resource)
+AWS.resources.subscribe(SecurityHubFindingFilter.register_resources)

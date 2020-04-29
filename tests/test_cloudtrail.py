@@ -11,11 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import time
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class CloudTrail(BaseTest):
@@ -146,7 +144,6 @@ class CloudTrail(BaseTest):
                     }]
                 }]
             },
-            config=Config.empty(),
             session_factory=factory,
         )
         resources = p.run()

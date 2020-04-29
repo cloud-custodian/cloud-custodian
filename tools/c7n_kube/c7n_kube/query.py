@@ -25,7 +25,7 @@ from c7n.utils import local_session
 log = logging.getLogger('custodian.k8s.query')
 
 
-class ResourceQuery(object):
+class ResourceQuery:
     def __init__(self, session_factory):
         self.session_factory = session_factory
 
@@ -49,7 +49,7 @@ class ResourceQuery(object):
 
 
 @sources.register('describe-kube')
-class DescribeSource(object):
+class DescribeSource:
     def __init__(self, manager):
         self.manager = manager
         self.query = ResourceQuery(manager.session_factory)
@@ -133,7 +133,7 @@ class CustomResourceQueryManager(QueryResourceManager):
         }
 
     def validate(self):
-        required_keys = set(['group', 'version', 'plural'])
+        required_keys = {'group', 'version', 'plural'}
         if 'query' not in self.data:
             raise PolicyValidationError(
                 "Custom resources require query in policy with only " +
@@ -153,7 +153,7 @@ class TypeMeta(type):
 
 
 @six.add_metaclass(TypeMeta)
-class TypeInfo(object):
+class TypeInfo:
     group = None
     version = None
     enum_spec = ()

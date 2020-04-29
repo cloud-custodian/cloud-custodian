@@ -39,8 +39,6 @@ CLI Usage
 
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from concurrent.futures import as_completed
 
 from datetime import datetime
@@ -65,8 +63,8 @@ log = logging.getLogger('custodian.reports')
 
 def report(policies, start_date, options, output_fh, raw_output_fh=None):
     """Format a policy's extant records into a report."""
-    regions = set([p.options.region for p in policies])
-    policy_names = set([p.name for p in policies])
+    regions = {p.options.region for p in policies}
+    policy_names = {p.name for p in policies}
     formatter = Formatter(
         policies[0].resource_manager.resource_type,
         extra_fields=options.field,
@@ -145,7 +143,7 @@ def _get_values(record, field_list, tag_map):
     return vals
 
 
-class Formatter(object):
+class Formatter:
 
     def __init__(self, resource_type, extra_fields=(), include_default_fields=True,
                  include_region=False, include_policy=False, fields=()):

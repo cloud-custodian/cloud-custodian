@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from .common import BaseTest
+import time
 
 
 class TestGlueConnections(BaseTest):
@@ -305,6 +304,45 @@ class TestGlueCrawlers(BaseTest):
         crawlers = client.get_crawlers()["Crawlers"]
         self.assertFalse("test" in [c.get("Name") for c in crawlers])
 
+    def test_security_config_missing_filter(self):
+        p = self.load_policy(
+            {
+                "name": "glue-crawler-security-config",
+                "resource": "glue-crawler",
+                "filters": [{
+                    "type": "security-config",
+                    "missing": True}]
+            },
+        )
+        resources = p.resource_manager.filter_resources([{
+            'Name': 'bad-crawler',
+            'S3Targets': [{'Path': 's3://wicked'}]}])
+        assert len(resources) == 1
+        assert resources[0]['Name'] == 'bad-crawler'
+
+    def test_security_config_filter(self):
+        session_factory = self.replay_flight_data("test_glue_sec_config_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-crawler-security-config",
+                "resource": "glue-crawler",
+                "filters": [
+                    {"type": "security-config",
+                     "key": "EncryptionConfiguration.CloudWatchEncryption.CloudWatchEncryptionMode",
+                     "value": "SSE-KMS",
+                     "op": "eq"},
+                    {"type": "security-config",
+                     "key": "EncryptionConfiguration.CloudWatchEncryption.KmsKeyArn",
+                     "value": "arn:aws:kms:us-east-1:123456789123:key/358f7699-4ea5-455a-9c78-1c868301e5a8", # noqa
+                     "op": "eq"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'test-filter-crawler')
+
 
 class TestGlueTables(BaseTest):
     def test_tables_delete(self):
@@ -343,3 +381,158 @@ class TestGlueDatabases(BaseTest):
         client = session_factory().client("glue")
         databases = client.get_databases()
         self.assertFalse("test" in [t.get("Name") for t in databases.get("DatabaseList", [])])
+
+
+class TestGlueClassifiers(BaseTest):
+
+    def test_classifiers_delete(self):
+        session_factory = self.replay_flight_data("test_glue_classifier_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-classifier-delete",
+                "resource": "glue-classifier",
+                "filters": [{"CsvClassifier.Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        classifiers = client.get_classifiers()
+        self.assertFalse("test" in [t.get('CsvClassifier').get("Name")
+            for t in classifiers.get("Classifiers", [])])
+
+
+class GlueMLTransform(BaseTest):
+
+    def test_ml_transforms_delete(self):
+        session_factory = self.replay_flight_data("test_glue_ml_transform_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-ml-transform-delete",
+                "resource": "glue-ml-transform",
+                "filters": [{"Name": 'test'}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        ml_transforms = client.get_ml_transforms()
+        self.assertFalse("test" in [t.get("Name") for t in ml_transforms.get("Transforms", [])])
+
+
+class TestGlueSecurityConfiguration(BaseTest):
+
+    def test_security_configurations_delete(self):
+        session_factory = self.replay_flight_data("test_glue_security_configuration_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-security-configuration-delete",
+                "resource": "glue-security-configuration",
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        security_configrations = client.get_security_configurations()
+        self.assertFalse("test" in [t.get("Name")
+            for t in security_configrations.get("SecurityConfigurations", [])])
+
+
+class TestGlueTriggers(BaseTest):
+
+    def test_triggers_delete(self):
+        session_factory = self.replay_flight_data("test_glue_trigger_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-trigger-delete",
+                "resource": "glue-trigger",
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(60)
+        client = session_factory().client("glue")
+        triggers = client.get_triggers()
+        self.assertFalse("test" in [t.get("Name") for t in triggers.get("Triggers", [])])
+
+
+class TestGlueWorkflows(BaseTest):
+
+    def test_workflows_delete(self):
+        session_factory = self.replay_flight_data("test_glue_workflow_delete")
+        p = self.load_policy(
+            {
+                "name": "glue-workflow-delete",
+                "resource": "glue-workflow",
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        workflows = client.list_workflows()
+        self.assertFalse("test" in [t.get("Name") for t in workflows.get("Workflows", [])])
+
+
+class TestGlueDataCatalog(BaseTest):
+
+    def test_glue_datacat_put_encryption(self):
+        session_factory = self.replay_flight_data("test_glue_datacat_put_encryption")
+        client = session_factory().client("glue")
+        cat_setting = client.get_data_catalog_encryption_settings()
+        self.assertEqual(cat_setting.get('DataCatalogEncryptionSettings').get(
+            'EncryptionAtRest').get('SseAwsKmsKeyId'), 'alias/skunk/trails')
+        p = self.load_policy(
+            {
+                "name": "glue-security-config",
+                "resource": "glue-catalog",
+                'filters': [{
+                    'type': 'value',
+                    'key': 'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+                    'value': 'alias/skunk/trails',
+                    'op': 'eq'},
+                ],
+                "actions": [{
+                    "type": "set-encryption",
+                    "attributes": {
+                        "EncryptionAtRest": {
+                            "CatalogEncryptionMode": "SSE-KMS",
+                            "SseAwsKmsKeyId": "alias/skunk/glue/encrypted"},
+                    },
+                }]
+            },
+            session_factory=session_factory,)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        datacatlog = client.get_data_catalog_encryption_settings()
+        self.assertEqual(datacatlog.get('DataCatalogEncryptionSettings').get(
+            'EncryptionAtRest'),
+            {'CatalogEncryptionMode': 'SSE-KMS', 'SseAwsKmsKeyId': 'alias/skunk/glue/encrypted'})
+
+    def test_glue_catalog_cross_account(self):
+        session_factory = self.replay_flight_data("test_glue_catalog_cross_account")
+        p = self.load_policy(
+            {
+                "name": "glue-catalog-cross-account",
+                "resource": "glue-catalog",
+                "filters": [{"type": "cross-account"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

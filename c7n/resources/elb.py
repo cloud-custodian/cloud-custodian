@@ -14,8 +14,6 @@
 """
 Elastic Load Balancers
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from concurrent.futures import as_completed
 import re
 
@@ -751,7 +749,7 @@ class DefaultVpc(DefaultVpcBase):
         return elb.get('VPCId') and self.match(elb.get('VPCId')) or False
 
 
-class ELBAttributeFilterBase(object):
+class ELBAttributeFilterBase:
     """ Mixin base class for filters that query LB attributes.
     """
 

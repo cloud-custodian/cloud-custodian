@@ -16,7 +16,7 @@ import jmespath
 import copy
 
 
-class Lookup(object):
+class Lookup:
     RESOURCE_SOURCE = 'resource'
 
     schema = {

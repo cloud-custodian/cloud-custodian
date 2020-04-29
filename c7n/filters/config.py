@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from c7n.filters import ValueFilter
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
@@ -121,14 +119,13 @@ class ConfigCompliance(Filter):
     def register_resources(klass, registry, resource_class):
         """model resource subscriber on resource registration.
 
-        Watch for new resource types being registered if they support aws config,
-        automatically, register the config-compliance filter.
+        Watch for new resource types being registered if they are
+        supported by aws config, automatically, register the
+        config-compliance filter.
         """
-
-        config_type = getattr(resource_class.resource_type, 'config_type', None)
-        if config_type is None:
+        if resource_class.resource_type.config_type is None:
             return
         resource_class.filter_registry.register('config-compliance', klass)
 
 
-resources.subscribe(resources.EVENT_REGISTER, ConfigCompliance.register_resources)
+resources.subscribe(ConfigCompliance.register_resources)

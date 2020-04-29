@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from datetime import datetime
 from dateutil import tz as tzutil
 
@@ -647,7 +645,7 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        s = set([x[0] for x in resources[0]["Invalid"]])
+        s = {x[0] for x in resources[0]["Invalid"]}
         self.assertTrue("invalid-subnet" in s)
         self.assertTrue("invalid-security-group" in s)
 

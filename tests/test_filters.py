@@ -11,13 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import calendar
 from datetime import datetime, timedelta
 from dateutil import tz
 from dateutil.parser import parse as parse_date
 import unittest
+import os
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -26,7 +25,7 @@ from c7n.resources.ec2 import filters
 from c7n.resources.elb import ELB
 from c7n.utils import annotation
 from .common import instance, event_data, Bag, BaseTest
-from c7n.filters.core import ValueRegex
+from c7n.filters.core import ValueRegex, parse_date as core_parse_date
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -61,6 +60,44 @@ class TestFilter(unittest.TestCase):
     def test_filter_call(self):
         filter_instance = base_filters.Filter({})
         self.assertIsInstance(filter_instance, base_filters.Filter)
+
+    def test_merge_annotation(self):
+        filter_instance1 = base_filters.Filter({})
+        filter_instance2 = base_filters.Filter({})
+        filter_instance1.matched_annotation_key = 'c7n:matched-keys'
+        filter_instance2.matched_annotation_key = 'c7n:matched-keys'
+        filter_instance1.get_block_operator = lambda: 'and'
+        filter_instance2.get_block_operator = lambda: 'and'
+
+        resource1 = {'Arn': 'arn:aws:iam::123456789012:user/zscholl',
+                     'CreateDate': datetime(2020, 1, 2, 17, 53, 23, 976000, tzinfo=tz.tzutc()),
+                     'Path': '/',
+                     'UserId': 'xafegj4qjwfl3mpuvyj5',
+                     'UserName': 'zscholl'}
+        resource2 = {'Arn': 'arn:aws:iam::123456789012:user/zscholl',
+                     'CreateDate': datetime(2020, 1, 2, 17, 53, 23, 976000, tzinfo=tz.tzutc()),
+                     'Path': '/',
+                     'UserId': 'xafegj4qjwfl3mpuvyj5',
+                     'UserName': 'zscholl'}
+
+        value1 = {'active': True, 'c7n:match-type': 'credential',
+                 'last_rotated': '2019-01-04T17:53:24+00:00',
+                 'last_used_date': '2019-01-04T17:53:24+00:00',
+                 'last_used_region': 'not_supported',
+                 'last_used_service': 'not_supported'}
+
+        value2 = {'active': True, 'c7n:match-type': 'credential',
+                 'last_rotated': '2020-01-02T18:53:24+00:00',
+                 'last_used_date': '2020-01-04T17:53:24+00:00',
+                 'last_used_region': 'not_supported',
+                 'last_used_service': 'not_supported'}
+        filter_instance1.merge_annotation(resource1, 'c7n:matched-keys', [value1, value2])
+        filter_instance1.merge_annotation(resource1, 'c7n:matched-keys', [value1])
+
+        filter_instance2.merge_annotation(resource2, 'c7n:matched-keys', [value1])
+        filter_instance2.merge_annotation(resource2, 'c7n:matched-keys', [value1, value2])
+
+        self.assertEqual(resource1, resource2)
 
 
 class TestOrFilter(unittest.TestCase):
@@ -103,16 +140,16 @@ class TestNotFilter(unittest.TestCase):
 
         f = filters.factory({"not": [{"Architecture": "amd64"}]})
 
-        class Manager(object):
+        class Manager:
 
-            class resource_type(object):
+            class resource_type:
                 id = 'Color'
 
             @classmethod
             def get_model(cls):
                 return cls.resource_type
 
-        class FakeFilter(object):
+        class FakeFilter:
 
             def __init__(self):
                 self.invoked = False
@@ -380,6 +417,32 @@ class TestValueTypes(BaseFilterTest):
 
         self.assertFilter(fdata, i(parse_date('2019/04/01')), True)
         self.assertFilter(fdata, i(datetime.now().isoformat()), False)
+
+    def test_parse_date_epoch(self):
+        def t(s, y):
+            dt = core_parse_date(s)
+            if y is None:
+                self.assertEqual(dt, None)
+            else:
+                self.assertEqual(dt.year, y)
+
+        t("123456789", 1973)        # (1973, 11, 29, 13, 33, 9)
+        t("1234567890", 2009)       # (2009, 2, 13, 15, 31, 30)
+        t("1234567890123", 2009)    # (2009, 2, 13, 15, 31, 30, 123000)
+
+        t("12345678901", 2361)      # (2361, 3, 21, 12, 15, 1)
+        t("12345678901234", 2361)   # (2361, 3, 21, 12, 15, 1, 234000)
+
+        if os.name == "nt":
+            # too big for windows
+            t("123456789012", 1973)     # (1973, 11, 29, 13, 33, 9, 012000)
+            t("123456789012345", None)
+        else:
+            t("123456789012", 5882)     # (5882, 3, 10, 16, 30, 12)
+            t("123456789012345", 5882)  # (5882, 3, 10, 16, 30, 12, 345000)
+
+        # nothing should be able to parse this
+        t("1234567890123456", None)
 
     def test_version(self):
         fdata = {

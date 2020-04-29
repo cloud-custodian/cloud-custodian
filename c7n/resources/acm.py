@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
@@ -25,7 +23,14 @@ class Certificate(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'acm'
-        enum_spec = ('list_certificates', 'CertificateSummaryList', None)
+        enum_spec = (
+            'list_certificates',
+            'CertificateSummaryList',
+            {'Includes': {
+                'keyTypes': [
+                    'RSA_2048', 'RSA_1024', 'RSA_4096',
+                    'EC_prime256v1', 'EC_secp384r1',
+                    'EC_secp521r1']}})
         id = 'CertificateArn'
         name = 'DomainName'
         date = 'CreatedAt'

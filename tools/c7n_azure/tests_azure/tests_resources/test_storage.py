@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import pytest
 from azure.mgmt.storage.models import StorageAccountUpdateParameters
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
@@ -362,6 +360,9 @@ class StorageTest(BaseTest):
         }, validate=True)
 
         resources = p.run()
+
+        self.sleep_in_live_mode(30)
+
         session = local_session(p.session_factory)
         token = StorageUtilities.get_storage_token(session)
         blob_settings = StorageSettingsUtilities.get_settings(
@@ -411,6 +412,9 @@ class StorageTest(BaseTest):
         }, validate=True)
 
         resources = p.run()
+
+        self.sleep_in_live_mode(30)
+
         session = local_session(p.session_factory)
         token = StorageUtilities.get_storage_token(session)
         blob_settings = StorageSettingsUtilities.get_settings(

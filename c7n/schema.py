@@ -25,19 +25,17 @@ allowedProperties and enum extension).
 All filters and actions are annotated with schema typically using
 the utils.type_schema function.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import Counter
 import json
 import inspect
 import logging
 
-from jsonschema import Draft4Validator as Validator
+from jsonschema import Draft4Validator as JsonSchemaValidator
 from jsonschema.exceptions import best_match
 
 from c7n.policy import execution
 from c7n.provider import clouds
-from c7n.resources import load_resources
+from c7n.resources import load_available
 from c7n.resolver import ValuesFrom
 from c7n.filters.core import ValueFilter, EventFilter, AgeFilter, OPERATORS, VALUE_TYPES
 from c7n.structure import StructureParser # noqa
@@ -46,9 +44,9 @@ from c7n.structure import StructureParser # noqa
 def validate(data, schema=None):
     if schema is None:
         schema = generate()
-        Validator.check_schema(schema)
+        JsonSchemaValidator.check_schema(schema)
 
-    validator = Validator(schema)
+    validator = JsonSchemaValidator(schema)
     errors = list(validator.iter_errors(data))
     if not errors:
         return check_unique(data) or []
@@ -214,10 +212,27 @@ def generate(resource_types=()):
                 'name': {
                     'type': 'string',
                     'pattern': "^[A-z][A-z0-9]*(-[A-z0-9]+)*$"},
+                'conditions': {
+                    'type': 'array',
+                    'items': {'anyOf': [
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'or': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'not': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'type': 'object', 'additionalProperties': False,
+                         'properties': {'and': {
+                             '$ref': '#/definitions/policy/properties/conditions'}}},
+                        {'$ref': '#/definitions/filters/value'},
+                        {'$ref': '#/definitions/filters/event'},
+                        {'$ref': '#/definitions/filters/valuekv'}]}},
+                # these should be deprecated for conditions
                 'region': {'type': 'string'},
                 'tz': {'type': 'string'},
                 'start': {'format': 'date-time'},
                 'end': {'format': 'date-time'},
+
                 'resource': {'type': 'string'},
                 'max-resources': {'anyOf': [
                     {'type': 'integer', 'minimum': 1},
@@ -229,7 +244,8 @@ def generate(resource_types=()):
                 'description': {'type': 'string'},
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'mode': {'$ref': '#/definitions/policy-mode'},
-                'source': {'enum': ['describe', 'config', 'resource-graph']},
+                'source': {'enum': ['describe', 'config',
+                                    'resource-graph', 'disk', 'static']},
                 'actions': {
                     'type': 'array',
                 },
@@ -265,10 +281,15 @@ def generate(resource_types=()):
     resource_refs = []
     for cloud_name, cloud_type in clouds.items():
         for type_name, resource_type in cloud_type.resources.items():
-            if resource_types and type_name not in resource_types:
-                continue
-
             r_type_name = "%s.%s" % (cloud_name, type_name)
+            if resource_types and r_type_name not in resource_types:
+                if not resource_type.type_aliases:
+                    continue
+                # atm only azure is using type aliases.
+                elif not {"%s.%s" % (cloud_name, ralias) for ralias
+                        in resource_type.type_aliases}.intersection(
+                        resource_types):
+                    continue
 
             aliases = []
             if resource_type.type_aliases:
@@ -308,6 +329,9 @@ def generate(resource_types=()):
         }
     }
 
+    # allow empty policies with lazy load
+    if not resource_refs:
+        schema['properties']['policies']['items'] = {'type': 'object'}
     return schema
 
 
@@ -442,7 +466,7 @@ def resource_vocabulary(cloud_name=None, qualify_name=True):
     return vocabulary
 
 
-class ElementSchema(object):
+class ElementSchema:
     """Utility functions for working with resource's filters and actions.
     """
 
@@ -568,7 +592,7 @@ def pprint_schema_summary(vocabulary):
 
 
 def json_dump(resource=None):
-    load_resources()
+    load_available()
     print(json.dumps(generate(resource), indent=2))
 
 

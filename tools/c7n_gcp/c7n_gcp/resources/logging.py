@@ -11,6 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n.utils import local_session, type_schema
+
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -18,27 +21,11 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 # how to map them given a project level root entity sans use of c7n-org
 
 
-@resources.register('logsink')
-class LogSink(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'logging'
-        version = 'v2'
-        component = 'projects.sinks'
-        enum_spec = ('list', 'sinks[]', None)
-        scope_key = 'parent'
-        scope_template = "projects/{}"
-        id = "name"
-
-        @staticmethod
-        def get(client, resource_info):
-            return client.execute_query('get', {
-                'sinkName': 'projects/{project_id}/sinks/{name}'.format(
-                    **resource_info)})
-
-
 @resources.register('log-project-sink')
 class LogProjectSink(QueryResourceManager):
+    """
+    https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.sinks
+    """
 
     class resource_type(TypeInfo):
         service = 'logging'
@@ -47,7 +34,9 @@ class LogProjectSink(QueryResourceManager):
         enum_spec = ('list', 'sinks[]', None)
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "destination", "filter", "writerIdentity", "createTime"]
 
         @staticmethod
         def get(client, resource_info):
@@ -56,9 +45,23 @@ class LogProjectSink(QueryResourceManager):
                     **resource_info)})
 
 
+@LogProjectSink.action_registry.register('delete')
+class DeletePubSubTopic(MethodAction):
+
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+
+    def get_resource_params(self, m, r):
+        session = local_session(self.manager.session_factory)
+        project = session.get_default_project()
+        return {'sinkName': 'projects/{}/sinks/{}'.format(project, r['name'])}
+
+
 @resources.register('log-project-metric')
 class LogProjectMetric(QueryResourceManager):
-
+    """
+    https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.metrics
+    """
     class resource_type(TypeInfo):
         service = 'logging'
         version = 'v2'
@@ -66,7 +69,9 @@ class LogProjectMetric(QueryResourceManager):
         enum_spec = ('list', 'metrics[]', None)
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "createTime", "filter"]
 
         @staticmethod
         def get(client, resource_info):
@@ -79,7 +84,9 @@ class LogProjectMetric(QueryResourceManager):
 
 @resources.register('log-exclusion')
 class LogExclusion(QueryResourceManager):
-
+    """
+    https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.exclusions
+    """
     class resource_type(TypeInfo):
         service = 'logging'
         version = 'v2'
@@ -87,7 +94,8 @@ class LogExclusion(QueryResourceManager):
         enum_spec = ('list', 'exclusions[]', None)
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = ["name", "description", "createTime", "disabled", "filter"]
 
         @staticmethod
         def get(client, resource_info):
