@@ -704,7 +704,10 @@ class RDSTest(BaseTest):
             {
                 "name": "db-subnet-group-unused",
                 "resource": "rds-subnet-group",
-                "filters": [{"type": "unused"}],
+                "filters": [{
+                    "DBSubnetGroupName": "not-used",
+                    "type": "unused"
+                }],
             },
             session_factory=session_factory,
         )
