@@ -52,27 +52,6 @@
                                 "Name": "us-east-1a"
                             },
                             "SubnetStatus": "Active"
-                        },
-                        {
-                            "SubnetIdentifier": "subnet-e3b194de",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-east-1e"
-                            },
-                            "SubnetStatus": "Active"
-                        },
-                        {
-                            "SubnetIdentifier": "subnet-efbcccb7",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-east-1b"
-                            },
-                            "SubnetStatus": "Active"
-                        },
-                        {
-                            "SubnetIdentifier": "subnet-3a334610",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-east-1d"
-                            },
-                            "SubnetStatus": "Active"
                         }
                     ]
                 },
@@ -83,8 +62,8 @@
                     "year": 2020,
                     "month": 4,
                     "day": 29,
-                    "hour": 0,
-                    "minute": 50,
+                    "hour": 1,
+                    "minute": 10,
                     "second": 0,
                     "microsecond": 0
                 },
