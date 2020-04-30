@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FileSystemId": "fs-4cbc54cf",
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"efs-policy-wizard-acb56018-d4f7-4efb-8b30-17a4e2fcb4ef\",\n  \"Statement\" : [ {\n    \"Sid\" : \"efs-statement-13d5143a-92bc-477c-8548-200167b47d7b\",\n    \"Effect\" : \"Deny\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"*\",\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-4cbc54cf\",\n    \"Condition\" : {\n      \"Bool\" : {\n        \"aws:SecureTransport\" : \"false\"\n      }\n    }\n  }, {\n    \"Sid\" : \"efs-statement-3ec42083-0c29-4939-8b46-113fdf22a229\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"elasticfilesystem:ClientMount\",\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-4cbc54cf\"\n  } ]\n}"
+    }
+}

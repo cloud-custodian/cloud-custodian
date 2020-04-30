@@ -233,3 +233,16 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["FileSystemId"], "fs-5f61b0df")
+
+    def test_efs_with_policy(self):
+        factory = self.replay_flight_data("test_describe_efs_with_policy")
+        p = self.load_policy(
+            {
+                "name": "efs-resource-with-policy",
+                "resource": "efs"
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 2)
+        self.assertGreater(len(resources[0]["Policy"]), 0)
