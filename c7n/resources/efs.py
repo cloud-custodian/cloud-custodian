@@ -325,9 +325,9 @@ class ReadOnlyByDefault(Filter):
     .. code-block:: yaml
 
             policies:
-                - name: efs-read-only-by-default
-                  resource: efs
-                  filters:
+              - name: efs-read-only-by-default
+                resource: efs
+                filters:
                   - type: read-only-by-default
                     value: True
     """
@@ -367,10 +367,10 @@ class InTransitEncription(Filter):
     .. code-block:: yaml
 
             policies:
-                - name: efs-in-transit-encription
+              - name: efs-in-transit-encription
                 resource: efs
                 filters:
-                - type: in-transit-encription
+                  - type: in-transit-encription
     """
     schema = type_schema(
         'in-transit-encription',
