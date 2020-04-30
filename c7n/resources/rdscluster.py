@@ -20,7 +20,7 @@ from c7n.filters import AgeFilter, CrossAccountAccessFilter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
 from c7n import tags
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
@@ -28,6 +28,12 @@ from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
 
 log = logging.getLogger('custodian.rds-cluster')
+
+
+class DescribeCluster(DescribeSource):
+
+    def augment(self, resources):
+        return tags.universal_augment(self.manager, resources)
 
 
 @resources.register('rds-cluster')
@@ -46,8 +52,12 @@ class RDSCluster(QueryResourceManager):
         dimension = 'DBClusterIdentifier'
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBClusters',)
+        config_type = 'AWS::RDS::DBCluster'
 
-    augment = tags.universal_augment
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeCluster
+    }
 
 
 RDSCluster.filter_registry.register('offhour', OffHour)
