@@ -10,6 +10,8 @@ idna==2.9
 importlib-metadata==1.6.0
 jinja2==2.11.2
 jmespath==0.9.5
+jsonpatch==1.25
+jsonpointer==2.0
 jsonschema==3.2.0
 ldap3==2.7
 markupsafe==1.1.1
