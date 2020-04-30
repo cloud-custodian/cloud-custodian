@@ -291,7 +291,7 @@ class TagActionFilter(Filter):
             raise PolicyValidationError(
                 "Invalid marked-for-op op:%s in %s" % (op, self.manager.data))
 
-        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = Time.get_tz(self.data.get('tz', 'utc'))
         if not tz:
             raise PolicyValidationError(
                 "Invalid timezone specified '%s' in %s" % (
@@ -303,7 +303,7 @@ class TagActionFilter(Filter):
         op = self.data.get('op', 'stop')
         skew = self.data.get('skew', 0)
         skew_hours = self.data.get('skew_hours', 0)
-        tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = Time.get_tz(self.data.get('tz', 'utc'))
 
         v = None
         for n in i.get('Tags', ()):
@@ -325,18 +325,18 @@ class TagActionFilter(Filter):
         try:
             action_date = parse(action_date_str)
         except Exception:
-            self.log.warning("could not parse tag:%s value:%s on %s" % (
+            self.log.error("could not parse tag:%s value:%s on %s" % (
                 tag, v, i['InstanceId']))
-
-        if self.current_date is None:
-            self.current_date = datetime.now()
+            return False
 
         if action_date.tzinfo:
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(tz)
-            self.current_date = datetime.now(tz=tz)
+            current_date = datetime.now(tz=tz)
+        else:
+            current_date = datetime.now()
 
-        return self.current_date >= (
+        return current_date >= (
             action_date - timedelta(days=skew, hours=skew_hours))
 
 
@@ -627,16 +627,16 @@ class TagDelayedAction(Action):
                 "mark-for-op specifies invalid op:%s in %s" % (
                     op, self.manager.data))
 
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
-        if not self.tz:
+        tz = Time.get_tz(self.data.get('tz', 'utc'))
+        if not tz:
             raise PolicyValidationError(
                 "Invalid timezone specified %s in %s" % (
-                    self.tz, self.manager.data))
+                    tz, self.manager.data))
         return self
 
     def generate_timestamp(self, days, hours):
-        n = datetime.now(tz=self.tz)
+        tz = Time.get_tz(self.data.get('tz', 'utc'))
+        n = datetime.now(tz=tz)
         if days is None or hours is None:
             # maintains default value of days being 4 if nothing is provided
             days = 4
@@ -662,7 +662,7 @@ class TagDelayedAction(Action):
 
     def process(self, resources):
         cfg = self.get_config_values()
-        self.tz = tzutil.gettz(Time.TZ_ALIASES.get(cfg['tz']))
+        tz = Time.get_tz(self.data.get(cfg['tz'], 'utc'))
         self.id_key = self.manager.get_model().id
 
         msg = cfg['msg'].format(
@@ -905,8 +905,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
     concurrency = 1
 
     def process(self, resources):
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        tz = Time.get_tz(self.data.get('tz', 'utc'))
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?

@@ -15,6 +15,7 @@
 module to test some universal tagging infrastructure not directly exposed.
 """
 import time
+from datetime import datetime, timedelta
 from mock import MagicMock, call
 
 from c7n.tags import universal_retry, coalesce_copy_user_tags
@@ -401,3 +402,80 @@ class CopyRelatedResourceTag(BaseTest):
 
         self.assertEqual(len(untagged_snaps), 1)
         self.assertTrue('Tags' not in untagged_snaps[0].keys())
+
+
+class TagsTest(BaseTest):
+
+    def test_tag_schema_validate(self):
+        self.assertTrue(
+            self.load_policy(
+                {
+                "name": "s3-mark-for-op",
+                "resource": "s3",
+                "filters": [{"tag:c7n_cleanup": "absent"}],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "days": 1,
+                    }
+                ]},
+                validate=True,
+            ))
+
+    def test_tag_filter(self):
+        session_factory = self.record_flight_data("test_tags_mark_for_op")
+        #'TTL: stop@2020-04-30'
+        p = self.load_policy({
+                "name": "s3-mark-for-op",
+                "resource": "s3",
+                "filters": [
+                    {"name": "repela"}
+                ],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "days": 1,
+                        "tz": 'pst'
+                    }
+                ]},
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    # def test_improper_tag_format(self):
+    #     session_factory = self.record_flight_data("test_tags_mark_for_op_improper_tag")
+    #     p = self.load_policy({
+    #             "name": "s3-mark-for-op",
+    #             "resource": "s3",
+    #             "filters": [{"tag:custodian_cleanup": 'missingcolon'}],
+    #             "actions": [
+    #                 {
+    #                     "type": "mark-for-op",
+    #                     "tag": "custodian_cleanup",
+    #                     "op": "stop",
+    #                     "days": 1,
+    #                     "tz": 'pst'
+    #                 }
+    #             ]},
+    #         session_factory=session_factory
+    #     )
+    #     resources = p.run()
+    #     self.assertEqual(len(resources), 0)
+
+    # def test_misformatted_date_string(self):
+    #     date = "notadate"
+    #     resources = [tools.get_resource({'custodian_status': 'TTL: stop@{0}'.format(date)})]
+
+    #     self._test_filter_scenario(resources, 0)
+
+    # def test_timezone_in_datestring(self):
+    #     tz = Time.get_tz('America/Santiago')
+    #     date = (now(tz) - datetime.timedelta(hours=1)).strftime('%Y/%m/%d %H%M %Z')
+    #     resources = [tools.get_resource({'custodian_status': 'TTL: stop@{0}'.format(date)})]
+
+    #     self._test_filter_scenario(resources, 1)
