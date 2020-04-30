@@ -32,3 +32,27 @@ class Bucket(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'bucket': resource_info['bucket_name']})
+
+
+@Bucket.action_registry.register('enable-uniform-bucket-level-access')
+class BucketLevelAccess(MethodAction):
+    '''
+    Additional Enforcement mechanism for the Organization Policy Bucket Level Access.
+    iamConfiguration.uniformBucketLevelAccess.enabled boolean.
+    When set to true, users can only specify bucket level IAM policies and not Object level ACL's.
+
+    Example Policy:
+    - name: enforce-uniform-bucket-level-access
+        resource: gcp.bucket
+        filters:
+        - iamConfiguration.uniformBucketLevelAccess.enable: false
+        actions:
+        - enable-uniform-bucket-level-access
+    '''
+
+    schema = type_schema('enable-uniform-bucket-level-access')
+    method_spec = {'op': 'patch'}
+
+    def get_resource_params(self, model, resource):
+        return {'bucket': resource['name'],
+                'body': {'iamConfiguration.uniformBucketLevelAccess.enabled': 'true'}}

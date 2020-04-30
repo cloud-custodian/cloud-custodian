@@ -43,3 +43,19 @@ class BucketTest(BaseTest):
         self.assertEqual(bucket['id'], "staging.cloud-custodian.appspot.com")
         self.assertEqual(bucket['storageClass'], "STANDARD")
         self.assertEqual(bucket['location'], "EU")
+
+    def test_enable_uniform_bucket_level_access(self):
+        project_id = 'cloud-custodian'
+        bucket_name = "cool-bucket"
+        factory = self.replay_flight_data(
+            'enable-uniform-bucket-level-access', project_id)
+        p = self.load_policy({'name': 'bucket', 'resource': 'gcp.bucket'},
+                             session_factory=factory)
+        bucket = p.resource_manager.get_resource({
+            "bucket_name": bucket_name,
+        })
+        self.assertEqual(bucket['name'], bucket_name)
+        self.assertEqual(bucket['id'], "cool-bucket")
+        self.assertEqual(bucket['storageClass'], "STANDARD")
+        self.assertEqual(bucket['location'], "EU")
+        self.assertEqual(bucket['iamConfiguration.uniformBucketLevelAccess.enabled'], "true")
