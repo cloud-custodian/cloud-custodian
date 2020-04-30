@@ -120,6 +120,18 @@ class UpdateAccount(BaseAction):
         client.update_account(patchOperations=self.data['patch'])
 
 
+class ApiDescribeSource(query.DescribeSource):
+
+    def augment(self, resources):
+        for r in resources:
+            tags = r.setdefault('Tags', [])
+            for k, v in r.pop('tags', {}).items():
+                tags.append({
+                    'Key': k,
+                    'Value': v})
+        return resources
+
+
 @resources.register('rest-api')
 class RestApi(query.QueryResourceManager):
 
@@ -135,6 +147,11 @@ class RestApi(query.QueryResourceManager):
         universal_taggable = object()
         permissions_enum = ('apigateway:GET',)
 
+    source_mapping = {
+        'config': query.ConfigSource,
+        'describe': ApiDescribeSource
+    }
+
     @property
     def generate_arn(self):
         """
@@ -149,23 +166,6 @@ class RestApi(query.QueryResourceManager):
                 region=self.config.region,
                 resource_type=self.resource_type.arn_type)
         return self._generate_arn
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return ApiDescribeSource(self)
-        return super(RestApi, self).get_source(source_type)
-
-
-class ApiDescribeSource(query.DescribeSource):
-
-    def augment(self, resources):
-        for r in resources:
-            tags = r.setdefault('Tags', [])
-            for k, v in r.pop('tags', {}).items():
-                tags.append({
-                    'Key': k,
-                    'Value': v})
-        return resources
 
 
 @RestApi.filter_registry.register('cross-account')

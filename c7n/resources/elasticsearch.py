@@ -11,15 +11,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import itertools
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction
 from c7n.filters import MetricsFilter
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import chunks, local_session, type_schema
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
+from c7n.utils import local_session, type_schema
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
+
+
+class DescribeDomain(DescribeSource):
+
+    def get_resources(self, resource_ids):
+        client = local_session(self.manager.session_factory).client('es')
+        return client.describe_elasticsearch_domains(
+            DomainNames=resource_ids)['DomainStatusList']
+
+    def augment(self, domains):
+        client = local_session(self.manager.session_factory).client('es')
+        model = self.manager.get_model()
+
+        def _augment(resource_set):
+            resources = self.manager.retry(
+                client.describe_elasticsearch_domains,
+                DomainNames=resource_set)['DomainStatusList']
+            for r in resources:
+                rarn = self.manager.generate_arn(r[model.id])
+                r['Tags'] = self.manager.retry(
+                    client.list_tags, ARN=rarn).get('TagList', [])
+            return resources
+
+        return _augment(domains)
 
 
 @resources.register('elasticsearch')
@@ -34,29 +57,12 @@ class ElasticSearchDomain(QueryResourceManager):
         id = 'DomainName'
         name = 'Name'
         dimension = "DomainName"
+        config_type = 'AWS::Elasticsearch::Domain'
 
-    def get_resources(self, resource_ids):
-        client = local_session(self.session_factory).client('es')
-        return client.describe_elasticsearch_domains(
-            DomainNames=resource_ids)['DomainStatusList']
-
-    def augment(self, domains):
-        client = local_session(self.session_factory).client('es')
-        model = self.get_model()
-
-        def _augment(resource_set):
-            resources = self.retry(
-                client.describe_elasticsearch_domains,
-                DomainNames=resource_set)['DomainStatusList']
-            for r in resources:
-                rarn = self.generate_arn(r[model.id])
-                r['Tags'] = self.retry(
-                    client.list_tags, ARN=rarn).get('TagList', [])
-            return resources
-
-        with self.executor_factory(max_workers=1) as w:
-            return list(itertools.chain(
-                *w.map(_augment, chunks(domains, 5))))
+    source_mapping = {
+        'describe': DescribeDomain,
+        'config': ConfigSource
+    }
 
 
 ElasticSearchDomain.filter_registry.register('marked-for-op', TagActionFilter)

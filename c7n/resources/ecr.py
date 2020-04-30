@@ -17,9 +17,24 @@ from c7n.actions import RemovePolicyBase, Action
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import local_session, type_schema
+
+
+class DescribeECR(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('ecr')
+        results = []
+        for r in resources:
+            try:
+                r['Tags'] = client.list_tags_for_resource(
+                    resourceArn=r['repositoryArn']).get('tags')
+                results.append(r)
+            except client.exceptions.RepositoryNotFoundException:
+                continue
+        return results
 
 
 @resources.register('ecr')
@@ -33,19 +48,12 @@ class ECR(QueryResourceManager):
         arn_type = 'repository'
         filter_name = 'repositoryNames'
         filter_type = 'list'
+        # config_type = 'AWS::ECR::Repository'
 
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('ecr')
-        results = []
-        for r in resources:
-            try:
-                r['Tags'] = client.list_tags_for_resource(
-                    resourceArn=r['repositoryArn']).get('tags')
-                results.append(r)
-            except client.exceptions.RepositoryNotFoundException:
-                continue
-
-        return results
+    source_mapping = {
+        'describe': DescribeECR,
+        'config': ConfigSource
+    }
 
 
 @ECR.action_registry.register('tag')

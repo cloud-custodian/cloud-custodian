@@ -1086,8 +1086,10 @@ class MonitorInstances(BaseAction, StateTransitionFilter):
 class InstanceFinding(PostFinding):
     def format_resource(self, r):
         ip_addresses = jmespath.search(
-            "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
-
+            "NetworkInterfaces[].Association.PublicIp", r)
+        ip_addresses.extend(jmespath.search(
+            "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r))
+        ip_addresses = list(filter(None, ip_addresses))
         # limit to max 10 ip addresses, per security hub service limits
         ip_addresses = ip_addresses and ip_addresses[:10] or ip_addresses
         details = {

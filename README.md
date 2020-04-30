@@ -34,10 +34,10 @@ provisioning. Or it can be run as a simple cron job on a server to
 execute against large existing fleets.
 
 Cloud Custodian was originally developed at CapitalOne (by @kapilt et
-al), but CapitalOne does not materially contribute or support this
-project, nor do they have any active maintainers. They represent just
-one of the thousands of users of this project. Like many opensource
-projects, development is lead by the community of hundreds of
+al). Since its inception, Cloud Custodian has grown beyond its original maintainers,
+and now Capital One represents
+one of many contributors to this project. Like many opensource
+projects, development is lead by a community of hundreds of
 contributors and several cloud providers have dedicated teams working
 on Custodian.
 
@@ -251,9 +251,6 @@ tools here
 - [**_Guardian_:**](https://cloudcustodian.io/docs/tools/c7n-guardian.html) Automated multi-account Guard Duty setup
 
 - [**_Omni SSM_:**](https://cloudcustodian.io/docs/tools/omnissm.html) EC2 Systems Manager Automation
-
-- **_Sentry_:** Cloudwatch Log parsing for python tracebacks to integrate with
-    <https://sentry.io/welcome/>
 
 - [**_Mugc_:**](https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/ops#mugc) A utility used to clean up Cloud Custodian Lambda policies that are deployed in an AWS environment.
 

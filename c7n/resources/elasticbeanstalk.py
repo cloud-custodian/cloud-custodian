@@ -15,7 +15,7 @@
 import logging
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n import utils
 from c7n import tags
 from c7n.utils import local_session, type_schema
@@ -41,6 +41,13 @@ class ElasticBeanstalk(QueryResourceManager):
         )
         filter_name = 'ApplicationNames'
         filter_type = 'list'
+        config_type = 'AWS::ElasticBeanstalk::Application'
+
+
+class DescribeEnvironment(DescribeSource):
+
+    def augment(self, resources):
+        return _eb_env_tags(resources, self.manager.session_factory, self.manager.retry)
 
 
 @resources.register('elasticbeanstalk-environment')
@@ -61,11 +68,13 @@ class ElasticBeanstalkEnvironment(QueryResourceManager):
         )
         filter_name = 'EnvironmentNames'
         filter_type = 'list'
+        config_type = 'AWS::ElasticBeanstalk::Environment'
 
     permissions = ('elasticbeanstalk:ListTagsForResource',)
-
-    def augment(self, envs):
-        return _eb_env_tags(envs, self.session_factory, self.retry)
+    source_mapping = {
+        'describe': DescribeEnvironment,
+        'config': ConfigSource
+    }
 
 
 ElasticBeanstalkEnvironment.filter_registry.register(

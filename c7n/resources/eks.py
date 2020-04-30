@@ -32,6 +32,7 @@ class EKS(QueryResourceManager):
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'
+        # config_type = 'AWS::EKS::Cluster'
 
     def augment(self, resources):
         resources = super(EKS, self).augment(resources)
