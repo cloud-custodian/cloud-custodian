@@ -281,10 +281,20 @@ class HasRootAccess(Filter):
                 filters:
                   - type: has-root-access
                     value: False
+
+              - name: efs-filter-root-access-with-exceptions
+                resource: efs
+                filters:
+                  - type: has-root-access
+                    value: False
+                    exceptions:
+                      - 123456789012
+                      - arn:aws:...
     """
     schema = type_schema(
         'has-root-access',
-        value={'enum': [True, False]})
+        value={'enum': [True, False]},
+        exceptions={'type': 'list'})
 
     permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
 
@@ -293,15 +303,70 @@ class HasRootAccess(Filter):
 
     def _filter_root_access(self, resource):
         policy = json.loads(resource['Policy'])
-        allows_root_access = any(stmt for stmt in policy['Statement'] if 'elasticfilesystem:ClientRootAccess' in stmt['Action'])
+        allows_root_access = any(stmt for stmt in policy['Statement'] if self._statement_has_root_access(stmt))
 
         return allows_root_access if self.data.get('value', False) else not allows_root_access
 
+    def _statement_has_root_access(self, statement):
+        principal = statement['Principal']['AWS']
+        exceptions = self.data.get('exceptions', [])
 
-# @ElasticFileSystem.filter_registry.register('read-only-by-default')
-# class ReadOnlyByDefault(Filter):
-#     print('hello')
+        return 'elasticfilesystem:ClientRootAccess' in statement['Action'] \
+            and statement['Effect'] == 'Allow' \
+            and (principal not in exceptions if principal is str else any(p not in exceptions for p in principal))
 
-# @ElasticFileSystem.filter_registry.register('in-transit-encription')
-# class InTransitEncription(Filter):
-#     print('hello')
+
+    @ElasticFileSystem.filter_registry.register('read-only-by-default')
+    class ReadOnlyByDefault(Filter):
+        """Filters efs based on the policy statement,
+        checking if it only allows read-only operations by default.
+        *Note* by default this filter checks if read-only is enabled.
+
+        :example:
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: efs-read-only-by-default
+                    resource: efs
+                    filters:
+                    - type: read-only-by-default
+                      value: True
+
+                  - name: efs-read-only-by-default-with-exceptions
+                    resource: efs
+                    filters:
+                    - type: read-only-by-default
+                      value: True
+                      exceptions:
+                        - 123456789012
+                        - arn:aws:...
+        """
+        schema = type_schema(
+            'read-only-by-default',
+            value={'enum': [True, False]},
+            exceptions={'type': 'list'})
+
+        permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
+
+        def process(self, resources, event=None):
+            return list(filter(self._filter_read_only_default, resources))
+
+        def _filter_read_only_default(self, resource):
+            policy = json.loads(resource['Policy'])
+            not_read_only = any(stmt for stmt in policy['Statement'] if self._statement_not_read_only(stmt))
+
+            return not_read_only if not self.data.get('value', True) else not not_read_only
+
+        def _statement_not_read_only(self, statement):
+            principal = statement['Principal']['AWS']
+            exceptions = self.data.get('exceptions', [])
+
+            return 'elasticfilesystem:ClientWrite' in statement['Action'] \
+                and statement['Effect'] == 'Allow' \
+                and (principal not in exceptions if principal is str else any(p not in exceptions for p in principal))
+
+
+    # @ElasticFileSystem.filter_registry.register('in-transit-encription')
+    # class InTransitEncription(Filter):
+    #     print('hello')

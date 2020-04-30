@@ -277,3 +277,70 @@ class ElasticFileSystem(BaseTest):
         )
         resources = p.run()
         self.assertEquals(len(resources), 2)
+
+    def test_not_has_root_access_with_exceptions(self):
+        factory = self.replay_flight_data("test_efs_filter_not_has_root_access_with_exceptions")
+        p = self.load_policy(
+            {
+                "name": "efs-has-root-access",
+                "resource": "efs",
+                "filters": [{
+                    "type": "has-root-access",
+                    "exceptions": [
+                        "*"
+                    ]
+                }]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 2)
+
+    def test_read_only_by_default(self):
+        factory = self.replay_flight_data("test_efs_filter_is_read_only_by_default")
+        p = self.load_policy(
+            {
+                "name": "efs-has-root-access",
+                "resource": "efs",
+                "filters": [{
+                    "type": "read-only-by-default",
+                }]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 1)
+
+    def test_not_read_only_by_default(self):
+        factory = self.replay_flight_data("test_efs_filter_is_not_read_only_by_default")
+        p = self.load_policy(
+            {
+                "name": "efs-has-root-access",
+                "resource": "efs",
+                "filters": [{
+                    "type": "read-only-by-default",
+                    "value": "False"
+                }]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 1)
+
+    def test_read_only_by_default_with_exceptions(self):
+        factory = self.replay_flight_data("test_efs_filter_is_read_only_by_default_with_exceptions")
+        p = self.load_policy(
+            {
+                "name": "efs-has-root-access",
+                "resource": "efs",
+                "filters": [{
+                    "type": "read-only-by-default",
+                    "exceptions": [
+                        "*"
+                    ]
+                }]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 2)
