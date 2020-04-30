@@ -54,7 +54,7 @@ class DescribeElasticFileSystem(DescribeSource):
             for resource_set in chunks(resources, 10):
                 futures.append(exec_factory.submit(self._add_policy_to_resource, client, resource_set))
 
-        return resources
+        return universal_augment(self.manager, resources)
 
     def _add_policy_to_resource(self, client, resources):
         for r in resources:
