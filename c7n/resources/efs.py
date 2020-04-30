@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from concurrent.futures import as_completed
-
 from c7n.actions import Action, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
@@ -46,24 +44,32 @@ class ElasticFileSystem(QueryResourceManager):
     def get_source(self, source_type):
         return DescribeElasticFileSystem(self)
 
+
 class DescribeElasticFileSystem(DescribeSource):
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('efs')
 
-        with self.manager.executor_factory(max_workers=min((10, len(resources) + 1))) as exec_factory:
+        with self.manager.executor_factory(
+            max_workers=min((10, len(resources) + 1))
+        ) as exec_factory:
             futures = []
             for resource_set in chunks(resources, 10):
-                futures.append(exec_factory.submit(self._add_policy_to_resource, client, resource_set))
+                futures.append(exec_factory.submit(
+                    self._add_policy_to_resource, client, resource_set
+                ))
 
         return universal_augment(self.manager, resources)
 
     def _add_policy_to_resource(self, client, resources):
         for r in resources:
-          try:
-              r['Policy'] = client.describe_file_system_policy(FileSystemId=r['FileSystemId'])['Policy']
-          except Exception as err:
-              self.manager.log.error('Failed to retrieve EFS resource policy: %s', err)
+            try:
+                r['Policy'] = client.describe_file_system_policy(
+                    FileSystemId=r['FileSystemId']
+                )['Policy']
+            except Exception as err:
+                self.manager.log.error('Failed to retrieve EFS resource policy: %s', err)
+
 
 @resources.register('efs-mount-target')
 class ElasticFileSystemMountTarget(ChildResourceManager):
@@ -265,6 +271,7 @@ class LifecyclePolicy(Filter):
                 continue
         return resources
 
+
 @ElasticFileSystem.filter_registry.register('has-root-access')
 class HasRootAccess(Filter):
     """Filters efs based on the policy statement,
@@ -293,7 +300,9 @@ class HasRootAccess(Filter):
 
     def _filter_root_access(self, resource):
         policy = json.loads(resource['Policy'])
-        allows_root_access = any(stmt for stmt in policy['Statement'] if self._statement_has_root_access(stmt))
+        allows_root_access = any(
+            stmt for stmt in policy['Statement'] if self._statement_has_root_access(stmt)
+        )
 
         return allows_root_access if self.data.get('value', False) else not allows_root_access
 
@@ -305,81 +314,85 @@ class HasRootAccess(Filter):
             and (principal == '*' if principal is str else '*' in principal)
 
 
-    @ElasticFileSystem.filter_registry.register('read-only-by-default')
-    class ReadOnlyByDefault(Filter):
-        """Filters efs based on the policy statement,
-        checking if it only allows read-only operations by default.
-        *Note* by default this filter checks if read-only is enabled.
+@ElasticFileSystem.filter_registry.register('read-only-by-default')
+class ReadOnlyByDefault(Filter):
+    """Filters efs based on the policy statement,
+    checking if it only allows read-only operations by default.
+    *Note* by default this filter checks if read-only is enabled.
 
-        :example:
+    :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-                policies:
-                  - name: efs-read-only-by-default
-                    resource: efs
-                    filters:
-                    - type: read-only-by-default
-                      value: True
-        """
-        schema = type_schema(
-            'read-only-by-default',
-            value={'enum': [True, False]})
+            policies:
+                - name: efs-read-only-by-default
+                resource: efs
+                filters:
+                - type: read-only-by-default
+                    value: True
+    """
+    schema = type_schema(
+        'read-only-by-default',
+        value={'enum': [True, False]})
 
-        permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
 
-        def process(self, resources, event=None):
-            return list(filter(self._filter_read_only_default, resources))
+    def process(self, resources, event=None):
+        return list(filter(self._filter_read_only_default, resources))
 
-        def _filter_read_only_default(self, resource):
-            policy = json.loads(resource['Policy'])
-            not_read_only = any(stmt for stmt in policy['Statement'] if self._statement_not_read_only(stmt))
+    def _filter_read_only_default(self, resource):
+        policy = json.loads(resource['Policy'])
+        not_read_only = any(
+            stmt for stmt in policy['Statement'] if self._statement_not_read_only(stmt)
+        )
 
-            return not_read_only if not self.data.get('value', True) else not not_read_only
+        return not_read_only if not self.data.get('value', True) else not not_read_only
 
-        def _statement_not_read_only(self, statement):
-            principal = statement['Principal']['AWS']
+    def _statement_not_read_only(self, statement):
+        principal = statement['Principal']['AWS']
 
-            return 'elasticfilesystem:ClientWrite' in statement['Action'] \
-                and statement['Effect'] == 'Allow' \
-                and (principal == '*' if principal is str else '*' in principal)
+        return 'elasticfilesystem:ClientWrite' in statement['Action'] \
+            and statement['Effect'] == 'Allow' \
+            and (principal == '*' if principal is str else '*' in principal)
 
 
-    @ElasticFileSystem.filter_registry.register('in-transit-encription')
-    class InTransitEncription(Filter):
-        """Filters efs based on the policy statement,
-        checking if it only allows access within encripted network.
-        *Note* by default this filter checks if encription in transit is enabled.
+@ElasticFileSystem.filter_registry.register('in-transit-encription')
+class InTransitEncription(Filter):
+    """Filters efs based on the policy statement,
+    checking if it only allows access within encripted network.
+    *Note* by default this filter checks if encription in transit is enabled.
 
-        :example:
+    :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-                policies:
-                  - name: efs-in-transit-encription
-                    resource: efs
-                    filters:
-                    - type: in-transit-encription
-        """
-        schema = type_schema(
-            'in-transit-encription',
-            value={'enum': [True, False]})
+            policies:
+                - name: efs-in-transit-encription
+                resource: efs
+                filters:
+                - type: in-transit-encription
+    """
+    schema = type_schema(
+        'in-transit-encription',
+        value={'enum': [True, False]})
 
-        permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
 
-        def process(self, resources, event=None):
-            return list(filter(self._filter_in_transit_encription, resources))
+    def process(self, resources, event=None):
+        return list(filter(self._filter_in_transit_encription, resources))
 
-        def _filter_in_transit_encription(self, resource):
-            policy = json.loads(resource['Policy'])
-            transit_encription = any(stmt for stmt in policy['Statement'] if self._statement_in_transit_encription(stmt))
+    def _filter_in_transit_encription(self, resource):
+        policy = json.loads(resource['Policy'])
+        transit_encription = any(
+            stmt for stmt in policy['Statement'] if self._statement_in_transit_encription(stmt)
+        )
 
-            return transit_encription if self.data.get('value', True) else not transit_encription
+        return transit_encription if self.data.get('value', True) else not transit_encription
 
-        def _statement_in_transit_encription(self, statement):
-            principal = statement['Principal']['AWS']
+    def _statement_in_transit_encription(self, statement):
+        principal = statement['Principal']['AWS']
 
-            return '*' in statement['Action'] \
-                and statement['Effect'] == 'Deny' \
-                and (principal == '*' if principal is str else '*' in principal) \
-                and statement['Condition']['Bool']['aws:SecureTransport'] == 'false'
+        return '*' in statement['Action'] \
+            and statement['Effect'] == 'Deny' \
+            and (principal == '*' if principal is str else '*' in principal) \
+            and statement['Condition']['Bool']['aws:SecureTransport'] == 'false'
