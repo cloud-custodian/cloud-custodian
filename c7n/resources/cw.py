@@ -89,6 +89,9 @@ class EventRule(QueryResourceManager):
         filter_name = "NamePrefix"
         filter_type = "scalar"
         cfn_type = 'AWS::Events::Rule'
+        universal_taggable = object()
+
+    augment = universal_augment
 
 
 @EventRule.filter_registry.register('metrics')
