@@ -293,7 +293,7 @@ class HasRootAccess(Filter):
         'has-root-access',
         value={'enum': [True, False]})
 
-    permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy',)
 
     def process(self, resources, event=None):
         return list(filter(self._filter_root_access, resources))
@@ -326,16 +326,16 @@ class ReadOnlyByDefault(Filter):
 
             policies:
                 - name: efs-read-only-by-default
-                resource: efs
-                filters:
-                - type: read-only-by-default
+                  resource: efs
+                  filters:
+                  - type: read-only-by-default
                     value: True
     """
     schema = type_schema(
         'read-only-by-default',
         value={'enum': [True, False]})
 
-    permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy',)
 
     def process(self, resources, event=None):
         return list(filter(self._filter_read_only_default, resources))
@@ -376,7 +376,7 @@ class InTransitEncription(Filter):
         'in-transit-encription',
         value={'enum': [True, False]})
 
-    permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy',)
 
     def process(self, resources, event=None):
         return list(filter(self._filter_in_transit_encription, resources))
