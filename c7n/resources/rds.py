@@ -1456,10 +1456,9 @@ class UnusedRDSSubnetGroup(Filter):
     def process(self, configs, event=None):
         rds = self.manager.get_resource_manager('rds').resources()
         self.used = set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName', rds))
-        self.used.union(
-            set(
-                jmespath.search('[].DBSubnetGroup.DBSubnetGroupName',
-                self.manager.get_resource_manager('rds-cluster').resources(augment=False))))
+        self.used.update(set(
+            jmespath.search('[].DBSubnetGroup.DBSubnetGroupName',
+            self.manager.get_resource_manager('rds-cluster').resources(augment=False))))
         return super(UnusedRDSSubnetGroup, self).process(configs)
 
     def __call__(self, config):
