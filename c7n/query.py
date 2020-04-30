@@ -142,7 +142,8 @@ class ChildResourceQuery(ResourceQuery):
 
         parent_type, parent_key, annotate_parent = m.parent_spec
         parents = self.manager.get_resource_manager(parent_type)
-        parent_ids = [p[parents.resource_type.id] for p in parents.resources()]
+        parent_ids = [p[parents.resource_type.id] for p in parents.resources(
+            augment=False)]
 
         # Bail out with no parent ids...
         existing_param = parent_key in params
