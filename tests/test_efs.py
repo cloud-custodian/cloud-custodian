@@ -247,7 +247,7 @@ class ElasticFileSystem(BaseTest):
         self.assertEquals(len(resources), 2)
         self.assertGreater(len(resources[0]["Policy"]), 0)
 
-    def test_has_root_access_(self):
+    def test_has_root_access(self):
         factory = self.replay_flight_data("test_efs_filter_has_root_access")
         p = self.load_policy(
             {
@@ -261,13 +261,14 @@ class ElasticFileSystem(BaseTest):
             session_factory=factory
         )
         resources = p.run()
-        self.assertEquals(len(resources), 0)
+        self.assertEquals(len(resources), 1)
+        self.assertEquals(resources[0]['FileSystemId'], 'fs-cb09e148')
 
     def test_not_has_root_access(self):
         factory = self.replay_flight_data("test_efs_filter_not_has_root_access")
         p = self.load_policy(
             {
-                "name": "efs-has-root-access",
+                "name": "efs-not-has-root-access",
                 "resource": "efs",
                 "filters": [{
                     "type": "has-root-access"
@@ -276,31 +277,14 @@ class ElasticFileSystem(BaseTest):
             session_factory=factory
         )
         resources = p.run()
-        self.assertEquals(len(resources), 2)
-
-    def test_not_has_root_access_with_exceptions(self):
-        factory = self.replay_flight_data("test_efs_filter_not_has_root_access_with_exceptions")
-        p = self.load_policy(
-            {
-                "name": "efs-has-root-access",
-                "resource": "efs",
-                "filters": [{
-                    "type": "has-root-access",
-                    "exceptions": [
-                        "*"
-                    ]
-                }]
-            },
-            session_factory=factory
-        )
-        resources = p.run()
-        self.assertEquals(len(resources), 2)
+        self.assertEquals(len(resources), 1)
+        self.assertEquals(resources[0]['FileSystemId'], 'fs-4cbc54cf')
 
     def test_read_only_by_default(self):
         factory = self.replay_flight_data("test_efs_filter_is_read_only_by_default")
         p = self.load_policy(
             {
-                "name": "efs-has-root-access",
+                "name": "efs-read-only-by-default",
                 "resource": "efs",
                 "filters": [{
                     "type": "read-only-by-default",
@@ -310,37 +294,54 @@ class ElasticFileSystem(BaseTest):
         )
         resources = p.run()
         self.assertEquals(len(resources), 1)
+        self.assertEquals(resources[0]['FileSystemId'], 'fs-4cbc54cf')
 
     def test_not_read_only_by_default(self):
         factory = self.replay_flight_data("test_efs_filter_is_not_read_only_by_default")
         p = self.load_policy(
             {
-                "name": "efs-has-root-access",
+                "name": "efs-not-read-only-by-default",
                 "resource": "efs",
                 "filters": [{
                     "type": "read-only-by-default",
-                    "value": "False"
+                    "value": False
                 }]
             },
             session_factory=factory
         )
         resources = p.run()
         self.assertEquals(len(resources), 1)
+        self.assertEquals(resources[0]['FileSystemId'], 'fs-cb09e148')
 
-    def test_read_only_by_default_with_exceptions(self):
-        factory = self.replay_flight_data("test_efs_filter_is_read_only_by_default_with_exceptions")
+    def test_in_transit_encription(self):
+        factory = self.replay_flight_data("test_efs_filter_in_transit_encription")
         p = self.load_policy(
             {
-                "name": "efs-has-root-access",
+                "name": "efs-in-transit-encription",
                 "resource": "efs",
                 "filters": [{
-                    "type": "read-only-by-default",
-                    "exceptions": [
-                        "*"
-                    ]
+                    "type": "in-transit-encription",
                 }]
             },
             session_factory=factory
         )
         resources = p.run()
-        self.assertEquals(len(resources), 2)
+        self.assertEquals(len(resources), 1)
+        self.assertEquals(resources[0]['FileSystemId'], 'fs-4cbc54cf')
+
+    def test_not_in_transit_encription(self):
+        factory = self.replay_flight_data("test_efs_filter_not_in_transit_encription")
+        p = self.load_policy(
+            {
+                "name": "efs-not-in-transit-encription",
+                "resource": "efs",
+                "filters": [{
+                    "type": "in-transit-encription",
+                    "value": False
+                }]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 1)
+        self.assertEquals(resources[0]['FileSystemId'], 'fs-cb09e148')

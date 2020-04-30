@@ -281,20 +281,10 @@ class HasRootAccess(Filter):
                 filters:
                   - type: has-root-access
                     value: False
-
-              - name: efs-filter-root-access-with-exceptions
-                resource: efs
-                filters:
-                  - type: has-root-access
-                    value: False
-                    exceptions:
-                      - 123456789012
-                      - arn:aws:...
     """
     schema = type_schema(
         'has-root-access',
-        value={'enum': [True, False]},
-        exceptions={'type': 'list'})
+        value={'enum': [True, False]})
 
     permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
 
@@ -309,11 +299,10 @@ class HasRootAccess(Filter):
 
     def _statement_has_root_access(self, statement):
         principal = statement['Principal']['AWS']
-        exceptions = self.data.get('exceptions', [])
 
         return 'elasticfilesystem:ClientRootAccess' in statement['Action'] \
             and statement['Effect'] == 'Allow' \
-            and (principal not in exceptions if principal is str else any(p not in exceptions for p in principal))
+            and (principal == '*' if principal is str else '*' in principal)
 
 
     @ElasticFileSystem.filter_registry.register('read-only-by-default')
@@ -332,20 +321,10 @@ class HasRootAccess(Filter):
                     filters:
                     - type: read-only-by-default
                       value: True
-
-                  - name: efs-read-only-by-default-with-exceptions
-                    resource: efs
-                    filters:
-                    - type: read-only-by-default
-                      value: True
-                      exceptions:
-                        - 123456789012
-                        - arn:aws:...
         """
         schema = type_schema(
             'read-only-by-default',
-            value={'enum': [True, False]},
-            exceptions={'type': 'list'})
+            value={'enum': [True, False]})
 
         permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
 
@@ -360,13 +339,47 @@ class HasRootAccess(Filter):
 
         def _statement_not_read_only(self, statement):
             principal = statement['Principal']['AWS']
-            exceptions = self.data.get('exceptions', [])
 
             return 'elasticfilesystem:ClientWrite' in statement['Action'] \
                 and statement['Effect'] == 'Allow' \
-                and (principal not in exceptions if principal is str else any(p not in exceptions for p in principal))
+                and (principal == '*' if principal is str else '*' in principal)
 
 
-    # @ElasticFileSystem.filter_registry.register('in-transit-encription')
-    # class InTransitEncription(Filter):
-    #     print('hello')
+    @ElasticFileSystem.filter_registry.register('in-transit-encription')
+    class InTransitEncription(Filter):
+        """Filters efs based on the policy statement,
+        checking if it only allows access within encripted network.
+        *Note* by default this filter checks if encription in transit is enabled.
+
+        :example:
+
+        .. code-block:: yaml
+
+                policies:
+                  - name: efs-in-transit-encription
+                    resource: efs
+                    filters:
+                    - type: in-transit-encription
+        """
+        schema = type_schema(
+            'in-transit-encription',
+            value={'enum': [True, False]})
+
+        permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
+
+        def process(self, resources, event=None):
+            return list(filter(self._filter_in_transit_encription, resources))
+
+        def _filter_in_transit_encription(self, resource):
+            policy = json.loads(resource['Policy'])
+            transit_encription = any(stmt for stmt in policy['Statement'] if self._statement_in_transit_encription(stmt))
+
+            return transit_encription if self.data.get('value', True) else not transit_encription
+
+        def _statement_in_transit_encription(self, statement):
+            principal = statement['Principal']['AWS']
+
+            return '*' in statement['Action'] \
+                and statement['Effect'] == 'Deny' \
+                and (principal == '*' if principal is str else '*' in principal) \
+                and statement['Condition']['Bool']['aws:SecureTransport'] == 'false'

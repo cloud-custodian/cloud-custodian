@@ -3,6 +3,6 @@
     "data": {
         "ResponseMetadata": {},
         "FileSystemId": "fs-cb09e148",
-        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"efs-policy-wizard-4dcfbff7-07fb-483f-9e2b-0233c3cfdb17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"efs-statement-599b9607-40bc-4ad1-afbd-9cae0d400b0c\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : [ \"elasticfilesystem:ClientMount\", \"elasticfilesystem:ClientWrite\" ],\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-cb09e148\"\n  } ]\n}"
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"efs-policy-wizard-3b4e538e-5475-49c0-b464-8cc9f74ded6f\",\n  \"Statement\" : [ {\n    \"Sid\" : \"efs-statement-d2864d31-8d96-4d74-b9f6-eb190bb5df70\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : [ \"elasticfilesystem:ClientMount\", \"elasticfilesystem:ClientWrite\", \"elasticfilesystem:ClientRootAccess\" ],\n    \"Resource\" : \"arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-cb09e148\"\n  } ]\n}"
     }
 }
