@@ -288,6 +288,9 @@ class PostFinding(Action):
 
     Example generate a finding for accounts that don't have shield enabled.
 
+    Note with Cloud Custodian (0.9+) you need to enable the Custodian integration
+    to post-findings, see Getting Started with :ref:`Security Hub <aws-securityhub>`.
+
     :example:
 
     .. code-block:: yaml

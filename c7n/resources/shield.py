@@ -30,6 +30,7 @@ class ShieldProtection(QueryResourceManager):
         id = 'Id'
         name = 'Name'
         arn = False
+        config_type = 'AWS::Shield::Protection'
 
 
 @resources.register('shield-attack')

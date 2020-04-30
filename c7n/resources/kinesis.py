@@ -15,9 +15,15 @@ import jmespath
 
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
+
+
+class DescribeStream(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('kinesis')
@@ -35,10 +41,12 @@ class KinesisStream(QueryResourceManager):
         name = id = 'StreamName'
         dimension = 'StreamName'
         universal_taggable = True
+        # config_type = 'AWS::Kinesis::Stream'
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(KinesisStream, self).augment(resources))
+    source_mapping = {
+        'describe': DescribeStream,
+        'config': ConfigSource
+    }
 
 
 @KinesisStream.action_registry.register('encrypt')
@@ -88,6 +96,12 @@ class Delete(Action):
                 StreamName=r['StreamName'])
 
 
+class DescribeDeliveryStream(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
 
@@ -102,10 +116,12 @@ class DeliveryStream(QueryResourceManager):
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
         universal_taggable = object()
+        # config_type = 'AWS::KinesisFirehose::DeliveryStream'
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(DeliveryStream, self).augment(resources))
+    source_mapping = {
+        'describe': DescribeDeliveryStream,
+        'config': ConfigSource
+    }
 
 
 @DeliveryStream.action_registry.register('delete')
@@ -213,6 +229,12 @@ class FirehoseEncryptS3Destination(Action):
                 client.update_destination(**params)
 
 
+class DescribeApp(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
 @resources.register('kinesis-analytics')
 class AnalyticsApp(QueryResourceManager):
 
@@ -225,10 +247,12 @@ class AnalyticsApp(QueryResourceManager):
         arn = id = "ApplicationARN"
         arn_type = 'application'
         universal_taggable = object()
+        # config_type = 'AWS::KinesisAnalytics::Application'
 
-    def augment(self, resources):
-        return universal_augment(
-            self, super(AnalyticsApp, self).augment(resources))
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeApp
+    }
 
 
 @AnalyticsApp.action_registry.register('delete')

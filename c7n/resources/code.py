@@ -168,3 +168,4 @@ class CodeDeployPipeline(QueryResourceManager):
         date = 'created'
         # Note this is purposeful, codepipeline don't have a separate type specifier.
         arn_type = ""
+        config_type = "AWS::CodePipeline::Pipeline"

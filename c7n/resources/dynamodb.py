@@ -26,29 +26,6 @@ from c7n.utils import (
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 
 
-@resources.register('dynamodb-table')
-class Table(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'dynamodb'
-        arn_type = 'table'
-        enum_spec = ('list_tables', 'TableNames', None)
-        detail_spec = ("describe_table", "TableName", None, "Table")
-        id = 'TableName'
-        name = 'TableName'
-        date = 'CreationDateTime'
-        dimension = 'TableName'
-        config_type = 'AWS::DynamoDB::Table'
-        universal_taggable = object()
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeTable(self)
-        elif source_type == 'config':
-            return ConfigTable(self)
-        raise ValueError('invalid source %s' % source_type)
-
-
 class ConfigTable(query.ConfigSource):
 
     def load_resource(self, item):
@@ -76,6 +53,27 @@ class DescribeTable(query.DescribeSource):
         return universal_augment(
             self.manager,
             super(DescribeTable, self).augment(resources))
+
+
+@resources.register('dynamodb-table')
+class Table(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'dynamodb'
+        arn_type = 'table'
+        enum_spec = ('list_tables', 'TableNames', None)
+        detail_spec = ("describe_table", "TableName", None, "Table")
+        id = 'TableName'
+        name = 'TableName'
+        date = 'CreationDateTime'
+        dimension = 'TableName'
+        config_type = 'AWS::DynamoDB::Table'
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeTable,
+        'config': ConfigTable
+    }
 
 
 class StatusFilter:
@@ -373,7 +371,7 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         enum_spec = ('describe_clusters', 'Clusters', None)
         id = 'ClusterArn'
         name = 'ClusterName'
-        config_type = 'AWS::DAX::Cluster'
+        # config_type = 'AWS::DAX::Cluster'
 
     permissions = ('dax:ListTags',)
 

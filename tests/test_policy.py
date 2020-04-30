@@ -23,7 +23,7 @@ from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
-from c7n.resources.aws import AWS
+from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
 from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
@@ -196,6 +196,70 @@ class PolicyMetaLint(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_config_resource_support(self):
+
+        # for several of these we express support as filter or action instead
+        # of a resource.
+        whitelist = {
+            'AWS::EC2::Host',
+            'AWS::EC2::RegisteredHAInstance',
+            'AWS::EC2::EgressOnlyInternetGateway',
+            'AWS::EC2::VPCEndpointService',
+            'AWS::EC2::FlowLog',
+            'AWS::RDS::DBSecurityGroup',
+            'AWS::RDS::EventSubscription',
+            'AWS::S3::AccountPublicAccessBlock',
+            'AWS::Redshift::ClusterParameterGroup',
+            'AWS::Redshift::ClusterSecurityGroup',
+            'AWS::Redshift::EventSubscription',
+            'AWS::SSM::ManagedInstanceInventory',
+            'AWS::AutoScaling::ScalingPolicy',
+            'AWS::AutoScaling::ScheduledAction',
+            'AWS::WAF::RateBasedRule',
+            'AWS::WAF::Rule',
+            'AWS::WAF::RuleGroup',
+            'AWS::WAFRegional::RateBasedRule',
+            'AWS::WAFRegional::Rule',
+            'AWS::WAFRegional::RuleGroup',
+            'AWS::ElasticBeanstalk::ApplicationVersion',
+            'AWS::WAFv2::WebACL',
+            'AWS::WAFv2::RuleGroup',
+            'AWS::WAFv2::IPSet',
+            'AWS::WAFv2::RegexPatternSet',
+            'AWS::WAFv2::ManagedRuleSet',
+            'AWS::XRay::EncryptionConfig',
+            'AWS::SSM::AssociationCompliance',
+            'AWS::SSM::PatchCompliance',
+            'AWS::ShieldRegional::Protection',
+            'AWS::Config::ResourceCompliance',
+            'AWS::ApiGatewayV2::Stage',
+            'AWS::ApiGatewayV2::Api',
+            'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
+            'AWS::ServiceCatalog::CloudFormationProduct',
+            'AWS::ServiceCatalog::Portfolio'}
+
+        resource_map = {}
+        for k, v in manager.resources.items():
+            if not v.resource_type.config_type:
+                continue
+            resource_map[v.resource_type.config_type] = v
+        resource_config_types = set(resource_map)
+
+        session = fake_session()._session
+        model = session.get_service_model('config')
+        shape = model.shape_for('ResourceType')
+
+        config_types = set(shape.enum).difference(whitelist)
+        missing = config_types.difference(resource_config_types)
+        if missing:
+            raise AssertionError(
+                "Missing config types \n %s" % ('\n'.join(missing)))
+
+        bad_types = resource_config_types.difference(config_types)
+        if bad_types:
+            raise AssertionError(
+                "Invalid config types \n %s" % ('\n'.join(bad_types)))
 
     def test_resource_meta_with_class(self):
         missing = set()
