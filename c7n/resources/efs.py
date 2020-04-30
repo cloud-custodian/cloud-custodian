@@ -24,6 +24,8 @@ from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry, chunks
 from .aws import shape_validate
 
+import json
+
 
 @resources.register('efs')
 class ElasticFileSystem(QueryResourceManager):
@@ -262,3 +264,44 @@ class LifecyclePolicy(Filter):
             except client.exceptions.FileSystemNotFound:
                 continue
         return resources
+
+@ElasticFileSystem.filter_registry.register('has-root-access')
+class HasRootAccess(Filter):
+    """Filters efs based on the policy statement,
+    checking if root access is blocked by default.
+    *Note* by default this filter checks if the root access is disabled.
+
+    :example:
+
+      .. code-block:: yaml
+
+            policies:
+              - name: efs-filter-root-access
+                resource: efs
+                filters:
+                  - type: has-root-access
+                    value: False
+    """
+    schema = type_schema(
+        'has-root-access',
+        value={'enum': [True, False]})
+
+    permissions = ('elasticfilesystem:DescribeFileSystemPolicy')
+
+    def process(self, resources, event=None):
+        return list(filter(self._filter_root_access, resources))
+
+    def _filter_root_access(self, resource):
+        policy = json.loads(resource['Policy'])
+        allows_root_access = any(stmt for stmt in policy['Statement'] if 'elasticfilesystem:ClientRootAccess' in stmt['Action'])
+
+        return allows_root_access if self.data.get('value', False) else not allows_root_access
+
+
+# @ElasticFileSystem.filter_registry.register('read-only-by-default')
+# class ReadOnlyByDefault(Filter):
+#     print('hello')
+
+# @ElasticFileSystem.filter_registry.register('in-transit-encription')
+# class InTransitEncription(Filter):
+#     print('hello')

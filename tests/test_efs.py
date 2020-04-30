@@ -246,3 +246,34 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEquals(len(resources), 2)
         self.assertGreater(len(resources[0]["Policy"]), 0)
+
+    def test_has_root_access_(self):
+        factory = self.replay_flight_data("test_efs_filter_has_root_access")
+        p = self.load_policy(
+            {
+                "name": "efs-has-root-access",
+                "resource": "efs",
+                "filters": [{
+                    "type": "has-root-access",
+                    "value": True
+                }]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 0)
+
+    def test_not_has_root_access(self):
+        factory = self.replay_flight_data("test_efs_filter_not_has_root_access")
+        p = self.load_policy(
+            {
+                "name": "efs-has-root-access",
+                "resource": "efs",
+                "filters": [{
+                    "type": "has-root-access"
+                }]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEquals(len(resources), 2)
