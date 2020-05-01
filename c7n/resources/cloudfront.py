@@ -225,7 +225,6 @@ class StreamingDistributionConfig(ValueFilter):
     def process(self, resources, event=None):
 
         self.augment([r for r in resources if self.annotation_key not in r])
-        print(resources)
         return super().process(resources, event)
 
     def augment(self, resources):
@@ -237,7 +236,7 @@ class StreamingDistributionConfig(ValueFilter):
             try:
                 r[self.annotation_key] = client.get_streaming_distribution_config(Id=r['Id']) \
                     .get('StreamingDistributionConfig')
-            except (client.exceptions.NoSuchDistribution):
+            except (client.exceptions.NoSuchStreamingDistribution):
                 r[self.annotation_key] = {}
             except Exception as e:
                 self.log.warning(
@@ -680,7 +679,6 @@ class StreamingDistributionUpdateAction(BaseAction):
     shape = 'UpdateStreamingDistributionRequest'
 
     def validate(self):
-        print('validate')
         attrs = dict(self.data.get('attributes'))
         if attrs.get('CallerReference'):
             raise PolicyValidationError('CallerReference field cannot be updated')
@@ -694,7 +692,6 @@ class StreamingDistributionUpdateAction(BaseAction):
             "Id": "sample_id",
             "IfMatch": "sample_string",
         }
-        print(request)
         return shape_validate(request, self.shape, 'cloudfront')
 
     def set_required_update_fields(self, config):
@@ -732,7 +729,7 @@ class StreamingDistributionUpdateAction(BaseAction):
                 IfMatch=res['ETag'],
                 StreamingDistributionConfig=updatedConfig
             )
-        except (client.exceptions.NoSuchDistribution):
+        except (client.exceptions.NoSuchStreamingDistribution):
             pass
         except Exception as e:
             self.log.warning(
