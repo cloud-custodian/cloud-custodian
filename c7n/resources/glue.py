@@ -106,6 +106,21 @@ class EndpointSubnetFilter(SubnetFilter):
 
 @GlueDevEndpoint.filter_registry.register('route-table')
 class EndpointRouteTableFilter(ValueFilter):
+    """Filter Route Tables connected to a Glue Dev Endpoint
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: glue-endpoint-public-route
+            resource: aws.glue-dev-endpoint
+            filters:
+                - type: route-table
+                  key: RouteTables[].Routes[].DestinationCidrBlock
+                  value: 0.0.0.0/0
+                  op: contains
+    """    
     annotation_key = 'c7n:route-table'
     annotate = False  # no annotation from value filter
     schema = type_schema('route-table', rinherit=ValueFilter.schema)
