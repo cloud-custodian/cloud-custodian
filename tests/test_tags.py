@@ -15,13 +15,11 @@
 module to test some universal tagging infrastructure not directly exposed.
 """
 import time
-from datetime import datetime, timedelta
 from mock import MagicMock, call
 
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
-from c7n.filters.offhours import Time
 
 from .common import BaseTest
 
@@ -411,23 +409,25 @@ class TagsTest(BaseTest):
         self.assertTrue(
             self.load_policy(
                 {
-                "name": "ec2-mark-for-op",
-                "resource": "ec2",
-                "filters": [{"tag:c7n:cleanup": "absent"}],
-                "actions": [
-                    {
-                        "type": "mark-for-op",
-                        "tag": "c7n:cleanup",
-                        "op": "stop",
-                        "days": 1,
-                    }
-                ]},
+                    "name": "ec2-mark-for-op",
+                    "resource": "ec2",
+                    "filters": [{"tag:c7n:cleanup": "absent"}],
+                    "actions": [
+                        {
+                            "type": "mark-for-op",
+                            "tag": "c7n:cleanup",
+                            "op": "stop",
+                            "days": 1,
+                        }
+                    ]
+                },
                 validate=True,
             ))
 
     def test_tag_filter(self):
         session_factory = self.replay_flight_data("test_tags_mark_for_op")
-        p = self.load_policy({
+        p = self.load_policy(
+            {
                 "name": "ec2-mark-for-op",
                 "resource": "ec2",
                 "filters": [
@@ -437,7 +437,8 @@ class TagsTest(BaseTest):
                         "tag": "c7n:cleanup",
                         "op": "stop"
                     }
-                ]},
+                ]
+            },
             session_factory=session_factory
         )
         resources = p.run()
@@ -445,7 +446,8 @@ class TagsTest(BaseTest):
 
     def test_misformatted_date_string(self):
         session_factory = self.replay_flight_data("test_tags_mark_for_op_improper_tag")
-        p = self.load_policy({
+        p = self.load_policy(
+            {
                 "name": "ec2-mark-for-op",
                 "resource": "ec2",
                 "filters": [
@@ -456,7 +458,8 @@ class TagsTest(BaseTest):
                         "tag": "c7n:cleanup",
                         "op": "stop"
                     }
-                ]},
+                ]
+            },
             session_factory=session_factory
         )
         resources = p.run()
@@ -465,7 +468,8 @@ class TagsTest(BaseTest):
     def test_timezone_in_datestring(self):
         date = '2020/05/01 1000 KST'
         session_factory = self.replay_flight_data("test_tags_timezone")
-        p = self.load_policy({
+        p = self.load_policy(
+            {
                 "name": "ec2-mark-for-op",
                 "resource": "ec2",
                 "filters": [
@@ -479,12 +483,13 @@ class TagsTest(BaseTest):
                         "hours": 1,
                         "tz": 'kst'
                     }
-                ]},
+                ]
+            },
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)        
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('ec2')
-        resp = client.describe_instances(InstanceIds=['i-0c42a3120a1d4a236'])   
+        resp = client.describe_instances(InstanceIds=['i-0c42a3120a1d4a236'])
         self.assertEqual(resp["Reservations"][0]["Instances"][0]["Tags"][0]["Key"], "c7n:cleanup")
         self.assertTrue(date in resp["Reservations"][0]["Instances"][0]["Tags"][0]["Value"])

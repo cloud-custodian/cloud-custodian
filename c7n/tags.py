@@ -23,7 +23,6 @@ from collections import Counter
 from concurrent.futures import as_completed
 
 from datetime import datetime, timedelta
-from dateutil import tz as tzutil
 from dateutil.parser import parse
 
 import itertools
@@ -662,7 +661,7 @@ class TagDelayedAction(Action):
 
     def process(self, resources):
         cfg = self.get_config_values()
-        tz = Time.get_tz(self.data.get(cfg['tz'], 'utc'))
+        self.tz = Time.get_tz(self.data.get(cfg['tz'], 'utc'))
         self.id_key = self.manager.get_model().id
 
         msg = cfg['msg'].format(
@@ -905,7 +904,7 @@ class UniversalTagDelayedAction(TagDelayedAction):
     concurrency = 1
 
     def process(self, resources):
-        tz = Time.get_tz(self.data.get('tz', 'utc'))
+        self.tz = Time.get_tz(self.data.get('tz', 'utc'))
         self.id_key = self.manager.get_model().id
 
         # Move this to policy? / no resources bypasses actions?
