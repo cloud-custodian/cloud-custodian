@@ -657,7 +657,7 @@ class StreamingDistributionUpdateAction(BaseAction):
     .. code-block:: yaml
 
         policies:
-        - name: enforce-distribution-logging
+        - name: enforce-streaming-distribution-logging
           resource: streaming-distribution
           filters:
             - type: value
