@@ -214,7 +214,7 @@ class UpdateGlueCrawler(BaseAction):
         attributes={'type': 'object'},
         required=('attributes',))
 
-    permission = ('glue:UpdateCrawler')
+    permissions = ('glue:UpdateCrawler')
     shape = 'UpdateCrawlerRequest'
 
     def validate(self):
