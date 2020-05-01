@@ -21,6 +21,7 @@ from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
@@ -184,6 +185,53 @@ class GlueCrawler(QueryResourceManager):
         universal_taggable = True
 
     augment = universal_augment
+
+
+@GlueCrawler.action_registry.register('update-crawler')
+class UpdateGlueCrawler(BaseAction):
+    """Updates glue crawlers based on specified parameter
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: glue-crawler-update
+                resource: aws.glue-crawler
+                filters:
+                  - type: value
+                    key: CrawlerSecurityConfiguration
+                    value: null
+                actions:
+                  - type: update-crawler
+                    attributes:
+                        CrawlerSecurityConfiguration: glue-approved
+
+    """
+
+    schema = type_schema(
+        'update-crawler',
+        attributes={'type': 'object'},
+        required=('attributes',))
+
+    permission = ('glue:UpdateCrawler')
+    shape = 'UpdateCrawlerRequest'
+
+    def validate(self):
+        attrs = dict(self.data['attributes'])
+        if 'Name' in attrs:
+            raise PolicyValidationError(
+                "Can't include Crawler name in update-crawler action")
+        attrs['Name'] = 'PolicyValidation'
+        return shape_validate(attrs, self.shape, 'glue')
+
+    def process(self, crawlers):
+        client = local_session(self.manager.session_factory).client('glue')
+        for crawler in crawlers:
+            try:
+                client.update_crawler(Name=crawler['Name'], **self.data['attributes'])
+            except client.exceptions.EntityNotFoundException:
+                continue
 
 
 class SecurityConfigFilter(RelatedResourceFilter):

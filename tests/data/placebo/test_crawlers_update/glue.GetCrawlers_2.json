@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "Crawlers": [
+            {
+                "Name": "test-filter-crawler",
+                "Role": "c7n-glue-test",
+                "Targets": {
+                    "S3Targets": [
+                        {
+                            "Path": "s3://cof-c7n-sandbox-dev/horizontal-dev/us-east-1/policies/account-service-limits-notify/2019/08/08/22",
+                            "Exclusions": []
+                        },
+                        {
+                            "Path": "s3://cof-c7n-sandbox-dev/public-cloud-dev/us-east-1/policies/account-service-limits-notify/2019/08/01/22",
+                            "Exclusions": []
+                        }
+                    ],
+                    "JdbcTargets": [],
+                    "DynamoDBTargets": [],
+                    "CatalogTargets": []
+                },
+                "DatabaseName": "central-logs-poc",
+                "Classifiers": [],
+                "SchemaChangePolicy": {
+                    "UpdateBehavior": "UPDATE_IN_DATABASE",
+                    "DeleteBehavior": "DEPRECATE_IN_DATABASE"
+                },
+                "State": "READY",
+                "CrawlElapsedTime": 0,
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 18,
+                    "hour": 10,
+                    "minute": 55,
+                    "second": 51,
+                    "microsecond": 0
+                },
+                "LastUpdated": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 30,
+                    "hour": 21,
+                    "minute": 17,
+                    "second": 32,
+                    "microsecond": 0
+                },
+                "Version": 7,
+                "CrawlerSecurityConfiguration": "glue-test"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
