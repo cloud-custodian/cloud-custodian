@@ -326,6 +326,32 @@ class TestRedshift(BaseTest):
             resources[0]['KmsKeyId'],
             'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5') # NOQA
 
+    def test_redshift_set_attributes(self):
+        factory = self.record_flight_data("test_redshift_set_attributes")
+        p = self.load_policy(
+            {
+                "name": "redshift-allow-version-upgrade",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "AllowVersionUpgrade",
+                        "value": True,
+                    }
+                ],
+                "actions": [{
+                    "type": "set-attributes",
+                    "attributes": {
+                        "AllowVersionUpgrade": False,
+                    }
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['AllowVersionUpgrade'])
+
 
 class TestRedshiftSnapshot(BaseTest):
 
