@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
+import jmespath
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from .aws import shape_validate
@@ -100,6 +102,35 @@ class GlueDevEndpoint(QueryResourceManager):
 class EndpointSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = 'SubnetId'
+
+
+@GlueDevEndpoint.filter_registry.register('route-table')
+class EndpointRouteTableFilter(ValueFilter):
+    annotation_key = 'c7n:route-table'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('route-table', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super(EndpointRouteTableFilter, self).process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.describe_route_tables(
+                    Filters=[
+                        {
+                            "Name":"association.subnet-id",
+                            "Values": [r['SubnetId']]
+                        }
+                    ]).get('RouteTables', [])                  
+            except client.exceptions.EntityNotFoundException:
+                r[self.annotation_key] = {}
+
+    def __call__(self, r):
+        return super(EndpointRouteTableFilter, self).__call__(r[self.annotation_key])
 
 
 @GlueDevEndpoint.action_registry.register('delete')
