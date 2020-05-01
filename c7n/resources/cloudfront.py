@@ -208,7 +208,7 @@ class StreamingDistributionConfig(ValueFilter):
     .. code-block:: yaml
 
             policies:
-              - name: logging-enabled
+              - name: streaming-distribution-logging-enabled
                 resource: streaming-distribution
                 filters:
                   - type: streaming-distribution-config
