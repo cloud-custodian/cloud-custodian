@@ -308,11 +308,11 @@ class CloudFront(BaseTest):
         mock_factory = MagicMock()
         mock_factory.region = 'us-east-1'
         mock_factory().client(
-            'cloudfront').exceptions.NoSuchDistribution = (
-                client.exceptions.NoSuchDistribution)
+            'cloudfront').exceptions.NoSuchStreamingDistribution = (
+                client.exceptions.NoSuchStreamingDistribution)
 
         mock_factory().client('cloudfront').get_streaming_distribution_config.side_effect = (
-            client.exceptions.NoSuchDistribution(
+            client.exceptions.NoSuchStreamingDistribution(
                 {'Error': {'Code': 'xyz'}},
                 operation_name='get_streaming_distribution_config'))
         p = self.load_policy(

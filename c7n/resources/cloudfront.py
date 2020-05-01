@@ -729,7 +729,7 @@ class StreamingDistributionUpdateAction(BaseAction):
                 IfMatch=res['ETag'],
                 StreamingDistributionConfig=updatedConfig
             )
-        except (client.exceptions.NoSuchStreamingDistribution):
+        except (client.exceptions.NoSuchResource, client.exceptions.NoSuchStreamingDistribution):
             pass
         except Exception as e:
             self.log.warning(
