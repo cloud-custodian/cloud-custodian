@@ -21,6 +21,7 @@ from mock import MagicMock, call
 from c7n.tags import universal_retry, coalesce_copy_user_tags
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
+from c7n.filters.offhours import Time
 
 from .common import BaseTest
 
@@ -410,14 +411,14 @@ class TagsTest(BaseTest):
         self.assertTrue(
             self.load_policy(
                 {
-                "name": "s3-mark-for-op",
-                "resource": "s3",
-                "filters": [{"tag:c7n_cleanup": "absent"}],
+                "name": "ec2-mark-for-op",
+                "resource": "ec2",
+                "filters": [{"tag:c7n:cleanup": "absent"}],
                 "actions": [
                     {
                         "type": "mark-for-op",
-                        "tag": "custodian_cleanup",
-                        "op": "delete",
+                        "tag": "c7n:cleanup",
+                        "op": "stop",
                         "days": 1,
                     }
                 ]},
@@ -425,21 +426,16 @@ class TagsTest(BaseTest):
             ))
 
     def test_tag_filter(self):
-        session_factory = self.record_flight_data("test_tags_mark_for_op")
-        #'TTL: stop@2020-04-30'
+        session_factory = self.replay_flight_data("test_tags_mark_for_op")
         p = self.load_policy({
-                "name": "s3-mark-for-op",
-                "resource": "s3",
+                "name": "ec2-mark-for-op",
+                "resource": "ec2",
                 "filters": [
-                    {"name": "repela"}
-                ],
-                "actions": [
+                    {"InstanceId": "i-0c42a3120a1d4a236"},
                     {
-                        "type": "mark-for-op",
-                        "tag": "custodian_cleanup",
-                        "op": "delete",
-                        "days": 1,
-                        "tz": 'pst'
+                        "type": "marked-for-op",
+                        "tag": "c7n:cleanup",
+                        "op": "stop"
                     }
                 ]},
             session_factory=session_factory
@@ -447,35 +443,48 @@ class TagsTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    # def test_improper_tag_format(self):
-    #     session_factory = self.record_flight_data("test_tags_mark_for_op_improper_tag")
-    #     p = self.load_policy({
-    #             "name": "s3-mark-for-op",
-    #             "resource": "s3",
-    #             "filters": [{"tag:custodian_cleanup": 'missingcolon'}],
-    #             "actions": [
-    #                 {
-    #                     "type": "mark-for-op",
-    #                     "tag": "custodian_cleanup",
-    #                     "op": "stop",
-    #                     "days": 1,
-    #                     "tz": 'pst'
-    #                 }
-    #             ]},
-    #         session_factory=session_factory
-    #     )
-    #     resources = p.run()
-    #     self.assertEqual(len(resources), 0)
+    def test_misformatted_date_string(self):
+        session_factory = self.replay_flight_data("test_tags_mark_for_op_improper_tag")
+        p = self.load_policy({
+                "name": "ec2-mark-for-op",
+                "resource": "ec2",
+                "filters": [
+                    {"InstanceId": "i-0c42a3120a1d4a236"},
+                    {"tag:c7n:cleanup": "whhhwh"},
+                    {
+                        "type": "marked-for-op",
+                        "tag": "c7n:cleanup",
+                        "op": "stop"
+                    }
+                ]},
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
-    # def test_misformatted_date_string(self):
-    #     date = "notadate"
-    #     resources = [tools.get_resource({'custodian_status': 'TTL: stop@{0}'.format(date)})]
-
-    #     self._test_filter_scenario(resources, 0)
-
-    # def test_timezone_in_datestring(self):
-    #     tz = Time.get_tz('America/Santiago')
-    #     date = (now(tz) - datetime.timedelta(hours=1)).strftime('%Y/%m/%d %H%M %Z')
-    #     resources = [tools.get_resource({'custodian_status': 'TTL: stop@{0}'.format(date)})]
-
-    #     self._test_filter_scenario(resources, 1)
+    def test_timezone_in_datestring(self):
+        date = '2020/05/01 1000 KST'
+        session_factory = self.replay_flight_data("test_tags_timezone")
+        p = self.load_policy({
+                "name": "ec2-mark-for-op",
+                "resource": "ec2",
+                "filters": [
+                    {"InstanceId": "i-0c42a3120a1d4a236"},
+                ],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "c7n:cleanup",
+                        "op": "stop",
+                        "hours": 1,
+                        "tz": 'kst'
+                    }
+                ]},
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)        
+        client = session_factory().client('ec2')
+        resp = client.describe_instances(InstanceIds=['i-0c42a3120a1d4a236'])   
+        self.assertEqual(resp["Reservations"][0]["Instances"][0]["Tags"][0]["Key"], "c7n:cleanup")
+        self.assertTrue(date in resp["Reservations"][0]["Instances"][0]["Tags"][0]["Value"])

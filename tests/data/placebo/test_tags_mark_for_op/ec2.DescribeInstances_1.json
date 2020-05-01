@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "InstanceId": "i-0c42a3120a1d4a236",
+                        "Tags": [
+                            {
+                                "Key": "c7n:cleanup",
+                                "Value": "Resource does not meet policy: stop@2020/04/30"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
