@@ -6,16 +6,7 @@
                 "Name": "test-filter-crawler",
                 "Role": "c7n-glue-test",
                 "Targets": {
-                    "S3Targets": [
-                        {
-                            "Path": "s3://cof-c7n-sandbox-dev/horizontal-dev/us-east-1/policies/account-service-limits-notify/2019/08/08/22",
-                            "Exclusions": []
-                        },
-                        {
-                            "Path": "s3://cof-c7n-sandbox-dev/public-cloud-dev/us-east-1/policies/account-service-limits-notify/2019/08/01/22",
-                            "Exclusions": []
-                        }
-                    ],
+                    "S3Targets": [],
                     "JdbcTargets": [],
                     "DynamoDBTargets": [],
                     "CatalogTargets": []

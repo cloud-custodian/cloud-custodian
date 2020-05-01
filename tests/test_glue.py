@@ -366,6 +366,7 @@ class TestGlueCrawlers(BaseTest):
         self.assertEqual(len(response), 1)
         self.assertTrue(response[0].get('CrawlerSecurityConfiguration'), 'glue-test')
 
+
 class TestGlueTables(BaseTest):
     def test_tables_delete(self):
         session_factory = self.replay_flight_data("test_glue_table_delete")
