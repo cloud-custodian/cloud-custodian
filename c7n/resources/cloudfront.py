@@ -198,6 +198,7 @@ class DistributionConfig(ValueFilter):
     def __call__(self, r):
         return super(DistributionConfig, self).__call__(r[self.annotation_key])
 
+
 @StreamingDistribution.filter_registry.register('streaming-distribution-config')
 class StreamingDistributionConfig(ValueFilter):
     """Check for Cloudfront streaming distribution config values

@@ -5,7 +5,7 @@
         "ETag": "E3SPE6T0EJSAA4",
         "Distribution": {
             "Id": "E1OQK8XICQK4UM",
-            "ARN": "arn:aws:cloudfront::644160558196:distribution/E1OQK8XICQK4UM",
+            "ARN": "arn:aws:cloudfront::123456789012:distribution/E1OQK8XICQK4UM",
             "Status": "InProgress",
             "DistributionConfig": {
                 "CallerReference": "6441605581961",
