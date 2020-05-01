@@ -18,7 +18,8 @@ import json
 from c7n.actions import RemovePolicyBase, BaseAction
 from c7n.filters import Filter, CrossAccountAccessFilter, ValueFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
+from c7n.query import (
+    ConfigSource, DescribeSource, QueryResourceManager, RetryPageIterator, TypeInfo)
 from c7n.utils import local_session, type_schema
 from c7n.tags import universal_augment
 
@@ -37,19 +38,10 @@ class KeyAlias(QueryResourceManager):
         return [r for r in resources if 'TargetKeyId' in r]
 
 
-@resources.register('kms-key')
-class Key(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'kms'
-        arn_type = "key"
-        enum_spec = ('list_keys', 'Keys', None)
-        name = "KeyId"
-        id = "KeyArn"
-        universal_taggable = True
+class DescribeKey(DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.session_factory).client('kms')
+        client = local_session(self.manager.session_factory).client('kms')
 
         for r in resources:
             try:
@@ -65,7 +57,25 @@ class Key(QueryResourceManager):
                 else:
                     raise
 
-        return universal_augment(self, resources)
+        return universal_augment(self.manager, resources)
+
+
+@resources.register('kms-key')
+class Key(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'kms'
+        arn_type = "key"
+        enum_spec = ('list_keys', 'Keys', None)
+        name = "KeyId"
+        id = "KeyArn"
+        universal_taggable = True
+        config_type = 'AWS::KMS::Key'
+
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeKey
+    }
 
 
 @Key.filter_registry.register('key-rotation-status')

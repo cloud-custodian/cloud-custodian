@@ -46,6 +46,7 @@ import functools
 import itertools
 import logging
 import operator
+import jmespath
 import re
 from decimal import Decimal as D, ROUND_HALF_UP
 
@@ -75,6 +76,22 @@ log = logging.getLogger('custodian.rds')
 
 filters = FilterRegistry('rds.filters')
 actions = ActionRegistry('rds.actions')
+
+
+class DescribeRDS(DescribeSource):
+
+    def augment(self, dbs):
+        return universal_augment(
+            self.manager, super(DescribeRDS, self).augment(dbs))
+
+
+class ConfigRDS(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super(ConfigRDS, self).load_resource(item)
+        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
+          for t in item['supplementaryConfiguration']['Tags']]
+        return resource
 
 
 @resources.register('rds')
@@ -112,29 +129,10 @@ class RDS(QueryResourceManager):
     filter_registry = filters
     action_registry = actions
 
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeRDS(self)
-        elif source_type == 'config':
-            return ConfigRDS(self)
-        raise ValueError("Unsupported source: %s for %s" % (
-            source_type, self.resource_type.config_type))
-
-
-class DescribeRDS(DescribeSource):
-
-    def augment(self, dbs):
-        return universal_augment(
-            self.manager, super(DescribeRDS, self).augment(dbs))
-
-
-class ConfigRDS(ConfigSource):
-
-    def load_resource(self, item):
-        resource = super(ConfigRDS, self).load_resource(item)
-        resource['Tags'] = [{u'Key': t['key'], u'Value': t['value']}
-          for t in item['supplementaryConfiguration']['Tags']]
-        return resource
+    source_mapping = {
+        'describe': DescribeRDS,
+        'config': ConfigRDS
+    }
 
 
 def _db_instance_eligible_for_backup(resource):
@@ -933,7 +931,7 @@ class RDSSubscription(QueryResourceManager):
             'describe_event_subscriptions', 'EventSubscriptionsList', None)
         name = id = "EventSubscriptionArn"
         date = "SubscriptionCreateTime"
-        config_type = "AWS::DB::EventSubscription"
+        # config_type = "AWS::DB::EventSubscription"
         # SubscriptionName isn't part of describe events results?! all the
         # other subscription apis.
         # filter_name = 'SubscriptionName'
@@ -1366,6 +1364,15 @@ class RDSModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
             )
 
 
+class DescribeSubnetGroup(DescribeSource):
+
+    def augment(self, resources):
+        _db_subnet_group_tags(
+            resources, self.manager.session_factory,
+            self.manager.executor_factory, self.manager.retry)
+        return resources
+
+
 @resources.register('rds-subnet-group')
 class RDSSubnetGroup(QueryResourceManager):
     """RDS subnet group."""
@@ -1379,11 +1386,12 @@ class RDSSubnetGroup(QueryResourceManager):
         filter_name = 'DBSubnetGroupName'
         filter_type = 'scalar'
         permissions_enum = ('rds:DescribeDBSubnetGroups',)
+        config_type = 'AWS::RDS::DBSubnetGroup'
 
-    def augment(self, resources):
-        _db_subnet_group_tags(
-            resources, self.session_factory, self.executor_factory, self.retry)
-        return resources
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeSubnetGroup
+    }
 
 
 def _db_subnet_group_tags(subnet_groups, session_factory, executor_factory, retry):
@@ -1454,8 +1462,9 @@ class UnusedRDSSubnetGroup(Filter):
 
     def process(self, configs, event=None):
         rds = self.manager.get_resource_manager('rds').resources()
-        self.used = {r.get('DBSubnetGroupName', r['DBInstanceIdentifier'])
-                     for r in rds}
+        self.used = set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName', rds))
+        self.used.update(set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName',
+            self.manager.get_resource_manager('rds-cluster').resources(augment=False))))
         return super(UnusedRDSSubnetGroup, self).process(configs)
 
     def __call__(self, config):

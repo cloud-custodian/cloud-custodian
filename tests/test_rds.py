@@ -704,7 +704,10 @@ class RDSTest(BaseTest):
             {
                 "name": "db-subnet-group-unused",
                 "resource": "rds-subnet-group",
-                "filters": [{"type": "unused"}],
+                "filters": [
+                    {'DBSubnetGroupName': 'not-used'},
+                    {"type": "unused"}
+                ],
             },
             session_factory=session_factory,
         )
@@ -712,6 +715,7 @@ class RDSTest(BaseTest):
         resources = policy.run()
 
         self.assertEqual(len(resources), 1, "Resources should be unused")
+        self.assertEqual(resources[0]['DBSubnetGroupName'], "not-used")
 
     def test_rds_modify_db(self):
         session_factory = self.replay_flight_data("test_rds_modify_db")

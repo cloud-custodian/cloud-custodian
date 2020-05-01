@@ -1658,6 +1658,7 @@ class RouteTable(query.QueryResourceManager):
         filter_name = 'RouteTableIds'
         filter_type = 'list'
         id_prefix = "rtb-"
+        config_type = "AWS::EC2::RouteTable"
 
 
 @RouteTable.filter_registry.register('vpc')
@@ -1776,6 +1777,7 @@ class PeeringConnection(query.QueryResourceManager):
         filter_name = 'VpcPeeringConnectionIds'
         filter_type = 'list'
         id_prefix = "pcx-"
+        config_type = "AWS::EC2::VPCPeeringConnection"
 
 
 @PeeringConnection.filter_registry.register('cross-account')
@@ -2026,6 +2028,7 @@ class CustomerGateway(query.QueryResourceManager):
         filter_type = 'list'
         name = 'CustomerGatewayId'
         id_prefix = "cgw-"
+        config_type = 'AWS::EC2::CustomerGateway'
 
 
 @resources.register('internet-gateway')
@@ -2084,6 +2087,7 @@ class NATGateway(query.QueryResourceManager):
         filter_type = 'list'
         date = 'CreateTime'
         id_prefix = "nat-"
+        config_type = 'AWS::EC2::NatGateway'
 
 
 @NATGateway.action_registry.register('delete')
@@ -2139,6 +2143,7 @@ class VpcEndpoint(query.QueryResourceManager):
         filter_type = 'list'
         id_prefix = "vpce-"
         universal_taggable = object()
+        config_type = "AWS::EC2::VPCEndpoint"
 
 
 @VpcEndpoint.filter_registry.register('cross-account')
