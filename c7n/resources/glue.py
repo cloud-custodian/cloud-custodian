@@ -125,7 +125,7 @@ class EndpointRouteTableFilter(ValueFilter):
                             "Name":"association.subnet-id",
                             "Values": [r['SubnetId']]
                         }
-                    ]).get('RouteTables', [])                  
+                    ])
             except client.exceptions.EntityNotFoundException:
                 r[self.annotation_key] = {}
 
