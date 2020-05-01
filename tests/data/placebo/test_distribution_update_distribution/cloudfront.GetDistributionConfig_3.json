@@ -2,15 +2,15 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "ETag": "ETAPGKTC9B1VZ",
+        "ETag": "E3SPE6T0EJSAA4",
         "DistributionConfig": {
             "CallerReference": "6441605581961",
             "Comment": "",
             "Enabled": true,
             "Logging": {
-                "Enabled": false,
+                "Enabled": true,
                 "IncludeCookies": false,
-                "Bucket": "",
+                "Bucket": "test-logging.s3.amazonaws.com",
                 "Prefix": ""
             }
         }

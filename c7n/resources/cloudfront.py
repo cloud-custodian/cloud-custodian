@@ -164,7 +164,7 @@ class DistributionConfig(ValueFilter):
                 filters:
                   - type: distribution-config
                     key: Logging.Enabled
-                    value: true
+                    value: False
    """
 
     schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
@@ -197,6 +197,55 @@ class DistributionConfig(ValueFilter):
 
     def __call__(self, r):
         return super(DistributionConfig, self).__call__(r[self.annotation_key])
+
+@StreamingDistribution.filter_registry.register('streaming-distribution-config')
+class StreamingDistributionConfig(ValueFilter):
+    """Check for Cloudfront streaming distribution config values
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: logging-enabled
+                resource: streaming-distribution
+                filters:
+                  - type: streaming-distribution-config
+                    key: Logging.Enabled
+                    value: true
+   """
+
+    schema = type_schema('streaming-distribution-config', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('cloudfront:GetStreamingDistributionConfig',)
+    annotation_key = 'c7n:streaming-distribution-config'
+    annotate = False
+
+    def process(self, resources, event=None):
+
+        self.augment([r for r in resources if self.annotation_key not in r])
+        print(resources)
+        return super().process(resources, event)
+
+    def augment(self, resources):
+
+        client = local_session(self.manager.session_factory).client(
+            'cloudfront', region_name=self.manager.config.region)
+
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_streaming_distribution_config(Id=r['Id']) \
+                    .get('StreamingDistributionConfig')
+            except (client.exceptions.NoSuchDistribution):
+                r[self.annotation_key] = {}
+            except Exception as e:
+                self.log.warning(
+                    "Exception trying to get Streaming Distribution Config: %s error: %s",
+                    r['ARN'], e)
+                raise e
+
+    def __call__(self, r):
+        return super(StreamingDistributionConfig, self).__call__(r[self.annotation_key])
 
 
 @Distribution.filter_registry.register('mismatch-s3-origin')
@@ -564,6 +613,10 @@ class DistributionUpdateAction(BaseAction):
                 "ViewerProtocolPolicy": "",
                 "MinTTL": 0
             }
+        if 'Comment' not in config:
+            config['Comment'] = ''
+        if 'Enabled' not in config:
+            config['Enabled'] = False
 
     def process(self, distributions):
         client = local_session(self.manager.session_factory).client(
@@ -591,4 +644,97 @@ class DistributionUpdateAction(BaseAction):
             self.log.warning(
                 "Exception trying to update Distribution: %s error: %s",
                 distribution['ARN'], e)
+            raise e
+
+
+@StreamingDistribution.action_registry.register('set-attributes')
+class StreamingDistributionUpdateAction(BaseAction):
+    """Action to update the attributes of a distribution
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: enforce-distribution-logging
+          resource: streaming-distribution
+          filters:
+            - type: value
+              key: "Logging.Enabled"
+              value: false
+          actions:
+            - type: set-attributes
+              attributes:
+                Logging:
+                    Enabled: true
+                    Bucket: 'test-enable-logging-c7n.s3.amazonaws.com'
+                    Prefix: ''
+    """
+    schema = type_schema('set-attributes',
+                        attributes={"type": "object"},
+                        required=('attributes',))
+
+    permissions = ("cloudfront:UpdateStreamingDistribution",
+                   "cloudfront:GetStreamingDistributionConfig",)
+    shape = 'UpdateStreamingDistributionRequest'
+
+    def validate(self):
+        print('validate')
+        attrs = dict(self.data.get('attributes'))
+        if attrs.get('CallerReference'):
+            raise PolicyValidationError('CallerReference field cannot be updated')
+
+        # Set default values for required fields if they are not present
+        attrs["CallerReference"] = ""
+        self.set_required_update_fields(attrs)
+
+        request = {
+            "StreamingDistributionConfig": attrs,
+            "Id": "sample_id",
+            "IfMatch": "sample_string",
+        }
+        print(request)
+        return shape_validate(request, self.shape, 'cloudfront')
+
+    def set_required_update_fields(self, config):
+        if 'S3Origin' not in config:
+            config["S3Origin"] = {
+                "DomainName": 'domain_name',
+                "OriginAccessIdentity": 'origin_access_identity'
+            }
+        if 'TrustedSigners' not in config:
+            config["TrustedSigners"] = {
+                "Enabled": False,
+                "Quantity": 0
+            }
+        if 'Comment' not in config:
+            config['Comment'] = ''
+        if 'Enabled' not in config:
+            config['Enabled'] = False
+
+    def process(self, streaming_distributions):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service)
+        for d in streaming_distributions:
+            self.process_distribution(client, d)
+
+    def process_distribution(self, client, streaming_distribution):
+        try:
+            res = client.get_streaming_distribution_config(
+                Id=streaming_distribution[self.manager.get_model().id])
+            config = res['StreamingDistributionConfig']
+            updatedConfig = {**config, **self.data['attributes']}
+            if config == updatedConfig:
+                return
+            res = client.update_streaming_distribution(
+                Id=streaming_distribution[self.manager.get_model().id],
+                IfMatch=res['ETag'],
+                StreamingDistributionConfig=updatedConfig
+            )
+        except (client.exceptions.NoSuchDistribution):
+            pass
+        except Exception as e:
+            self.log.warning(
+                "Exception trying to update Streaming Distribution: %s error: %s",
+                streaming_distribution['ARN'], e)
             raise e
