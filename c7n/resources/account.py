@@ -1574,7 +1574,7 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
         resource[self.annotation].update(encryption_setting.get('ConnectionPasswordEncryption'))
 
         for kmskey in self.data:
-            if not self.data[kmskey].startswith('alias'):
+            if not isinstance(self.data[kmskey], str) or not self.data[kmskey].startswith('alias'):
                 continue
             key = resource[self.annotation].get(kmskey)
             vfd = {'c7n:AliasName': self.data[kmskey]}
