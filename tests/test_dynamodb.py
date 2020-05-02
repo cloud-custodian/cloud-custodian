@@ -14,6 +14,7 @@
 from .common import BaseTest
 import datetime
 from dateutil import tz as tzutil
+from unittest.mock import MagicMock
 
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
@@ -155,6 +156,47 @@ class DynamodbTest(BaseTest):
         self.assertEqual(
             res['PointInTimeRecoveryDescription']["PointInTimeRecoveryStatus"],
             'ENABLED')
+
+    def test_continuous_backup_action_error(self):
+        factory = self.replay_flight_data("test_dynamodb_continuous_backup_action")
+
+        client = factory().client("dynamodb")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'dynamodb').exceptions.TableNotFoundException = (
+                client.exceptions.TableNotFoundException)
+
+        mock_factory().client('dynamodb').update_continuous_backups.side_effect = (
+            client.exceptions.TableNotFoundException(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='update_continuous_backups'))
+       
+        p = self.load_policy(
+            {
+                "name": "dynamodb-continuous_backup-action",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "check-continuous-backup",
+                        "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
+                        "value": "ENABLED",
+                        "op": "ne"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-continuous-backup"
+                    }
+                ]
+            },
+            session_factory=mock_factory,
+        )
+        try:
+            p.resource_manager.actions[0].process([{'TableName': 'abc'}])
+        except client.exceptions.TableNotFoundException:
+            self.fail('should not raise')          
+        mock_factory().client('dynamodb').update_continuous_backups.assert_called_once()
 
     def test_dynamodb_mark(self):
         session_factory = self.replay_flight_data("test_dynamodb_mark")
