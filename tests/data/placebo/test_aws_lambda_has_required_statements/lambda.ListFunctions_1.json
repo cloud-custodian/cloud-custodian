@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "xyz-dev",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:xyz-dev",
+                "Runtime": "python3.7",
+                "Role": "arn:aws:iam::644160558196:role/xyz-dev",
+                "Handler": "app.app",
+                "CodeSize": 13939,
+                "Description": "",
+                "Timeout": 60,
+                "MemorySize": 128,
+                "LastModified": "2019-08-05T10:38:30.668+0000",
+                "CodeSha256": "vtvgtUhKI3S+lrr1vxAyv00ogABiJQt2iUg6KdN7Dag=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "b24ac05b-8ae9-4057-8b6f-d0e6ca86327c"
+            }
+        ]
+    }
+}

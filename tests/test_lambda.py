@@ -321,6 +321,33 @@ class LambdaTest(BaseTest):
         self.assertEqual(resources[0]["FunctionName"], "mys3")
         self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-f9cc4d9f"])
 
+    def test_lambda_has_required_statements(self):
+        session = self.replay_flight_data("test_aws_lambda_has_required_statements")
+        p = self.load_policy(
+            {
+                "name": "lambda-has_statements",
+                "resource": "aws.lambda",
+                "filters": [
+                    {"FunctionName": "xyz-dev"},
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "lambda:InvokeFunction"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert(
+            "\"Action\":\"lambda:InvokeFunction\"" in resources[0]["c7n:Policy"]
+        )
+
 
 class LambdaTagTest(BaseTest):
 

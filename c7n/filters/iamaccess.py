@@ -382,8 +382,11 @@ class PolicyStatementFilter(Filter):
     def process(self, resources, event=None):
         return list(filter(None, map(self.process_resource, resources)))
 
+    def get_policy(self, r):
+        return r.get('Policy')
+
     def process_resource(self, r):
-        p = r.get('Policy')
+        p = self.get_policy(r)
         if p is None:
             return None
         p = json.loads(p)

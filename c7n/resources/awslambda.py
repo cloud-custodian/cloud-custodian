@@ -280,6 +280,7 @@ class KmsFilter(KmsRelatedFilter):
     """
     RelatedIdsExpression = 'KMSKeyArn'
 
+
 @AWSLambda.filter_registry.register('has-statement')
 class HasStatementFilter(PolicyStatementFilter):
     """Find lambdas with set of policy statements.
@@ -298,6 +299,22 @@ class HasStatementFilter(PolicyStatementFilter):
                         Action: 'lambda:*'
                         Principal: '*'
     """
+
+    def get_policy(self, r):
+        client = local_session(self.manager.session_factory).client('lambda')
+        if 'c7n:Policy' not in r:
+            try:
+                r['c7n:Policy'] = client.get_policy(
+                    FunctionName=r['FunctionArn']).get('Policy')
+            except ClientError as e:
+                if e.response['Error']['Code'] != ErrAccessDenied:
+                    raise
+                r['c7n:Policy'] = None
+
+        if not r['c7n:Policy']:
+            return
+        return r.get('c7n:Policy')
+
 
 @AWSLambda.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
