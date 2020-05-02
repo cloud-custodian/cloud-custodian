@@ -44,6 +44,51 @@ class ConnectionSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = 'PhysicalConnectionRequirements.SubnetId'
 
+@GlueConnection.filter_registry.register('route-table')
+class ConnectionRouteTableFilter(ValueFilter):
+    """Filter Route Tables connected to a Glue Dev Endpoint
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: glue-endpoint-public-route
+            resource: aws.glue-dev-endpoint
+            filters:
+                - type: route-table
+                  key: RouteTables[].Routes[].DestinationCidrBlock
+                  value: 0.0.0.0/0
+                  op: contains
+    """
+    annotation_key = 'c7n:route-table'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('route-table', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super(ConnectionRouteTableFilter, self).process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.describe_route_tables(
+                    Filters=[
+                        {
+                            "Name":"association.subnet-id",
+                            "Values": [r['PhysicalConnectionRequirements']['SubnetId']]
+                        }
+                    ])
+                print(r[self.annotation_key])
+            except client.exceptions.EntityNotFoundException:
+                r[self.annotation_key] = {}
+
+    def __call__(self, r):
+        return super(ConnectionRouteTableFilter, self).__call__(r[self.annotation_key])
+
 
 @GlueConnection.filter_registry.register('security-group')
 class ConnectionSecurityGroupFilter(SecurityGroupFilter):
@@ -120,11 +165,12 @@ class EndpointRouteTableFilter(ValueFilter):
                   key: RouteTables[].Routes[].DestinationCidrBlock
                   value: 0.0.0.0/0
                   op: contains
-    """    
+    """
     annotation_key = 'c7n:route-table'
     annotate = False  # no annotation from value filter
     schema = type_schema('route-table', rinherit=ValueFilter.schema)
     schema_alias = False
+
 
     def process(self, resources, event=None):
         self.augment([r for r in resources if self.annotation_key not in r])
