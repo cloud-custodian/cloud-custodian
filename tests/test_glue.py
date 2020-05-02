@@ -63,7 +63,6 @@ class TestGlueConnections(BaseTest):
             ["sg-6c7fa917"],
         )
 
-
     def test_connection_route_table_filter(self):
         session_factory = self.replay_flight_data("test_glue_route_table_filter")
         p = self.load_policy(
@@ -72,8 +71,8 @@ class TestGlueConnections(BaseTest):
                 "resource": "glue-connection",
                 "filters": [
                     {
-                        "type": "route-table", 
-                        "key": "RouteTables[].Routes[].DestinationCidrBlock", 
+                        "type": "route-table",
+                        "key": "RouteTables[].Routes[].DestinationCidrBlock",
                         "value": "0.0.0.0/0",
                         "op": "contains"
                     }
@@ -90,7 +89,6 @@ class TestGlueConnections(BaseTest):
             "0.0.0.0/0",
             routes,
         )
-
 
     def test_connection_delete(self):
         session_factory = self.replay_flight_data("test_glue_delete_connection")
@@ -146,8 +144,8 @@ class TestGlueDevEndpoints(BaseTest):
                 "resource": "aws.glue-dev-endpoint",
                 "filters": [
                     {
-                        "type": "route-table", 
-                        "key": "RouteTables[].Routes[].DestinationCidrBlock", 
+                        "type": "route-table",
+                        "key": "RouteTables[].Routes[].DestinationCidrBlock",
                         "value": "0.0.0.0/0",
                         "op": "contains"
                     }
@@ -165,6 +163,7 @@ class TestGlueDevEndpoints(BaseTest):
             "0.0.0.0/0",
             routes,
         )
+
 
 class TestGlueTag(BaseTest):
 
