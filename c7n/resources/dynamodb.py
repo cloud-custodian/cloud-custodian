@@ -24,6 +24,7 @@ from c7n.tags import (
 from c7n.utils import (
     local_session, chunks, type_schema, snapshot_identifier)
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters import ValueFilter
 
 
 class ConfigTable(query.ConfigSource):
@@ -118,6 +119,94 @@ class KmsFilter(KmsRelatedFilter):
                       op: regex
     """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
+
+
+@Table.filter_registry.register('check-continuous-backup')
+class TableContinuousBackupFilter(ValueFilter):
+    """Check for continuous backups and point in time recovery (PITR) on a dynamodb table.
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: dynamodb-continuous-backups-disabled
+                  resource: aws.dynamodb-table
+                  filters:
+                      - type: check-continuous-backup
+                        key: ContinuousBackupsStatus
+                        op: eq
+                        value: DISABLED
+                - name: dynamodb-pitr-disabled
+                  resource: aws.dynamodb-table
+                  filters:
+                      - type: check-continuous-backup
+                        key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
+                        op: ne
+                        value: ENABLED                        
+    """
+
+    annotation_key = 'c7n:continuous-backup'
+    annotate = False
+    schema = type_schema('check-continuous-backup', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('dynamodb:DescribeContinuousBackups',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super(TableContinuousBackupFilter, self).process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.describe_continuous_backups(
+                    TableName=r['TableName']).get('ContinuousBackupsDescription', {})
+            except client.exceptions.TableNotFoundException:
+                continue
+
+    def __call__(self, r):
+        return super(TableContinuousBackupFilter, self).__call__(r[self.annotation_key])
+
+
+@Table.action_registry.register('set-continuous-backup')
+class TableContinuousBackupAction(BaseAction):
+    """Set continuous backups and point in time recovery (PITR) on a dynamodb table.
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: dynamodb-continuous-backups-disabled-set
+                  resource: aws.dynamodb-table
+                  filters:
+                      - type: check-continuous-backup
+                        key: ContinuousBackupsStatus
+                        op: eq
+                        value: DISABLED
+                  actions:
+                      - type: set-continuous-backup
+
+    """
+
+    schema = type_schema(
+        'set-continuous-backup',
+        state={'type': 'boolean', 'default': True})
+    permissions = ('dynamodb:UpdateContinuousBackups')
+    annotation_key = TableContinuousBackupFilter.annotation_key
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.update_continuous_backups(
+                    TableName=r['TableName'],
+                    PointInTimeRecoverySpecification={
+                        'PointInTimeRecoveryEnabled': self.data.get('state', True)
+                })
+            except client.exceptions.TableNotFoundException:
+                continue
 
 
 @Table.action_registry.register('delete')
