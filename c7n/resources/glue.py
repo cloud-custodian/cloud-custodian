@@ -23,7 +23,6 @@ from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
 from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
-from c7n.resources.account import get_account
 from c7n.resources.account import GlueCatalogEncryptionEnabled
 
 
