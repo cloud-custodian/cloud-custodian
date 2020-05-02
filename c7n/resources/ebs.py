@@ -31,7 +31,7 @@ from c7n.filters.health import HealthEventFilter
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import Tag
+from c7n.tags import Tag, coalesce_copy_user_tags
 from c7n.utils import (
     camelResource,
     chunks,
@@ -1180,11 +1180,14 @@ class CreateSnapshot(BaseAction):
                   - type: snapshot
                     copy-tags:
                       - Name
+                    tags:
+                        custodian_snapshot: True
     """
     schema = type_schema(
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
-           'copy-volume-tags': {'type': 'boolean'}})
+           'copy-volume-tags': {'type': 'boolean'},
+           'tags': {'type': 'object'}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def validate(self):
@@ -1212,19 +1215,9 @@ class CreateSnapshot(BaseAction):
             raise
 
     def get_snapshot_tags(self, resource):
-        tags = [
-            {'Key': 'custodian_snapshot', 'Value': ''}]
-        copy_keys = self.data.get('copy-tags', [])
-        copy_tags = []
-        if copy_keys:
-            for t in resource.get('Tags', []):
-                if t['Key'] in copy_keys:
-                    copy_tags.append(t)
-            tags.extend(copy_tags)
-            return tags
-        if self.data.get('copy-volume-tags', True):
-            tags.extend(resource.get('Tags', []))
-        return tags
+        user_tags = self.data.get('tags', {}) or {'custodian_snapshot': ''}
+        copy_tags = self.data.get('copy-tags', []) or self.data.get('copy-volume-tags', True)
+        return coalesce_copy_user_tags(resource, copy_tags, user_tags)
 
 
 @EBS.action_registry.register('delete')

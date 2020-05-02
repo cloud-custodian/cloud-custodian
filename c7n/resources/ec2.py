@@ -36,6 +36,7 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query, utils
+from c7n.tags import coalesce_copy_user_tags
 from c7n.utils import type_schema, filter_empty
 
 from c7n.resources.iam import CheckPermissions
@@ -1530,12 +1531,15 @@ class Snapshot(BaseAction):
               - type: snapshot
                 copy-tags:
                   - Name
+                tags:
+                    custodian_snapshot: True
     """
 
     schema = type_schema(
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
            'copy-volume-tags': {'type': 'boolean'},
+           'tags': {'type': 'object'},
            'exclude-boot': {'type': 'boolean', 'default': False}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
@@ -1590,16 +1594,9 @@ class Snapshot(BaseAction):
                 resource['InstanceId'], err_code)
 
     def get_snapshot_tags(self, resource):
-        tags = [
-            {'Key': 'custodian_snapshot', 'Value': ''}]
-        copy_keys = self.data.get('copy-tags', [])
-        copy_tags = []
-        if copy_keys:
-            for t in resource.get('Tags', []):
-                if t['Key'] in copy_keys:
-                    copy_tags.append(t)
-            tags.extend(copy_tags)
-        return tags
+        user_tags = self.data.get('tags', {}) or {'custodian_snapshot': ''}
+        copy_tags = self.data.get('copy-tags', [])
+        return coalesce_copy_user_tags(resource, copy_tags, user_tags)
 
 
 @actions.register('modify-security-groups')
