@@ -61,6 +61,7 @@ class HandleTest(BaseTest):
              'authorization_file': None,
              'cache': '',
              'regions': (),
+             'exclude_regions': (),
              'cache_period': 0,
              'log_group': None,
              'metrics': None})
