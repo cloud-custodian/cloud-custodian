@@ -13,6 +13,7 @@
 # limitations under the License.
 from .common import BaseTest
 import time
+import jmespath
 
 
 class TestGlueConnections(BaseTest):
@@ -62,6 +63,35 @@ class TestGlueConnections(BaseTest):
             ["sg-6c7fa917"],
         )
 
+
+    def test_connection_route_table_filter(self):
+        session_factory = self.replay_flight_data("test_glue_route_table_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-connection",
+                "resource": "glue-connection",
+                "filters": [
+                    {
+                        "type": "route-table", 
+                        "key": "RouteTables[].Routes[].DestinationCidrBlock", 
+                        "value": "0.0.0.0/0",
+                        "op": "contains"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        routes = set(
+            jmespath.search('[].\"c7n:route-table\"[].RouteTables[].Routes[].DestinationCidrBlock',
+            resources))
+        self.assertIn(
+            "0.0.0.0/0",
+            routes,
+        )
+
+
     def test_connection_delete(self):
         session_factory = self.replay_flight_data("test_glue_delete_connection")
         p = self.load_policy(
@@ -108,6 +138,33 @@ class TestGlueDevEndpoints(BaseTest):
         dev_endpoints = client.get_dev_endpoints()["DevEndpoints"]
         self.assertFalse(dev_endpoints)
 
+    def test_connection_route_table_filter(self):
+        session_factory = self.replay_flight_data("test_glue_dev_endpoint_route_table_filter")
+        p = self.load_policy(
+            {
+                "name": "glue-dev-endpoint-route",
+                "resource": "aws.glue-dev-endpoint",
+                "filters": [
+                    {
+                        "type": "route-table", 
+                        "key": "RouteTables[].Routes[].DestinationCidrBlock", 
+                        "value": "0.0.0.0/0",
+                        "op": "contains"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        routes = set(
+            jmespath.search('[].\"c7n:route-table\"[].RouteTables[].Routes[].DestinationCidrBlock',
+            resources))
+        print(routes)
+        self.assertIn(
+            "0.0.0.0/0",
+            routes,
+        )
 
 class TestGlueTag(BaseTest):
 

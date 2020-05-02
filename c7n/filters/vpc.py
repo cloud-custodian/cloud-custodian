@@ -89,7 +89,6 @@ class RouteTableFilter(ValueFilter):
                             "Values": [self._get_filter(r)]
                         }
                     ])
-                print(self._get_filter(r))
             except client.exceptions.EntityNotFoundException:
                 r[self.annotation_key] = {}
 

@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "DevEndpoints": [
+            {
+                "EndpointName": "test",
+                "RoleArn": "arn:aws:iam::644160558196:role/GLUE-POC",
+                "SecurityGroupIds": [
+                    "sg-0d30141b566cfa039"
+                ],
+                "SubnetId": "subnet-023db907202d61c00",
+                "YarnEndpointAddress": "ip-10-0-0-50.ec2.internal",
+                "PrivateAddress": "ip-10-0-0-50.ec2.internal",
+                "ZeppelinRemoteSparkInterpreterPort": 9007,
+                "Status": "READY",
+                "GlueVersion": "1.0",
+                "NumberOfNodes": 5,
+                "AvailabilityZone": "us-east-1a",
+                "VpcId": "vpc-072f438c953672ace",
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 28,
+                    "hour": 16,
+                    "minute": 53,
+                    "second": 17,
+                    "microsecond": 724000
+                },
+                "LastModifiedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 2,
+                    "hour": 17,
+                    "minute": 52,
+                    "second": 55,
+                    "microsecond": 365000
+                },
+                "Arguments": {
+                    "--enable-glue-datacatalog": " ",
+                    "GLUE_PYTHON_VERSION": "3"
+                }
+            }
+        ],
+        "NextToken": "",
+        "ResponseMetadata": {}
+    }
+}
