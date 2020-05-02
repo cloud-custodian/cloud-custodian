@@ -194,13 +194,12 @@ class TableContinuousBackupAction(BaseAction):
         'set-continuous-backup',
         state={'type': 'boolean', 'default': True})
     permissions = ('dynamodb:UpdateContinuousBackups')
-    annotation_key = TableContinuousBackupFilter.annotation_key
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('dynamodb')
         for r in resources:
             try:
-                r[self.annotation_key] = client.update_continuous_backups(
+                client.update_continuous_backups(
                     TableName=r['TableName'],
                     PointInTimeRecoverySpecification={
                         'PointInTimeRecoveryEnabled': self.data.get('state', True)
