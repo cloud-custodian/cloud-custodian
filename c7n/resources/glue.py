@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import itertools
-import jmespath
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from .aws import shape_validate
@@ -63,6 +61,7 @@ class ConnectionRouteTableFilter(RouteTableFilter):
                   op: contains
     """
     association_type = "association.subnet-id"
+
     def _get_filter(self, r):
         return r['PhysicalConnectionRequirements']['SubnetId']
 
@@ -144,6 +143,7 @@ class EndpointRouteTableFilter(RouteTableFilter):
                   op: contains
     """
     association_type = "association.subnet-id"
+
     def _get_filter(self, r):
         return r['SubnetId']
 
