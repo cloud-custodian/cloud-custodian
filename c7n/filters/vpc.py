@@ -62,6 +62,41 @@ class VpcFilter(MatchResourceValidator, RelatedResourceFilter):
     AnnotationKey = "matched-vpcs"
 
 
+class RouteTableFilter(ValueFilter):
+    """Filter Route Tables connected to a resource using its subnet
+    """
+    annotation_key = 'c7n:route-table'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('route-table', rinherit=ValueFilter.schema)
+    schema_alias = False
+    association_type: None
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super(RouteTableFilter, self).process(resources, event)
+
+    def _get_filter(self, r):
+        raise NotImplementedError("subclass responsiblity")
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.describe_route_tables(
+                    Filters=[
+                        {
+                            "Name": self.association_type,
+                            "Values": [self._get_filter(r)]
+                        }
+                    ])
+                print(self._get_filter(r))
+            except client.exceptions.EntityNotFoundException:
+                r[self.annotation_key] = {}
+
+    def __call__(self, r):
+        return super(RouteTableFilter, self).__call__(r[self.annotation_key])
+
+
 class DefaultVpcBase(Filter):
     """Filter to resources in a default vpc."""
     vpcs = None
