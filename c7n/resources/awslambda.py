@@ -13,7 +13,6 @@
 # limitations under the License.
 import jmespath
 import json
-import six
 
 from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
@@ -365,7 +364,7 @@ class SetConcurrency(BaseAction):
                    'lambda:PutFunctionConcurrency')
 
     def validate(self):
-        if self.data.get('expr', False) and not isinstance(self.data['value'], six.text_type):
+        if self.data.get('expr', False) and not isinstance(self.data['value'], str):
             raise ValueError("invalid value expression %s" % self.data['value'])
         return self
 

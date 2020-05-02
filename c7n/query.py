@@ -21,7 +21,6 @@ import itertools
 import json
 
 import jmespath
-import six
 import os
 
 from c7n.actions import ActionRegistry
@@ -108,7 +107,7 @@ class ResourceQuery:
         if client_filter:
             # This logic was added to prevent the issue from:
             # https://github.com/cloud-custodian/cloud-custodian/issues/1398
-            if all(map(lambda r: isinstance(r, six.string_types), resources)):
+            if all(map(lambda r: isinstance(r, str), resources)):
                 resources = [r for r in resources if r in identities]
             else:
                 resources = [r for r in resources if r[m.id] in identities]
@@ -343,7 +342,7 @@ class ConfigSource:
         return {'expr': s}
 
     def load_resource(self, item):
-        if isinstance(item['configuration'], six.string_types):
+        if isinstance(item['configuration'], str):
             item_config = json.loads(item['configuration'])
         else:
             item_config = item['configuration']
@@ -369,8 +368,7 @@ class ConfigSource:
         return resources
 
 
-@six.add_metaclass(QueryMeta)
-class QueryResourceManager(ResourceManager):
+class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     resource_type = ""
 
@@ -704,8 +702,7 @@ class TypeMeta(type):
         return "<TypeInfo %s>" % identifier
 
 
-@six.add_metaclass(TypeMeta)
-class TypeInfo:
+class TypeInfo(metaclass=TypeMeta):
     """Resource Type Metadata"""
 
     ###########

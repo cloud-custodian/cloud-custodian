@@ -18,7 +18,6 @@ try:
 except ImportError:
     from collections import Iterable
 
-import six
 from c7n_azure import constants
 from c7n_azure.actions.logic_app import LogicAppAction
 from azure.mgmt.resourcegraph.models import QueryRequest
@@ -185,8 +184,7 @@ class TypeMeta(type):
             cls.client)
 
 
-@six.add_metaclass(TypeMeta)
-class TypeInfo:
+class TypeInfo(metaclass=TypeMeta):
     doc_groups = None
 
     """api client construction information"""
@@ -203,8 +201,7 @@ class TypeInfo:
         return {}
 
 
-@six.add_metaclass(TypeMeta)
-class ChildTypeInfo(TypeInfo):
+class ChildTypeInfo(TypeInfo, metaclass=TypeMeta):
     """api client construction information for child resources"""
     parent_manager_name = ''
     annotate_parent = True
@@ -230,8 +227,7 @@ class QueryMeta(type):
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
-@six.add_metaclass(QueryMeta)
-class QueryResourceManager(ResourceManager):
+class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     class resource_type(TypeInfo):
         pass
 
@@ -329,8 +325,7 @@ class QueryResourceManager(ResourceManager):
         self.source.validate()
 
 
-@six.add_metaclass(QueryMeta)
-class ChildResourceManager(QueryResourceManager):
+class ChildResourceManager(QueryResourceManager, metaclass=QueryMeta):
     child_source = 'describe-child-azure'
     parent_manager = None
 

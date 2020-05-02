@@ -24,10 +24,8 @@ import re
 import sys
 import threading
 import time
-
-import six
-from six.moves.urllib import parse as urlparse
-from six.moves.urllib.request import getproxies
+from urllib import parse as urlparse
+from urllib.request import getproxies
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -423,7 +421,7 @@ def parse_cidr(value):
     if '/' not in value:
         klass = ipaddress.ip_address
     try:
-        v = klass(six.text_type(value))
+        v = klass(str(value))
     except (ipaddress.AddressValueError, ValueError):
         v = None
     return v
@@ -524,7 +522,7 @@ def format_string_values(obj, err_fallback=(IndexError, KeyError), *args, **kwar
         for item in obj:
             new.append(format_string_values(item, *args, **kwargs))
         return new
-    elif isinstance(obj, six.string_types):
+    elif isinstance(obj, str):
         try:
             return obj.format(*args, **kwargs)
         except err_fallback:
@@ -641,7 +639,7 @@ class QueryParser:
 
             vtype = cls.QuerySchema.get(key)
             if vtype is None and key.startswith('tag'):
-                vtype = six.string_types
+                vtype = str
 
             if not isinstance(values, list):
                 raise PolicyValidationError(
@@ -649,7 +647,7 @@ class QueryParser:
                         cls.type_name, data,))
 
             for v in values:
-                if isinstance(vtype, tuple) and vtype != six.string_types:
+                if isinstance(vtype, tuple):
                     if v not in vtype:
                         raise PolicyValidationError(
                             "%s Query Filter Invalid Value: %s Valid: %s" % (

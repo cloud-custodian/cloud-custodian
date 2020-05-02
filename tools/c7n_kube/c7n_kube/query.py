@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import logging
-import six
 
 from c7n.actions import ActionRegistry
 from c7n.exceptions import PolicyValidationError
@@ -79,8 +78,7 @@ class QueryMeta(type):
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
-@six.add_metaclass(QueryMeta)
-class QueryResourceManager(ResourceManager):
+class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
         self.source = self.get_source(self.source_type)
@@ -122,8 +120,7 @@ class QueryResourceManager(ResourceManager):
         return resources
 
 
-@six.add_metaclass(QueryMeta)
-class CustomResourceQueryManager(QueryResourceManager):
+class CustomResourceQueryManager(QueryResourceManager, metaclass=QueryMeta):
     def get_resource_query(self):
         custom_resource = self.data['query'][0]
         return {
@@ -152,16 +149,14 @@ class TypeMeta(type):
             cls.version)
 
 
-@six.add_metaclass(TypeMeta)
-class TypeInfo:
+class TypeInfo(metaclass=TypeMeta):
     group = None
     version = None
     enum_spec = ()
     namespaced = True
 
 
-@six.add_metaclass(TypeMeta)
-class CustomTypeInfo(TypeInfo):
+class CustomTypeInfo(TypeInfo, metaclass=TypeMeta):
     group = 'CustomObjects'
     version = ''
     enum_spec = ('list_cluster_custom_object', 'items', None)
