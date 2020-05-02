@@ -193,7 +193,7 @@ class TableContinuousBackupAction(BaseAction):
     schema = type_schema(
         'set-continuous-backup',
         state={'type': 'boolean', 'default': True})
-    permissions = ('dynamodb:UpdateContinuousBackups')
+    permissions = ('dynamodb:UpdateContinuousBackups',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('dynamodb')
