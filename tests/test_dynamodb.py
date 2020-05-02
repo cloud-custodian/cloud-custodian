@@ -100,6 +100,29 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["TableName"], "test-table-kms-filter")
 
+    def test_continuous_backup_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_continuous_backup_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-continuous_backup-filters",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "check-continuous-backup",
+                        "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
+                        "value": "ENABLED",
+                        "op": "ne"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:continuous-backup"]["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"], 
+            "DISABLED")
+
     def test_dynamodb_mark(self):
         session_factory = self.replay_flight_data("test_dynamodb_mark")
         client = session_factory().client("dynamodb")
