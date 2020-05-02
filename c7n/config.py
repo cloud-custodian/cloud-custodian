@@ -42,6 +42,7 @@ class Config(Bag):
         d.update({
             'region': os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'),
             'regions': (),
+            'exclude_regions': (),
             'cache': '',
             'profile': None,
             'account_id': None,

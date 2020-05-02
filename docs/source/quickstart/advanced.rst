@@ -35,6 +35,11 @@ for the policy's resource::
 
   $ custodian run -s out --region all policy.yml
 
+When using ``all``, one or more regions can be excluded by specifying the
+``--exclude-region`` flag.
+
+  $ custodian run -s out --region all --exclude-region us-east-1 policy.yml
+
 Note: when running reports against multiple regions the output is placed in a different
 directory than when running against a single region.  See the multi-region reporting
 section below.

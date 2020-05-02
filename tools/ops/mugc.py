@@ -134,18 +134,18 @@ def resources_gc_prefix(options, policy_config, policy_collection):
             continue
         policy_regions.setdefault(p.options.region, []).append(p)
 
-    regions = get_gc_regions(options.regions)
+    regions = get_gc_regions(options.regions, options.exclude_regions)
     for r in regions:
         region_gc(options, r, policy_config, policy_regions.get(r, []))
 
 
-def get_gc_regions(regions):
+def get_gc_regions(regions, exclude_regions):
     if 'all' in regions:
         session = boto3.Session(
             region_name='us-east-1',
             aws_access_key_id='never',
             aws_secret_access_key='found')
-        return session.get_available_regions('s3')
+        return list(set(session.get_available_regions('s3')) - set(exclude_regions))
     return regions
 
 
@@ -161,6 +161,9 @@ def setup_parser():
     parser.add_argument(
         '-r', '--region', action='append', dest='regions', metavar='REGION',
         help="AWS Region to target. Can be used multiple times, also supports `all`")
+    parser.add_argument(
+        "--exclude-region", action='append', default=[], metavar='EXCLUDE REGION',
+        dest="exclude_regions", help="AWS Region(s) to exclude.")
     parser.add_argument('--dryrun', action="store_true", default=False)
     parser.add_argument(
         "--profile", default=os.environ.get('AWS_PROFILE'),

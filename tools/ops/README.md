@@ -40,11 +40,12 @@ name of the function.
 
 **TIP: Launch always before --dryrun command**
 
-mugc also suports the following args:
+mugc also supports the following args:
 
 ```
 usage: mugc.py [-h] [-c [CONFIG_FILES [CONFIG_FILES ...]]] [--present]
-               [-r REGION] [--dryrun] [--profile PROFILE] [--prefix PREFIX]
+               [-r REGION] [--exclude-region EXCLUDE REGION]
+               [--dryrun] [--profile PROFILE] [--prefix PREFIX]
                [--policy-regex POLICY_REGEX] [-p POLICY_FILTER]
                [--assume ASSUME_ROLE] [-v]
                [configs [configs ...]]
@@ -61,6 +62,8 @@ optional arguments:
   -r REGION, --region REGION
                         AWS Region to target. Can be used multiple times, also
                         supports `all`
+  --exclude-region    EXCLUDE REGION
+                        AWS Region(s) to exclude.
   --dryrun
   --profile PROFILE     AWS Account Config File Profile to utilize
   --prefix PREFIX       The Lambda name prefix to use for clean-up
