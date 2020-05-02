@@ -57,7 +57,7 @@ class ElasticSearchDomain(QueryResourceManager):
         id = 'DomainName'
         name = 'Name'
         dimension = "DomainName"
-        config_type = 'AWS::Elasticsearch::Domain'
+        cfn_type = config_type = 'AWS::Elasticsearch::Domain'
 
     source_mapping = {
         'describe': DescribeDomain,

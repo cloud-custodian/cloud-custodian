@@ -29,7 +29,7 @@ from datetime import datetime
 from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
@@ -42,6 +42,12 @@ filters.register('tag-count', tags.TagCountFilter)
 filters.register('marked-for-op', tags.TagActionFilter)
 filters.register('shield-enabled', IsShieldProtected)
 filters.register('shield-metrics', ShieldMetrics)
+
+
+class DescribeELB(DescribeSource):
+
+    def augment(self, resources):
+        return tags.universal_augment(self.manager, resources)
 
 
 @resources.register('elb')
@@ -59,7 +65,7 @@ class ELB(QueryResourceManager):
         name = 'DNSName'
         date = 'CreatedTime'
         dimension = 'LoadBalancerName'
-        config_type = "AWS::ElasticLoadBalancing::LoadBalancer"
+        cfn_type = config_type = "AWS::ElasticLoadBalancing::LoadBalancer"
         default_report_fields = (
             'LoadBalancerName',
             'DNSName',
@@ -69,23 +75,16 @@ class ELB(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+    source_mapping = {
+        'describe': DescribeELB,
+        'config': ConfigSource
+    }
 
     @classmethod
     def get_permissions(cls):
         return ('elasticloadbalancing:DescribeLoadBalancers',
                 'elasticloadbalancing:DescribeLoadBalancerAttributes',
                 'elasticloadbalancing:DescribeTags')
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeELB(self)
-        return super(ELB, self).get_source(source_type)
-
-
-class DescribeELB(DescribeSource):
-
-    def augment(self, resources):
-        return tags.universal_augment(self.manager, resources)
 
 
 @actions.register('set-shield')

@@ -25,6 +25,7 @@ class GameLiftBuild(QueryResourceManager):
         name = 'Name'
         date = 'CreationTime'
         arn = False
+        cfn_type = 'AWS::GameLift::Build'
 
 
 @resources.register('gamelift-fleet')
@@ -39,3 +40,4 @@ class GameLiftFleet(QueryResourceManager):
         date = 'CreationTime'
         batch_detail_spec = (
             "describe_fleet_attributes", "FleetIds", None, "FleetAttributes", None)
+        cfn_type = 'AWS::GameLift::Fleet'

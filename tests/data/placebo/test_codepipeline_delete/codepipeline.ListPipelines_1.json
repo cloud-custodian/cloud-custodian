@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "pipelines": [
+            {
+                "name": "devinprod",
+                "version": 1,
+                "created": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 1,
+                    "hour": 19,
+                    "minute": 36,
+                    "second": 4,
+                    "microsecond": 447000
+                },
+                "updated": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 1,
+                    "hour": 19,
+                    "minute": 36,
+                    "second": 4,
+                    "microsecond": 447000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

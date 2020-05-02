@@ -30,6 +30,7 @@ class CognitoIdentityPool(QueryResourceManager):
         id = 'IdentityPoolId'
         name = 'IdentityPoolName'
         arn_type = "identitypool"
+        cfn_type = 'AWS::Cognito::IdentityPool'
 
 
 @CognitoIdentityPool.action_registry.register('delete')
@@ -77,6 +78,7 @@ class CognitoUserPool(QueryResourceManager):
         id = 'Id'
         name = 'Name'
         arn_type = "userpool"
+        cfn_type = 'AWS::Cognito::UserPool'
 
 
 @CognitoUserPool.action_registry.register('delete')
