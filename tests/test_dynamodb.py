@@ -171,7 +171,6 @@ class DynamodbTest(BaseTest):
             client.exceptions.TableNotFoundException(
                 {'Error': {'Code': 'xyz'}},
                 operation_name='update_continuous_backups'))
-       
         p = self.load_policy(
             {
                 "name": "dynamodb-continuous_backup-action",
@@ -195,7 +194,7 @@ class DynamodbTest(BaseTest):
         try:
             p.resource_manager.actions[0].process([{'TableName': 'abc'}])
         except client.exceptions.TableNotFoundException:
-            self.fail('should not raise')          
+            self.fail('should not raise')
         mock_factory().client('dynamodb').update_continuous_backups.assert_called_once()
 
     def test_dynamodb_mark(self):
