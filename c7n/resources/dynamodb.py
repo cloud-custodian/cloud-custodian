@@ -143,7 +143,7 @@ class TableContinuousBackupFilter(ValueFilter):
                       - type: check-continuous-backup
                         key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
                         op: ne
-                        value: ENABLED                        
+                        value: ENABLED
     """
 
     annotation_key = 'c7n:continuous-backup'
@@ -203,7 +203,7 @@ class TableContinuousBackupAction(BaseAction):
                     TableName=r['TableName'],
                     PointInTimeRecoverySpecification={
                         'PointInTimeRecoveryEnabled': self.data.get('state', True)
-                })
+                    })
             except client.exceptions.TableNotFoundException:
                 continue
 

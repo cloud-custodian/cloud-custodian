@@ -120,8 +120,7 @@ class DynamodbTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]["c7n:continuous-backup"] \
-                ["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"],
+            resources[0]["c7n:continuous-backup"]["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"], # noqa
             "DISABLED")
 
     def test_continuous_backup_action(self):
@@ -150,13 +149,11 @@ class DynamodbTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            resources[0]["c7n:continuous-backup"] \
-                ["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"], 
+            resources[0]["c7n:continuous-backup"]["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"],  # noqa
             "DISABLED")
-        res = client.describe_continuous_backups(TableName=resources[0]["TableName"]) \
-            ['ContinuousBackupsDescription']
+        res = client.describe_continuous_backups(TableName=resources[0]["TableName"])['ContinuousBackupsDescription']  # noqa
         self.assertEqual(
-            res['PointInTimeRecoveryDescription']["PointInTimeRecoveryStatus"], 
+            res['PointInTimeRecoveryDescription']["PointInTimeRecoveryStatus"],
             'ENABLED')
 
     def test_dynamodb_mark(self):
