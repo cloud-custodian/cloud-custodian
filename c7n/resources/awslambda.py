@@ -22,6 +22,7 @@ from concurrent.futures import as_completed
 from c7n.actions import BaseAction, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters.iamaccess import PolicyStatementFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query
@@ -279,6 +280,24 @@ class KmsFilter(KmsRelatedFilter):
     """
     RelatedIdsExpression = 'KMSKeyArn'
 
+@AWSLambda.filter_registry.register('has-statement')
+class HasStatementFilter(PolicyStatementFilter):
+    """Find lambdas with set of policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: lambda-public-policy
+                resource: aws.lambda
+                filters:
+                  - type: has-statement
+                    statements:
+                      - Effect: Allow
+                        Action: 'lambda:*'
+                        Principal: '*'
+    """
 
 @AWSLambda.action_registry.register('remove-statements')
 class RemovePolicyStatement(RemovePolicyBase):
