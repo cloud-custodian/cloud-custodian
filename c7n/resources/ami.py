@@ -30,35 +30,6 @@ from c7n.utils import local_session, type_schema, chunks, merge_dict_list
 log = logging.getLogger('custodian.ami')
 
 
-@resources.register('ami')
-class AMI(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'ec2'
-        arn_type = 'image'
-        enum_spec = (
-            'describe_images', 'Images', None)
-        id = 'ImageId'
-        filter_name = 'ImageIds'
-        filter_type = 'list'
-        name = 'Name'
-        date = 'CreationDate'
-
-    def resources(self, query=None):
-        if query is None and 'query' in self.data:
-            query = merge_dict_list(self.data['query'])
-        elif query is None:
-            query = {}
-        if query.get('Owners') is None:
-            query['Owners'] = ['self']
-        return super(AMI, self).resources(query=query)
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeImageSource(self)
-        return super(AMI, self).get_source(source_type)
-
-
 class DescribeImageSource(DescribeSource):
 
     def get_resources(self, ids, cache=True):
@@ -73,6 +44,34 @@ class DescribeImageSource(DescribeSource):
                     continue
                 raise
         return []
+
+
+@resources.register('ami')
+class AMI(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ec2'
+        arn_type = 'image'
+        enum_spec = (
+            'describe_images', 'Images', None)
+        id = 'ImageId'
+        filter_name = 'ImageIds'
+        filter_type = 'list'
+        name = 'Name'
+        date = 'CreationDate'
+
+    source_mapping = {
+        'describe': DescribeImageSource
+    }
+
+    def resources(self, query=None):
+        if query is None and 'query' in self.data:
+            query = merge_dict_list(self.data['query'])
+        elif query is None:
+            query = {}
+        if query.get('Owners') is None:
+            query['Owners'] = ['self']
+        return super(AMI, self).resources(query=query)
 
 
 class ErrorHandler:

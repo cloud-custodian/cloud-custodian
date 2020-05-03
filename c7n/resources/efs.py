@@ -38,6 +38,7 @@ class ElasticFileSystem(QueryResourceManager):
         filter_name = 'FileSystemId'
         filter_type = 'scalar'
         universal_taggable = True
+        cfn_type = 'AWS::EFS::FileSystem'
 
     augment = universal_augment
 
@@ -54,6 +55,7 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         filter_name = 'MountTargetId'
         filter_type = 'scalar'
         arn = False
+        cfn_type = 'AWS::EFS::MountTarget'
 
 
 @ElasticFileSystemMountTarget.filter_registry.register('subnet')

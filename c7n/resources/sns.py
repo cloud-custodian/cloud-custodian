@@ -51,7 +51,7 @@ class SNS(QueryResourceManager):
         id = 'TopicArn'
         name = 'DisplayName'
         dimension = 'TopicName'
-        # config_type = 'AWS::SNS::Topic'
+        cfn_type = 'AWS::SNS::Topic'
         default_report_fields = (
             'TopicArn',
             'DisplayName',

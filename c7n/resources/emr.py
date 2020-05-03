@@ -48,6 +48,7 @@ class EMRCluster(QueryResourceManager):
         name = 'Name'
         id = 'Id'
         date = "Status.Timeline.CreationDateTime"
+        cfn_type = 'AWS::EMR::Cluster'
 
     action_registry = actions
     filter_registry = filters
@@ -299,6 +300,7 @@ class EMRSecurityConfiguration(QueryResourceManager):
         enum_spec = ('list_security_configurations', 'SecurityConfigurations', None)
         detail_spec = ('describe_security_configuration', 'Name', 'Name', None)
         id = name = 'Name'
+        cfn_type = 'AWS::EMR::SecurityConfiguration'
 
     permissions = ('elasticmapreduce:ListSecurityConfigurations',
                   'elasticmapreduce:DescribeSecurityConfiguration',)

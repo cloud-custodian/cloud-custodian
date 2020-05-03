@@ -33,9 +33,11 @@ class CodeRepository(QueryResourceManager):
         name = id = 'repositoryName'
         arn = "Arn"
         date = 'creationDate'
+        cfn_type = 'AWS::CodeCommit::Repository'
+        universal_tagging = object()
 
     def get_resources(self, ids, cache=True):
-        return self.augment([{'repositoryName': i} for i in ids])
+        return universal_augment(self, self.augment([{'repositoryName': i} for i in ids]))
 
 
 @CodeRepository.action_registry.register('delete')
@@ -72,6 +74,14 @@ class DeleteRepository(BaseAction):
                 "Exception deleting repo:\n %s" % e)
 
 
+class DescribeBuild(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(
+            self.manager,
+            super(DescribeBuild, self).augment(resources))
+
+
 @resources.register('codebuild')
 class CodeBuildProject(QueryResourceManager):
 
@@ -84,25 +94,14 @@ class CodeBuildProject(QueryResourceManager):
         arn = 'arn'
         date = 'created'
         dimension = 'ProjectName'
-        config_type = "AWS::CodeBuild::Project"
+        cfn_type = config_type = "AWS::CodeBuild::Project"
         arn_type = 'project'
         universal_taggable = object()
 
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeBuild(self)
-        elif source_type == 'config':
-            return ConfigSource(self)
-        raise ValueError("Unsupported source: %s for %s" % (
-            source_type, self.resource_type.config_type))
-
-
-class DescribeBuild(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(
-            self.manager,
-            super(DescribeBuild, self).augment(resources))
+    source_mapping = {
+        'describe': DescribeBuild,
+        'config': ConfigSource
+    }
 
 
 @CodeBuildProject.filter_registry.register('subnet')
@@ -157,6 +156,13 @@ class DeleteProject(BaseAction):
                 "Exception deleting project:\n %s" % e)
 
 
+class DescribePipeline(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        return universal_augment(self.manager, resources)
+
+
 @resources.register('codepipeline')
 class CodeDeployPipeline(QueryResourceManager):
 
@@ -168,4 +174,25 @@ class CodeDeployPipeline(QueryResourceManager):
         date = 'created'
         # Note this is purposeful, codepipeline don't have a separate type specifier.
         arn_type = ""
-        config_type = "AWS::CodePipeline::Pipeline"
+        cfn_type = config_type = "AWS::CodePipeline::Pipeline"
+        universal_tagging = object()
+
+    source_mapping = {
+        'describe': DescribePipeline,
+        'config': ConfigSource
+    }
+
+
+@CodeDeployPipeline.action_registry.register('delete')
+class DeletePipeline(BaseAction):
+
+    schema = type_schema('delete')
+    permissions = ('codepipeline:DeletePipeline',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('codepipeline')
+        for r in resources:
+            try:
+                self.manager.retry(client.delete_pipeline, name=r['name'])
+            except client.exceptions.PipelineNotFoundException:
+                continue

@@ -48,72 +48,6 @@ filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
 
 
-@resources.register('ec2')
-class EC2(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'ec2'
-        arn_type = 'instance'
-        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
-        id = 'InstanceId'
-        filter_name = 'InstanceIds'
-        filter_type = 'list'
-        name = 'PublicDnsName'
-        date = 'LaunchTime'
-        dimension = 'InstanceId'
-        config_type = "AWS::EC2::Instance"
-
-        default_report_fields = (
-            'CustodianDate',
-            'InstanceId',
-            'tag:Name',
-            'InstanceType',
-            'LaunchTime',
-            'VpcId',
-            'PrivateIpAddress',
-        )
-
-    filter_registry = filters
-    action_registry = actions
-
-    # if we have to do a fallback scenario where tags don't come in describe
-    permissions = ('ec2:DescribeTags',)
-
-    def __init__(self, ctx, data):
-        super(EC2, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
-
-    def resources(self, query=None):
-        q = self.resource_query()
-        if q is not None:
-            query = query or {}
-            query['Filters'] = q
-        return super(EC2, self).resources(query=query)
-
-    def resource_query(self):
-        qf = []
-        qf_names = set()
-        # allow same name to be specified multiple times and append the queries
-        # under the same name
-        for q in self.queries:
-            qd = q.query()
-            if qd['Name'] in qf_names:
-                for qf in qf:
-                    if qd['Name'] == qf['Name']:
-                        qf['Values'].extend(qd['Values'])
-            else:
-                qf_names.add(qd['Name'])
-                qf.append(qd)
-        return qf
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeEC2(self)
-        elif source_type == 'config':
-            return query.ConfigSource(self)
-        raise ValueError('invalid source %s' % source_type)
-
-
 class DescribeEC2(query.DescribeSource):
 
     def augment(self, resources):
@@ -167,6 +101,69 @@ class DescribeEC2(query.DescribeSource):
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
+
+
+@resources.register('ec2')
+class EC2(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'instance'
+        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
+        id = 'InstanceId'
+        filter_name = 'InstanceIds'
+        filter_type = 'list'
+        name = 'PublicDnsName'
+        date = 'LaunchTime'
+        dimension = 'InstanceId'
+        cfn_type = config_type = "AWS::EC2::Instance"
+
+        default_report_fields = (
+            'CustodianDate',
+            'InstanceId',
+            'tag:Name',
+            'InstanceType',
+            'LaunchTime',
+            'VpcId',
+            'PrivateIpAddress',
+        )
+
+    filter_registry = filters
+    action_registry = actions
+
+    # if we have to do a fallback scenario where tags don't come in describe
+    permissions = ('ec2:DescribeTags',)
+    source_mapping = {
+        'describe': DescribeEC2,
+        'config': query.ConfigSource
+    }
+
+    def __init__(self, ctx, data):
+        super(EC2, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(self.data.get('query', []))
+
+    def resources(self, query=None):
+        q = self.resource_query()
+        if q is not None:
+            query = query or {}
+            query['Filters'] = q
+        return super(EC2, self).resources(query=query)
+
+    def resource_query(self):
+        qf = []
+        qf_names = set()
+        # allow same name to be specified multiple times and append the queries
+        # under the same name
+        for q in self.queries:
+            qd = q.query()
+            if qd['Name'] in qf_names:
+                for qf in qf:
+                    if qd['Name'] == qf['Name']:
+                        qf['Values'].extend(qd['Values'])
+            else:
+                qf_names.add(qd['Name'])
+                qf.append(qd)
+        return qf
 
 
 @filters.register('security-group')

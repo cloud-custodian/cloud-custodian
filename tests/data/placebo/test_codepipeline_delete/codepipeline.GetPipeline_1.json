@@ -1,0 +1,98 @@
+{
+    "status_code": 200,
+    "data": {
+        "pipeline": {
+            "name": "devinprod",
+            "roleArn": "arn:aws:iam::644160558196:role/service-role/BondDouble7",
+            "artifactStore": {
+                "type": "S3",
+                "location": "codepipeline-us-east-1-644160558196"
+            },
+            "stages": [
+                {
+                    "name": "Source",
+                    "actions": [
+                        {
+                            "name": "Source",
+                            "actionTypeId": {
+                                "category": "Source",
+                                "owner": "AWS",
+                                "provider": "CodeCommit",
+                                "version": "1"
+                            },
+                            "runOrder": 1,
+                            "configuration": {
+                                "BranchName": "master",
+                                "PollForSourceChanges": "false",
+                                "RepositoryName": "fizzbuzz"
+                            },
+                            "outputArtifacts": [
+                                {
+                                    "name": "SourceArtifact"
+                                }
+                            ],
+                            "inputArtifacts": [],
+                            "region": "us-east-1",
+                            "namespace": "SourceVariables"
+                        }
+                    ]
+                },
+                {
+                    "name": "Build",
+                    "actions": [
+                        {
+                            "name": "Build",
+                            "actionTypeId": {
+                                "category": "Build",
+                                "owner": "AWS",
+                                "provider": "CodeBuild",
+                                "version": "1"
+                            },
+                            "runOrder": 1,
+                            "configuration": {
+                                "ProjectName": "envoy"
+                            },
+                            "outputArtifacts": [
+                                {
+                                    "name": "BuildArtifact"
+                                }
+                            ],
+                            "inputArtifacts": [
+                                {
+                                    "name": "SourceArtifact"
+                                }
+                            ],
+                            "region": "us-east-1",
+                            "namespace": "BuildVariables"
+                        }
+                    ]
+                }
+            ],
+            "version": 1
+        },
+        "metadata": {
+            "pipelineArn": "arn:aws:codepipeline:us-east-1:644160558196:devinprod",
+            "created": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 5,
+                "day": 1,
+                "hour": 19,
+                "minute": 36,
+                "second": 4,
+                "microsecond": 447000
+            },
+            "updated": {
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 5,
+                "day": 1,
+                "hour": 19,
+                "minute": 36,
+                "second": 4,
+                "microsecond": 447000
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

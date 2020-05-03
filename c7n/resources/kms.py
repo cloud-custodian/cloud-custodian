@@ -33,6 +33,7 @@ class KeyAlias(QueryResourceManager):
         enum_spec = ('list_aliases', 'Aliases', None)
         name = "AliasName"
         id = "AliasArn"
+        cfn_type = 'AWS::KMS::Alias'
 
     def augment(self, resources):
         return [r for r in resources if 'TargetKeyId' in r]
@@ -70,7 +71,7 @@ class Key(QueryResourceManager):
         name = "KeyId"
         id = "KeyArn"
         universal_taggable = True
-        config_type = 'AWS::KMS::Key'
+        cfn_type = config_type = 'AWS::KMS::Key'
 
     source_mapping = {
         'config': ConfigSource,

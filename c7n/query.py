@@ -786,6 +786,9 @@ class TypeInfo:
     # of dimensions require subclass metrics filter.
     dimension = None
 
+    # AWS Cloudformation type
+    cfn_type = None
+
     # AWS Config Service resource type name
     config_type = None
 

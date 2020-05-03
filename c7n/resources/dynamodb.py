@@ -67,7 +67,7 @@ class Table(query.QueryResourceManager):
         name = 'TableName'
         date = 'CreationDateTime'
         dimension = 'TableName'
-        config_type = 'AWS::DynamoDB::Table'
+        cfn_type = config_type = 'AWS::DynamoDB::Table'
         universal_taggable = object()
 
     source_mapping = {
@@ -362,33 +362,6 @@ class Stream(query.QueryResourceManager):
         dimension = 'TableName'
 
 
-@resources.register('dax')
-class DynamoDbAccelerator(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'dax'
-        arn_type = 'cluster'
-        enum_spec = ('describe_clusters', 'Clusters', None)
-        id = 'ClusterArn'
-        name = 'ClusterName'
-        # config_type = 'AWS::DAX::Cluster'
-
-    permissions = ('dax:ListTags',)
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeDaxCluster(self)
-        elif source_type == 'config':
-            return query.ConfigSource(self)
-        raise ValueError('invalid source %s' % source_type)
-
-    def get_resources(self, ids, cache=True, augment=True):
-        """Override in order to disable the augment for serverless policies.
-           list_tags on dax resources always fail until the cluster is finished creating.
-        """
-        return super(DynamoDbAccelerator, self).get_resources(ids, cache, augment=False)
-
-
 class DescribeDaxCluster(query.DescribeSource):
 
     def get_resources(self, ids, cache=True):
@@ -404,6 +377,30 @@ class DescribeDaxCluster(query.DescribeSource):
             self.manager.session_factory,
             self.manager.retry,
             self.manager.log)))
+
+
+@resources.register('dax')
+class DynamoDbAccelerator(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'dax'
+        arn_type = 'cluster'
+        enum_spec = ('describe_clusters', 'Clusters', None)
+        id = 'ClusterArn'
+        name = 'ClusterName'
+        cfn_type = 'AWS::DAX::Cluster'
+
+    permissions = ('dax:ListTags',)
+    source_mapping = {
+        'describe': DescribeDaxCluster,
+        'config': query.ConfigSource
+    }
+
+    def get_resources(self, ids, cache=True, augment=True):
+        """Override in order to disable the augment for serverless policies.
+           list_tags on dax resources always fail until the cluster is finished creating.
+        """
+        return super(DynamoDbAccelerator, self).get_resources(ids, cache, augment=False)
 
 
 def _dax_cluster_tags(tables, session_factory, retry, log):
