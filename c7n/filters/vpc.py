@@ -62,27 +62,29 @@ class VpcFilter(MatchResourceValidator, RelatedResourceFilter):
     AnnotationKey = "matched-vpcs"
 
 
-class RouteTableFilter(ValueFilter):
-    """Filter Route Tables connected to a resource using its subnet
+class RelatedNetworkFilter(ValueFilter):
+    """Filter netwoking components related to the resource
     """
     annotation_key = 'c7n:route-table'
     annotate = False  # no annotation from value filter
     schema = type_schema('route-table', rinherit=ValueFilter.schema)
     schema_alias = False
     association_type: None
+    describe_method: None
 
     def process(self, resources, event=None):
         self.augment([r for r in resources if self.annotation_key not in r])
-        return super(RouteTableFilter, self).process(resources, event)
+        return super(RelatedNetworkFilter, self).process(resources, event)
 
     def _get_filter(self, r):
         raise NotImplementedError("subclass responsiblity")
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
+        m = getattr(client, self.describe_method)
         for r in resources:
             try:
-                r[self.annotation_key] = client.describe_route_tables(
+                r[self.annotation_key] = m(
                     Filters=[
                         {
                             "Name": self.association_type,
@@ -93,7 +95,7 @@ class RouteTableFilter(ValueFilter):
                 r[self.annotation_key] = {}
 
     def __call__(self, r):
-        return super(RouteTableFilter, self).__call__(r[self.annotation_key])
+        return super(RelatedNetworkFilter, self).__call__(r[self.annotation_key])
 
 
 class DefaultVpcBase(Filter):

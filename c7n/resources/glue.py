@@ -18,7 +18,7 @@ from c7n.manager import resources, ResourceManager
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction, ActionRegistry
-from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, RouteTableFilter
+from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, RelatedNetworkFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
 from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry, CrossAccountAccessFilter
@@ -44,7 +44,7 @@ class ConnectionSubnetFilter(SubnetFilter):
 
 
 @GlueConnection.filter_registry.register('route-table')
-class ConnectionRouteTableFilter(RouteTableFilter):
+class ConnectionRouteTableFilter(RelatedNetworkFilter):
     """Filter Route Tables connected to a Glue Dev Endpoint
 
     :example:
@@ -61,6 +61,7 @@ class ConnectionRouteTableFilter(RouteTableFilter):
                   op: contains
     """
     association_type = "association.subnet-id"
+    describe_method = "describe_route_tables"
 
     def _get_filter(self, r):
         return r['PhysicalConnectionRequirements']['SubnetId']
@@ -126,7 +127,7 @@ class EndpointSubnetFilter(SubnetFilter):
 
 
 @GlueDevEndpoint.filter_registry.register('route-table')
-class EndpointRouteTableFilter(RouteTableFilter):
+class EndpointRouteTableFilter(RelatedNetworkFilter):
     """Filter Route Tables connected to a Glue Dev Endpoint
 
     :example:
@@ -143,6 +144,7 @@ class EndpointRouteTableFilter(RouteTableFilter):
                   op: contains
     """
     association_type = "association.subnet-id"
+    describe_method = "describe_route_tables"
 
     def _get_filter(self, r):
         return r['SubnetId']
