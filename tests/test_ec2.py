@@ -1033,6 +1033,7 @@ class TestStart(BaseTest):
         self.assertIn("i-08270b9cfb568a1c4", log_output)
 
 
+
 class TestOr(BaseTest):
 
     def test_ec2_or_condition(self):
@@ -1918,3 +1919,47 @@ class TestMonitoringInstance(BaseTest):
         self.assertIn(
             instance[0]['Monitoring']['State'].lower(), ['disabled', 'disabling']
         )
+
+class TestUnusedKeys(BaseTest):
+
+    def test_ec2_unused_keys(self):
+        # not working right
+        session_factory = self.record_flight_data("test_ec2_unused_key_delete")
+        client = session_factory().client('ec2')
+        instances = client.describe_instances(Filters=[
+            {
+                "Name": 'instance-state-name',
+                "Values": [
+                    "running"
+                ]
+            }
+        ])
+        self.assertEqual(len(instances['Reservations'][0]['Instances']), 1)
+        used_key = {instances['Reservations'][0]['Instances'][0]['KeyName']}
+        keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
+        unused_key = keys - used_key
+        self.assertEqual(len(unused_key), 1)
+        self.assertNotEqual(unused_key, used_key)           
+        p = self.load_policy(
+            {
+                "name": "ec2-unused-keys",
+                "resource": "aws.ec2",
+                "filters": [
+                    {
+                        "type": "unused-keys"
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "delete-unused-keys"
+                    },                    
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
+        self.assertEqual(len(resources), len(unused_key))
+        self.assertEqual(resources[0], unused_key[0])        
+        self.assertNotIn(unused_key, keys)
+        self.assertIn(used_key, keys)        

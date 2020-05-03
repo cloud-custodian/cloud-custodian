@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyPairs": [
+            {
+                "KeyPairId": "key-0c4538b58c6a30d7f",
+                "KeyFingerprint": "dc:56:0e:f9:e8:4e:f0:c7:2f:b1:0d:22:e0:2d:ef:4f:a6:65:e4:95",
+                "KeyName": "delete",
+                "Tags": []
+            },
+            {
+                "KeyPairId": "key-09f5f4325b5ef063d",
+                "KeyFingerprint": "ec:32:02:27:84:e8:70:12:b3:6e:77:68:af:6b:d7:7d:d3:51:53:ab",
+                "KeyName": "dont delete",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
