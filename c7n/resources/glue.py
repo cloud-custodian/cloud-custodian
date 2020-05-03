@@ -61,7 +61,7 @@ class ConnectionRouteTableFilter(RelatedNetworkFilter):
                   value: 0.0.0.0/0
                   op: contains
     """
-    permissions = ("ec2:DescribeRouteTables",)    
+    permissions = ("ec2:DescribeRouteTables",)
     association_type = "association.subnet-id"
     describe_method = "describe_route_tables"
     match_path = "PhysicalConnectionRequirements.SubnetId"
