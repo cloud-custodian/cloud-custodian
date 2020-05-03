@@ -62,9 +62,7 @@ class ConnectionRouteTableFilter(RelatedNetworkFilter):
     """
     association_type = "association.subnet-id"
     describe_method = "describe_route_tables"
-
-    def _get_filter(self, r):
-        return r['PhysicalConnectionRequirements']['SubnetId']
+    match_path = "PhysicalConnectionRequirements.SubnetId"
 
 
 @GlueConnection.filter_registry.register('security-group')
@@ -145,9 +143,7 @@ class EndpointRouteTableFilter(RelatedNetworkFilter):
     """
     association_type = "association.subnet-id"
     describe_method = "describe_route_tables"
-
-    def _get_filter(self, r):
-        return r['SubnetId']
+    match_path = 'SubnetId'
 
 
 @GlueDevEndpoint.action_registry.register('delete')

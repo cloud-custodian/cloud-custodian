@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import jmespath
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema
 
@@ -69,15 +70,13 @@ class RelatedNetworkFilter(ValueFilter):
     annotate = False  # no annotation from value filter
     schema = type_schema('route-table', rinherit=ValueFilter.schema)
     schema_alias = False
-    association_type: None
-    describe_method: None
+    association_type = None
+    describe_method = None
+    match_path = None
 
     def process(self, resources, event=None):
         self.augment([r for r in resources if self.annotation_key not in r])
         return super(RelatedNetworkFilter, self).process(resources, event)
-
-    def _get_filter(self, r):
-        raise NotImplementedError("subclass responsiblity")
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -88,7 +87,7 @@ class RelatedNetworkFilter(ValueFilter):
                     Filters=[
                         {
                             "Name": self.association_type,
-                            "Values": [self._get_filter(r)]
+                            "Values": [jmespath.search(self.match_path, r)]
                         }
                     ])
             except client.exceptions.EntityNotFoundException:
