@@ -53,7 +53,7 @@ class ConnectionRouteTableFilter(RelatedNetworkFilter):
     .. code-block:: yaml
 
         policies:
-          - name: glue-endpoint-public-route
+          - name: glue-connection-public-route
             resource: aws.glue-connection
             filters:
                 - type: route-table
