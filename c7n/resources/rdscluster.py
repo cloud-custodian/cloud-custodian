@@ -16,11 +16,11 @@ import logging
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter
+from c7n.filters import AgeFilter, CrossAccountAccessFilter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
 from c7n import tags
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
@@ -28,6 +28,12 @@ from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
 
 log = logging.getLogger('custodian.rds-cluster')
+
+
+class DescribeCluster(DescribeSource):
+
+    def augment(self, resources):
+        return tags.universal_augment(self.manager, resources)
 
 
 @resources.register('rds-cluster')
@@ -46,8 +52,12 @@ class RDSCluster(QueryResourceManager):
         dimension = 'DBClusterIdentifier'
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBClusters',)
+        cfn_type = config_type = 'AWS::RDS::DBCluster'
 
-    augment = tags.universal_augment
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeCluster
+    }
 
 
 RDSCluster.filter_registry.register('offhour', OffHour)
@@ -336,13 +346,26 @@ class ModifyDbCluster(BaseAction):
                 **self.data['attributes'])
 
 
+class DescribeClusterSnapshot(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('rds')
+        return self.manager.retry(
+            client.describe_db_cluster_snapshots,
+            Filters=[{
+                'Name': 'db-cluster-snapshot-id',
+                'Values': resource_ids}]).get('DBClusterSnapshots', ())
+
+    def augment(self, resources):
+        return tags.universal_augment(self.manager, resources)
+
+
 @resources.register('rds-cluster-snapshot')
 class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
     """
 
     class resource_type(TypeInfo):
-
         service = 'rds'
         arn_type = 'cluster-snapshot'
         arn_separator = ':'
@@ -352,9 +375,48 @@ class RDSClusterSnapshot(QueryResourceManager):
         name = id = 'DBClusterSnapshotIdentifier'
         date = 'SnapshotCreateTime'
         universal_tagging = object()
+        config_type = 'AWS::RDS::DBClusterSnapshot'
         permissions_enum = ('rds:DescribeDBClusterSnapshots',)
 
-    augment = tags.universal_augment
+    source_mapping = {
+        'describe': DescribeClusterSnapshot,
+        'config': ConfigSource
+    }
+
+
+@RDSClusterSnapshot.filter_registry.register('cross-account')
+class CrossAccountSnapshot(CrossAccountAccessFilter):
+
+    permissions = ('rds:DescribeDBClusterSnapshotAttributes',)
+
+    def process(self, resources, event=None):
+        self.accounts = self.get_accounts()
+        results = []
+        with self.executor_factory(max_workers=2) as w:
+            futures = []
+            for resource_set in chunks(resources, 20):
+                futures.append(w.submit(
+                    self.process_resource_set, resource_set))
+            for f in as_completed(futures):
+                results.extend(f.result())
+        return results
+
+    def process_resource_set(self, resource_set):
+        client = local_session(self.manager.session_factory).client('rds')
+        results = []
+        for r in resource_set:
+            attrs = {t['AttributeName']: t['AttributeValues']
+             for t in self.manager.retry(
+                client.describe_db_cluster_snapshot_attributes,
+                     DBClusterSnapshotIdentifier=r['DBClusterSnapshotIdentifier'])[
+                         'DBClusterSnapshotAttributesResult']['DBClusterSnapshotAttributes']}
+            r['c7n:attributes'] = attrs
+            shared_accounts = set(attrs.get('restore', []))
+            delta_accounts = shared_accounts.difference(self.accounts)
+            if delta_accounts:
+                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                results.append(r)
+        return results
 
 
 @RDSClusterSnapshot.filter_registry.register('age')

@@ -21,8 +21,8 @@ The Azure provider for Cloud Custodian can be hosted by Azure Functions or in a 
 like ACI or AKS. Both hosting options have periodic and event based execution modes.
 
 For a quick and inexpensive start to running custodian policies, Azure Functions are a good hosting
-strategy. The Azure Containter Host requires more up-front configuration, but can make running a 
-large number of policies against multiple subscriptions more maintanable.
+strategy. The Azure Container Host requires more up-front configuration, but can make running a 
+large number of policies against multiple subscriptions more maintainable.
 
 .. toctree::
   :maxdepth: 2

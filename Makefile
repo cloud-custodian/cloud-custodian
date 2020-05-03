@@ -1,3 +1,4 @@
+SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
 PKG_SET = tools/c7n_gcp tools/c7n_azure tools/c7n_kube tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext
 
@@ -9,9 +10,31 @@ install-poetry:
 	poetry install
 	for pkg in $(PKG_SET); do cd $$pkg && poetry install && cd ../..; done
 
+pkg-rebase:
+	rm -f poetry.lock
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f poetry.lock && cd ../..; done
+
+	rm -f setup.py
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f setup.py && cd ../..; done
+
+	rm -f requirements.txt
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f requirements.txt && cd ../..; done
+
+	@$(MAKE) -f $(SELF_MAKE) pkg-update
+	git add poetry.lock
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add poetry.lock && cd ../..; done
+
+	@$(MAKE) -f $(SELF_MAKE) pkg-gen-setup
+	git add setup.py
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add setup.py && cd ../..; done
+
+	@$(MAKE) -f $(SELF_MAKE) pkg-gen-requirements
+	git add requirements.txt
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add requirements.txt && cd ../..; done
+
 pkg-update:
 	poetry update
-	for pkg in $(PKG_SET); do cd $$pkg && poetry update && cd ../..; done
+	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry update && cd ../..; done
 
 pkg-show-update:
 	poetry show -o
@@ -30,15 +53,17 @@ pkg-gen-requirements:
 	poetry export --dev --without-hashes -f requirements.txt > requirements.txt
 	for pkg in $(PKG_SET); do cd $$pkg && poetry export --without-hashes -f requirements.txt > requirements.txt && cd ../..; done
 
-pkg-publish-wheel:
-# clean up any artifacts first
-	rm -f dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
+pkg-increment:
 # increment versions
 	poetry version patch
 	for pkg in $(PKG_SET); do cd $$pkg && poetry version patch && cd ../..; done
 # generate setup
 	@$(MAKE) pkg-gen-setup
+
+pkg-publish-wheel:
+# clean up any artifacts first
+	rm -f dist/*
+	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
 # generate sdist
 	python setup.py bdist_wheel
 	for pkg in $(PKG_SET); do cd $$pkg && python setup.py bdist_wheel && cd ../..; done
@@ -49,6 +74,9 @@ pkg-publish-wheel:
 	twine upload -r testpypi dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r testpypi dist/* && cd ../..; done
 
+test-poetry:
+	. test.env && poetry run pytest -n auto tests tools
+
 test:
 	./bin/tox -e py38
 
@@ -56,7 +84,7 @@ ftest:
 	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 ./bin/py.test -m functional tests
 
 sphinx:
-	make -f docs/Makefile.sphinx clean && \
+# if this errors either tox -e docs or cd tools/c7n_sphinext && poetry install
 	make -f docs/Makefile.sphinx html
 
 ghpages:

@@ -230,3 +230,38 @@ class TestActions(unittest.TestCase):
     def test_action_construction(self):
 
         self.assertIsInstance(actions.factory("terminate", None), emr.Terminate)
+
+
+class TestEMRSecurityConfiguration(BaseTest):
+    def test_emr_security_configuration(self):
+        session_factory = self.replay_flight_data("test_emr_security_configuration")
+        p = self.load_policy(
+            {
+                'name': 'emr',
+                'resource': 'emr-security-configuration',
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        print(resources)
+        self.assertEqual(resources[0]["SecurityConfiguration"]['EncryptionConfiguration']
+             ['EnableInTransitEncryption'], False)
+
+    def test_emr_security_configuration_delete(self):
+        session_factory = self.replay_flight_data("test_emr_security_configuration_delete")
+        p = self.load_policy(
+            {
+                'name': 'emr',
+                'resource': 'emr-security-configuration',
+                "filters": [{"Name": "test"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory(region="us-east-1").client("emr")
+        resp = client.list_security_configurations()
+        self.assertFalse(
+            resp['SecurityConfigurations']
+        )

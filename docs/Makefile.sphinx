@@ -9,7 +9,9 @@ endif
 SPHINXBINS    ?= .tox/$(VIRTUALENV)/bin
 SRCDIR        ?= docs/source
 SPHINXOPTS    ?=
-SPHINXBUILD   ?= $(SPHINXBINS)/sphinx-build
+#SPHINXBUILD   ?= $(SPHINXBINS)/sphinx-build
+# use for poetry environments
+SPHINXBUILD   ?= sphinx-build
 PAPER         ?=
 BUILDDIR      ?= $(SRCDIR)/../build
 
@@ -65,18 +67,18 @@ html:
 
 #
 # Copy readme files that are in the tree to avoid duplicating
-#	cp README.md $(SRCDIR)/overview.md
+#	cp -p README.md $(SRCDIR)/overview.md
 	mkdir -p $(SRCDIR)/tools/assets
-	cp tools/c7n_org/README.md $(SRCDIR)/tools/c7n-org.md
-	cp tools/cask/readme.md $(SRCDIR)/tools/cask.md
-	cp tools/c7n_policystream/README.md $(SRCDIR)/tools/c7n-policystream.md
-	cp tools/c7n_mailer/README.md $(SRCDIR)/tools/c7n-mailer.md
-	cp tools/c7n_trailcreator/readme.md $(SRCDIR)/tools/c7n-trailcreator.md
-	cp tools/c7n_guardian/readme.md $(SRCDIR)/tools/c7n-guardian.md
-	cp tools/omnissm/README.md $(SRCDIR)/tools/omnissm.md
-	cp tools/omnissm/assets/omnissm.svg $(SRCDIR)/tools/assets/omnissm.svg
-	cp tools/c7n_salactus/README.md $(SRCDIR)/tools/c7n-salactus.md
-	cp tools/c7n_logexporter/README.md $(SRCDIR)/tools/c7n-logexporter.md
+	cp -p tools/c7n_org/README.md $(SRCDIR)/tools/c7n-org.md
+	cp -p tools/cask/readme.md $(SRCDIR)/tools/cask.md
+	cp -p tools/c7n_policystream/README.md $(SRCDIR)/tools/c7n-policystream.md
+	cp -p tools/c7n_mailer/README.md $(SRCDIR)/tools/c7n-mailer.md
+	cp -p tools/c7n_trailcreator/readme.md $(SRCDIR)/tools/c7n-trailcreator.md
+	cp -p tools/c7n_guardian/readme.md $(SRCDIR)/tools/c7n-guardian.md
+	cp -p tools/omnissm/README.md $(SRCDIR)/tools/omnissm.md
+	cp -p tools/omnissm/assets/omnissm.svg $(SRCDIR)/tools/assets/omnissm.svg
+	cp -p tools/c7n_salactus/README.md $(SRCDIR)/tools/c7n-salactus.md
+	cp -p tools/c7n_logexporter/README.md $(SRCDIR)/tools/c7n-logexporter.md
 
 	mkdir -p $(SRCDIR)/aws/resources
 	c7n-sphinxext --provider aws --output-dir $(SRCDIR)/aws/resources --group-by=resource_type.service
@@ -88,19 +90,19 @@ html:
 
 #
 # Remove the copies so folks dont accidentally edit the copy
-	rm $(SRCDIR)/tools/c7n-org.md
-	rm $(SRCDIR)/tools/c7n-policystream.md
-	rm $(SRCDIR)/tools/c7n-mailer.md
-	rm $(SRCDIR)/tools/c7n-trailcreator.md
-	rm $(SRCDIR)/tools/omnissm.md
-	rm $(SRCDIR)/tools/c7n-salactus.md
-	rm $(SRCDIR)/tools/c7n-logexporter.md
-	rm $(SRCDIR)/tools/c7n-guardian.md
-	rm $(SRCDIR)/tools/cask.md
-	rm -R $(SRCDIR)/tools/assets
-	rm $(SRCDIR)/aws/resources/*rst
-	rm $(SRCDIR)/azure/resources/*rst
-	rm $(SRCDIR)/gcp/resources/*rst
+#	rm $(SRCDIR)/tools/c7n-org.md
+#	rm $(SRCDIR)/tools/c7n-policystream.md
+#	rm $(SRCDIR)/tools/c7n-mailer.md
+#	rm $(SRCDIR)/tools/c7n-trailcreator.md
+#	rm $(SRCDIR)/tools/omnissm.md
+#	rm $(SRCDIR)/tools/c7n-salactus.md
+#	rm $(SRCDIR)/tools/c7n-logexporter.md
+#	rm $(SRCDIR)/tools/c7n-guardian.md
+#	rm $(SRCDIR)/tools/cask.md
+#	rm -R $(SRCDIR)/tools/assets
+#	rm $(SRCDIR)/aws/resources/*rst
+#	rm $(SRCDIR)/azure/resources/*rst
+#	rm $(SRCDIR)/gcp/resources/*rst
 
 
 	@echo

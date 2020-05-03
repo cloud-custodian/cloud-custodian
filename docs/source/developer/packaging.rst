@@ -68,7 +68,7 @@ automation specific to custodian is in tools/dev/poetrypkg.py
 Caveats
 -------
 
-To maintain within repo dependencies betweeen packages, we specify all
+To maintain within repo dependencies between packages, we specify all
 within intra repo dependencies as dev dependencies with relative
 directory source paths. When we generate setup.py files we do so sans
 any dev deps, which we resolve in generation to the latest version,

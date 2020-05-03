@@ -20,7 +20,9 @@ from c7n.utils import type_schema, local_session
 
 @resources.register('service')
 class Service(QueryResourceManager):
-
+    """GCP Service Management
+    https://cloud.google.com/service-infrastructure/docs/service-management/reference/rest/v1/services
+    """
     class resource_type(TypeInfo):
         service = 'servicemanagement'
         version = 'v1'
@@ -29,7 +31,8 @@ class Service(QueryResourceManager):
         scope = 'project'
         scope_key = 'consumerId'
         scope_template = 'project:{}'
-        id = 'serviceName'
+        name = id = 'serviceName'
+        default_report_fields = [name, "producerProjectId"]
 
         @staticmethod
         def get(client, resource_info):

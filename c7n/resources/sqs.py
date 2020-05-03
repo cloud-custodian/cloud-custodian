@@ -21,10 +21,36 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.iamaccess import PolicyStatementFilter
 from c7n.manager import resources
 from c7n.utils import local_session
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.actions import BaseAction
 from c7n.utils import type_schema
 from c7n.tags import universal_augment
+
+
+class DescribeQueue(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sqs')
+
+        def _augment(r):
+            try:
+                queue = self.manager.retry(
+                    client.get_queue_attributes,
+                    QueueUrl=r,
+                    AttributeNames=['All'])['Attributes']
+                queue['QueueUrl'] = r
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
+                    return
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    self.log.warning("Denied access to sqs %s" % r)
+                    return
+                raise
+            return queue
+
+        with self.manager.executor_factory(max_workers=2) as w:
+            return universal_augment(
+                self.manager, list(filter(None, w.map(_augment, resources))))
 
 
 @resources.register('sqs')
@@ -35,6 +61,7 @@ class SQS(QueryResourceManager):
         arn_type = ""
         enum_spec = ('list_queues', 'QueueUrls', None)
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
+        cfn_type = config_type = 'AWS::SQS::Queue'
         id = 'QueueUrl'
         arn = "QueueArn"
         filter_name = 'QueueNamePrefix'
@@ -49,6 +76,11 @@ class SQS(QueryResourceManager):
             'ApproximateNumberOfMessages',
         )
 
+    source_mapping = {
+        'describe': DescribeQueue,
+        'config': ConfigSource
+    }
+
     def get_permissions(self):
         perms = super(SQS, self).get_permissions()
         perms.append('sqs:GetQueueAttributes')
@@ -62,29 +94,6 @@ class SQS(QueryResourceManager):
                 continue
             ids_normalized.append(i.rsplit('/', 1)[-1])
         return super(SQS, self).get_resources(ids_normalized, cache)
-
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('sqs')
-
-        def _augment(r):
-            try:
-                queue = self.retry(
-                    client.get_queue_attributes,
-                    QueueUrl=r,
-                    AttributeNames=['All'])['Attributes']
-                queue['QueueUrl'] = r
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'AWS.SimpleQueueService.NonExistentQueue':
-                    return
-                if e.response['Error']['Code'] == 'AccessDenied':
-                    self.log.warning("Denied access to sqs %s" % r)
-                    return
-                raise
-            return queue
-
-        with self.executor_factory(max_workers=2) as w:
-            return universal_augment(
-                self, list(filter(None, w.map(_augment, resources))))
 
 
 @SQS.filter_registry.register('metrics')

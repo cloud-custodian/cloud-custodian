@@ -390,6 +390,8 @@ class QueryResourceManager(ResourceManager):
             'Throttling',
             'Client.RequestLimitExceeded')))
 
+    source_mapping = sources
+
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
         self.source = self.get_source(self.source_type)
@@ -399,7 +401,7 @@ class QueryResourceManager(ResourceManager):
         return self.data.get('source', 'describe')
 
     def get_source(self, source_type):
-        return sources.get(source_type)(self)
+        return self.source_mapping.get(source_type)(self)
 
     @classmethod
     def has_arn(cls):
@@ -783,6 +785,9 @@ class TypeInfo:
     # resource id can be passed as this value. further customizations
     # of dimensions require subclass metrics filter.
     dimension = None
+
+    # AWS Cloudformation type
+    cfn_type = None
 
     # AWS Config Service resource type name
     config_type = None

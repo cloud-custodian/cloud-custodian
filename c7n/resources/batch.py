@@ -31,6 +31,7 @@ class ComputeEnvironment(QueryResourceManager):
         arn_type = "compute-environment"
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
+        cfn_type = 'AWS::Batch::ComputeEnvironment'
 
 
 @ComputeEnvironment.filter_registry.register('security-group')
@@ -57,6 +58,7 @@ class JobDefinition(QueryResourceManager):
         id = name = "jobDefinitionName"
         enum_spec = (
             'describe_job_definitions', 'jobDefinitions', None)
+        cfn_type = 'AWS::Batch::JobDefinition'
 
 
 class StateTransitionFilter:

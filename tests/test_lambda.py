@@ -300,7 +300,7 @@ class LambdaTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertEqual(
-            {r["c7n:EventSources"][0] for r in resources}, set(["iot.amazonaws.com"])
+            {r["c7n:EventSources"][0] for r in resources}, {"iot.amazonaws.com"}
         )
 
     def test_sg_filter(self):

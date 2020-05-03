@@ -286,10 +286,9 @@ def generate(resource_types=()):
                 if not resource_type.type_aliases:
                     continue
                 # atm only azure is using type aliases.
-                elif not set([
-                        "%s.%s" % (cloud_name, ralias) for ralias
-                        in resource_type.type_aliases]).intersection(
-                            resource_types):
+                elif not {"%s.%s" % (cloud_name, ralias) for ralias
+                        in resource_type.type_aliases}.intersection(
+                        resource_types):
                     continue
 
             aliases = []

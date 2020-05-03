@@ -19,8 +19,9 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
-from c7n.filters import StateTransitionFilter, FilterRegistry, CrossAccountAccessFilter
+from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
 
@@ -34,6 +35,7 @@ class GlueConnection(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = "connection"
+        cfn_type = 'AWS::Glue::Connection'
 
 
 @GlueConnection.filter_registry.register('subnet')
@@ -91,6 +93,7 @@ class GlueDevEndpoint(QueryResourceManager):
         date = 'CreatedTimestamp'
         arn_type = "devEndpoint"
         universal_taggable = True
+        cfn_type = 'AWS::Glue::DevEndpoint'
 
     augment = universal_augment
 
@@ -150,6 +153,7 @@ class GlueJob(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'job'
         universal_taggable = True
+        cfn_type = 'AWS::Glue::Job'
 
     permissions = ('glue:GetJobs',)
     augment = universal_augment
@@ -181,8 +185,65 @@ class GlueCrawler(QueryResourceManager):
         arn_type = 'crawler'
         state_key = 'State'
         universal_taggable = True
+        cfn_type = 'AWS::Glue::Crawler'
 
     augment = universal_augment
+
+
+class SecurityConfigFilter(RelatedResourceFilter):
+    """Filters glue crawlers with security configurations
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: need-kms-cloudwatch
+                resource: glue-crawler
+                filters:
+                  - type: security-config
+                    key: EncryptionConfiguration.CloudWatchEncryption.CloudWatchEncryptionMode
+                    op: ne
+                    value: SSE-KMS
+
+    To find resources missing any security configuration all set `missing: true` on the filter.
+    """
+
+    RelatedResource = "c7n.resources.glue.GlueSecurityConfiguration"
+    AnnotationKey = "matched-security-config"
+    RelatedIdsExpression = None
+
+    schema = type_schema(
+        'security-config',
+        missing={'type': 'boolean', 'default': False},
+        rinherit=ValueFilter.schema)
+
+    def validate(self):
+        if self.data.get('missing'):
+            return self
+        else:
+            return super(SecurityConfigFilter, self).validate()
+
+    def process(self, resources, event=None):
+        if self.data.get('missing'):
+            return [r for r in resources if self.RelatedIdsExpression not in r]
+        return super(SecurityConfigFilter, self).process(resources, event=None)
+
+
+@GlueDevEndpoint.filter_registry.register('security-config')
+class DevEndpointSecurityConfigFilter(SecurityConfigFilter):
+    RelatedIdsExpression = 'SecurityConfiguration'
+
+
+@GlueJob.filter_registry.register('security-config')
+class GlueJobSecurityConfigFilter(SecurityConfigFilter):
+    RelatedIdsExpression = 'SecurityConfiguration'
+
+
+@GlueCrawler.filter_registry.register('security-config')
+class GlueCrawlerSecurityConfigFilter(SecurityConfigFilter):
+
+    RelatedIdsExpression = 'CrawlerSecurityConfiguration'
 
 
 @GlueCrawler.action_registry.register('delete')
@@ -213,6 +274,7 @@ class GlueDatabase(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'database'
         state_key = 'State'
+        cfn_type = 'AWS::Glue::Database'
 
 
 @GlueDatabase.action_registry.register('delete')
@@ -284,6 +346,7 @@ class GlueClassifier(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = 'classifier'
+        cfn_type = 'AWS::Glue::Classifier'
 
 
 @GlueClassifier.action_registry.register('delete')
@@ -314,6 +377,7 @@ class GlueMLTransform(QueryResourceManager):
         id = 'TransformId'
         arn_type = 'mlTransform'
         universal_taggable = object()
+        cfn_type = 'AWS::Glue::MLTransform'
 
     augment = universal_augment
 
@@ -345,6 +409,7 @@ class GlueSecurityConfiguration(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
+        cfn_type = 'AWS::Glue::SecurityConfiguration'
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')
@@ -371,6 +436,7 @@ class GlueTrigger(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'trigger'
         universal_taggable = object()
+        cfn_type = 'AWS::Glue::Trigger'
 
     augment = universal_augment
 
@@ -400,6 +466,7 @@ class GlueWorkflow(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'workflow'
         universal_taggable = object()
+        cfn_type = 'AWS::Glue::Workflow'
 
     def augment(self, resources):
         return universal_augment(
@@ -421,6 +488,11 @@ class DeleteWorkflow(BaseAction):
                 continue
 
 
+@GlueWorkflow.filter_registry.register('security-config')
+class GlueWorkflowSecurityConfigFilter(SecurityConfigFilter):
+    RelatedIdsExpression = 'SecurityConfiguration'
+
+
 @resources.register('glue-catalog')
 class GlueDataCatalog(ResourceManager):
 
@@ -432,6 +504,7 @@ class GlueDataCatalog(ResourceManager):
         service = 'glue'
         arn_type = 'catalog'
         id = name = 'CatalogId'
+        cfn_type = 'AWS::Glue::DataCatalogEncryptionSettings'
 
     @classmethod
     def get_permissions(cls):

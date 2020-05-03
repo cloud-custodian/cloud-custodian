@@ -63,8 +63,8 @@ log = logging.getLogger('custodian.reports')
 
 def report(policies, start_date, options, output_fh, raw_output_fh=None):
     """Format a policy's extant records into a report."""
-    regions = set([p.options.region for p in policies])
-    policy_names = set([p.name for p in policies])
+    regions = {p.options.region for p in policies}
+    policy_names = {p.name for p in policies}
     formatter = Formatter(
         policies[0].resource_manager.resource_type,
         extra_fields=options.field,

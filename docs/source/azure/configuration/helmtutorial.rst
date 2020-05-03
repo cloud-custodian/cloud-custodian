@@ -94,7 +94,7 @@ small cluster and should be adjusted to fit your needs outside this tutorial.
     az aks get-credentials --resource-group c7n-helm-tutorial --name c7n-helm    
 
 Once the cluster has been created, we can initialize helm and tiller. First, create the Service 
-Account and Cluster Roler Binding for Tiller
+Account and Cluster Role Binding for Tiller
 
 .. code-block:: yaml
 

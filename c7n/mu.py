@@ -47,6 +47,7 @@ from c7n.utils import parse_s3, local_session, get_retry, merge_dict
 log = logging.getLogger('custodian.serverless')
 
 LambdaRetry = get_retry(('InsufficientPermissionsException',), max_attempts=2)
+RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=2)
 
 
 class PythonPackageArchive:
@@ -1113,7 +1114,7 @@ class CloudWatchEventSource:
 
         # Add Targets
         found = False
-        response = self.client.list_targets_by_rule(Rule=func.name)
+        response = RuleRetry(self.client.list_targets_by_rule, Rule=func.name)
         # CloudWatchE seems to be quite picky about function arns (no aliases/versions)
         func_arn = func.arn
 
@@ -1155,9 +1156,10 @@ class CloudWatchEventSource:
             try:
                 targets = self.client.list_targets_by_rule(
                     Rule=func.name)['Targets']
-                self.client.remove_targets(
-                    Rule=func.name,
-                    Ids=[t['Id'] for t in targets])
+                if targets:
+                    self.client.remove_targets(
+                        Rule=func.name,
+                        Ids=[t['Id'] for t in targets])
             except ClientError as e:
                 log.warning(
                     "Could not remove targets for rule %s error: %s",

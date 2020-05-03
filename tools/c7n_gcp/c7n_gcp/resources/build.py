@@ -25,4 +25,5 @@ class CloudBuild(QueryResourceManager):
         enum_spec = ('list', 'builds[]', None)
         scope = 'project'
         scope_key = 'projectId'
-        id = "id"
+        name = id = "id"
+        default_report_fields = ["status", "startTime", "logsURL"]

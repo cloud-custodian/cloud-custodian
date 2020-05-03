@@ -23,8 +23,8 @@ tool like Github. This allows us to version and enable collaboration through
 git pull requests and issues. In this example, we will be setting up a new repo
 in Github.
 
-First, set up a new repo in Github and grab the reporistory url. You don't need
-need to add a README or any other files to it first.
+First, set up a new repo in Github and grab the repository url. You don't need
+to add a README or any other files to it first.
 
 .. code-block:: bash
 
@@ -73,7 +73,7 @@ First, navigate to https://azure.microsoft.com/en-us/services/devops/pipelines/ 
 click the "Start pipelines free with Github" button and follow the flow to connect
 your Github account with Devops Pipelines.
 
-Next click on the Piplines section in the left hand side of the sidebar and connect
+Next click on the Pipelines section in the left hand side of the sidebar and connect
 with Github. Once the pipeline is setup, we can add the following azure devops
 configuration to our repo:
 
@@ -190,7 +190,7 @@ Cloud Custodian is to start with running Cloud Custodian against a single accoun
 To start, create a virtual machine on your cloud provider of choice.
 It's recommended to execute Cloud Custodian in the same cloud provider
 that you are operating against to prevent a hard dependency on one
-cloud to another as well being able to utilize your cloud's best pratices
+cloud to another as well being able to utilize your cloud's best practices
 for credentials (instance profile, service account, etc).
 
 Then, log into the instance and set up Custodian, following the instructions

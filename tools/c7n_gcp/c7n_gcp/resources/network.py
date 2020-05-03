@@ -29,7 +29,10 @@ class Network(QueryResourceManager):
         version = 'v1'
         component = 'networks'
         scope_template = "projects/{}/global/networks"
-        id = "name"
+        name = id = "name"
+        default_report_fields = [
+            "name", "description", "creationTimestamp",
+            "autoCreateSubnetworks", "IPv4Range", "gatewayIPv4"]
 
 
 @resources.register('subnet')
@@ -41,7 +44,10 @@ class Subnet(QueryResourceManager):
         version = 'v1'
         component = 'subnetworks'
         enum_spec = ('aggregatedList', 'items.*.subnetworks[]', None)
-        id = "name"
+        name = id = "name"
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "ipCidrRange",
+            "gatewayAddress", "region", "state"]
 
         @staticmethod
         def get(client, resource_info):
@@ -116,7 +122,10 @@ class Firewall(QueryResourceManager):
         service = 'compute'
         version = 'v1'
         component = 'firewalls'
-        id = "name"
+        name = id = "name"
+        default_report_fields = [
+            name, "description", "network", "priority", "creationTimestamp",
+            "logConfig.enabled", "disabled"]
 
         @staticmethod
         def get(client, resource_info):
@@ -134,7 +143,9 @@ class Router(QueryResourceManager):
         version = 'v1'
         component = 'routers'
         enum_spec = ('aggregatedList', 'items.*.routers[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "region", "network"]
 
         @staticmethod
         def get(client, resource_info):
@@ -182,7 +193,9 @@ class Route(QueryResourceManager):
         version = 'v1'
         component = 'routes'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "network", "priority", "destRange"]
 
         @staticmethod
         def get(client, resource_info):
@@ -200,7 +213,10 @@ class Interconnect(QueryResourceManager):
         version = 'v1'
         component = 'interconnects'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "operationalStatus",
+            "linkType", "location"]
 
         @staticmethod
         def get(client, resource_info):
@@ -218,7 +234,10 @@ class InterconnectAttachment(QueryResourceManager):
         version = 'v1'
         component = 'interconnectAttachments'
         enum_spec = ('aggregatedList', 'items.*.interconnectAttachments[]', None)
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "description", "creationTimestamp", "interconnect",
+            "router", "region", "operationalStatus"]
 
         @staticmethod
         def get(client, resource_info):

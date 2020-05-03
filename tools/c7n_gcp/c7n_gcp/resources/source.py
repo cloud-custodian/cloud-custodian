@@ -17,6 +17,9 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('sourcerepo')
 class SourceRepository(QueryResourceManager):
+    """GCP Cloud Source Repositories
+    https://cloud.google.com/source-repositories/docs/reference/rest/v1/projects.repos
+    """
 
     class resource_type(TypeInfo):
         service = 'sourcerepo'
@@ -26,4 +29,6 @@ class SourceRepository(QueryResourceManager):
         scope = 'project'
         scope_key = 'name'
         scope_template = "projects/{}-"
-        id = 'name'
+        name = id = 'name'
+
+        default_report_fields = ["name", "size", "url"]

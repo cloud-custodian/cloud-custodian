@@ -320,7 +320,7 @@ class Not(BooleanGroupFilter):
                 break
 
         before = set(resource_map.keys())
-        after = set([r[rtype_id] for r in resources])
+        after = {r[rtype_id] for r in resources}
         results = before - after
         sweeper.sweep([])
 

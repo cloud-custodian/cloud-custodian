@@ -519,8 +519,8 @@ class CosmosDBFirewallActionTest(BaseTest):
             set(kwargs['create_update_parameters']['properties']['ipRangeFilter'].split(',')))
         self.assertEqual(
             {'id1', 'id2'},
-            set([r.id for r in
-                 kwargs['create_update_parameters']['properties']['virtualNetworkRules']]))
+            {r.id for r in
+             kwargs['create_update_parameters']['properties']['virtualNetworkRules']})
 
 
 class CosmosDBThroughputActionsTest(BaseTest):

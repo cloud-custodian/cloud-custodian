@@ -19,7 +19,9 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('ml-model')
 class MLModel(QueryResourceManager):
-
+    """GCP Resource
+    https://cloud.google.com/ai-platform/prediction/docs/reference/rest/v1/projects.models
+    """
     class resource_type(TypeInfo):
         service = 'ml'
         version = 'v1'
@@ -28,7 +30,9 @@ class MLModel(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'name'
+        default_report_fields = [
+            id, name, "description", "onlinePredictionLogging"]
         get_requires_event = True
 
         @staticmethod
@@ -41,7 +45,9 @@ class MLModel(QueryResourceManager):
 
 @resources.register('ml-job')
 class MLJob(QueryResourceManager):
-
+    """GCP Resource
+    https://cloud.google.com/ai-platform/prediction/docs/reference/rest/v1/projects.jobs
+    """
     class resource_type(TypeInfo):
         service = 'ml'
         version = 'v1'
@@ -50,7 +56,9 @@ class MLJob(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = 'projects/{}'
-        id = 'name'
+        name = id = 'jobId'
+        default_report_fields = [
+            "jobId", "status", "createTime", "endTime"]
         get_requires_event = True
 
         @staticmethod

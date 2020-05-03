@@ -44,6 +44,24 @@ To install Cloud Custodian, just run::
   (custodian) $ pip install c7n_gcp   #Install GCP Package
 
 
+Docker
+++++++
+
+To install via docker, just run::
+
+  $ docker pull cloudcustodian/c7n
+
+You'll need to export cloud provider credentials to the container
+when executing. One example, if your using environment variables for provider
+credentials::
+
+  $ docker run -it \
+    -v $(pwd)/output:/home/custodian/output \
+    -v $(pwd)/policy.yml:/home/custodian/policy.yml \
+    --env-file <(env | grep "^AWS\|^AZURE\|^GOOGLE") \
+       cloudcustodian/c7n run -v -s /home/custodian/output /home/custodian/policy.yml
+
+
 .. _explore-cc:
 
 Explore Cloud Custodian

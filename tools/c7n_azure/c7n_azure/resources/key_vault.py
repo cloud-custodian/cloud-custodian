@@ -240,8 +240,8 @@ class WhiteListFilter(Filter):
                     # If user_permissions is not empty, but allowed permissions is empty -- Failed.
                     return False
                 # User lowercase to compare sets
-                lower_user_perm = set([x.lower() for x in user_permissions[v]])
-                lower_perm = set([x.lower() for x in permissions[v]])
+                lower_user_perm = {x.lower() for x in user_permissions[v]}
+                lower_perm = {x.lower() for x in permissions[v]}
                 if lower_user_perm.difference(lower_perm):
                     # If user has more permissions than allowed -- Failed
                     return False

@@ -380,6 +380,41 @@ class RDSClusterSnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
+    def test_rdscluster_snapshot_get_resources(self):
+        session_factory = self.replay_flight_data('test_rds_cluster_snapshot_get_resources')
+        p = self.load_policy(
+            {
+                'name': 'rdscluster-get',
+                'resource': 'aws.rds-cluster-snapshot'
+            },
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources([
+            'test-cluster-final-snapshot',
+            'invalid',
+            'rds:database-1-2020-04-27-05-58'])
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            {'rds:database-1-2020-04-27-05-58', 'test-cluster-final-snapshot'},
+            {r['DBClusterSnapshotIdentifier'] for r in resources})
+        self.assertEqual(
+            {len(r['Tags']) for r in resources},
+            {1, 0})
+
+    def test_rdscluster_snapshot_cross_account(self):
+        session_factory = self.replay_flight_data('test_rds_cluster_snapshot_cross_account')
+        p = self.load_policy(
+            {
+                'name': 'rdscluster-snapshot-xaccount',
+                'resource': 'aws.rds-cluster-snapshot',
+                'filters': [
+                    {'type': 'cross-account'}]
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['DBClusterSnapshotIdentifier'], 'test-cluster-final-snapshot')
+        self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['12345678910'])
+
     def test_rdscluster_snapshot_simple_filter(self):
         session_factory = self.replay_flight_data("test_rdscluster_snapshot_simple")
         p = self.load_policy(

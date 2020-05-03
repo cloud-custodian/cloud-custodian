@@ -297,7 +297,7 @@ def report(options, policies):
         log.error('Error: must supply at least one policy')
         sys.exit(1)
 
-    resources = set([p.resource_type for p in policies])
+    resources = {p.resource_type for p in policies}
     if len(resources) > 1:
         log.error('Error: Report subcommand can accept multiple policies, '
                   'but they must all be for the same resource.')
@@ -349,7 +349,7 @@ def schema_cmd(options):
     if not options.resource:
         load_available(resources=False)
         resource_list = {'resources': sorted(itertools.chain(
-            *[clouds[p].resource_map.keys() for p in PROVIDER_NAMES]))}
+            *[clouds[p].resource_map.keys() for p in PROVIDER_NAMES if p in clouds]))}
         print(yaml_dump(resource_list))
         return
 

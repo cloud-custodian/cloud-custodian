@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import time
 from .common import BaseTest
 
 
@@ -117,3 +118,16 @@ class CodePipeline(BaseTest):
             p.resource_manager.get_arns(resources),
             ['arn:aws:codepipeline:us-east-1:001100:custodian-deploy'])
         self.assertEqual(len(resources[0]["stages"]), 2)
+
+    def test_delete_pipeline(self):
+        factory = self.replay_flight_data('test_codepipeline_delete')
+        p = self.load_policy(
+            {'name': 'del-pipe', 'resource': 'aws.codepipeline',
+             'actions': ['delete']},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = factory().client('codepipeline')
+        if self.recording:
+            time.sleep(2)
+        self.assertFalse(client.list_pipelines().get('pipelines'))

@@ -30,6 +30,9 @@ class AppEngineApp(QueryResourceManager):
         enum_spec = ('get', '[@]', None)
         scope = None
         id = 'id'
+        name = 'name'
+        default_report_fields = [
+            'id', 'locationId', 'servingStatus', 'authDomain', 'defaultHostName']
 
         @staticmethod
         def get(client, resource_info):
@@ -56,6 +59,7 @@ class AppEngineCertificate(ChildResourceManager):
         component = 'apps.authorizedCertificates'
         enum_spec = ('list', 'certificates[]', None)
         scope = None
+        name = 'displayName'
         id = 'id'
         parent_spec = {
             'resource': 'app-engine',
@@ -63,6 +67,7 @@ class AppEngineCertificate(ChildResourceManager):
                 ('id', 'appsId')
             }
         }
+        default_report_fields = ['displayName', 'expireTime']
 
         @staticmethod
         def get(client, resource_info):
@@ -75,7 +80,7 @@ class AppEngineCertificate(ChildResourceManager):
 @resources.register('app-engine-domain')
 class AppEngineDomain(ChildResourceManager):
     """GCP resource:
-    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedDomains
+    https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.authorizedDomains/list#AuthorizedDomain
     """
     class resource_type(ChildTypeInfo):
         service = 'appengine'
@@ -84,6 +89,8 @@ class AppEngineDomain(ChildResourceManager):
         enum_spec = ('list', 'domains[]', None)
         scope = None
         id = 'id'
+        name = "name"
+        default_report_fields = [id, name]
         parent_spec = {
             'resource': 'app-engine',
             'child_enum_params': {
@@ -107,7 +114,9 @@ class AppEngineDomainMapping(ChildResourceManager):
         component = 'apps.domainMappings'
         enum_spec = ('list', 'domainMappings[]', None)
         scope = None
+        name = "name"
         id = 'id'
+        default_report_fields = [id, name]
         parent_spec = {
             'resource': 'app-engine',
             'child_enum_params': {
@@ -138,13 +147,14 @@ class AppEngineFirewallIngressRule(ChildResourceManager):
         component = 'apps.firewall.ingressRules'
         enum_spec = ('list', 'ingressRules[]', None)
         scope = None
-        id = 'priority'
+        name = id = 'priority'
         parent_spec = {
             'resource': 'app-engine',
             'child_enum_params': {
                 ('id', 'appsId')
             }
         }
+        default_report_fields = ['priority', 'action', 'sourceRange', 'description']
 
         @staticmethod
         def get(client, resource_info):
