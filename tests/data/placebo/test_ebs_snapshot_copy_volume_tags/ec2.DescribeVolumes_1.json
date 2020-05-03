@@ -74,12 +74,6 @@
             "Device": "/dev/sda1"
           }
         ],
-        "Tags": [
-          {
-            "Value": "FancyTestInstancePrivate",
-            "Key": "Name"
-          }
-        ],
         "Encrypted": false,
         "VolumeType": "gp2",
         "VolumeId": "vol-0252f61378ede9d01",

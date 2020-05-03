@@ -105,17 +105,6 @@
                 "SnapshotId": "snap-04589ad9a763d4cfd"
             }
         ],
-        "ResponseMetadata": {
-            "RequestId": "9d4ac018-d955-4993-823c-f37223b689a6",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "content-type": "text/xml;charset=UTF-8",
-                "transfer-encoding": "chunked",
-                "vary": "accept-encoding",
-                "date": "Tue, 11 Jun 2019 21:25:24 GMT",
-                "server": "AmazonEC2"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }
