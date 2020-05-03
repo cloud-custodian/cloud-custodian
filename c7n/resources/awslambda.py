@@ -32,32 +32,6 @@ from c7n.utils import local_session, type_schema
 ErrAccessDenied = "AccessDeniedException"
 
 
-@resources.register('lambda')
-class AWSLambda(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'lambda'
-        arn_type = 'function'
-        arn_separator = ":"
-        enum_spec = ('list_functions', 'Functions', None)
-        name = id = 'FunctionName'
-        date = 'LastModified'
-        dimension = 'FunctionName'
-        config_type = "AWS::Lambda::Function"
-        universal_taggable = object()
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeLambda(self)
-        elif source_type == 'config':
-            return ConfigLambda(self)
-        raise ValueError("Unsupported source: %s for %s" % (
-            source_type, self.resource_type.config_type))
-
-    def get_resources(self, ids, cache=True, augment=False):
-        return super(AWSLambda, self).get_resources(ids, cache, augment)
-
-
 class DescribeLambda(query.DescribeSource):
 
     def augment(self, resources):
@@ -88,6 +62,30 @@ class ConfigLambda(query.ConfigSource):
         resource['c7n:Policy'] = item[
             'supplementaryConfiguration'].get('Policy')
         return resource
+
+
+@resources.register('lambda')
+class AWSLambda(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'lambda'
+        arn_type = 'function'
+        arn_separator = ":"
+        enum_spec = ('list_functions', 'Functions', None)
+        name = id = 'FunctionName'
+        date = 'LastModified'
+        dimension = 'FunctionName'
+        config_type = 'AWS::Lambda::Function'
+        cfn_type = 'AWS::Lambda::Function'
+        universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeLambda,
+        'config': ConfigLambda
+    }
+
+    def get_resources(self, ids, cache=True, augment=False):
+        return super(AWSLambda, self).get_resources(ids, cache, augment)
 
 
 @AWSLambda.filter_registry.register('security-group')
@@ -481,6 +479,7 @@ class LambdaLayerVersion(query.QueryResourceManager):
         date = 'CreatedDate'
         arn = "LayerVersionArn"
         arn_type = "layer"
+        cfn_type = 'AWS::Lambda::LayerVersion'
 
     def augment(self, resources):
         versions = {}

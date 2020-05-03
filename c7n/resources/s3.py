@@ -88,40 +88,6 @@ actions.register('put-metric', PutMetric)
 MAX_COPY_SIZE = 1024 * 1024 * 1024 * 2
 
 
-@resources.register('s3')
-class S3(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 's3'
-        arn_type = ''
-        enum_spec = ('list_buckets', 'Buckets[]', None)
-        detail_spec = ('list_objects', 'Bucket', 'Contents[]')
-        name = id = 'Name'
-        date = 'CreationDate'
-        dimension = 'BucketName'
-        config_type = 'AWS::S3::Bucket'
-
-    filter_registry = filters
-    action_registry = actions
-
-    def get_arns(self, resources):
-        return ["arn:aws:s3:::{}".format(r["Name"]) for r in resources]
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeS3(self)
-        elif source_type == 'config':
-            return ConfigS3(self)
-        else:
-            return super(S3, self).get_source(source_type)
-
-    @classmethod
-    def get_permissions(cls):
-        perms = ["s3:ListAllMyBuckets"]
-        perms.extend([n[-1] for n in S3_AUGMENT_TABLE])
-        return perms
-
-
 class DescribeS3(query.DescribeSource):
 
     def augment(self, buckets):
@@ -138,6 +104,9 @@ class DescribeS3(query.DescribeSource):
 
 
 class ConfigS3(query.ConfigSource):
+
+    # normalize config's janky idiosyncratic bespoke formating to the
+    # standard describe api responses.
 
     def get_query_params(self, query):
         q = super(ConfigS3, self).get_query_params(query)
@@ -389,6 +358,36 @@ class ConfigS3(query.ConfigSource):
                 if r['redirect'][ck]:
                     redirect[rk] = r['redirect'][ck]
         resource['Website'] = website
+
+
+@resources.register('s3')
+class S3(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 's3'
+        arn_type = ''
+        enum_spec = ('list_buckets', 'Buckets[]', None)
+        detail_spec = ('list_objects', 'Bucket', 'Contents[]')
+        name = id = 'Name'
+        date = 'CreationDate'
+        dimension = 'BucketName'
+        cfn_type = config_type = 'AWS::S3::Bucket'
+
+    filter_registry = filters
+    action_registry = actions
+    source_mapping = {
+        'describe': DescribeS3,
+        'config': ConfigS3
+    }
+
+    def get_arns(self, resources):
+        return ["arn:aws:s3:::{}".format(r["Name"]) for r in resources]
+
+    @classmethod
+    def get_permissions(cls):
+        perms = ["s3:ListAllMyBuckets"]
+        perms.extend([n[-1] for n in S3_AUGMENT_TABLE])
+        return perms
 
 
 S3_CONFIG_SUPPLEMENT_NULL_MAP = {

@@ -35,6 +35,7 @@ class GlueConnection(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = "connection"
+        cfn_type = 'AWS::Glue::Connection'
 
 
 @GlueConnection.filter_registry.register('subnet')
@@ -92,6 +93,7 @@ class GlueDevEndpoint(QueryResourceManager):
         date = 'CreatedTimestamp'
         arn_type = "devEndpoint"
         universal_taggable = True
+        cfn_type = 'AWS::Glue::DevEndpoint'
 
     augment = universal_augment
 
@@ -151,6 +153,7 @@ class GlueJob(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'job'
         universal_taggable = True
+        cfn_type = 'AWS::Glue::Job'
 
     permissions = ('glue:GetJobs',)
     augment = universal_augment
@@ -182,6 +185,7 @@ class GlueCrawler(QueryResourceManager):
         arn_type = 'crawler'
         state_key = 'State'
         universal_taggable = True
+        cfn_type = 'AWS::Glue::Crawler'
 
     augment = universal_augment
 
@@ -270,6 +274,7 @@ class GlueDatabase(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'database'
         state_key = 'State'
+        cfn_type = 'AWS::Glue::Database'
 
 
 @GlueDatabase.action_registry.register('delete')
@@ -341,6 +346,7 @@ class GlueClassifier(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = 'classifier'
+        cfn_type = 'AWS::Glue::Classifier'
 
 
 @GlueClassifier.action_registry.register('delete')
@@ -371,6 +377,7 @@ class GlueMLTransform(QueryResourceManager):
         id = 'TransformId'
         arn_type = 'mlTransform'
         universal_taggable = object()
+        cfn_type = 'AWS::Glue::MLTransform'
 
     augment = universal_augment
 
@@ -402,6 +409,7 @@ class GlueSecurityConfiguration(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
+        cfn_type = 'AWS::Glue::SecurityConfiguration'
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')
@@ -428,6 +436,7 @@ class GlueTrigger(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'trigger'
         universal_taggable = object()
+        cfn_type = 'AWS::Glue::Trigger'
 
     augment = universal_augment
 
@@ -457,6 +466,7 @@ class GlueWorkflow(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'workflow'
         universal_taggable = object()
+        cfn_type = 'AWS::Glue::Workflow'
 
     def augment(self, resources):
         return universal_augment(
@@ -494,6 +504,7 @@ class GlueDataCatalog(ResourceManager):
         service = 'glue'
         arn_type = 'catalog'
         id = name = 'CatalogId'
+        cfn_type = 'AWS::Glue::DataCatalogEncryptionSettings'
 
     @classmethod
     def get_permissions(cls):

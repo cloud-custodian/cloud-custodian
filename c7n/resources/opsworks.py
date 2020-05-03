@@ -56,6 +56,7 @@ class OpsworkStack(QueryResourceManager):
         date = 'CreatedAt'
         dimension = "StackId"
         arn = "Arn"
+        cfn_type = 'AWS::OpsWorks::App'
 
 
 @OpsworkStack.action_registry.register('delete')
@@ -168,6 +169,7 @@ class OpsworksCM(QueryResourceManager):
         name = id = 'ServerName'
         date = 'CreatedAt'
         arn = "ServerArn"
+        cfn_type = 'AWS::OpsWorksCM::Server'
 
 
 @OpsworksCM.action_registry.register('delete')

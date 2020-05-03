@@ -16,49 +16,12 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.utils import local_session, chunks, type_schema, get_retry
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import FilterRegistry
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
-
-
-@resources.register('dms-instance')
-class ReplicationInstance(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'dms'
-        arn_type = 'rep'
-        enum_spec = (
-            'describe_replication_instances', 'ReplicationInstances', None)
-        name = id = 'ReplicationInstanceIdentifier'
-        arn = 'ReplicationInstanceArn'
-        date = 'InstanceCreateTime'
-
-    filters = FilterRegistry('dms-instance.filters')
-    filters.register('marked-for-op', TagActionFilter)
-    filter_registry = filters
-    retry = staticmethod(get_retry(('Throttled',)))
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return InstanceDescribe(self)
-        return super(ReplicationInstance, self).get_source(source_type)
-
-
-@resources.register('dms-endpoint')
-class DmsEndpoints(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'dms'
-        enum_spec = ('describe_endpoints', 'Endpoints', None)
-        arn = id = 'EndpointArn'
-        name = 'EndpointIdentifier'
-        arn_type = 'endpoint'
-        universal_taggable = object()
-
-    augment = universal_augment
 
 
 class InstanceDescribe(DescribeSource):
@@ -93,6 +56,45 @@ class InstanceDescribe(DescribeSource):
                     ResourceArn=arn).get('TagList', [])
             except client.exceptions.ResourceNotFoundFault:
                 continue
+
+
+@resources.register('dms-instance')
+class ReplicationInstance(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'dms'
+        arn_type = 'rep'
+        enum_spec = (
+            'describe_replication_instances', 'ReplicationInstances', None)
+        name = id = 'ReplicationInstanceIdentifier'
+        arn = 'ReplicationInstanceArn'
+        date = 'InstanceCreateTime'
+        cfn_type = 'AWS::DMS::ReplicationInstance'
+
+    filters = FilterRegistry('dms-instance.filters')
+    filters.register('marked-for-op', TagActionFilter)
+    filter_registry = filters
+    retry = staticmethod(get_retry(('Throttled',)))
+
+    source_mapping = {
+        'describe': InstanceDescribe,
+        'config': ConfigSource
+    }
+
+
+@resources.register('dms-endpoint')
+class DmsEndpoints(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'dms'
+        enum_spec = ('describe_endpoints', 'Endpoints', None)
+        arn = id = 'EndpointArn'
+        name = 'EndpointIdentifier'
+        arn_type = 'endpoint'
+        universal_taggable = object()
+        cfn_type = 'AWS::DMS::Endpoint'
+
+    augment = universal_augment
 
 
 @ReplicationInstance.filter_registry.register('kms-key')
