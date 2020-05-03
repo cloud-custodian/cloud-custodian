@@ -37,44 +37,6 @@ from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 log = logging.getLogger('custodian.app-elb')
 
 
-@resources.register('app-elb')
-class AppELB(QueryResourceManager):
-    """Resource manager for v2 ELBs (AKA ALBs and NLBs).
-    """
-
-    class resource_type(TypeInfo):
-        service = 'elbv2'
-        permission_prefix = 'elasticloadbalancing'
-        enum_spec = ('describe_load_balancers', 'LoadBalancers', None)
-        name = 'LoadBalancerName'
-        id = 'LoadBalancerArn'
-        filter_name = "Names"
-        filter_type = "list"
-        dimension = "LoadBalancer"
-        date = 'CreatedTime'
-        config_type = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
-        arn = "LoadBalancerArn"
-        # The suffix varies by type of loadbalancer (app vs net)
-        arn_type = 'loadbalancer/app'
-
-    retry = staticmethod(get_retry(('Throttling',)))
-
-    @classmethod
-    def get_permissions(cls):
-        # override as the service is not the iam prefix
-        return ("elasticloadbalancing:DescribeLoadBalancers",
-                "elasticloadbalancing:DescribeLoadBalancerAttributes",
-                "elasticloadbalancing:DescribeTags")
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeAppElb(self)
-        elif source_type == 'config':
-            return ConfigAppElb(self)
-        raise ValueError("Unsupported source: %s for %s" % (
-            source_type, self.resource_type.config_type))
-
-
 class DescribeAppElb(DescribeSource):
 
     def get_resources(self, ids, cache=True):
@@ -118,6 +80,40 @@ class ConfigAppElb(ConfigSource):
             attr['key']: parse_attribute_value(attr['value']) for
             attr in item_attrs}
         return resource
+
+
+@resources.register('app-elb')
+class AppELB(QueryResourceManager):
+    """Resource manager for v2 ELBs (AKA ALBs and NLBs).
+    """
+
+    class resource_type(TypeInfo):
+        service = 'elbv2'
+        permission_prefix = 'elasticloadbalancing'
+        enum_spec = ('describe_load_balancers', 'LoadBalancers', None)
+        name = 'LoadBalancerName'
+        id = 'LoadBalancerArn'
+        filter_name = "Names"
+        filter_type = "list"
+        dimension = "LoadBalancer"
+        date = 'CreatedTime'
+        cfn_type = config_type = 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+        arn = "LoadBalancerArn"
+        # The suffix varies by type of loadbalancer (app vs net)
+        arn_type = 'loadbalancer/app'
+
+    retry = staticmethod(get_retry(('Throttling',)))
+    source_mapping = {
+        'describe': DescribeAppElb,
+        'config': ConfigAppElb
+    }
+
+    @classmethod
+    def get_permissions(cls):
+        # override as the service is not the iam prefix
+        return ("elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeLoadBalancerAttributes",
+                "elasticloadbalancing:DescribeTags")
 
 
 def _describe_appelb_tags(albs, session_factory, executor_factory, retry):
@@ -885,6 +881,7 @@ class AppELBTargetGroup(QueryResourceManager):
         name = 'TargetGroupName'
         id = 'TargetGroupArn'
         permission_prefix = 'elasticloadbalancing'
+        cfn_type = 'AWS::ElasticLoadBalancingV2::TargetGroup'
 
     filter_registry = FilterRegistry('app-elb-target-group.filters')
     action_registry = ActionRegistry('app-elb-target-group.actions')

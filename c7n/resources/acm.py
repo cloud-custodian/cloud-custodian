@@ -45,6 +45,7 @@ class Certificate(QueryResourceManager):
         detail_spec = (
             "describe_certificate", "CertificateArn",
             'CertificateArn', 'Certificate')
+        cfn_type = "AWS::CertificateManager::Certificate"
         config_type = "AWS::ACM::Certificate"
         arn_type = 'certificate'
         universal_taggable = object()

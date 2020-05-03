@@ -52,7 +52,7 @@ class RDSCluster(QueryResourceManager):
         dimension = 'DBClusterIdentifier'
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBClusters',)
-        config_type = 'AWS::RDS::DBCluster'
+        cfn_type = config_type = 'AWS::RDS::DBCluster'
 
     source_mapping = {
         'config': ConfigSource,
@@ -346,6 +346,20 @@ class ModifyDbCluster(BaseAction):
                 **self.data['attributes'])
 
 
+class DescribeClusterSnapshot(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('rds')
+        return self.manager.retry(
+            client.describe_db_cluster_snapshots,
+            Filters=[{
+                'Name': 'db-cluster-snapshot-id',
+                'Values': resource_ids}]).get('DBClusterSnapshots', ())
+
+    def augment(self, resources):
+        return tags.universal_augment(self.manager, resources)
+
+
 @resources.register('rds-cluster-snapshot')
 class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
@@ -364,24 +378,10 @@ class RDSClusterSnapshot(QueryResourceManager):
         config_type = 'AWS::RDS::DBClusterSnapshot'
         permissions_enum = ('rds:DescribeDBClusterSnapshots',)
 
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeClusterSnapshot(self)
-        return super().get_source(source_type)
-
-
-class DescribeClusterSnapshot(DescribeSource):
-
-    def get_resources(self, resource_ids, cache=True):
-        client = local_session(self.manager.session_factory).client('rds')
-        return self.manager.retry(
-            client.describe_db_cluster_snapshots,
-            Filters=[{
-                'Name': 'db-cluster-snapshot-id',
-                'Values': resource_ids}]).get('DBClusterSnapshots', ())
-
-    def augment(self, resources):
-        return tags.universal_augment(self.manager, resources)
+    source_mapping = {
+        'describe': DescribeClusterSnapshot,
+        'config': ConfigSource
+    }
 
 
 @RDSClusterSnapshot.filter_registry.register('cross-account')

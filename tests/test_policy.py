@@ -30,7 +30,7 @@ from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
 from c7n.version import version
 
-from .common import BaseTest, event_data, Bag
+from .common import BaseTest, event_data, Bag, load_data
 
 
 class DummyResource(manager.ResourceManager):
@@ -196,6 +196,18 @@ class PolicyMetaLint(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_cfn_resource_validity(self):
+        # for resources which are annotated with cfn_type ensure that it is
+        # a valid type.
+        resource_cfn_types = set()
+        for k, v in manager.resources.items():
+            rtype = v.resource_type.cfn_type
+            if rtype is not None:
+                resource_cfn_types.add(rtype)
+        cfn_types = set(load_data('cfn-types.json'))
+        for rtype in resource_cfn_types:
+            assert rtype in cfn_types, "invalid cfn %s" % rtype
 
     def test_config_resource_support(self):
 

@@ -35,7 +35,7 @@ from c7n.filters import ValueFilter, Filter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
 from c7n.utils import (
@@ -43,26 +43,6 @@ from c7n.utils import (
 
 from c7n.resources.aws import Arn
 from c7n.resources.securityhub import OtherResourcePostFinding
-
-
-@resources.register('iam-group')
-class Group(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'iam'
-        arn_type = 'group'
-        enum_spec = ('list_groups', 'Groups', None)
-        id = name = 'GroupName'
-        date = 'CreateDate'
-        config_type = "AWS::IAM::Group"
-        # Denotes this resource type exists across regions
-        global_resource = True
-        arn = 'Arn'
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeGroup(self)
-        return super(Group, self).get_source(source_type)
 
 
 class DescribeGroup(DescribeSource):
@@ -82,25 +62,24 @@ class DescribeGroup(DescribeSource):
         return resources
 
 
-@resources.register('iam-role')
-class Role(QueryResourceManager):
+@resources.register('iam-group')
+class Group(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'iam'
-        arn_type = 'role'
-        enum_spec = ('list_roles', 'Roles', None)
-        detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
-        id = name = 'RoleName'
+        arn_type = 'group'
+        enum_spec = ('list_groups', 'Groups', None)
+        id = name = 'GroupName'
         date = 'CreateDate'
-        config_type = "AWS::IAM::Role"
+        cfn_type = config_type = "AWS::IAM::Group"
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
 
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeRole(self)
-        return super(Role, self).get_source(source_type)
+    source_mapping = {
+        'describe': DescribeGroup,
+        'config': ConfigSource
+    }
 
 
 class DescribeRole(DescribeSource):
@@ -117,6 +96,27 @@ class DescribeRole(DescribeSource):
                 continue
             resources.append(result.pop('Role'))
         return resources
+
+
+@resources.register('iam-role')
+class Role(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        arn_type = 'role'
+        enum_spec = ('list_roles', 'Roles', None)
+        detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
+        id = name = 'RoleName'
+        date = 'CreateDate'
+        cfn_type = config_type = "AWS::IAM::Role"
+        # Denotes this resource type exists across regions
+        global_resource = True
+        arn = 'Arn'
+
+    source_mapping = {
+        'describe': DescribeRole,
+        'config': ConfigSource
+    }
 
 
 @Role.action_registry.register('tag')
@@ -202,27 +202,6 @@ class RoleSetBoundary(SetBoundary):
                 'RoleName': resource['RoleName']}
 
 
-@resources.register('iam-user')
-class User(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'iam'
-        arn_type = 'user'
-        detail_spec = ('get_user', 'UserName', 'UserName', 'User')
-        enum_spec = ('list_users', 'Users', None)
-        id = name = 'UserName'
-        date = 'CreateDate'
-        config_type = "AWS::IAM::User"
-        # Denotes this resource type exists across regions
-        global_resource = True
-        arn = 'Arn'
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeUser(self)
-        return super(User, self).get_source(source_type)
-
-
 class DescribeUser(DescribeSource):
 
     def get_resources(self, resource_ids, cache=True):
@@ -235,6 +214,27 @@ class DescribeUser(DescribeSource):
             except client.exceptions.NoSuchEntityException:
                 continue
         return results
+
+
+@resources.register('iam-user')
+class User(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        arn_type = 'user'
+        detail_spec = ('get_user', 'UserName', 'UserName', 'User')
+        enum_spec = ('list_users', 'Users', None)
+        id = name = 'UserName'
+        date = 'CreateDate'
+        cfn_type = config_type = "AWS::IAM::User"
+        # Denotes this resource type exists across regions
+        global_resource = True
+        arn = 'Arn'
+
+    source_mapping = {
+        'describe': DescribeUser,
+        'config': ConfigSource
+    }
 
 
 @User.action_registry.register('tag')
@@ -338,27 +338,6 @@ class UserSetBoundary(SetBoundary):
                 'UserName': resource['UserName']}
 
 
-@resources.register('iam-policy')
-class Policy(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'iam'
-        arn_type = 'policy'
-        enum_spec = ('list_policies', 'Policies', None)
-        id = 'PolicyId'
-        name = 'PolicyName'
-        date = 'CreateDate'
-        config_type = "AWS::IAM::Policy"
-        # Denotes this resource type exists across regions
-        global_resource = True
-        arn = 'Arn'
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribePolicy(self)
-        return super(Policy, self).get_source(source_type)
-
-
 class DescribePolicy(DescribeSource):
 
     def resources(self, query=None):
@@ -379,6 +358,27 @@ class DescribePolicy(DescribeSource):
                 if e.response['Error']['Code'] == 'NoSuchEntityException':
                     continue
         return results
+
+
+@resources.register('iam-policy')
+class Policy(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        arn_type = 'policy'
+        enum_spec = ('list_policies', 'Policies', None)
+        id = 'PolicyId'
+        name = 'PolicyName'
+        date = 'CreateDate'
+        cfn_type = config_type = "AWS::IAM::Policy"
+        # Denotes this resource type exists across regions
+        global_resource = True
+        arn = 'Arn'
+
+    source_mapping = {
+        'describe': DescribePolicy,
+        'config': ConfigSource
+    }
 
 
 class PolicyQueryParser(QueryParser):

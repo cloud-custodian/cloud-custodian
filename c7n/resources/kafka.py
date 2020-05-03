@@ -32,6 +32,7 @@ class Kafka(QueryResourceManager):
         filter_name = 'ClusterNameFilter'
         filter_type = 'scalar'
         universal_taggable = object()
+        cfn_type = 'AWS::MSK::Cluster'
 
     def augment(self, resources):
         for r in resources:

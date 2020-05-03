@@ -41,7 +41,7 @@ class ElasticBeanstalk(QueryResourceManager):
         )
         filter_name = 'ApplicationNames'
         filter_type = 'list'
-        config_type = 'AWS::ElasticBeanstalk::Application'
+        cfn_type = config_type = 'AWS::ElasticBeanstalk::Application'
 
 
 class DescribeEnvironment(DescribeSource):
@@ -68,7 +68,7 @@ class ElasticBeanstalkEnvironment(QueryResourceManager):
         )
         filter_name = 'EnvironmentNames'
         filter_type = 'list'
-        config_type = 'AWS::ElasticBeanstalk::Environment'
+        cfn_type = config_type = 'AWS::ElasticBeanstalk::Environment'
 
     permissions = ('elasticbeanstalk:ListTagsForResource',)
     source_mapping = {

@@ -50,6 +50,7 @@ class ASG(query.QueryResourceManager):
         filter_name = 'AutoScalingGroupNames'
         filter_type = 'list'
         config_type = 'AWS::AutoScaling::AutoScalingGroup'
+        cfn_type = 'AWS::AutoScaling::AutoScalingGroup'
 
         default_report_fields = (
             'AutoScalingGroupName',
@@ -1630,7 +1631,7 @@ class LaunchConfig(query.QueryResourceManager):
             'describe_launch_configurations', 'LaunchConfigurations', None)
         filter_name = 'LaunchConfigurationNames'
         filter_type = 'list'
-        config_type = 'AWS::AutoScaling::LaunchConfiguration'
+        cfn_type = config_type = 'AWS::AutoScaling::LaunchConfiguration'
 
 
 @LaunchConfig.filter_registry.register('age')
