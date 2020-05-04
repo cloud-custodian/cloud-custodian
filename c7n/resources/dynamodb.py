@@ -196,9 +196,8 @@ class TableContinuousBackupAction(BaseAction, StatusFilter):
     permissions = ('dynamodb:UpdateContinuousBackups',)
 
     def process(self, resources):
-        resources = self.filter_table_state(
-            resources, self.valid_status)
-        print(resources)
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
         client = local_session(self.manager.session_factory).client('dynamodb')
