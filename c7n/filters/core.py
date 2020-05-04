@@ -577,7 +577,7 @@ class ValueFilter(Filter):
         return False
 
     def process_value_type(self, sentinel, value, resource):
-        if self.vtype == 'normalize' and isinstance(value, str):
+        if self.vtype == 'normalize':
             return sentinel, value.strip().lower()
 
         elif self.vtype == 'expr':

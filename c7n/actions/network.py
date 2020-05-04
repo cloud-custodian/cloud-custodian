@@ -120,7 +120,7 @@ class ModifyVpcSecurityGroupsAction(Action):
 
     def _get_array(self, k):
         v = self.data.get(k, [])
-        if isinstance(v, str):
+        if isinstance(v, (str, bytes)):
             return [v]
         return v
 
