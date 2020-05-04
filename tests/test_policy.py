@@ -576,13 +576,13 @@ class TestPolicyCollection(BaseTest):
         # Region exclusions.
         collection = AWS().initialize_policies(
             original, Config.empty(regions=["all"], exclude_regions=["us-east-1"]))
-        self.assertEqual(len(collection.resource_types), 2)
+        self.assertEqual(len(collection.resource_types), 1)
         s3_regions = [p.options.region for p in collection if p.resource_type == "s3"]
         self.assertNotIn("us-east-1", s3_regions)
         self.assertIn("us-east-2", s3_regions)
         # iam is still included since it's global.
         iam = [p for p in collection if p.resource_type == "iam-user"]
-        self.assertEqual(len(iam), 1)
+        self.assertEqual(len(iam), 0)
 
         collection = AWS().initialize_policies(
             original, Config.empty(regions=["eu-west-1", "eu-west-2"], output_dir="/test/output/")

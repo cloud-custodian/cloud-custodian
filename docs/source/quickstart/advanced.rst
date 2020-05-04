@@ -19,6 +19,7 @@ order:
  * the ``--region`` flag
  * the ``AWS_DEFAULT_REGION`` environment variable
  * the region set in the ``~/.aws/config`` file
+ * global resources default to `us-east-1`
 
 It is possible to run policies against multiple regions by specifying the ``--region``
 flag multiple times::
@@ -26,7 +27,8 @@ flag multiple times::
   $ custodian run -s out --region us-east-1 --region us-west-1 policy.yml
 
 If a supplied region does not support the resource for a given policy that region will
-be skipped.
+be skipped.  Additionally, one or more regions can be skipped by specifying
+``--exclude-region``.
 
 The special ``all`` keyword can be used in place of a region to specify the policy
 should run against `all applicable regions
@@ -34,10 +36,6 @@ should run against `all applicable regions
 for the policy's resource::
 
   $ custodian run -s out --region all policy.yml
-
-When using ``all``, one or more regions can be excluded by specifying the
-``--exclude-region`` flag.
-
   $ custodian run -s out --region all --exclude-region us-east-1 policy.yml
 
 Note: when running reports against multiple regions the output is placed in a different
