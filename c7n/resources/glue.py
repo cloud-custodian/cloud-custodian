@@ -520,8 +520,7 @@ class GlueDataCatalog(ResourceManager):
     def _get_catalog_encryption_settings(self):
         client = utils.local_session(self.session_factory).client('glue')
         settings = client.get_data_catalog_encryption_settings()
-        if not settings.get('CatalogId'):
-            settings['CatalogId'] = self.config.account_id
+        settings['CatalogId'] = self.config.account_id
         settings.pop('ResponseMetadata', None)
         return [settings]
 
