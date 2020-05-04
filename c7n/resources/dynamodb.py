@@ -154,7 +154,7 @@ class TableContinuousBackupFilter(ValueFilter):
 
     def process(self, resources, event=None):
         self.augment([r for r in resources if self.annotation_key not in r])
-        return super(TableContinuousBackupFilter, self).process(resources, event)
+        return super().process(resources, event)
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('dynamodb')
@@ -166,11 +166,11 @@ class TableContinuousBackupFilter(ValueFilter):
                 continue
 
     def __call__(self, r):
-        return super(TableContinuousBackupFilter, self).__call__(r[self.annotation_key])
+        return super().__call__(r[self.annotation_key])
 
 
 @Table.action_registry.register('set-continuous-backup')
-class TableContinuousBackupAction(BaseAction):
+class TableContinuousBackupAction(BaseAction, StatusFilter):
     """Set continuous backups and point in time recovery (PITR) on a dynamodb table.
 
     :example:
@@ -189,13 +189,18 @@ class TableContinuousBackupAction(BaseAction):
                   - type: set-continuous-backup
 
     """
-
+    valid_status = ('ACTIVE',)
     schema = type_schema(
         'set-continuous-backup',
         state={'type': 'boolean', 'default': True})
     permissions = ('dynamodb:UpdateContinuousBackups',)
 
     def process(self, resources):
+        resources = self.filter_table_state(
+            resources, self.valid_status)
+        print(resources)
+        if not len(resources):
+            return        
         client = local_session(self.manager.session_factory).client('dynamodb')
         for r in resources:
             try:

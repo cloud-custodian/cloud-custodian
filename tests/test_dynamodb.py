@@ -192,7 +192,7 @@ class DynamodbTest(BaseTest):
             session_factory=mock_factory,
         )
         try:
-            p.resource_manager.actions[0].process([{'TableName': 'abc'}])
+            p.resource_manager.actions[0].process([{'TableName': 'abc', 'TableStatus': 'ACTIVE'}])
         except client.exceptions.TableNotFoundException:
             self.fail('should not raise')
         mock_factory().client('dynamodb').update_continuous_backups.assert_called_once()
