@@ -109,7 +109,7 @@ class DynamodbTest(BaseTest):
                 "resource": "dynamodb-table",
                 "filters": [
                     {
-                        "type": "check-continuous-backup",
+                        "type": "continuous-backup",
                         "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
                         "value": "ENABLED",
                         "op": "ne"
@@ -133,7 +133,7 @@ class DynamodbTest(BaseTest):
                 "resource": "dynamodb-table",
                 "filters": [
                     {
-                        "type": "check-continuous-backup",
+                        "type": "continuous-backup",
                         "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
                         "value": "ENABLED",
                         "op": "ne"
@@ -177,7 +177,7 @@ class DynamodbTest(BaseTest):
                 "resource": "dynamodb-table",
                 "filters": [
                     {
-                        "type": "check-continuous-backup",
+                        "type": "continuous-backup",
                         "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
                         "value": "ENABLED",
                         "op": "ne"

@@ -107,48 +107,48 @@ class KmsFilter(KmsRelatedFilter):
 
     :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-                - name: dynamodb-kms-key-filters
-                  resource: dynamodb-table
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/dynamodb)"
-                      op: regex
+        policies:
+            - name: dynamodb-kms-key-filters
+                resource: dynamodb-table
+                filters:
+                - type: kms-key
+                    key: c7n:AliasName
+                    value: "^(alias/aws/dynamodb)"
+                    op: regex
     """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 
-@Table.filter_registry.register('check-continuous-backup')
+@Table.filter_registry.register('continuous-backup')
 class TableContinuousBackupFilter(ValueFilter):
     """Check for continuous backups and point in time recovery (PITR) on a dynamodb table.
 
     :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-                - name: dynamodb-continuous-backups-disabled
-                  resource: aws.dynamodb-table
-                  filters:
-                      - type: check-continuous-backup
-                        key: ContinuousBackupsStatus
-                        op: eq
-                        value: DISABLED
-                - name: dynamodb-pitr-disabled
-                  resource: aws.dynamodb-table
-                  filters:
-                      - type: check-continuous-backup
-                        key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
-                        op: ne
-                        value: ENABLED
+        policies:
+            - name: dynamodb-continuous-backups-disabled
+                resource: aws.dynamodb-table
+                filters:
+                    - type: continuous-backup
+                    key: ContinuousBackupsStatus
+                    op: eq
+                    value: DISABLED
+            - name: dynamodb-pitr-disabled
+                resource: aws.dynamodb-table
+                filters:
+                    - type: continuous-backup
+                    key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
+                    op: ne
+                    value: ENABLED
     """
 
     annotation_key = 'c7n:continuous-backup'
     annotate = False
-    schema = type_schema('check-continuous-backup', rinherit=ValueFilter.schema)
+    schema = type_schema('continuous-backup', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('dynamodb:DescribeContinuousBackups',)
 
@@ -177,16 +177,16 @@ class TableContinuousBackupAction(BaseAction):
 
         .. code-block:: yaml
 
-            policies:
-                - name: dynamodb-continuous-backups-disabled-set
-                  resource: aws.dynamodb-table
-                  filters:
-                      - type: check-continuous-backup
-                        key: ContinuousBackupsStatus
-                        op: eq
-                        value: DISABLED
-                  actions:
-                      - type: set-continuous-backup
+        policies:
+            - name: dynamodb-continuous-backups-disabled-set
+                resource: aws.dynamodb-table
+                filters:
+                    - type: continuous-backup
+                    key: ContinuousBackupsStatus
+                    op: eq
+                    value: DISABLED
+                actions:
+                    - type: set-continuous-backup
 
     """
 
