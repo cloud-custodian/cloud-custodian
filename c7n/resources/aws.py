@@ -614,20 +614,19 @@ class AWS(Provider):
                 _, resource_type = p.resource_type.split('.', 1)
             else:
                 resource_type = p.resource_type
-            available_regions = service_region_map.get(
-                resource_service_map.get(resource_type), ())
+            available_regions = set(service_region_map.get(
+                resource_service_map.get(resource_type), ()))
 
             # its a global service/endpoint, use user provided region
             # or us-east-1.
             if not available_regions and options.regions:
-                candidates = [r for r in options.regions if r != 'all']
-                candidate = candidates and candidates[0] or 'us-east-1'
-                svc_regions = [candidate]
+                svc_regions = {next((r for r in options.regions if r != 'all'),
+                                     'us-east-1')}
             elif 'all' in options.regions:
-                svc_regions = list(set(available_regions).intersection(enabled_regions) -
-                                   set(options.exclude_regions))
+                svc_regions = available_regions.intersection(enabled_regions)
             else:
-                svc_regions = options.regions
+                svc_regions = set(options.regions)
+            svc_regions = list(svc_regions - set(options.exclude_regions))
 
             for region in svc_regions:
                 if available_regions and region not in available_regions:

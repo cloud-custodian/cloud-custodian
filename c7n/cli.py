@@ -55,7 +55,7 @@ def _default_options(p, blacklist=""):
         provider.add_argument(
             "--exclude-region", action='append', default=[],
             dest="exclude_regions", metavar='EXCLUDE REGION',
-            help="AWS Region(s) to exclude.")
+            help="Cloud Region(s) to exclude.")
     provider.add_argument(
         "--profile",
         help="AWS Account Config File Profile to utilize")
