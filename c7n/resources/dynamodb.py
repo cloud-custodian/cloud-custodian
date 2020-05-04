@@ -76,28 +76,6 @@ class Table(query.QueryResourceManager):
     }
 
 
-class StatusFilter:
-    """Filter tables by status"""
-
-    valid_states = ()
-
-    def filter_table_state(self, tables, states=None):
-        states = states or self.valid_states
-        orig_count = len(tables)
-        result = [t for t in tables if t['TableStatus'] in states]
-        self.log.info("%s %d of %d tables" % (
-            self.__class__.__name__, len(result), orig_count))
-        return result
-
-    def filter_backup_state(self, tables, states=None):
-        states = states or self.valid_states
-        orig_count = len(tables)
-        result = [t for t in tables if t['BackupStatus'] in states]
-        self.log.info("%s %d of %d tables" % (
-            self.__class__.__name__, len(result), orig_count))
-        return result
-
-
 @Table.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     """
@@ -121,7 +99,7 @@ class KmsFilter(KmsRelatedFilter):
 
 
 @Table.action_registry.register('delete')
-class DeleteTable(BaseAction, StatusFilter):
+class DeleteTable(BaseAction):
     """Action to delete dynamodb tables
 
     :example:
@@ -146,8 +124,8 @@ class DeleteTable(BaseAction, StatusFilter):
             client.delete_table(TableName=t['TableName'])
 
     def process(self, resources):
-        resources = self.filter_table_state(
-            resources, self.valid_status)
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
 
@@ -165,7 +143,7 @@ class DeleteTable(BaseAction, StatusFilter):
 
 
 @Table.action_registry.register('set-stream')
-class SetStream(BaseAction, StatusFilter):
+class SetStream(BaseAction):
     """Action to enable/disable streams on table.
 
     :example:
@@ -192,8 +170,8 @@ class SetStream(BaseAction, StatusFilter):
     permissions = ("dynamodb:UpdateTable",)
 
     def process(self, tables):
-        tables = self.filter_table_state(
-            tables, self.valid_status)
+        tables = self.filter_resources(
+            tables, 'TableStatus', self.valid_status)
         if not len(tables):
             self.log.warning("Table not in ACTIVE state.")
             return
@@ -232,7 +210,7 @@ class SetStream(BaseAction, StatusFilter):
 
 
 @Table.action_registry.register('backup')
-class CreateBackup(BaseAction, StatusFilter):
+class CreateBackup(BaseAction):
     """Creates a manual backup of a DynamoDB table. Use of the optional
        prefix flag will attach a user specified prefix. Otherwise,
        the backup prefix will default to 'Backup'.
@@ -255,8 +233,8 @@ class CreateBackup(BaseAction, StatusFilter):
     permissions = ('dynamodb:CreateBackup',)
 
     def process(self, resources):
-        resources = self.filter_table_state(
-            resources, self.valid_status)
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
 
@@ -294,7 +272,7 @@ class Backup(query.QueryResourceManager):
 
 
 @Backup.action_registry.register('delete')
-class DeleteBackup(BaseAction, StatusFilter):
+class DeleteBackup(BaseAction):
     """Deletes backups of a DynamoDB table
 
     :example:
@@ -319,8 +297,8 @@ class DeleteBackup(BaseAction, StatusFilter):
     permissions = ('dynamodb:DeleteBackup',)
 
     def process(self, backups):
-        backups = self.filter_backup_state(
-            backups, self.valid_status)
+        backups = self.filter_resources(
+            backups, 'BackupStatus', self.valid_status)
         if not len(backups):
             return
 
