@@ -113,10 +113,10 @@ class KmsFilter(KmsRelatedFilter):
               - name: dynamodb-kms-key-filters
                 resource: dynamodb-table
                 filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(alias/aws/dynamodb)"
-                op: regex
+                  - type: kms-key
+                    key: c7n:AliasName
+                    value: "^(alias/aws/dynamodb)"
+                    op: regex
     """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
@@ -143,7 +143,7 @@ class TableContinuousBackupFilter(ValueFilter):
                   - type: continuous-backup
                     key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
                     op: ne
-                    value: ENABLED
+                    value: ENABLED                 
     """
 
     annotation_key = 'c7n:continuous-backup'
