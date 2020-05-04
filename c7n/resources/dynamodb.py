@@ -110,13 +110,13 @@ class KmsFilter(KmsRelatedFilter):
     .. code-block:: yaml
 
         policies:
-            - name: dynamodb-kms-key-filters
-                resource: dynamodb-table
-                filters:
-                - type: kms-key
-                    key: c7n:AliasName
-                    value: "^(alias/aws/dynamodb)"
-                    op: regex
+          - name: dynamodb-kms-key-filters
+            resource: dynamodb-table
+            filters:
+          - type: kms-key
+            key: c7n:AliasName
+            value: "^(alias/aws/dynamodb)"
+            op: regex
     """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
@@ -130,20 +130,20 @@ class TableContinuousBackupFilter(ValueFilter):
     .. code-block:: yaml
 
         policies:
-            - name: dynamodb-continuous-backups-disabled
-                resource: aws.dynamodb-table
-                filters:
-                    - type: continuous-backup
-                    key: ContinuousBackupsStatus
-                    op: eq
-                    value: DISABLED
-            - name: dynamodb-pitr-disabled
-                resource: aws.dynamodb-table
-                filters:
-                    - type: continuous-backup
-                    key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
-                    op: ne
-                    value: ENABLED
+          - name: dynamodb-continuous-backups-disabled
+            resource: aws.dynamodb-table
+            filters:
+              - type: continuous-backup
+                key: ContinuousBackupsStatus
+                op: eq
+                value: DISABLED
+          - name: dynamodb-pitr-disabled
+            resource: aws.dynamodb-table
+            filters:
+              - type: continuous-backup
+                key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
+                op: ne
+                value: ENABLED
     """
 
     annotation_key = 'c7n:continuous-backup'
@@ -178,15 +178,15 @@ class TableContinuousBackupAction(BaseAction):
         .. code-block:: yaml
 
         policies:
-            - name: dynamodb-continuous-backups-disabled-set
-                resource: aws.dynamodb-table
-                filters:
-                    - type: continuous-backup
-                    key: ContinuousBackupsStatus
-                    op: eq
-                    value: DISABLED
-                actions:
-                    - type: set-continuous-backup
+          - name: dynamodb-continuous-backups-disabled-set
+            resource: aws.dynamodb-table
+            filters:
+              - type: continuous-backup
+                key: ContinuousBackupsStatus
+                op: eq
+                value: DISABLED
+            actions:
+              - type: set-continuous-backup
 
     """
 
