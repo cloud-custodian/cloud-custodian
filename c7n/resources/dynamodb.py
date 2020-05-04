@@ -143,7 +143,7 @@ class TableContinuousBackupFilter(ValueFilter):
                   - type: continuous-backup
                     key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
                     op: ne
-                    value: ENABLED                 
+                    value: ENABLED
     """
 
     annotation_key = 'c7n:continuous-backup'
