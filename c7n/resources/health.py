@@ -13,8 +13,6 @@
 # limitations under the License.
 import itertools
 
-import six
-
 from c7n.exceptions import PolicyValidationError
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
@@ -142,6 +140,6 @@ class QueryFilter:
 
     def query(self):
         value = self.value
-        if isinstance(self.value, six.string_types):
+        if isinstance(self.value, str):
             value = [self.value]
         return {'Name': self.key, 'Values': value}

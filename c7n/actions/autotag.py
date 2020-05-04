@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import six
 
 from .core import EventAction
 from c7n.exceptions import PolicyValidationError
@@ -142,7 +141,7 @@ class AutoTagUser(EventAction):
         principal_id_key = self.data.get('principal_id_tag', None)
         if principal_id_key and principal_id_value:
             new_tags[principal_id_key] = principal_id_value
-        for key, value in six.iteritems(new_tags):
+        for key, value in new_tags.items():
             tag_action({'key': key, 'value': value}, self.manager).process(untagged_resources)
         return new_tags
 

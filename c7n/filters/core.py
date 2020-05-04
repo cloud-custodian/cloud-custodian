@@ -29,7 +29,6 @@ from dateutil.tz import tzutc
 from dateutil.parser import parse
 from distutils import version
 import jmespath
-import six
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import ThreadPoolExecutor
@@ -47,13 +46,13 @@ ANNOTATION_KEY = "c7n:MatchedFilters"
 
 
 def glob_match(value, pattern):
-    if not isinstance(value, six.string_types):
+    if not isinstance(value, str):
         return False
     return fnmatch.fnmatch(value, pattern)
 
 
 def regex_match(value, regex):
-    if not isinstance(value, six.string_types):
+    if not isinstance(value, str):
         return False
     # Note python 2.5+ internally cache regex
     # would be nice to use re2
@@ -61,7 +60,7 @@ def regex_match(value, regex):
 
 
 def regex_case_sensitive_match(value, regex):
-    if not isinstance(value, six.string_types):
+    if not isinstance(value, str):
         return False
     # Note python 2.5+ internally cache regex
     # would be nice to use re2
@@ -147,7 +146,7 @@ class FilterRegistry(PluginRegistry):
             elif op == 'not':
                 return Not(data, self, manager)
             return ValueFilter(data, manager)
-        if isinstance(data, six.string_types):
+        if isinstance(data, str):
             filter_type = data
             data = {'type': data}
         else:
@@ -578,7 +577,7 @@ class ValueFilter(Filter):
         return False
 
     def process_value_type(self, sentinel, value, resource):
-        if self.vtype == 'normalize' and isinstance(value, six.string_types):
+        if self.vtype == 'normalize':
             return sentinel, value.strip().lower()
 
         elif self.vtype == 'expr':
@@ -732,7 +731,7 @@ def parse_date(v, tz=None):
             return cast_tz(v, tz)
         return v
 
-    if isinstance(v, six.string_types):
+    if isinstance(v, str):
         try:
             return cast_tz(parse(v), tz)
         except (AttributeError, TypeError, ValueError, OverflowError):
@@ -741,13 +740,13 @@ def parse_date(v, tz=None):
     # OSError on windows -- https://bugs.python.org/issue36439
     exceptions = (ValueError, OSError) if os.name == "nt" else (ValueError)
 
-    if isinstance(v, (int, float) + six.string_types):
+    if isinstance(v, (int, float, str)):
         try:
             v = cast_tz(datetime.datetime.fromtimestamp(float(v)), tz)
         except exceptions:
             pass
 
-    if isinstance(v, (int, float) + six.string_types):
+    if isinstance(v, (int, float, str)):
         try:
             # try interpreting as milliseconds epoch
             v = cast_tz(datetime.datetime.fromtimestamp(float(v) / 1000), tz)

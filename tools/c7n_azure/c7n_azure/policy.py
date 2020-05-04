@@ -17,7 +17,6 @@ import re
 import sys
 import time
 
-import six
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
@@ -181,7 +180,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         settings = options.get(name, {})
         result = {}
         # str type implies settings is a resource id
-        if isinstance(settings, six.string_types):
+        if isinstance(settings, str):
             result['id'] = settings
             result['name'] = ResourceIdParser.get_resource_name(settings)
             result['resource_group_name'] = ResourceIdParser.get_resource_group(settings)

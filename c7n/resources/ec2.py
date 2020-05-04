@@ -18,7 +18,6 @@ import random
 import re
 import zlib
 
-import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -1947,7 +1946,7 @@ class QueryFilter:
 
     def query(self):
         value = self.value
-        if isinstance(self.value, six.string_types):
+        if isinstance(self.value, str):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
@@ -2071,7 +2070,7 @@ class LaunchTemplate(query.QueryResourceManager):
                 t_versions.setdefault(
                     tinfo['LaunchTemplateId'], []).append(
                         tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
-        elif isinstance(rids[0], six.string_types):
+        elif isinstance(rids[0], str):
             for tid in rids:
                 t_versions[tid] = []
 

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import six
 
 from azure.mgmt.resource.policy.models import PolicyAssignment
 from azure.mgmt.resource import SubscriptionClient
@@ -27,8 +26,7 @@ from c7n_azure.query import QueryMeta, TypeInfo
 
 
 @resources.register('subscription')
-@six.add_metaclass(QueryMeta)
-class Subscription(ResourceManager):
+class Subscription(ResourceManager, metaclass=QueryMeta):
     """Subscription Resource
 
     :example:

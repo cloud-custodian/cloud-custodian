@@ -766,7 +766,8 @@ class SGUsage(Filter):
         sg_ids = set()
         expr = jmespath.compile(
             'EcsParameters.NetworkConfiguration.awsvpcConfiguration.SecurityGroups[]')
-        for rule in self.manager.get_resource_manager('event-rule-target').resources():
+        for rule in self.manager.get_resource_manager(
+                'event-rule-target').resources(augment=False):
             ids = expr.search(rule)
             if ids:
                 sg_ids.update(ids)

@@ -21,7 +21,6 @@ import time
 
 from dateutil import parser, tz as tzutil
 import jmespath
-import six
 
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
@@ -229,7 +228,7 @@ class PolicyExecutionMode:
         client = session.client('cloudwatch')
 
         for m in metrics:
-            if isinstance(m, six.string_types):
+            if isinstance(m, str):
                 dimensions = default_dimensions
             else:
                 m, m_dimensions = m
@@ -618,7 +617,7 @@ class CloudTrailMode(LambdaMode):
         events = self.policy.data['mode'].get('events')
         assert events, "cloud trail mode requires specifiying events to subscribe"
         for e in events:
-            if isinstance(e, six.string_types):
+            if isinstance(e, str):
                 assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e
             if isinstance(e, dict):
                 jmespath.compile(e['ids'])

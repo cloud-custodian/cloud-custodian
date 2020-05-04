@@ -15,8 +15,6 @@ import logging
 import time
 import json
 
-import six
-
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry, MetricsFilter
@@ -282,7 +280,7 @@ class QueryFilter:
 
     def query(self):
         value = self.value
-        if isinstance(self.value, six.string_types):
+        if isinstance(self.value, str):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}

@@ -47,8 +47,6 @@ import os
 import time
 import ssl
 
-import six
-
 from botocore.client import Config
 from botocore.exceptions import ClientError
 
@@ -135,7 +133,7 @@ class ConfigS3(query.ConfigSource):
                 raise ValueError("unhandled supplementary config %s", k)
                 continue
             v = cfg[k]
-            if isinstance(cfg[k], six.string_types):
+            if isinstance(cfg[k], str):
                 v = json.loads(cfg[k])
             method(resource, v)
 
@@ -158,7 +156,7 @@ class ConfigS3(query.ConfigSource):
 
     def handle_AccessControlList(self, resource, item_value):
         # double serialized in config for some reason
-        if isinstance(item_value, six.string_types):
+        if isinstance(item_value, str):
             item_value = json.loads(item_value)
 
         resource['Acl'] = {}
@@ -1138,7 +1136,7 @@ class DeleteBucketNotification(BucketActionBase):
 
         cfg = defaultdict(list)
 
-        for t in six.itervalues(BucketNotificationFilter.FIELDS):
+        for t in BucketNotificationFilter.FIELDS.values():
             for c in n.get(t, []):
                 if c['Id'] not in statement_ids:
                     cfg[t].append(c)

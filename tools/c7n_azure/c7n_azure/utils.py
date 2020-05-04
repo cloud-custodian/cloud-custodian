@@ -22,7 +22,6 @@ import time
 import uuid
 from concurrent.futures import as_completed
 
-import six
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
 from azure.keyvault import KeyVaultAuthentication, AccessToken
 from azure.keyvault import KeyVaultClient, KeyVaultId
@@ -98,7 +97,7 @@ class StringUtils:
 
     @staticmethod
     def equal(a, b, case_insensitive=True):
-        if isinstance(a, six.string_types) and isinstance(b, six.string_types):
+        if isinstance(a, str) and isinstance(b, str):
             if case_insensitive:
                 return a.strip().lower() == b.strip().lower()
             else:
@@ -113,7 +112,7 @@ class StringUtils:
 
     @staticmethod
     def naming_hash(val, length=8):
-        if isinstance(val, six.string_types):
+        if isinstance(val, str):
             val = val.encode('utf8')
         return hashlib.sha256(val).hexdigest().lower()[:length]
 

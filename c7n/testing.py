@@ -25,7 +25,6 @@ import unittest
 
 import pytest
 import mock
-import six
 import yaml
 
 from c7n import policy
@@ -192,7 +191,7 @@ class CustodianTestCore:
     # Backport from stdlib for 2.7 compat, drop when 2.7 support is dropped.
     def assertRegex(self, text, expected_regex, msg=None):
         """Fail the test unless the text matches the regular expression."""
-        if isinstance(expected_regex, six.string_types):
+        if isinstance(expected_regex, str):
             assert expected_regex, "expected_regex must not be empty."
             expected_regex = re.compile(expected_regex)
         if not expected_regex.search(text):
@@ -247,7 +246,7 @@ class TextTestIO(io.StringIO):
         # we want to print from (think: traceback.print_exc) so we can't
         # standardize the arg type up at the call sites. Hack it here.
 
-        if not isinstance(b, six.text_type):
+        if not isinstance(b, str):
             b = b.decode("utf8")
         return super(TextTestIO, self).write(b)
 
@@ -277,10 +276,8 @@ def mock_datetime_now(tgt, dt):
         def utcnow(cls):
             return cls.target
 
-        # Python2 & Python3 compatible metaclass
-
     MockedDatetime = DatetimeSubclassMeta(
-        b"datetime" if str is bytes else "datetime",  # hack Python2/3 port
+        "datetime",
         (BaseMockedDatetime,),
         {},
     )
