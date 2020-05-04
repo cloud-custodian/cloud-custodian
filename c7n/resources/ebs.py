@@ -1164,7 +1164,20 @@ class EncryptInstanceVolumes(BaseAction):
 
 @EBS.action_registry.register('snapshot')
 class CreateSnapshot(BaseAction):
-    """Snapshot an EBS volume
+    """Snapshot an EBS volume.
+
+    Tags may be optionally added to the snapshot during creation.
+
+    - `copy-volume-tags` copies all the tags from the specified
+      volume to the corresponding snapshot.
+    - `copy-tags` copies the listed tags from each volume
+      to the snapshot.  This is mutually exclusive with
+      `copy-volume-tags`.
+    - `tags` allows new tags to be added to each snapshot.  If
+      no tags are specified, then the tag `custodian_snapshot`
+      is added.
+
+    The default behavior is `copy-volume-tags: true`.
 
     :example:
 

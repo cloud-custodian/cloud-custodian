@@ -1521,6 +1521,7 @@ class Snapshot(BaseAction):
     """Snapshot the volumes attached to an EC2 instance.
 
     Tags may be optionally added to the snapshot during creation.
+
     - `copy-volume-tags` copies all the tags from the specified
       volume to the corresponding snapshot.
     - `copy-tags` copies the listed tags from each volume
