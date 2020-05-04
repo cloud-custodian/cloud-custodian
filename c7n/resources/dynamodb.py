@@ -200,7 +200,7 @@ class TableContinuousBackupAction(BaseAction, StatusFilter):
             resources, self.valid_status)
         print(resources)
         if not len(resources):
-            return        
+            return
         client = local_session(self.manager.session_factory).client('dynamodb')
         for r in resources:
             try:
