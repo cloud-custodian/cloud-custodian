@@ -1682,15 +1682,16 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                                     'items': {
                                         'type': 'object',
                                         'properties': {
-                                            'MinRange': 'number',
-                                            'MaxRange': 'number'
+                                            'MinRange': {'type': 'number', "minimum": 0},
+                                            'MaxRange': {'type': 'number', "minimum": 0}
                                         },
                                         'required': 'MinRange'
                                     }
                                 }
                             },
                              'required': 'BlockPublicSecurityGroupRules'
-                         })
+                         },
+                         required=('BlockPublicAccessConfiguration',))
 
     permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
 
