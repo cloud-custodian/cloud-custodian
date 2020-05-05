@@ -173,7 +173,6 @@ class SetStream(BaseAction):
         tables = self.filter_resources(
             tables, 'TableStatus', self.valid_status)
         if not len(tables):
-            self.log.warning("Table not in ACTIVE state.")
             return
 
         state = self.data.get('state')
