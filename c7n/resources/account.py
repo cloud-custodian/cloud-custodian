@@ -1674,14 +1674,25 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
     """
 
     schema = type_schema('set-emr-block-public-access-configuration',
-                         BlockPublicAccessConfiguration={"type": "object"},
-                         required=('BlockPublicAccessConfiguration',))
-    permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
-    shape = 'PutBlockPublicAccessConfigurationInput'
+                         BlockPublicAccessConfiguration={"type": "object",
+                            'properties': {
+                                'BlockPublicSecurityGroupRules': {'type': 'boolean'},
+                                'PermittedPublicSecurityGroupRuleRanges': {
+                                    'type': 'array',
+                                    'items': {
+                                        'type': 'object',
+                                        'properties': {
+                                            'MinRange': 'number',
+                                            'MaxRange': 'number'
+                                        },
+                                        'required': 'MinRange'
+                                    }
+                                }
+                            },
+                            'required': 'BlockPublicSecurityGroupRules'
+                         })
 
-    def validate(self):
-        config = {'BlockPublicAccessConfiguration': self.data['BlockPublicAccessConfiguration']}
-        return shape_validate(config, self.shape, 'emr')
+    permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('emr')
@@ -1698,7 +1709,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                 base = {}
 
         config = base['BlockPublicAccessConfiguration']
-        updatedConfig = {**config, **self.data['BlockPublicAccessConfiguration']}
+        updatedConfig = {**config, **self.data.get('BlockPublicAccessConfiguration')}
 
         if config == updatedConfig:
             return
