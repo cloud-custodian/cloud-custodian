@@ -1572,10 +1572,9 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
                 'DataCatalogEncryptionSettings')
         resource[self.annotation] = encryption_setting.get('EncryptionAtRest')
         resource[self.annotation].update(encryption_setting.get('ConnectionPasswordEncryption'))
-
-        for encrypt_attr in self.data:
-            if encrypt_attr == 'type' or not isinstance(
-               self.data[encrypt_attr], str) or not self.data[encrypt_attr].startswith('alias'):
+        key_attrs = ('SseAwsKmsKeyId', 'AwsKmsKeyId')
+        for encrypt_attr in key_attrs:
+            if encrypt_attr not in self.data or not self.data[encrypt_attr].startswith('alias'):
                 continue
             key = resource[self.annotation].get(encrypt_attr)
             vfd = {'c7n:AliasName': self.data[encrypt_attr]}
