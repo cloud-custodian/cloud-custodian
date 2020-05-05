@@ -620,8 +620,8 @@ class AWS(Provider):
             # its a global service/endpoint, use user provided region
             # or us-east-1.
             if not available_regions and options.regions:
-                svc_regions = {next((r for r in options.regions if r != 'all'),
-                                     'us-east-1')}
+                svc_regions = {next(
+                    (r for r in options.regions if r != 'all'), 'us-east-1')}
             elif 'all' in options.regions:
                 svc_regions = available_regions.intersection(enabled_regions)
             else:
