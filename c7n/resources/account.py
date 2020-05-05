@@ -1685,11 +1685,11 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                                             'MinRange': {'type': 'number', "minimum": 0},
                                             'MaxRange': {'type': 'number', "minimum": 0}
                                         },
-                                        'required': 'MinRange'
+                                        'required': ['MinRange']
                                     }
                                 }
                             },
-                             'required': 'BlockPublicSecurityGroupRules'
+                             'required': ['BlockPublicSecurityGroupRules']
                          },
                          required=('BlockPublicAccessConfiguration',))
 
