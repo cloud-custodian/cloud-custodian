@@ -1573,17 +1573,18 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
         resource[self.annotation] = encryption_setting.get('EncryptionAtRest')
         resource[self.annotation].update(encryption_setting.get('ConnectionPasswordEncryption'))
 
-        for kmskey in self.data:
-            if not isinstance(self.data[kmskey], str) or not self.data[kmskey].startswith('alias'):
+        for encrypt_attr in self.data:
+            if encrypt_attr == 'type' or not isinstance(
+               self.data[encrypt_attr], str) or not self.data[encrypt_attr].startswith('alias'):
                 continue
-            key = resource[self.annotation].get(kmskey)
-            vfd = {'c7n:AliasName': self.data[kmskey]}
+            key = resource[self.annotation].get(encrypt_attr)
+            vfd = {'c7n:AliasName': self.data[encrypt_attr]}
             vf = KmsRelatedFilter(vfd, self.manager)
             vf.RelatedIdsExpression = 'KmsKeyId'
             vf.annotate = False
             if not vf.process([{'KmsKeyId': key}]):
                 return []
-            resource[self.annotation][kmskey] = self.data[kmskey]
+            resource[self.annotation][encrypt_attr] = self.data[encrypt_attr]
         return resource[self.annotation]
 
 
