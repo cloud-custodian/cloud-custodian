@@ -1689,7 +1689,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                                     }
                                 }
                             },
-                         'required': 'BlockPublicSecurityGroupRules'
+                             'required': 'BlockPublicSecurityGroupRules'
                          })
 
     permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
