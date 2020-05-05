@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "x-guploader-uploadid": "AAANsUl3BoplyP0wiaG3La9yk84R5GrR-YB3AblgcXCIdhi_tFypwi_NgR2ABB-aclUnsoCTs4ciSFUeclPY-tgu128",
+    "etag": "CAE=",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Tue, 05 May 2020 22:09:04 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "pragma": "no-cache",
+    "content-length": "151",
+    "server": "UploadServer",
+    "alt-svc": "h3-27=\":443\"; ma=2592000,h3-25=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "status": "200"
+  },
+  "body": {
+    "iamConfiguration": {
+      "bucketPolicyOnly": {
+        "enabled": false
+      },
+      "uniformBucketLevelAccess": {
+        "enabled": false
+      }
+    }
+  }
+}

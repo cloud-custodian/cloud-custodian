@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from c7n.utils import type_schema
+from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -34,7 +36,7 @@ class Bucket(QueryResourceManager):
                 'get', {'bucket': resource_info['bucket_name']})
 
 
-@Bucket.action_registry.register('enable-uniform-bucket-level-access')
+@Bucket.action_registry.register('enable-uniform-access')
 class BucketLevelAccess(MethodAction):
     '''
     Additional Enforcement mechanism for the Organization Policy Bucket Level Access.
@@ -55,4 +57,5 @@ class BucketLevelAccess(MethodAction):
 
     def get_resource_params(self, model, resource):
         return {'bucket': resource['name'],
-                'body': {'iamConfiguration.uniformBucketLevelAccess.enabled': 'true'}}
+                'fields': 'iamConfiguration',
+                'body': {'iamConfiguration': {'uniformbucketlevelaccess': {'enabled': True}}}}
