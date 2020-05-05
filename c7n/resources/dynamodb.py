@@ -148,7 +148,7 @@ class TableContinuousBackupFilter(ValueFilter):
 
 
 @Table.action_registry.register('set-continuous-backup')
-class TableContinuousBackupAction(BaseAction, StatusFilter):
+class TableContinuousBackupAction(BaseAction):
     """Set continuous backups and point in time recovery (PITR) on a dynamodb table.
 
     :example:
