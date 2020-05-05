@@ -1533,7 +1533,20 @@ class SetS3PublicBlock(BaseAction):
 
 
 class GlueCatalogEncryptionEnabled(MultiAttrFilter):
+    """ Filter glue catalog by its glue encryption status and KMS key
 
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: glue-catalog-security-config
+          resource: aws.glue-catalog
+          filters:
+            - type: glue-security-config
+              SseAwsKmsKeyId: alias/aws/glue
+
+    """
     retry = staticmethod(QueryResourceManager.retry)
 
     schema = {
@@ -1541,7 +1554,7 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
         'additionalProperties': False,
         'properties': {
             'type': {'enum': ['glue-security-config']},
-            'CatalogEncryptionMode': {'type': 'string'},
+            'CatalogEncryptionMode': {'enum': ['DISABLED', 'SSE-KMS']},
             'SseAwsKmsKeyId': {'type': 'string'},
             'ReturnConnectionPasswordEncrypted': {'type': 'boolean'},
             'AwsKmsKeyId': {'type': 'string'}
