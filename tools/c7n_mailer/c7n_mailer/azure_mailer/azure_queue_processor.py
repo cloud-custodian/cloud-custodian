@@ -20,7 +20,6 @@ import base64
 import json
 import zlib
 
-import six
 from c7n_mailer.azure_mailer.sendgrid_delivery import SendGridDelivery
 from c7n_mailer.smtp_delivery import SmtpDelivery
 
@@ -128,7 +127,7 @@ class MailerAzureQueueProcessor:
                 smtp_delivery = SmtpDelivery(config=self.config,
                                              session=self.session,
                                              logger=self.logger)
-                for to_addrs, message in six.iteritems(email_messages):
+                for to_addrs, message in email_messages.items():
                     self.logger.info(
                         'Sending message to SMTP server, {}.'.format(self.config['smtp_server']))
                     smtp_delivery.send_message(message=message, to_addrs=list(to_addrs))

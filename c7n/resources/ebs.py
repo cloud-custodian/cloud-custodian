@@ -20,7 +20,6 @@ import time
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
-import six
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -140,17 +139,17 @@ class ErrorHandler:
 class SnapshotQueryParser(QueryParser):
 
     QuerySchema = {
-        'description': six.string_types,
+        'description': str,
         'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
-        'owner-id': six.string_types,
-        'progress': six.string_types,
-        'snapshot-id': six.string_types,
-        'start-time': six.string_types,
+        'owner-id': str,
+        'progress': str,
+        'snapshot-id': str,
+        'start-time': str,
         'status': ('pending', 'completed', 'error'),
-        'tag': six.string_types,
-        'tag-key': six.string_types,
-        'volume-id': six.string_types,
-        'volume-size': six.string_types,
+        'tag': str,
+        'tag-key': str,
+        'volume-id': str,
+        'volume-size': str,
     }
 
     type_name = 'EBS'

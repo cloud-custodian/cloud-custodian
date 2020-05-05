@@ -17,7 +17,6 @@ import copy
 import os
 import unittest
 
-import six
 from c7n_mailer.email_delivery import EmailDelivery
 from common import logger, get_ldap_lookup
 from common import MAILER_CONFIG, RESOURCE_1, SQS_MESSAGE_1, SQS_MESSAGE_4
@@ -148,7 +147,7 @@ class EmailTest(unittest.TestCase):
             SQS_MESSAGE
         )
         with patch("smtplib.SMTP") as mock_smtp:
-            for email_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
+            for email_addrs, mimetext_msg in to_addrs_to_email_messages_map.items():
                 self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
 
                 self.assertEqual(mimetext_msg['X-Priority'], '1 (Highest)')
@@ -185,7 +184,7 @@ class EmailTest(unittest.TestCase):
             SQS_MESSAGE
         )
         with patch("smtplib.SMTP") as mock_smtp:
-            for email_addrs, mimetext_msg in six.iteritems(to_addrs_to_email_messages_map):
+            for email_addrs, mimetext_msg in to_addrs_to_email_messages_map.items():
                 self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
                 self.assertEqual(mimetext_msg.get('X-Priority'), None)
                 # self.assertEqual(mimetext_msg.get('X-Priority'), None)

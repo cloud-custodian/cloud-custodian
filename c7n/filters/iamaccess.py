@@ -38,8 +38,6 @@ import fnmatch
 import logging
 import json
 
-import six
-
 from c7n.filters import Filter
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema
@@ -98,7 +96,7 @@ class PolicyChecker:
 
     # Policy statement handling
     def check(self, policy_text):
-        if isinstance(policy_text, six.string_types):
+        if isinstance(policy_text, str):
             policy = json.loads(policy_text)
         else:
             policy = policy_text
@@ -118,7 +116,7 @@ class PolicyChecker:
     def handle_action(self, s):
         if self.check_actions:
             actions = s.get('Action')
-            actions = isinstance(actions, six.string_types) and (actions,) or actions
+            actions = isinstance(actions, str) and (actions,) or actions
             for a in actions:
                 if fnmatch.filter(self.check_actions, a):
                     return True
@@ -142,7 +140,7 @@ class PolicyChecker:
 
         assert len(s['Principal']) == 1, "Too many principals %s" % s
 
-        if isinstance(s['Principal'], six.string_types):
+        if isinstance(s['Principal'], str):
             p = s['Principal']
         elif 'AWS' in s['Principal']:
             p = s['Principal']['AWS']
@@ -152,7 +150,7 @@ class PolicyChecker:
             return True
 
         principal_ok = True
-        p = isinstance(p, six.string_types) and (p,) or p
+        p = isinstance(p, str) and (p,) or p
         for pid in p:
             if pid == '*':
                 principal_ok = False
@@ -216,7 +214,7 @@ class PolicyChecker:
             cond['values'] = s['Condition'][s_cond_op][cond['key']]
             cond['values'] = (
                 isinstance(cond['values'],
-                           six.string_types) and (cond['values'],) or cond['values'])
+                           str) and (cond['values'],) or cond['values'])
             cond['key'] = cond['key'].lower()
             s_cond.append(cond)
 

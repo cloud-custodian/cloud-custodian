@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import json
-import six
 
 from c7n.exceptions import PolicyValidationError
 
@@ -78,7 +77,7 @@ class StructureParser:
             raise PolicyValidationError((
                 'policy:%s must use a list for filters found:%s' % (
                     p['name'], type(p['filters']).__name__)))
-        element_types = (dict,) + six.string_types
+        element_types = (dict, str)
         for f in p.get('filters', ()):
             if not isinstance(f, element_types):
                 raise PolicyValidationError((

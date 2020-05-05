@@ -13,13 +13,13 @@
 # limitations under the License.
 from collections import namedtuple
 from functools import wraps
+from urllib.parse import urlparse
 
 from azure.common import AzureHttpError
 from azure.storage.common import TokenCredential
 from azure.storage.blob import BlockBlobService
 from azure.storage.queue import QueueService
 from c7n_azure.constants import RESOURCE_STORAGE
-from six.moves.urllib.parse import urlparse
 
 try:
     from functools import lru_cache
