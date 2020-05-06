@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "ClusterIdentifier": "test",
+                "AllowVersionUpgrade": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

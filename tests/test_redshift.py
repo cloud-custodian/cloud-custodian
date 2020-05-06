@@ -326,31 +326,56 @@ class TestRedshift(BaseTest):
             resources[0]['KmsKeyId'],
             'arn:aws:kms:us-east-1:644160558196:key/8785aeb9-a616-4e2b-bbd3-df3cde76bcc5') # NOQA
 
-    def test_redshift_set_attributes(self):
-        factory = self.record_flight_data("test_redshift_set_attributes")
+    def test_redshift_set_maintenance_track_name(self):
+        factory = self.replay_flight_data("test_redshift_set_maintenance_track_name")
+        client = factory().client("redshift")
         p = self.load_policy(
             {
-                "name": "redshift-allow-version-upgrade",
+                "name": "redshift-set-maintenance-track-name",
                 "resource": "redshift",
-                "filters": [
-                    {
-                        "type": "value",
-                        "key": "AllowVersionUpgrade",
-                        "value": True,
-                    }
-                ],
                 "actions": [{
-                    "type": "set-attributes",
-                    "attributes": {
-                        "AllowVersionUpgrade": False,
-                    }
+                    "type": "set-maintenance-track-name",
+                    "MaintenanceTrackName": 'current',
                 }]
             },
             session_factory=factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['AllowVersionUpgrade'])
+        cluster = client.describe_clusters(ClusterIdentifier="test")["Clusters"][0]
+        self.assertEqual(
+            cluster["ClusterIdentifier"], resources[0]["ClusterIdentifier"]
+        )
+        self.assertEqual(cluster['MaintenanceTrackName'], 'current')
+
+    def test_redshift_set_allow_version_upgrade(self):
+        factory = self.replay_flight_data("test-redshift-set-allow-version-upgrade")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "redshift_set_allow_version_upgrade",
+                "resource": "redshift",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "AllowVersionUpgrade",
+                        "value": False,
+                    }
+                ],
+                "actions": [{
+                    "type": "set-allow-version-upgrade",
+                    "AllowVersionUpgrade": True,
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        cluster = client.describe_clusters(ClusterIdentifier="test")["Clusters"][0]
+        self.assertEqual(
+            cluster["ClusterIdentifier"], resources[0]["ClusterIdentifier"]
+        )
+        self.assertTrue(cluster['AllowVersionUpgrade'])
 
 
 class TestRedshiftSnapshot(BaseTest):

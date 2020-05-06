@@ -13,7 +13,6 @@
 # limitations under the License.
 import json
 import itertools
-import inspect
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -31,8 +30,6 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, snapshot_identifier)
-from .aws import shape_validate
-
 
 
 @resources.register('redshift')
@@ -605,10 +602,11 @@ class RedshiftSetPublicAccess(BaseAction):
                         futures[f]['ClusterIdentifier'], f.exception())
         return clusters
 
-@Redshift.action_registry.register('set-attributes')
-class RedshiftSetPublicAccess(BaseAction):
+
+@Redshift.action_registry.register('set-maintenance-track-name')
+class RedshiftSetMaintenanceTrackName(BaseAction):
     """
-    Action to modify Redshift clusters
+    Action to set MaintenanceTrackName on Redshift clusters
 
     :example:
 
@@ -617,29 +615,55 @@ class RedshiftSetPublicAccess(BaseAction):
             policies:
                 - name: redshift-modify-cluster
                   resource: redshift
-                  filters:
-                    - type: value
-                      key: AllowVersionUpgrade
-                      kalue: false
                   actions:
-                    - type: set-attributes
-                      attributes:
-                        AllowVersionUpgrade: true
+                    - type: set-maintenance-track-name
+                      MaintenanceTrackName: 'latest'
     """
 
-    schema = type_schema('set-attributes',
-                        attributes={"type": "object"},
-                        required=('attributes',))
-
+    schema = type_schema('set-maintenance-track-name',
+                        MaintenanceTrackName={"type": "string"},
+                        required=('MaintenanceTrackName',))
     permissions = ('redshift:ModifyCluster',)
 
-    shape = 'ModifyClusterMessage'
+    def process(self, clusters):
+        client = client = local_session(self.manager.session_factory).client('redshift')
+        for cluster in clusters:
+            self.process_cluster(client, cluster)
 
-    def validate(self):
-        attrs = dict(self.data.get('attributes'))
-        attrs["ClusterIdentifier"] = ""
+    def process_cluster(self, client, cluster):
+        try:
+            client.modify_cluster(
+                ClusterIdentifier=cluster['ClusterIdentifier'],
+                MaintenanceTrackName=self.data.get('MaintenanceTrackName', '')
+            )
+        except Exception as e:
+            self.log.warning(
+                "Exception trying to set MaintenanceTrackName on cluster: %s error: %s",
+                cluster['ClusterIdentifier'], e)
+            raise e
 
-        return shape_validate(attrs, self.shape, 'redshift')
+
+@Redshift.action_registry.register('set-allow-version-upgrade')
+class RedshiftSetAllowVersionUpgrade(BaseAction):
+    """
+    Action to set MaintenanceTrackName on Redshift clusters
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: redshift-allow-version-upgrade
+                  resource: redshift
+                  actions:
+                    - type: set-allow-version-upgrade
+                      AllowVersionUpgrade: True
+    """
+
+    schema = type_schema('set-set-allow-version-upgrade',
+                        AllowVersionUpgrade={"type": "boolean"},
+                        required=('AllowVersionUpgrade',))
+    permissions = ('redshift:ModifyCluster',)
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client(
@@ -649,15 +673,13 @@ class RedshiftSetPublicAccess(BaseAction):
 
     def process_cluster(self, client, cluster):
         try:
-            updatedCluster = {**cluster, **self.data['attributes']}
-            if updatedCluster == cluster:
-                return
-            print(inspect.signature(client.modify_cluster))
-            print(updatedCluster)
-            res = client.modify_cluster(updatedCluster)
+            client.modify_cluster(
+                ClusterIdentifier=cluster['ClusterIdentifier'],
+                AllowVersionUpgrade=self.data.get('AllowVersionUpgrade', False)
+            )
         except Exception as e:
             self.log.warning(
-                "Exception trying to modify cluster: %s error: %s",
+                "Exception trying to set AllowVersionUpgrade on cluster: %s error: %s",
                 cluster['ClusterIdentifier'], e)
             raise e
 

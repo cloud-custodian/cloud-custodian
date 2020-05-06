@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "Cluster": {
+            "ClusterIdentifier": "test",
+            "PendingModifiedValues": {
+                "MaintenanceTrackName": "current"
+            },
+            "MaintenanceTrackName": "trailing"
+        },
+        "ResponseMetadata": {}
+    }
+}
