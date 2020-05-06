@@ -616,7 +616,7 @@ class RedshiftSetAttributes(BaseAction):
                   filters:
                     - type: value
                       key: AllowVersionUpgrade
-                      kalue: false
+                      value: false
                   actions:
                     - type: set-attributes
                       attributes:
