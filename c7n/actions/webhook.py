@@ -20,7 +20,7 @@ except ImportError:
 import jmespath
 
 import urllib3
-from six.moves.urllib import parse
+from urllib import parse
 
 from c7n import utils
 from .core import EventAction

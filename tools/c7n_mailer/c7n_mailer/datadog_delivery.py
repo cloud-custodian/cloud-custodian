@@ -16,7 +16,7 @@ import time
 
 from datadog import api
 from datadog import initialize
-from six.moves.urllib.parse import urlparse, parse_qsl
+from urllib.parse import urlparse, parse_qsl
 
 
 class DataDogDelivery:

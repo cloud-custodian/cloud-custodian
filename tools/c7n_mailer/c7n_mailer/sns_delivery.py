@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
 from boto3 import Session
 
 from .utils import (
@@ -63,7 +62,7 @@ class SnsDelivery:
         sns_addrs_to_rendered_jinja_messages = []
         # take the map with lists of resources, and jinja render them and add them
         # to sns_addrs_to_rendered_jinja_messages as an sns_message package
-        for sns_topic, resources in six.iteritems(sns_to_resources_map):
+        for sns_topic, resources in sns_to_resources_map.items():
             sns_addrs_to_rendered_jinja_messages.append(
                 self.get_sns_message_package(
                     sqs_message,

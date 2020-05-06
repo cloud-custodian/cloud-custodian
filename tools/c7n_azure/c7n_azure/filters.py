@@ -18,7 +18,6 @@ from abc import ABCMeta, abstractmethod
 from concurrent.futures import as_completed
 from datetime import timedelta
 
-import six
 from azure.mgmt.costmanagement.models import (QueryAggregation,
                                               QueryComparisonExpression,
                                               QueryDataset, QueryDefinition,
@@ -526,8 +525,7 @@ class AzureOnHour(OnHour):
         return tag_value
 
 
-@six.add_metaclass(ABCMeta)
-class FirewallRulesFilter(Filter):
+class FirewallRulesFilter(Filter, metaclass=ABCMeta):
     """Filters resources by the firewall rules
 
     Rules can be specified as x.x.x.x-y.y.y.y or x.x.x.x or x.x.x.x/y.
@@ -642,8 +640,7 @@ class FirewallRulesFilter(Filter):
             raise FilterValidationError("Internal error.")
 
 
-@six.add_metaclass(ABCMeta)
-class FirewallBypassFilter(Filter):
+class FirewallBypassFilter(Filter, metaclass=ABCMeta):
     """Filters resources by the firewall bypass rules
     """
 

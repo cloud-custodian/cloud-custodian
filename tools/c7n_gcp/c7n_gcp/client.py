@@ -21,11 +21,13 @@
 # todo:
 # - consider forking googleapiclient to get rid of httplib2
 
+import http.client
 import logging
 import threading
 import os
 import socket
 import ssl
+from urllib.error import URLError
 
 from googleapiclient import discovery, errors  # NOQA
 from googleapiclient.http import set_user_agent
@@ -37,8 +39,6 @@ import httplib2
 from ratelimiter import RateLimiter
 from retrying import retry
 
-from six.moves import http_client
-from six.moves.urllib.error import URLError
 
 HTTPLIB_CA_BUNDLE = os.environ.get('HTTPLIB_CA_BUNDLE')
 
@@ -56,8 +56,8 @@ log = logging.getLogger('c7n_gcp.client')
 NUM_HTTP_RETRIES = 5
 
 RETRYABLE_EXCEPTIONS = (
-    http_client.ResponseNotReady,
-    http_client.IncompleteRead,
+    http.client.ResponseNotReady,
+    http.client.IncompleteRead,
     httplib2.ServerNotFoundError,
     socket.error,
     ssl.SSLError,

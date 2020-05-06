@@ -16,7 +16,6 @@ Application & Network Load Balancers
 """
 import json
 import logging
-import six
 
 from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
@@ -66,14 +65,14 @@ class ConfigAppElb(ConfigSource):
 
         # Config originally stored supplementaryconfig on elbv2 as json
         # strings. Support that format for historical queries.
-        if isinstance(item_tags, six.string_types):
+        if isinstance(item_tags, str):
             item_tags = json.loads(item_tags)
         resource['Tags'] = [
             {'Key': t['key'], 'Value': t['value']} for t in item_tags]
 
         item_attrs = item['supplementaryConfiguration'][
             'LoadBalancerAttributes']
-        if isinstance(item_attrs, six.string_types):
+        if isinstance(item_attrs, str):
             item_attrs = json.loads(item_attrs)
         # Matches annotation of AppELBAttributeFilterBase filter
         resource['Attributes'] = {

@@ -19,7 +19,6 @@ import logging
 import os
 import sys
 
-import six
 import yaml
 from yaml.constructor import ConstructorError
 
@@ -123,7 +122,7 @@ def policy_command(f):
             policies_by_region[p.options.region].append(p)
         for region in policies_by_region.keys():
             counts = Counter([p.name for p in policies_by_region[region]])
-            for policy, count in six.iteritems(counts):
+            for policy, count in counts.items():
                 if count > 1:
                     log.error("duplicate policy name '{}'".format(policy))
                     sys.exit(1)

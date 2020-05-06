@@ -18,7 +18,6 @@ import random
 import re
 import zlib
 
-import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -37,6 +36,7 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query, utils
+from c7n.tags import coalesce_copy_user_tags
 from c7n.utils import type_schema, filter_empty
 
 from c7n.resources.iam import CheckPermissions
@@ -1093,7 +1093,7 @@ class DeleteUnusedEC2Keys(BaseAction):
 class MonitorInstances(BaseAction, StateTransitionFilter):
     """Action on EC2 Instances to enable/disable detailed monitoring
 
-    The differents states of detailed monitoring status are :
+    The different states of detailed monitoring status are :
     'disabled'|'disabling'|'enabled'|'pending'
     (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_instances)
 
@@ -1453,7 +1453,7 @@ class Stop(BaseAction, StateTransitionFilter):
 
 @actions.register('reboot')
 class Reboot(BaseAction, StateTransitionFilter):
-    """reboots a previously running EC2 instance.
+    """Reboots a previously running EC2 instance.
 
     :Example:
 
@@ -1586,7 +1586,20 @@ class Terminate(BaseAction, StateTransitionFilter):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
-    """Snapshots volumes attached to an EC2 instance
+    """Snapshot the volumes attached to an EC2 instance.
+
+    Tags may be optionally added to the snapshot during creation.
+
+    - `copy-volume-tags` copies all the tags from the specified
+      volume to the corresponding snapshot.
+    - `copy-tags` copies the listed tags from each volume
+      to the snapshot.  This is mutually exclusive with
+      `copy-volume-tags`.
+    - `tags` allows new tags to be added to each snapshot when using
+      'copy-tags`.  If no tags are specified, then the tag
+      `custodian_snapshot` is added.
+
+    The default behavior is `copy-volume-tags: true`.
 
     :Example:
 
@@ -1599,12 +1612,15 @@ class Snapshot(BaseAction):
               - type: snapshot
                 copy-tags:
                   - Name
+                tags:
+                    custodian_snapshot: True
     """
 
     schema = type_schema(
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
            'copy-volume-tags': {'type': 'boolean'},
+           'tags': {'type': 'object'},
            'exclude-boot': {'type': 'boolean', 'default': False}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
@@ -1659,16 +1675,9 @@ class Snapshot(BaseAction):
                 resource['InstanceId'], err_code)
 
     def get_snapshot_tags(self, resource):
-        tags = [
-            {'Key': 'custodian_snapshot', 'Value': ''}]
-        copy_keys = self.data.get('copy-tags', [])
-        copy_tags = []
-        if copy_keys:
-            for t in resource.get('Tags', []):
-                if t['Key'] in copy_keys:
-                    copy_tags.append(t)
-            tags.extend(copy_tags)
-        return tags
+        user_tags = self.data.get('tags', {}) or {'custodian_snapshot': ''}
+        copy_tags = self.data.get('copy-tags', [])
+        return coalesce_copy_user_tags(resource, copy_tags, user_tags)
 
 
 @actions.register('modify-security-groups')
@@ -2015,7 +2024,7 @@ class QueryFilter:
 
     def query(self):
         value = self.value
-        if isinstance(self.value, six.string_types):
+        if isinstance(self.value, str):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
@@ -2023,7 +2032,7 @@ class QueryFilter:
 
 @filters.register('instance-attribute')
 class InstanceAttribute(ValueFilter):
-    """EC2 Instance Value FIlter on a given instance attribute.
+    """EC2 Instance Value Filter on a given instance attribute.
 
     Filters EC2 Instances with the given instance attribute
 
@@ -2139,7 +2148,7 @@ class LaunchTemplate(query.QueryResourceManager):
                 t_versions.setdefault(
                     tinfo['LaunchTemplateId'], []).append(
                         tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
-        elif isinstance(rids[0], six.string_types):
+        elif isinstance(rids[0], str):
             for tid in rids:
                 t_versions[tid] = []
 

@@ -23,7 +23,6 @@ import types
 from collections import namedtuple
 
 import jwt
-import six
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
 from azure.keyvault import KeyVaultAuthentication, AccessToken
@@ -304,8 +303,7 @@ class Session:
         return json.dumps(function_auth_params, indent=2)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class TokenProvider:
+class TokenProvider(metaclass=abc.ABCMeta):
     AuthenticationResult = namedtuple(
         'AuthenticationResult', 'credential, subscription_id, tenant_id')
 

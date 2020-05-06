@@ -20,7 +20,6 @@ import time
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 from dateutil.parser import parse as parse_date
-import six
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -32,7 +31,7 @@ from c7n.filters.health import HealthEventFilter
 from c7n.manager import resources
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import Tag
+from c7n.tags import Tag, coalesce_copy_user_tags
 from c7n.utils import (
     camelResource,
     chunks,
@@ -140,17 +139,17 @@ class ErrorHandler:
 class SnapshotQueryParser(QueryParser):
 
     QuerySchema = {
-        'description': six.string_types,
+        'description': str,
         'owner-alias': ('amazon', 'amazon-marketplace', 'microsoft'),
-        'owner-id': six.string_types,
-        'progress': six.string_types,
-        'snapshot-id': six.string_types,
-        'start-time': six.string_types,
+        'owner-id': str,
+        'progress': str,
+        'snapshot-id': str,
+        'start-time': str,
         'status': ('pending', 'completed', 'error'),
-        'tag': six.string_types,
-        'tag-key': six.string_types,
-        'volume-id': six.string_types,
-        'volume-size': six.string_types,
+        'tag': str,
+        'tag-key': str,
+        'volume-id': str,
+        'volume-size': str,
     }
 
     type_name = 'EBS'
@@ -1165,7 +1164,20 @@ class EncryptInstanceVolumes(BaseAction):
 
 @EBS.action_registry.register('snapshot')
 class CreateSnapshot(BaseAction):
-    """Snapshot an EBS volume
+    """Snapshot an EBS volume.
+
+    Tags may be optionally added to the snapshot during creation.
+
+    - `copy-volume-tags` copies all the tags from the specified
+      volume to the corresponding snapshot.
+    - `copy-tags` copies the listed tags from each volume
+      to the snapshot.  This is mutually exclusive with
+      `copy-volume-tags`.
+    - `tags` allows new tags to be added to each snapshot.  If
+      no tags are specified, then the tag `custodian_snapshot`
+      is added.
+
+    The default behavior is `copy-volume-tags: true`.
 
     :example:
 
@@ -1181,11 +1193,14 @@ class CreateSnapshot(BaseAction):
                   - type: snapshot
                     copy-tags:
                       - Name
+                    tags:
+                        custodian_snapshot: True
     """
     schema = type_schema(
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
-           'copy-volume-tags': {'type': 'boolean'}})
+           'copy-volume-tags': {'type': 'boolean'},
+           'tags': {'type': 'object'}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def validate(self):
@@ -1213,19 +1228,9 @@ class CreateSnapshot(BaseAction):
             raise
 
     def get_snapshot_tags(self, resource):
-        tags = [
-            {'Key': 'custodian_snapshot', 'Value': ''}]
-        copy_keys = self.data.get('copy-tags', [])
-        copy_tags = []
-        if copy_keys:
-            for t in resource.get('Tags', []):
-                if t['Key'] in copy_keys:
-                    copy_tags.append(t)
-            tags.extend(copy_tags)
-            return tags
-        if self.data.get('copy-volume-tags', True):
-            tags.extend(resource.get('Tags', []))
-        return tags
+        user_tags = self.data.get('tags', {}) or {'custodian_snapshot': ''}
+        copy_tags = self.data.get('copy-tags', []) or self.data.get('copy-volume-tags', True)
+        return coalesce_copy_user_tags(resource, copy_tags, user_tags)
 
 
 @EBS.action_registry.register('delete')

@@ -19,7 +19,6 @@ import logging
 import os
 import time
 import subprocess
-import six
 import sys
 
 import multiprocessing
@@ -212,7 +211,7 @@ def resolve_regions(regions):
 def get_session(account, session_name, region):
     if account.get('role'):
         roles = account['role']
-        if isinstance(roles, six.string_types):
+        if isinstance(roles, str):
             roles = [roles]
         s = None
         for r in roles:
@@ -532,7 +531,7 @@ def run_account(account, region, policies_config, output_path,
     env_vars = account_tags(account)
 
     if account.get('role'):
-        if isinstance(account['role'], six.string_types):
+        if isinstance(account['role'], str):
             config['assume_role'] = account['role']
             config['external_id'] = account.get('external_id')
         else:

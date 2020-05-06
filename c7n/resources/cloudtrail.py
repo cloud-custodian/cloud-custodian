@@ -102,12 +102,16 @@ class Status(ValueFilter):
     annotation_key = 'c7n:TrailStatus'
 
     def process(self, resources, event=None):
+
+        non_account_trails = set()
+
         for r in resources:
             region = self.manager.config.region
             trail_arn = Arn.parse(r['TrailARN'])
 
             if (r.get('IsOrganizationTrail') and
                     self.manager.config.account_id != trail_arn.account_id):
+                non_account_trails.add(r['TrailARN'])
                 continue
             if r.get('HomeRegion') and r['HomeRegion'] != region:
                 region = trail_arn.region
@@ -119,7 +123,12 @@ class Status(ValueFilter):
             status.pop('ResponseMetadata')
             r[self.annotation_key] = status
 
-        return super(Status, self).process(resources)
+        if non_account_trails:
+            self.log.warning(
+                'found %d org cloud trail from different account that cant be processed',
+                len(non_account_trails))
+        return super(Status, self).process([
+            r for r in resources if r['TrailARN'] not in non_account_trails])
 
     def __call__(self, r):
         return self.match(r['c7n:TrailStatus'])
