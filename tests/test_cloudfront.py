@@ -286,7 +286,7 @@ class CloudFront(BaseTest):
                 "resource": "streaming-distribution",
                 "filters": [
                     {
-                        "type": "streaming-distribution-config",
+                        "type": "distribution-config",
                         "key": "Logging.Enabled",
                         "value": True
                     }
@@ -298,7 +298,7 @@ class CloudFront(BaseTest):
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['c7n:streaming-distribution-config']['Logging']['Enabled'],
+        self.assertEqual(resources[0]['c7n:distribution-config']['Logging']['Enabled'],
             True)
 
     def test_streaming_distribution_check_logging_enabled_error(self):
@@ -321,7 +321,7 @@ class CloudFront(BaseTest):
                 "resource": "streaming-distribution",
                 "filters": [
                     {
-                        "type": "streaming-distribution-config",
+                        "type": "distribution-config",
                         "key": "Logging.Enabled",
                         "value": True
                     }
@@ -482,7 +482,7 @@ class CloudFront(BaseTest):
                 "resource": "streaming-distribution",
                 "filters": [
                     {
-                        "type": "streaming-distribution-config",
+                        "type": "distribution-config",
                         "key": "Logging.Enabled",
                         "value": False,
                     }
