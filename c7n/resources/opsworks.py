@@ -20,29 +20,6 @@ from c7n.utils import local_session, type_schema
 from c7n import utils
 
 
-class StateTransitionFilter:
-    """Filter instances by state.
-
-    Try to simplify construction for policy authors by automatically
-    filtering elements (filters or actions) to the instances states
-    they are valid for. Separate from ec2 class as uses ['status']
-    instead of ['State']['Name'].
-
-    For more details see
-    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
-    """
-    valid_origin_states = ()
-
-    def filter_instance_state(self, instances, states=None):
-        states = states or self.valid_origin_states
-        orig_length = len(instances)
-        results = [i for i in instances
-                   if i['Status'] in states]
-        self.log.info("%s %d of %d instances" % (
-            self.__class__.__name__, len(results), orig_length))
-        return results
-
-
 @resources.register('opswork-stack')
 class OpsworkStack(QueryResourceManager):
 
@@ -60,7 +37,7 @@ class OpsworkStack(QueryResourceManager):
 
 
 @OpsworkStack.action_registry.register('delete')
-class DeleteStack(BaseAction, StateTransitionFilter):
+class DeleteStack(BaseAction):
     """Action to delete Opswork Stack
 
     It is recommended to use a filter to avoid unwanted deletion of stacks
@@ -97,7 +74,7 @@ class DeleteStack(BaseAction, StateTransitionFilter):
                 client.delete_app(AppId=app['AppId'])
             instances = client.describe_instances(StackId=stack_id)['Instances']
             orig_length = len(instances)
-            instances = self.filter_instance_state(instances)
+            instances = self.filter_resources(instances, 'Status', self.valid_origin_states)
             if(len(instances) != orig_length):
                 self.log.exception(
                     "All instances must be stopped before deletion. Stack Id: %s Name: %s." %

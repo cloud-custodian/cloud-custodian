@@ -1022,7 +1022,7 @@ class SsmCompliance(Filter):
 
 
 @actions.register('set-monitoring')
-class MonitorInstances(BaseAction, StateTransitionFilter):
+class MonitorInstances(BaseAction):
     """Action on EC2 Instances to enable/disable detailed monitoring
 
     The different states of detailed monitoring status are :
@@ -1121,7 +1121,7 @@ class InstanceFinding(PostFinding):
 
 
 @actions.register('start')
-class Start(BaseAction, StateTransitionFilter):
+class Start(BaseAction):
     """Starts a previously stopped EC2 instance.
 
     :Example:
@@ -1150,7 +1150,7 @@ class Start(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self._filter_ec2_with_volumes(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
             return
 
@@ -1206,7 +1206,7 @@ def extract_instance_id(state_error):
 
 
 @actions.register('resize')
-class Resize(BaseAction, StateTransitionFilter):
+class Resize(BaseAction):
     """Change an instance's size.
 
     An instance can only be resized when its stopped, this action
@@ -1236,10 +1236,8 @@ class Resize(BaseAction, StateTransitionFilter):
         return perms
 
     def process(self, resources):
-        stopped_instances = self.filter_instance_state(
-            resources, ('stopped',))
-        running_instances = self.filter_instance_state(
-            resources, ('running',))
+        stopped_instances = self.filter_resources(resources, 'State.Name', ('stopped',))
+        running_instances = self.filter_resources(resources, 'State.Name', ('running',))
 
         if self.data.get('restart') and running_instances:
             Stop({'terminate-ephemeral': False},
@@ -1287,7 +1285,7 @@ class Resize(BaseAction, StateTransitionFilter):
 
 
 @actions.register('stop')
-class Stop(BaseAction, StateTransitionFilter):
+class Stop(BaseAction):
     """Stops or hibernates a running EC2 instances
 
     :Example:
@@ -1349,7 +1347,7 @@ class Stop(BaseAction, StateTransitionFilter):
         return enabled, disabled
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
         client = utils.local_session(
@@ -1384,7 +1382,7 @@ class Stop(BaseAction, StateTransitionFilter):
 
 
 @actions.register('reboot')
-class Reboot(BaseAction, StateTransitionFilter):
+class Reboot(BaseAction):
     """Reboots a previously running EC2 instance.
 
     :Example:
@@ -1413,7 +1411,7 @@ class Reboot(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self._filter_ec2_with_volumes(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
             return
 
@@ -1448,7 +1446,7 @@ class Reboot(BaseAction, StateTransitionFilter):
 
 
 @actions.register('terminate')
-class Terminate(BaseAction, StateTransitionFilter):
+class Terminate(BaseAction):
     """ Terminate a set of instances.
 
     While ec2 offers a bulk delete api, any given instance can be configured
@@ -1482,7 +1480,7 @@ class Terminate(BaseAction, StateTransitionFilter):
         return permissions
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
         client = utils.local_session(
@@ -1646,7 +1644,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
 
 @actions.register('autorecover-alarm')
-class AutorecoverAlarm(BaseAction, StateTransitionFilter):
+class AutorecoverAlarm(BaseAction):
     """Adds a cloudwatch metric alarm to recover an EC2 instance.
 
     This action takes effect on instances that are NOT part
@@ -1676,7 +1674,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self.filter_asg_membership.process(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
             return
         client = utils.local_session(
@@ -1709,7 +1707,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 
 @actions.register('set-instance-profile')
-class SetInstanceProfile(BaseAction, StateTransitionFilter):
+class SetInstanceProfile(BaseAction):
     """Sets (add, modify, remove) the instance profile for a running EC2 instance.
 
     :Example:
@@ -1741,7 +1739,7 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
     valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
         client = utils.local_session(self.manager.session_factory).client('ec2')
