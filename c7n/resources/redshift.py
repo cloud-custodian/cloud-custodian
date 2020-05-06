@@ -30,6 +30,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, snapshot_identifier)
+from .aws import shape_validate
 
 
 @resources.register('redshift')
@@ -603,67 +604,39 @@ class RedshiftSetPublicAccess(BaseAction):
         return clusters
 
 
-@Redshift.action_registry.register('set-maintenance-track-name')
-class RedshiftSetMaintenanceTrackName(BaseAction):
+@Redshift.action_registry.register('set-attributes')
+class RedshiftSetAttributes(BaseAction):
     """
-    Action to set MaintenanceTrackName on Redshift clusters
-
+    Action to modify Redshift clusters
     :example:
-
     .. code-block:: yaml
-
             policies:
                 - name: redshift-modify-cluster
                   resource: redshift
+                  filters:
+                    - type: value
+                      key: AllowVersionUpgrade
+                      kalue: false
                   actions:
-                    - type: set-maintenance-track-name
-                      MaintenanceTrackName: 'latest'
+                    - type: set-attributes
+                      attributes:
+                        AllowVersionUpgrade: true
     """
 
-    schema = type_schema('set-maintenance-track-name',
-                        MaintenanceTrackName={"type": "string"},
-                        required=('MaintenanceTrackName',))
+    schema = type_schema('set-attributes',
+                        attributes={"type": "object"},
+                        required=('attributes',))
+
     permissions = ('redshift:ModifyCluster',)
 
-    def process(self, clusters):
-        client = client = local_session(self.manager.session_factory).client('redshift')
-        for cluster in clusters:
-            self.process_cluster(client, cluster)
+    shape = 'ModifyClusterMessage'
 
-    def process_cluster(self, client, cluster):
-        try:
-            client.modify_cluster(
-                ClusterIdentifier=cluster['ClusterIdentifier'],
-                MaintenanceTrackName=self.data.get('MaintenanceTrackName', '')
-            )
-        except Exception as e:
-            self.log.warning(
-                "Exception trying to set MaintenanceTrackName on cluster: %s error: %s",
-                cluster['ClusterIdentifier'], e)
-            raise e
-
-
-@Redshift.action_registry.register('set-allow-version-upgrade')
-class RedshiftSetAllowVersionUpgrade(BaseAction):
-    """
-    Action to set MaintenanceTrackName on Redshift clusters
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-                - name: redshift-allow-version-upgrade
-                  resource: redshift
-                  actions:
-                    - type: set-allow-version-upgrade
-                      AllowVersionUpgrade: True
-    """
-
-    schema = type_schema('set-allow-version-upgrade',
-                        AllowVersionUpgrade={"type": "boolean"},
-                        required=('AllowVersionUpgrade',))
-    permissions = ('redshift:ModifyCluster',)
+    def validate(self):
+        attrs = dict(self.data.get('attributes'))
+        if attrs.get('ClusterIdentifier'):
+            raise PolicyValidationError('ClusterIdentifier field cannot be updated')
+        attrs["ClusterIdentifier"] = ""
+        return shape_validate(attrs, self.shape, 'redshift')
 
     def process(self, clusters):
         client = local_session(self.manager.session_factory).client(
@@ -673,13 +646,57 @@ class RedshiftSetAllowVersionUpgrade(BaseAction):
 
     def process_cluster(self, client, cluster):
         try:
-            client.modify_cluster(
-                ClusterIdentifier=cluster['ClusterIdentifier'],
-                AllowVersionUpgrade=self.data.get('AllowVersionUpgrade', False)
-            )
+            config = dict(self.data.get('attributes'))
+            base_config = {
+                'ClusterIdentifier': (cluster.get('PendingModifiedValues').get('ClusterIdentifier')
+                                     or cluster['ClusterIdentifier']),
+                'ClusterType': cluster.get('PendingModifiedValues').get('ClusterType'),
+                'NodeType': (cluster.get('PendingModifiedValues').get('NodeType')
+                            or cluster['NodeType']),
+                'NumberOfNodes': (cluster.get('PendingModifiedValues').get('NumberOfNodes')
+                                 or cluster['NumberOfNodes']),
+                'ClusterSecurityGroups':
+                    [data.pop('Status') for data in cluster['ClusterSecurityGroups']],
+                'VpcSecurityGroupIds':
+                    [data.pop('Status') for data in cluster['VpcSecurityGroups']],
+                'MasterUserPassword': (cluster.get('PendingModifiedValues')
+                                      .get('MasterUserPassword')),
+                'AutomatedSnapshotRetentionPeriod': (cluster.get('PendingModifiedValues')
+                                                    .get('AutomatedSnapshotRetentionPeriod')
+                                                    or cluster['AutomatedSnapshotRetentionPeriod']),
+                'ManualSnapshotRetentionPeriod': cluster.get('ManualSnapshotRetentionPeriod'),
+                'PreferredMaintenanceWindow': cluster.get('PreferredMaintenanceWindow'),
+                'ClusterVersion': (cluster.get('PendingModifiedValues').get('ClusterVersion')
+                                  or cluster['ClusterVersion']),
+                'AllowVersionUpgrade': cluster['AllowVersionUpgrade'],
+                'HsmClientCertificateIdentifier': (cluster.get('HsmStatus') and
+                                                  cluster.get('HsmStatus')
+                                                  .get('HsmClientCertificateIdentifier')),
+                'HsmConfigurationIdentifier': (cluster.get('HsmStatus') and
+                                              cluster.get('HsmStatus')
+                                              .get('HsmConfigurationIdentifier')),
+                'PubliclyAccessible': (cluster.get('PendingModifiedValues')
+                                      .get('PubliclyAccessible') or cluster['PubliclyAccessible']),
+                'ElasticIp': (cluster.get('ElasticIpStatus')
+                             and cluster.get('ElasticIpStatus').get('ElasticIp')),
+                'EnhancedVpcRouting': (cluster.get('PendingModifiedValues')
+                                      .get('EnhancedVpcRouting') or cluster['EnhancedVpcRouting']),
+                'MaintenanceTrackName': (cluster.get('PendingModifiedValues')
+                                        .get('MaintenanceTrackName')
+                                        or cluster['MaintenanceTrackName']),
+                'Encrypted': cluster.get('Encrypted'),
+                'KmsKeyId': cluster.get('KmsKeyId')
+            }
+            updatedCluster = {**base_config, **config}
+            if updatedCluster == cluster:
+                return
+            config['ClusterIdentifier'] = (cluster.get('PendingModifiedValues')
+                                          .get('ClusterIdentifier')
+                                          or cluster['ClusterIdentifier'])
+            client.modify_cluster(**config)
         except Exception as e:
             self.log.warning(
-                "Exception trying to set AllowVersionUpgrade on cluster: %s error: %s",
+                "Exception trying to modify cluster: %s error: %s",
                 cluster['ClusterIdentifier'], e)
             raise e
 
