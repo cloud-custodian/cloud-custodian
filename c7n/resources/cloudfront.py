@@ -188,6 +188,7 @@ class IsWafEnabled(Filter):
                 results.append(r)
         return results
 
+
 class BaseDistributionConfig(ValueFilter):
     schema = type_schema('distribution-config', rinherit=ValueFilter.schema)
     schema_alias = False
@@ -201,6 +202,7 @@ class BaseDistributionConfig(ValueFilter):
 
     def __call__(self, r):
         return super(BaseDistributionConfig, self).__call__(r[self.annotation_key])
+
 
 @Distribution.filter_registry.register('distribution-config')
 class DistributionConfig(BaseDistributionConfig):
@@ -236,6 +238,7 @@ class DistributionConfig(BaseDistributionConfig):
                     r['ARN'], e)
                 raise e
 
+
 @StreamingDistribution.filter_registry.register('distribution-config')
 class StreamingDistributionConfig(BaseDistributionConfig):
     """Check for Cloudfront streaming distribution config values
@@ -270,6 +273,7 @@ class StreamingDistributionConfig(BaseDistributionConfig):
                     "Exception trying to get Streaming Distribution Config: %s error: %s",
                     r['ARN'], e)
                 raise e
+
 
 @Distribution.filter_registry.register('mismatch-s3-origin')
 class MismatchS3Origin(Filter):
