@@ -92,6 +92,7 @@ class HostedZone(Route53Base, QueryResourceManager):
         universal_taggable = True
         # Denotes this resource type exists across regions
         global_resource = True
+        cfn_type = 'AWS::Route53::HostedZone'
 
     def get_arns(self, resource_set):
         arns = []
@@ -114,6 +115,7 @@ class HealthCheck(Route53Base, QueryResourceManager):
         enum_spec = ('list_health_checks', 'HealthChecks', None)
         name = id = 'Id'
         universal_taggable = True
+        cfn_type = 'AWS::Route53::HealthCheck'
 
 
 @resources.register('rrset')
@@ -125,6 +127,7 @@ class ResourceRecordSet(ChildResourceManager):
         parent_spec = ('hostedzone', 'HostedZoneId', None)
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
+        cfn_type = 'AWS::Route53::RecordSet'
 
 
 @resources.register('r53domain')

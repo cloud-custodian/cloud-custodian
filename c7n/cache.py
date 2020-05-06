@@ -14,7 +14,7 @@
 """Provide basic caching services to avoid extraneous queries over
 multiple policies on the same resource type.
 """
-from six.moves import cPickle as pickle
+import pickle
 
 import os
 import logging

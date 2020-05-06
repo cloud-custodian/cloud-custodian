@@ -143,7 +143,7 @@ class RestApi(query.QueryResourceManager):
         name = 'name'
         date = 'createdDate'
         dimension = 'GatewayName'
-        config_type = "AWS::ApiGateway::RestApi"
+        cfn_type = config_type = "AWS::ApiGateway::RestApi"
         universal_taggable = object()
         permissions_enum = ('apigateway:GET',)
 
@@ -246,43 +246,6 @@ class DeleteApi(BaseAction):
                 continue
 
 
-@resources.register('rest-stage')
-class RestStage(query.ChildResourceManager):
-
-    child_source = 'describe-rest-stage'
-
-    class resource_type(query.TypeInfo):
-        service = 'apigateway'
-        parent_spec = ('rest-api', 'restApiId', None)
-        enum_spec = ('get_stages', 'item', None)
-        name = id = 'stageName'
-        date = 'createdDate'
-        universal_taggable = True
-        config_type = "AWS::ApiGateway::Stage"
-        arn_type = 'stages'
-        permissions_enum = ('apigateway:GET',)
-
-    def get_source(self, source_type):
-        if source_type == 'describe-rest-stage':
-            return DescribeRestStage(self)
-        return super(RestStage, self).get_source(source_type)
-
-    @property
-    def generate_arn(self):
-        self._generate_arn = functools.partial(
-            generate_arn,
-            self.resource_type.service,
-            region=self.config.region)
-        return self._generate_arn
-
-    def get_arns(self, resources):
-        arns = []
-        for r in resources:
-            arns.append(self.generate_arn('/restapis/' + r['restApiId'] +
-             '/stages/' + r[self.get_model().id]))
-        return arns
-
-
 @query.sources.register('describe-rest-stage')
 class DescribeRestStage(query.ChildDescribeSource):
 
@@ -303,6 +266,42 @@ class DescribeRestStage(query.ChildDescribeSource):
                     'Value': v})
             results.append(r)
         return results
+
+
+@resources.register('rest-stage')
+class RestStage(query.ChildResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'apigateway'
+        parent_spec = ('rest-api', 'restApiId', None)
+        enum_spec = ('get_stages', 'item', None)
+        name = id = 'stageName'
+        date = 'createdDate'
+        universal_taggable = True
+        cfn_type = config_type = "AWS::ApiGateway::Stage"
+        arn_type = 'stages'
+        permissions_enum = ('apigateway:GET',)
+
+    child_source = 'describe-rest-stage'
+    source_mapping = {
+        'describe-rest-stage': DescribeRestStage,
+        'config': query.ConfigSource
+    }
+
+    @property
+    def generate_arn(self):
+        self._generate_arn = functools.partial(
+            generate_arn,
+            self.resource_type.service,
+            region=self.config.region)
+        return self._generate_arn
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn('/restapis/' + r['restApiId'] +
+             '/stages/' + r[self.get_model().id]))
+        return arns
 
 
 @RestStage.action_registry.register('update')
@@ -386,6 +385,7 @@ class RestResource(query.ChildResourceManager):
         id = 'id'
         name = 'path'
         permissions_enum = ('apigateway:GET',)
+        cfn_type = 'AWS::ApiGateway::Resource'
 
 
 @query.sources.register('describe-rest-resource')
@@ -414,6 +414,7 @@ class RestApiVpcLink(query.QueryResourceManager):
         id = 'id'
         name = 'name'
         permissions_enum = ('apigateway:GET',)
+        cfn_type = 'AWS::ApiGateway::VpcLink'
 
 
 @RestResource.filter_registry.register('rest-integration')

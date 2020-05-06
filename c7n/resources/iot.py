@@ -29,3 +29,4 @@ class IoT(QueryResourceManager):
             'thingName',
             'thingTypeName'
         )
+        cfn_type = 'AWS::IoT::Thing'

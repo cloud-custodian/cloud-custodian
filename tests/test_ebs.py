@@ -500,6 +500,27 @@ class VolumeSnapshotTest(BaseTest):
         for s in snapshot_data['Snapshots']:
             self.assertEqual(rtags, {t['Key']: t['Value'] for t in s['Tags']})
 
+    def test_volume_snapshot_copy_volume_tags(self):
+        factory = self.replay_flight_data("test_ebs_snapshot_copy_volume_tags")
+        policy = self.load_policy(
+            {
+                "name": "ebs-test-snapshot",
+                "resource": "ebs",
+                "filters": [{"VolumeId": "vol-0252f61378ede9d01"}],
+                "actions": [{"type": "snapshot",
+                             "copy-volume-tags": False,
+                             "tags": {'test-tag': 'custodian'}}]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        snapshot_data = factory().client("ec2").describe_snapshots(
+            Filters=[{"Name": "volume-id", "Values": ["vol-0252f61378ede9d01"]}]
+        )
+        for s in snapshot_data['Snapshots']:
+            self.assertEqual({'test-tag': 'custodian'}, {t['Key']: t['Value'] for t in s['Tags']})
+
 
 class VolumeDeleteTest(BaseTest):
 

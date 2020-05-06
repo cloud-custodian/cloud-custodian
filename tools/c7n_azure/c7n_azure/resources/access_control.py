@@ -15,7 +15,6 @@
 import logging
 import re
 
-import six
 from azure.graphrbac import GraphRbacManagementClient
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import Azure
@@ -387,7 +386,7 @@ class ScopeFilter(Filter):
         return [d for d in data if self.is_scope(d["properties"]["scope"], scope_value)]
 
     def is_scope(self, scope, scope_type):
-        if not isinstance(scope, six.string_types):
+        if not isinstance(scope, str):
             return False
 
         regex = ""

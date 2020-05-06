@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import jmespath
-import six
 
 
 class CloudWatchEvents:
@@ -107,7 +106,7 @@ class CloudWatchEvents:
         # but usage context is lambda entry.
         if k in cls.trail_events:
             v = dict(cls.trail_events[k])
-            if isinstance(v['ids'], six.string_types):
+            if isinstance(v['ids'], str):
                 v['ids'] = e = jmespath.compile('detail.%s' % v['ids'])
                 cls.trail_events[k]['ids'] = e
             return v

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import six
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -35,6 +34,7 @@ class NotebookInstance(QueryResourceManager):
         arn = id = 'NotebookInstanceArn'
         name = 'NotebookInstanceName'
         date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::NotebookInstance'
 
     permissions = ('sagemaker:ListTags',)
 
@@ -196,7 +196,7 @@ class QueryFilter:
 
     def query(self):
         value = self.value
-        if isinstance(self.value, six.string_types):
+        if isinstance(self.value, str):
             value = [self.value]
         return {'Name': self.key, 'Value': value}
 
@@ -213,6 +213,7 @@ class SagemakerEndpoint(QueryResourceManager):
         arn = id = 'EndpointArn'
         name = 'EndpointName'
         date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::Endpoint'
 
     permissions = ('sagemaker:ListTags',)
 
@@ -245,6 +246,7 @@ class SagemakerEndpointConfig(QueryResourceManager):
         arn = id = 'EndpointConfigArn'
         name = 'EndpointConfigName'
         date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::EndpointConfig'
 
     permissions = ('sagemaker:ListTags',)
 
@@ -276,6 +278,7 @@ class Model(QueryResourceManager):
         arn = id = 'ModelArn'
         name = 'ModelName'
         date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::Model'
 
     permissions = ('sagemaker:ListTags',)
 

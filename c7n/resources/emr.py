@@ -15,8 +15,6 @@ import logging
 import time
 import json
 
-import six
-
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry, MetricsFilter
@@ -48,6 +46,7 @@ class EMRCluster(QueryResourceManager):
         name = 'Name'
         id = 'Id'
         date = "Status.Timeline.CreationDateTime"
+        cfn_type = 'AWS::EMR::Cluster'
 
     action_registry = actions
     filter_registry = filters
@@ -281,7 +280,7 @@ class QueryFilter:
 
     def query(self):
         value = self.value
-        if isinstance(self.value, six.string_types):
+        if isinstance(self.value, str):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
@@ -299,6 +298,7 @@ class EMRSecurityConfiguration(QueryResourceManager):
         enum_spec = ('list_security_configurations', 'SecurityConfigurations', None)
         detail_spec = ('describe_security_configuration', 'Name', 'Name', None)
         id = name = 'Name'
+        cfn_type = 'AWS::EMR::SecurityConfiguration'
 
     permissions = ('elasticmapreduce:ListSecurityConfigurations',
                   'elasticmapreduce:DescribeSecurityConfiguration',)

@@ -18,7 +18,6 @@ import random
 import re
 import zlib
 
-import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -37,6 +36,7 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query, utils
+from c7n.tags import coalesce_copy_user_tags
 from c7n.utils import type_schema, filter_empty
 
 from c7n.resources.iam import CheckPermissions
@@ -46,72 +46,6 @@ RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
 
 filters = FilterRegistry('ec2.filters')
 actions = ActionRegistry('ec2.actions')
-
-
-@resources.register('ec2')
-class EC2(query.QueryResourceManager):
-
-    class resource_type(query.TypeInfo):
-        service = 'ec2'
-        arn_type = 'instance'
-        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
-        id = 'InstanceId'
-        filter_name = 'InstanceIds'
-        filter_type = 'list'
-        name = 'PublicDnsName'
-        date = 'LaunchTime'
-        dimension = 'InstanceId'
-        config_type = "AWS::EC2::Instance"
-
-        default_report_fields = (
-            'CustodianDate',
-            'InstanceId',
-            'tag:Name',
-            'InstanceType',
-            'LaunchTime',
-            'VpcId',
-            'PrivateIpAddress',
-        )
-
-    filter_registry = filters
-    action_registry = actions
-
-    # if we have to do a fallback scenario where tags don't come in describe
-    permissions = ('ec2:DescribeTags',)
-
-    def __init__(self, ctx, data):
-        super(EC2, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
-
-    def resources(self, query=None):
-        q = self.resource_query()
-        if q is not None:
-            query = query or {}
-            query['Filters'] = q
-        return super(EC2, self).resources(query=query)
-
-    def resource_query(self):
-        qf = []
-        qf_names = set()
-        # allow same name to be specified multiple times and append the queries
-        # under the same name
-        for q in self.queries:
-            qd = q.query()
-            if qd['Name'] in qf_names:
-                for qf in qf:
-                    if qd['Name'] == qf['Name']:
-                        qf['Values'].extend(qd['Values'])
-            else:
-                qf_names.add(qd['Name'])
-                qf.append(qd)
-        return qf
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeEC2(self)
-        elif source_type == 'config':
-            return query.ConfigSource(self)
-        raise ValueError('invalid source %s' % source_type)
 
 
 class DescribeEC2(query.DescribeSource):
@@ -167,6 +101,69 @@ class DescribeEC2(query.DescribeSource):
         for r in resources:
             r['Tags'] = resource_tags.get(r[m.id], ())
         return resources
+
+
+@resources.register('ec2')
+class EC2(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'ec2'
+        arn_type = 'instance'
+        enum_spec = ('describe_instances', 'Reservations[].Instances[]', None)
+        id = 'InstanceId'
+        filter_name = 'InstanceIds'
+        filter_type = 'list'
+        name = 'PublicDnsName'
+        date = 'LaunchTime'
+        dimension = 'InstanceId'
+        cfn_type = config_type = "AWS::EC2::Instance"
+
+        default_report_fields = (
+            'CustodianDate',
+            'InstanceId',
+            'tag:Name',
+            'InstanceType',
+            'LaunchTime',
+            'VpcId',
+            'PrivateIpAddress',
+        )
+
+    filter_registry = filters
+    action_registry = actions
+
+    # if we have to do a fallback scenario where tags don't come in describe
+    permissions = ('ec2:DescribeTags',)
+    source_mapping = {
+        'describe': DescribeEC2,
+        'config': query.ConfigSource
+    }
+
+    def __init__(self, ctx, data):
+        super(EC2, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(self.data.get('query', []))
+
+    def resources(self, query=None):
+        q = self.resource_query()
+        if q is not None:
+            query = query or {}
+            query['Filters'] = q
+        return super(EC2, self).resources(query=query)
+
+    def resource_query(self):
+        qf = []
+        qf_names = set()
+        # allow same name to be specified multiple times and append the queries
+        # under the same name
+        for q in self.queries:
+            qd = q.query()
+            if qd['Name'] in qf_names:
+                for qf in qf:
+                    if qd['Name'] == qf['Name']:
+                        qf['Values'].extend(qd['Values'])
+            else:
+                qf_names.add(qd['Name'])
+                qf.append(qd)
+        return qf
 
 
 @filters.register('security-group')
@@ -1028,7 +1025,7 @@ class SsmCompliance(Filter):
 class MonitorInstances(BaseAction, StateTransitionFilter):
     """Action on EC2 Instances to enable/disable detailed monitoring
 
-    The differents states of detailed monitoring status are :
+    The different states of detailed monitoring status are :
     'disabled'|'disabling'|'enabled'|'pending'
     (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_instances)
 
@@ -1388,7 +1385,7 @@ class Stop(BaseAction, StateTransitionFilter):
 
 @actions.register('reboot')
 class Reboot(BaseAction, StateTransitionFilter):
-    """reboots a previously running EC2 instance.
+    """Reboots a previously running EC2 instance.
 
     :Example:
 
@@ -1521,7 +1518,20 @@ class Terminate(BaseAction, StateTransitionFilter):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
-    """Snapshots volumes attached to an EC2 instance
+    """Snapshot the volumes attached to an EC2 instance.
+
+    Tags may be optionally added to the snapshot during creation.
+
+    - `copy-volume-tags` copies all the tags from the specified
+      volume to the corresponding snapshot.
+    - `copy-tags` copies the listed tags from each volume
+      to the snapshot.  This is mutually exclusive with
+      `copy-volume-tags`.
+    - `tags` allows new tags to be added to each snapshot when using
+      'copy-tags`.  If no tags are specified, then the tag
+      `custodian_snapshot` is added.
+
+    The default behavior is `copy-volume-tags: true`.
 
     :Example:
 
@@ -1534,12 +1544,15 @@ class Snapshot(BaseAction):
               - type: snapshot
                 copy-tags:
                   - Name
+                tags:
+                    custodian_snapshot: True
     """
 
     schema = type_schema(
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
            'copy-volume-tags': {'type': 'boolean'},
+           'tags': {'type': 'object'},
            'exclude-boot': {'type': 'boolean', 'default': False}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
@@ -1594,16 +1607,9 @@ class Snapshot(BaseAction):
                 resource['InstanceId'], err_code)
 
     def get_snapshot_tags(self, resource):
-        tags = [
-            {'Key': 'custodian_snapshot', 'Value': ''}]
-        copy_keys = self.data.get('copy-tags', [])
-        copy_tags = []
-        if copy_keys:
-            for t in resource.get('Tags', []):
-                if t['Key'] in copy_keys:
-                    copy_tags.append(t)
-            tags.extend(copy_tags)
-        return tags
+        user_tags = self.data.get('tags', {}) or {'custodian_snapshot': ''}
+        copy_tags = self.data.get('copy-tags', [])
+        return coalesce_copy_user_tags(resource, copy_tags, user_tags)
 
 
 @actions.register('modify-security-groups')
@@ -1950,7 +1956,7 @@ class QueryFilter:
 
     def query(self):
         value = self.value
-        if isinstance(self.value, six.string_types):
+        if isinstance(self.value, str):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
@@ -1958,7 +1964,7 @@ class QueryFilter:
 
 @filters.register('instance-attribute')
 class InstanceAttribute(ValueFilter):
-    """EC2 Instance Value FIlter on a given instance attribute.
+    """EC2 Instance Value Filter on a given instance attribute.
 
     Filters EC2 Instances with the given instance attribute
 
@@ -2074,7 +2080,7 @@ class LaunchTemplate(query.QueryResourceManager):
                 t_versions.setdefault(
                     tinfo['LaunchTemplateId'], []).append(
                         tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
-        elif isinstance(rids[0], six.string_types):
+        elif isinstance(rids[0], str):
             for tid in rids:
                 t_versions[tid] = []
 

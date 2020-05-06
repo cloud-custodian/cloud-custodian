@@ -45,7 +45,7 @@ class Redshift(QueryResourceManager):
         filter_type = 'scalar'
         date = 'ClusterCreateTime'
         dimension = 'ClusterIdentifier'
-        config_type = "AWS::Redshift::Cluster"
+        cfn_type = config_type = "AWS::Redshift::Cluster"
 
 
 Redshift.filter_registry.register('marked-for-op', tags.TagActionFilter)
@@ -749,7 +749,7 @@ class RedshiftSubnetGroup(QueryResourceManager):
             'describe_cluster_subnet_groups', 'ClusterSubnetGroups', None)
         filter_name = 'ClusterSubnetGroupName'
         filter_type = 'scalar'
-        config_type = "AWS::Redshift::ClusterSubnetGroup"
+        cfn_type = config_type = "AWS::Redshift::ClusterSubnetGroup"
 
 
 @resources.register('redshift-snapshot')

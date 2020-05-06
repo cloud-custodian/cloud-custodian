@@ -18,7 +18,6 @@ import sys
 import tempfile
 import time
 
-import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
 import mock
@@ -414,11 +413,11 @@ class UtilTest(BaseTest):
         # are returned instead of a dictionary.
         FakeResource.schema = {}
         ret = utils.reformat_schema(FakeResource)
-        self.assertIsInstance(ret, six.text_type)
+        self.assertIsInstance(ret, str)
 
         delattr(FakeResource, "schema")
         ret = utils.reformat_schema(FakeResource)
-        self.assertIsInstance(ret, six.text_type)
+        self.assertIsInstance(ret, str)
 
     def test_load_file(self):
         # Basic load

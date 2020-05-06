@@ -60,7 +60,7 @@ class SQS(QueryResourceManager):
         arn_type = ""
         enum_spec = ('list_queues', 'QueueUrls', None)
         detail_spec = ("get_queue_attributes", "QueueUrl", None, "Attributes")
-        config_type = 'AWS::SQS::Queue'
+        cfn_type = config_type = 'AWS::SQS::Queue'
         id = 'QueueUrl'
         arn = "QueueArn"
         filter_name = 'QueueNamePrefix'
