@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-import sys
 
 from botocore.exceptions import ClientError
 import mock
@@ -407,17 +406,10 @@ class ResizeTest(BaseTest):
             {r["VolumeId"] for r in resources},
             set(("vol-0073dcd216489ea1b", "vol-0e4cba7adc4764f79")),
         )
-
-        # normalizing on str/unicode repr output between versions.. punt
-        if sys.version_info[0] > 2:
-            return
-
         self.assertEqual(
             output.getvalue().strip(),
-            (
-                "filtered 4 of 6 volumes due to [(u'instance-type', 2), "
-                "(u'vol-mutation', 1), (u'vol-type', 1)]"
-            ),
+            ("filtered 4 of 6 volumes due to [('instance-type', 2), "
+             "('vol-mutation', 1), ('vol-type', 1)]")
         )
 
 

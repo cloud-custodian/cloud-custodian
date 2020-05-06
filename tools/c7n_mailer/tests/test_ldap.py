@@ -37,7 +37,7 @@ def azure_pipelines_broken():
     As an alternative while we look for alternatives, this checks for tests
     known failing with broken python installations and skips them.\
     """
-    return (sys.version_info.major, sys.version_info.minor) in ((2, 7), (3, 7))
+    return (sys.version_info.major, sys.version_info.minor) == (3, 7)
 
 
 SKIP_REASON = "Azure Pipelines still broken"
