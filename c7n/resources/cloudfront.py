@@ -122,7 +122,7 @@ class StreamingDistribution(QueryResourceManager):
         'config': ConfigSource
     }
 
-    
+
 Distribution.filter_registry.register('shield-metrics', ShieldMetrics)
 Distribution.filter_registry.register('shield-enabled', IsShieldProtected)
 Distribution.action_registry.register('set-shield', SetShieldProtection)
