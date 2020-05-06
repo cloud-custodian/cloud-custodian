@@ -241,29 +241,6 @@ class StateTransitionAge(AgeFilter):
         return None
 
 
-class StateTransitionFilter:
-    """Filter instances by state.
-
-    Try to simplify construction for policy authors by automatically
-    filtering elements (filters or actions) to the instances states
-    they are valid for.
-
-    For more details see
-     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
-
-    """
-    valid_origin_states = ()
-
-    def filter_instance_state(self, instances, states=None):
-        states = states or self.valid_origin_states
-        orig_length = len(instances)
-        results = [i for i in instances
-                   if i['State']['Name'] in states]
-        self.log.info("%s %d of %d instances" % (
-            self.__class__.__name__, len(results), orig_length))
-        return results
-
-
 @filters.register('ebs')
 class AttachedVolume(ValueFilter):
     """EC2 instances with EBS backed volume
@@ -472,7 +449,7 @@ class InstanceImage(ValueFilter, InstanceImageBase):
 
 
 @filters.register('offhour')
-class InstanceOffHour(OffHour, StateTransitionFilter):
+class InstanceOffHour(OffHour):
     """Custodian OffHour filter
 
     Filters running EC2 instances with the intent to stop at a given hour of
@@ -534,26 +511,26 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
             return super(InstanceOffHour, self).process(
-                self.filter_instance_state(resources))
+                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
         else:
             return super(InstanceOffHour, self).process(resources)
 
 
 @filters.register('network-location')
-class EC2NetworkLocation(net_filters.NetworkLocation, StateTransitionFilter):
+class EC2NetworkLocation(net_filters.NetworkLocation):
 
     valid_origin_states = ('pending', 'running', 'shutting-down', 'stopping',
                            'stopped')
 
     def process(self, resources, event=None):
-        resources = self.filter_instance_state(resources)
+        resources = self.filter_resources(resources, 'State.Name', self.valid_origin_states)
         if not resources:
             return []
         return super(EC2NetworkLocation, self).process(resources)
 
 
 @filters.register('onhour')
-class InstanceOnHour(OnHour, StateTransitionFilter):
+class InstanceOnHour(OnHour):
     """Custodian OnHour filter
 
     Filters stopped EC2 instances with the intent to start at a given hour of
@@ -615,7 +592,7 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
             return super(InstanceOnHour, self).process(
-                self.filter_instance_state(resources))
+                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
         else:
             return super(InstanceOnHour, self).process(resources)
 
@@ -797,7 +774,7 @@ class UserData(ValueFilter):
 
 
 @filters.register('singleton')
-class SingletonFilter(Filter, StateTransitionFilter):
+class SingletonFilter(Filter):
     """EC2 instances without autoscaling or a recover alarm
 
     Filters EC2 instances that are not members of an autoscaling group
@@ -832,7 +809,7 @@ class SingletonFilter(Filter, StateTransitionFilter):
 
     def process(self, instances, event=None):
         return super(SingletonFilter, self).process(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
 
     def __call__(self, i):
         if self.in_asg(i):
