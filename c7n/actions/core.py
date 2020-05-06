@@ -16,8 +16,7 @@ Actions to take on resources
 """
 import logging
 
-import jmespath
-
+from c7n.element import Element
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
@@ -56,7 +55,7 @@ class ActionRegistry(PluginRegistry):
         return action_class(data, manager)
 
 
-class Action:
+class Action(Element):
 
     permissions = ()
     metrics = ()
@@ -86,26 +85,6 @@ class Action:
     def process(self, resources):
         raise NotImplementedError(
             "Base action class does not implement behavior")
-
-    def filter_resources(self, resources, key_expr, allowed_values=()):
-        # many actions implementing a resource state transition only allow
-        # a given set of starting states, this method will filter resources
-        # and issue a warning log, as implicit filtering in actions means
-        # our policy metrics are off, and they should be added as policy
-        # filters.
-        resource_count = len(resources)
-        search_expr = key_expr
-        if not search_expr.startswith('[].'):
-            search_expr = '[].' + key_expr
-        results = [r for value, r in zip(
-            jmespath.search(search_expr, resources), resources)
-            if value in allowed_values]
-        if resource_count != len(results):
-            self.log.warning(
-                "%s implicitly filtered %d of %d resources key:%s on %s",
-                self.type, len(results), resource_count, key_expr,
-                (', '.join(allowed_values)))
-        return results
 
     def _run_api(self, cmd, *args, **kw):
         try:
