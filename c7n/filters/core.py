@@ -810,4 +810,3 @@ class ValueRegex:
         if capture is None:  # regex didn't capture anything
             return None
         return capture.group(1)
-
