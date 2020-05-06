@@ -660,7 +660,7 @@ class RedshiftSetAllowVersionUpgrade(BaseAction):
                       AllowVersionUpgrade: True
     """
 
-    schema = type_schema('set-set-allow-version-upgrade',
+    schema = type_schema('set-allow-version-upgrade',
                         AllowVersionUpgrade={"type": "boolean"},
                         required=('AllowVersionUpgrade',))
     permissions = ('redshift:ModifyCluster',)
