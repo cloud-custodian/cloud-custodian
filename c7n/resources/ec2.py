@@ -1036,7 +1036,7 @@ class UnusedEC2Keys(Filter):
                   - unused-keys
     """
     annotation_key = 'c7n:unused_keys'
-    permissions = ('EC2:DescribeKeyPairs',)
+    permissions = ('ec2:DescribeKeyPairs',)
     schema = type_schema('unused-keys')
 
     def process(self, resources, event=None):
@@ -1065,7 +1065,7 @@ class DeleteUnusedEC2Keys(BaseAction):
                 actions:
                   - delete-unused-keys
     """
-    permissions = ('EC2:DeleteKeyPair',)
+    permissions = ('ec2:DeleteKeyPair',)
     schema = type_schema('delete-unused-keys')
 
     def process(self, unused):
