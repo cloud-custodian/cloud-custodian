@@ -3,14 +3,14 @@
     "data": {
         "KeyPairs": [
             {
-                "KeyPairId": "key-0c4538b58c6a30d7f",
-                "KeyFingerprint": "dc:56:0e:f9:e8:4e:f0:c7:2f:b1:0d:22:e0:2d:ef:4f:a6:65:e4:95",
+                "KeyPairId": "key-025a3d336f839e81d",
+                "KeyFingerprint": "86:9e:cd:92:a9:0a:b9:d3:8d:bf:43:07:0d:bb:7b:17:2f:e9:11:23",
                 "KeyName": "delete",
                 "Tags": []
             },
             {
-                "KeyPairId": "key-09f5f4325b5ef063d",
-                "KeyFingerprint": "ec:32:02:27:84:e8:70:12:b3:6e:77:68:af:6b:d7:7d:d3:51:53:ab",
+                "KeyPairId": "key-07e61731992e3461a",
+                "KeyFingerprint": "bd:c4:ea:ee:20:2e:26:14:a2:b4:ac:13:2e:ae:a3:51:6a:d5:f8:c3",
                 "KeyName": "dont delete",
                 "Tags": []
             }

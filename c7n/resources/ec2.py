@@ -1035,25 +1035,18 @@ class UnusedEC2Keys(Filter):
                 filters:
                   - unused-keys
     """
+    annotation_key = 'c7n:unused_keys'
     permissions = ('EC2:DescribeKeyPairs',)
     schema = type_schema('unused-keys')
 
     def process(self, resources, event=None):
-        client = utils.local_session(self.manager.session_factory).client('ec2')
-        self.used, self.key_pairs = unused_key_pairs(resources, client)
-        return super(UnusedEC2Keys, self).process(self.key_pairs)
+        client = utils.local_session(self.manager.session_factory).client('ec2')        
+        self.used = [r['KeyName'] for r in resources if 'KeyName' in r]
+        self.key_pairs = client.describe_key_pairs()['KeyPairs']
+        return super().process(self.key_pairs)
 
     def __call__(self, key_pair):
-        return key_pair not in self.used
-
-
-def unused_key_pairs(resources, client):
-    used = set()
-    for r in resources:
-        if 'KeyName' in r:
-            used.add(r['KeyName'])
-    key_pairs = client.describe_key_pairs()
-    return used, set(jmespath.search('KeyPairs[].KeyName', key_pairs))
+        return key_pair['KeyName'] not in self.used
 
 
 @EC2.action_registry.register('delete-unused-keys')
@@ -1075,18 +1068,15 @@ class DeleteUnusedEC2Keys(BaseAction):
     permissions = ('EC2:DeleteKeyPair',)
     schema = type_schema('delete-unused-keys')
 
-    def process(self, resources):
+    def process(self, unused):
         client = utils.local_session(self.manager.session_factory).client('ec2')
-        used, key_pairs = unused_key_pairs(resources, client)
-        unused = key_pairs - used
-        print(used)
-        print(key_pairs)
-        print(unused)
         for key in unused:
-            pass
+            if 'KeyPairId' not in key:
+                raise PolicyValidationError(
+                    "This doesn't seem like filtered unused keys, did you use the filter first?")  
             # not using a try/catch because this operation does not throw any useful errors
             # for example, it returns a 200 if you hardcoded the KeyName to 'hotdog'
-            # client.delete_key_pair(KeyName=key)
+            client.delete_key_pair(KeyName=key['KeyName'])
 
 
 @actions.register('set-monitoring')

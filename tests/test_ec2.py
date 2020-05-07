@@ -1947,8 +1947,7 @@ class TestMonitoringInstance(BaseTest):
 class TestUnusedKeys(BaseTest):
 
     def test_ec2_unused_keys(self):
-        # not working right
-        session_factory = self.record_flight_data("test_ec2_unused_key_delete")
+        session_factory = self.replay_flight_data("test_ec2_unused_key_delete")
         client = session_factory().client('ec2')
         instances = client.describe_instances(Filters=[
             {
@@ -1984,6 +1983,24 @@ class TestUnusedKeys(BaseTest):
         resources = p.run()
         keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
         self.assertEqual(len(resources), len(unused_key))
-        self.assertEqual(resources[0], unused_key[0])        
-        self.assertNotIn(unused_key, keys)
-        self.assertIn(used_key, keys)        
+        self.assertIn(resources[0]['KeyName'], unused_key)        
+        self.assertNotEqual(unused_key, keys)
+        self.assertEqual(used_key, keys)
+
+    def test_ec2_unused_key_not_filtered_error(self):
+        session_factory = self.replay_flight_data("test_ec2_unused_key_not_filtered_error")
+        client = session_factory().client('ec2')         
+        p = self.load_policy(
+            {
+                "name": "ec2-unused-keys",
+                "resource": "aws.ec2",
+                "actions": [
+                    {
+                        "type": "delete-unused-keys"
+                    },                    
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with self.assertRaises(PolicyValidationError):
+            p.run()
