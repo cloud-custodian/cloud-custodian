@@ -2960,7 +2960,7 @@ class TestUnusedKeys(BaseTest):
                 ],
                 "actions": [
                     {
-                        "type": "delete-unused"
+                        "type": "delete"
                     },
                 ]
             },
@@ -2980,7 +2980,25 @@ class TestUnusedKeys(BaseTest):
                     "resource": "aws.key-pair",
                     "actions": [
                         {
-                            "type": "delete-unused"
+                            "type": "delete"
+                        },
+                    ]
+                }
+            )
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "delete-unused-keys",
+                    "resource": "aws.key-pair",
+                    "filters": [
+                        {
+                            "type": "unused",
+                            "state": False
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete"
                         },
                     ]
                 }

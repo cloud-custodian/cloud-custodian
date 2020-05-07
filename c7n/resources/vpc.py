@@ -2198,19 +2198,27 @@ class UnusedKeyPairs(Filter):
                 resource: aws.key-pair
                 filters:
                   - unused
+              - name: used-key-pairs
+                resource: aws.key-pair
+                filters:
+                  - type: unused
+                    state: false
     """
     annotation_key = 'c7n:unused_keys'
     permissions = ('ec2:DescribeKeyPairs',)
-    schema = type_schema('unused')
+    schema = type_schema('unused',
+        state={'type': 'boolean'})
 
     def process(self, resources, event=None):
         instances = self.manager.get_resource_manager('ec2').resources()
         used = set(jmespath.search('[].KeyName', instances))
-        unused = [r for r in resources if r['KeyName'] not in used]
-        return unused
+        if self.data.get('state', True):
+            return [r for r in resources if r['KeyName'] not in used]
+        else:
+            return [r for r in resources if r['KeyName'] in used]
 
 
-@KeyPair.action_registry.register('delete-unused')
+@KeyPair.action_registry.register('delete')
 class DeleteUnusedKeyPairs(BaseAction):
     """Delete all ec2 keys that are not in use
 
@@ -2224,15 +2232,19 @@ class DeleteUnusedKeyPairs(BaseAction):
                 filters:
                   - unused
                 actions:
-                  - delete-unused
+                  - delete
     """
     permissions = ('ec2:DeleteKeyPair',)
-    schema = type_schema('delete-unused')
+    schema = type_schema('delete')
 
     def validate(self):
         if not [f for f in self.manager.iter_filters() if isinstance(f, UnusedKeyPairs)]:
             raise PolicyValidationError(
-                "delete-unused should be used in conjunction with unused filter on %s" % (
+                "delete should be used in conjunction with the unused filter on %s" % (
+                    self.manager.data,))
+        if [True for f in self.manager.iter_filters() if f.data.get('state') is False]:
+            raise PolicyValidationError(
+                "You policy has filtered used keys you should use this with unused keys %s" % (
                     self.manager.data,))
         return self
 
