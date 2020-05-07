@@ -2187,7 +2187,7 @@ class KeyPair(query.QueryResourceManager):
 
 @KeyPair.filter_registry.register('unused')
 class UnusedKeyPairs(Filter):
-    """Filter for used or unused keys. The default is unused 
+    """Filter for used or unused keys. The default is unused
        but can be changed by using the state property.
 
     :example:
