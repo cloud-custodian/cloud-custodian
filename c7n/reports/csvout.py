@@ -96,7 +96,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
     rows = formatter.to_csv(records)
 
     if options.format == 'csv':
-        writer = csv.writer(output_fh, dialect=csv.excel)
+        writer = csv.writer(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
         writer.writerows(rows)
     elif options.format == 'json':

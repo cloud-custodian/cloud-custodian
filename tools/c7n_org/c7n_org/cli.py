@@ -390,7 +390,7 @@ def report(config, output, use, output_dir, accounts,
         fields=prefix_fields)
 
     rows = formatter.to_csv(records, unique=False)
-    writer = csv.writer(output, dialect=csv.excel)
+    writer = csv.writer(output, formatter.headers())
     writer.writerow(formatter.headers())
     writer.writerows(rows)
 
