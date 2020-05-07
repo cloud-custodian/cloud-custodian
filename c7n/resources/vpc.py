@@ -2187,7 +2187,8 @@ class KeyPair(query.QueryResourceManager):
 
 @KeyPair.filter_registry.register('unused')
 class UnusedKeyPairs(Filter):
-    """Filters all ec2 keys that are not in use
+    """Filter for used or unused keys. The default is unused 
+       but can be changed by using the state property.
 
     :example:
 
@@ -2221,6 +2222,8 @@ class UnusedKeyPairs(Filter):
 @KeyPair.action_registry.register('delete')
 class DeleteUnusedKeyPairs(BaseAction):
     """Delete all ec2 keys that are not in use
+       This should always be used with the unused filter
+       and it will prevent you from using without it.
 
     :example:
 
