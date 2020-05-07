@@ -2000,5 +2000,5 @@ class TestUnusedKeys(BaseTest):
             },
             session_factory=session_factory,
         )
-        with self.assertRaises(PolicyValidationError):
+        with self.assertRaises(KeyError):
             p.run()

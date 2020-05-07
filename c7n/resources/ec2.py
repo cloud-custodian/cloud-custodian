@@ -1071,12 +1071,9 @@ class DeleteUnusedEC2Keys(BaseAction):
     def process(self, unused):
         client = utils.local_session(self.manager.session_factory).client('ec2')
         for key in unused:
-            if 'KeyPairId' not in key:
-                raise PolicyValidationError(
-                    "This doesn't seem like filtered unused keys, did you use the filter first?")
             # not using a try/catch because this operation does not throw any useful errors
             # for example, it returns a 200 if you hardcoded the KeyName to 'hotdog'
-            client.delete_key_pair(KeyName=key['KeyName'])
+            client.delete_key_pair(KeyPairId=key['KeyPairId'])
 
 
 @actions.register('set-monitoring')
