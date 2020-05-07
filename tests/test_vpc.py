@@ -2973,7 +2973,6 @@ class TestUnusedKeys(BaseTest):
         self.assertEqual(used_key, keys)
 
     def test_vpc_unused_key_not_filtered_error(self):
-        session_factory = self.replay_flight_data("test_vpc_unused_key_not_filtered_error")
         with self.assertRaises(PolicyValidationError):
             self.load_policy(
                 {
@@ -2984,6 +2983,5 @@ class TestUnusedKeys(BaseTest):
                             "type": "delete-unused"
                         },
                     ]
-                },
-                session_factory=session_factory,
+                }
             )
