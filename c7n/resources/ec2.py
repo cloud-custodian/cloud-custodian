@@ -1040,7 +1040,7 @@ class UnusedEC2Keys(Filter):
     schema = type_schema('unused-keys')
 
     def process(self, resources, event=None):
-        client = utils.local_session(self.manager.session_factory).client('ec2')        
+        client = utils.local_session(self.manager.session_factory).client('ec2')
         self.used = [r['KeyName'] for r in resources if 'KeyName' in r]
         self.key_pairs = client.describe_key_pairs()['KeyPairs']
         return super().process(self.key_pairs)
@@ -1073,7 +1073,7 @@ class DeleteUnusedEC2Keys(BaseAction):
         for key in unused:
             if 'KeyPairId' not in key:
                 raise PolicyValidationError(
-                    "This doesn't seem like filtered unused keys, did you use the filter first?")  
+                    "This doesn't seem like filtered unused keys, did you use the filter first?")
             # not using a try/catch because this operation does not throw any useful errors
             # for example, it returns a 200 if you hardcoded the KeyName to 'hotdog'
             client.delete_key_pair(KeyName=key['KeyName'])

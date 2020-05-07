@@ -1033,7 +1033,6 @@ class TestStart(BaseTest):
         self.assertIn("i-08270b9cfb568a1c4", log_output)
 
 
-
 class TestOr(BaseTest):
 
     def test_ec2_or_condition(self):
@@ -1944,8 +1943,8 @@ class TestMonitoringInstance(BaseTest):
             instance[0]['Monitoring']['State'].lower(), ['disabled', 'disabling']
         )
 
-class TestUnusedKeys(BaseTest):
 
+class TestUnusedKeys(BaseTest):
     def test_ec2_unused_keys(self):
         session_factory = self.replay_flight_data("test_ec2_unused_key_delete")
         client = session_factory().client('ec2')
@@ -1962,7 +1961,7 @@ class TestUnusedKeys(BaseTest):
         keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
         unused_key = keys - used_key
         self.assertEqual(len(unused_key), 1)
-        self.assertNotEqual(unused_key, used_key)           
+        self.assertNotEqual(unused_key, used_key)
         p = self.load_policy(
             {
                 "name": "ec2-unused-keys",
@@ -1975,7 +1974,7 @@ class TestUnusedKeys(BaseTest):
                 "actions": [
                     {
                         "type": "delete-unused-keys"
-                    },                    
+                    },
                 ]
             },
             session_factory=session_factory,
@@ -1983,13 +1982,12 @@ class TestUnusedKeys(BaseTest):
         resources = p.run()
         keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
         self.assertEqual(len(resources), len(unused_key))
-        self.assertIn(resources[0]['KeyName'], unused_key)        
+        self.assertIn(resources[0]['KeyName'], unused_key)
         self.assertNotEqual(unused_key, keys)
         self.assertEqual(used_key, keys)
 
     def test_ec2_unused_key_not_filtered_error(self):
         session_factory = self.replay_flight_data("test_ec2_unused_key_not_filtered_error")
-        client = session_factory().client('ec2')         
         p = self.load_policy(
             {
                 "name": "ec2-unused-keys",
@@ -1997,7 +1995,7 @@ class TestUnusedKeys(BaseTest):
                 "actions": [
                     {
                         "type": "delete-unused-keys"
-                    },                    
+                    },
                 ]
             },
             session_factory=session_factory,
