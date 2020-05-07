@@ -80,13 +80,11 @@ class PolicyMetaLint(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
+            {
                     "kinesis:DescribeStream",
                     "kinesis:ListStreams",
                     "kinesis:DeleteStream",
-                )
-            ),
+                },
         )
 
     def test_schema_plugin_name_mismatch(self):
@@ -183,9 +181,8 @@ class PolicyMetaLint(BaseTest):
             if arn_gen:
                 overrides.add(k)
 
-        overrides = overrides.difference(set(
-            ('account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage')))
+        overrides = overrides.difference({'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
+             'rest-stage'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -342,16 +339,16 @@ class PolicyMetaLint(BaseTest):
 
     def test_resource_arn_info(self):
         missing = []
-        whitelist_missing = set((
-            'rest-stage', 'rest-resource', 'rest-vpclink'))
+        whitelist_missing = {
+            'rest-stage', 'rest-resource', 'rest-vpclink'}
         explicit = []
-        whitelist_explicit = set((
+        whitelist_explicit = {
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target',
-            'support-case', 'transit-attachment', 'config-recorder'))
+            'support-case', 'transit-attachment', 'config-recorder'}
 
         missing_method = []
         for k, v in manager.resources.items():
@@ -470,13 +467,11 @@ class PolicyMeta(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
+            {
                     "kinesis:DescribeStream",
                     "kinesis:ListStreams",
                     "kinesis:DeleteStream",
-                )
-            ),
+                },
         )
 
     def test_policy_manager_custom_permissions(self):
@@ -497,13 +492,11 @@ class PolicyMeta(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
+            {
                     "ec2:DescribeInstances",
                     "ec2:DescribeTags",
                     "cloudwatch:GetMetricStatistics",
-                )
-            ),
+                },
         )
 
 
@@ -731,7 +724,7 @@ class TestPolicy(BaseTest):
         for p in collection:
             self.assertTrue(p.name is not None)
 
-        self.assertEqual(collection.resource_types, set(("s3", "ec2")))
+        self.assertEqual(collection.resource_types, {"s3", "ec2"})
         self.assertTrue("s3-remediate" in collection)
 
         self.assertEqual(
