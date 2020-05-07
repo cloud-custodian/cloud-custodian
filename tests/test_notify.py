@@ -85,14 +85,14 @@ class NotifyTest(BaseTest):
         self.assertEqual(
             set(body.keys()),
             {
-                    "account_id",
-                    "action",
-                    "event",
-                    "policy",
-                    "region",
-                    "account",
-                    "resources",
-                },
+                "account_id",
+                "action",
+                "event",
+                "policy",
+                "region",
+                "account",
+                "resources",
+            },
         )
 
     def test_resource_prep(self):

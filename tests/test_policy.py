@@ -81,10 +81,10 @@ class PolicyMetaLint(BaseTest):
         self.assertEqual(
             perms,
             {
-                    "kinesis:DescribeStream",
-                    "kinesis:ListStreams",
-                    "kinesis:DeleteStream",
-                },
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "kinesis:DeleteStream",
+            },
         )
 
     def test_schema_plugin_name_mismatch(self):
@@ -181,7 +181,8 @@ class PolicyMetaLint(BaseTest):
             if arn_gen:
                 overrides.add(k)
 
-        overrides = overrides.difference({'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
+        overrides = overrides.difference(
+            {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
@@ -468,10 +469,10 @@ class PolicyMeta(BaseTest):
         self.assertEqual(
             perms,
             {
-                    "kinesis:DescribeStream",
-                    "kinesis:ListStreams",
-                    "kinesis:DeleteStream",
-                },
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "kinesis:DeleteStream",
+            },
         )
 
     def test_policy_manager_custom_permissions(self):
@@ -493,10 +494,10 @@ class PolicyMeta(BaseTest):
         self.assertEqual(
             perms,
             {
-                    "ec2:DescribeInstances",
-                    "ec2:DescribeTags",
-                    "cloudwatch:GetMetricStatistics",
-                },
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags",
+                "cloudwatch:GetMetricStatistics",
+            },
         )
 
 

@@ -212,10 +212,10 @@ class TestDisableApiTermination(BaseTest):
         self.assertEqual(
             perms,
             {
-                    "ec2:DescribeInstances",
-                    "ec2:DescribeTags",
-                    "ec2:DescribeInstanceAttribute",
-                },
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags",
+                "ec2:DescribeInstanceAttribute",
+            },
         )
 
 

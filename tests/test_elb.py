@@ -174,10 +174,10 @@ class HealthCheckProtocolMismatchTest(BaseTest):
         self.assertEqual(
             elb_names,
             {
-                    "test-elb-no-listeners",
-                    "test-elb-protocol-matches",
-                    "test-elb-multiple-listeners",
-                },
+                "test-elb-no-listeners",
+                "test-elb-protocol-matches",
+                "test-elb-multiple-listeners",
+            },
         )
 
 

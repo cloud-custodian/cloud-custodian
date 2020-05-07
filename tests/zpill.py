@@ -126,9 +126,9 @@ class BluePill(pill.Pill):
 
     def get_available(self):
         return {
-                os.path.join(self.data_path, n)
-                for n in fnmatch.filter(os.listdir(self.data_path), "*.json")
-            }
+            os.path.join(self.data_path, n)
+            for n in fnmatch.filter(os.listdir(self.data_path), "*.json")
+        }
 
     def get_next_file_path(self, service, operation):
         fn, format = super(BluePill, self).get_next_file_path(service, operation)
