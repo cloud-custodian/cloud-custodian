@@ -20,7 +20,7 @@ from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
-from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry, CrossAccountAccessFilter
+from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
 
@@ -246,14 +246,14 @@ class GlueCrawlerSecurityConfigFilter(SecurityConfigFilter):
 
 
 @GlueCrawler.action_registry.register('delete')
-class DeleteCrawler(BaseAction, StateTransitionFilter):
+class DeleteCrawler(BaseAction):
 
     schema = type_schema('delete')
     permissions = ('glue:DeleteCrawler',)
     valid_origin_states = ('READY', 'FAILED')
 
     def process(self, resources):
-        resources = self.filter_resource_state(resources)
+        resources = self.filter_resources(resources, 'State', self.valid_origin_states)
 
         client = local_session(self.manager.session_factory).client('glue')
         for r in resources:
