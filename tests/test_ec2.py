@@ -1981,7 +1981,6 @@ class TestUnusedKeys(BaseTest):
         )
         resources = p.run()
         keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
-        self.assertEqual(len(resources), len(unused_key))
         self.assertIn(resources[0]['KeyName'], unused_key)
         self.assertNotEqual(unused_key, keys)
         self.assertEqual(used_key, keys)
