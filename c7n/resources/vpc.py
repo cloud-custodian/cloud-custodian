@@ -2185,6 +2185,65 @@ class KeyPair(query.QueryResourceManager):
         taggable = False
 
 
+@KeyPair.filter_registry.register('unused')
+class UnusedKeyPairs(Filter):
+    """Filters all ec2 keys that are not in use
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: unused-key-pairs
+                resource: aws.key-pair
+                filters:
+                  - unused
+    """
+    annotation_key = 'c7n:unused_keys'
+    permissions = ('ec2:DescribeKeyPairs',)
+    schema = type_schema('unused-keys')
+
+    def process(self, resources, event=None):
+        instances = self.manager.get_resource_manager('ec2').resources()
+        used = set(jmespath.search('[].KeyName', instances))
+        unused = [r for r in resources if r['KeyName'] not in used]
+        return unused
+
+
+@KeyPair.action_registry.register('delete-unused')
+class DeleteUnusedKeyPairs(BaseAction):
+    """Delete all ec2 keys that are not in use
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: delete-unused-key-pairs
+                resource: aws.key-pair
+                filters:
+                  - unused
+                actions:
+                  - delete-unused
+    """
+    permissions = ('ec2:DeleteKeyPair',)
+    schema = type_schema('delete-unused-keys')
+
+    def validate(self):
+        if not [f for f in self.manager.iter_filters() if isinstance(f, UnusedKeyPairs)]:
+            raise PolicyValidationError(
+                "delete-unused should be used in conjunction with unused filter on %s" % (
+                    self.manager.data,))
+        return self
+
+    def process(self, unused):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for key in unused:
+            # not using a try/catch because this operation does not throw any useful errors
+            # for example, it returns a 200 if you hardcoded the KeyName to 'hotdog'
+            client.delete_key_pair(KeyPairId=key['KeyPairId'])
+
+
 @Vpc.action_registry.register('set-flow-log')
 @Subnet.action_registry.register('set-flow-log')
 @NetworkInterface.action_registry.register('set-flow-log')

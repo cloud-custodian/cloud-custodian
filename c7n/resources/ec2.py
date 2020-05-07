@@ -1021,61 +1021,6 @@ class SsmCompliance(Filter):
         return results
 
 
-@EC2.filter_registry.register('unused-keys')
-class UnusedEC2Keys(Filter):
-    """Filters all ec2 keys that are not in use
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: ec2-unused-keys
-                resource: ec2
-                filters:
-                  - unused-keys
-    """
-    annotation_key = 'c7n:unused_keys'
-    permissions = ('ec2:DescribeKeyPairs',)
-    schema = type_schema('unused-keys')
-
-    def process(self, resources, event=None):
-        client = utils.local_session(self.manager.session_factory).client('ec2')
-        self.used = [r['KeyName'] for r in resources if 'KeyName' in r]
-        self.key_pairs = client.describe_key_pairs()['KeyPairs']
-        return super().process(self.key_pairs)
-
-    def __call__(self, key_pair):
-        return key_pair['KeyName'] not in self.used
-
-
-@EC2.action_registry.register('delete-unused-keys')
-class DeleteUnusedEC2Keys(BaseAction):
-    """Delete all ec2 keys that are not in use
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: ec2-delete-unused-keys
-                resource: ec2
-                filters:
-                  - unused-keys
-                actions:
-                  - delete-unused-keys
-    """
-    permissions = ('ec2:DeleteKeyPair',)
-    schema = type_schema('delete-unused-keys')
-
-    def process(self, unused):
-        client = utils.local_session(self.manager.session_factory).client('ec2')
-        for key in unused:
-            # not using a try/catch because this operation does not throw any useful errors
-            # for example, it returns a 200 if you hardcoded the KeyName to 'hotdog'
-            client.delete_key_pair(KeyPairId=key['KeyPairId'])
-
-
 @actions.register('set-monitoring')
 class MonitorInstances(BaseAction, StateTransitionFilter):
     """Action on EC2 Instances to enable/disable detailed monitoring
