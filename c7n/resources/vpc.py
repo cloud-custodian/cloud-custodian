@@ -2201,7 +2201,7 @@ class UnusedKeyPairs(Filter):
     """
     annotation_key = 'c7n:unused_keys'
     permissions = ('ec2:DescribeKeyPairs',)
-    schema = type_schema('unused-keys')
+    schema = type_schema('unused')
 
     def process(self, resources, event=None):
         instances = self.manager.get_resource_manager('ec2').resources()
@@ -2227,7 +2227,7 @@ class DeleteUnusedKeyPairs(BaseAction):
                   - delete-unused
     """
     permissions = ('ec2:DeleteKeyPair',)
-    schema = type_schema('delete-unused-keys')
+    schema = type_schema('delete-unused')
 
     def validate(self):
         if not [f for f in self.manager.iter_filters() if isinstance(f, UnusedKeyPairs)]:
