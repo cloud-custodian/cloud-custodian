@@ -480,9 +480,9 @@ class ServiceUsage(Filter):
     """
 
     JOB_COMPLETE = 'COMPLETED'
-    SERVICE_ATTR = set((
+    SERVICE_ATTR = {
         'ServiceName', 'ServiceNamespace', 'TotalAuthenticatedEntities',
-        'LastAuthenticated', 'LastAuthenticatedEntity'))
+        'LastAuthenticated', 'LastAuthenticatedEntity'}
 
     schema_alias = True
     schema_attr = {

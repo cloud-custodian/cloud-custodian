@@ -1308,14 +1308,14 @@ class ModifyableVolume(Filter):
 
     schema = type_schema('modifyable')
 
-    older_generation = set((
+    older_generation = {
         'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge',
         'c1.medium', 'c1.xlarge', 'cc2.8xlarge',
         'm2.xlarge', 'm2.2xlarge', 'm2.4xlarge', 'cr1.8xlarge',
         'hi1.4xlarge', 'hs1.8xlarge', 'cg1.4xlarge', 't1.micro',
         # two legs good, not all current gen work either.
         'm3.large', 'm3.xlarge', 'm3.2xlarge'
-    ))
+    }
 
     permissions = ("ec2:DescribeInstances",)
 

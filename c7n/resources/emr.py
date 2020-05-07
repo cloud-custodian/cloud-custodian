@@ -239,7 +239,7 @@ class Terminate(BaseAction):
 
 
 # Valid EMR Query Filters
-EMR_VALID_FILTERS = set(('CreatedAfter', 'CreatedBefore', 'ClusterStates'))
+EMR_VALID_FILTERS = {'CreatedAfter', 'CreatedBefore', 'ClusterStates'}
 
 
 class QueryFilter:

@@ -177,7 +177,7 @@ class OpsItem(QueryResourceManager):
             'Status', 'Title', 'LastModifiedTime',
             'CreatedBy', 'CreatedTime')
 
-    QueryKeys = set((
+    QueryKeys = {
         'Status',
         'CreatedBy',
         'Source',
@@ -190,8 +190,8 @@ class OpsItem(QueryResourceManager):
         'OperationalDataKey',
         'OperationalDataValue',
         'ResourceId',
-        'AutomationId'))
-    QueryOperators = set(('Equal', 'LessThan', 'GreaterThan', 'Contains'))
+        'AutomationId'}
+    QueryOperators = {'Equal', 'LessThan', 'GreaterThan', 'Contains'}
 
     def validate(self):
         self.query = self.resource_query()
@@ -216,7 +216,7 @@ class OpsItem(QueryResourceManager):
         filters = []
         for q in self.data.get('query', ()):
             if (not isinstance(q, dict) or
-                not set(q.keys()) == set(('Key', 'Values', 'Operator')) or
+                not set(q.keys()) == {'Key', 'Values', 'Operator'} or
                 q['Key'] not in self.QueryKeys or
                     q['Operator'] not in self.QueryOperators):
                 raise PolicyValidationError(

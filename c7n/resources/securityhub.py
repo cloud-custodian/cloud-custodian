@@ -195,7 +195,7 @@ class SecurityHub(LambdaMode):
             resource_sets.setdefault((rarn.account_id, rarn.region), []).append(rarn)
         # Warn if not configured for member-role and have multiple accounts resources.
         if (not self.policy.data['mode'].get('member-role') and
-                set((self.policy.options.account_id,)) != {
+                {self.policy.options.account_id} != {
                     rarn.account_id for rarn in resource_arns}):
             msg = ('hub-mode not configured for multi-account member-role '
                    'but multiple resource accounts found')
