@@ -2239,8 +2239,7 @@ class DeleteUnusedKeyPairs(BaseAction):
     def process(self, unused):
         client = local_session(self.manager.session_factory).client('ec2')
         for key in unused:
-            # not using a try/catch because this operation does not throw any useful errors
-            # for example, it returns a 200 if you hardcoded the KeyName to 'hotdog'
+            # not using a try/catch because we want this to raise if the id is invalid
             client.delete_key_pair(KeyPairId=key['KeyPairId'])
 
 
