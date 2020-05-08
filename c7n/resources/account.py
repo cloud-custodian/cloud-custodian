@@ -1614,15 +1614,15 @@ class EMRBlockPublicAccessConfiguration(ValueFilter):
     .. code-block:: yaml
 
             policies:
-              - name: get-emr-block-public-access-configuration
+              - name: get-emr-block-public-access
                 resource: account
                 filters:
-                  - type: emr-block-public-access-configuration
+                  - type: emr-block-public-access
     """
 
-    annotation_key = 'c7n:emr-block-public-access-configuration'
+    annotation_key = 'c7n:emr-block-public-access'
     annotate = False  # no annotation from value filter
-    schema = type_schema('emr-block-public-access-configuration', rinherit=ValueFilter.schema)
+    schema = type_schema('emr-block-public-access', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ("elasticmapreduce:GetBlockPublicAccessConfiguration",)
 
@@ -1655,14 +1655,14 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: set-emr-block-public-access-configuration
+              - name: set-emr-block-public-access
                 resource: account
                 filters:
-                  - type: emr-block-public-access-configuration
+                  - type: emr-block-public-access
                     key: BlockPublicAccessConfiguration.BlockPublicSecurityGroupRules
                     value: False
                 actions:
-                  - type: set-emr-block-public-access-configuration
+                  - type: set-emr-block-public-access
                     config:
                         BlockPublicSecurityGroupRules: True
                         PermittedPublicSecurityGroupRuleRanges:
@@ -1673,7 +1673,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
 
     """
 
-    schema = type_schema('set-emr-block-public-access-configuration',
+    schema = type_schema('set-emr-block-public-access',
                          config={"type": "object",
                             'properties': {
                                 'BlockPublicSecurityGroupRules': {'type': 'boolean'},
