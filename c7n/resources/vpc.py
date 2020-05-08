@@ -2187,23 +2187,24 @@ class KeyPair(query.QueryResourceManager):
 
 @KeyPair.filter_registry.register('unused')
 class UnusedKeyPairs(Filter):
-    """Filter for used or unused keys. The default is unused
-       but can be changed by using the state property.
+    """Filter for used or unused keys.
+
+    The default is unused but can be changed by using the state property.
 
     :example:
 
     .. code-block:: yaml
 
-            policies:
-              - name: unused-key-pairs
-                resource: aws.key-pair
-                filters:
-                  - unused
-              - name: used-key-pairs
-                resource: aws.key-pair
-                filters:
-                  - type: unused
-                    state: false
+      policies:
+        - name: unused-key-pairs
+          resource: aws.key-pair
+          filters:
+            - unused
+        - name: used-key-pairs
+          resource: aws.key-pair
+          filters:
+            - type: unused
+              state: false
     """
     annotation_key = 'c7n:unused_keys'
     permissions = ('ec2:DescribeKeyPairs',)
@@ -2222,20 +2223,21 @@ class UnusedKeyPairs(Filter):
 @KeyPair.action_registry.register('delete')
 class DeleteUnusedKeyPairs(BaseAction):
     """Delete all ec2 keys that are not in use
-       This should always be used with the unused filter
-       and it will prevent you from using without it.
+
+    This should always be used with the unused filter
+    and it will prevent you from using without it.
 
     :example:
 
     .. code-block:: yaml
 
-            policies:
-              - name: delete-unused-key-pairs
-                resource: aws.key-pair
-                filters:
-                  - unused
-                actions:
-                  - delete
+      policies:
+        - name: delete-unused-key-pairs
+          resource: aws.key-pair
+          filters:
+            - unused
+          actions:
+            - delete
     """
     permissions = ('ec2:DeleteKeyPair',)
     schema = type_schema('delete')
