@@ -651,61 +651,31 @@ class RedshiftSetAttributes(BaseAction):
     def process_cluster(self, client, cluster):
         try:
             config = dict(self.data.get('attributes'))
-            base_config = {
-                'ClusterIdentifier':
-                    (jmespath.search('PendingModifiedValues.ClusterIdentifier', cluster)
-                    or cluster.get('ClusterIdentifier')),
-                'ClusterType':
-                    jmespath.search('PendingModifiedValues.ClusterType', cluster),
-                'NodeType':
-                    (cluster.get('PendingModifiedValues').get('NodeType')
-                    or cluster.get('NodeType')),
-                'NumberOfNodes':
-                    (jmespath.search('PendingModifiedValues.NumberOfNodes', cluster)
-                    or cluster.get('NumberOfNodes')),
-                'ClusterSecurityGroups':
-                    jmespath.search('ClusterSecurityGroups[].ClusterSecurityGroupName', cluster),
-                'VpcSecurityGroupIds':
-                    jmespath.search('VpcSecurityGroups[].VpcSecurityGroupId', cluster),
-                'MasterUserPassword':
-                    jmespath.search('PendingModifiedValues.MasterUserPassword', cluster),
-                'AutomatedSnapshotRetentionPeriod':
-                    (jmespath.search('PendingModifiedValues.AutomatedSnapshotRetentionPeriod',
-                    cluster) or cluster.get('AutomatedSnapshotRetentionPeriod')),
-                'ManualSnapshotRetentionPeriod':
-                    cluster.get('ManualSnapshotRetentionPeriod'),
-                'PreferredMaintenanceWindow':
-                    cluster.get('PreferredMaintenanceWindow'),
-                'ClusterVersion':
-                    (jmespath.search('PendingModifiedValues.ClusterVersion', cluster)
-                    or cluster.get('ClusterVersion')),
-                'AllowVersionUpgrade':
-                    cluster.get('AllowVersionUpgrade'),
-                'HsmClientCertificateIdentifier':
-                    jmespath.search('HsmStatus.HsmClientCertificateIdentifier', cluster),
-                'HsmConfigurationIdentifier':
-                    jmespath.search('HsmStatus.HsmConfigurationIdentifier', cluster),
-                'PubliclyAccessible':
-                    (jmespath.search('PendingModifiedValues.PubliclyAccessible', cluster)
-                    or cluster.get('PubliclyAccessible')),
-                'ElasticIp':
-                    jmespath.search('ElasticIpStatus.ElasticIp', cluster),
-                'EnhancedVpcRouting':
-                    (jmespath.search('PendingModifiedValues.EnhancedVpcRouting', cluster)
-                    or cluster.get('EnhancedVpcRouting')),
-                'MaintenanceTrackName':
-                    (jmespath.search('PendingModifiedValues.MaintenanceTrackName', cluster)
-                    or cluster.get('MaintenanceTrackName')),
-                'Encrypted': cluster.get('Encrypted'),
-                'KmsKeyId': cluster.get('KmsKeyId')
-            }
-            updatedCluster = {**base_config, **config}
-            if updatedCluster == cluster:
+            modify = {}
+            for k, v in config.items():
+                if k == 'ElasticIp' and v != jmespath.search('ElasticIpStatus.ElasticIp', cluster):
+                    modify[k] = v
+                elif (k == 'ClusterSecurityGroups' and v !=
+                jmespath.search('ClusterSecurityGroups[].ClusterSecurityGroupName', cluster)):
+                    modify[k] = v
+                elif (k == 'VpcSecurityGroupIds' and v !=
+                jmespath.search('VpcSecurityGroups[].VpcSecurityGroupId', cluster)):
+                    modify[k] = v
+                elif (k == 'HsmClientCertificateIdentifier' and
+                v != jmespath.search('HsmStatus.HsmClientCertificateIdentifier', cluster)):
+                    modify[k] = v
+                elif (k == 'HsmConfigurationIdentifier' and
+                v != jmespath.search('HsmStatus.HsmConfigurationIdentifier', cluster)):
+                    modify[k] = v
+                elif v != cluster.get('PendingModifiedValues').get(k, cluster.get(k)):
+                    modify[k] = v
+            if not modify:
                 return
-            config['ClusterIdentifier'] = (cluster.get('PendingModifiedValues')
+
+            modify['ClusterIdentifier'] = (cluster.get('PendingModifiedValues')
                                           .get('ClusterIdentifier')
-                                          or cluster['ClusterIdentifier'])
-            client.modify_cluster(**config)
+                                          or cluster.get('ClusterIdentifier'))
+            client.modify_cluster(**modify)
         except Exception as e:
             self.log.warning(
                 "Exception trying to modify cluster: %s error: %s",
