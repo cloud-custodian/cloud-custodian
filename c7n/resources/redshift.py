@@ -613,6 +613,7 @@ class RedshiftSetAttributes(BaseAction):
     :example:
 
     .. code-block:: yaml
+
             policies:
                 - name: redshift-modify-cluster
                   resource: redshift
