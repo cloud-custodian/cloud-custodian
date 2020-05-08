@@ -975,7 +975,7 @@ class AccountTests(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["c7n:emr-block-public-access-configuration"]
+        self.assertEqual(resources[0]["c7n:emr-block-public-access"]
             ['BlockPublicAccessConfigurationMetadata']['CreatedByArn'],
             "arn:aws:iam::12345678901:user/test")
 
