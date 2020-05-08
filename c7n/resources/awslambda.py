@@ -13,6 +13,7 @@
 # limitations under the License.
 import jmespath
 import json
+from urllib.parse import urlparse, parse_qs
 
 from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
@@ -26,7 +27,9 @@ from c7n.manager import resources
 from c7n import query
 from c7n.resources.iam import CheckPermissions
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, select_keys
+
+from .securityhub import PostFinding
 
 ErrAccessDenied = "AccessDeniedException"
 
@@ -47,6 +50,9 @@ class DescribeLambda(query.DescribeSource):
                 continue
             config = func.pop('Configuration')
             config.update(func)
+            if 'Tags' in config:
+                config['Tags'] = [
+                    {'Key': k, 'Value': v} for k, v in config['Tags'].items()]
             resources.append(config)
         return resources
 
@@ -275,6 +281,49 @@ class KmsFilter(KmsRelatedFilter):
                       op: regex
     """
     RelatedIdsExpression = 'KMSKeyArn'
+
+
+@AWSLambda.action_registry.register('post-finding')
+class LambdaPostFinding(PostFinding):
+
+    resource_type = 'AwsLambdaFunction'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        # security hub formatting beggars belief
+        details = self.filter_empty(select_keys(r,
+            ['CodeSha256',
+             'DeadLetterConfig',
+             'Environment',
+             'Handler',
+             'KMSKeyArn',
+             'LastModified',
+             'MemorySize'
+             'MasterArn',
+             'RevisionId',
+             'Role',
+             'Runtime',
+             'TracingConfig',
+             'Timeout',
+             'Version',
+             'VpcConfig']))
+        # do the brain dead parts Layers, Code, TracingConfig
+        if 'Layers' in r:
+            r['Layers'] = {
+                'Arn': r['Layers'][0]['Arn'],
+                'CodeSize': r['Layers'][0]['CodeSize']}
+        details.get('VpcConfig', {}).pop('VpcId', None)
+
+        if 'Code' in r and r['Code'].get('RepositoryType') == "S3":
+            parsed = urlparse(r['Code']['Location'])
+            details['Code'] = {
+                'S3Bucket': parsed.netloc.split('.', 1)[0],
+                'S3Key': parsed.path[1:]}
+            params = parse_qs(parsed.query)
+            if params['versionId']:
+                details['Code']['S3ObjectVersion'] = params['versionId'][0]
+        payload.update(details)
+        return envelope
 
 
 @AWSLambda.action_registry.register('remove-statements')
@@ -594,3 +643,15 @@ class DeleteLayerVersion(BaseAction):
                     VersionNumber=r['Version'])
             except client.exceptions.ResourceNotFound:
                 continue
+
+
+@LambdaLayerVersion.action_registry.register('post-finding')
+class LayerPostFinding(PostFinding):
+
+    resource_type = 'AwsLambdaLayerVersion'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        payload.update(self.filter_empty(
+            select_keys(r, ['Version', 'CreatedDate', 'CompatibleRuntimes'])))
+        return envelope

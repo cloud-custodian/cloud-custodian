@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/c7n-test",
+                "AliasArn": "arn:aws:kms:us-west-2:644160558196:alias/c7n-test",
+                "TargetKeyId": "44d25a5c-7efa-44ed-8436-b9511ea921b3"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

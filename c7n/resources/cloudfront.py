@@ -24,6 +24,7 @@ from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+from c7n.resources.securityhub import PostFinding
 
 
 class DescribeDistribution(DescribeSource):
@@ -269,6 +270,29 @@ class MismatchS3Origin(Filter):
                     results.append(r)
 
         return results
+
+
+@Distribution.action_registry.register('post-finding')
+class DistributionPostFinding(PostFinding):
+
+    resource_type = 'AwsCloudFrontDistribution'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        origins = r['DistributionConfig']['Origins']
+
+        payload.update(self.filter_empty({
+            'DomainName': r['DomainName'],
+            'WebACLId': r.get('WebACLId'),
+            'LastModifiedTime': r['LastModifiedTime'],
+            'Status': r['Status'],
+            'Logging': self.filter_empty(r['DistributionConfig'].get('Logging', {})),
+            'Origins': [
+                dict(Id=o['Id'], OriginPath=o['OriginPath'], DomainName=o['DomainName'])
+                for o in origins]
+        }))
+
+        return envelope
 
 
 @Distribution.action_registry.register('set-waf')

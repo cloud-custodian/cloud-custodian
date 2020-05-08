@@ -404,7 +404,7 @@ class ResizeTest(BaseTest):
         resources = p.run()
         self.assertEqual(
             {r["VolumeId"] for r in resources},
-            set(("vol-0073dcd216489ea1b", "vol-0e4cba7adc4764f79")),
+            {"vol-0073dcd216489ea1b", "vol-0e4cba7adc4764f79"},
         )
         self.assertEqual(
             output.getvalue().strip(),

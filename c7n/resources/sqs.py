@@ -25,6 +25,8 @@ from c7n.actions import BaseAction
 from c7n.utils import type_schema
 from c7n.tags import universal_augment
 
+from c7n.resources.securityhub import PostFinding
+
 
 class DescribeQueue(DescribeSource):
 
@@ -147,6 +149,25 @@ class KmsFilter(KmsRelatedFilter):
                         op: regex
     """
     RelatedIdsExpression = 'KmsMasterKeyId'
+
+
+@SQS.action_registry.register('post-finding')
+class SQSPostFinding(PostFinding):
+
+    resource_type = 'AwsSqsQueue'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        payload.update(self.filter_empty({
+            'KmsDataKeyReusePeriodSeconds': r.get('KmsDataKeyReusePeriodSeconds'),
+            'KmsMasterKeyId': r.get('KmsMasterKeyId'),
+            'QueueName': r['QueueArn'].split(':')[-1],
+            'DeadLetterTargetArn': r.get('DeadLetterTargetArn')
+        }))
+        if 'KmsDataKeyReusePeriodSeconds' in payload:
+            payload['KmsDataKeyReusePeriodSeconds'] = int(
+                payload['KmsDataKeyReusePeriodSeconds'])
+        return envelope
 
 
 @SQS.action_registry.register('remove-statements')

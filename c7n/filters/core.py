@@ -388,7 +388,7 @@ class ValueFilter(Filter):
     }
     schema_alias = True
     annotate = True
-    required_keys = set(('value', 'key'))
+    required_keys = {'value', 'key'}
 
     def __init__(self, data, manager=None):
         super(ValueFilter, self).__init__(data, manager)

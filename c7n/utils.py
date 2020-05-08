@@ -675,3 +675,10 @@ def merge_dict(a, b):
         if k not in d:
             d[k] = v
     return d
+
+
+def select_keys(d, keys):
+    result = {}
+    for k in keys:
+        result[k] = d.get(k)
+    return result

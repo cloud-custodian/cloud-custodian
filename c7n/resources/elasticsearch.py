@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import jmespath
 
 from c7n.actions import Action, ModifyVpcSecurityGroupsAction
 from c7n.filters import MetricsFilter
@@ -19,6 +20,8 @@ from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
+
+from .securityhub import PostFinding
 
 
 class DescribeDomain(DescribeSource):
@@ -94,6 +97,48 @@ class Metrics(MetricsFilter):
                  'Value': self.manager.account_id},
                 {'Name': 'DomainName',
                  'Value': resource['DomainName']}]
+
+
+@ElasticSearchDomain.action_registry.register('post-finding')
+class ElasticSearchPostFinding(PostFinding):
+
+    resource_type = 'AwsElasticsearchDomain'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        payload.update(self.filter_empty({
+            'AccessPolicies': r.get('AccessPolicies'),
+            'DomainId': r['DomainId'],
+            'DomainName': r['DomainName'],
+            'Endpoint': r.get('Endpoint'),
+            'Endpoints': r.get('Endpoints'),
+            'DomainEndpointOptions': self.filter_empty({
+                'EnforceHTTPS': jmespath.search(
+                    'DomainEndpointOptions.EnforceHTTPS', r),
+                'TLSSecurityPolicy': jmespath.search(
+                    'DomainEndpointOptions.TLSSecurityPolicy', r)
+            }),
+            'ElasticsearchVersion': r['ElasticsearchVersion'],
+            'EncryptionAtRestOptions': self.filter_empty({
+                'Enabled': jmespath.search(
+                    'EncryptionAtRestOptions.Enabled', r),
+                'KmsKeyId': jmespath.search(
+                    'EncryptionAtRestOptions.KmsKeyId', r)
+            }),
+            'NodeToNodeEncryptionOptions': self.filter_empty({
+                'Enabled': jmespath.search(
+                    'NodeToNodeEncryptionOptions.Enabled', r)
+            }),
+            'VPCOptions': self.filter_empty({
+                'AvailabilityZones': jmespath.search(
+                    'VPCOptions.AvailabilityZones', r),
+                'SecurityGroupIds': jmespath.search(
+                    'VPCOptions.SecurityGroupIds', r),
+                'SubnetIds': jmespath.search('VPCOptions.SubnetIds', r),
+                'VPCId': jmespath.search('VPCOptions.VPCId', r)
+            })
+        }))
+        return envelope
 
 
 @ElasticSearchDomain.action_registry.register('modify-security-groups')

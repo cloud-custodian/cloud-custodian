@@ -109,7 +109,7 @@ class StructureParserTest(BaseTest):
         self.assertEqual(
             p.get_resource_types({'policies': [
                 {'resource': 'ec2'}, {'resource': 'gcp.instance'}]}),
-            set(('aws.ec2', 'gcp.instance')))
+            {'aws.ec2', 'gcp.instance'})
 
 
 class SchemaTest(BaseTest):
