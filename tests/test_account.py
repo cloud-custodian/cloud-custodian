@@ -966,7 +966,7 @@ class AccountTests(BaseTest):
                 'name': 'get-emr-block-public-access-configuration',
                 'resource': 'account',
                 'filters': [{
-                    'type': 'emr-block-public-access-configuration',
+                    'type': 'emr-block-public-access',
                     'key': 'BlockPublicAccessConfiguration',
                     'value': 'not-null'
                 }]
@@ -986,8 +986,8 @@ class AccountTests(BaseTest):
                 'name': 'emr',
                 'resource': 'account',
                 'actions': [{
-                    "type": "set-emr-block-public-access-configuration",
-                    "BlockPublicAccessConfiguration": {
+                    "type": "set-emr-block-public-access",
+                    "config": {
                         "BlockPublicSecurityGroupRules": True,
                         "PermittedPublicSecurityGroupRuleRanges": [{
                             "MinRange": 23,

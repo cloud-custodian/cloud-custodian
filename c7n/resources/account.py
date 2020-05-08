@@ -1605,7 +1605,7 @@ class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
     """
 
 
-@filters.register('emr-block-public-access-configuration')
+@filters.register('emr-block-public-access')
 class EMRBlockPublicAccessConfiguration(ValueFilter):
     """Check for EMR block public access configuration on an account
 
@@ -1645,7 +1645,7 @@ class EMRBlockPublicAccessConfiguration(ValueFilter):
         return super(EMRBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])
 
 
-@actions.register('set-emr-block-public-access-configuration')
+@actions.register('set-emr-block-public-access')
 class PutAccountBlockPublicAccessConfiguration(BaseAction):
     """Action to put/update the EMR block public access configuration for your
        AWS account in the current region
@@ -1663,7 +1663,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                     value: False
                 actions:
                   - type: set-emr-block-public-access-configuration
-                    BlockPublicAccessConfiguration:
+                    config:
                         BlockPublicSecurityGroupRules: True
                         PermittedPublicSecurityGroupRuleRanges:
                             - MinRange: 22
@@ -1674,7 +1674,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
     """
 
     schema = type_schema('set-emr-block-public-access-configuration',
-                         BlockPublicAccessConfiguration={"type": "object",
+                         config={"type": "object",
                             'properties': {
                                 'BlockPublicSecurityGroupRules': {'type': 'boolean'},
                                 'PermittedPublicSecurityGroupRuleRanges': {
@@ -1691,7 +1691,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                             },
                              'required': ['BlockPublicSecurityGroupRules']
                          },
-                         required=('BlockPublicAccessConfiguration',))
+                         required=('config',))
 
     permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
 
@@ -1710,7 +1710,7 @@ class PutAccountBlockPublicAccessConfiguration(BaseAction):
                 base = {}
 
         config = base['BlockPublicAccessConfiguration']
-        updatedConfig = {**config, **self.data.get('BlockPublicAccessConfiguration')}
+        updatedConfig = {**config, **self.data.get('config')}
 
         if config == updatedConfig:
             return
