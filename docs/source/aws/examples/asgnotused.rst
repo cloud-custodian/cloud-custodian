@@ -16,12 +16,12 @@ If value won't change cloudCustodian will send an alert with ASGs.
     filters:
       - type: value
         key: MinSize
-        value: 1
-        op: less-than
+        value: 0
+        op: eq
       - type: value
         key: DesiredCapacity
-        value: 1
-        op: less-than
+        value: 0
+        op: eq
     actions:
       - type: mark-for-op
         op: notify
@@ -29,7 +29,7 @@ If value won't change cloudCustodian will send an alert with ASGs.
   - name: asg-unmark-as-unused
     resource: asg
     comments: |
-      Unmark any ASG which has a value upper than 0.
+      Unmark any ASG that has a value greater than 0.
     filters:
       - type: value
         key: DesiredCapacity
