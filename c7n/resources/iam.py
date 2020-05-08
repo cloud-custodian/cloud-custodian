@@ -492,7 +492,7 @@ class ServiceUsage(Filter):
             {'type': 'number'},
             {'type': 'null'},
             {'$ref': '#/definitions/filters/value'}]}
-        for sa in SERVICE_ATTR}
+        for sa in sorted(SERVICE_ATTR)}
     schema_attr['match-operator'] = {'enum': ['all', 'any']}
     schema_attr['poll-delay'] = {'type': 'number'}
     schema = type_schema(
