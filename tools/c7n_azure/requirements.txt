@@ -1,4 +1,4 @@
-adal==1.2.2
+adal==1.2.3
 antlr4-python3-runtime==4.8; python_version >= "3.0"
 applicationinsights==0.11.9
 apscheduler==3.6.3
@@ -10,7 +10,7 @@ azure-common==1.1.25
 azure-cosmos==3.1.2
 azure-cosmosdb-nspkg==2.0.2
 azure-cosmosdb-table==1.0.6
-azure-functions==1.2.0; python_version >= "3" and python_version < "4"
+azure-functions==1.2.1; python_version >= "3" and python_version < "4"
 azure-graphrbac==0.61.1
 azure-keyvault==1.1.0
 azure-mgmt-apimanagement==0.1.0

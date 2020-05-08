@@ -29,6 +29,7 @@ class StepFunction(QueryResourceManager):
         enum_spec = ('list_state_machines', 'stateMachines', None)
         arn = id = 'stateMachineArn'
         arn_type = 'stateMachine'
+        cfn_type = 'AWS::StepFunctions::StateMachine'
         name = 'name'
         date = 'creationDate'
         detail_spec = (

@@ -36,7 +36,7 @@ class CloudFormation(QueryResourceManager):
         filter_type = 'scalar'
         name = 'StackName'
         date = 'CreationTime'
-        config_type = 'AWS::CloudFormation::Stack'
+        cfn_type = config_type = 'AWS::CloudFormation::Stack'
 
 
 @CloudFormation.action_registry.register('delete')

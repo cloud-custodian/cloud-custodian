@@ -21,6 +21,8 @@ get deleted so you always have a rolling 7 days worth of snapshots.
                 - Environment
                 - "Billing Cost Center"
                 - Name
+            tags:
+              CloudCustodian: true
 
      - name: ebs-delete-old-ebs-snapshots
        resource: ebs-snapshot

@@ -16,13 +16,13 @@ import json
 import os
 import tempfile
 import mock
+from urllib.parse import quote_plus
 
 from unittest import TestCase
 
 from c7n.resources import s3
 from c7n.ufuncs import s3crypt
 from .common import BaseTest
-from six.moves.urllib_parse import quote_plus
 
 
 class TestS3Crypt(TestCase):

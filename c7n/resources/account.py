@@ -1533,7 +1533,20 @@ class SetS3PublicBlock(BaseAction):
 
 
 class GlueCatalogEncryptionEnabled(MultiAttrFilter):
+    """ Filter glue catalog by its glue encryption status and KMS key
 
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: glue-catalog-security-config
+          resource: aws.glue-catalog
+          filters:
+            - type: glue-security-config
+              SseAwsKmsKeyId: alias/aws/glue
+
+    """
     retry = staticmethod(QueryResourceManager.retry)
 
     schema = {
@@ -1541,7 +1554,7 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
         'additionalProperties': False,
         'properties': {
             'type': {'enum': ['glue-security-config']},
-            'CatalogEncryptionMode': {'type': 'string'},
+            'CatalogEncryptionMode': {'enum': ['DISABLED', 'SSE-KMS']},
             'SseAwsKmsKeyId': {'type': 'string'},
             'ReturnConnectionPasswordEncrypted': {'type': 'boolean'},
             'AwsKmsKeyId': {'type': 'string'}
@@ -1572,18 +1585,18 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
                 'DataCatalogEncryptionSettings')
         resource[self.annotation] = encryption_setting.get('EncryptionAtRest')
         resource[self.annotation].update(encryption_setting.get('ConnectionPasswordEncryption'))
-
-        for kmskey in self.data:
-            if not self.data[kmskey].startswith('alias'):
+        key_attrs = ('SseAwsKmsKeyId', 'AwsKmsKeyId')
+        for encrypt_attr in key_attrs:
+            if encrypt_attr not in self.data or not self.data[encrypt_attr].startswith('alias'):
                 continue
-            key = resource[self.annotation].get(kmskey)
-            vfd = {'c7n:AliasName': self.data[kmskey]}
+            key = resource[self.annotation].get(encrypt_attr)
+            vfd = {'c7n:AliasName': self.data[encrypt_attr]}
             vf = KmsRelatedFilter(vfd, self.manager)
             vf.RelatedIdsExpression = 'KmsKeyId'
             vf.annotate = False
             if not vf.process([{'KmsKeyId': key}]):
                 return []
-            resource[self.annotation][kmskey] = self.data[kmskey]
+            resource[self.annotation][encrypt_attr] = self.data[encrypt_attr]
         return resource[self.annotation]
 
 

@@ -38,6 +38,7 @@ class SSMParameter(QueryResourceManager):
         id = "Name"
         universal_taggable = True
         arn_type = "parameter"
+        cfn_type = 'AWS::SSM::Parameter'
 
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('ssm:GetParameters',

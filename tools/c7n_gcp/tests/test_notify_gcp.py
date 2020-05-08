@@ -16,7 +16,6 @@ from gcp_common import BaseTest
 from c7n_gcp.client import Session
 
 import mock
-import sys
 
 
 class NotifyTest(BaseTest):
@@ -60,8 +59,6 @@ class NotifyTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         stub_client.execute_command.assert_called_once()
-        if sys.version_info.major < 3:
-            return
 
         stub_client.execute_command.assert_called_with(
             'publish', {

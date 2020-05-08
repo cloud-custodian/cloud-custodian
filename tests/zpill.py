@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import fnmatch
+from io import StringIO
 import json
 import os
 import shutil
@@ -24,7 +25,6 @@ import boto3
 import placebo
 from botocore.response import StreamingBody
 from placebo import pill
-from six import StringIO
 
 from c7n.testing import CustodianTestCore
 

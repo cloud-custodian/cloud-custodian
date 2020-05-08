@@ -20,7 +20,7 @@ from c7n.filters import AgeFilter, CrossAccountAccessFilter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import ConfigSource, QueryResourceManager, TypeInfo, DescribeSource
 from c7n import tags
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
@@ -28,6 +28,12 @@ from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
 
 log = logging.getLogger('custodian.rds-cluster')
+
+
+class DescribeCluster(DescribeSource):
+
+    def augment(self, resources):
+        return tags.universal_augment(self.manager, resources)
 
 
 @resources.register('rds-cluster')
@@ -46,8 +52,12 @@ class RDSCluster(QueryResourceManager):
         dimension = 'DBClusterIdentifier'
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBClusters',)
+        cfn_type = config_type = 'AWS::RDS::DBCluster'
 
-    augment = tags.universal_augment
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeCluster
+    }
 
 
 RDSCluster.filter_registry.register('offhour', OffHour)
@@ -336,6 +346,20 @@ class ModifyDbCluster(BaseAction):
                 **self.data['attributes'])
 
 
+class DescribeClusterSnapshot(DescribeSource):
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('rds')
+        return self.manager.retry(
+            client.describe_db_cluster_snapshots,
+            Filters=[{
+                'Name': 'db-cluster-snapshot-id',
+                'Values': resource_ids}]).get('DBClusterSnapshots', ())
+
+    def augment(self, resources):
+        return tags.universal_augment(self.manager, resources)
+
+
 @resources.register('rds-cluster-snapshot')
 class RDSClusterSnapshot(QueryResourceManager):
     """Resource manager for RDS cluster snapshots.
@@ -354,24 +378,10 @@ class RDSClusterSnapshot(QueryResourceManager):
         config_type = 'AWS::RDS::DBClusterSnapshot'
         permissions_enum = ('rds:DescribeDBClusterSnapshots',)
 
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeClusterSnapshot(self)
-        return super().get_source(source_type)
-
-
-class DescribeClusterSnapshot(DescribeSource):
-
-    def get_resources(self, resource_ids, cache=True):
-        client = local_session(self.manager.session_factory).client('rds')
-        return self.manager.retry(
-            client.describe_db_cluster_snapshots,
-            Filters=[{
-                'Name': 'db-cluster-snapshot-id',
-                'Values': resource_ids}]).get('DBClusterSnapshots', ())
-
-    def augment(self, resources):
-        return tags.universal_augment(self.manager, resources)
+    source_mapping = {
+        'describe': DescribeClusterSnapshot,
+        'config': ConfigSource
+    }
 
 
 @RDSClusterSnapshot.filter_registry.register('cross-account')

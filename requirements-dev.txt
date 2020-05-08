@@ -25,4 +25,4 @@
 # so explicitly list them here..
 vcrpy-unittest==0.1.7
 parameterized==0.7.4
-fakeredis==1.4.0
+fakeredis==1.4.1

@@ -14,7 +14,7 @@
 
 import json
 from time import sleep
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 from random import uniform
 import requests
 from jsonpointer import resolve_pointer, JsonPointerException

@@ -15,7 +15,6 @@
 import jmespath
 import json
 import logging
-import six
 
 from googleapiclient.errors import HttpError
 
@@ -105,8 +104,7 @@ class QueryMeta(type):
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
-@six.add_metaclass(QueryMeta)
-class QueryResourceManager(ResourceManager):
+class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
@@ -257,8 +255,7 @@ class TypeMeta(type):
             cls.version)
 
 
-@six.add_metaclass(TypeMeta)
-class TypeInfo:
+class TypeInfo(metaclass=TypeMeta):
 
     # api client construction information
     service = None

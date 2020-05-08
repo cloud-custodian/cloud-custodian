@@ -27,3 +27,4 @@ class DLMPolicy(QueryResourceManager):
         filter_name = 'PolicyIds'
         filter_type = 'list'
         arn = False
+        cfn_type = 'AWS::DLM::LifecyclePolicy'

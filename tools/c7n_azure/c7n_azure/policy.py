@@ -14,10 +14,8 @@
 
 import logging
 import re
-import sys
 import time
 
-import six
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
@@ -181,7 +179,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         settings = options.get(name, {})
         result = {}
         # str type implies settings is a resource id
-        if isinstance(settings, six.string_types):
+        if isinstance(settings, str):
             result['id'] = settings
             result['name'] = ResourceIdParser.get_resource_name(settings)
             result['resource_group_name'] = ResourceIdParser.get_resource_group(settings)
@@ -205,10 +203,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
         # Make sure we have auth data for function provisioning
         session = local_session(self.policy.session_factory)
         session.get_functions_auth_string("")
-
-        if sys.version_info[0] < 3:
-            self.log.error("Python 2.7 is not supported for deploying Azure Functions.")
-            sys.exit(1)
 
         self.target_subscription_ids = session.get_function_target_subscription_ids()
 
