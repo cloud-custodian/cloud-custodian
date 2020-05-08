@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import mock
-import sys
 from jsonschema.exceptions import best_match
 
 from c7n.exceptions import PolicyValidationError
@@ -195,10 +194,6 @@ class SchemaTest(BaseTest):
         errors = list(validator.iter_errors(data))
         self.assertEqual(len(errors), 1)
         error = specific_error(errors[0])
-        # the repr unicode situation on py2.7 makes this harder to do
-        # an exact match
-        if sys.version_info.major == 2:
-            return self.assertIn('StorageType', str(error))
         self.assertIn(
             "[{'StorageType': 'StandardStorage'}] is not of type 'object'",
             str(error))

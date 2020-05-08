@@ -22,7 +22,6 @@ import ipaddress
 import logging
 import operator
 import re
-import sys
 import os
 
 from dateutil.tz import tzutc
@@ -715,12 +714,6 @@ class EventFilter(ValueFilter):
         return []
 
 
-def cast_tz(d, tz):
-    if sys.version_info.major == 2:
-        return d.replace(tzinfo=tz)
-    return d.astimezone(tz)
-
-
 def parse_date(v, tz=None):
     if v is None:
         return v
@@ -729,12 +722,12 @@ def parse_date(v, tz=None):
 
     if isinstance(v, datetime.datetime):
         if v.tzinfo is None:
-            return cast_tz(v, tz)
+            return v.astimezone(tz)
         return v
 
     if isinstance(v, str):
         try:
-            return cast_tz(parse(v), tz)
+            return parse(v).astimezone(tz)
         except (AttributeError, TypeError, ValueError, OverflowError):
             pass
 
@@ -743,14 +736,14 @@ def parse_date(v, tz=None):
 
     if isinstance(v, (int, float, str)):
         try:
-            v = cast_tz(datetime.datetime.fromtimestamp(float(v)), tz)
+            v = datetime.datetime.fromtimestamp(float(v)).astimezone(tz)
         except exceptions:
             pass
 
     if isinstance(v, (int, float, str)):
         try:
             # try interpreting as milliseconds epoch
-            v = cast_tz(datetime.datetime.fromtimestamp(float(v) / 1000), tz)
+            v = datetime.datetime.fromtimestamp(float(v) / 1000).astimezone(tz)
         except exceptions:
             pass
 
