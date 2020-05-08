@@ -13,6 +13,7 @@
 # limitations under the License.
 import json
 import itertools
+import jmespath
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -608,7 +609,9 @@ class RedshiftSetPublicAccess(BaseAction):
 class RedshiftSetAttributes(BaseAction):
     """
     Action to modify Redshift clusters
+
     :example:
+
     .. code-block:: yaml
             policies:
                 - name: redshift-modify-cluster
@@ -648,42 +651,50 @@ class RedshiftSetAttributes(BaseAction):
         try:
             config = dict(self.data.get('attributes'))
             base_config = {
-                'ClusterIdentifier': (cluster.get('PendingModifiedValues').get('ClusterIdentifier')
-                                     or cluster['ClusterIdentifier']),
-                'ClusterType': cluster.get('PendingModifiedValues').get('ClusterType'),
-                'NodeType': (cluster.get('PendingModifiedValues').get('NodeType')
-                            or cluster['NodeType']),
-                'NumberOfNodes': (cluster.get('PendingModifiedValues').get('NumberOfNodes')
-                                 or cluster['NumberOfNodes']),
+                'ClusterIdentifier':
+                    (jmespath.search('PendingModifiedValues.ClusterIdentifier', cluster)
+                    or cluster.get('ClusterIdentifier')),
+                'ClusterType':
+                    jmespath.search('PendingModifiedValues.ClusterType', cluster),
+                'NodeType':
+                    (cluster.get('PendingModifiedValues').get('NodeType')
+                    or cluster.get('NodeType')),
+                'NumberOfNodes':
+                    (jmespath.search('PendingModifiedValues.NumberOfNodes', cluster)
+                    or cluster.get('NumberOfNodes')),
                 'ClusterSecurityGroups':
-                    [data.pop('Status') for data in cluster['ClusterSecurityGroups']],
+                    jmespath.search('ClusterSecurityGroups[].ClusterSecurityGroupName', cluster),
                 'VpcSecurityGroupIds':
-                    [data.pop('Status') for data in cluster['VpcSecurityGroups']],
-                'MasterUserPassword': (cluster.get('PendingModifiedValues')
-                                      .get('MasterUserPassword')),
-                'AutomatedSnapshotRetentionPeriod': (cluster.get('PendingModifiedValues')
-                                                    .get('AutomatedSnapshotRetentionPeriod')
-                                                    or cluster['AutomatedSnapshotRetentionPeriod']),
-                'ManualSnapshotRetentionPeriod': cluster.get('ManualSnapshotRetentionPeriod'),
-                'PreferredMaintenanceWindow': cluster.get('PreferredMaintenanceWindow'),
-                'ClusterVersion': (cluster.get('PendingModifiedValues').get('ClusterVersion')
-                                  or cluster['ClusterVersion']),
-                'AllowVersionUpgrade': cluster['AllowVersionUpgrade'],
-                'HsmClientCertificateIdentifier': (cluster.get('HsmStatus') and
-                                                  cluster.get('HsmStatus')
-                                                  .get('HsmClientCertificateIdentifier')),
-                'HsmConfigurationIdentifier': (cluster.get('HsmStatus') and
-                                              cluster.get('HsmStatus')
-                                              .get('HsmConfigurationIdentifier')),
-                'PubliclyAccessible': (cluster.get('PendingModifiedValues')
-                                      .get('PubliclyAccessible') or cluster['PubliclyAccessible']),
-                'ElasticIp': (cluster.get('ElasticIpStatus')
-                             and cluster.get('ElasticIpStatus').get('ElasticIp')),
-                'EnhancedVpcRouting': (cluster.get('PendingModifiedValues')
-                                      .get('EnhancedVpcRouting') or cluster['EnhancedVpcRouting']),
-                'MaintenanceTrackName': (cluster.get('PendingModifiedValues')
-                                        .get('MaintenanceTrackName')
-                                        or cluster['MaintenanceTrackName']),
+                    jmespath.search('VpcSecurityGroups[].VpcSecurityGroupId', cluster),
+                'MasterUserPassword':
+                    jmespath.search('PendingModifiedValues.MasterUserPassword', cluster),
+                'AutomatedSnapshotRetentionPeriod':
+                    (jmespath.search('PendingModifiedValues.AutomatedSnapshotRetentionPeriod',
+                    cluster) or cluster.get('AutomatedSnapshotRetentionPeriod')),
+                'ManualSnapshotRetentionPeriod':
+                    cluster.get('ManualSnapshotRetentionPeriod'),
+                'PreferredMaintenanceWindow':
+                    cluster.get('PreferredMaintenanceWindow'),
+                'ClusterVersion':
+                    (jmespath.search('PendingModifiedValues.ClusterVersion', cluster)
+                    or cluster.get('ClusterVersion')),
+                'AllowVersionUpgrade':
+                    cluster.get('AllowVersionUpgrade'),
+                'HsmClientCertificateIdentifier':
+                    jmespath.search('HsmStatus.HsmClientCertificateIdentifier', cluster),
+                'HsmConfigurationIdentifier':
+                    jmespath.search('HsmStatus.HsmConfigurationIdentifier', cluster),
+                'PubliclyAccessible':
+                    (jmespath.search('PendingModifiedValues.PubliclyAccessible', cluster)
+                    or cluster.get('PubliclyAccessible')),
+                'ElasticIp':
+                    jmespath.search('ElasticIpStatus.ElasticIp', cluster),
+                'EnhancedVpcRouting':
+                    (jmespath.search('PendingModifiedValues.EnhancedVpcRouting', cluster)
+                    or cluster.get('EnhancedVpcRouting')),
+                'MaintenanceTrackName':
+                    (jmespath.search('PendingModifiedValues.MaintenanceTrackName', cluster)
+                    or cluster.get('MaintenanceTrackName')),
                 'Encrypted': cluster.get('Encrypted'),
                 'KmsKeyId': cluster.get('KmsKeyId')
             }
