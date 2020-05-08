@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import copy
-import csv
 from datetime import datetime, timedelta
 import json
 import itertools
@@ -49,23 +48,6 @@ class SafeDumper(BaseSafeDumper or object):
 
 
 log = logging.getLogger('custodian.utils')
-
-
-class UnicodeWriter:
-    """utf8 encoding csv writer."""
-
-    def __init__(self, f, dialect=csv.excel, **kwds):
-        self.writer = csv.writer(f, dialect=dialect, **kwds)
-        if sys.version_info.major == 3:
-            self.writerows = self.writer.writerows
-            self.writerow = self.writer.writerow
-
-    def writerow(self, row):
-        self.writer.writerow([s.encode("utf-8") for s in row])
-
-    def writerows(self, rows):
-        for row in rows:
-            self.writerow(row)
 
 
 class VarsSubstitutionError(Exception):

@@ -14,7 +14,6 @@
 
 import logging
 import re
-import sys
 import time
 
 from azure.mgmt.eventgrid.models import \
@@ -204,10 +203,6 @@ class AzureFunctionMode(ServerlessExecutionMode):
         # Make sure we have auth data for function provisioning
         session = local_session(self.policy.session_factory)
         session.get_functions_auth_string("")
-
-        if sys.version_info[0] < 3:
-            self.log.error("Python 2.7 is not supported for deploying Azure Functions.")
-            sys.exit(1)
 
         self.target_subscription_ids = session.get_function_target_subscription_ids()
 
