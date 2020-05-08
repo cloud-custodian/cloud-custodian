@@ -42,6 +42,16 @@ class KmsRelatedFilter(RelatedResourceFilter):
     RelatedResource = "c7n.resources.kms.Key"
     AnnotationKey = "matched-kms-key"
 
+    def get_related_ids(self, resources):
+        related_ids = super().get_related_ids(resources)
+        normalized_ids = []
+        for rid in related_ids:
+            if rid.startswith('arn:'):
+                normalized_ids.append(rid.rsplit('/', 1)[-1])
+            else:
+                normalized_ids.append(rid)
+        return normalized_ids
+
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('kms')
         related = self.get_related(resources)

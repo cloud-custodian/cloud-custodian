@@ -2929,3 +2929,77 @@ class FlowLogsTest(BaseTest):
             "FlowLogs"
         ]
         self.assertEqual(logs[0]["MaxAggregationInterval"], 60)
+
+
+class TestUnusedKeys(BaseTest):
+    def test_vpc_unused_keys(self):
+        session_factory = self.replay_flight_data("test_vpc_unused_key_delete")
+        client = session_factory().client('ec2')
+        instances = client.describe_instances(Filters=[
+            {
+                "Name": 'instance-state-name',
+                "Values": [
+                    "running"
+                ]
+            }
+        ])
+        self.assertEqual(len(instances['Reservations'][0]['Instances']), 1)
+        used_key = {instances['Reservations'][0]['Instances'][0]['KeyName']}
+        keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
+        unused_key = keys - used_key
+        self.assertEqual(len(unused_key), 1)
+        self.assertNotEqual(unused_key, used_key)
+        p = self.load_policy(
+            {
+                "name": "unused-keys",
+                "resource": "aws.key-pair",
+                "filters": [
+                    {
+                        "type": "unused"
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "delete"
+                    },
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        keys = {key['KeyName'] for key in client.describe_key_pairs()['KeyPairs']}
+        self.assertIn(resources[0]['KeyName'], unused_key)
+        self.assertNotEqual(unused_key, keys)
+        self.assertEqual(used_key, keys)
+
+    def test_vpc_unused_key_not_filtered_error(self):
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "delete-unused-keys",
+                    "resource": "aws.key-pair",
+                    "actions": [
+                        {
+                            "type": "delete"
+                        },
+                    ]
+                }
+            )
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "delete-unused-keys",
+                    "resource": "aws.key-pair",
+                    "filters": [
+                        {
+                            "type": "unused",
+                            "state": False
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "type": "delete"
+                        },
+                    ]
+                }
+            )

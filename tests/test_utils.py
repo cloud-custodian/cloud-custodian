@@ -14,7 +14,6 @@
 import json
 import ipaddress
 import os
-import sys
 import tempfile
 import time
 
@@ -185,21 +184,15 @@ class UtilTest(BaseTest):
         self.assertEqual("{:+5M%M}".format(utils.FormatDate(d)), "05")
 
     def test_group_by(self):
-        sorter = lambda x: x  # NOQA E731
-        sorter = sys.version_info.major == 2 and sorted or sorter
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
-        self.assertEqual(
-            sorter(list(utils.group_by(items, "Type").keys())), [None, "a", "b"]
-        )
+        self.assertEqual(list(utils.group_by(items, "Type").keys()), [None, "a", "b"])
         items = [
             {},
             {"Type": {"Part": "a"}},
             {"Type": {"Part": "a"}},
             {"Type": {"Part": "b"}},
         ]
-        self.assertEqual(
-            sorter(list(utils.group_by(items, "Type.Part").keys())), [None, "a", "b"]
-        )
+        self.assertEqual(list(utils.group_by(items, "Type.Part").keys()), [None, "a", "b"])
 
     def write_temp_file(self, contents, suffix=".tmp"):
         """ Write a temporary file and return the filename.

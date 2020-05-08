@@ -111,11 +111,11 @@ class UtilsTest(BaseTest):
         self.assertEqual(TagHelper.get_tag_value(resource, 'tag3', True), 'VALUE3')
 
     def test_get_ports(self):
-        self.assertEqual(PortsRangeHelper.get_ports_set_from_string("5, 4-5, 9"), set([4, 5, 9]))
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_string("5, 4-5, 9"), {4, 5, 9})
         rule = {'properties': {'destinationPortRange': '10-12'}}
-        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), set([10, 11, 12]))
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12})
         rule = {'properties': {'destinationPortRanges': ['80', '10-12']}}
-        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), set([10, 11, 12, 80]))
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12, 80})
 
     def test_validate_ports_string(self):
         self.assertEqual(PortsRangeHelper.validate_ports_string('80'), True)

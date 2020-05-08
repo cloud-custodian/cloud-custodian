@@ -195,7 +195,7 @@ class SecurityHub(LambdaMode):
             resource_sets.setdefault((rarn.account_id, rarn.region), []).append(rarn)
         # Warn if not configured for member-role and have multiple accounts resources.
         if (not self.policy.data['mode'].get('member-role') and
-                set((self.policy.options.account_id,)) != {
+                {self.policy.options.account_id} != {
                     rarn.account_id for rarn in resource_arns}):
             msg = ('hub-mode not configured for multi-account member-role '
                    'but multiple resource accounts found')
@@ -318,6 +318,8 @@ class PostFinding(Action):
     FindingVersion = "2018-10-08"
 
     permissions = ('securityhub:BatchImportFindings',)
+
+    resource_type = ""
 
     schema_alias = True
     schema = type_schema(
@@ -542,6 +544,20 @@ class PostFinding(Action):
 
         return filter_empty(finding)
 
+    def format_envelope(self, r):
+        details = {}
+        envelope = filter_empty({
+            'Id': self.manager.get_arns([r])[0],
+            'Region': self.manager.config.region,
+            'Tags': {t['Key']: t['Value'] for t in r.get('Tags', [])},
+            'Partition': get_partition(self.manager.config.region),
+            'Details': {self.resource_type: details},
+            'Type': self.resource_type
+        })
+        return envelope, details
+
+    filter_empty = staticmethod(filter_empty)
+
     def format_resource(self, r):
         raise NotImplementedError("subclass responsibility")
 
@@ -549,6 +565,7 @@ class PostFinding(Action):
 class OtherResourcePostFinding(PostFinding):
 
     fields = ()
+    resource_type = 'Other'
 
     def format_resource(self, r):
         details = {}
@@ -576,11 +593,11 @@ class OtherResourcePostFinding(PostFinding):
 
         details['c7n:resource-type'] = self.manager.type
         other = {
-            'Type': 'Other',
+            'Type': self.resource_type,
             'Id': self.manager.get_arns([r])[0],
             'Region': self.manager.config.region,
             'Partition': get_partition(self.manager.config.region),
-            'Details': {'Other': filter_empty(details)}
+            'Details': {self.resource_type: filter_empty(details)}
         }
         tags = {t['Key']: t['Value'] for t in r.get('Tags', [])}
         if tags:

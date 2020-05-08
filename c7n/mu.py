@@ -712,10 +712,10 @@ class LambdaFunction(AbstractLambdaFunction):
 
     def __init__(self, func_data, archive):
         self.func_data = func_data
-        required = set((
+        required = {
             'name', 'handler', 'memory_size',
             'timeout', 'role', 'runtime',
-            'description'))
+            'description'}
         missing = required.difference(func_data)
         if missing:
             raise ValueError("Missing required keys %s" % " ".join(missing))

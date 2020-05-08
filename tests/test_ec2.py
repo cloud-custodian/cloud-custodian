@@ -211,13 +211,11 @@ class TestDisableApiTermination(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
-                    "ec2:DescribeInstances",
-                    "ec2:DescribeTags",
-                    "ec2:DescribeInstanceAttribute",
-                )
-            ),
+            {
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags",
+                "ec2:DescribeInstanceAttribute",
+            },
         )
 
 

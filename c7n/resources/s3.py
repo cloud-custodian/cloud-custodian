@@ -767,14 +767,18 @@ class BucketFilterBase(Filter):
 
 @S3.action_registry.register("post-finding")
 class BucketFinding(PostFinding):
+
+    resource_type = 'AwsS3Bucket'
+
     def format_resource(self, r):
         owner = r.get("Acl", {}).get("Owner", {})
         resource = {
-            "Type": "AwsS3Bucket",
+            "Type": self.resource_type,
             "Id": "arn:aws:s3:::{}".format(r["Name"]),
             "Region": get_region(r),
             "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
-            "Details": {"AwsS3Bucket": {"OwnerId": owner.get('ID', 'Unknown')}}
+            "Details": {self.resource_type: {
+                "OwnerId": owner.get('ID', 'Unknown')}}
         }
 
         if "DisplayName" in owner:
@@ -3177,6 +3181,7 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                          key={'type': 'string'})
 
     permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey')
+    annotation_key = 'c7n:bucket-encryption'
 
     def process(self, buckets, event=None):
         self.resolve_keys(buckets)
@@ -3194,16 +3199,22 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         return results
 
     def process_bucket(self, b):
+
         client = bucket_client(local_session(self.manager.session_factory), b)
         rules = []
-        try:
-            be = client.get_bucket_encryption(Bucket=b['Name'])
-            b['c7n:bucket-encryption'] = be
-            rules = be.get('ServerSideEncryptionConfiguration', []).get('Rules', [])
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ServerSideEncryptionConfigurationNotFoundError':
-                raise
+        if self.annotation_key not in b:
+            try:
+                be = client.get_bucket_encryption(Bucket=b['Name'])
+                be.pop('ResponseMetadata', None)
+            except ClientError as e:
+                if e.response['Error']['Code'] != 'ServerSideEncryptionConfigurationNotFoundError':
+                    raise
+                be = {}
+            b[self.annotation_key] = be
+        else:
+            be = [self.annotation_key]
 
+        rules = be.get('ServerSideEncryptionConfiguration', {}).get('Rules', [])
         # default `state` to True as previous impl assumed state == True
         # to preserve backwards compatibility
         if self.data.get('state', True):

@@ -80,13 +80,11 @@ class ConfigRuleTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 3)
         self.assertEqual(
-            set(
-                (
-                    "custodian-bucket-tags",
-                    "custodian-bucket-ver-tags",
-                    "custodian-db-tags",
-                )
-            ),
+            {
+                "custodian-bucket-tags",
+                "custodian-bucket-ver-tags",
+                "custodian-db-tags",
+            },
             {r["ConfigRuleName"] for r in resources},
         )
 

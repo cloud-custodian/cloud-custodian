@@ -66,7 +66,7 @@ class ModifyVpcSecurityGroupsAction(Action):
             {'required': ['add', 'type']}]
     }
 
-    SYMBOLIC_SGS = set(('all', 'matched', 'network-location'))
+    SYMBOLIC_SGS = {'all', 'matched', 'network-location'}
 
     sg_expr = None
     vpc_expr = None

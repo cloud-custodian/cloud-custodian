@@ -1057,10 +1057,10 @@ class RestoreInstance(BaseAction):
         'rds:RestoreDBInstanceFromDBSnapshot')
 
     poll_period = 60
-    restore_keys = set((
+    restore_keys = {
         'VPCSecurityGroups', 'MultiAZ', 'DBSubnetGroupName',
         'InstanceClass', 'StorageType', 'ParameterGroupName',
-        'OptionGroupName'))
+        'OptionGroupName'}
 
     def validate(self):
         found = False

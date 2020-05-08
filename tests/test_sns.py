@@ -14,6 +14,7 @@
 import json
 
 from .common import BaseTest, functional
+from c7n.resources.aws import shape_validate
 from c7n.utils import yaml_load
 
 
@@ -681,3 +682,30 @@ class TestSNS(BaseTest):
         client = session_factory().client("sns")
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["TopicArn"])["Tags"]
         self.assertTrue(tags[0]["Key"], "custodian_cleanup")
+
+    def test_sns_post_finding(self):
+        factory = self.replay_flight_data('test_sns_post_finding')
+        p = self.load_policy({
+            'name': 'sns',
+            'resource': 'aws.sns',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        resources = p.resource_manager.get_resources([
+            'arn:aws:sns:us-west-2:644160558196:config-topic'])
+        rfinding = p.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.assertEqual(
+            rfinding,
+            {'Details': {'AwsSnsTopic': {
+                'Owner': '644160558196',
+                'TopicName': 'config-topic'}},
+             'Id': 'arn:aws:sns:us-west-2:644160558196:config-topic',
+             'Partition': 'aws',
+             'Region': 'us-west-2',
+             'Type': 'AwsSnsTopic'})
+        shape_validate(
+            rfinding['Details']['AwsSnsTopic'],
+            'AwsSnsTopicDetails', 'securityhub')

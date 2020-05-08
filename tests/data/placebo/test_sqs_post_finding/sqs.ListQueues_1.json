@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://us-west-2.queue.amazonaws.com/644160558196/test_sqs_modify_policy_add_remove_statements"
+        ],
+        "ResponseMetadata": {}
+    }
+}
