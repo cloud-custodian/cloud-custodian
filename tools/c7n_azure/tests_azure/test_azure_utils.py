@@ -249,19 +249,27 @@ class UtilsTest(BaseTest):
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
 
-    managed_group_return_value = ([
-        Bag({'name': '/providers/Microsoft.Management/managementGroups/cc-test-1',
-             'type': '/providers/Microsoft.Management/managementGroups'}),
-        Bag({'name': '/providers/Microsoft.Management/managementGroups/cc-test-2',
-             'type': '/providers/Microsoft.Management/managementGroups'}),
-        Bag({'name': DEFAULT_SUBSCRIPTION_ID,
-             'type': '/subscriptions'}),
-        Bag({'name': GUID,
-             'type': '/subscriptions'}),
-    ])
+    managed_group_return_value = Bag({
+        'properties': {
+            'name': 'dev',
+            'type': '/providers/Micrsoft.Management/managementGroups',
+            'children': [
+                Bag({'name': DEFAULT_SUBSCRIPTION_ID,
+                     'type': '/subscriptions'}),
+                Bag({'name': 'east',
+                     'type': '/providers/Microsoft.Management/managementGroups',
+                     'children': [{
+                         'type': '/subscriptions',
+                         'name': GUID}]})
+            ],
+        }
+    })
+    managed_group_return_value['serialize'] = lambda self=managed_group_return_value: self
 
-    @patch('azure.mgmt.managementgroups.operations.EntitiesOperations.list',
-           return_value=managed_group_return_value)
+    @patch((
+        'azure.mgmt.managementgroups.operations'
+        '.management_groups_operations.ManagementGroupsOperations.get'),
+        return_value=managed_group_return_value)
     def test_managed_group_helper(self, _1):
         sub_ids = ManagedGroupHelper.get_subscriptions_list('test-group', "")
         self.assertEqual(sub_ids, [DEFAULT_SUBSCRIPTION_ID, GUID])
