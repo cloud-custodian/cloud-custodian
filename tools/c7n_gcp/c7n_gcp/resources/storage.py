@@ -38,12 +38,12 @@ class Bucket(QueryResourceManager):
 
 @Bucket.action_registry.register('set-uniform-access')
 class BucketLevelAccess(MethodAction):
-    '''Disable object ACLs on a bucket.
+    '''Uniform access disables object ACLs on a bucket.
 
     Enabling this means only bucket policies (and organization bucket
     policies) govern access to a bucket.
 
-    When set to true, users can only specify bucket level IAM policies
+    When enabled, users can only specify bucket level IAM policies
     and not Object level ACL's.
 
     Example Policy:
@@ -56,7 +56,9 @@ class BucketLevelAccess(MethodAction):
          filters:
           - iamConfiguration.uniformBucketLevelAccess.enable: false
          actions:
-          - enable-uniform-bucket-level-access
+          - type: set-uniform-access
+            # The following is also the default
+            state: true
     '''
 
     schema = type_schema('set-uniform-access', state={'type': 'boolean'})
