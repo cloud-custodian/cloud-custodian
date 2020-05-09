@@ -23,8 +23,8 @@ import gzip
 import json
 import random
 import tempfile
+from urllib.parse import unquote_plus
 
-from six.moves.urllib_parse import unquote_plus
 
 from c7n.utils import chunks
 

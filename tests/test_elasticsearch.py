@@ -13,6 +13,8 @@
 # limitations under the License.
 from .common import BaseTest
 
+from c7n.resources.aws import shape_validate
+
 
 class ElasticSearch(BaseTest):
 
@@ -84,6 +86,45 @@ class ElasticSearch(BaseTest):
             "DomainStatus"
         ]
         self.assertEqual(state["Deleted"], True)
+
+    def test_post_finding_es(self):
+        factory = self.replay_flight_data('test_elasticsearch_post_finding')
+        p = self.load_policy({
+            'name': 'es-post',
+            'resource': 'aws.elasticsearch',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        resources = p.resource_manager.resources()
+        self.maxDiff = None
+        self.assertEqual(len(resources), 1)
+        fresource = p.resource_manager.actions[0].format_resource(resources[0])
+        self.assertEqual(
+            fresource['Details']['AwsElasticsearchDomain'],
+            {'AccessPolicies': '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"*"},"Action":"es:*","Resource":"arn:aws:es:us-west-2:644160558196:domain/devx/*"}]}',  # noqa
+             'DomainEndpointOptions': {
+                 'EnforceHTTPS': True,
+                 'TLSSecurityPolicy': 'Policy-Min-TLS-1-0-2019-07'},
+             'DomainId': '644160558196/devx',
+             'DomainName': 'devx',
+             'Endpoints': {
+                 'vpc': 'vpc-devx-4j4l2ateukiwrnnxgbowppjt64.us-west-2.es.amazonaws.com'},
+             'ElasticsearchVersion': '7.4',
+             'EncryptionAtRestOptions': {
+                 'Enabled': True,
+                 'KmsKeyId': 'arn:aws:kms:us-west-2:644160558196:key/9b776c6e-0a40-45d0-996b-707018677fe9'  # noqa
+             },
+             'NodeToNodeEncryptionOptions': {'Enabled': True},
+             'VPCOptions': {'AvailabilityZones': ['us-west-2b'],
+                            'SecurityGroupIds': ['sg-0eecc076'],
+                            'SubnetIds': ['subnet-63c97615'],
+                            'VPCId': 'vpc-4a9ff72e'}})
+        shape_validate(
+            fresource['Details']['AwsElasticsearchDomain'],
+            'AwsElasticsearchDomainDetails',
+            'securityhub')
 
     def test_domain_add_tag(self):
         session_factory = self.replay_flight_data("test_elasticsearch_add_tag")

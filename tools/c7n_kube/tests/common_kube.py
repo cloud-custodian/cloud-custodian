@@ -15,7 +15,7 @@ import atexit
 from functools import partial
 import json
 import os
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 import tempfile
 import vcr

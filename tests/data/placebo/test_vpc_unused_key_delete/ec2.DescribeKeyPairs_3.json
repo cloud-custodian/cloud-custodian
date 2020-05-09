@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyPairs": [
+            {
+                "KeyPairId": "key-07e61731992e3461a",
+                "KeyFingerprint": "bd:c4:ea:ee:20:2e:26:14:a2:b4:ac:13:2e:ae:a3:51:6a:d5:f8:c3",
+                "KeyName": "dont delete",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

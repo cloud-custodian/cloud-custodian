@@ -59,6 +59,7 @@ import json
 import logging
 import os
 import time
+from urllib.parse import urlparse
 import uuid
 import zlib
 
@@ -68,7 +69,6 @@ from botocore.exceptions import ClientError
 from botocore.vendored import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dateutil.parser import parse as parse_date
-from six.moves.urllib.parse import urlparse
 
 from c7n.config import Bag
 

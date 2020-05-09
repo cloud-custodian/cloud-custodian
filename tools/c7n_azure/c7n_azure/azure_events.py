@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import six
 from azure.mgmt.eventgrid.models import EventSubscription, EventSubscriptionFilter
 from c7n_azure.session import Session
 
@@ -124,7 +123,7 @@ class AzureEvents:
     def get_event_operations(cls, events):
         event_operations = []
         for e in events:
-            if isinstance(e, six.string_types):
+            if isinstance(e, str):
                 event = cls.get(e)
                 event_operations.append('%s/%s' % (event['resource_provider'], event['event']))
 

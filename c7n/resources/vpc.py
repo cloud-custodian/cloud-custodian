@@ -766,7 +766,8 @@ class SGUsage(Filter):
         sg_ids = set()
         expr = jmespath.compile(
             'EcsParameters.NetworkConfiguration.awsvpcConfiguration.SecurityGroups[]')
-        for rule in self.manager.get_resource_manager('event-rule-target').resources():
+        for rule in self.manager.get_resource_manager(
+                'event-rule-target').resources(augment=False):
             ids = expr.search(rule)
             if ids:
                 sg_ids.update(ids)
@@ -1032,12 +1033,12 @@ class SGPermission(Filter):
 
     """
 
-    perm_attrs = set((
+    perm_attrs = {
         'IpProtocol', 'FromPort', 'ToPort', 'UserIdGroupPairs',
-        'IpRanges', 'PrefixListIds'))
-    filter_attrs = set((
+        'IpRanges', 'PrefixListIds'}
+    filter_attrs = {
         'Cidr', 'CidrV6', 'Ports', 'OnlyPorts',
-        'SelfReference', 'Description', 'SGReferences'))
+        'SelfReference', 'Description', 'SGReferences'}
     attrs = perm_attrs.union(filter_attrs)
     attrs.add('match-operator')
     attrs.add('match-operator')
@@ -2182,6 +2183,80 @@ class KeyPair(query.QueryResourceManager):
         name = id = 'KeyName'
         filter_name = 'KeyNames'
         taggable = False
+
+
+@KeyPair.filter_registry.register('unused')
+class UnusedKeyPairs(Filter):
+    """Filter for used or unused keys.
+
+    The default is unused but can be changed by using the state property.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: unused-key-pairs
+          resource: aws.key-pair
+          filters:
+            - unused
+        - name: used-key-pairs
+          resource: aws.key-pair
+          filters:
+            - type: unused
+              state: false
+    """
+    annotation_key = 'c7n:unused_keys'
+    permissions = ('ec2:DescribeKeyPairs',)
+    schema = type_schema('unused',
+        state={'type': 'boolean'})
+
+    def process(self, resources, event=None):
+        instances = self.manager.get_resource_manager('ec2').resources()
+        used = set(jmespath.search('[].KeyName', instances))
+        if self.data.get('state', True):
+            return [r for r in resources if r['KeyName'] not in used]
+        else:
+            return [r for r in resources if r['KeyName'] in used]
+
+
+@KeyPair.action_registry.register('delete')
+class DeleteUnusedKeyPairs(BaseAction):
+    """Delete all ec2 keys that are not in use
+
+    This should always be used with the unused filter
+    and it will prevent you from using without it.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: delete-unused-key-pairs
+          resource: aws.key-pair
+          filters:
+            - unused
+          actions:
+            - delete
+    """
+    permissions = ('ec2:DeleteKeyPair',)
+    schema = type_schema('delete')
+
+    def validate(self):
+        if not [f for f in self.manager.iter_filters() if isinstance(f, UnusedKeyPairs)]:
+            raise PolicyValidationError(
+                "delete should be used in conjunction with the unused filter on %s" % (
+                    self.manager.data,))
+        if [True for f in self.manager.iter_filters() if f.data.get('state') is False]:
+            raise PolicyValidationError(
+                "You policy has filtered used keys you should use this with unused keys %s" % (
+                    self.manager.data,))
+        return self
+
+    def process(self, unused):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for key in unused:
+            client.delete_key_pair(KeyPairId=key['KeyPairId'])
 
 
 @Vpc.action_registry.register('set-flow-log')

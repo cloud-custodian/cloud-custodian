@@ -17,10 +17,9 @@ import jmespath
 import json
 import os.path
 import logging
+from urllib.request import Request, urlopen
+from urllib.parse import parse_qsl, urlparse
 import zlib
-from six import text_type
-from six.moves.urllib.request import Request, urlopen
-from six.moves.urllib.parse import parse_qsl, urlparse
 from contextlib import closing
 
 from c7n.utils import format_string_values
@@ -150,7 +149,7 @@ class ValuesFrom:
             raise ValueError(
                 "Unsupported format %s for url %s",
                 format, self.data['url'])
-        contents = text_type(self.resolver.resolve(self.data['url']))
+        contents = str(self.resolver.resolve(self.data['url']))
         return contents, format
 
     def get_values(self):

@@ -13,7 +13,6 @@
 # limitations under the License.
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from .aws import shape_validate
 from c7n.manager import resources, ResourceManager
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
@@ -21,7 +20,7 @@ from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
-from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry, CrossAccountAccessFilter
+from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
 
@@ -247,14 +246,14 @@ class GlueCrawlerSecurityConfigFilter(SecurityConfigFilter):
 
 
 @GlueCrawler.action_registry.register('delete')
-class DeleteCrawler(BaseAction, StateTransitionFilter):
+class DeleteCrawler(BaseAction):
 
     schema = type_schema('delete')
     permissions = ('glue:DeleteCrawler',)
     valid_origin_states = ('READY', 'FAILED')
 
     def process(self, resources):
-        resources = self.filter_resource_state(resources)
+        resources = self.filter_resources(resources, 'State', self.valid_origin_states)
 
         client = local_session(self.manager.session_factory).client('glue')
         for r in resources:
@@ -520,6 +519,7 @@ class GlueDataCatalog(ResourceManager):
     def _get_catalog_encryption_settings(self):
         client = utils.local_session(self.session_factory).client('glue')
         settings = client.get_data_catalog_encryption_settings()
+        settings['CatalogId'] = self.config.account_id
         settings.pop('ResponseMetadata', None)
         return [settings]
 
@@ -548,25 +548,43 @@ class GlueDataCatalogEncryption(BaseAction):
                 actions:
                   - type: set-encryption
                     attributes:
-                        EncryptionAtRest:
-                            CatalogEncryptionMode: SSE-KMS
-                            SseAwsKmsKeyId: alias/aws/glue
+                      EncryptionAtRest:
+                        CatalogEncryptionMode: SSE-KMS
+                        SseAwsKmsKeyId: alias/aws/glue
     """
 
     schema = type_schema(
         'set-encryption',
-        attributes={'type': 'object', "minItems": 1},
-        required=('attributes',))
+        required=['attributes'],
+        attributes={
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'EncryptionAtRest': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['CatalogEncryptionMode'],
+                    'properties': {
+                        'CatalogEncryptionMode': {'enum': ['DISABLED', 'SSE-KMS']},
+                        'SseAwsKmsKeyId': {'type': 'string'}
+                    }
+                },
+                'ConnectionPasswordEncryption': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['ReturnConnectionPasswordEncrypted'],
+                    'properties': {
+                        'ReturnConnectionPasswordEncrypted': {'type': 'boolean'},
+                        'AwsKmsKeyId': {'type': 'string'}
+                    }
+                }
+            }
+        }
+    )
 
     permissions = ('glue:PutDataCatalogEncryptionSettings',)
-    shape = 'PutDataCatalogEncryptionSettingsRequest'
 
-    def validate(self):
-        attrs = {}
-        attrs['DataCatalogEncryptionSettings'] = self.data['attributes']
-        return shape_validate(attrs, self.shape, 'glue')
-
-    def process(self, catalog):
+    def process(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
         # there is one glue data catalog per account
         client.put_data_catalog_encryption_settings(
@@ -575,7 +593,7 @@ class GlueDataCatalogEncryption(BaseAction):
 
 @GlueDataCatalog.filter_registry.register('glue-security-config')
 class GlueCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
-    """Filter aws account by its glue encryption status and KMS key
+    """Filter glue catalog by its glue encryption status and KMS key
 
     :example:
 

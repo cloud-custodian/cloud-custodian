@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from botocore.exceptions import ClientError
+import jmespath
 
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
@@ -19,6 +20,8 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
+
+from .securityhub import OtherResourcePostFinding
 
 
 @resources.register('codecommit')
@@ -120,6 +123,43 @@ class BuildSecurityGroupFilter(SecurityGroupFilter):
 class BuildVpcFilter(VpcFilter):
 
     RelatedIdsExpression = "vpcConfig.vpcId"
+
+
+@CodeBuildProject.action_registry.register('post-finding')
+class BuildPostFinding(OtherResourcePostFinding):
+
+    resource_type = 'AwsCodeBuildProject'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        payload.update(self.filter_empty({
+            'Name': r['name'],
+            'EncryptionKey': r['encryptionKey'],
+            'Environment': self.filter_empty({
+                'Type': r['environment']['type'],
+                'Certificate': r['environment'].get('certificate'),
+                'RegistryCredential': self.filter_empty({
+                    'Credential': jmespath.search(
+                        'environment.registryCredential.credential', r),
+                    'CredentialProvider': jmespath.search(
+                        'environment.registryCredential.credentialProvider', r)
+                }),
+                'ImagePullCredentialsType': r['environment'].get(
+                    'imagePullCredentialsType')
+            }),
+            'ServiceRole': r['serviceRole'],
+            'VpcConfig': self.filter_empty({
+                'VpcId': jmespath.search('vpcConfig.vpcId', r),
+                'Subnets': jmespath.search('vpcConfig.subnets', r),
+                'SecurityGroupIds': jmespath.search('vpcConfig.securityGroupIds', r)
+            }),
+            'Source': self.filter_empty({
+                'Type': jmespath.search('source.type', r),
+                'Location': jmespath.search('source.location', r),
+                'GitCloneDepth': jmespath.search('source.gitCloneDepth', r)
+            }),
+        }))
+        return envelope
 
 
 @CodeBuildProject.action_registry.register('delete')

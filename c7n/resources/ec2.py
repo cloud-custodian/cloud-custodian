@@ -18,7 +18,6 @@ import random
 import re
 import zlib
 
-import six
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
@@ -37,6 +36,7 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query, utils
+from c7n.tags import coalesce_copy_user_tags
 from c7n.utils import type_schema, filter_empty
 
 from c7n.resources.iam import CheckPermissions
@@ -239,29 +239,6 @@ class StateTransitionAge(AgeFilter):
         if dates:
             return parse(dates[0][1:-1])
         return None
-
-
-class StateTransitionFilter:
-    """Filter instances by state.
-
-    Try to simplify construction for policy authors by automatically
-    filtering elements (filters or actions) to the instances states
-    they are valid for.
-
-    For more details see
-     https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
-
-    """
-    valid_origin_states = ()
-
-    def filter_instance_state(self, instances, states=None):
-        states = states or self.valid_origin_states
-        orig_length = len(instances)
-        results = [i for i in instances
-                   if i['State']['Name'] in states]
-        self.log.info("%s %d of %d instances" % (
-            self.__class__.__name__, len(results), orig_length))
-        return results
 
 
 @filters.register('ebs')
@@ -472,7 +449,7 @@ class InstanceImage(ValueFilter, InstanceImageBase):
 
 
 @filters.register('offhour')
-class InstanceOffHour(OffHour, StateTransitionFilter):
+class InstanceOffHour(OffHour):
     """Custodian OffHour filter
 
     Filters running EC2 instances with the intent to stop at a given hour of
@@ -534,26 +511,26 @@ class InstanceOffHour(OffHour, StateTransitionFilter):
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
             return super(InstanceOffHour, self).process(
-                self.filter_instance_state(resources))
+                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
         else:
             return super(InstanceOffHour, self).process(resources)
 
 
 @filters.register('network-location')
-class EC2NetworkLocation(net_filters.NetworkLocation, StateTransitionFilter):
+class EC2NetworkLocation(net_filters.NetworkLocation):
 
     valid_origin_states = ('pending', 'running', 'shutting-down', 'stopping',
                            'stopped')
 
     def process(self, resources, event=None):
-        resources = self.filter_instance_state(resources)
+        resources = self.filter_resources(resources, 'State.Name', self.valid_origin_states)
         if not resources:
             return []
         return super(EC2NetworkLocation, self).process(resources)
 
 
 @filters.register('onhour')
-class InstanceOnHour(OnHour, StateTransitionFilter):
+class InstanceOnHour(OnHour):
     """Custodian OnHour filter
 
     Filters stopped EC2 instances with the intent to start at a given hour of
@@ -615,7 +592,7 @@ class InstanceOnHour(OnHour, StateTransitionFilter):
     def process(self, resources, event=None):
         if self.data.get('state-filter', True):
             return super(InstanceOnHour, self).process(
-                self.filter_instance_state(resources))
+                self.filter_resources(resources, 'State.Name', self.valid_origin_states))
         else:
             return super(InstanceOnHour, self).process(resources)
 
@@ -797,7 +774,7 @@ class UserData(ValueFilter):
 
 
 @filters.register('singleton')
-class SingletonFilter(Filter, StateTransitionFilter):
+class SingletonFilter(Filter):
     """EC2 instances without autoscaling or a recover alarm
 
     Filters EC2 instances that are not members of an autoscaling group
@@ -832,7 +809,7 @@ class SingletonFilter(Filter, StateTransitionFilter):
 
     def process(self, instances, event=None):
         return super(SingletonFilter, self).process(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
 
     def __call__(self, i):
         if self.in_asg(i):
@@ -1022,10 +999,10 @@ class SsmCompliance(Filter):
 
 
 @actions.register('set-monitoring')
-class MonitorInstances(BaseAction, StateTransitionFilter):
+class MonitorInstances(BaseAction):
     """Action on EC2 Instances to enable/disable detailed monitoring
 
-    The differents states of detailed monitoring status are :
+    The different states of detailed monitoring status are :
     'disabled'|'disabling'|'enabled'|'pending'
     (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_instances)
 
@@ -1081,12 +1058,13 @@ class MonitorInstances(BaseAction, StateTransitionFilter):
 
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
+
+    resource_type = 'AwsEc2Instance'
+
     def format_resource(self, r):
         ip_addresses = jmespath.search(
-            "NetworkInterfaces[].Association.PublicIp", r)
-        ip_addresses.extend(jmespath.search(
-            "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r))
-        ip_addresses = list(filter(None, ip_addresses))
+            "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
+
         # limit to max 10 ip addresses, per security hub service limits
         ip_addresses = ip_addresses and ip_addresses[:10] or ip_addresses
         details = {
@@ -1105,7 +1083,7 @@ class InstanceFinding(PostFinding):
             details["IamInstanceProfileArn"] = r["IamInstanceProfile"]["Arn"]
 
         instance = {
-            "Type": "AwsEc2Instance",
+            "Type": self.resource_type,
             "Id": "arn:{}:ec2:{}:{}:instance/{}".format(
                 utils.REGION_PARTITION_MAP.get(self.manager.config.region, 'aws'),
                 self.manager.config.region,
@@ -1113,7 +1091,7 @@ class InstanceFinding(PostFinding):
                 r["InstanceId"]),
             "Region": self.manager.config.region,
             "Tags": {t["Key"]: t["Value"] for t in r.get("Tags", [])},
-            "Details": {"AwsEc2Instance": filter_empty(details)},
+            "Details": {self.resource_type: filter_empty(details)},
         }
 
         instance = filter_empty(instance)
@@ -1121,7 +1099,7 @@ class InstanceFinding(PostFinding):
 
 
 @actions.register('start')
-class Start(BaseAction, StateTransitionFilter):
+class Start(BaseAction):
     """Starts a previously stopped EC2 instance.
 
     :Example:
@@ -1150,7 +1128,7 @@ class Start(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self._filter_ec2_with_volumes(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
             return
 
@@ -1206,7 +1184,7 @@ def extract_instance_id(state_error):
 
 
 @actions.register('resize')
-class Resize(BaseAction, StateTransitionFilter):
+class Resize(BaseAction):
     """Change an instance's size.
 
     An instance can only be resized when its stopped, this action
@@ -1236,10 +1214,8 @@ class Resize(BaseAction, StateTransitionFilter):
         return perms
 
     def process(self, resources):
-        stopped_instances = self.filter_instance_state(
-            resources, ('stopped',))
-        running_instances = self.filter_instance_state(
-            resources, ('running',))
+        stopped_instances = self.filter_resources(resources, 'State.Name', ('stopped',))
+        running_instances = self.filter_resources(resources, 'State.Name', ('running',))
 
         if self.data.get('restart') and running_instances:
             Stop({'terminate-ephemeral': False},
@@ -1287,7 +1263,7 @@ class Resize(BaseAction, StateTransitionFilter):
 
 
 @actions.register('stop')
-class Stop(BaseAction, StateTransitionFilter):
+class Stop(BaseAction):
     """Stops or hibernates a running EC2 instances
 
     :Example:
@@ -1349,7 +1325,7 @@ class Stop(BaseAction, StateTransitionFilter):
         return enabled, disabled
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
         client = utils.local_session(
@@ -1384,8 +1360,8 @@ class Stop(BaseAction, StateTransitionFilter):
 
 
 @actions.register('reboot')
-class Reboot(BaseAction, StateTransitionFilter):
-    """reboots a previously running EC2 instance.
+class Reboot(BaseAction):
+    """Reboots a previously running EC2 instance.
 
     :Example:
 
@@ -1413,7 +1389,7 @@ class Reboot(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self._filter_ec2_with_volumes(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
             return
 
@@ -1448,7 +1424,7 @@ class Reboot(BaseAction, StateTransitionFilter):
 
 
 @actions.register('terminate')
-class Terminate(BaseAction, StateTransitionFilter):
+class Terminate(BaseAction):
     """ Terminate a set of instances.
 
     While ec2 offers a bulk delete api, any given instance can be configured
@@ -1482,7 +1458,7 @@ class Terminate(BaseAction, StateTransitionFilter):
         return permissions
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
         client = utils.local_session(
@@ -1518,7 +1494,20 @@ class Terminate(BaseAction, StateTransitionFilter):
 
 @actions.register('snapshot')
 class Snapshot(BaseAction):
-    """Snapshots volumes attached to an EC2 instance
+    """Snapshot the volumes attached to an EC2 instance.
+
+    Tags may be optionally added to the snapshot during creation.
+
+    - `copy-volume-tags` copies all the tags from the specified
+      volume to the corresponding snapshot.
+    - `copy-tags` copies the listed tags from each volume
+      to the snapshot.  This is mutually exclusive with
+      `copy-volume-tags`.
+    - `tags` allows new tags to be added to each snapshot when using
+      'copy-tags`.  If no tags are specified, then the tag
+      `custodian_snapshot` is added.
+
+    The default behavior is `copy-volume-tags: true`.
 
     :Example:
 
@@ -1531,12 +1520,15 @@ class Snapshot(BaseAction):
               - type: snapshot
                 copy-tags:
                   - Name
+                tags:
+                    custodian_snapshot: True
     """
 
     schema = type_schema(
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
            'copy-volume-tags': {'type': 'boolean'},
+           'tags': {'type': 'object'},
            'exclude-boot': {'type': 'boolean', 'default': False}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
@@ -1591,16 +1583,9 @@ class Snapshot(BaseAction):
                 resource['InstanceId'], err_code)
 
     def get_snapshot_tags(self, resource):
-        tags = [
-            {'Key': 'custodian_snapshot', 'Value': ''}]
-        copy_keys = self.data.get('copy-tags', [])
-        copy_tags = []
-        if copy_keys:
-            for t in resource.get('Tags', []):
-                if t['Key'] in copy_keys:
-                    copy_tags.append(t)
-            tags.extend(copy_tags)
-        return tags
+        user_tags = self.data.get('tags', {}) or {'custodian_snapshot': ''}
+        copy_tags = self.data.get('copy-tags', [])
+        return coalesce_copy_user_tags(resource, copy_tags, user_tags)
 
 
 @actions.register('modify-security-groups')
@@ -1637,7 +1622,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
 
 
 @actions.register('autorecover-alarm')
-class AutorecoverAlarm(BaseAction, StateTransitionFilter):
+class AutorecoverAlarm(BaseAction):
     """Adds a cloudwatch metric alarm to recover an EC2 instance.
 
     This action takes effect on instances that are NOT part
@@ -1667,7 +1652,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
     def process(self, instances):
         instances = self.filter_asg_membership.process(
-            self.filter_instance_state(instances))
+            self.filter_resources(instances, 'State.Name', self.valid_origin_states))
         if not len(instances):
             return
         client = utils.local_session(
@@ -1700,7 +1685,7 @@ class AutorecoverAlarm(BaseAction, StateTransitionFilter):
 
 
 @actions.register('set-instance-profile')
-class SetInstanceProfile(BaseAction, StateTransitionFilter):
+class SetInstanceProfile(BaseAction):
     """Sets (add, modify, remove) the instance profile for a running EC2 instance.
 
     :Example:
@@ -1732,7 +1717,7 @@ class SetInstanceProfile(BaseAction, StateTransitionFilter):
     valid_origin_states = ('running', 'pending', 'stopped', 'stopping')
 
     def process(self, instances):
-        instances = self.filter_instance_state(instances)
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
         if not len(instances):
             return
         client = utils.local_session(self.manager.session_factory).client('ec2')
@@ -1947,7 +1932,7 @@ class QueryFilter:
 
     def query(self):
         value = self.value
-        if isinstance(self.value, six.string_types):
+        if isinstance(self.value, str):
             value = [self.value]
 
         return {'Name': self.key, 'Values': value}
@@ -1955,7 +1940,7 @@ class QueryFilter:
 
 @filters.register('instance-attribute')
 class InstanceAttribute(ValueFilter):
-    """EC2 Instance Value FIlter on a given instance attribute.
+    """EC2 Instance Value Filter on a given instance attribute.
 
     Filters EC2 Instances with the given instance attribute
 
@@ -2071,7 +2056,7 @@ class LaunchTemplate(query.QueryResourceManager):
                 t_versions.setdefault(
                     tinfo['LaunchTemplateId'], []).append(
                         tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
-        elif isinstance(rids[0], six.string_types):
+        elif isinstance(rids[0], str):
             for tid in rids:
                 t_versions[tid] = []
 

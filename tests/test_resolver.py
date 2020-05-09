@@ -17,8 +17,7 @@ import pickle
 import os
 import tempfile
 import vcr
-from six.moves.urllib.request import urlopen
-from six import binary_type
+from urllib.request import urlopen
 
 from .common import BaseTest, ACCOUNT_ID, Bag
 from .test_s3 import destroyBucket
@@ -46,7 +45,7 @@ class FakeCache:
 class FakeResolver:
 
     def __init__(self, contents):
-        if isinstance(contents, binary_type):
+        if isinstance(contents, bytes):
             contents = contents.decode("utf8")
         self.contents = contents
 

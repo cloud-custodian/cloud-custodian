@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import six
 
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
@@ -360,7 +359,7 @@ class AppELBTest(BaseTest):
             "Attributes"
         ]
         for attribute in attributes:
-            for key, value in six.iteritems(attribute):
+            for key, value in attribute.items():
                 if "deletion_protection.enabled" in key:
                     self.assertTrue(value)
         self.assertEqual(len(resources), 1)

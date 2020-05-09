@@ -23,7 +23,6 @@ import types
 from collections import namedtuple
 
 import jwt
-import six
 from azure.common.credentials import (BasicTokenAuthentication,
                                       ServicePrincipalCredentials)
 from azure.keyvault import KeyVaultAuthentication, AccessToken
@@ -174,11 +173,7 @@ class Session:
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
 
-        if sys.version_info[0] < 3:
-            import funcsigs
-            klass_parameters = funcsigs.signature(klass).parameters
-        else:
-            klass_parameters = inspect.signature(klass).parameters
+        klass_parameters = inspect.signature(klass).parameters
 
         if 'subscription_id' in klass_parameters:
             client = klass(credentials=self.credentials, subscription_id=self.subscription_id)
@@ -304,8 +299,7 @@ class Session:
         return json.dumps(function_auth_params, indent=2)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class TokenProvider:
+class TokenProvider(metaclass=abc.ABCMeta):
     AuthenticationResult = namedtuple(
         'AuthenticationResult', 'credential, subscription_id, tenant_id')
 

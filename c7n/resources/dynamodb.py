@@ -24,6 +24,7 @@ from c7n.tags import (
 from c7n.utils import (
     local_session, chunks, type_schema, snapshot_identifier)
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters import ValueFilter
 
 
 class ConfigTable(query.ConfigSource):
@@ -76,28 +77,6 @@ class Table(query.QueryResourceManager):
     }
 
 
-class StatusFilter:
-    """Filter tables by status"""
-
-    valid_states = ()
-
-    def filter_table_state(self, tables, states=None):
-        states = states or self.valid_states
-        orig_count = len(tables)
-        result = [t for t in tables if t['TableStatus'] in states]
-        self.log.info("%s %d of %d tables" % (
-            self.__class__.__name__, len(result), orig_count))
-        return result
-
-    def filter_backup_state(self, tables, states=None):
-        states = states or self.valid_states
-        orig_count = len(tables)
-        result = [t for t in tables if t['BackupStatus'] in states]
-        self.log.info("%s %d of %d tables" % (
-            self.__class__.__name__, len(result), orig_count))
-        return result
-
-
 @Table.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
     """
@@ -106,22 +85,113 @@ class KmsFilter(KmsRelatedFilter):
 
     :example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
-                - name: dynamodb-kms-key-filters
-                  resource: dynamodb-table
-                  filters:
-                    - type: kms-key
-                      key: c7n:AliasName
-                      value: "^(alias/aws/dynamodb)"
-                      op: regex
+              - name: dynamodb-kms-key-filters
+                resource: dynamodb-table
+                filters:
+                  - type: kms-key
+                    key: c7n:AliasName
+                    value: "^(alias/aws/dynamodb)"
+                    op: regex
     """
     RelatedIdsExpression = 'SSEDescription.KMSMasterKeyArn'
 
 
+@Table.filter_registry.register('continuous-backup')
+class TableContinuousBackupFilter(ValueFilter):
+    """Check for continuous backups and point in time recovery (PITR) on a dynamodb table.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-continuous-backups-disabled
+                resource: aws.dynamodb-table
+                filters:
+                  - type: continuous-backup
+                    key: ContinuousBackupsStatus
+                    op: eq
+                    value: DISABLED
+              - name: dynamodb-pitr-disabled
+                resource: aws.dynamodb-table
+                filters:
+                  - type: continuous-backup
+                    key: PointInTimeRecoveryDescription.PointInTimeRecoveryStatus
+                    op: ne
+                    value: ENABLED
+    """
+
+    annotation_key = 'c7n:continuous-backup'
+    annotate = False
+    schema = type_schema('continuous-backup', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('dynamodb:DescribeContinuousBackups',)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.describe_continuous_backups(
+                    TableName=r['TableName']).get('ContinuousBackupsDescription', {})
+            except client.exceptions.TableNotFoundException:
+                continue
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])
+
+
+@Table.action_registry.register('set-continuous-backup')
+class TableContinuousBackupAction(BaseAction):
+    """Set continuous backups and point in time recovery (PITR) on a dynamodb table.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-continuous-backups-disabled-set
+                resource: aws.dynamodb-table
+                filters:
+                  - type: continuous-backup
+                    key: ContinuousBackupsStatus
+                    op: eq
+                    value: DISABLED
+                actions:
+                  - type: set-continuous-backup
+
+    """
+    valid_status = ('ACTIVE',)
+    schema = type_schema(
+        'set-continuous-backup',
+        state={'type': 'boolean', 'default': True})
+    permissions = ('dynamodb:UpdateContinuousBackups',)
+
+    def process(self, resources):
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
+        if not len(resources):
+            return
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            try:
+                client.update_continuous_backups(
+                    TableName=r['TableName'],
+                    PointInTimeRecoverySpecification={
+                        'PointInTimeRecoveryEnabled': self.data.get('state', True)
+                    })
+            except client.exceptions.TableNotFoundException:
+                continue
+
+
 @Table.action_registry.register('delete')
-class DeleteTable(BaseAction, StatusFilter):
+class DeleteTable(BaseAction):
     """Action to delete dynamodb tables
 
     :example:
@@ -146,8 +216,8 @@ class DeleteTable(BaseAction, StatusFilter):
             client.delete_table(TableName=t['TableName'])
 
     def process(self, resources):
-        resources = self.filter_table_state(
-            resources, self.valid_status)
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
 
@@ -165,7 +235,7 @@ class DeleteTable(BaseAction, StatusFilter):
 
 
 @Table.action_registry.register('set-stream')
-class SetStream(BaseAction, StatusFilter):
+class SetStream(BaseAction):
     """Action to enable/disable streams on table.
 
     :example:
@@ -192,10 +262,9 @@ class SetStream(BaseAction, StatusFilter):
     permissions = ("dynamodb:UpdateTable",)
 
     def process(self, tables):
-        tables = self.filter_table_state(
-            tables, self.valid_status)
+        tables = self.filter_resources(
+            tables, 'TableStatus', self.valid_status)
         if not len(tables):
-            self.log.warning("Table not in ACTIVE state.")
             return
 
         state = self.data.get('state')
@@ -232,7 +301,7 @@ class SetStream(BaseAction, StatusFilter):
 
 
 @Table.action_registry.register('backup')
-class CreateBackup(BaseAction, StatusFilter):
+class CreateBackup(BaseAction):
     """Creates a manual backup of a DynamoDB table. Use of the optional
        prefix flag will attach a user specified prefix. Otherwise,
        the backup prefix will default to 'Backup'.
@@ -255,8 +324,8 @@ class CreateBackup(BaseAction, StatusFilter):
     permissions = ('dynamodb:CreateBackup',)
 
     def process(self, resources):
-        resources = self.filter_table_state(
-            resources, self.valid_status)
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
         if not len(resources):
             return
 
@@ -294,7 +363,7 @@ class Backup(query.QueryResourceManager):
 
 
 @Backup.action_registry.register('delete')
-class DeleteBackup(BaseAction, StatusFilter):
+class DeleteBackup(BaseAction):
     """Deletes backups of a DynamoDB table
 
     :example:
@@ -319,8 +388,8 @@ class DeleteBackup(BaseAction, StatusFilter):
     permissions = ('dynamodb:DeleteBackup',)
 
     def process(self, backups):
-        backups = self.filter_backup_state(
-            backups, self.valid_status)
+        backups = self.filter_resources(
+            backups, 'BackupStatus', self.valid_status)
         if not len(backups):
             return
 

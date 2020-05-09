@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import six
 from c7n_azure.actions.delete import DeleteAction
 from c7n_azure.actions.lock import LockAction
 from c7n_azure.actions.tagging import (AutoTagDate)
@@ -28,8 +27,7 @@ from c7n_azure.utils import ResourceIdParser
 arm_resource_types = {}
 
 
-@six.add_metaclass(TypeMeta)
-class ArmTypeInfo(TypeInfo):
+class ArmTypeInfo(TypeInfo, metaclass=TypeMeta):
     # api client construction information for ARM resources
     id = 'id'
     name = 'name'
@@ -43,8 +41,7 @@ class ArmTypeInfo(TypeInfo):
     enable_tag_operations = True
 
 
-@six.add_metaclass(QueryMeta)
-class ArmResourceManager(QueryResourceManager):
+class ArmResourceManager(QueryResourceManager, metaclass=QueryMeta):
     class resource_type(ArmTypeInfo):
         service = 'azure.mgmt.resource'
         client = 'ResourceManagementClient'
@@ -101,8 +98,7 @@ class ArmResourceManager(QueryResourceManager):
             resource_class.filter_registry.register('diagnostic-settings', DiagnosticSettingsFilter)
 
 
-@six.add_metaclass(QueryMeta)
-class ChildArmResourceManager(ChildResourceManager, ArmResourceManager):
+class ChildArmResourceManager(ChildResourceManager, ArmResourceManager, metaclass=QueryMeta):
 
     class resource_type(ChildTypeInfo, ArmTypeInfo):
         pass
