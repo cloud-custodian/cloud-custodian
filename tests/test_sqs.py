@@ -688,6 +688,7 @@ class QueueTests(BaseTest):
         self.assertEqual(len(resources), 1)
         assert(
             "\"Sid\":\"ApprovedDeleteStatement\"" in resources[0]["Policy"]
+        )
 
     def test_sqs_post_finding(self):
         factory = self.replay_flight_data('test_sqs_post_finding')
