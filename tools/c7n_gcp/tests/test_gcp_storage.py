@@ -58,12 +58,12 @@ class BucketTest(BaseTest):
                 {'name': 'c7n-dev-test'},
                 {'iamConfiguration.uniformBucketLevelAccess.enabled': False},
             ],
-            'actions': ['enable-uniform-access']},
+            'actions': ['set-uniform-access']},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         if self.recording:
-            time.sleep(10)
+            time.sleep(5)
         bucket = p.resource_manager.get_resource({
             "bucket_name": bucket_name,
         })

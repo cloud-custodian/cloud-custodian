@@ -36,26 +36,41 @@ class Bucket(QueryResourceManager):
                 'get', {'bucket': resource_info['bucket_name']})
 
 
-@Bucket.action_registry.register('enable-uniform-access')
+@Bucket.action_registry.register('set-uniform-access')
 class BucketLevelAccess(MethodAction):
-    '''
-    Additional Enforcement mechanism for the Organization Policy Bucket Level Access.
-    iamConfiguration.uniformBucketLevelAccess.enabled boolean.
-    When set to true, users can only specify bucket level IAM policies and not Object level ACL's.
+    '''Disable object ACLs on a bucket.
+
+    Enabling this means only bucket policies (and organization bucket
+    policies) govern access to a bucket.
+
+    When set to true, users can only specify bucket level IAM policies
+    and not Object level ACL's.
 
     Example Policy:
-    - name: enforce-uniform-bucket-level-access
-        resource: gcp.bucket
-        filters:
-        - iamConfiguration.uniformBucketLevelAccess.enable: false
-        actions:
-        - enable-uniform-bucket-level-access
+
+    .. code-block:: yaml
+
+      policies:
+       - name: enforce-uniform-bucket-level-access
+         resource: gcp.bucket
+         filters:
+          - iamConfiguration.uniformBucketLevelAccess.enable: false
+         actions:
+          - enable-uniform-bucket-level-access
     '''
 
-    schema = type_schema('enable-uniform-bucket-level-access')
+    schema = type_schema('set-uniform-access', state={'type': 'boolean'})
     method_spec = {'op': 'patch'}
 
+    # the google docs and example on this api appear to broken.
+    # https://cloud.google.com/storage/docs/using-uniform-bucket-level-access#rest-apis
+    #
+    # instead we observe the behavior gsutil interaction to effect the same.
+    # the key seems to be the undocumented projection parameter
+    #
     def get_resource_params(self, model, resource):
+        enabled = self.data.get('state', True)
         return {'bucket': resource['name'],
                 'fields': 'iamConfiguration',
-                'body': {'iamConfiguration': {'uniformbucketlevelaccess': {'enabled': True}}}}
+                'projection': 'noAcl',  # not documented but
+                'body': {'iamConfiguration': {'uniformBucketLevelAccess': {'enabled': enabled}}}}
