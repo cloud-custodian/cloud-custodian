@@ -131,6 +131,26 @@ class ResourceManager:
                     queue.appendleft(gf)
             yield f
 
+    def call_api(self, func, *args, ignore_not_found=True, not_found_codes=None, **kwargs):
+        """Call a boto API with args and kwargs.
+
+        Apply standard error handling to an API call, such as skipping Resoure Not Found
+        exceptions.  This function will ignore the exceptions that don't need to raise
+        an error.
+
+        Args:
+            func: API to call.
+            ignore_not_found: Boolean set to False to always raise an exception.
+            not_found_codes: Iterable of exceptions to ignore.
+        """
+        if not_found_codes is None:
+            not_found_codes = self.resource_type.not_found_exceptions
+        try:
+            return func(*args, **kwargs)
+        except ClientError as e:
+            if not ignore_not_found or e.response['Error']['Code'] not in not_found_codes:
+                raise
+
     def validate(self):
         """
         Validates resource definition, does NOT validate filters, actions, modes.

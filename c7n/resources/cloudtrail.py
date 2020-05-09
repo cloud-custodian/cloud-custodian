@@ -44,6 +44,7 @@ class CloudTrail(QueryResourceManager):
         name = 'Name'
         cfn_type = config_type = "AWS::CloudTrail::Trail"
         universal_taggable = object()
+        not_found_exceptions = ("TrailNotFoundException",)
 
     source_mapping = {
         'describe': DescribeTrail,
@@ -257,7 +258,4 @@ class DeleteTrail(BaseAction):
         shadow_check.embedded = True
         resources = shadow_check.process(resources)
         for r in resources:
-            try:
-                client.delete_trail(Name=r['Name'])
-            except client.exceptions.TrailNotFoundException:
-                continue
+            self.manager.call_api(client.delete_trail, Name=r['Name'])

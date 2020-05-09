@@ -41,6 +41,7 @@ class RestAccount(ResourceManager):
         name = id = 'account_id'
         dimension = None
         arn = False
+        not_found_exceptions = ("NotFoundException",)
 
     @classmethod
     def get_permissions(cls):
@@ -146,6 +147,7 @@ class RestApi(query.QueryResourceManager):
         cfn_type = config_type = "AWS::ApiGateway::RestApi"
         universal_taggable = object()
         permissions_enum = ('apigateway:GET',)
+        not_found_exceptions = ("NotFoundException",)
 
     source_mapping = {
         'config': query.ConfigSource,
@@ -240,10 +242,7 @@ class DeleteApi(BaseAction):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
         for r in resources:
-            try:
-                client.delete_rest_api(restApiId=r['id'])
-            except client.exceptions.NotFoundException:
-                continue
+            self.manager.call_api(client.delete_rest_api, restApiId=r['id'])
 
 
 @query.sources.register('describe-rest-stage')
@@ -281,6 +280,7 @@ class RestStage(query.ChildResourceManager):
         cfn_type = config_type = "AWS::ApiGateway::Stage"
         arn_type = 'stages'
         permissions_enum = ('apigateway:GET',)
+        not_found_exceptions = ("NotFoundException",)
 
     child_source = 'describe-rest-stage'
     source_mapping = {
@@ -364,13 +364,10 @@ class DeleteStage(BaseAction):
     def process(self, resources):
         client = utils.local_session(self.manager.session_factory).client('apigateway')
         for r in resources:
-            try:
-                self.manager.retry(
-                    client.delete_stage,
-                    restApiId=r['restApiId'],
-                    stageName=r['stageName'])
-            except client.exceptions.NotFoundException:
-                pass
+            self.manager.call_api(self.manager.retry,
+                                  client.delete_stage,
+                                  restApiId=r['restApiId'],
+                                  stageName=r['stageName'])
 
 
 @resources.register('rest-resource')
@@ -386,6 +383,7 @@ class RestResource(query.ChildResourceManager):
         name = 'path'
         permissions_enum = ('apigateway:GET',)
         cfn_type = 'AWS::ApiGateway::Resource'
+        not_found_exceptions = ("NotFoundException",)
 
 
 @query.sources.register('describe-rest-resource')
@@ -415,6 +413,7 @@ class RestApiVpcLink(query.QueryResourceManager):
         name = 'name'
         permissions_enum = ('apigateway:GET',)
         cfn_type = 'AWS::ApiGateway::VpcLink'
+        not_found_exceptions = ("NotFoundException",)
 
 
 @RestResource.filter_registry.register('rest-integration')
@@ -488,19 +487,17 @@ class FilterRestIntegration(ValueFilter):
     def process_task_set(self, client, task_set):
         results = []
         for r, m in task_set:
-            try:
-                integration = client.get_integration(
-                    restApiId=r['restApiId'],
-                    resourceId=r['id'],
-                    httpMethod=m)
+            integration = self.manager.call_api(
+                client.get_integration,
+                restApiId=r['restApiId'],
+                resourceId=r['id'],
+                httpMethod=m)
+            if integration is not None:  # TODO not found
                 integration.pop('ResponseMetadata', None)
                 integration['restApiId'] = r['restApiId']
                 integration['resourceId'] = r['id']
                 integration['resourceHttpMethod'] = m
                 results.append(integration)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'NotFoundException':
-                    pass
 
         return results
 
@@ -585,13 +582,10 @@ class DeleteRestIntegration(BaseAction):
 
         for r in resources:
             for i in r.get(ANNOTATION_KEY_MATCHED_INTEGRATIONS, []):
-                try:
-                    client.delete_integration(
-                        restApiId=i['restApiId'],
-                        resourceId=i['resourceId'],
-                        httpMethod=i['resourceHttpMethod'])
-                except client.exceptions.NotFoundException:
-                    continue
+                self.manager.call_api(client.delete_integration,
+                                      restApiId=i['restApiId'],
+                                      resourceId=i['resourceId'],
+                                      httpMethod=i['resourceHttpMethod'])
 
 
 @RestResource.filter_registry.register('rest-method')

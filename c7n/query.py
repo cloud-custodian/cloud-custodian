@@ -774,6 +774,10 @@ class TypeInfo(metaclass=TypeMeta):
     batch_detail_spec = None
 
     ##########
+    # Exceptions
+    not_found_exceptions = ()
+
+    ##########
     # Misc
 
     # used for reporting, array of fields

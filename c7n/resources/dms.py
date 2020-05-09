@@ -51,11 +51,8 @@ class InstanceDescribe(DescribeSource):
     def process_resource_set(self, client, resources):
         for arn, r in zip(self.manager.get_arns(resources), resources):
             self.manager.log.info("arn %s" % arn)
-            try:
-                r['Tags'] = client.list_tags_for_resource(
+            r['Tags'] = self.manager.call_api(client.list_tags_for_resource,
                     ResourceArn=arn).get('TagList', [])
-            except client.exceptions.ResourceNotFoundFault:
-                continue
 
 
 @resources.register('dms-instance')
@@ -70,6 +67,7 @@ class ReplicationInstance(QueryResourceManager):
         arn = 'ReplicationInstanceArn'
         date = 'InstanceCreateTime'
         cfn_type = 'AWS::DMS::ReplicationInstance'
+        not_found_exceptions = ('ResourceNotFoundFault',)
 
     filters = FilterRegistry('dms-instance.filters')
     filters.register('marked-for-op', TagActionFilter)
@@ -93,6 +91,7 @@ class DmsEndpoints(QueryResourceManager):
         arn_type = 'endpoint'
         universal_taggable = object()
         cfn_type = 'AWS::DMS::Endpoint'
+        not_found_exceptions = ('ResourceNotFoundFault',)
 
     augment = universal_augment
 
@@ -216,12 +215,9 @@ class InstanceTag(Tag):
     def process_resource_set(self, client, resources, tags):
         client = local_session(self.manager.session_factory).client('dms')
         for r in resources:
-            try:
-                client.add_tags_to_resource(
-                    ResourceArn=r['ReplicationInstanceArn'],
-                    Tags=tags)
-            except client.exceptions.ResourceNotFoundFault:
-                continue
+            self.manager.call_api(client.add_tags_to_resource,
+                                  ResourceArn=r['ReplicationInstanceArn'],
+                                  Tags=tags)
 
 
 @ReplicationInstance.action_registry.register('remove-tag')
@@ -246,12 +242,10 @@ class InstanceRemoveTag(RemoveTag):
 
     def process_resource_set(self, client, resources, tags):
         for r in resources:
-            try:
-                client.remove_tags_from_resource(
-                    ResourceArn=r['ReplicationInstanceArn'],
-                    TagKeys=tags)
-            except client.exceptions.ResourceNotFoundFault:
-                continue
+            self.manager.call_api(
+                client.remove_tags_from_resource,
+                ResourceArn=r['ReplicationInstanceArn'],
+                TagKeys=tags)
 
 
 @ReplicationInstance.action_registry.register('mark-for-op')
@@ -406,7 +400,4 @@ class DeleteDmsEndpoint(BaseAction):
         client = local_session(self.manager.session_factory).client('dms')
         for e in endpoints:
             EndpointArn = e['EndpointArn']
-            try:
-                client.delete_endpoint(EndpointArn=EndpointArn)
-            except client.exceptions.ResourceNotFoundFault:
-                continue
+            self.manager.call_api(client.delete_endpoint, EndpointArn=EndpointArn)

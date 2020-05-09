@@ -163,6 +163,7 @@ class LogGroup(QueryResourceManager):
         date = 'creationTime'
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
+        not_found_exceptions = ('ResourceNotFoundException',)
 
     def augment(self, resources):
         resources = universal_augment(self, resources)
@@ -229,11 +230,8 @@ class Delete(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('logs')
         for r in resources:
-            try:
-                self.manager.retry(
-                    client.delete_log_group, logGroupName=r['logGroupName'])
-            except client.exceptions.ResourceNotFoundException:
-                continue
+            self.manager.call_api(
+                self.manager.retry, client.delete_log_group, logGroupName=r['logGroupName'])
 
 
 @LogGroup.filter_registry.register('last-write')
@@ -399,11 +397,9 @@ class EncryptLogGroup(BaseAction):
         key = self.resolve_key(self.data.get('kms-key'))
 
         for r in resources:
-            try:
-                if state:
-                    client.associate_kms_key(
-                        logGroupName=r['logGroupName'], kmsKeyId=key)
-                else:
-                    client.disassociate_kms_key(logGroupName=r['logGroupName'])
-            except client.exceptions.ResourceNotFoundException:
-                continue
+            if state:
+                self.manager.call_api(client.associate_kms_key,
+                    logGroupName=r['logGroupName'], kmsKeyId=key)
+            else:
+                self.manager.call_api(client.disassociate_kms_key,
+                    logGroupName=r['logGroupName'])
