@@ -61,6 +61,7 @@ class SNS(QueryResourceManager):
             'SubscriptionsPending',
             'SubscriptionsDeleted'
         )
+        not_found_exceptions = ('ResourceNotFound', 'NotFoundException')
 
     permissions = ('sns:ListTagsForResource',)
     source_mapping = {
@@ -110,12 +111,7 @@ class TagTopic(Tag):
 
     def process_resource_set(self, client, resources, new_tags):
         for r in resources:
-            try:
-                client.tag_resource(
-                    ResourceArn=r['TopicArn'],
-                    Tags=new_tags)
-            except client.exceptions.ResourceNotFound:
-                continue
+            self.manager.call_api(client.tag_resource, ResourceArn=r['TopicArn'], Tags=new_tags)
 
 
 @SNS.action_registry.register('remove-tag')
@@ -140,10 +136,7 @@ class UntagTopic(RemoveTag):
 
     def process_resource_set(self, client, resources, tags):
         for r in resources:
-            try:
-                client.untag_resource(ResourceArn=r['TopicArn'], TagKeys=tags)
-            except client.exceptions.ResourceNotFound:
-                continue
+            self.manager.call_api(client.untag_resource, ResourceArn=r['TopicArn'], TagKeys=tags)
 
 
 @SNS.action_registry.register('mark-for-op')
@@ -464,7 +457,4 @@ class DeleteTopic(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('sns')
         for r in resources:
-            try:
-                client.delete_topic(TopicArn=r['TopicArn'])
-            except client.exceptions.NotFoundException:
-                continue
+            self.manager.call_api(client.delete_topic, TopicArn=r['TopicArn'])

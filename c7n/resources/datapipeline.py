@@ -43,6 +43,7 @@ class DataPipeline(QueryResourceManager):
         batch_detail_spec = (
             'describe_pipelines', 'pipelineIds', 'id', 'pipelineDescriptionList', None)
         enum_spec = ('list_pipelines', 'pipelineIdList', None)
+        not_found_exceptions = ('PipelineNotFoundException',)
 
     def augment(self, resources):
         filter(None, _datapipeline_info(
@@ -115,10 +116,7 @@ class Delete(BaseAction):
             self.manager.session_factory).client('datapipeline')
 
         for p in pipelines:
-            try:
-                client.delete_pipeline(pipelineId=p['id'])
-            except client.exceptions.PipelineNotFoundException:
-                continue
+            self.manager.call_api(client.delete_pipeline, pipelineId=p['id'])
 
 
 @DataPipeline.action_registry.register('mark-for-op')
@@ -167,11 +165,11 @@ class TagPipeline(Tag):
     def process_resource_set(self, client, pipelines, tags):
         tag_array = [dict(key=t['Key'], value=t['Value']) for t in tags]
         for pipeline in pipelines:
-            try:
-                client.add_tags(pipelineId=pipeline['id'], tags=tag_array)
-            except (client.exceptions.PipelineDeletedException,
-                    client.exceptions.PipelineNotFoundException):
-                continue
+            self.manager.call_api(
+                client.add_tags,
+                not_found_codes=('PipelineDeletedException', 'PipelineNotFoundException'),
+                pipelineId=pipeline['id'],
+                tags=tag_array)
 
 
 @DataPipeline.action_registry.register('remove-tag')
@@ -196,8 +194,8 @@ class UntagPipeline(RemoveTag):
 
     def process_resource_set(self, client, pipelines, tags):
         for pipeline in pipelines:
-            try:
-                client.remove_tags(pipelineId=pipeline['id'], tagKeys=tags)
-            except (client.exceptions.PipelineDeletedException,
-                    client.exceptions.PipelineNotFoundException):
-                continue
+            self.manager.call_api(
+                client.remove_tags,
+                not_found_codes=('PipelineDeletedException', 'PipelineNotFoundException'),
+                pipelineId=pipeline['id'],
+                tagKeys=tags)

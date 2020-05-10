@@ -14,6 +14,8 @@
 from collections import deque
 import logging
 
+from botocore.exceptions import ClientError
+
 from c7n import cache
 from c7n.executor import ThreadPoolExecutor
 from c7n.provider import clouds

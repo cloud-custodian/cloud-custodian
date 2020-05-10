@@ -1494,6 +1494,7 @@ class NetworkInterface(query.QueryResourceManager):
         filter_type = 'list'
         cfn_type = config_type = "AWS::EC2::NetworkInterface"
         id_prefix = "eni-"
+        not_found_exception = ('InvalidNetworkInterfaceID.NotFound',)
 
     source_mapping = {
         'describe': DescribeENI,
@@ -1637,13 +1638,10 @@ class DeleteNetworkInterface(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
         for r in resources:
-            try:
-                self.manager.retry(
-                    client.delete_network_interface,
-                    NetworkInterfaceId=r['NetworkInterfaceId'])
-            except ClientError as err:
-                if not err.response['Error']['Code'] == 'InvalidNetworkInterfaceID.NotFound':
-                    raise
+            self.manager.call_api(
+                self.manager.retry,
+                client.delete_network_interface,
+                NetworkInterfaceId=r['NetworkInterfaceId'])
 
 
 @resources.register('route-table')
@@ -1951,6 +1949,7 @@ class NetworkAddress(query.QueryResourceManager):
         filter_name = 'AllocationId'
         filter_type = 'list'
         config_type = "AWS::EC2::EIP"
+        not_found_exception = ('InvalidAllocationID.NotFound',)
 
 
 NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
@@ -2009,12 +2008,7 @@ class AddressRelease(BaseAction):
                 unassoc_addrs, self.process_attached(client, assoc_addrs))
 
         for r in unassoc_addrs:
-            try:
-                client.release_address(AllocationId=r['AllocationId'])
-            except ClientError as e:
-                # If its already been released, ignore, else raise.
-                if e.response['Error']['Code'] == 'InvalidAllocationID.NotFound':
-                    raise
+            self.manager.call_api(client.release_address, AllocationId=r['AllocationId'])
 
 
 @resources.register('customer-gateway')
@@ -2044,6 +2038,7 @@ class InternetGateway(query.QueryResourceManager):
         filter_type = 'list'
         cfn_type = config_type = "AWS::EC2::InternetGateway"
         id_prefix = "igw-"
+        not_found_exception = ('InvalidInternetGatewayId.NotFound',)
 
 
 @InternetGateway.action_registry.register('delete')
@@ -2069,11 +2064,8 @@ class DeleteInternetGateway(BaseAction):
 
         client = local_session(self.manager.session_factory).client('ec2')
         for r in resources:
-            try:
-                client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
-            except ClientError as err:
-                if not err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
-                    raise
+            self.manager.call_api(client.delete_internet_gateway,
+                InternetGatewayId=r['InternetGatewayId'])
 
 
 @resources.register('nat-gateway')

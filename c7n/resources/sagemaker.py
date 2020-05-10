@@ -35,6 +35,7 @@ class NotebookInstance(QueryResourceManager):
         name = 'NotebookInstanceName'
         date = 'CreationTime'
         cfn_type = 'AWS::SageMaker::NotebookInstance'
+        not_found_exceptions = ('ResourceNotFound',)
 
     permissions = ('sagemaker:ListTags',)
 
@@ -69,6 +70,7 @@ class SagemakerJob(QueryResourceManager):
         date = 'CreationTime'
         permission_augment = (
             'sagemaker:DescribeTrainingJob', 'sagemaker:ListTags')
+        not_found_exceptions = ('ResourceNotFound',)
 
     def __init__(self, ctx, data):
         super(SagemakerJob, self).__init__(ctx, data)
@@ -112,6 +114,7 @@ class SagemakerTransformJob(QueryResourceManager):
         date = 'CreationTime'
         filter_name = 'TransformJobArn'
         permission_augment = ('sagemaker:DescribeTransformJob', 'sagemaker:ListTags')
+        not_found_exceptions = ('ResourceNotFound',)
 
     def __init__(self, ctx, data):
         super(SagemakerTransformJob, self).__init__(ctx, data)
@@ -214,6 +217,7 @@ class SagemakerEndpoint(QueryResourceManager):
         name = 'EndpointName'
         date = 'CreationTime'
         cfn_type = 'AWS::SageMaker::Endpoint'
+        not_found_exceptions = ('ResourceNotFound',)
 
     permissions = ('sagemaker:ListTags',)
 
@@ -247,6 +251,7 @@ class SagemakerEndpointConfig(QueryResourceManager):
         name = 'EndpointConfigName'
         date = 'CreationTime'
         cfn_type = 'AWS::SageMaker::EndpointConfig'
+        not_found_exceptions = ('ResourceNotFound',)
 
     permissions = ('sagemaker:ListTags',)
 
@@ -279,6 +284,7 @@ class Model(QueryResourceManager):
         name = 'ModelName'
         date = 'CreationTime'
         cfn_type = 'AWS::SageMaker::Model'
+        not_found_exceptions = ('ResourceNotFound',)
 
     permissions = ('sagemaker:ListTags',)
 
@@ -482,11 +488,8 @@ class StartNotebookInstance(BaseAction):
         client = local_session(self.manager.session_factory).client('sagemaker')
 
         for n in resources:
-            try:
-                client.start_notebook_instance(
-                    NotebookInstanceName=n['NotebookInstanceName'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            self.manager.call_api(client.start_notebook_instance,
+                                  NotebookInstanceName=n['NotebookInstanceName'])
 
 
 @NotebookInstance.action_registry.register('stop')
@@ -518,11 +521,8 @@ class StopNotebookInstance(BaseAction):
         client = local_session(self.manager.session_factory).client('sagemaker')
 
         for n in resources:
-            try:
-                client.stop_notebook_instance(
-                    NotebookInstanceName=n['NotebookInstanceName'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            self.manager.call_api(client.stop_notebook_instance,
+                                  NotebookInstanceName=n['NotebookInstanceName'])
 
 
 @NotebookInstance.action_registry.register('delete')
@@ -554,11 +554,8 @@ class DeleteNotebookInstance(BaseAction):
         client = local_session(self.manager.session_factory).client('sagemaker')
 
         for n in resources:
-            try:
-                client.delete_notebook_instance(
-                    NotebookInstanceName=n['NotebookInstanceName'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            self.manager.call_api(client.delete_notebook_instance,
+                                  NotebookInstanceName=n['NotebookInstanceName'])
 
 
 @NotebookInstance.filter_registry.register('security-group')
@@ -626,10 +623,7 @@ class DeleteModel(BaseAction):
         client = local_session(self.manager.session_factory).client('sagemaker')
 
         for m in resources:
-            try:
-                client.delete_model(ModelName=m['ModelName'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            self.manager.call_api(client.delete_model, ModelName=m['ModelName'])
 
 
 @SagemakerJob.action_registry.register('stop')
@@ -655,10 +649,7 @@ class SagemakerJobStop(BaseAction):
         client = local_session(self.manager.session_factory).client('sagemaker')
 
         for j in jobs:
-            try:
-                client.stop_training_job(TrainingJobName=j['TrainingJobName'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            self.manager.call_api(client.stop_training_job, TrainingJobName=j['TrainingJobName'])
 
 
 @SagemakerEndpoint.action_registry.register('delete')
@@ -685,10 +676,7 @@ class SagemakerEndpointDelete(BaseAction):
     def process(self, endpoints):
         client = local_session(self.manager.session_factory).client('sagemaker')
         for e in endpoints:
-            try:
-                client.delete_endpoint(EndpointName=e['EndpointName'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            self.manager.call_api(client.delete_endpoint, EndpointName=e['EndpointName'])
 
 
 @SagemakerEndpointConfig.action_registry.register('delete')
@@ -713,11 +701,8 @@ class SagemakerEndpointConfigDelete(BaseAction):
     def process(self, endpoints):
         client = local_session(self.manager.session_factory).client('sagemaker')
         for e in endpoints:
-            try:
-                client.delete_endpoint_config(
-                    EndpointConfigName=e['EndpointConfigName'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            self.manager.call_api(client.delete_endpoint_config,
+                                  EndpointConfigName=e['EndpointConfigName'])
 
 
 @SagemakerTransformJob.action_registry.register('stop')
@@ -743,7 +728,4 @@ class SagemakerTransformJobStop(BaseAction):
         client = local_session(self.manager.session_factory).client('sagemaker')
 
         for j in jobs:
-            try:
-                client.stop_transform_job(TransformJobName=j['TransformJobName'])
-            except client.exceptions.ResourceNotFound:
-                pass
+            self.manager.call_api(client.stop_transform_job, TransformJobName=j['TransformJobName'])

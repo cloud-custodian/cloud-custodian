@@ -70,6 +70,7 @@ class Table(query.QueryResourceManager):
         dimension = 'TableName'
         cfn_type = config_type = 'AWS::DynamoDB::Table'
         universal_taggable = object()
+        not_found_exceptions = ('TableNotFoundException',)
 
     source_mapping = {
         'describe': DescribeTable,
@@ -137,11 +138,9 @@ class TableContinuousBackupFilter(ValueFilter):
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('dynamodb')
         for r in resources:
-            try:
-                r[self.annotation_key] = client.describe_continuous_backups(
-                    TableName=r['TableName']).get('ContinuousBackupsDescription', {})
-            except client.exceptions.TableNotFoundException:
-                continue
+            r[self.annotation_key] = self.manager.call_api(
+                client.describe_continuous_backups,
+                TableName=r['TableName']).get('ContinuousBackupsDescription', {})
 
     def __call__(self, r):
         return super().__call__(r[self.annotation_key])
@@ -180,14 +179,12 @@ class TableContinuousBackupAction(BaseAction):
             return
         client = local_session(self.manager.session_factory).client('dynamodb')
         for r in resources:
-            try:
-                client.update_continuous_backups(
-                    TableName=r['TableName'],
-                    PointInTimeRecoverySpecification={
-                        'PointInTimeRecoveryEnabled': self.data.get('state', True)
-                    })
-            except client.exceptions.TableNotFoundException:
-                continue
+            self.manager.call_api(
+                client.update_continuous_backups,
+                TableName=r['TableName'],
+                PointInTimeRecoverySpecification={
+                    'PointInTimeRecoveryEnabled': self.data.get('state', True)
+                })
 
 
 @Table.action_registry.register('delete')
@@ -458,6 +455,7 @@ class DynamoDbAccelerator(query.QueryResourceManager):
         id = 'ClusterArn'
         name = 'ClusterName'
         cfn_type = 'AWS::DAX::Cluster'
+        not_found_exceptions = ('ClusterNotFoundFault', 'InvalidClusterStateFault')
 
     permissions = ('dax:ListTags',)
     source_mapping = {
