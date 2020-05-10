@@ -383,6 +383,9 @@ class PolicyStatementFilter(Filter):
     def get_policy(self, r):
         return r.get('Policy')
 
+    def get_required_statements(self, r):
+        return format_string_values(list(self.data.get('statements', [])))
+
     def process_resource(self, r):
         p = self.get_policy(r)
         if p is None:
@@ -395,7 +398,7 @@ class PolicyStatementFilter(Filter):
             if s.get('Sid') in required:
                 required.remove(s['Sid'])
 
-        required_statements = format_string_values(list(self.data.get('statements', [])))
+        required_statements = self.get_required_statements(r)
         for required_statement in required_statements:
             for statement in statements:
                 found = 0

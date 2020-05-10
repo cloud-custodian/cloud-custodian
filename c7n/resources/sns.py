@@ -14,9 +14,8 @@
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
-from c7n.filters import CrossAccountAccessFilter, PolicyChecker
+from c7n.filters import CrossAccountAccessFilter, PolicyChecker, PolicyStatementFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters.iamaccess import PolicyStatementFilter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom

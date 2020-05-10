@@ -65,7 +65,7 @@ from c7n.actions import (
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
-    ValueFilter)
+    ValueFilter, PolicyStatementFilter)
 from c7n.manager import resources
 from c7n.output import NullBlobOutput
 from c7n import query
@@ -755,16 +755,6 @@ class BucketActionBase(BaseAction):
             return results
 
 
-class BucketFilterBase(Filter):
-    def get_std_format_args(self, bucket):
-        return {
-            'account_id': self.manager.config.account_id,
-            'region': self.manager.config.region,
-            'bucket_name': bucket['Name'],
-            'bucket_region': get_region(bucket)
-        }
-
-
 @S3.action_registry.register("post-finding")
 class BucketFinding(PostFinding):
 
@@ -788,7 +778,7 @@ class BucketFinding(PostFinding):
 
 
 @filters.register('has-statement')
-class HasStatementFilter(BucketFilterBase):
+class HasStatementFilter(PolicyStatementFilter):
     """Find buckets with set of policy statements.
 
     :example:
@@ -814,66 +804,18 @@ class HasStatementFilter(BucketFilterBase):
                         Action: 's3:*'
                         Principal: '*'
     """
-    schema = type_schema(
-        'has-statement',
-        statement_ids={'type': 'array', 'items': {'type': 'string'}},
-        statements={
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'Sid': {'type': 'string'},
-                    'Effect': {'type': 'string', 'enum': ['Allow', 'Deny']},
-                    'Principal': {'anyOf': [
-                        {'type': 'string'},
-                        {'type': 'object'}, {'type': 'array'}]},
-                    'NotPrincipal': {
-                        'anyOf': [{'type': 'object'}, {'type': 'array'}]},
-                    'Action': {
-                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'NotAction': {
-                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'Resource': {
-                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'NotResource': {
-                        'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'Condition': {'type': 'object'}
-                },
-                'required': ['Effect']
-            }
-        })
 
-    def process(self, buckets, event=None):
-        return list(filter(None, map(self.process_bucket, buckets)))
+    def get_required_statements(self, r):
+        return format_string_values(list(self.data.get('statements', [])),
+                                    **self.get_std_format_args(r))
 
-    def process_bucket(self, b):
-        p = b.get('Policy')
-        if p is None:
-            return None
-        p = json.loads(p)
-
-        required = list(self.data.get('statement_ids', []))
-        statements = p.get('Statement', [])
-        for s in list(statements):
-            if s.get('Sid') in required:
-                required.remove(s['Sid'])
-
-        required_statements = format_string_values(list(self.data.get('statements', [])),
-                                                   **self.get_std_format_args(b))
-        for required_statement in required_statements:
-            for statement in statements:
-                found = 0
-                for key, value in required_statement.items():
-                    if key in statement and value == statement[key]:
-                        found += 1
-                if found and found == len(required_statement):
-                    required_statements.remove(required_statement)
-                    break
-
-        if (self.data.get('statement_ids', []) and not required) or \
-           (self.data.get('statements', []) and not required_statements):
-            return b
-        return None
+    def get_std_format_args(self, bucket):
+        return {
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+            'bucket_name': bucket['Name'],
+            'bucket_region': get_region(bucket)
+        }
 
 
 ENCRYPTION_STATEMENT_GLOB = {

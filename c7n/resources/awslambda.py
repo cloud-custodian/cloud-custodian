@@ -20,9 +20,8 @@ from botocore.paginate import Paginator
 from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction, RemovePolicyBase, ModifyVpcSecurityGroupsAction
-from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, ValueFilter, PolicyStatementFilter
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.filters.iamaccess import PolicyStatementFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query
