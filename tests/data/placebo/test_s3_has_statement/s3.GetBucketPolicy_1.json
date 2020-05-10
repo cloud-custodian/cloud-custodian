@@ -1,15 +1,7 @@
 {
-    "status_code": 404, 
+    "status_code": 200, 
     "data": {
-        "ResponseMetadata": {
-            "HTTPStatusCode": 404, 
-            "HostId": "N/r54UyuioFB+1JEh4nEgIfbuqiWpayzIIIpHtqGizi5RFZcXhibOGyarc8hJgvg2LB+JsU1L4Q=", 
-            "RequestId": "8E4B0DD43705C703"
-        }, 
-        "Error": {
-            "Message": "The bucket policy does not exist", 
-            "Code": "NoSuchBucketPolicy", 
-            "BucketName": "cf-templates-nyrabrca5x2n-us-east-1"
-        }
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-policy-test/*\",\"Condition\":{\"StringNotEquals\":{\"s3:x-amz-server-side-encryption\":[\"AES256\",\"aws:kms\"]}}},{\"Sid\":\"Zebra\",\"Effect\":\"Deny\",\"Principal\":\"arn:aws:iam::644160558196:root\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::custodian-policy-test/*\"}]}", 
+        "ResponseMetadata": {}
     }
 }
