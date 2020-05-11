@@ -667,14 +667,11 @@ class RedshiftSetAttributes(BaseAction):
             if not modify:
                 return
 
-            print(modify)
-
             modify['ClusterIdentifier'] = (cluster.get('PendingModifiedValues', {})
                                           .get('ClusterIdentifier')
                                           or cluster.get('ClusterIdentifier'))
             client.modify_cluster(**modify)
-        except (client.exceptions.ClusterNotFoundFault,
-                client.exceptions.ResourceNotFoundFault):
+        except (client.exceptions.ClusterNotFoundFault):
             return
         except ClientError as e:
             self.log.warning(

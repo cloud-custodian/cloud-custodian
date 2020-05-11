@@ -5,7 +5,8 @@
             {
                 "ClusterIdentifier": "test",
                 "MaintenanceTrackName": "current",
-                "AllowVersionUpgrade": true
+                "AllowVersionUpgrade": true,
+                "PubliclyAccessible": false
             }
         ],
         "ResponseMetadata": {}
