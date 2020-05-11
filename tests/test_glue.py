@@ -536,3 +536,46 @@ class TestGlueDataCatalog(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_glue_catalog_has_statements(self):
+        session_factory = self.replay_flight_data("test_glue_catalog_has_statements")
+        p = self.load_policy(
+            {
+                "name": "glue-catalog-has-statements",
+                "resource": "glue-catalog",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "glue:*",
+                                "Principal": "*",
+                                "Resource": "arn:aws:glue:us-east-1:644160558196:*",
+                                "Condition": {
+                                    "StringNotEquals": {
+                                        "aws:PrincipalOrgId": 'o-4amkskbcf1'
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
+            '\"Effect\" : \"Deny\"', resources[0]["c7n:AccessPolicy"], 'missing effect element')
+        self.assertIn(
+            '\"Principal\" : \"*\"', resources[0]["c7n:AccessPolicy"], 'missing principal element')
+        self.assertIn(
+            '\"Action\" : \"glue:*\"', resources[0]["c7n:AccessPolicy"], 'missing action element')
+        self.assertIn(
+            '\"Resource\" : \"arn:aws:glue:us-east-1:644160558196:*\"',
+            resources[0]["c7n:AccessPolicy"], 'missing resource element')
+        self.assertIn(
+            ('\"Condition\" : {\n      \"StringNotEquals\" : '
+                '{\n        \"aws:PrincipalOrgId\" : \"o-4amkskbcf1\"\n'),
+            resources[0]["c7n:AccessPolicy"], 'missing condition element')

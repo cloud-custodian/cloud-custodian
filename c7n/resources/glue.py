@@ -20,7 +20,12 @@ from c7n.actions import BaseAction, ActionRegistry
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
-from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
+from c7n.filters import (
+    ValueFilter,
+    FilterRegistry,
+    CrossAccountAccessFilter,
+    PolicyStatementFilter
+)
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
 
@@ -637,3 +642,30 @@ class GlueCatalogCrossAccount(CrossAccountAccessFilter):
             policy = {}
         r[self.policy_annotation] = policy
         return policy
+
+
+@GlueDataCatalog.filter_registry.register('has-statement')
+class HasStatementFilter(PolicyStatementFilter, GlueCatalogCrossAccount):
+    """Find catalogs with set of policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: glue-explicit-deny
+            resource: aws.glue-catalog
+            filters:
+              - type: has-statement
+                statements:
+                  - Effect: Deny
+                    Action: 'glue:*'
+                    Principal: '*'
+                    Resource: 'arn:aws:glue:{region}:{account_id}:*'
+                    Condition:
+                      StringNotEquals:
+                        "aws:PrincipalOrgId": 'o-yourorgid'
+    """
+
+    def get_policy(self, r):
+        return self.get_resource_policy(r)

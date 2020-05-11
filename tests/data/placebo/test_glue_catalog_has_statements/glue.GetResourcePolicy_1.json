@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PolicyInJson": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Effect\" : \"Deny\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"glue:*\",\n    \"Resource\" : \"arn:aws:glue:us-east-1:644160558196:*\",\n    \"Condition\" : {\n      \"StringNotEquals\" : {\n        \"aws:PrincipalOrgId\" : \"o-4amkskbcf1\"\n      }\n    }\n  } ]\n}",
+        "PolicyHash": "q3C9fnzx8zzcr5AH1Y0TZA==",
+        "CreateTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 5,
+            "day": 11,
+            "hour": 14,
+            "minute": 35,
+            "second": 17,
+            "microsecond": 919000
+        },
+        "UpdateTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 5,
+            "day": 11,
+            "hour": 14,
+            "minute": 35,
+            "second": 17,
+            "microsecond": 919000
+        },
+        "ResponseMetadata": {}
+    }
+}
