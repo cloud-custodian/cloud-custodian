@@ -1616,3 +1616,118 @@ class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
               SseAwsKmsKeyId: alias/aws/glue
 
     """
+
+
+@filters.register('emr-block-public-access')
+class EMRBlockPublicAccessConfiguration(ValueFilter):
+    """Check for EMR block public access configuration on an account
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: get-emr-block-public-access
+                resource: account
+                filters:
+                  - type: emr-block-public-access
+    """
+
+    annotation_key = 'c7n:emr-block-public-access'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('emr-block-public-access', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ("elasticmapreduce:GetBlockPublicAccessConfiguration",)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            'emr', region_name=self.manager.config.region)
+
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_block_public_access_configuration()
+                r[self.annotation_key].pop('ResponseMetadata')
+            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                r[self.annotation_key] = {}
+
+    def __call__(self, r):
+        return super(EMRBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])
+
+
+@actions.register('set-emr-block-public-access')
+class PutAccountBlockPublicAccessConfiguration(BaseAction):
+    """Action to put/update the EMR block public access configuration for your
+       AWS account in the current region
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-emr-block-public-access
+                resource: account
+                filters:
+                  - type: emr-block-public-access
+                    key: BlockPublicAccessConfiguration.BlockPublicSecurityGroupRules
+                    value: False
+                actions:
+                  - type: set-emr-block-public-access
+                    config:
+                        BlockPublicSecurityGroupRules: True
+                        PermittedPublicSecurityGroupRuleRanges:
+                            - MinRange: 22
+                              MaxRange: 22
+                            - MinRange: 23
+                              MaxRange: 23
+
+    """
+
+    schema = type_schema('set-emr-block-public-access',
+                         config={"type": "object",
+                            'properties': {
+                                'BlockPublicSecurityGroupRules': {'type': 'boolean'},
+                                'PermittedPublicSecurityGroupRuleRanges': {
+                                    'type': 'array',
+                                    'items': {
+                                        'type': 'object',
+                                        'properties': {
+                                            'MinRange': {'type': 'number', "minimum": 0},
+                                            'MaxRange': {'type': 'number', "minimum": 0}
+                                        },
+                                        'required': ['MinRange']
+                                    }
+                                }
+                            },
+                             'required': ['BlockPublicSecurityGroupRules']
+                         },
+                         required=('config',))
+
+    permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('emr')
+        r = resources[0]
+
+        base = {}
+        if EMRBlockPublicAccessConfiguration.annotation_key in r:
+            base = r[EMRBlockPublicAccessConfiguration.annotation_key]
+        else:
+            try:
+                base = client.get_block_public_access_configuration()
+                base.pop('ResponseMetadata')
+            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                base = {}
+
+        config = base['BlockPublicAccessConfiguration']
+        updatedConfig = {**config, **self.data.get('config')}
+
+        if config == updatedConfig:
+            return
+
+        client.put_block_public_access_configuration(
+            BlockPublicAccessConfiguration=updatedConfig
+        )

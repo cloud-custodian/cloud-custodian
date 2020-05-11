@@ -29,6 +29,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.filters.iamaccess import CrossAccountAccessFilter, PolicyChecker
 from c7n.mu import LambdaManager, LambdaFunction, PythonPackageArchive
 from botocore.exceptions import ClientError
+from c7n.resources.aws import shape_validate
 from c7n.resources.sns import SNS
 from c7n.resources.iam import (
     UserMfaDevice,
@@ -376,6 +377,48 @@ class IAMMFAFilter(BaseTest):
 
 
 class IamRoleTest(BaseTest):
+
+    def test_iam_role_post(self):
+        factory = self.replay_flight_data("test_security_hub_iam_role")
+        policy = self.load_policy(
+            {
+                "name": "iam-role-finding",
+                "resource": "iam-role",
+                "filters": [{"type": "value", "key": "RoleName", "value": "app1"}],
+                "actions": [
+                    {
+                        "type": "post-finding",
+                        "severity": 10,
+                        "severity_normalized": 10,
+                        "types": [
+                            "Software and Configuration Checks/AWS Security Best Practices"
+                        ],
+                    }
+                ],
+            },
+            config={"account_id": "101010101111"},
+            session_factory=factory,
+        )
+
+        resources = policy.resource_manager.get_resources(['app1'])
+        self.assertEqual(len(resources), 1)
+        rfinding = policy.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.maxDiff = None
+        self.assertIn('AssumeRolePolicyDocument', rfinding['Details']['AwsIamRole'])
+        rfinding['Details']['AwsIamRole'].pop('AssumeRolePolicyDocument')
+        self.assertEqual(rfinding, {
+            'Details': {'AwsIamRole': {
+                'CreateDate': '2018-05-24T13:34:59+00:00',
+                'MaxSessionDuration': 3600,
+                'Path': '/',
+                'RoleId': 'AROAIGK7B2VUDZL4I73HK',
+                'RoleName': 'app1'}},
+            'Id': 'arn:aws:iam::101010101111:role/app1',
+            'Partition': 'aws',
+            'Region': 'us-east-1',
+            'Type': 'AwsIamRole'})
+        shape_validate(rfinding['Details']['AwsIamRole'], 'AwsIamRoleDetails', 'securityhub')
 
     def test_iam_role_inuse(self):
         session_factory = self.replay_flight_data("test_iam_role_inuse")

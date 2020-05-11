@@ -14,6 +14,8 @@
 import time
 from .common import BaseTest
 
+from c7n.resources.aws import shape_validate
+
 
 class CodeCommit(BaseTest):
 
@@ -102,6 +104,41 @@ class CodeBuild(BaseTest):
         remainder = client.list_projects()["projects"]
         self.assertEqual(len(remainder), 2)
         self.assertNotIn("test-delete-codebuild", remainder)
+
+    def test_post_finding_build(self):
+        factory = self.replay_flight_data('test_codebuild_post_finding')
+        p = self.load_policy({
+            'name': 'codebuild',
+            'resource': 'aws.codebuild',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-east-2'})
+        builds = p.resource_manager.resources()
+        self.assertEqual(len(builds), 1)
+        self.maxDiff = None
+        rfinding = p.resource_manager.actions[0].format_resource(builds[0])
+        self.assertEqual(
+            rfinding,
+            {'Details': {
+                'AwsCodeBuildProject': {
+                    'EncryptionKey': 'arn:aws:kms:us-east-2:644160558196:alias/aws/s3',
+                    'Environment': {'ImagePullCredentialsType': 'CODEBUILD',
+                                    'Type': 'LINUX_CONTAINER'},
+                    'Name': 'custodian',
+                    'ServiceRole': 'arn:aws:iam::644160558196:role/service-role/codebuild-test-service-role',  # noqa
+                    'Source': {'Location': 'https://github.com/kapilt/cloud-custodian',
+                               'Type': 'GITHUB'}}},
+             'Id': 'arn:aws:codebuild:us-east-2:644160558196:project/custodian',
+             'Partition': 'aws',
+             'Region': 'us-east-2',
+             'Type': 'AwsCodeBuildProject'})
+
+        shape_validate(
+            rfinding['Details']['AwsCodeBuildProject'],
+            'AwsCodeBuildProjectDetails',
+            'securityhub')
 
 
 class CodePipeline(BaseTest):

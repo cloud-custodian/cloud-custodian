@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "QueueArn": "arn:aws:sqs:us-west-2:644160558196:test_sqs_modify_policy_add_remove_statements",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1586463530",
+            "LastModifiedTimestamp": "1588416897",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"sqs:Subscribe\"},{\"Sid\":\"RemoveMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sqs:GetQueueAttributes\"}]}",
+            "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:us-west-2:644160558196:deadlq\",\"maxReceiveCount\":1}",
+            "ReceiveMessageWaitTimeSeconds": "0",
+            "KmsMasterKeyId": "alias/aws/sqs",
+            "KmsDataKeyReusePeriodSeconds": "300"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -33,6 +33,7 @@ from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
+from json import JSONEncoder
 
 from c7n.utils import chunks, local_session
 
@@ -477,13 +478,33 @@ class AppInsightsHelper:
 
 
 class ManagedGroupHelper:
+    class serialize(JSONEncoder):
+        def default(self, o):
+            return o.__dict__
+
+    @staticmethod
+    def filter_subscriptions(key, dictionary):
+        for k, v in dictionary.items():
+            if k == key:
+                if v == '/subscriptions':
+                    yield dictionary
+            elif isinstance(v, dict):
+                for result in ManagedGroupHelper.filter_subscriptions(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    for result in ManagedGroupHelper.filter_subscriptions(key, d):
+                        yield result
 
     @staticmethod
     def get_subscriptions_list(managed_resource_group, credentials):
         client = ManagementGroupsAPI(credentials)
-        entities = client.entities.list(filter='name eq \'%s\'' % managed_resource_group)
-
-        return [e.name for e in entities if e.type == '/subscriptions']
+        groups = client.management_groups.get(
+            group_id=managed_resource_group, recurse=True,
+            expand="children").serialize()["properties"]
+        subscriptions = ManagedGroupHelper.filter_subscriptions('type', groups)
+        subscriptions = [subscription['name'] for subscription in subscriptions]
+        return subscriptions
 
 
 def generate_key_vault_url(name):
