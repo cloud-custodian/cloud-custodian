@@ -632,6 +632,13 @@ class RedshiftSetAttributes(BaseAction):
                         required=('attributes',))
 
     permissions = ('redshift:ModifyCluster',)
+    cluster_mapping = {
+        'ElasticIp': 'ElasticIpStatus.ElasticIp',
+        'ClusterSecurityGroups': 'ClusterSecurityGroups[].ClusterSecurityGroupName',
+        'VpcSecurityGroupIds': 'VpcSecurityGroups[].ClusterSecurityGroupName',
+        'HsmClientCertificateIdentifier': 'HsmStatus.HsmClientCertificateIdentifier',
+        'HsmConfigurationIdentifier': 'HsmStatus.HsmConfigurationIdentifier'
+    }
 
     shape = 'ModifyClusterMessage'
 
@@ -653,21 +660,10 @@ class RedshiftSetAttributes(BaseAction):
             config = dict(self.data.get('attributes'))
             modify = {}
             for k, v in config.items():
-                if k == 'ElasticIp' and v != jmespath.search('ElasticIpStatus.ElasticIp', cluster):
+                if (k in self.cluster_mapping and
+                v != jmespath.search(self.cluster_mapping[k], cluster)):
                     modify[k] = v
-                elif (k == 'ClusterSecurityGroups' and v !=
-                jmespath.search('ClusterSecurityGroups[].ClusterSecurityGroupName', cluster)):
-                    modify[k] = v
-                elif (k == 'VpcSecurityGroupIds' and v !=
-                jmespath.search('VpcSecurityGroups[].VpcSecurityGroupId', cluster)):
-                    modify[k] = v
-                elif (k == 'HsmClientCertificateIdentifier' and
-                v != jmespath.search('HsmStatus.HsmClientCertificateIdentifier', cluster)):
-                    modify[k] = v
-                elif (k == 'HsmConfigurationIdentifier' and
-                v != jmespath.search('HsmStatus.HsmConfigurationIdentifier', cluster)):
-                    modify[k] = v
-                elif v != cluster.get('PendingModifiedValues').get(k, cluster.get(k)):
+                if v != cluster.get('PendingModifiedValues').get(k, cluster.get(k)):
                     modify[k] = v
             if not modify:
                 return
@@ -676,11 +672,14 @@ class RedshiftSetAttributes(BaseAction):
                                           .get('ClusterIdentifier')
                                           or cluster.get('ClusterIdentifier'))
             client.modify_cluster(**modify)
-        except Exception as e:
+        except (client.exceptions.ClusterNotFoundFault,
+                client.exceptions.ResourceNotFoundFault):
+            return
+        except ClientError as e:
             self.log.warning(
                 "Exception trying to modify cluster: %s error: %s",
                 cluster['ClusterIdentifier'], e)
-            raise e
+            raise
 
 
 @Redshift.action_registry.register('mark-for-op')
