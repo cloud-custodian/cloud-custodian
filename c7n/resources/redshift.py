@@ -660,15 +660,14 @@ class RedshiftSetAttributes(BaseAction):
             config = dict(self.data.get('attributes'))
             modify = {}
             for k, v in config.items():
-                if (k in self.cluster_mapping and
-                v != jmespath.search(self.cluster_mapping[k], cluster)):
-                    modify[k] = v
-                if v != cluster.get('PendingModifiedValues').get(k, cluster.get(k)):
+                if ((k in self.cluster_mapping and
+                v != jmespath.search(self.cluster_mapping[k], cluster)) or
+                v != cluster.get('PendingModifiedValues', {}).get(k, cluster.get(k))):
                     modify[k] = v
             if not modify:
                 return
 
-            modify['ClusterIdentifier'] = (cluster.get('PendingModifiedValues')
+            modify['ClusterIdentifier'] = (cluster.get('PendingModifiedValues', {})
                                           .get('ClusterIdentifier')
                                           or cluster.get('ClusterIdentifier'))
             client.modify_cluster(**modify)
