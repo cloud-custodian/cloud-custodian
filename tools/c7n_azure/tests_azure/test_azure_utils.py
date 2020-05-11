@@ -111,11 +111,11 @@ class UtilsTest(BaseTest):
         self.assertEqual(TagHelper.get_tag_value(resource, 'tag3', True), 'VALUE3')
 
     def test_get_ports(self):
-        self.assertEqual(PortsRangeHelper.get_ports_set_from_string("5, 4-5, 9"), set([4, 5, 9]))
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_string("5, 4-5, 9"), {4, 5, 9})
         rule = {'properties': {'destinationPortRange': '10-12'}}
-        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), set([10, 11, 12]))
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12})
         rule = {'properties': {'destinationPortRanges': ['80', '10-12']}}
-        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), set([10, 11, 12, 80]))
+        self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12, 80})
 
     def test_validate_ports_string(self):
         self.assertEqual(PortsRangeHelper.validate_ports_string('80'), True)
@@ -249,19 +249,27 @@ class UtilsTest(BaseTest):
         self.assertEqual(mock.orig_send.call_count, 1)
         self.assertEqual(logger.call_count, 1)
 
-    managed_group_return_value = ([
-        Bag({'name': '/providers/Microsoft.Management/managementGroups/cc-test-1',
-             'type': '/providers/Microsoft.Management/managementGroups'}),
-        Bag({'name': '/providers/Microsoft.Management/managementGroups/cc-test-2',
-             'type': '/providers/Microsoft.Management/managementGroups'}),
-        Bag({'name': DEFAULT_SUBSCRIPTION_ID,
-             'type': '/subscriptions'}),
-        Bag({'name': GUID,
-             'type': '/subscriptions'}),
-    ])
+    managed_group_return_value = Bag({
+        'properties': {
+            'name': 'dev',
+            'type': '/providers/Micrsoft.Management/managementGroups',
+            'children': [
+                Bag({'name': DEFAULT_SUBSCRIPTION_ID,
+                     'type': '/subscriptions'}),
+                Bag({'name': 'east',
+                     'type': '/providers/Microsoft.Management/managementGroups',
+                     'children': [{
+                         'type': '/subscriptions',
+                         'name': GUID}]})
+            ],
+        }
+    })
+    managed_group_return_value['serialize'] = lambda self=managed_group_return_value: self
 
-    @patch('azure.mgmt.managementgroups.operations.EntitiesOperations.list',
-           return_value=managed_group_return_value)
+    @patch((
+        'azure.mgmt.managementgroups.operations'
+        '.management_groups_operations.ManagementGroupsOperations.get'),
+        return_value=managed_group_return_value)
     def test_managed_group_helper(self, _1):
         sub_ids = ManagedGroupHelper.get_subscriptions_list('test-group', "")
         self.assertEqual(sub_ids, [DEFAULT_SUBSCRIPTION_ID, GUID])

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import json
-import six
 
 from c7n.exceptions import PolicyValidationError
 
@@ -24,15 +23,14 @@ class StructureParser:
     Intent is to provide more humane validation for top level errors
     instead of printing full schema as error message.
     """
-    allowed_file_keys = set(('vars', 'policies'))
-    required_policy_keys = set(('name', 'resource'))
-    allowed_policy_keys = set(
-        ('name', 'resource', 'title', 'description', 'mode',
+    allowed_file_keys = {'vars', 'policies'}
+    required_policy_keys = {'name', 'resource'}
+    allowed_policy_keys = {'name', 'resource', 'title', 'description', 'mode',
          'tags', 'max-resources', 'source', 'query',
          'filters', 'actions', 'source', 'tags', 'conditions',
          # legacy keys subject to deprecation.
          'region', 'start', 'end', 'tz', 'max-resources-percent',
-         'comments', 'comment'))
+         'comments', 'comment'}
 
     def validate(self, data):
         if not isinstance(data, dict):
@@ -78,7 +76,7 @@ class StructureParser:
             raise PolicyValidationError((
                 'policy:%s must use a list for filters found:%s' % (
                     p['name'], type(p['filters']).__name__)))
-        element_types = (dict,) + six.string_types
+        element_types = (dict, str)
         for f in p.get('filters', ()):
             if not isinstance(f, element_types):
                 raise PolicyValidationError((

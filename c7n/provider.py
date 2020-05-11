@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import abc
-import six
 import importlib
 
 from c7n.registry import PluginRegistry
@@ -22,8 +21,7 @@ from c7n.registry import PluginRegistry
 clouds = PluginRegistry('c7n.providers')
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Provider:
+class Provider(metaclass=abc.ABCMeta):
     """Provider Base Class"""
 
     @abc.abstractproperty

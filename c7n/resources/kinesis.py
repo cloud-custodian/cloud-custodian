@@ -41,7 +41,7 @@ class KinesisStream(QueryResourceManager):
         name = id = 'StreamName'
         dimension = 'StreamName'
         universal_taggable = True
-        # config_type = 'AWS::Kinesis::Stream'
+        cfn_type = 'AWS::Kinesis::Stream'
 
     source_mapping = {
         'describe': DescribeStream,
@@ -116,7 +116,7 @@ class DeliveryStream(QueryResourceManager):
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
         universal_taggable = object()
-        # config_type = 'AWS::KinesisFirehose::DeliveryStream'
+        cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
 
     source_mapping = {
         'describe': DescribeDeliveryStream,
@@ -247,7 +247,7 @@ class AnalyticsApp(QueryResourceManager):
         arn = id = "ApplicationARN"
         arn_type = 'application'
         universal_taggable = object()
-        # config_type = 'AWS::KinesisAnalytics::Application'
+        cfn_type = 'AWS::KinesisAnalytics::Application'
 
     source_mapping = {
         'config': ConfigSource,

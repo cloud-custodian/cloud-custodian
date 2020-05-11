@@ -14,7 +14,7 @@
 import datetime
 import json
 import hashlib
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import local_session, type_schema

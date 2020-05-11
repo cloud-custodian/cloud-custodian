@@ -14,7 +14,6 @@
 import json
 from datetime import timedelta
 
-from six import string_types
 from tests_azure.azure_common import BaseTest, arm_template
 from dateutil.parser import parse
 
@@ -131,7 +130,7 @@ def resource_cmp(res1, res2, ignore_properties=[]):
             if not resource_cmp(item1, item2):
                 return False
 
-    elif isinstance(res1, string_types):
+    elif isinstance(res1, str):
         res1 = res1.lower()
         res2 = res2.lower()
 

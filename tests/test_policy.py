@@ -25,12 +25,13 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
 from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
+from c7n.policy import ConfigPollRuleMode
 from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
 from c7n.version import version
 
-from .common import BaseTest, event_data, Bag
+from .common import BaseTest, event_data, Bag, load_data
 
 
 class DummyResource(manager.ResourceManager):
@@ -80,13 +81,11 @@ class PolicyMetaLint(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
-                    "kinesis:DescribeStream",
-                    "kinesis:ListStreams",
-                    "kinesis:DeleteStream",
-                )
-            ),
+            {
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "kinesis:DeleteStream",
+            },
         )
 
     def test_schema_plugin_name_mismatch(self):
@@ -183,9 +182,9 @@ class PolicyMetaLint(BaseTest):
             if arn_gen:
                 overrides.add(k)
 
-        overrides = overrides.difference(set(
-            ('account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage')))
+        overrides = overrides.difference(
+            {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
+             'rest-stage'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -196,6 +195,40 @@ class PolicyMetaLint(BaseTest):
                 names.append(k)
         if names:
             self.fail("%s dont have resource name for reporting" % (", ".join(names)))
+
+    def test_cfn_resource_validity(self):
+        # for resources which are annotated with cfn_type ensure that it is
+        # a valid type.
+        resource_cfn_types = set()
+        for k, v in manager.resources.items():
+            rtype = v.resource_type.cfn_type
+            if rtype is not None:
+                resource_cfn_types.add(rtype)
+        cfn_types = set(load_data('cfn-types.json'))
+        for rtype in resource_cfn_types:
+            assert rtype in cfn_types, "invalid cfn %s" % rtype
+
+    def test_securityhub_resource_support(self):
+        session = fake_session()._session
+        model = session.get_service_model('securityhub')
+        shape = model.shape_for('ResourceDetails')
+        mangled_hub_types = set(shape.members.keys())
+        resource_hub_types = set()
+
+        whitelist = set(('AwsS3Object', 'Container'))
+        todo = set((
+            'AwsRdsDbInstance',
+            'AwsElbv2LoadBalancer',
+            'AwsEc2SecurityGroup',
+            'AwsIamAccessKey',
+            'AwsEc2NetworkInterface',
+            'AwsWafWebAcl'))
+        mangled_hub_types = mangled_hub_types.difference(whitelist).difference(todo)
+        for k, v in manager.resources.items():
+            finding = v.action_registry.get('post-finding')
+            if finding:
+                resource_hub_types.add(finding.resource_type)
+        assert mangled_hub_types.difference(resource_hub_types) == set()
 
     def test_config_resource_support(self):
 
@@ -330,16 +363,16 @@ class PolicyMetaLint(BaseTest):
 
     def test_resource_arn_info(self):
         missing = []
-        whitelist_missing = set((
-            'rest-stage', 'rest-resource', 'rest-vpclink'))
+        whitelist_missing = {
+            'rest-stage', 'rest-resource', 'rest-vpclink'}
         explicit = []
-        whitelist_explicit = set((
+        whitelist_explicit = {
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target',
-            'support-case', 'transit-attachment', 'config-recorder'))
+            'support-case', 'transit-attachment', 'config-recorder'}
 
         missing_method = []
         for k, v in manager.resources.items():
@@ -458,13 +491,11 @@ class PolicyMeta(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
-                    "kinesis:DescribeStream",
-                    "kinesis:ListStreams",
-                    "kinesis:DeleteStream",
-                )
-            ),
+            {
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "kinesis:DeleteStream",
+            },
         )
 
     def test_policy_manager_custom_permissions(self):
@@ -485,13 +516,11 @@ class PolicyMeta(BaseTest):
         perms = policy.get_permissions()
         self.assertEqual(
             perms,
-            set(
-                (
-                    "ec2:DescribeInstances",
-                    "ec2:DescribeTags",
-                    "cloudwatch:GetMetricStatistics",
-                )
-            ),
+            {
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags",
+                "cloudwatch:GetMetricStatistics",
+            },
         )
 
 
@@ -719,7 +748,7 @@ class TestPolicy(BaseTest):
         for p in collection:
             self.assertTrue(p.name is not None)
 
-        self.assertEqual(collection.resource_types, set(("s3", "ec2")))
+        self.assertEqual(collection.resource_types, {"s3", "ec2"})
         self.assertTrue("s3-remediate" in collection)
 
         self.assertEqual(
@@ -1198,6 +1227,45 @@ class PhdModeTest(BaseTest):
         self.load_policy(
             {'name': 'abc', 'resource': 'account',
              'mode': {'type': 'phd'}})
+
+
+class ConfigModeTest(BaseTest):
+
+    def test_config_poll(self):
+        factory = self.replay_flight_data('test_config_poll_rule_evaluation')
+        cmock = mock.MagicMock()
+        requests = []
+
+        def record_requests(Evaluations, ResultToken):
+            requests.append(Evaluations)
+
+        cmock.put_evaluations.side_effect = record_requests
+        cmock.put_evaluations.return_value = {}
+        self.patch(
+            ConfigPollRuleMode, '_get_client', lambda self: cmock)
+        p = self.load_policy({
+            'name': 'kin-poll',
+            'resource': 'aws.kinesis',
+            'filters': [{'tag:App': 'Dev'}],
+            'mode': {
+                'type': 'config-poll-rule',
+                'schedule': 'Three_Hours'}},
+            session_factory=factory)
+        event = event_data('poll-evaluation.json', 'config')
+        results = p.push(event, None)
+        self.assertEqual(results, ['dev2'])
+        self.assertEqual(
+            requests,
+            [[{'Annotation': 'The resource is not compliant with policy:kin-poll.',
+               'ComplianceResourceId': 'dev2',
+               'ComplianceResourceType': 'AWS::Kinesis::Stream',
+               'ComplianceType': 'NON_COMPLIANT',
+               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}],
+             [{'Annotation': 'The resource is compliant with policy:kin-poll.',
+               'ComplianceResourceId': 'dev1',
+               'ComplianceResourceType': 'AWS::Kinesis::Stream',
+               'ComplianceType': 'COMPLIANT',
+               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}]])
 
 
 class GuardModeTest(BaseTest):

@@ -47,7 +47,7 @@ class Redshift(QueryResourceManager):
         filter_type = 'scalar'
         date = 'ClusterCreateTime'
         dimension = 'ClusterIdentifier'
-        config_type = "AWS::Redshift::Cluster"
+        cfn_type = config_type = "AWS::Redshift::Cluster"
 
 
 Redshift.filter_registry.register('marked-for-op', tags.TagActionFilter)
@@ -126,20 +126,8 @@ class LoggingFilter(ValueFilter):
         return results
 
 
-class StateTransitionAction(BaseAction):
-
-    def filter_cluster_state(self, resources, states):
-        resource_count = len(resources)
-        results = [r for r in resources if r['ClusterStatus'] in states]
-        if resource_count != len(results):
-            self.log.warning(
-                '%s filtered to %d of %d clusters in states: %s',
-                self.type, len(results), resource_count, ', '.join(states))
-        return results
-
-
 @Redshift.action_registry.register('pause')
-class Pause(StateTransitionAction):
+class Pause(BaseAction):
 
     schema = type_schema('pause')
     permissions = ('redshift:PauseCluster',)
@@ -147,7 +135,7 @@ class Pause(StateTransitionAction):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
-        for r in self.filter_cluster_state(resources, ('available',)):
+        for r in self.filter_resources(resources, 'ClusterStatus', ('available',)):
             try:
                 client.pause_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])
@@ -157,7 +145,7 @@ class Pause(StateTransitionAction):
 
 
 @Redshift.action_registry.register('resume')
-class Resume(StateTransitionAction):
+class Resume(BaseAction):
 
     schema = type_schema('resume')
     permissions = ('redshift:ResumeCluster',)
@@ -165,7 +153,7 @@ class Resume(StateTransitionAction):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
-        for r in self.filter_cluster_state(resources, ('paused',)):
+        for r in self.filter_resources(resources, 'ClusterStatus', ('paused',)):
             try:
                 client.resume_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])
@@ -826,7 +814,7 @@ class RedshiftSubnetGroup(QueryResourceManager):
             'describe_cluster_subnet_groups', 'ClusterSubnetGroups', None)
         filter_name = 'ClusterSubnetGroupName'
         filter_type = 'scalar'
-        config_type = "AWS::Redshift::ClusterSubnetGroup"
+        cfn_type = config_type = "AWS::Redshift::ClusterSubnetGroup"
 
 
 @resources.register('redshift-snapshot')

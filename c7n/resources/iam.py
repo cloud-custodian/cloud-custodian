@@ -25,7 +25,6 @@ from concurrent.futures import as_completed
 from dateutil.tz import tzutc
 from dateutil.parser import parse as parse_date
 
-import six
 from botocore.exceptions import ClientError
 
 
@@ -35,34 +34,16 @@ from c7n.filters import ValueFilter, Filter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.tags import TagActionFilter, TagDelayedAction, Tag, RemoveTag
 from c7n.utils import (
-    get_partition, local_session, type_schema, chunks, filter_empty, QueryParser)
+    get_partition, local_session, type_schema, chunks, filter_empty, QueryParser,
+    select_keys
+)
 
 from c7n.resources.aws import Arn
 from c7n.resources.securityhub import OtherResourcePostFinding
-
-
-@resources.register('iam-group')
-class Group(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'iam'
-        arn_type = 'group'
-        enum_spec = ('list_groups', 'Groups', None)
-        id = name = 'GroupName'
-        date = 'CreateDate'
-        config_type = "AWS::IAM::Group"
-        # Denotes this resource type exists across regions
-        global_resource = True
-        arn = 'Arn'
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeGroup(self)
-        return super(Group, self).get_source(source_type)
 
 
 class DescribeGroup(DescribeSource):
@@ -82,25 +63,24 @@ class DescribeGroup(DescribeSource):
         return resources
 
 
-@resources.register('iam-role')
-class Role(QueryResourceManager):
+@resources.register('iam-group')
+class Group(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'iam'
-        arn_type = 'role'
-        enum_spec = ('list_roles', 'Roles', None)
-        detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
-        id = name = 'RoleName'
+        arn_type = 'group'
+        enum_spec = ('list_groups', 'Groups', None)
+        id = name = 'GroupName'
         date = 'CreateDate'
-        config_type = "AWS::IAM::Role"
+        cfn_type = config_type = "AWS::IAM::Group"
         # Denotes this resource type exists across regions
         global_resource = True
         arn = 'Arn'
 
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeRole(self)
-        return super(Role, self).get_source(source_type)
+    source_mapping = {
+        'describe': DescribeGroup,
+        'config': ConfigSource
+    }
 
 
 class DescribeRole(DescribeSource):
@@ -117,6 +97,44 @@ class DescribeRole(DescribeSource):
                 continue
             resources.append(result.pop('Role'))
         return resources
+
+
+@resources.register('iam-role')
+class Role(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        arn_type = 'role'
+        enum_spec = ('list_roles', 'Roles', None)
+        detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
+        id = name = 'RoleName'
+        date = 'CreateDate'
+        cfn_type = config_type = "AWS::IAM::Role"
+        # Denotes this resource type exists across regions
+        global_resource = True
+        arn = 'Arn'
+
+    source_mapping = {
+        'describe': DescribeRole,
+        'config': ConfigSource
+    }
+
+
+@Role.action_registry.register('post-finding')
+class RolePostFinding(OtherResourcePostFinding):
+
+    resource_type = 'AwsIamRole'
+
+    def format_resource(self, r):
+        envelope, payload = self.format_envelope(r)
+        payload.update(self.filter_empty(
+            select_keys(r, ['AssumeRolePolicyDocument', 'CreateDate',
+                            'MaxSessionDuration', 'Path', 'RoleId',
+                            'RoleName'])))
+        payload['AssumeRolePolicyDocument'] = json.dumps(
+            payload['AssumeRolePolicyDocument'])
+        payload['CreateDate'] = payload['CreateDate'].isoformat()
+        return envelope
 
 
 @Role.action_registry.register('tag')
@@ -202,27 +220,6 @@ class RoleSetBoundary(SetBoundary):
                 'RoleName': resource['RoleName']}
 
 
-@resources.register('iam-user')
-class User(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'iam'
-        arn_type = 'user'
-        detail_spec = ('get_user', 'UserName', 'UserName', 'User')
-        enum_spec = ('list_users', 'Users', None)
-        id = name = 'UserName'
-        date = 'CreateDate'
-        config_type = "AWS::IAM::User"
-        # Denotes this resource type exists across regions
-        global_resource = True
-        arn = 'Arn'
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeUser(self)
-        return super(User, self).get_source(source_type)
-
-
 class DescribeUser(DescribeSource):
 
     def get_resources(self, resource_ids, cache=True):
@@ -235,6 +232,27 @@ class DescribeUser(DescribeSource):
             except client.exceptions.NoSuchEntityException:
                 continue
         return results
+
+
+@resources.register('iam-user')
+class User(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        arn_type = 'user'
+        detail_spec = ('get_user', 'UserName', 'UserName', 'User')
+        enum_spec = ('list_users', 'Users', None)
+        id = name = 'UserName'
+        date = 'CreateDate'
+        cfn_type = config_type = "AWS::IAM::User"
+        # Denotes this resource type exists across regions
+        global_resource = True
+        arn = 'Arn'
+
+    source_mapping = {
+        'describe': DescribeUser,
+        'config': ConfigSource
+    }
 
 
 @User.action_registry.register('tag')
@@ -338,27 +356,6 @@ class UserSetBoundary(SetBoundary):
                 'UserName': resource['UserName']}
 
 
-@resources.register('iam-policy')
-class Policy(QueryResourceManager):
-
-    class resource_type(TypeInfo):
-        service = 'iam'
-        arn_type = 'policy'
-        enum_spec = ('list_policies', 'Policies', None)
-        id = 'PolicyId'
-        name = 'PolicyName'
-        date = 'CreateDate'
-        config_type = "AWS::IAM::Policy"
-        # Denotes this resource type exists across regions
-        global_resource = True
-        arn = 'Arn'
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribePolicy(self)
-        return super(Policy, self).get_source(source_type)
-
-
 class DescribePolicy(DescribeSource):
 
     def resources(self, query=None):
@@ -381,12 +378,33 @@ class DescribePolicy(DescribeSource):
         return results
 
 
+@resources.register('iam-policy')
+class Policy(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'iam'
+        arn_type = 'policy'
+        enum_spec = ('list_policies', 'Policies', None)
+        id = 'PolicyId'
+        name = 'PolicyName'
+        date = 'CreateDate'
+        cfn_type = config_type = "AWS::IAM::Policy"
+        # Denotes this resource type exists across regions
+        global_resource = True
+        arn = 'Arn'
+
+    source_mapping = {
+        'describe': DescribePolicy,
+        'config': ConfigSource
+    }
+
+
 class PolicyQueryParser(QueryParser):
 
     QuerySchema = {
         'Scope': ('All', 'AWS', 'Local'),
         'PolicyUsageFilter': ('PermissionsPolicy', 'PermissionsBoundary'),
-        'PathPrefix': six.string_types,
+        'PathPrefix': str,
         'OnlyAttached': bool
     }
     multi_value = False
@@ -481,9 +499,9 @@ class ServiceUsage(Filter):
     """
 
     JOB_COMPLETE = 'COMPLETED'
-    SERVICE_ATTR = set((
+    SERVICE_ATTR = {
         'ServiceName', 'ServiceNamespace', 'TotalAuthenticatedEntities',
-        'LastAuthenticated', 'LastAuthenticatedEntity'))
+        'LastAuthenticated', 'LastAuthenticatedEntity'}
 
     schema_alias = True
     schema_attr = {
@@ -493,7 +511,7 @@ class ServiceUsage(Filter):
             {'type': 'number'},
             {'type': 'null'},
             {'$ref': '#/definitions/filters/value'}]}
-        for sa in SERVICE_ATTR}
+        for sa in sorted(SERVICE_ATTR)}
     schema_attr['match-operator'] = {'enum': ['all', 'any']}
     schema_attr['poll-delay'] = {'type': 'number'}
     schema = type_schema(
@@ -695,7 +713,7 @@ class CheckPermissions(Filter):
         return evaluations
 
     def get_eval_matcher(self):
-        if isinstance(self.data['match'], six.string_types):
+        if isinstance(self.data['match'], str):
             if self.data['match'] == 'denied':
                 values = ['explicitDeny', 'implicitDeny']
             else:
@@ -1192,10 +1210,10 @@ class AllowAllIamPolicies(Filter):
         for s in statements:
             if ('Condition' not in s and
                     'Action' in s and
-                    isinstance(s['Action'], six.string_types) and
+                    isinstance(s['Action'], str) and
                     s['Action'] == "*" and
                     'Resource' in s and
-                    isinstance(s['Resource'], six.string_types) and
+                    isinstance(s['Resource'], str) and
                     s['Resource'] == "*" and
                     s['Effect'] == "Allow"):
                 return True
@@ -1419,7 +1437,7 @@ class CredentialReport(Filter):
             return report
         data = self.fetch_credential_report()
         report = {}
-        if isinstance(data, six.binary_type):
+        if isinstance(data, bytes):
             reader = csv.reader(io.StringIO(data.decode('utf-8')))
         else:
             reader = csv.reader(io.StringIO(data))

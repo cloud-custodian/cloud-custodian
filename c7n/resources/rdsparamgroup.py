@@ -40,6 +40,7 @@ class RDSParamGroup(QueryResourceManager):
         name = id = 'DBParameterGroupName'
         dimension = 'DBParameterGroupName'
         permissions_enum = ('rds:DescribeDBParameterGroups',)
+        cfn_type = 'AWS::RDS::DBParameterGroup'
 
     filter_registry = pg_filters
     action_registry = pg_actions
@@ -62,6 +63,7 @@ class RDSClusterParamGroup(QueryResourceManager):
         name = id = 'DBClusterParameterGroupName'
         dimension = 'DBClusterParameterGroupName'
         permissions_enum = ('rds:DescribeDBClusterParameterGroups',)
+        cfn_type = 'AWS::RDS::DBClusterParameterGroup'
 
     filter_registry = pg_cluster_filters
     action_registry = pg_cluster_actions

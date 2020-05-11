@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "StreamNames": [
+            "dev1",
+            "dev2"
+        ],
+        "HasMoreStreams": false,
+        "ResponseMetadata": {}
+    }
+}

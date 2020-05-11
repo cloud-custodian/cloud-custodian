@@ -18,7 +18,7 @@ S3 Key Encrypt on Bucket Changes
 import json
 import boto3
 from botocore.exceptions import ClientError
-from six.moves.urllib.parse import unquote_plus
+from urllib.parse import unquote_plus
 from c7n.resources.s3 import EncryptExtantKeys
 from c7n.utils import get_retry
 

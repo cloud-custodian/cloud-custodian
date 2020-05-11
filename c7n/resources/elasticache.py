@@ -49,6 +49,7 @@ class ElastiCacheCluster(QueryResourceManager):
         date = 'CacheClusterCreateTime'
         dimension = 'CacheClusterId'
         universal_taggable = True
+        cfn_type = 'AWS::ElastiCache::CacheCluster'
 
     filter_registry = filters
     action_registry = actions
@@ -263,6 +264,7 @@ class ElastiCacheSubnetGroup(QueryResourceManager):
         name = id = 'CacheSubnetGroupName'
         filter_name = 'CacheSubnetGroupName'
         filter_type = 'scalar'
+        cfn_type = 'AWS::ElastiCache::SubnetGroup'
 
 
 @resources.register('cache-snapshot')
@@ -467,5 +469,6 @@ class ElastiCacheReplicationGroup(QueryResourceManager):
                      'ReplicationGroups[]', None)
         arn_type = 'replicationgroup'
         id = name = dimension = 'ReplicationGroupId'
+        cfn_type = 'AWS::ElastiCache::ReplicationGroup'
 
     permissions = ('elasticache:DescribeReplicationGroups',)

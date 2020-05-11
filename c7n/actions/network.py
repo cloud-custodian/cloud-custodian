@@ -13,7 +13,6 @@
 # limitations under the License.
 import itertools
 import jmespath
-import six
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n import utils
@@ -67,7 +66,7 @@ class ModifyVpcSecurityGroupsAction(Action):
             {'required': ['add', 'type']}]
     }
 
-    SYMBOLIC_SGS = set(('all', 'matched', 'network-location'))
+    SYMBOLIC_SGS = {'all', 'matched', 'network-location'}
 
     sg_expr = None
     vpc_expr = None
@@ -121,7 +120,7 @@ class ModifyVpcSecurityGroupsAction(Action):
 
     def _get_array(self, k):
         v = self.data.get(k, [])
-        if isinstance(v, six.string_types):
+        if isinstance(v, (str, bytes)):
             return [v]
         return v
 
