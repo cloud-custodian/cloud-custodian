@@ -4,6 +4,9 @@
         "Clusters": [
             {
                 "ClusterIdentifier": "test",
+                "PendingModifiedValues": {
+                    "MaintenanceTrackName": "trailing"
+                },
                 "AllowVersionUpgrade": false
             }
         ],

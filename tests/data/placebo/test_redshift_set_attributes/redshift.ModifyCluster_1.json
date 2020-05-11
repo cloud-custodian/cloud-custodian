@@ -3,6 +3,7 @@
     "data": {
         "Cluster": {
             "ClusterIdentifier": "test",
+            "MaintenanceTrackName": "current",
             "AllowVersionUpgrade": true
             }
         },

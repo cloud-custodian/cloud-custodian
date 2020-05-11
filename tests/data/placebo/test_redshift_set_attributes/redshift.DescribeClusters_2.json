@@ -4,6 +4,7 @@
         "Clusters": [
             {
                 "ClusterIdentifier": "test",
+                "MaintenanceTrackName": "current",
                 "AllowVersionUpgrade": true
             }
         ],

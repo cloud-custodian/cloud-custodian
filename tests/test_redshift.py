@@ -344,6 +344,7 @@ class TestRedshift(BaseTest):
                     "type": "set-attributes",
                     "attributes": {
                         "AllowVersionUpgrade": True,
+                        "MaintenanceTrackName": "current"
                     }
                 }]
             },
@@ -356,6 +357,7 @@ class TestRedshift(BaseTest):
             cluster["ClusterIdentifier"], resources[0]["ClusterIdentifier"]
         )
         self.assertTrue(cluster['AllowVersionUpgrade'])
+        self.assertEqual(cluster["MaintenanceTrackName"], "current")
 
 
 class TestRedshiftSnapshot(BaseTest):

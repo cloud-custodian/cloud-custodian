@@ -667,6 +667,8 @@ class RedshiftSetAttributes(BaseAction):
             if not modify:
                 return
 
+            print(modify)
+
             modify['ClusterIdentifier'] = (cluster.get('PendingModifiedValues', {})
                                           .get('ClusterIdentifier')
                                           or cluster.get('ClusterIdentifier'))
