@@ -25,6 +25,5 @@ requests==2.23.0
 s3transfer==0.3.3
 sendgrid==6.3.0
 six==1.14.0
-splunk-sdk==1.6.12
 urllib3==1.25.9
 zipp==3.1.0

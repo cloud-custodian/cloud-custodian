@@ -25,6 +25,7 @@ from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
 from c7n.resources.aws import AWS, fake_session
 from c7n.resources.ec2 import EC2
+from c7n.policy import ConfigPollRuleMode
 from c7n.schema import generate, JsonSchemaValidator
 from c7n.utils import dumps
 from c7n.query import ConfigSource, TypeInfo
@@ -1226,6 +1227,45 @@ class PhdModeTest(BaseTest):
         self.load_policy(
             {'name': 'abc', 'resource': 'account',
              'mode': {'type': 'phd'}})
+
+
+class ConfigModeTest(BaseTest):
+
+    def test_config_poll(self):
+        factory = self.replay_flight_data('test_config_poll_rule_evaluation')
+        cmock = mock.MagicMock()
+        requests = []
+
+        def record_requests(Evaluations, ResultToken):
+            requests.append(Evaluations)
+
+        cmock.put_evaluations.side_effect = record_requests
+        cmock.put_evaluations.return_value = {}
+        self.patch(
+            ConfigPollRuleMode, '_get_client', lambda self: cmock)
+        p = self.load_policy({
+            'name': 'kin-poll',
+            'resource': 'aws.kinesis',
+            'filters': [{'tag:App': 'Dev'}],
+            'mode': {
+                'type': 'config-poll-rule',
+                'schedule': 'Three_Hours'}},
+            session_factory=factory)
+        event = event_data('poll-evaluation.json', 'config')
+        results = p.push(event, None)
+        self.assertEqual(results, ['dev2'])
+        self.assertEqual(
+            requests,
+            [[{'Annotation': 'The resource is not compliant with policy:kin-poll.',
+               'ComplianceResourceId': 'dev2',
+               'ComplianceResourceType': 'AWS::Kinesis::Stream',
+               'ComplianceType': 'NON_COMPLIANT',
+               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}],
+             [{'Annotation': 'The resource is compliant with policy:kin-poll.',
+               'ComplianceResourceId': 'dev1',
+               'ComplianceResourceType': 'AWS::Kinesis::Stream',
+               'ComplianceType': 'COMPLIANT',
+               'OrderingTimestamp': '2020-05-03T13:55:44.576Z'}]])
 
 
 class GuardModeTest(BaseTest):

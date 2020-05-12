@@ -536,7 +536,7 @@ def get_keys_charset(keys, bid):
     if charset is None:
         raise ValueError(
             "Bucket: %s Failed charset ngram detection %r\n%s" % (
-                bid, "".join(chars)), "\n".join(sorted(keys)))
+                bid, "".join(chars), "\n".join(sorted(keys))))
 
     for n, sset in normalized.items():
         charset = charset.symmetric_difference(sset)

@@ -886,7 +886,8 @@ class PolicyLambda(AbstractLambdaFunction):
 
     def get_events(self, session_factory):
         events = []
-        if self.policy.data['mode']['type'] == 'config-rule':
+        if self.policy.data['mode']['type'] in (
+                'config-rule', 'config-poll-rule'):
             events.append(
                 ConfigRule(self.policy.data['mode'], session_factory))
         elif self.policy.data['mode']['type'] == 'hub-action':
@@ -1296,7 +1297,7 @@ class BucketLambdaNotification:
             params['SourceAccount'] = self.data['account_s3']
             params['SourceArn'] = 'arn:aws:s3:::*'
         else:
-            params['SourceArn'] = 'arn:aws:s3:::%' % self.bucket['Name']
+            params['SourceArn'] = 'arn:aws:s3:::%s' % self.bucket['Name']
         try:
             lambda_client.add_permission(**params)
         except lambda_client.exceptions.ResourceConflictException:
@@ -1605,8 +1606,11 @@ class ConfigRule:
 
         if isinstance(func, PolicyLambda):
             manager = func.policy.load_resource_manager()
-            if hasattr(manager.get_model(), 'config_type'):
-                config_type = manager.get_model().config_type
+            resource_model = manager.get_model()
+            if resource_model.config_type:
+                config_type = resource_model.config_type
+            elif resource_model.cfn_type and 'schedule' in self.data:
+                config_type = resource_model.cfn_type
             else:
                 raise Exception("You may have attempted to deploy a config "
                                 "based lambda function with an unsupported config type. "
@@ -1618,6 +1622,12 @@ class ConfigRule:
         else:
             params['Scope']['ComplianceResourceTypes'] = self.data.get(
                 'resource-types', ())
+        if self.data.get('schedule'):
+            params['Source']['SourceDetails'] = [{
+                'EventSource': 'aws.config',
+                'MessageType': 'ScheduledNotification'
+            }]
+            params['MaximumExecutionFrequency'] = self.data['schedule']
         return params
 
     def get(self, rule_name):
@@ -1637,6 +1647,9 @@ class ConfigRule:
         if rule['Scope'] != params['Scope']:
             return True
         if rule['Source'] != params['Source']:
+            return True
+        if ('MaximumExecutionFrequency' in params and
+                rule['MaximumExecutionFrequency'] != params['MaximumExecutionFrequency']):
             return True
         if rule.get('Description', '') != rule.get('Description', ''):
             return True
