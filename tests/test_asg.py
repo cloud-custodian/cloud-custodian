@@ -233,7 +233,6 @@ class AutoScalingTest(BaseTest):
                 "filters": [{"type": "image-age", "days": 90}],
             })
         ImageAgeFilter.launch_info = LaunchInfo(p.resource_manager)
-        import pdb; pdb.set_trace()
         age = p.resource_manager.filters[0]
         age.process(asg)
         self.assertEqual(age.get_resource_date(asg[0]), parse("2000-01-01T01:01:01.000Z"))
