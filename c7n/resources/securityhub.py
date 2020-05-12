@@ -196,7 +196,8 @@ class SecurityHub(LambdaMode):
         # Lazy import to avoid aws sdk runtime dep in core
         from c7n.resources.aws import Arn
         for finding in event['detail']['findings']:
-            resource_sets.setdefault((finding['AwsAccountId'], finding['Resources'][0]['Region']), []).append(Arn.parse(finding['Resources'][0]['Id']))
+            resource_sets.setdefault((finding['AwsAccountId'], finding['Resources'][0]['Region']),
+                                     []).append(Arn.parse(finding['Resources'][0]['Id']))
 
         # Warn if not configured for member-role and have multiple accounts resources.
         if (not self.policy.data['mode'].get('member-role') and
@@ -207,14 +208,6 @@ class SecurityHub(LambdaMode):
             self.policy.log.warning(msg)
             raise PolicyExecutionError(msg)
         return resource_sets
-
-    def get_resource_arns(self, event):
-        event_type = event['detail-type']
-        arn_resolver = getattr(self, self.handlers[event_type])
-        arns = arn_resolver(event)
-        # Lazy import to avoid aws sdk runtime dep in core
-        from c7n.resources.aws import Arn
-        return {Arn.parse(r) for r in arns}
 
     def resolve_resources(self, resource_map):
         # For centralized setups in a hub aggregator account
