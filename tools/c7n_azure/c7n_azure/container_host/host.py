@@ -266,7 +266,7 @@ class Host:
 
             # update periodic
             periodic_names = \
-                [p['name'] for p in policy_config['policies'] if p.get('mode', {}).get('schedule')]
+                [p['name'] for p in policy_config.get('policies', []) if p.get('mode', {}).get('schedule')]
             periodic_to_remove = \
                 [p for p in periodic_names if p in [j.id for j in self.scheduler.get_jobs()]]
 
