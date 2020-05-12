@@ -199,7 +199,7 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_asg_image_age_filer_deleted_config(self):
+    def test_asg_image_age_filter_deleted_config(self):
         asg = [{
             "AutoScalingGroupName": "devx",
             "MixedInstancesPolicy": {
