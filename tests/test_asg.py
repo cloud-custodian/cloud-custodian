@@ -15,8 +15,8 @@ from datetime import datetime
 from dateutil import tz as tzutil
 
 from .common import BaseTest
-from dateutil.parser import parse
-from c7n.resources.asg import LaunchInfo, ImageAgeFilter
+
+from c7n.resources.asg import LaunchInfo
 
 
 class LaunchConfigTest(BaseTest):
