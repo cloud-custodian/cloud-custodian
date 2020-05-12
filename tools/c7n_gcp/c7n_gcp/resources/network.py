@@ -33,6 +33,7 @@ class Network(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp",
             "autoCreateSubnetworks", "IPv4Range", "gatewayIPv4"]
+        asset_type = "compute.googleapis.com/Network"
 
 
 @resources.register('subnet')
@@ -48,6 +49,7 @@ class Subnet(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "ipCidrRange",
             "gatewayAddress", "region", "state"]
+        asset_type = "compute.googleapis.com/Subnetwork"
 
         @staticmethod
         def get(client, resource_info):
@@ -126,6 +128,7 @@ class Firewall(QueryResourceManager):
         default_report_fields = [
             name, "description", "network", "priority", "creationTimestamp",
             "logConfig.enabled", "disabled"]
+        asset_type = "compute.googleapis.com/Firewall"
 
         @staticmethod
         def get(client, resource_info):
@@ -146,6 +149,7 @@ class Router(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "creationTimestamp", "region", "network"]
+        asset_type = "compute.googleapis.com/Router"
 
         @staticmethod
         def get(client, resource_info):
@@ -196,6 +200,7 @@ class Route(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "creationTimestamp", "network", "priority", "destRange"]
+        asset_type = "compute.googleapis.com/Route"
 
         @staticmethod
         def get(client, resource_info):
@@ -217,6 +222,7 @@ class Interconnect(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "operationalStatus",
             "linkType", "location"]
+        asset_type = "compute.googleapis.com/Interconnect"
 
         @staticmethod
         def get(client, resource_info):
@@ -238,6 +244,7 @@ class InterconnectAttachment(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "interconnect",
             "router", "region", "operationalStatus"]
+        asset_type = "compute.googleapis.com/InterconnectAttachment"
 
         @staticmethod
         def get(client, resource_info):

@@ -83,7 +83,9 @@ class ConfigCompliance(Filter):
                     # for multi resource type rules, only look at
                     # results for the resource type currently being
                     # processed.
-                    if rident['ResourceType'] != resource_model.config_type:
+                    if rident['ResourceType'] not in (
+                            resource_model.config_type,
+                            resource_model.cfn_type):
                         continue
 
                     if not filters:
@@ -123,7 +125,8 @@ class ConfigCompliance(Filter):
         supported by aws config, automatically, register the
         config-compliance filter.
         """
-        if resource_class.resource_type.config_type is None:
+        if (resource_class.resource_type.cfn_type is None and
+                resource_class.resource_type.config_type is None):
             return
         resource_class.filter_registry.register('config-compliance', klass)
 

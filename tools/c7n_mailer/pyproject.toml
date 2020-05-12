@@ -28,7 +28,6 @@ sendgrid = "^6.1.1"
 datadog = "^0.34.0"
 ldap3 = "^2.6.1"
 redis = "^3.4.1"
-splunk-sdk = "^1.6.12"
 jsonpointer = "^2.0"
 jsonpatch = "^1.25"
 

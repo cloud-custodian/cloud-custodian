@@ -419,14 +419,6 @@ version = "2.1.0"
 
 [[package]]
 category = "main"
-description = "The Splunk Software Development Kit for Python."
-name = "splunk-sdk"
-optional = false
-python-versions = "*"
-version = "1.6.12"
-
-[[package]]
-category = "main"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 name = "urllib3"
 optional = false
@@ -459,7 +451,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "e074b9762446f9fb837c6c3651df313386783751591c019851d899ebfb682dca"
+content-hash = "ada358158de8d1ea8ef245204f06bdd74fa58dad189d0f1fde86006010ea2d2b"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -665,9 +657,6 @@ six = [
 sortedcontainers = [
     {file = "sortedcontainers-2.1.0-py2.py3-none-any.whl", hash = "sha256:d9e96492dd51fae31e60837736b38fe42a187b5404c16606ff7ee7cd582d4c60"},
     {file = "sortedcontainers-2.1.0.tar.gz", hash = "sha256:974e9a32f56b17c1bac2aebd9dcf197f3eb9cd30553c5852a3187ad162e1a03a"},
-]
-splunk-sdk = [
-    {file = "splunk-sdk-1.6.12.tar.gz", hash = "sha256:eb6446227447fe10f4c0a0d830efd91ab57e3cb815f4675a42d522241e9ef3ae"},
 ]
 urllib3 = [
     {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},

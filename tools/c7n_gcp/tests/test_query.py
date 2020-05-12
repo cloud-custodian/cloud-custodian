@@ -12,8 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from c7n.resources import load_resources
 from c7n_gcp.query import GcpLocation
+from c7n_gcp.provider import GoogleCloud
+
 from gcp_common import BaseTest
+
+
+def test_gcp_resource_metadata_asset_type():
+    load_resources('gcp.*')
+    # asset inventory doesn't support these
+    whitelist = set((
+        'app-engine-domain',
+        'app-engine-certificate',
+        'app-engine-firewall-ingress-rule',
+        'app-engine-domain-mapping',
+        'bq-job',
+        'bq-project',
+        'build',
+        'dataflow-job',
+        'dm-deployment',
+        'function',
+        'loadbalancer-ssl-policy',
+        'log-exclusion',
+        'ml-job',
+        'ml-model',
+        'sourcerepo',
+        'sql-backup-run',
+        'sql-ssl-cert',
+        'sql-user',
+        'pubsub-snapshot'
+    ))
+    missing = set()
+    for k, v in GoogleCloud.resources.items():
+        if v.resource_type.asset_type is None:
+            missing.add(k)
+    remainder = missing.difference(whitelist)
+    if remainder:
+        raise ValueError(str(remainder))
 
 
 class GcpLocationTest(BaseTest):

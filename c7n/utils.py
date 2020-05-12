@@ -609,8 +609,8 @@ class QueryParser:
 
             if not cls.multi_value and isinstance(values, list):
                 raise PolicyValidationError(
-                    "%s QUery Filter Invalid Key: Value:%s Must be single valued" % (
-                        cls.type_name, key, values))
+                    "%s Query Filter Invalid Key: Value:%s Must be single valued" % (
+                        cls.type_name, key))
             elif not cls.multi_value:
                 values = [values]
 
