@@ -69,6 +69,13 @@
                     {
                         "ResourceId": "devx",
                         "ResourceType": "auto-scaling-group",
+                        "Key": "Creator",
+                        "Value": "xyz@gmail.com",
+                        "PropagateAtLaunch": false
+                    },
+                    {
+                        "ResourceId": "devx",
+                        "ResourceType": "auto-scaling-group",
                         "Key": "Env",
                         "Value": "App",
                         "PropagateAtLaunch": true
