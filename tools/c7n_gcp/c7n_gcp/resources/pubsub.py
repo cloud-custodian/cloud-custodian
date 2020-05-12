@@ -34,6 +34,7 @@ class PubSubTopic(QueryResourceManager):
         scope_template = "projects/{}"
         name = id = "name"
         default_report_fields = ["name", "kmsKeyName"]
+        asset_type = "pubsub.googleapis.com/Topic"
 
         @staticmethod
         def get(client, resource_info):
@@ -65,6 +66,7 @@ class PubSubSubscription(QueryResourceManager):
         default_report_fields = [
             "name", "topic", "ackDeadlineSeconds",
             "retainAckedMessages", "messageRetentionDuration"]
+        asset_type = "pubsub.googleapis.com/Subscription"
 
         @staticmethod
         def get(client, resource_info):

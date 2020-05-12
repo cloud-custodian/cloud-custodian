@@ -34,6 +34,7 @@ class DataSet(QueryResourceManager):
         default_report_fields = [
             id, name, "description",
             "creationTime", "lastModifiedTime"]
+        asset_type = "bigquery.googleapis.com/Dataset"
 
         @staticmethod
         def get(client, event):
@@ -126,6 +127,7 @@ class BigQueryTable(ChildResourceManager):
                 ('tableReference.datasetId', 'datasetId'),
             ]
         }
+        asset_type = "bigquery.googleapis.com/Table"
 
         @staticmethod
         def get(client, event):

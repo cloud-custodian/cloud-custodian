@@ -37,6 +37,7 @@ class LogProjectSink(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "destination", "filter", "writerIdentity", "createTime"]
+        asset_type = "logging.googleapis.com/LogSink"
 
         @staticmethod
         def get(client, resource_info):
@@ -72,6 +73,7 @@ class LogProjectMetric(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "createTime", "filter"]
+        asset_type = "logging.googleapis.com/LogMetric"
 
         @staticmethod
         def get(client, resource_info):

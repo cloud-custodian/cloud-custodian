@@ -33,6 +33,7 @@ class AppEngineApp(QueryResourceManager):
         name = 'name'
         default_report_fields = [
             'id', 'locationId', 'servingStatus', 'authDomain', 'defaultHostName']
+        asset_type = "appengine.googleapis.com/Application"
 
         @staticmethod
         def get(client, resource_info):
