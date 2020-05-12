@@ -20,8 +20,7 @@ install_requires = \
  'python-dateutil>=2.8.1,<3.0.0',
  'pyyaml>=5.3,<6.0',
  'redis>=3.4.1,<4.0.0',
- 'sendgrid>=6.1.1,<7.0.0',
- 'splunk-sdk>=1.6.12,<2.0.0']
+ 'sendgrid>=6.1.1,<7.0.0']
 
 entry_points = \
 {'console_scripts': ['c7n-mailer = c7n_mailer.cli:main',

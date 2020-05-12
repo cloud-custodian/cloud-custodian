@@ -37,6 +37,7 @@ class KubernetesCluster(QueryResourceManager):
         default_report_fields = [
             'name', 'description', 'status', 'currentMasterVersion', 'currentNodeVersion',
             'currentNodeCount', 'location']
+        asset_type = 'container.googleapis.com/Cluster'
 
         @staticmethod
         def get(client, resource_info):
@@ -82,7 +83,7 @@ class KubernetesClusterNodePool(ChildResourceManager):
         scope = 'global'
         name = id = 'name'
         parent_spec = {'resource': 'gke-cluster'}
-
+        asset_type = 'container.googleapis.com/NodePool'
         default_report_fields = ['name', 'status', 'version']
 
         @staticmethod

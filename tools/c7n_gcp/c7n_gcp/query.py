@@ -284,6 +284,9 @@ class TypeInfo(metaclass=TypeMeta):
     name = None
     default_report_fields = ()
 
+    # cloud asset inventory type
+    asset_type = None
+
 
 class ChildTypeInfo(TypeInfo):
 
