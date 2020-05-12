@@ -15,8 +15,8 @@ from datetime import datetime
 from dateutil import tz as tzutil
 
 from .common import BaseTest
-
-from c7n.resources.asg import LaunchInfo
+from dateutil.parser import parse
+from c7n.resources.asg import LaunchInfo, ImageAgeFilter
 
 
 class LaunchConfigTest(BaseTest):
@@ -198,6 +198,45 @@ class AutoScalingTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_asg_image_age_filer_deleted_config(self):
+        asg = [{
+            "AutoScalingGroupName": "devx",
+            "MixedInstancesPolicy": {
+                "LaunchTemplate": {
+                    "LaunchTemplateSpecification": {
+                        "LaunchTemplateId": "lt-0877401c93c294001",
+                        "LaunchTemplateName": "test",
+                        "Version": "4"},
+                    "Overrides": [{"InstanceType": "t1.micro"},
+                                  {"InstanceType": "t2.small"}]
+                },
+                "InstancesDistribution": {
+                    "OnDemandAllocationStrategy": "prioritized",
+                    "OnDemandBaseCapacity": 1,
+                    "OnDemandPercentageAboveBaseCapacity": 0,
+                    "SpotAllocationStrategy": "capacity-optimized"
+                }
+            },
+            "MinSize": 1,
+            "MaxSize": 1,
+            "DesiredCapacity": 1,
+            "DefaultCooldown": 300,
+            "AvailabilityZones": ["us-east-1d", "us-east-1e"],
+            "HealthCheckType": "EC2",
+            "HealthCheckGracePeriod": 300,
+            "VPCZoneIdentifier": "subnet-3a334610,subnet-e3b194de"}]
+        p = self.load_policy(
+            {
+                "name": "asg-cfg-filter",
+                "resource": "asg",
+                "filters": [{"type": "image-age", "days": 90}],
+            })
+        ImageAgeFilter.launch_info = LaunchInfo(p.resource_manager)
+        import pdb; pdb.set_trace()
+        age = p.resource_manager.filters[0]
+        age.process(asg)
+        self.assertEqual(age.get_resource_date(asg[0]), parse("2000-01-01T01:01:01.000Z"))
 
     def test_asg_config_filter(self):
         factory = self.replay_flight_data("test_asg_config_filter")
