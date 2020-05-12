@@ -233,9 +233,10 @@ class AutoScalingTest(BaseTest):
                 "filters": [{"type": "image-age", "days": 90}],
             })
         ImageAgeFilter.launch_info = LaunchInfo(p.resource_manager)
-        age = p.resource_manager.filters[0]
-        age.process(asg)
-        self.assertEqual(age.get_resource_date(asg[0]), parse("2000-01-01T01:01:01.000Z"))
+        image_age = p.resource_manager.filters[0]
+        import pdb; pdb.set_trace()
+        image_age.process(asg)
+        self.assertEqual(image_age.get_resource_date(asg[0]), parse("2000-01-01T01:01:01.000Z"))
 
     def test_asg_config_filter(self):
         factory = self.replay_flight_data("test_asg_config_filter")
