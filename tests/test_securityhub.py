@@ -134,7 +134,7 @@ class SecurityHubTest(BaseTest):
                 {'type': 'post-finding',
                  'types': [
                      "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"  # NOQA
-                     ]}]})
+                 ]}]})
         post_finding = policy.resource_manager.actions[0]
         resource = post_finding.format_resource(
             {'Name': 'xyz', 'CreationDate': 'xtf'})

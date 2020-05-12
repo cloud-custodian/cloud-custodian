@@ -47,21 +47,21 @@ class StackDriverMetrics(Metrics):
 
     METRICS_DESCRIPTORS = {
         'resourcecount': {
-            'type': '%s/%'.format(METRICS_PREFIX, 'resourcecount'),
+            'type': '{}/{}'.format(METRICS_PREFIX, 'resourcecount'),
             'valueType': 'INT64',
             'units': 'items',
             'description': 'Number of resources that matched the given policy',
             'displayName': 'Resources',
         },
         'resourcetime': {
-            'type': '%s/%s'.format(METRICS_PREFIX, 'resourcetime'),
+            'type': '{}/{}'.format(METRICS_PREFIX, 'resourcetime'),
             'valueType': 'DOUBLE',
             'units': 's',
             'description': 'Time to query the resources for a given policy',
             'displayName': 'Query Time',
         },
         'actiontime': {
-            'type': '%s/%s'.format(METRICS_PREFIX, 'actiontime'),
+            'type': '{}/{}'.format(METRICS_PREFIX, 'actiontime'),
             'valueType': 'DOUBLE',
             'units': 's',
             'description': 'Time to perform actions for a given policy',
