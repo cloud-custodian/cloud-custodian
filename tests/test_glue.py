@@ -579,3 +579,44 @@ class TestGlueDataCatalog(BaseTest):
             ('\"Condition\" : {\n      \"StringNotEquals\" : '
                 '{\n        \"aws:PrincipalOrgId\" : \"o-4amkskbcf1\"\n'),
             resources[0]["c7n:AccessPolicy"], 'missing condition element')
+
+    def test_glue_catalog_has_statements_fuzzy(self):
+        session_factory = self.replay_flight_data("test_glue_catalog_has_statements_fuzzy")
+        p = self.load_policy(
+            {
+                "name": "glue-catalog-has-statements",
+                "resource": "glue-catalog",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "glue:*",
+                                "Principal": "*",
+                                "Resource": "arn:aws:glue:us-east-1:644160558196:*",
+                                "Condition": {
+                                    "StringNotEquals": {
+                                        "aws:PrincipalOrgId": 'o-4amkskbcf1'
+                                    }
+                                }
+                            }
+                        ],
+                        'fuzzy_match': True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
+            ('\"Condition\" : {\n      \"StringNotEquals\" : '
+                '{\n        \"aws:PrincipalOrgId\" : \"o-4amkskbcf1\"\n'),
+            resources[0]["c7n:AccessPolicy"], 'missing condition element, did not partial match')
+        self.assertIn(
+            ('\"Condition\" : {\n      \"StringNotEquals\" : '
+             '{\n        \"aws:PrincipalOrgId\" : \"o-4amkskbcf1\"\n'
+             '      },\n      \"DateGreaterThan\" : {\n        \"aws:CurrentTime\" : '
+             '\"2019-07-16T12:00:00Z\"\n'),
+            resources[0]["c7n:AccessPolicy"], 'missing condition element, did not partial match')

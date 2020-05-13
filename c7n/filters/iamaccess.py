@@ -409,8 +409,12 @@ class PolicyStatementFilter(Filter):
                             if isinstance(value, list):
                                 if set(value).issubset(statement[key]):
                                     found += 1
-                            if isinstance(value, dict):
+                            elif isinstance(value, dict):
                                 if dict(statement[key], **value) == statement[key]:
+                                    print(value == statement[key])
+                                    found += 1
+                            else:
+                                if value == statement[key]:
                                     found += 1
                         else:
                             if value == statement[key]:
