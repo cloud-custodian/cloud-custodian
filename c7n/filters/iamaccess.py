@@ -375,7 +375,8 @@ class PolicyStatementFilter(Filter):
                 },
                 'required': ['Effect']
             }
-        })
+        },
+        fuzzy_match={'type': 'boolean', 'default': False})
 
     def process(self, resources, event=None):
         return list(filter(None, map(self.process_resource, resources)))
@@ -403,8 +404,17 @@ class PolicyStatementFilter(Filter):
             for statement in statements:
                 found = 0
                 for key, value in required_statement.items():
-                    if key in statement and value == statement[key]:
-                        found += 1
+                    if key in statement:
+                        if self.data.get('fuzzy_match', False):
+                            if value.__class__() is list:
+                                if set(value).issubset(statement[key]):
+                                    found += 1
+                            if value.__class__() is dict:
+                                if dict(statement[key], **value) == statement[key]:
+                                    found += 1
+                        else:
+                            if value == statement[key]:
+                                found += 1
                 if found and found == len(required_statement):
                     required_statements.remove(required_statement)
                     break
