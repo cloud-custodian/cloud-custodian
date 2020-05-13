@@ -411,7 +411,6 @@ class PolicyStatementFilter(Filter):
                                     found += 1
                             elif isinstance(value, dict):
                                 if dict(statement[key], **value) == statement[key]:
-                                    print(value == statement[key])
                                     found += 1
                             else:
                                 if value == statement[key]:
