@@ -406,10 +406,10 @@ class PolicyStatementFilter(Filter):
                 for key, value in required_statement.items():
                     if key in statement:
                         if self.data.get('fuzzy_match', False):
-                            if value.__class__() is list:
+                            if isinstance(value, list):
                                 if set(value).issubset(statement[key]):
                                     found += 1
-                            if value.__class__() is dict:
+                            if isinstance(value, dict):
                                 if dict(statement[key], **value) == statement[key]:
                                     found += 1
                         else:
