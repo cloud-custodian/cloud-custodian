@@ -402,23 +402,9 @@ class PolicyStatementFilter(Filter):
         required_statements = self.get_required_statements(r)
         for required_statement in required_statements:
             for statement in statements:
-                found = 0
-                for key, value in required_statement.items():
-                    if key in statement:
-                        if self.data.get('fuzzy_match', False):
-                            if isinstance(value, list):
-                                if set(value).issubset(statement[key]):
-                                    found += 1
-                            elif isinstance(value, dict):
-                                if dict(statement[key], **value) == statement[key]:
-                                    found += 1
-                            else:
-                                if value == statement[key]:
-                                    found += 1
-                        else:
-                            if value == statement[key]:
-                                found += 1
-                if found and found == len(required_statement):
+                matches = sum(
+                    1 for k, v in required_statement.items() if self.match(k, v, statement))
+                if matches == len(required_statement):
                     required_statements.remove(required_statement)
                     break
 
@@ -426,3 +412,12 @@ class PolicyStatementFilter(Filter):
            (self.data.get('statements', []) and not required_statements):
             return r
         return None
+
+    def match(self, k, v, stmt):
+        if k in stmt:
+            if self.data.get('fuzzy_match', False):
+                if isinstance(v, list):
+                    return set(v).issubset(stmt[k])
+                elif isinstance(v, dict):
+                    return dict(stmt[k], **v) == stmt[k]
+            return v == stmt[k]
