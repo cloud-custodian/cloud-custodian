@@ -13,7 +13,6 @@
 # limitations under the License.
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
-from .aws import shape_validate
 from c7n.manager import resources, ResourceManager
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
@@ -22,7 +21,7 @@ from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.tags import universal_augment
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import StateTransitionFilter, ValueFilter, FilterRegistry, CrossAccountAccessFilter
+from c7n.filters import ValueFilter, FilterRegistry, CrossAccountAccessFilter
 from c7n import query, utils
 from c7n.resources.account import GlueCatalogEncryptionEnabled
 
@@ -36,6 +35,7 @@ class GlueConnection(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = "connection"
+        cfn_type = 'AWS::Glue::Connection'
 
 
 @GlueConnection.filter_registry.register('subnet')
@@ -93,6 +93,7 @@ class GlueDevEndpoint(QueryResourceManager):
         date = 'CreatedTimestamp'
         arn_type = "devEndpoint"
         universal_taggable = True
+        cfn_type = 'AWS::Glue::DevEndpoint'
 
     augment = universal_augment
 
@@ -152,6 +153,7 @@ class GlueJob(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'job'
         universal_taggable = True
+        cfn_type = 'AWS::Glue::Job'
 
     permissions = ('glue:GetJobs',)
     augment = universal_augment
@@ -183,6 +185,7 @@ class GlueCrawler(QueryResourceManager):
         arn_type = 'crawler'
         state_key = 'State'
         universal_taggable = True
+        cfn_type = 'AWS::Glue::Crawler'
 
     augment = universal_augment
 
@@ -291,14 +294,14 @@ class GlueCrawlerSecurityConfigFilter(SecurityConfigFilter):
 
 
 @GlueCrawler.action_registry.register('delete')
-class DeleteCrawler(BaseAction, StateTransitionFilter):
+class DeleteCrawler(BaseAction):
 
     schema = type_schema('delete')
     permissions = ('glue:DeleteCrawler',)
     valid_origin_states = ('READY', 'FAILED')
 
     def process(self, resources):
-        resources = self.filter_resource_state(resources)
+        resources = self.filter_resources(resources, 'State', self.valid_origin_states)
 
         client = local_session(self.manager.session_factory).client('glue')
         for r in resources:
@@ -318,6 +321,7 @@ class GlueDatabase(QueryResourceManager):
         date = 'CreatedOn'
         arn_type = 'database'
         state_key = 'State'
+        cfn_type = 'AWS::Glue::Database'
 
 
 @GlueDatabase.action_registry.register('delete')
@@ -389,6 +393,7 @@ class GlueClassifier(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = 'classifier'
+        cfn_type = 'AWS::Glue::Classifier'
 
 
 @GlueClassifier.action_registry.register('delete')
@@ -419,6 +424,7 @@ class GlueMLTransform(QueryResourceManager):
         id = 'TransformId'
         arn_type = 'mlTransform'
         universal_taggable = object()
+        cfn_type = 'AWS::Glue::MLTransform'
 
     augment = universal_augment
 
@@ -450,6 +456,7 @@ class GlueSecurityConfiguration(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'securityConfiguration'
         date = 'CreatedTimeStamp'
+        cfn_type = 'AWS::Glue::SecurityConfiguration'
 
 
 @GlueSecurityConfiguration.action_registry.register('delete')
@@ -476,6 +483,7 @@ class GlueTrigger(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'trigger'
         universal_taggable = object()
+        cfn_type = 'AWS::Glue::Trigger'
 
     augment = universal_augment
 
@@ -505,6 +513,7 @@ class GlueWorkflow(QueryResourceManager):
         id = name = 'Name'
         arn_type = 'workflow'
         universal_taggable = object()
+        cfn_type = 'AWS::Glue::Workflow'
 
     def augment(self, resources):
         return universal_augment(
@@ -542,6 +551,7 @@ class GlueDataCatalog(ResourceManager):
         service = 'glue'
         arn_type = 'catalog'
         id = name = 'CatalogId'
+        cfn_type = 'AWS::Glue::DataCatalogEncryptionSettings'
 
     @classmethod
     def get_permissions(cls):
@@ -557,6 +567,7 @@ class GlueDataCatalog(ResourceManager):
     def _get_catalog_encryption_settings(self):
         client = utils.local_session(self.session_factory).client('glue')
         settings = client.get_data_catalog_encryption_settings()
+        settings['CatalogId'] = self.config.account_id
         settings.pop('ResponseMetadata', None)
         return [settings]
 
@@ -585,25 +596,43 @@ class GlueDataCatalogEncryption(BaseAction):
                 actions:
                   - type: set-encryption
                     attributes:
-                        EncryptionAtRest:
-                            CatalogEncryptionMode: SSE-KMS
-                            SseAwsKmsKeyId: alias/aws/glue
+                      EncryptionAtRest:
+                        CatalogEncryptionMode: SSE-KMS
+                        SseAwsKmsKeyId: alias/aws/glue
     """
 
     schema = type_schema(
         'set-encryption',
-        attributes={'type': 'object', "minItems": 1},
-        required=('attributes',))
+        required=['attributes'],
+        attributes={
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'EncryptionAtRest': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['CatalogEncryptionMode'],
+                    'properties': {
+                        'CatalogEncryptionMode': {'enum': ['DISABLED', 'SSE-KMS']},
+                        'SseAwsKmsKeyId': {'type': 'string'}
+                    }
+                },
+                'ConnectionPasswordEncryption': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'required': ['ReturnConnectionPasswordEncrypted'],
+                    'properties': {
+                        'ReturnConnectionPasswordEncrypted': {'type': 'boolean'},
+                        'AwsKmsKeyId': {'type': 'string'}
+                    }
+                }
+            }
+        }
+    )
 
     permissions = ('glue:PutDataCatalogEncryptionSettings',)
-    shape = 'PutDataCatalogEncryptionSettingsRequest'
 
-    def validate(self):
-        attrs = {}
-        attrs['DataCatalogEncryptionSettings'] = self.data['attributes']
-        return shape_validate(attrs, self.shape, 'glue')
-
-    def process(self, catalog):
+    def process(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
         # there is one glue data catalog per account
         client.put_data_catalog_encryption_settings(
@@ -612,7 +641,7 @@ class GlueDataCatalogEncryption(BaseAction):
 
 @GlueDataCatalog.filter_registry.register('glue-security-config')
 class GlueCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
-    """Filter aws account by its glue encryption status and KMS key
+    """Filter glue catalog by its glue encryption status and KMS key
 
     :example:
 

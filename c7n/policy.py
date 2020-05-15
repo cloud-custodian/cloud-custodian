@@ -21,7 +21,6 @@ import time
 
 from dateutil import parser, tz as tzutil
 import jmespath
-import six
 
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
@@ -229,7 +228,7 @@ class PolicyExecutionMode:
         client = session.client('cloudwatch')
 
         for m in metrics:
-            if isinstance(m, six.string_types):
+            if isinstance(m, str):
                 dimensions = default_dimensions
             else:
                 m, m_dimensions = m
@@ -618,7 +617,7 @@ class CloudTrailMode(LambdaMode):
         events = self.policy.data['mode'].get('events')
         assert events, "cloud trail mode requires specifiying events to subscribe"
         for e in events:
-            if isinstance(e, six.string_types):
+            if isinstance(e, str):
                 assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e
             if isinstance(e, dict):
                 jmespath.compile(e['ids'])
@@ -711,6 +710,99 @@ class GuardDutyMode(LambdaMode):
         elif self.policy.data['resource'] == 'iam-user':
             self.policy.data['mode']['resource-filter'] = 'AccessKey'
         return super(GuardDutyMode, self).provision()
+
+
+@execution.register('config-poll-rule')
+class ConfigPollRuleMode(LambdaMode, PullMode):
+    """This mode represents a periodic/scheduled AWS config evaluation.
+
+    The primary benefit this mode offers is to support additional resources
+    beyond what config supports natively, as it can post evaluations for
+    any resource which has a cloudformation type. If a resource is natively
+    supported by config its highly recommended to use a `config-rule`
+    mode instead.
+
+    This mode effectively receives no data from config, instead its
+    periodically executed by config and polls and evaluates all
+    resources. It is equivalent to a periodic policy, except it also
+    pushes resource evaluations to config.
+    """
+    schema = utils.type_schema(
+        'config-poll-rule',
+        schedule={'enum': [
+            "One_Hour",
+            "Three_Hours",
+            "Six_Hours",
+            "Twelve_Hours",
+            "TwentyFour_Hours"]},
+        rinherit=LambdaMode.schema)
+
+    def validate(self):
+        super().validate()
+        if not self.policy.data['mode'].get('schedule'):
+            raise PolicyValidationError(
+                "policy:%s config-poll-rule schedule required" % (
+                    self.policy.name))
+        if self.policy.resource_manager.resource_type.config_type:
+            raise PolicyValidationError(
+                "resource:%s fully supported by config and should use mode: config-rule" % (
+                    self.policy.resource_type))
+        if self.policy.data['mode'].get('pattern'):
+            raise PolicyValidationError(
+                "policy:%s AWS Config does not support event pattern filtering" % (
+                    self.policy.name))
+        if not self.policy.resource_manager.resource_type.cfn_type:
+            raise PolicyValidationError((
+                'policy:%s resource:%s does not have a cloudformation type'
+                ' and is there-fore not supported by config-poll-rule'))
+
+    def _get_client(self):
+        return utils.local_session(
+            self.policy.session_factory).client('config')
+
+    def run(self, event, lambda_context):
+        cfg_event = json.loads(event['invokingEvent'])
+        resource_type = self.policy.resource_manager.resource_type.cfn_type
+        resource_id = self.policy.resource_manager.resource_type.id
+        client = self._get_client()
+
+        matched_resources = set()
+        for r in PullMode.run(self):
+            matched_resources.add(r[resource_id])
+        unmatched_resources = set()
+        for r in self.policy.resource_manager.get_resource_manager(
+                self.policy.resource_type).resources():
+            if r[resource_id] not in matched_resources:
+                unmatched_resources.add(r[resource_id])
+
+        evaluations = [dict(
+            ComplianceResourceType=resource_type,
+            ComplianceResourceId=r,
+            ComplianceType='NON_COMPLIANT',
+            OrderingTimestamp=cfg_event['notificationCreationTime'],
+            Annotation='The resource is not compliant with policy:%s.' % (
+                self.policy.name))
+            for r in matched_resources]
+        if evaluations:
+            self.policy.resource_manager.retry(
+                client.put_evaluations,
+                Evaluations=evaluations,
+                ResultToken=event.get('resultToken', 'No token found.'))
+
+        evaluations = [dict(
+            ComplianceResourceType=resource_type,
+            ComplianceResourceId=r,
+            ComplianceType='COMPLIANT',
+            OrderingTimestamp=cfg_event['notificationCreationTime'],
+            Annotation='The resource is compliant with policy:%s.' % (
+                self.policy.name))
+            for r in unmatched_resources]
+        if evaluations:
+            self.policy.resource_manager.retry(
+                client.put_evaluations,
+                Evaluations=evaluations,
+                ResultToken=event.get('resultToken', 'No token found.'))
+        return list(matched_resources)
 
 
 @execution.register('config-rule')

@@ -35,6 +35,7 @@ class SpannerInstance(QueryResourceManager):
 
         labels = True
         labels_op = 'patch'
+        asset_type = "spanner.googleapis.com/Instance"
 
         @staticmethod
         def get(client, resource_info):
@@ -149,6 +150,7 @@ class SpannerDatabaseInstance(ChildResourceManager):
             ]
         }
         default_report_fields = ["name", "state", "createTime"]
+        asset_type = "spanner.googleapis.com/Database"
 
         @staticmethod
         def get(client, resource_info):

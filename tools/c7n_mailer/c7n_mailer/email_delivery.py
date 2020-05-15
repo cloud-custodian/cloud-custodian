@@ -13,7 +13,6 @@
 # limitations under the License.
 from itertools import chain
 
-import six
 from c7n_mailer.smtp_delivery import SmtpDelivery
 from c7n_mailer.utils_email import is_email, get_mimetext_message
 import c7n_mailer.azure_mailer.sendgrid_delivery as sendgrid
@@ -195,7 +194,7 @@ class EmailDelivery:
     def get_to_addrs_email_messages_map(self, sqs_message):
         to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(sqs_message)
         to_addrs_to_mimetext_map = {}
-        for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
+        for to_addrs, resources in to_addrs_to_resources_map.items():
             to_addrs_to_mimetext_map[to_addrs] = get_mimetext_message(
                 self.config,
                 self.logger,

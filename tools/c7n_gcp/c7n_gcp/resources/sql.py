@@ -37,6 +37,7 @@ class SqlInstance(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]
+        asset_type = "sqladmin.googleapis.com/Instance"
 
         @staticmethod
         def get(client, resource_info):

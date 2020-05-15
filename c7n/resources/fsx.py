@@ -29,6 +29,7 @@ class FSx(QueryResourceManager):
         name = id = 'FileSystemId'
         arn = "ResourceARN"
         date = 'CreationTime'
+        cfn_type = 'AWS::FSx::FileSystem'
 
 
 @resources.register('fsx-backup')

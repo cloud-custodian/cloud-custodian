@@ -266,7 +266,7 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
 
     if account_id:
         q += "and records.recipientaccountid = '{}'".format(
-            account_id=account_id)
+            account_id)
 
     date_format, date_value = None, None
     if year:

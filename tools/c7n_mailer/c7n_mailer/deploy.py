@@ -48,7 +48,7 @@ CORE_DEPS = [
     'datadog', 'decorator',
     # requests (recursive deps), needed by datadog, slackclient, splunk
     'requests', 'urllib3', 'idna', 'chardet', 'certifi',
-    # used by splunk; also dependencies of c7n itself
+    # used by splunk mailer transport
     'jsonpointer', 'jsonpatch',
     # sendgrid dependencies
     'sendgrid', 'python_http_client']

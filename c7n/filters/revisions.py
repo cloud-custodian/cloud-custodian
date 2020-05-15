@@ -16,8 +16,6 @@ Custodian support for diffing and patching across multiple versions
 of a resource.
 """
 
-import six
-
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzlocal, tzutc
 
@@ -78,7 +76,7 @@ class Diff(Filter):
             for n in self.manager.data['filters'][:idx]:
                 if isinstance(n, dict) and n.get('type', '') == 'locked':
                     found = True
-                if isinstance(n, six.string_types) and n == 'locked':
+                if isinstance(n, str) and n == 'locked':
                     found = True
             if not found:
                 raise PolicyValidationError(

@@ -84,17 +84,15 @@ class NotifyTest(BaseTest):
         body = json.loads(zlib.decompress(base64.b64decode(messages[0]["Body"])))
         self.assertEqual(
             set(body.keys()),
-            set(
-                (
-                    "account_id",
-                    "action",
-                    "event",
-                    "policy",
-                    "region",
-                    "account",
-                    "resources",
-                )
-            ),
+            {
+                "account_id",
+                "action",
+                "event",
+                "policy",
+                "region",
+                "account",
+                "resources",
+            },
         )
 
     def test_resource_prep(self):

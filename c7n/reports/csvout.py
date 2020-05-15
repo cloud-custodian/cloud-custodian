@@ -41,6 +41,7 @@ CLI Usage
 """
 from concurrent.futures import as_completed
 
+import csv
 from datetime import datetime
 import gzip
 import io
@@ -50,13 +51,11 @@ import logging
 import os
 from tabulate import tabulate
 
-import six
 from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
 
 from c7n.executor import ThreadPoolExecutor
 from c7n.utils import local_session, dumps
-from c7n.utils import UnicodeWriter
 
 log = logging.getLogger('custodian.reports')
 
@@ -97,7 +96,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
     rows = formatter.to_csv(records)
 
     if options.format == 'csv':
-        writer = UnicodeWriter(output_fh, formatter.headers())
+        writer = csv.writer(output_fh, formatter.headers())
         writer.writerow(formatter.headers())
         writer.writerows(rows)
     elif options.format == 'json':
@@ -137,8 +136,8 @@ def _get_values(record, field_list, tag_map):
             value = jmespath.search(field, record)
             if value is None:
                 value = ''
-            if not isinstance(value, six.text_type):
-                value = six.text_type(value)
+            if not isinstance(value, str):
+                value = str(value)
         vals.append(value)
     return vals
 

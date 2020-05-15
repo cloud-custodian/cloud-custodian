@@ -26,7 +26,7 @@ import os
 import tempfile
 import uuid
 
-from six.moves.urllib.parse import unquote_plus
+from urllib.parse import unquote_plus
 
 s3 = boto3.client('s3')
 log = logging.getLogger('logregate')

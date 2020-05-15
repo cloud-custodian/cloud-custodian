@@ -14,7 +14,7 @@
 from unittest import TestCase
 from c7n import cache, config
 from argparse import Namespace
-from six.moves import cPickle as pickle
+import pickle
 import tempfile
 import mock
 import os

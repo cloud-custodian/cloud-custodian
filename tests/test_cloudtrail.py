@@ -29,6 +29,21 @@ class CloudTrail(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue('c7n:TrailStatus' in resources[0])
 
+    def test_org_trail_status(self):
+        factory = self.replay_flight_data('test_cloudtrail_org_trail_status_skip')
+        output = self.capture_logging('custodian')
+        p = self.load_policy({
+            'name': 'resource',
+            'resource': 'cloudtrail',
+            'filters': [{'type': 'status', 'key': 'IsLogging', 'value': True}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertIn(
+            ("found 1 org cloud trail from different"
+             " account that cant be processed"),
+            output.getvalue())
+        self.assertEqual(len(resources), 0)
+
     def test_trail_update(self):
         factory = self.replay_flight_data('test_cloudtrail_update')
         p = self.load_policy({

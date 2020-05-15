@@ -37,7 +37,7 @@ class Alarm(QueryResourceManager):
         filter_type = 'list'
         name = 'AlarmName'
         date = 'AlarmConfigurationUpdatedTimestamp'
-        config_type = 'AWS::CloudWatch::Alarm'
+        cfn_type = config_type = 'AWS::CloudWatch::Alarm'
 
     retry = staticmethod(get_retry(('Throttled',)))
 
@@ -82,12 +82,16 @@ class EventRule(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'events'
-        arn_type = 'event-rule'
+        arn_type = 'rule'
         enum_spec = ('list_rules', 'Rules', None)
         name = "Name"
         id = "Name"
         filter_name = "NamePrefix"
         filter_type = "scalar"
+        cfn_type = 'AWS::Events::Rule'
+        universal_taggable = object()
+
+    augment = universal_augment
 
 
 @EventRule.filter_registry.register('metrics')
@@ -158,6 +162,7 @@ class LogGroup(QueryResourceManager):
         dimension = 'LogGroupName'
         date = 'creationTime'
         universal_taggable = True
+        cfn_type = 'AWS::Logs::LogGroup'
 
     def augment(self, resources):
         resources = universal_augment(self, resources)

@@ -1495,7 +1495,7 @@ class SetS3PublicBlock(BaseAction):
         config.pop('type')
         if config.pop('state', None) is False and config:
             raise PolicyValidationError(
-                "%s cant set state false with controls specified".format(
+                "{} cant set state false with controls specified".format(
                     self.type))
 
     def process(self, resources):
@@ -1533,7 +1533,20 @@ class SetS3PublicBlock(BaseAction):
 
 
 class GlueCatalogEncryptionEnabled(MultiAttrFilter):
+    """ Filter glue catalog by its glue encryption status and KMS key
 
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: glue-catalog-security-config
+          resource: aws.glue-catalog
+          filters:
+            - type: glue-security-config
+              SseAwsKmsKeyId: alias/aws/glue
+
+    """
     retry = staticmethod(QueryResourceManager.retry)
 
     schema = {
@@ -1541,7 +1554,7 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
         'additionalProperties': False,
         'properties': {
             'type': {'enum': ['glue-security-config']},
-            'CatalogEncryptionMode': {'type': 'string'},
+            'CatalogEncryptionMode': {'enum': ['DISABLED', 'SSE-KMS']},
             'SseAwsKmsKeyId': {'type': 'string'},
             'ReturnConnectionPasswordEncrypted': {'type': 'boolean'},
             'AwsKmsKeyId': {'type': 'string'}
@@ -1572,18 +1585,18 @@ class GlueCatalogEncryptionEnabled(MultiAttrFilter):
                 'DataCatalogEncryptionSettings')
         resource[self.annotation] = encryption_setting.get('EncryptionAtRest')
         resource[self.annotation].update(encryption_setting.get('ConnectionPasswordEncryption'))
-
-        for kmskey in self.data:
-            if not self.data[kmskey].startswith('alias'):
+        key_attrs = ('SseAwsKmsKeyId', 'AwsKmsKeyId')
+        for encrypt_attr in key_attrs:
+            if encrypt_attr not in self.data or not self.data[encrypt_attr].startswith('alias'):
                 continue
-            key = resource[self.annotation].get(kmskey)
-            vfd = {'c7n:AliasName': self.data[kmskey]}
+            key = resource[self.annotation].get(encrypt_attr)
+            vfd = {'c7n:AliasName': self.data[encrypt_attr]}
             vf = KmsRelatedFilter(vfd, self.manager)
             vf.RelatedIdsExpression = 'KmsKeyId'
             vf.annotate = False
             if not vf.process([{'KmsKeyId': key}]):
                 return []
-            resource[self.annotation][kmskey] = self.data[kmskey]
+            resource[self.annotation][encrypt_attr] = self.data[encrypt_attr]
         return resource[self.annotation]
 
 
@@ -1603,3 +1616,118 @@ class AccountCatalogEncryptionFilter(GlueCatalogEncryptionEnabled):
               SseAwsKmsKeyId: alias/aws/glue
 
     """
+
+
+@filters.register('emr-block-public-access')
+class EMRBlockPublicAccessConfiguration(ValueFilter):
+    """Check for EMR block public access configuration on an account
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: get-emr-block-public-access
+                resource: account
+                filters:
+                  - type: emr-block-public-access
+    """
+
+    annotation_key = 'c7n:emr-block-public-access'
+    annotate = False  # no annotation from value filter
+    schema = type_schema('emr-block-public-access', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ("elasticmapreduce:GetBlockPublicAccessConfiguration",)
+
+    def process(self, resources, event=None):
+        self.augment([r for r in resources if self.annotation_key not in r])
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client(
+            'emr', region_name=self.manager.config.region)
+
+        for r in resources:
+            try:
+                r[self.annotation_key] = client.get_block_public_access_configuration()
+                r[self.annotation_key].pop('ResponseMetadata')
+            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                r[self.annotation_key] = {}
+
+    def __call__(self, r):
+        return super(EMRBlockPublicAccessConfiguration, self).__call__(r[self.annotation_key])
+
+
+@actions.register('set-emr-block-public-access')
+class PutAccountBlockPublicAccessConfiguration(BaseAction):
+    """Action to put/update the EMR block public access configuration for your
+       AWS account in the current region
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-emr-block-public-access
+                resource: account
+                filters:
+                  - type: emr-block-public-access
+                    key: BlockPublicAccessConfiguration.BlockPublicSecurityGroupRules
+                    value: False
+                actions:
+                  - type: set-emr-block-public-access
+                    config:
+                        BlockPublicSecurityGroupRules: True
+                        PermittedPublicSecurityGroupRuleRanges:
+                            - MinRange: 22
+                              MaxRange: 22
+                            - MinRange: 23
+                              MaxRange: 23
+
+    """
+
+    schema = type_schema('set-emr-block-public-access',
+                         config={"type": "object",
+                            'properties': {
+                                'BlockPublicSecurityGroupRules': {'type': 'boolean'},
+                                'PermittedPublicSecurityGroupRuleRanges': {
+                                    'type': 'array',
+                                    'items': {
+                                        'type': 'object',
+                                        'properties': {
+                                            'MinRange': {'type': 'number', "minimum": 0},
+                                            'MaxRange': {'type': 'number', "minimum": 0}
+                                        },
+                                        'required': ['MinRange']
+                                    }
+                                }
+                            },
+                             'required': ['BlockPublicSecurityGroupRules']
+                         },
+                         required=('config',))
+
+    permissions = ("elasticmapreduce:PutBlockPublicAccessConfiguration",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('emr')
+        r = resources[0]
+
+        base = {}
+        if EMRBlockPublicAccessConfiguration.annotation_key in r:
+            base = r[EMRBlockPublicAccessConfiguration.annotation_key]
+        else:
+            try:
+                base = client.get_block_public_access_configuration()
+                base.pop('ResponseMetadata')
+            except client.exceptions.NoSuchPublicAccessBlockConfiguration:
+                base = {}
+
+        config = base['BlockPublicAccessConfiguration']
+        updatedConfig = {**config, **self.data.get('config')}
+
+        if config == updatedConfig:
+            return
+
+        client.put_block_public_access_configuration(
+            BlockPublicAccessConfiguration=updatedConfig
+        )

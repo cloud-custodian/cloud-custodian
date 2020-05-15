@@ -18,7 +18,6 @@ import abc
 import logging
 import sys
 
-import six
 from c7n_azure import constants
 from c7n_azure.utils import ThreadHelper
 from msrestazure.azure_exceptions import CloudError
@@ -26,8 +25,7 @@ from msrestazure.azure_exceptions import CloudError
 from c7n.actions import BaseAction, EventAction
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AzureBaseAction(BaseAction):
+class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
     session = None
     max_workers = constants.DEFAULT_MAX_THREAD_WORKERS
     chunk_size = constants.DEFAULT_CHUNK_SIZE
@@ -102,8 +100,7 @@ class AzureBaseAction(BaseAction):
             "Base action class does not implement this behavior")
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AzureEventAction(EventAction, AzureBaseAction):
+class AzureEventAction(EventAction, AzureBaseAction, metaclass=abc.ABCMeta):
 
     def _process_resources(self, resources, event):
         self._prepare_processing()

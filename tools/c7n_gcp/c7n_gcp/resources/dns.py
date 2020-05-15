@@ -28,6 +28,7 @@ class DnsManagedZone(QueryResourceManager):
         id = 'id'
         name = 'name'
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
+        asset_type = "dns.googleapis.com/ManagedZone"
 
         @staticmethod
         def get(client, resource_info):
@@ -49,6 +50,7 @@ class DnsPolicy(QueryResourceManager):
         id = 'id'
         name = 'name'
         default_report_fields = ['id', 'name', 'description', 'enableLogging']
+        asset_type = "dns.googleapis.com/Policy"
 
         @staticmethod
         def get(client, resource_info):

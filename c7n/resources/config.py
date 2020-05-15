@@ -28,6 +28,7 @@ class ConfigRecorder(QueryResourceManager):
         filter_name = 'ConfigurationRecorderNames'
         filter_type = 'list'
         arn = False
+        cfn_type = 'AWS::Config::ConfigurationRecorder'
 
     def augment(self, resources):
         # in general we don't to default augmentation beyond tags, to
@@ -60,6 +61,7 @@ class ConfigRule(QueryResourceManager):
         arn_type = 'config-rule'
         filter_name = 'ConfigRuleNames'
         filter_type = 'list'
+        cfn_type = 'AWS::Config::ConfigRule'
 
 
 @ConfigRule.filter_registry.register('status')

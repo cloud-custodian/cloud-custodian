@@ -85,7 +85,6 @@ ftest:
 
 sphinx:
 # if this errors either tox -e docs or cd tools/c7n_sphinext && poetry install
-	which c7n-sphinxext
 	make -f docs/Makefile.sphinx html
 
 ghpages:

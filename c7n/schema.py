@@ -279,13 +279,12 @@ def generate(resource_types=()):
     }
 
     resource_refs = []
-    for cloud_name, cloud_type in clouds.items():
-        for type_name, resource_type in cloud_type.resources.items():
+    for cloud_name, cloud_type in sorted(clouds.items()):
+        for type_name, resource_type in sorted(cloud_type.resources.items()):
             r_type_name = "%s.%s" % (cloud_name, type_name)
             if resource_types and r_type_name not in resource_types:
                 if not resource_type.type_aliases:
                     continue
-                # atm only azure is using type aliases.
                 elif not {"%s.%s" % (cloud_name, ralias) for ralias
                         in resource_type.type_aliases}.intersection(
                         resource_types):

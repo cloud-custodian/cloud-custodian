@@ -22,7 +22,6 @@ import time
 import uuid
 from concurrent.futures import as_completed
 
-import six
 from azure.graphrbac.models import DirectoryObject, GetObjectsParameters
 from azure.keyvault import KeyVaultAuthentication, AccessToken
 from azure.keyvault import KeyVaultClient, KeyVaultId
@@ -34,6 +33,7 @@ from msrestazure.azure_active_directory import MSIAuthentication
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 from netaddr import IPNetwork, IPRange, IPSet
+from json import JSONEncoder
 
 from c7n.utils import chunks, local_session
 
@@ -98,7 +98,7 @@ class StringUtils:
 
     @staticmethod
     def equal(a, b, case_insensitive=True):
-        if isinstance(a, six.string_types) and isinstance(b, six.string_types):
+        if isinstance(a, str) and isinstance(b, str):
             if case_insensitive:
                 return a.strip().lower() == b.strip().lower()
             else:
@@ -113,7 +113,7 @@ class StringUtils:
 
     @staticmethod
     def naming_hash(val, length=8):
-        if isinstance(val, six.string_types):
+        if isinstance(val, str):
             val = val.encode('utf8')
         return hashlib.sha256(val).hexdigest().lower()[:length]
 
@@ -478,13 +478,33 @@ class AppInsightsHelper:
 
 
 class ManagedGroupHelper:
+    class serialize(JSONEncoder):
+        def default(self, o):
+            return o.__dict__
+
+    @staticmethod
+    def filter_subscriptions(key, dictionary):
+        for k, v in dictionary.items():
+            if k == key:
+                if v == '/subscriptions':
+                    yield dictionary
+            elif isinstance(v, dict):
+                for result in ManagedGroupHelper.filter_subscriptions(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    for result in ManagedGroupHelper.filter_subscriptions(key, d):
+                        yield result
 
     @staticmethod
     def get_subscriptions_list(managed_resource_group, credentials):
         client = ManagementGroupsAPI(credentials)
-        entities = client.entities.list(filter='name eq \'%s\'' % managed_resource_group)
-
-        return [e.name for e in entities if e.type == '/subscriptions']
+        groups = client.management_groups.get(
+            group_id=managed_resource_group, recurse=True,
+            expand="children").serialize()["properties"]
+        subscriptions = ManagedGroupHelper.filter_subscriptions('type', groups)
+        subscriptions = [subscription['name'] for subscription in subscriptions]
+        return subscriptions
 
 
 def generate_key_vault_url(name):

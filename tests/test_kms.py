@@ -11,8 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json, time
+import json
+import time
 
+
+from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
 
 
@@ -295,3 +298,35 @@ class KMSTagging(BaseTest):
             target_key_arn = client.describe_key(
                 KeyId=target_key_id).get('KeyMetadata').get('Arn')
         self.assertEqual(resources[0]['KmsKeyId'], target_key_arn)
+
+    def test_kms_post_finding(self):
+        factory = self.replay_flight_data('test_kms_post_finding')
+        p = self.load_policy({
+            'name': 'kms',
+            'resource': 'aws.kms',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+
+        resources = p.resource_manager.get_resources([
+            'arn:aws:kms:us-west-2:644160558196:alias/c7n-test'])
+        rfinding = p.resource_manager.actions[0].format_resource(
+            resources[0])
+        self.maxDiff = None
+        rfinding['Details']['AwsKmsKey'].pop('CreationDate')
+        self.assertEqual(
+            rfinding,
+            {'Details': {'AwsKmsKey': {
+                'KeyId': '44d25a5c-7efa-44ed-8436-b9511ea921b3',
+                'KeyManager': 'CUSTOMER',
+                'KeyState': 'Enabled',
+                'Origin': 'AWS_KMS'}},
+             'Id': 'arn:aws:kms:us-west-2:644160558196:alias/44d25a5c-7efa-44ed-8436-b9511ea921b3',
+             'Partition': 'aws',
+             'Region': 'us-west-2',
+             'Type': 'AwsKmsKey'})
+
+        shape_validate(
+            rfinding['Details']['AwsKmsKey'], 'AwsKmsKeyDetails', 'securityhub')

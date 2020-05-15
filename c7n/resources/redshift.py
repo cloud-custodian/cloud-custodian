@@ -13,6 +13,7 @@
 # limitations under the License.
 import json
 import itertools
+import jmespath
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -30,6 +31,7 @@ from c7n.query import QueryResourceManager, TypeInfo
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, snapshot_identifier)
+from .aws import shape_validate
 
 
 @resources.register('redshift')
@@ -45,7 +47,7 @@ class Redshift(QueryResourceManager):
         filter_type = 'scalar'
         date = 'ClusterCreateTime'
         dimension = 'ClusterIdentifier'
-        config_type = "AWS::Redshift::Cluster"
+        cfn_type = config_type = "AWS::Redshift::Cluster"
 
 
 Redshift.filter_registry.register('marked-for-op', tags.TagActionFilter)
@@ -124,20 +126,8 @@ class LoggingFilter(ValueFilter):
         return results
 
 
-class StateTransitionAction(BaseAction):
-
-    def filter_cluster_state(self, resources, states):
-        resource_count = len(resources)
-        results = [r for r in resources if r['ClusterStatus'] in states]
-        if resource_count != len(results):
-            self.log.warning(
-                '%s filtered to %d of %d clusters in states: %s',
-                self.type, len(results), resource_count, ', '.join(states))
-        return results
-
-
 @Redshift.action_registry.register('pause')
-class Pause(StateTransitionAction):
+class Pause(BaseAction):
 
     schema = type_schema('pause')
     permissions = ('redshift:PauseCluster',)
@@ -145,7 +135,7 @@ class Pause(StateTransitionAction):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
-        for r in self.filter_cluster_state(resources, ('available',)):
+        for r in self.filter_resources(resources, 'ClusterStatus', ('available',)):
             try:
                 client.pause_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])
@@ -155,7 +145,7 @@ class Pause(StateTransitionAction):
 
 
 @Redshift.action_registry.register('resume')
-class Resume(StateTransitionAction):
+class Resume(BaseAction):
 
     schema = type_schema('resume')
     permissions = ('redshift:ResumeCluster',)
@@ -163,7 +153,7 @@ class Resume(StateTransitionAction):
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('redshift')
-        for r in self.filter_cluster_state(resources, ('paused',)):
+        for r in self.filter_resources(resources, 'ClusterStatus', ('paused',)):
             try:
                 client.resume_cluster(
                     ClusterIdentifier=r['ClusterIdentifier'])
@@ -603,6 +593,81 @@ class RedshiftSetPublicAccess(BaseAction):
         return clusters
 
 
+@Redshift.action_registry.register('set-attributes')
+class RedshiftSetAttributes(BaseAction):
+    """
+    Action to modify Redshift clusters
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: redshift-modify-cluster
+                  resource: redshift
+                  filters:
+                    - type: value
+                      key: AllowVersionUpgrade
+                      value: false
+                  actions:
+                    - type: set-attributes
+                      attributes:
+                        AllowVersionUpgrade: true
+    """
+
+    schema = type_schema('set-attributes',
+                        attributes={"type": "object"},
+                        required=('attributes',))
+
+    permissions = ('redshift:ModifyCluster',)
+    cluster_mapping = {
+        'ElasticIp': 'ElasticIpStatus.ElasticIp',
+        'ClusterSecurityGroups': 'ClusterSecurityGroups[].ClusterSecurityGroupName',
+        'VpcSecurityGroupIds': 'VpcSecurityGroups[].ClusterSecurityGroupName',
+        'HsmClientCertificateIdentifier': 'HsmStatus.HsmClientCertificateIdentifier',
+        'HsmConfigurationIdentifier': 'HsmStatus.HsmConfigurationIdentifier'
+    }
+
+    shape = 'ModifyClusterMessage'
+
+    def validate(self):
+        attrs = dict(self.data.get('attributes'))
+        if attrs.get('ClusterIdentifier'):
+            raise PolicyValidationError('ClusterIdentifier field cannot be updated')
+        attrs["ClusterIdentifier"] = ""
+        return shape_validate(attrs, self.shape, 'redshift')
+
+    def process(self, clusters):
+        client = local_session(self.manager.session_factory).client(
+            self.manager.get_model().service)
+        for cluster in clusters:
+            self.process_cluster(client, cluster)
+
+    def process_cluster(self, client, cluster):
+        try:
+            config = dict(self.data.get('attributes'))
+            modify = {}
+            for k, v in config.items():
+                if ((k in self.cluster_mapping and
+                v != jmespath.search(self.cluster_mapping[k], cluster)) or
+                v != cluster.get('PendingModifiedValues', {}).get(k, cluster.get(k))):
+                    modify[k] = v
+            if not modify:
+                return
+
+            modify['ClusterIdentifier'] = (cluster.get('PendingModifiedValues', {})
+                                          .get('ClusterIdentifier')
+                                          or cluster.get('ClusterIdentifier'))
+            client.modify_cluster(**modify)
+        except (client.exceptions.ClusterNotFoundFault):
+            return
+        except ClientError as e:
+            self.log.warning(
+                "Exception trying to modify cluster: %s error: %s",
+                cluster['ClusterIdentifier'], e)
+            raise
+
+
 @Redshift.action_registry.register('mark-for-op')
 class TagDelayedAction(tags.TagDelayedAction):
     """Action to create an action to be performed at a later time
@@ -749,7 +814,7 @@ class RedshiftSubnetGroup(QueryResourceManager):
             'describe_cluster_subnet_groups', 'ClusterSubnetGroups', None)
         filter_name = 'ClusterSubnetGroupName'
         filter_type = 'scalar'
-        config_type = "AWS::Redshift::ClusterSubnetGroup"
+        cfn_type = config_type = "AWS::Redshift::ClusterSubnetGroup"
 
 
 @resources.register('redshift-snapshot')
