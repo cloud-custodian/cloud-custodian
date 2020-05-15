@@ -425,6 +425,19 @@ def process_resource(
     return {'$ref': '#/definitions/resources/%s/policy' % type_name}
 
 
+def resource_outline(provider=None):
+    outline = {}
+    for cname, ctype in sorted(clouds.items()):
+        if provider and provider != cname:
+            continue
+        cresources = outline[cname] = {}
+        for rname, rtype in sorted(ctype.resources.items()):
+            cresources['%s.%s' % (cname, rname)] = rinfo = {}
+            rinfo['filters'] = sorted(rtype.filter_registry.keys())
+            rinfo['actions'] = sorted(rtype.action_registry.keys())
+    return outline
+
+
 def resource_vocabulary(cloud_name=None, qualify_name=True):
     vocabulary = {}
     resources = {}
