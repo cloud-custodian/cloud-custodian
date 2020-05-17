@@ -348,6 +348,9 @@ class CrossAccountAccessFilter(Filter):
 class PolicyStatementFilter(Filter):
     """  Check a resource for a set of policy statements.
     """
+    POLICY_ELEMENTS = [
+        'Sid', 'Effect', 'Principal', 'NotPrincipal', 'Action', 
+        'NotAction', 'Resource', 'NotResource', 'Condition']
     schema = type_schema(
         'has-statement',
         statement_ids={'type': 'array', 'items': {'type': 'string'}},
@@ -371,12 +374,17 @@ class PolicyStatementFilter(Filter):
                         'anyOf': [{'type': 'string'}, {'type': 'array'}]},
                     'NotResource': {
                         'anyOf': [{'type': 'string'}, {'type': 'array'}]},
-                    'Condition': {'type': 'object'}
+                    'Condition': {'type': 'object'},
+                    'PartialMatch': {
+                        'anyOf': [
+                            {'type':'string', "enum": POLICY_ELEMENTS},
+                            {'type':'array', 'items': [
+                                {"type": "string", "enum": POLICY_ELEMENTS}]}]
+                    }
                 },
                 'required': ['Effect']
             }
-        },
-        fuzzy_match={'type': 'boolean', 'default': False})
+        })
 
     def process(self, resources, event=None):
         return list(filter(None, map(self.process_resource, resources)))
@@ -401,10 +409,12 @@ class PolicyStatementFilter(Filter):
 
         required_statements = self.get_required_statements(r)
         for required_statement in required_statements:
+            partial_match_elements = required_statement.pop('PartialMatch', [])
             for statement in statements:
-                matches = sum(
-                    1 for k, v in required_statement.items() if self.match(k, v, statement))
-                if matches == len(required_statement):
+                match_count = sum(
+                    1 for k, v in required_statement.items() if self.match(
+                        k, v, statement, partial_match_elements))
+                if match_count == len(required_statement):
                     required_statements.remove(required_statement)
                     break
 
@@ -413,9 +423,9 @@ class PolicyStatementFilter(Filter):
             return r
         return None
 
-    def match(self, k, v, stmt):
+    def match(self, k, v, stmt, partial_match_elements):
         if k in stmt:
-            if self.data.get('fuzzy_match', False):
+            if k in partial_match_elements:
                 if isinstance(v, list):
                     return set(v).issubset(stmt[k])
                 elif isinstance(v, dict):

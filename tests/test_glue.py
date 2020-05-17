@@ -599,10 +599,10 @@ class TestGlueDataCatalog(BaseTest):
                                     "StringNotEquals": {
                                         "aws:PrincipalOrgId": 'o-4amkskbcf1'
                                     }
-                                }
+                                },
+                                "PartialMatch": "Condition"
                             }
-                        ],
-                        'fuzzy_match': True
+                        ]
                     }
                 ],
             },
