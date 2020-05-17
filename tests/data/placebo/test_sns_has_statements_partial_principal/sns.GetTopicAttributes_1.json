@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Sid\":\"Statement1\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::644160558196:user/erik.gartz@capitalone.com\",\"*\",\"arn:aws:iam::644160558196:user/john.hillegass@capitalone.com\"]},\"Action\":\"sns:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-2:644160558196:MyTopic\",\"Condition\":{\"StringEquals\":{\"sns:Protocol\":[\"https\",\"email\"]}}}]}",
+            "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Sid\":\"Statement1\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"arn:aws:iam::644160558196:user/magikarp@pokemon.com\",\"*\",\"arn:aws:iam::644160558196:user/pikachu@pokemon.com\"]},\"Action\":\"sns:Subscribe\",\"Resource\":\"arn:aws:sns:us-east-2:644160558196:MyTopic\",\"Condition\":{\"StringEquals\":{\"sns:Protocol\":[\"https\",\"email\"]}}}]}",
             "Owner": "644160558196",
             "SubscriptionsPending": "0",
             "TopicArn": "arn:aws:sns:us-east-1:644160558196:test123",
