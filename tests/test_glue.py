@@ -542,7 +542,7 @@ class TestGlueDataCatalog(BaseTest):
         p = self.load_policy(
             {
                 "name": "glue-catalog-has-statements",
-                "resource": "glue-catalog",
+                "resource": "aws.glue-catalog",
                 "filters": [
                     {
                         "type": "has-statement",
@@ -585,7 +585,7 @@ class TestGlueDataCatalog(BaseTest):
         p = self.load_policy(
             {
                 "name": "glue-catalog-has-statements",
-                "resource": "glue-catalog",
+                "resource": "aws.glue-catalog",
                 "filters": [
                     {
                         "type": "has-statement",
