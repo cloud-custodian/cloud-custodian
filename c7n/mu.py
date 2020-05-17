@@ -1297,7 +1297,7 @@ class BucketLambdaNotification:
             params['SourceAccount'] = self.data['account_s3']
             params['SourceArn'] = 'arn:aws:s3:::*'
         else:
-            params['SourceArn'] = 'arn:aws:s3:::%' % self.bucket['Name']
+            params['SourceArn'] = 'arn:aws:s3:::%s' % self.bucket['Name']
         try:
             lambda_client.add_permission(**params)
         except lambda_client.exceptions.ResourceConflictException:

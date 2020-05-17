@@ -26,6 +26,7 @@ from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
 from c7n.exceptions import PolicyValidationError, ClientError, ResourceLimitExceeded
 from c7n.filters import FilterRegistry, And, Or, Not
+from c7n.manager import iter_filters
 from c7n.output import DEFAULT_NAMESPACE, NullBlobOutput
 from c7n.resources import load_resources
 from c7n.registry import PluginRegistry
@@ -917,8 +918,7 @@ class PolicyConditions:
 
     def validate(self):
         self.filters.extend(self.convert_deprecated())
-        self.filters = self.filter_registry.parse(
-            self.filters, self.policy.resource_manager)
+        self.filters = self.filter_registry.parse(self.filters, self)
 
     def evaluate(self, event=None):
         policy_vars = dict(self.env_vars)
@@ -931,12 +931,16 @@ class PolicyConditions:
             'now': datetime.utcnow().replace(tzinfo=tzutil.tzutc()),
             'policy': self.policy.data
         })
+
         # note for no filters/conditions, this uses all([]) == true property.
         state = all([f.process([policy_vars], event) for f in self.filters])
         if not state:
             self.policy.log.info(
                 'Skipping policy:%s due to execution conditions', self.policy.name)
         return state
+
+    def iter_filters(self, block_end=False):
+        return iter_filters(self.filters, block_end=block_end)
 
     def convert_deprecated(self):
         filters = []
@@ -1141,9 +1145,18 @@ class Policy:
             permissions.update(a.get_permissions())
         return permissions
 
+    def _trim_runtime_filters(self):
+        from c7n.filters.core import trim_runtime
+        trim_runtime(self.conditions.filters)
+        trim_runtime(self.resource_manager.filters)
+
     def __call__(self):
         """Run policy in default mode"""
         mode = self.get_execution_mode()
+        if (isinstance(mode, ServerlessExecutionMode) or
+                self.options.dryrun):
+            self._trim_runtime_filters()
+
         if self.options.dryrun:
             resources = PullMode(self).run()
         elif not self.is_runnable():

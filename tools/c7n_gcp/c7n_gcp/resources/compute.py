@@ -37,6 +37,7 @@ class Instance(QueryResourceManager):
         name = id = 'name'
         labels = True
         default_report_fields = ['name', 'status', 'creationTimestamp', 'machineType', 'zone']
+        asset_type = "compute.googleapis.com/Instance"
 
         @staticmethod
         def get(client, resource_info):
@@ -161,6 +162,7 @@ class Image(QueryResourceManager):
         default_report_fields = [
             "name", "description", "sourceType", "status", "creationTimestamp",
             "storageLocation", "diskSizeGb", "family"]
+        asset_type = "compute.googleapis.com/Image"
 
         @staticmethod
         def get(client, resource_info):
@@ -194,6 +196,7 @@ class Disk(QueryResourceManager):
         name = id = 'name'
         labels = True
         default_report_fields = ["name", "sizeGb", "status", "zone"]
+        asset_type = "compute.googleapis.com/Disk"
 
         @staticmethod
         def get(client, resource_info):
@@ -293,6 +296,7 @@ class Snapshot(QueryResourceManager):
         enum_spec = ('list', 'items[]', None)
         name = id = 'name'
         default_report_fields = ["name", "status", "diskSizeGb", "creationTimestamp"]
+        asset_type = "compute.googleapis.com/Snapshot"
 
         @staticmethod
         def get(client, resource_info):
@@ -329,6 +333,7 @@ class InstanceTemplate(QueryResourceManager):
         default_report_fields = [
             name, "description", "creationTimestamp",
             "properties.machineType", "properties.description"]
+        asset_type = "compute.googleapis.com/InstanceTemplate"
 
         @staticmethod
         def get(client, resource_info):
@@ -378,6 +383,7 @@ class Autoscaler(QueryResourceManager):
         enum_spec = ('aggregatedList', 'items.*.autoscalers[]', None)
         default_report_fields = [
             "name", "description", "status", "target", "recommendedSize"]
+        asset_type = "compute.googleapis.com/Autoscaler"
 
         @staticmethod
         def get(client, resource_info):

@@ -199,6 +199,22 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_asg_image_age_filter_deleted_config(self):
+        factory = self.replay_flight_data("test_asg_image_age_filter_deleted_config")
+        p = self.load_policy(
+            {
+                "name": "asg-image-age-filter",
+                "resource": "asg",
+                "filters": [
+                    {"tag:Env": "present"},
+                    {"type": "image-age", "days": 5000, "op": "gt"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue('Env' in resources[0].get('Tags')[1].values())
+
     def test_asg_config_filter(self):
         factory = self.replay_flight_data("test_asg_config_filter")
         p = self.load_policy(
