@@ -788,7 +788,10 @@ class TestSNS(BaseTest):
                                         ]
                                     }
                                 },
-                                "PartialMatch": "Principal, Condition"
+                                "PartialMatch": [
+                                    "Principal",
+                                    "Condition"
+                                ]
                             }
                         ]
                     }
