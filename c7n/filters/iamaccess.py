@@ -349,7 +349,7 @@ class PolicyStatementFilter(Filter):
     """  Check a resource for a set of policy statements.
     """
     POLICY_ELEMENTS = [
-        'Sid', 'Effect', 'Principal', 'NotPrincipal', 'Action', 
+        'Sid', 'Effect', 'Principal', 'NotPrincipal', 'Action',
         'NotAction', 'Resource', 'NotResource', 'Condition']
     schema = type_schema(
         'has-statement',
@@ -377,8 +377,8 @@ class PolicyStatementFilter(Filter):
                     'Condition': {'type': 'object'},
                     'PartialMatch': {
                         'anyOf': [
-                            {'type':'string', "enum": POLICY_ELEMENTS},
-                            {'type':'array', 'items': [
+                            {'type': 'string', "enum": POLICY_ELEMENTS},
+                            {'type': 'array', 'items': [
                                 {"type": "string", "enum": POLICY_ELEMENTS}]}]
                     }
                 },
@@ -429,5 +429,23 @@ class PolicyStatementFilter(Filter):
                 if isinstance(v, list):
                     return set(v).issubset(stmt[k])
                 elif isinstance(v, dict):
-                    return dict(stmt[k], **v) == stmt[k]
+                    return dict_merge(stmt[k], v) == stmt[k]
+                else:
+                    return v in stmt[k]
             return v == stmt[k]
+
+
+def dict_merge(d1, d2):
+    d3 = d1.copy()
+    for k, v in d2.items():
+        if not d3.get(k):
+            d3[k] = v
+        elif isinstance(d3[k], dict) and isinstance(d2[k], dict):
+            d3[k] = dict_merge(d3[k], d2[k])
+        elif isinstance(v, list):
+            for val in v:
+                if val not in d3[k]:
+                    d3[k].append(val)
+        else:
+            d3[k] = v
+    return d3
