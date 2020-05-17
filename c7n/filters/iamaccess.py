@@ -446,6 +446,10 @@ def dict_merge(d1, d2):
             for val in v:
                 if val not in d3[k]:
                     d3[k].append(val)
+        elif k in d3 and not isinstance(v, type(d3[k])):
+            if isinstance(v, str) and isinstance(d3[k], list):
+                if v not in d3[k]:
+                    d3[k].append(v)
         else:
             d3[k] = v
     return d3
