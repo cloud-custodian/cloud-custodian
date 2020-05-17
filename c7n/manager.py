@@ -28,6 +28,18 @@ except ImportError:
 from c7n.utils import dumps
 
 
+def iter_filters(filters, block_end=False):
+    queue = deque(filters)
+    while queue:
+        f = queue.popleft()
+        if f is not None and f.type in ('or', 'and', 'not'):
+            if block_end:
+                queue.appendleft(None)
+            for gf in f.filters:
+                queue.appendleft(gf)
+        yield f
+
+
 class ResourceManager:
     """
     A Cloud Custodian resource
@@ -121,15 +133,7 @@ class ResourceManager:
         return self.query.resolve(self.resource_type)
 
     def iter_filters(self, block_end=False):
-        queue = deque(self.filters)
-        while queue:
-            f = queue.popleft()
-            if f and f.type in ('or', 'and', 'not'):
-                if block_end:
-                    queue.appendleft(None)
-                for gf in f.filters:
-                    queue.appendleft(gf)
-            yield f
+        return iter_filters(self.filters, block_end=block_end)
 
     def validate(self):
         """
