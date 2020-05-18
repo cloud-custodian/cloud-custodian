@@ -46,32 +46,6 @@ class Distribution(QueryResourceManager):
         dimension = "DistributionId"
         universal_taggable = True
         config_type = "AWS::CloudFront::Distribution"
-        validation_config = {
-            'Origins': {
-                'Quantity': 0,
-                'Items': [{
-                    'Id': '',
-                    'DomainName': ''
-                }]
-            },
-            'DefaultCacheBehavior': {
-                'TargetOriginId': '',
-                'ForwardedValues': {
-                    'QueryString': True,
-                    'Cookies': {
-                        'Forward': ''
-                    }
-                },
-                'TrustedSigners': {
-                    'Enabled': True,
-                    'Quantity': 0
-                },
-                'ViewerProtocolPolicy': '',
-                'MinTTL': 0
-            },
-            'Comment': '',
-            'Enabled': False
-        }
         cfn_type = config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
@@ -103,18 +77,6 @@ class StreamingDistribution(QueryResourceManager):
         date = 'LastModifiedTime'
         dimension = "DistributionId"
         universal_taggable = True
-        validation_config = {
-            'S3Origin': {
-                'DomainName': 'domain_name',
-                'OriginAccessIdentity': 'origin_access_identity'
-            },
-            'TrustedSigners': {
-                'Enabled': False,
-                'Quantity': 0
-            },
-            'Comment': '',
-            'Enabled': False
-        }
         cfn_type = config_type = "AWS::CloudFront::StreamingDistribution"
 
     source_mapping = {
@@ -577,7 +539,7 @@ class BaseUpdateAction(BaseAction):
 
         # Set default values for required fields if they are not present
         attrs["CallerReference"] = ""
-        config = self.manager.get_model().validation_config
+        config = self.validation_config
         updatedConfig = {**config, **attrs}
 
         request = {
@@ -623,6 +585,32 @@ class DistributionUpdateAction(BaseUpdateAction):
     permissions = ("cloudfront:UpdateDistribution",
                    "cloudfront:GetDistributionConfig",)
     shape = 'UpdateDistributionRequest'
+    validation_config = {
+        'Origins': {
+            'Quantity': 0,
+            'Items': [{
+                'Id': '',
+                'DomainName': ''
+            }]
+        },
+        'DefaultCacheBehavior': {
+            'TargetOriginId': '',
+            'ForwardedValues': {
+                'QueryString': True,
+                'Cookies': {
+                    'Forward': ''
+                }
+            },
+            'TrustedSigners': {
+                'Enabled': True,
+                'Quantity': 0
+            },
+            'ViewerProtocolPolicy': '',
+            'MinTTL': 0
+        },
+        'Comment': '',
+        'Enabled': False
+    }
 
     def validate(self):
         return super().validate('DistributionConfig', self.shape)
@@ -631,7 +619,7 @@ class DistributionUpdateAction(BaseUpdateAction):
         try:
             res = client.get_distribution_config(
                 Id=distribution[self.manager.get_model().id])
-            default_config = self.manager.get_model().validation_config
+            default_config = self.validation_config
             config = {**default_config, **res['DistributionConfig']}
             updatedConfig = {**config, **self.data['attributes']}
             if config == updatedConfig:
@@ -676,6 +664,18 @@ class StreamingDistributionUpdateAction(BaseUpdateAction):
     permissions = ("cloudfront:UpdateStreamingDistribution",
                    "cloudfront:GetStreamingDistributionConfig",)
     shape = 'UpdateStreamingDistributionRequest'
+    validation_config = {
+        'S3Origin': {
+            'DomainName': 'domain_name',
+            'OriginAccessIdentity': 'origin_access_identity'
+        },
+        'TrustedSigners': {
+            'Enabled': False,
+            'Quantity': 0
+        },
+        'Comment': '',
+        'Enabled': False
+    }
 
     def validate(self):
         return super().validate('StreamingDistributionConfig', self.shape)
@@ -684,7 +684,8 @@ class StreamingDistributionUpdateAction(BaseUpdateAction):
         try:
             res = client.get_streaming_distribution_config(
                 Id=streaming_distribution[self.manager.get_model().id])
-            config = res['StreamingDistributionConfig']
+            default_config = self.validation_config
+            config = {**default_config, **res['StreamingDistributionConfig']}
             updatedConfig = {**config, **self.data['attributes']}
             if config == updatedConfig:
                 return
