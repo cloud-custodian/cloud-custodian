@@ -51,18 +51,16 @@ def cli():
 @click.option('-a', '--accounts', multiple=True, default=None)
 @click.option('--master', help='Master account id or name')
 @click.option('--debug', help='Run single-threaded', is_flag=True)
-@click.option('--region', default='us-east-1')
-@click.option('--all-regions', help='Run in all regions', is_flag=True)
-def report(config, tags, accounts, master, debug, region, all_regions):
+@click.option(
+    '-r', '--region',
+    default=['all'], help='Region to report on (default: all)',
+    multiple=True)
+def report(config, tags, accounts, master, debug, region):
     """report on guard duty enablement by account"""
     accounts_config, master_info, executor = guardian_init(
         config, debug, master, accounts, tags)
 
-    if all_regions:
-        ec2_client = boto3.client('ec2')
-        regions = [region['RegionName'] for region in ec2_client.describe_regions()['Regions']]
-    else:
-        regions = [region]
+    regions = expand_regions(region)
 
     accounts_report = [x for x in executor(max_workers=WORKER_COUNT).map(
         report_one_region,
@@ -72,7 +70,6 @@ def report(config, tags, accounts, master, debug, region, all_regions):
         repeat(master),
         repeat(debug),
         regions,
-        repeat(all_regions)
     )]
     accounts_report = reduce(lambda x, y: x + y, accounts_report)
     accounts_report.sort(key=operator.itemgetter('updated'), reverse=True)
@@ -86,7 +83,6 @@ def report_one_region(
     master,
     debug,
     region,
-    all_regions
 ):
     """report on guard duty enablement by account"""
     accounts_config, master_info, executor = guardian_init(
@@ -110,8 +106,7 @@ def report_one_region(
         ar.pop('tags', None)
         ar.pop('role')
         ar.pop('regions', None)
-        if all_regions:
-            ar['region'] = region
+        ar['region'] = region
         if a['account_id'] in members:
             m = members[a['account_id']]
             ar['status'] = m['RelationshipStatus']
