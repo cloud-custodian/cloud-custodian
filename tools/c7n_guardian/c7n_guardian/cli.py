@@ -27,6 +27,9 @@ from c7n.utils import format_event, chunks
 
 from c7n_org.cli import init, filter_accounts, CONFIG_SCHEMA, WORKER_COUNT
 
+from itertools import repeat
+from functools import reduce
+
 log = logging.getLogger('c7n-guardian')
 
 
@@ -49,13 +52,49 @@ def cli():
 @click.option('--master', help='Master account id or name')
 @click.option('--debug', help='Run single-threaded', is_flag=True)
 @click.option('--region', default='us-east-1')
-def report(config, tags, accounts, master, debug, region):
+@click.option('--all-regions', help='Run in all regions', is_flag=True)
+def report(config, tags, accounts, master, debug, region, all_regions):
+    """report on guard duty enablement by account"""
+    accounts_config, master_info, executor = guardian_init(
+        config, debug, master, accounts, tags)
+
+    if all_regions:
+        ec2_client = boto3.client('ec2')
+        regions = [region['RegionName'] for region in ec2_client.describe_regions()['Regions']]
+    else:
+        regions = [region]
+
+    accounts_report = [x for x in executor(max_workers=WORKER_COUNT).map(
+        report_one_region,
+        repeat(config),
+        repeat(tags),
+        repeat(accounts),
+        repeat(master),
+        repeat(debug),
+        regions,
+        repeat(all_regions)
+    )]
+    accounts_report = reduce(lambda x, y: x + y, accounts_report)
+    accounts_report.sort(key=operator.itemgetter('updated'), reverse=True)
+    print(tabulate(accounts_report, headers=('keys')))
+
+
+def report_one_region(
+    config,
+    tags,
+    accounts,
+    master,
+    debug,
+    region,
+    all_regions
+):
     """report on guard duty enablement by account"""
     accounts_config, master_info, executor = guardian_init(
         config, debug, master, accounts, tags)
 
     session = get_session(
-        master_info.get('role'), 'c7n-guardian',
+        master_info.get('role'),
+        'c7n-guardian',
         master_info.get('profile'),
         region)
 
@@ -63,29 +102,29 @@ def report(config, tags, accounts, master, debug, region):
     detector_id = get_or_create_detector_id(client)
 
     members = {m['AccountId']: m for m in
-               client.list_members(DetectorId=detector_id).get('Members')}
+            client.list_members(DetectorId=detector_id).get('Members')}
 
     accounts_report = []
     for a in accounts_config['accounts']:
         ar = dict(a)
-        accounts_report.append(ar)
         ar.pop('tags', None)
         ar.pop('role')
         ar.pop('regions', None)
-        if a['account_id'] not in members:
+        if all_regions:
+            ar['region'] = region
+        if a['account_id'] in members:
+            m = members[a['account_id']]
+            ar['status'] = m['RelationshipStatus']
+            ar['member'] = True
+            ar['joined'] = m['InvitedAt']
+            ar['updated'] = m['UpdatedAt']
+        else:
             ar['member'] = False
             ar['status'] = None
             ar['invited'] = None
             ar['updated'] = datetime.datetime.now().isoformat()
-            continue
-        m = members[a['account_id']]
-        ar['status'] = m['RelationshipStatus']
-        ar['member'] = True
-        ar['joined'] = m['InvitedAt']
-        ar['updated'] = m['UpdatedAt']
-
-    accounts_report.sort(key=operator.itemgetter('updated'), reverse=True)
-    print(tabulate(accounts_report, headers=('keys')))
+        accounts_report.append(ar)
+    return accounts_report
 
 
 @cli.command()
