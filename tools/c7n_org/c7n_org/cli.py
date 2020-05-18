@@ -554,12 +554,13 @@ def run_account(account, region, policies_config, output_path,
             # Variable expansion and non schema validation (not optional)
             p.expand_variables(p.get_variables(account.get('vars', {})))
             p.validate()
-            aws_resource = clouds['aws'].resources.get(p.resource_type.replace('aws.','')).resource_type.service
+            normalized_resource = p.resource_type.replace('aws.', '')
+            aws_resource = clouds['aws'].resources.get(normalized_resource).resource_type.service
             if region not in boto3.session.Session().get_available_regions(aws_resource):
                 log.warning(
                     "Resource:%s not available in %s",
-                            p.resource_type, region)
-                continue  
+                    p.resource_type, region)
+                continue
             log.debug(
                 "Running policy:%s account:%s region:%s",
                 p.name, account['name'], region)
