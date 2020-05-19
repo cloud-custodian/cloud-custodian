@@ -257,7 +257,7 @@ and here is a description of the options:
 |:---------:|:----------------|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                                                                                                                                                 |
 |           | `from_address`  | string           | default from address                                                                                                                                                                |
-|           | `endpoint_url`  | string           | The complete URL to use for the constructed client.                                                                                                                                                                |
+|           | `endpoint_url`  | string           | SQS API URL (for use with VPC Endpoints)                                                                                                                                                                |
 |           | `contact_tags`  | array of strings | tags that we should look at for address information                                                                                                                                 |
 
 #### Standard Lambda Function Config
