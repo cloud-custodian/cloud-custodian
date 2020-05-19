@@ -178,6 +178,16 @@ class SchemaTest(CliTest):
             sorted(data['aws']['aws.ec2'].keys()), ['actions', 'filters'])
         self.assertTrue(len(data['aws']['aws.ec2']['actions']) > 10)
 
+    def test_schema_alias(self):
+        stdout, stderr = self.run_and_expect_success([
+            "custodian", "schema", "aws.network-addr"])
+        self.assertIn("aws.elastic-ip:", stdout)
+
+    def test_schema_alias_unqualified(self):
+        stdout, stderr = self.run_and_expect_success([
+            "custodian", "schema", "network-addr"])
+        self.assertIn("aws.elastic-ip:", stdout)
+
     def test_schema(self):
 
         # no options
