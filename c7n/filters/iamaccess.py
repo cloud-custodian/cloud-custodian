@@ -410,6 +410,9 @@ class PolicyStatementFilter(Filter):
         required_statements = self.get_required_statements(r)
         for required_statement in required_statements:
             partial_match_elements = required_statement.pop('PartialMatch', [])
+            if isinstance(partial_match_elements, str):
+                # Make list if string to prevent mismatches like Action in NotAction below
+                partial_match_elements = [partial_match_elements]
             for statement in statements:
                 match_count = sum(
                     1 for k, v in required_statement.items() if self.match(
