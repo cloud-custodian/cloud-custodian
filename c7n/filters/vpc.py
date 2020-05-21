@@ -73,6 +73,7 @@ class RelatedNetworkFilter(ValueFilter):
     association_type = None
     describe_method = None
     match_path = None
+    vpc_id = None
 
     def process(self, resources, event=None):
         self.augment([r for r in resources if self.annotation_key not in r])
@@ -92,6 +93,25 @@ class RelatedNetworkFilter(ValueFilter):
                     ])
             except client.exceptions.EntityNotFoundException:
                 r[self.annotation_key] = {}
+            if r[self.annotation_key] is None:
+                if not self.vpc_id:
+                    self.vpc_id = client.describe_subnets(
+                        SubnetIds=[
+                            jmespath.search(self.match_path, r),
+                        ],
+                    )['Subnets'][0]['VpcId']
+                default_rtb = m(
+                    Filters=[
+                        {
+                            "Name": 'association.subnet-id',
+                            "Values": [jmespath.search(self.vpc_id, r)]
+                        },
+                        {
+                            "Name": 'association.main',
+                            "Values": ['True']
+                        }
+                    ])
+                r[self.annotation_key] = default_rtb
 
     def __call__(self, r):
         return super(RelatedNetworkFilter, self).__call__(r[self.annotation_key])

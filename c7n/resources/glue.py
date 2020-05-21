@@ -148,6 +148,7 @@ class EndpointRouteTableFilter(RelatedNetworkFilter):
     association_type = "association.subnet-id"
     describe_method = "describe_route_tables"
     match_path = 'SubnetId'
+    vpc_id = 'VpcId'
 
 
 @GlueDevEndpoint.action_registry.register('delete')
