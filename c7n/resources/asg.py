@@ -14,7 +14,6 @@
 from botocore.client import ClientError
 
 from collections import Counter
-from concurrent.futures import as_completed
 
 from dateutil.parser import parse
 
@@ -29,8 +28,8 @@ import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
 from c7n import query
-from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
-from c7n.utils import local_session, type_schema, chunks, get_retry
+from c7n.tags import TagActionBase, TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
+from c7n.utils import local_session, type_schema, get_retry
 
 from .ec2 import deserialize_user_data
 
@@ -753,16 +752,15 @@ class GroupTagTrim(TagTrim):
                       - OwnerContact
     """
 
-    max_tag_count = 10
     permissions = ('autoscaling:DeleteTags',)
 
-    def process_tag_removal(self, client, resource, candidates):
+    def process_tag_removal(self, resource, candidates):
         tags = []
         for t in candidates:
             tags.append(
                 dict(Key=t, ResourceType='auto-scaling-group',
                      ResourceId=resource['AutoScalingGroupName']))
-        client.delete_tags(Tags=tags)
+        self.manager.retry(self.client.delete_tags, Tags=tags)
 
 
 @ASG.filter_registry.register('capacity-delta')
@@ -925,83 +923,87 @@ class Resize(Action):
         'autoscaling:UpdateAutoScalingGroup',
         'autoscaling:CreateOrUpdateTags'
     )
+    batch_size = 0
+    concurrency = 1
+    # ASG parameters to save to/restore from a tag
+    asg_params = ['MinSize', 'MaxSize', 'DesiredCapacity']
 
     def process(self, asgs):
-        # ASG parameters to save to/restore from a tag
-        asg_params = ['MinSize', 'MaxSize', 'DesiredCapacity']
 
         # support previous param desired_size when desired-size is not present
         if 'desired_size' in self.data and 'desired-size' not in self.data:
             self.data['desired-size'] = self.data['desired_size']
 
-        client = local_session(self.manager.session_factory).client(
-            'autoscaling')
-        for a in asgs:
-            tag_map = {t['Key']: t['Value'] for t in a.get('Tags', [])}
-            update = {}
-            current_size = len(a['Instances'])
+        return self._process_with_futures(self.process_asg, asgs)
 
-            if 'restore-options-tag' in self.data:
-                # we want to restore all ASG size params from saved data
-                self.log.debug(
-                    'Want to restore ASG %s size from tag %s' %
-                    (a['AutoScalingGroupName'], self.data['restore-options-tag']))
-                if self.data['restore-options-tag'] in tag_map:
-                    for field in tag_map[self.data['restore-options-tag']].split(';'):
-                        (param, value) = field.split('=')
-                        if param in asg_params:
-                            update[param] = int(value)
+    def process_asg(self, a):
+        tag_map = {t['Key']: t['Value'] for t in a.get('Tags', [])}
+        update = {}
+        current_size = len(a['Instances'])
 
-            else:
-                # we want to resize, parse provided params
-                if 'min-size' in self.data:
-                    update['MinSize'] = self.data['min-size']
+        if 'restore-options-tag' in self.data:
+            # we want to restore all ASG size params from saved data
+            self.log.debug(
+                'Want to restore ASG %s size from tag %s' %
+                (a['AutoScalingGroupName'], self.data['restore-options-tag']))
+            if self.data['restore-options-tag'] in tag_map:
+                for field in tag_map[self.data['restore-options-tag']].split(';'):
+                    (param, value) = field.split('=')
+                    if param in self.asg_params:
+                        update[param] = int(value)
 
-                if 'max-size' in self.data:
-                    update['MaxSize'] = self.data['max-size']
+        else:
+            # we want to resize, parse provided params
+            if 'min-size' in self.data:
+                update['MinSize'] = self.data['min-size']
 
-                if 'desired-size' in self.data:
-                    if self.data['desired-size'] == 'current':
-                        update['DesiredCapacity'] = min(current_size, a['DesiredCapacity'])
-                        if 'MinSize' not in update:
-                            # unless we were given a new value for min_size then
-                            # ensure it is at least as low as current_size
-                            update['MinSize'] = min(current_size, a['MinSize'])
-                    elif type(self.data['desired-size']) == int:
-                        update['DesiredCapacity'] = self.data['desired-size']
+            if 'max-size' in self.data:
+                update['MaxSize'] = self.data['max-size']
 
-            if update:
-                self.log.debug('ASG %s size: current=%d, min=%d, max=%d, desired=%d'
-                    % (a['AutoScalingGroupName'], current_size, a['MinSize'],
-                    a['MaxSize'], a['DesiredCapacity']))
+            if 'desired-size' in self.data:
+                if self.data['desired-size'] == 'current':
+                    update['DesiredCapacity'] = min(current_size, a['DesiredCapacity'])
+                    if 'MinSize' not in update:
+                        # unless we were given a new value for min_size then
+                        # ensure it is at least as low as current_size
+                        update['MinSize'] = min(current_size, a['MinSize'])
+                elif type(self.data['desired-size']) == int:
+                    update['DesiredCapacity'] = self.data['desired-size']
 
-                if 'save-options-tag' in self.data:
-                    # save existing ASG params to a tag before changing them
-                    self.log.debug('Saving ASG %s size to tag %s' %
-                        (a['AutoScalingGroupName'], self.data['save-options-tag']))
-                    tags = [dict(
-                        Key=self.data['save-options-tag'],
-                        PropagateAtLaunch=False,
-                        Value=';'.join({'%s=%d' % (param, a[param]) for param in asg_params}),
-                        ResourceId=a['AutoScalingGroupName'],
-                        ResourceType='auto-scaling-group',
-                    )]
-                    self.manager.retry(client.create_or_update_tags, Tags=tags)
+        if update:
+            self.log.debug('ASG %s size: current=%d, min=%d, max=%d, desired=%d'
+                % (a['AutoScalingGroupName'], current_size, a['MinSize'],
+                a['MaxSize'], a['DesiredCapacity']))
 
-                self.log.debug('Resizing ASG %s with %s' % (a['AutoScalingGroupName'],
-                    str(update)))
-                self.manager.retry(
-                    client.update_auto_scaling_group,
-                    AutoScalingGroupName=a['AutoScalingGroupName'],
-                    **update)
-            else:
-                self.log.debug('nothing to resize')
+            if 'save-options-tag' in self.data:
+                # save existing ASG params to a tag before changing them
+                self.log.debug('Saving ASG %s size to tag %s' %
+                    (a['AutoScalingGroupName'], self.data['save-options-tag']))
+                tags = [dict(
+                    Key=self.data['save-options-tag'],
+                    PropagateAtLaunch=False,
+                    Value=';'.join({'%s=%d' % (param, a[param]) for param in self.asg_params}),
+                    ResourceId=a['AutoScalingGroupName'],
+                    ResourceType='auto-scaling-group',
+                )]
+                self.manager.retry(self.client.create_or_update_tags, Tags=tags)
+
+            self.log.debug('Resizing ASG %s with %s' % (a['AutoScalingGroupName'],
+                str(update)))
+            self.manager.retry(
+                self.client.update_auto_scaling_group,
+                AutoScalingGroupName=a['AutoScalingGroupName'],
+                **update)
+            self.results.ok(a)
+        else:
+            self.results.skip(a, "nothing to resize")
+            self.log.debug('nothing to resize')
 
 
 @ASG.action_registry.register('remove-tag')
 @ASG.action_registry.register('untag')  # compatibility
 @ASG.action_registry.register('unmark')  # compatibility
-class RemoveTag(Action):
+class RemoveTag(TagActionBase):
     """Action to remove tag/tags from an ASG
 
     :example:
@@ -1028,43 +1030,27 @@ class RemoveTag(Action):
     batch_size = 1
 
     def process(self, asgs):
-        error = False
         tags = self.data.get('tags', [])
         if not tags:
             tags = [self.data.get('key', DEFAULT_TAG)]
-        client = local_session(self.manager.session_factory).client('autoscaling')
 
-        with self.executor_factory(max_workers=2) as w:
-            futures = {}
-            for asg_set in chunks(asgs, self.batch_size):
-                futures[w.submit(
-                    self.process_resource_set, client, asg_set, tags)] = asg_set
-            for f in as_completed(futures):
-                asg_set = futures[f]
-                if f.exception():
-                    error = f.exception()
-                    self.log.exception(
-                        "Exception untagging asg:%s tag:%s error:%s" % (
-                            ", ".join([a['AutoScalingGroupName']
-                                       for a in asg_set]),
-                            self.data.get('key', DEFAULT_TAG),
-                            f.exception()))
-        if error:
-            raise error
+        return self._process_with_futures(self.process_resource_set, asgs, tags)
 
-    def process_resource_set(self, client, asgs, tags):
+    def process_resource_set(self, asgs, tags):
         tag_set = []
         for a in asgs:
             for t in tags:
                 tag_set.append(dict(
                     Key=t, ResourceType='auto-scaling-group',
                     ResourceId=a['AutoScalingGroupName']))
-        self.manager.retry(client.delete_tags, Tags=tag_set)
+        r = self.manager.retry(self.client.delete_tags, Tags=tag_set)
+        self.results.ok(asgs)
+        return r
 
 
 @ASG.action_registry.register('tag')
 @ASG.action_registry.register('mark')
-class Tag(Action):
+class Tag(TagActionBase):
     """Action to add a tag to an ASG
 
     The *propagate* parameter can be used to specify that the tag being added
@@ -1117,27 +1103,9 @@ class Tag(Action):
 
     def process(self, asgs):
         tags = self.get_tag_set()
-        error = None
+        return self._process_with_futures(self.process_resource_set, asgs, tags)
 
-        client = self.get_client()
-        with self.executor_factory(max_workers=3) as w:
-            futures = {}
-            for asg_set in chunks(asgs, self.batch_size):
-                futures[w.submit(
-                    self.process_resource_set, client, asg_set, tags)] = asg_set
-            for f in as_completed(futures):
-                asg_set = futures[f]
-                if f.exception():
-                    self.log.exception(
-                        "Exception tagging tag:%s error:%s asg:%s" % (
-                            tags,
-                            f.exception(),
-                            ", ".join([a['AutoScalingGroupName']
-                                       for a in asg_set])))
-        if error:
-            raise error
-
-    def process_resource_set(self, client, asgs, tags):
+    def process_resource_set(self, asgs, tags):
         tag_params = []
         propagate = self.data.get('propagate', False)
         for t in tags:
@@ -1149,10 +1117,9 @@ class Tag(Action):
                 atags['ResourceType'] = 'auto-scaling-group'
                 atags['ResourceId'] = a['AutoScalingGroupName']
                 tag_params.append(atags)
-        self.manager.retry(client.create_or_update_tags, Tags=tag_params)
-
-    def get_client(self):
-        return local_session(self.manager.session_factory).client('autoscaling')
+        r = self.manager.retry(self.client.create_or_update_tags, Tags=tag_params)
+        self.results.ok(asgs)
+        return r
 
 
 @ASG.action_registry.register('propagate-tags')
@@ -1186,6 +1153,9 @@ class PropagateTags(Action):
         trim={'type': 'boolean'})
     permissions = ('ec2:DeleteTags', 'ec2:CreateTags')
 
+    batch_size = 0
+    concurrency = 3
+
     def validate(self):
         if not isinstance(self.data.get('tags', []), (list, tuple)):
             raise ValueError("No tags specified")
@@ -1196,9 +1166,10 @@ class PropagateTags(Action):
             return
         if self.data.get('trim', False):
             self.instance_map = self.get_instance_map(asgs)
-        with self.executor_factory(max_workers=3) as w:
-            instance_count = sum(list(w.map(self.process_asg, asgs)))
-            self.log.info("Applied tags to %d instances" % instance_count)
+
+        r = self._process_with_futures(self.process_asg, asgs)
+        self.log.info("Applied tags to %d instances" % sum(r))
+        return r
 
     def process_asg(self, asg):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -1219,6 +1190,7 @@ class PropagateTags(Action):
             client.create_tags(
                 Resources=instance_ids,
                 Tags=[{'Key': k, 'Value': v} for k, v in tag_map.items()])
+        self.results.ok(asg)
         return len(instance_ids)
 
     def prune_instance_tags(self, client, asg, tag_set, instances):
@@ -1270,7 +1242,7 @@ class PropagateTags(Action):
 
 
 @ASG.action_registry.register('rename-tag')
-class RenameTag(Action):
+class RenameTag(TagActionBase):
     """Rename a tag on an AutoScaleGroup.
 
     :example:
@@ -1288,12 +1260,14 @@ class RenameTag(Action):
                     source: OwnerNames
                     dest: OwnerName
     """
-
     schema = type_schema(
         'rename-tag', required=['source', 'dest'],
         propagate={'type': 'boolean'},
         source={'type': 'string'},
         dest={'type': 'string'})
+
+    batch_size = 0
+    concurrency = 3
 
     def get_permissions(self):
         permissions = (
@@ -1318,8 +1292,7 @@ class RenameTag(Action):
         self.log.info("Filtered from %d asgs to %d", count, len(asgs))
         self.log.info(
             "Renaming %s to %s on %d asgs", source, dest, len(filtered))
-        with self.executor_factory(max_workers=3) as w:
-            list(w.map(self.process_asg, asgs))
+        return self._process_with_futures(self.process_asg, asgs)
 
     def process_asg(self, asg):
         """Move source tag to destination tag.
@@ -1336,18 +1309,17 @@ class RenameTag(Action):
         source = tag_map[source_tag]
         destination_tag = self.data.get('dest')
         propagate = self.data.get('propagate', True)
-        client = local_session(
-            self.manager.session_factory).client('autoscaling')
+
         # technically safer to create first, but running into
         # max tags constraints, otherwise.
         #
         # delete_first = len([t for t in tag_map if not t.startswith('aws:')])
-        client.delete_tags(Tags=[
+        self.client.delete_tags(Tags=[
             {'ResourceId': asg['AutoScalingGroupName'],
              'ResourceType': 'auto-scaling-group',
              'Key': source_tag,
              'Value': source['Value']}])
-        client.create_or_update_tags(Tags=[
+        self.client.create_or_update_tags(Tags=[
             {'ResourceId': asg['AutoScalingGroupName'],
              'ResourceType': 'auto-scaling-group',
              'PropagateAtLaunch': propagate,
@@ -1355,6 +1327,7 @@ class RenameTag(Action):
              'Value': source['Value']}])
         if propagate:
             self.propagate_instance_tag(source, destination_tag, asg)
+        self.results.ok(asg)
 
     def propagate_instance_tag(self, source, destination_tag, asg):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -1456,9 +1429,11 @@ class Suspend(Action):
 
     ASG_PROCESSES = set(ASG_PROCESSES)
 
+    batch_size = 0
+    concurrency = 3
+
     def process(self, asgs):
-        with self.executor_factory(max_workers=3) as w:
-            list(w.map(self.process_asg, asgs))
+        return self._process_with_futures(self.process_asg, asgs)
 
     def process_asg(self, asg):
         """Multistep process to stop an asg aprori of setup
@@ -1477,6 +1452,7 @@ class Suspend(Action):
                 ScalingProcesses=processes,
                 AutoScalingGroupName=asg['AutoScalingGroupName'])
         except ClientError as e:
+            self.results.error(asg, e.response['Error']['Message'])
             if e.response['Error']['Code'] == 'ValidationError':
                 return
             raise
@@ -1484,11 +1460,14 @@ class Suspend(Action):
         try:
             instance_ids = [i['InstanceId'] for i in asg['Instances']]
             if not instance_ids:
+                self.results.ok(asg)
                 return
             retry = get_retry((
                 'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
             retry(ec2_client.stop_instances, InstanceIds=instance_ids)
+            self.results.ok(asg)
         except ClientError as e:
+            self.results.error(asg, e.response['Error']['Message'])
             if e.response['Error']['Code'] in (
                     'InvalidInstanceID.NotFound',
                     'IncorrectInstanceState'):
@@ -1521,6 +1500,7 @@ class Resume(Action):
                     delay: 300
 
     """
+
     schema = type_schema('resume', delay={'type': 'number'})
     permissions = ("autoscaling:ResumeProcesses", "ec2:StartInstances")
 
@@ -1528,53 +1508,48 @@ class Resume(Action):
         original_count = len(asgs)
         asgs = [a for a in asgs if a['SuspendedProcesses']]
         self.delay = self.data.get('delay', 30)
-        self.log.debug("Filtered from %d to %d suspended asgs",
-                       original_count, len(asgs))
+        self.log.debug(
+            "Filtered from %d to %d suspended asgs", original_count, len(asgs)
+        )
 
         session = local_session(self.manager.session_factory)
         ec2_client = session.client('ec2')
         asg_client = session.client('autoscaling')
 
-        with self.executor_factory(max_workers=3) as w:
-            futures = {}
-            for a in asgs:
-                futures[w.submit(self.resume_asg_instances, ec2_client, a)] = a
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error("Traceback resume asg:%s instances error:%s" % (
-                        futures[f]['AutoScalingGroupName'],
-                        f.exception()))
-                    continue
+        self._process_with_futures(
+            self.resume_asg_instances,
+            asgs,
+            ec2_client,
+            exception_format="Traceback resume asg:{resource} instances error:{error}",
+        )
 
         self.log.debug("Sleeping for asg health check grace")
         time.sleep(self.delay)
 
-        with self.executor_factory(max_workers=3) as w:
-            futures = {}
-            for a in asgs:
-                futures[w.submit(self.resume_asg, asg_client, a)] = a
-            for f in as_completed(futures):
-                if f.exception():
-                    self.log.error("Traceback resume asg:%s error:%s" % (
-                        futures[f]['AutoScalingGroupName'],
-                        f.exception()))
+        self._process_with_futures(
+            self.resume_asg,
+            asgs,
+            asg_client,
+            exception_format="Traceback resume asg:{resource} error:{error}",
+        )
 
-    def resume_asg_instances(self, ec2_client, asg):
+    def resume_asg_instances(self, asg, ec2_client):
         """Resume asg instances.
         """
         instance_ids = [i['InstanceId'] for i in asg['Instances']]
         if not instance_ids:
             return
-        retry = get_retry((
-            'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
+        retry = get_retry(('RequestLimitExceeded', 'Client.RequestLimitExceeded'))
         retry(ec2_client.start_instances, InstanceIds=instance_ids)
 
-    def resume_asg(self, asg_client, asg):
+    def resume_asg(self, asg, asg_client):
         """Resume asg processes.
         """
         self.manager.retry(
             asg_client.resume_processes,
-            AutoScalingGroupName=asg['AutoScalingGroupName'])
+            AutoScalingGroupName=asg['AutoScalingGroupName'],
+        )
+        self.results.ok(asg)
 
 
 @ASG.action_registry.register('delete')
@@ -1603,20 +1578,22 @@ class Delete(Action):
     permissions = ("autoscaling:DeleteAutoScalingGroup",)
 
     def process(self, asgs):
-        client = local_session(
-            self.manager.session_factory).client('autoscaling')
-        for asg in asgs:
-            self.process_asg(client, asg)
+        return self._process_with_futures(
+            self.process_asg, asgs, self.data.get('force', False)
+        )
 
-    def process_asg(self, client, asg):
-        force_delete = self.data.get('force', False)
+    def process_asg(self, asg, force_delete):
         try:
             self.manager.retry(
-                client.delete_auto_scaling_group,
+                self.client.delete_auto_scaling_group,
                 AutoScalingGroupName=asg['AutoScalingGroupName'],
-                ForceDelete=force_delete)
+                ForceDelete=force_delete
+            )
+            self.results.ok(asg)
         except ClientError as e:
+            # Catch already deleted
             if e.response['Error']['Code'] == 'ValidationError':
+                self.result.skip(asg, "resource already deleted")
                 return
             raise
 
@@ -1708,18 +1685,18 @@ class LaunchConfigDelete(Action):
     permissions = ("autoscaling:DeleteLaunchConfiguration",)
 
     def process(self, configs):
-        client = local_session(self.manager.session_factory).client('autoscaling')
+        return self._process_with_futures(self.process_config, configs)
 
-        for c in configs:
-            self.process_config(client, c)
-
-    def process_config(self, client, config):
+    def process_config(self, config):
         try:
-            client.delete_launch_configuration(
-                LaunchConfigurationName=config[
-                    'LaunchConfigurationName'])
+            self.manager.retry(
+                self.client.delete_launch_configuration,
+                LaunchConfigurationName=config['LaunchConfigurationName']
+            )
+            self.result.ok(config)
         except ClientError as e:
             # Catch already deleted
             if e.response['Error']['Code'] == 'ValidationError':
+                self.result.skip(config, "resource already deleted")
                 return
             raise

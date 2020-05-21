@@ -745,9 +745,9 @@ class RemoveTag(tags.RemoveTag):
     batch_size = 5
     permissions = ('redshift:DeleteTags',)
 
-    def process_resource_set(self, client, resources, tag_keys):
+    def process_resource_set(self, resources, tag_keys):
         for rarn, r in zip(self.manager.get_arns(resources), resources):
-            client.delete_tags(ResourceName=rarn, TagKeys=tag_keys)
+            self.manager.retry(self.client.delete_tags(ResourceName=rarn, TagKeys=tag_keys))
 
 
 @Redshift.action_registry.register('tag-trim')
@@ -777,12 +777,11 @@ class TagTrim(tags.TagTrim):
                       - RequiredTag2
     """
 
-    max_tag_count = 10
     permissions = ('redshift:DeleteTags',)
 
-    def process_tag_removal(self, client, resource, candidates):
+    def process_tag_removal(self, resource, candidates):
         arn = self.manager.generate_arn(resource['DBInstanceIdentifier'])
-        client.delete_tags(ResourceName=arn, TagKeys=candidates)
+        self.client.delete_tags(ResourceName=arn, TagKeys=candidates)
 
 
 @Redshift.action_registry.register('modify-security-groups')

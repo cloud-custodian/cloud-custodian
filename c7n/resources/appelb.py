@@ -294,20 +294,23 @@ class SetWaf(BaseAction):
         if state and target_acl_id not in name_id_map.values():
             raise ValueError("invalid web acl: %s" % (target_acl_id))
 
-        client = local_session(
-            self.manager.session_factory).client('waf-regional')
+        client = self.get_client('waf-regional')
 
+        return self._process_with_futures(
+            self.process_resource, resources, state, target_acl_id, client
+        )
+
+    def process_resource(self, resource, state, target_acl_id, client):
         arn_key = self.manager.resource_type.id
-
         # TODO implement force to reassociate.
         # TODO investigate limits on waf association.
-        for r in resources:
-            if state:
-                client.associate_web_acl(
-                    WebACLId=target_acl_id, ResourceArn=r[arn_key])
-            else:
-                client.disassociate_web_acl(
-                    WebACLId=target_acl_id, ResourceArn=r[arn_key])
+        if state:
+            client.associate_web_acl(
+                WebACLId=target_acl_id, ResourceArn=resource[arn_key])
+        else:
+            client.disassociate_web_acl(
+                WebACLId=target_acl_id, ResourceArn=resource[arn_key])
+        self.resources.ok(resource)
 
 
 @AppELB.action_registry.register('set-s3-logging')
@@ -349,32 +352,34 @@ class SetS3Logging(BaseAction):
         return self
 
     def process(self, resources):
-        client = local_session(self.manager.session_factory).client('elbv2')
-        for elb in resources:
-            elb_arn = elb['LoadBalancerArn']
-            attributes = [{
-                'Key': 'access_logs.s3.enabled',
-                'Value': (
-                    self.data.get('state') == 'enabled' and 'true' or 'value')}]
+        return self._process_with_futures(self.process_elb, resources)
 
-            if self.data.get('state') == 'enabled':
-                attributes.append({
-                    'Key': 'access_logs.s3.bucket',
-                    'Value': self.data['bucket']})
+    def process_elb(self, elb):
+        elb_arn = elb['LoadBalancerArn']
+        attributes = [{
+            'Key': 'access_logs.s3.enabled',
+            'Value': (
+                self.data.get('state') == 'enabled' and 'true' or 'value')}]
 
-                prefix_template = self.data['prefix']
-                info = {t['Key']: t['Value'] for t in elb.get('Tags', ())}
-                info['DNSName'] = elb.get('DNSName', '')
-                info['AccountId'] = elb['LoadBalancerArn'].split(':')[4]
-                info['LoadBalancerName'] = elb['LoadBalancerName']
+        if self.data.get('state') == 'enabled':
+            attributes.append({
+                'Key': 'access_logs.s3.bucket',
+                'Value': self.data['bucket']})
 
-                attributes.append({
-                    'Key': 'access_logs.s3.prefix',
-                    'Value': prefix_template.format(**info)})
+            prefix_template = self.data['prefix']
+            info = {t['Key']: t['Value'] for t in elb.get('Tags', ())}
+            info['DNSName'] = elb.get('DNSName', '')
+            info['AccountId'] = elb['LoadBalancerArn'].split(':')[4]
+            info['LoadBalancerName'] = elb['LoadBalancerName']
 
-            self.manager.retry(
-                client.modify_load_balancer_attributes,
-                LoadBalancerArn=elb_arn, Attributes=attributes)
+            attributes.append({
+                'Key': 'access_logs.s3.prefix',
+                'Value': prefix_template.format(**info)})
+
+        self.manager.retry(
+            self.client.modify_load_balancer_attributes,
+            LoadBalancerArn=elb_arn, Attributes=attributes)
+        self.results.ok(elb)
 
 
 @AppELB.action_registry.register('mark-for-op')
@@ -424,8 +429,8 @@ class AppELBTagAction(tags.Tag):
     batch_size = 1
     permissions = ("elasticloadbalancing:AddTags",)
 
-    def process_resource_set(self, client, resource_set, ts):
-        client.add_tags(
+    def process_resource_set(self, resource_set, ts):
+        self.client.add_tags(
             ResourceArns=[alb['LoadBalancerArn'] for alb in resource_set],
             Tags=ts)
 
@@ -451,8 +456,8 @@ class AppELBRemoveTagAction(tags.RemoveTag):
     batch_size = 1
     permissions = ("elasticloadbalancing:RemoveTags",)
 
-    def process_resource_set(self, client, resource_set, tag_keys):
-        client.remove_tags(
+    def process_resource_set(self, resource_set, tag_keys):
+        self.client.remove_tags(
             ResourceArns=[alb['LoadBalancerArn'] for alb in resource_set],
             TagKeys=tag_keys)
 
@@ -483,27 +488,26 @@ class AppELBDeleteAction(BaseAction):
         "elasticloadbalancing:ModifyLoadBalancerAttributes",)
 
     def process(self, load_balancers):
-        client = local_session(self.manager.session_factory).client('elbv2')
-        for lb in load_balancers:
-            self.process_alb(client, lb)
+        return self._process_with_futures(
+            self.process_alb,
+            load_balancers,
+            exception_format="Exception trying to delete ALB: {resource} error: {error}"
+        )
 
-    def process_alb(self, client, alb):
+    def process_alb(self, alb):
         try:
             if self.data.get('force'):
-                client.modify_load_balancer_attributes(
+                self.client.modify_load_balancer_attributes(
                     LoadBalancerArn=alb['LoadBalancerArn'],
                     Attributes=[{
                         'Key': 'deletion_protection.enabled',
                         'Value': 'false',
                     }])
             self.manager.retry(
-                client.delete_load_balancer, LoadBalancerArn=alb['LoadBalancerArn'])
-        except client.exceptions.LoadBalancerNotFoundException:
-            pass
-        except client.exceptions.OperationNotPermittedException as e:
-            self.log.warning(
-                "Exception trying to delete ALB: %s error: %s",
-                alb['LoadBalancerArn'], e)
+                self.client.delete_load_balancer, LoadBalancerArn=alb['LoadBalancerArn'])
+            self.results.ok(alb)
+        except self.client.exceptions.LoadBalancerNotFoundException:
+            self.results.ok(alb)
 
 
 class AppELBListenerFilterBase:
@@ -768,13 +772,16 @@ class AppELBModifyListenerPolicy(BaseAction):
             args['SslPolicy'] = self.data.get('sslpolicy')
         if 'certificate' in self.data:
             args['Certificates'] = [{'CertificateArn': self.data.get('certificate')}]
-        client = local_session(self.manager.session_factory).client('elbv2')
 
-        for alb in load_balancers:
-            for matched_listener in alb.get('c7n:MatchedListeners', ()):
-                client.modify_listener(
-                    ListenerArn=matched_listener['ListenerArn'],
-                    **args)
+        return self._process_with_futures(self.process_alb, load_balancers, args)
+
+    def process_alb(self, alb, args):
+        for matched_listener in alb.get('c7n:MatchedListeners', ()):
+            self.manager.retry(
+                self.client.modify_listener,
+                ListenerArn=matched_listener['ListenerArn'],
+                **args)
+        self.results.ok(alb)
 
 
 @AppELB.action_registry.register('modify-security-groups')
@@ -783,15 +790,16 @@ class AppELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     permissions = ("elasticloadbalancing:SetSecurityGroups",)
 
     def process(self, albs):
-        client = local_session(self.manager.session_factory).client('elbv2')
         groups = super(AppELBModifyVpcSecurityGroups, self).get_groups(albs)
 
         for idx, i in enumerate(albs):
             try:
-                client.set_security_groups(
+                self.client.set_security_groups(
                     LoadBalancerArn=i['LoadBalancerArn'],
                     SecurityGroups=groups[idx])
-            except client.exceptions.LoadBalancerNotFoundException:
+                self.results.ok(i)
+            except self.client.exceptions.LoadBalancerNotFoundException:
+                self.results.skip(i, "load balancer not found")
                 continue
 
 
@@ -964,8 +972,8 @@ class AppELBTargetGroupTagAction(tags.Tag):
     batch_size = 1
     permissions = ("elasticloadbalancing:AddTags",)
 
-    def process_resource_set(self, client, resource_set, ts):
-        client.add_tags(
+    def process_resource_set(self, resource_set, ts):
+        self.client.add_tags(
             ResourceArns=[tgroup['TargetGroupArn'] for tgroup in resource_set],
             Tags=ts)
 
@@ -991,8 +999,8 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
     batch_size = 1
     permissions = ("elasticloadbalancing:RemoveTags",)
 
-    def process_resource_set(self, client, resource_set, tag_keys):
-        client.remove_tags(
+    def process_resource_set(self, resource_set, tag_keys):
+        self.client.remove_tags(
             ResourceArns=[tgroup['TargetGroupArn'] for tgroup in resource_set],
             TagKeys=tag_keys)
 
@@ -1043,11 +1051,10 @@ class AppELBTargetGroupDeleteAction(BaseAction):
     permissions = ('elasticloadbalancing:DeleteTargetGroup',)
 
     def process(self, resources):
-        client = local_session(self.manager.session_factory).client('elbv2')
-        for tg in resources:
-            self.process_target_group(client, tg)
+        return self._process_with_futures(self.process_target_group, resources)
 
-    def process_target_group(self, client, target_group):
+    def process_target_group(self, target_group):
         self.manager.retry(
-            client.delete_target_group,
+            self.client.delete_target_group,
             TargetGroupArn=target_group['TargetGroupArn'])
+        self.results.ok(target_group)

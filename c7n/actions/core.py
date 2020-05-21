@@ -15,11 +15,14 @@
 Actions to take on resources
 """
 import logging
+import traceback
+from concurrent.futures import as_completed
 
 from c7n.element import Element
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.executor import ThreadPoolExecutor
 from c7n.registry import PluginRegistry
+from c7n import utils
 
 
 class ActionRegistry(PluginRegistry):
@@ -40,8 +43,7 @@ class ActionRegistry(PluginRegistry):
         if isinstance(data, dict):
             action_type = data.get('type')
             if action_type is None:
-                raise PolicyValidationError(
-                    "Invalid action type found in %s" % (data))
+                raise PolicyValidationError("Invalid action type found in %s" % (data))
         else:
             action_type = data
             data = {}
@@ -55,6 +57,71 @@ class ActionRegistry(PluginRegistry):
         return action_class(data, manager)
 
 
+class ActionResults:
+    AnnotationKey = "c7n:Actions"
+    allowed_states = ("ok", "skip", "error")
+
+    def __init__(self, action):
+        self.action = action
+        self.details = None
+        self.state = {}
+        self.metrics = {i: 0 for i in self.allowed_states}
+        self.resources = []
+
+    @property
+    def id_key(self):
+        return self.action.id_key
+
+    def initialize(self, resources):
+        self.resources = resources
+
+    def ok(self, resources):
+        self._add(resources, status="ok")
+
+    def skip(self, resources, reason):
+        self._add(resources, status="skip", reason=reason)
+
+    def error(self, resources, reason):
+        self._add(resources, status="error", reason=reason)
+
+    def exception(self, e):
+        self.details = {"Exception": e}
+        if self.resources:
+            self._add(self.resources, "error", e)
+
+    def remaining(self, status, reason=None):
+        if status not in self.allowed_states:
+            ValueError(
+                "{} is not a valid state: {}".format(status, self.allowed_states)
+            )
+        # rely on the fact we can only record one status per resource
+        self._add(self.resources, status=status, reason=reason)
+
+    def set_details(self, details):
+        self.details = details
+
+    def _add(self, resources, status, reason=None):
+        if isinstance(resources, list):
+            for r in resources:
+                self._set_status(r, status, reason)
+        else:
+            self._set_status(resources, status, reason)
+
+    def _set_status(self, resource, status, reason=None):
+        i = resource[self.id_key]
+        if i in self.state:
+            # already recorded a state, so ignore
+            return
+
+        if isinstance(reason, Exception):
+            reason = str(reason)
+
+        record = {"action": self.action.name, "status": status, "reason": reason}
+        resource[self.AnnotationKey] = resource.get(self.AnnotationKey, []) + [record]
+        self.metrics[status] += 1
+        self.state[i] = self.state.get(i, []) + [record]
+
+
 class Action(Element):
 
     permissions = ()
@@ -66,25 +133,125 @@ class Action(Element):
     permissions = ()
     schema = {'type': 'object'}
     schema_alias = None
+    batch_size = 0
+    concurrency = 2
 
     def __init__(self, data=None, manager=None, log_dir=None):
         self.data = data or {}
         self.manager = manager
         self.log_dir = log_dir
+        self.id_key = manager.get_model().id if manager else 'id'
+        self.results = ActionResults(self)
+        self._client = None
 
     def get_permissions(self):
         return self.permissions
+
+    def get_client(self, service=None, **kwargs):
+        return utils.local_session(self.manager.session_factory).client(
+            service or self.manager.resource_type.service, **kwargs
+        )
 
     def validate(self):
         return self
 
     @property
+    def client(self):
+        if not self._client:
+            self._client = self.get_client()
+        return self._client
+
+    @property
     def name(self):
         return self.__class__.__name__.lower()
 
+    def wrap_process(self, resources, event=None):
+        if self.data.get('include_failed', False) is False:
+            resources = self.remove_failed_resources(resources)
+        self.results.initialize(resources)
+        try:
+            if isinstance(self, EventAction):
+                details = self.process(resources, event=event)
+            else:
+                details = self.process(resources)
+            # no errors so anything left over is considered ok
+            self.results.remaining("ok")
+            self.results.set_details(details)
+        except Exception as e:
+            # mark any remaining resources as errors
+            self.results.remaining("error", e)
+            self.results.set_details({"Exception": traceback.format_exc()})
+        return self.results
+
     def process(self, resources):
-        raise NotImplementedError(
-            "Base action class does not implement behavior")
+        raise NotImplementedError("Base action class does not implement behavior")
+
+    # generic function for multi-worker execution
+    def _process_with_futures(
+        self,
+        helper,
+        resources,
+        *args,
+        max_workers=None,
+        batch_size=None,
+        exception_format=None,
+        **kwargs
+    ):
+
+        # select setting based on arg, data, class default
+        batch_size = batch_size or self.data.get('batch_size', self.batch_size)
+        concurrency = max_workers or self.concurrency
+
+        results = []
+        if not resources:
+            return results
+
+        with self.executor_factory(concurrency) as w:
+            futures = {}
+            if batch_size > 0:
+                # this is a list of resources passed to the helper
+                for rs in utils.chunks(resources, size=batch_size):
+                    futures[w.submit(helper, rs, *args, **kwargs)] = rs
+            else:
+                # a single resource passed to the helper
+                for r in resources:
+                    futures[w.submit(helper, r, *args, **kwargs)] = r
+
+            for f in as_completed(futures):
+                if f.exception():
+                    r = futures[f]
+                    fmt_vars = {
+                        "action": self.name,
+                        "count": len(r) if batch_size > 1 else 1,
+                        "policy": self.manager.data.get('name'),
+                        "error": f.exception(),
+                    }
+                    if batch_size == 0:
+                        fmt = "Error processing action:{action} resource:{resource} policy:{policy} error:{error}"
+                        fmt_vars["resource"] = r[self.id_key]
+                    else:
+                        fmt = "Error batch processing action:{action} count:{count} policy:{policy} error:{error}"
+                    if exception_format:
+                        fmt = exception_format
+                    self.log.error(fmt.format(**fmt_vars))
+                    self.results.error(r, f.exception())
+                    self._exception_hook(r, f.exception())
+                result = f.result()
+                if result:
+                    results.append(result)
+        return results
+
+    def _exception_hook(self, resource, e):
+        return
+
+    def remove_failed_resources(self, resources):
+        good = []
+        for r in resources:
+            if "error" not in [
+                a["status"] for a in r.get(ActionResults.AnnotationKey, [])
+            ]:
+                good.append(r)
+        return good
 
     def _run_api(self, cmd, *args, **kw):
         try:

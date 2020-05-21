@@ -160,11 +160,10 @@ class SnapshotTag(Tag):
 
     permissions = ('ec2:CreateTags',)
 
-    def process_resource_set(self, client, resource_set, tags):
+    def process_resource_set(self, resource_set, tags):
         while resource_set:
             try:
-                return super(SnapshotTag, self).process_resource_set(
-                    client, resource_set, tags)
+                return super(SnapshotTag, self).process_resource_set(resource_set, tags)
             except ClientError as e:
                 bad_snap = ErrorHandler.extract_bad_snapshot(e)
                 if bad_snap:

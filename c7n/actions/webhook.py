@@ -50,6 +50,7 @@ class Webhook(EventAction):
         'webhook',
         required=['url'],
         **{
+            'include_failed': {'type': 'boolean'},
             'url': {'type': 'string'},
             'body': {'type': 'string'},
             'batch': {'type': 'boolean'},
@@ -99,12 +100,20 @@ class Webhook(EventAction):
             for chunk in utils.chunks(resources, self.batch_size):
                 resource_data = self.lookup_data
                 resource_data['resources'] = chunk
-                self._process_call(resource_data)
+                e = self._process_call(resource_data)
+                if e:
+                    self.results.error(chunk, e)
+                else:
+                    self.results.ok(chunk)
         else:
             for r in resources:
                 resource_data = self.lookup_data
                 resource_data['resource'] = r
-                self._process_call(resource_data)
+                e = self._process_call(resource_data)
+                if e:
+                    self.results.error(r, e)
+                else:
+                    self.results.ok(r)
 
     def _process_call(self, resource):
         prepared_url = self._build_url(resource)
@@ -125,6 +134,7 @@ class Webhook(EventAction):
                           (self.method, res.status, prepared_url))
         except urllib3.exceptions.HTTPError as e:
             self.log.error("Error calling %s. Code: %s" % (prepared_url, e.reason))
+            return e.reason
 
     def _build_http_manager(self):
         pool_kwargs = {

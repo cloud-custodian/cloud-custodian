@@ -119,21 +119,28 @@ class Deregister(BaseAction):
     snap_expr = jmespath.compile('BlockDeviceMappings[].Ebs.SnapshotId')
 
     def process(self, images):
-        client = local_session(self.manager.session_factory).client('ec2')
         image_count = len(images)
         images = [i for i in images if self.manager.ctx.options.account_id == i['OwnerId']]
         if len(images) != image_count:
             self.log.info("Implicitly filtered %d non owned images", image_count - len(images))
+            self.results.skip(
+                [i for i in images if self.manager.ctx.options.account_id != i['OwnerId']],
+                "image not owned by account"
+            )
 
-        for i in images:
-            self.manager.retry(client.deregister_image, ImageId=i['ImageId'])
+        r = self._process_with_futures(self.process_image, images)
+        return r
 
-            if not self.data.get('delete-snapshots'):
-                continue
+    def process_image(self, i):
+        self.manager.retry(self.client.deregister_image, ImageId=i['ImageId'])
+        self.results.ok(i)
+
+        # this is just a best effort
+        if self.data.get('delete-snapshots'):
             snap_ids = self.snap_expr.search(i) or ()
             for s in snap_ids:
                 try:
-                    self.manager.retry(client.delete_snapshot, SnapshotId=s)
+                    self.manager.retry(self.client.delete_snapshot, SnapshotId=s)
                 except ClientError as e:
                     if e.error['Code'] == 'InvalidSnapshot.InUse':
                         continue
@@ -166,13 +173,12 @@ class RemoveLaunchPermissions(BaseAction):
     permissions = ('ec2:ResetImageAttribute',)
 
     def process(self, images):
-        client = local_session(self.manager.session_factory).client('ec2')
-        for i in images:
-            self.process_image(client, i)
+        return self._process_with_futures(self.process_image, images)
 
-    def process_image(self, client, image):
-        client.reset_image_attribute(
+    def process_image(self, image):
+        self.client.reset_image_attribute(
             ImageId=image['ImageId'], Attribute="launchPermission")
+        self.results.ok(image)
 
 
 @AMI.action_registry.register('copy')
@@ -217,18 +223,19 @@ class Copy(BaseAction):
 
     def process(self, images):
         session = local_session(self.manager.session_factory)
-        client = session.client(
-            'ec2',
-            region_name=self.data.get('region', None))
+        client = session.client('ec2', region_name=self.data.get('region', None))
 
-        for image in images:
-            client.copy_image(
-                Name=self.data.get('name', image['Name']),
-                Description=self.data.get('description', image['Description']),
-                SourceRegion=session.region_name,
-                SourceImageId=image['ImageId'],
-                Encrypted=self.data.get('encrypt', False),
-                KmsKeyId=self.data.get('key-id', ''))
+        return self._process_with_futures(self.process_image, images, client, session.region_name)
+
+    def process_image(self, image, client, source_region):
+        client.copy_image(
+            Name=self.data.get('name', image['Name']),
+            Description=self.data.get('description', image['Description']),
+            SourceRegion=source_region,
+            SourceImageId=image['ImageId'],
+            Encrypted=self.data.get('encrypt', False),
+            KmsKeyId=self.data.get('key-id', ''))
+        self.results.ok(image)
 
 
 @AMI.filter_registry.register('image-age')

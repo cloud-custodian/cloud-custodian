@@ -58,6 +58,7 @@ class LambdaInvoke(EventAction):
         'additionalProperties': False,
         'properties': {
             'type': {'enum': ['invoke-lambda']},
+            'include_failed': {'type': 'boolean'},
             'function': {'type': 'string'},
             'region': {'type': 'string'},
             'async': {'type': 'boolean'},
@@ -103,6 +104,7 @@ class LambdaInvoke(EventAction):
             result['Payload'] = result['Payload'].read()
             if isinstance(result['Payload'], bytes):
                 result['Payload'] = result['Payload'].decode('utf-8')
+            self.results.ok(resource_set)
             results.append(result)
         return results
 
