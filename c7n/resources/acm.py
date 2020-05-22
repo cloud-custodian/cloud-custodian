@@ -15,7 +15,7 @@ from c7n.actions import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, ConfigSource, TypeInfo
 from c7n.tags import universal_augment
-from c7n.utils import type_schema
+from c7n.utils import type_schema, local_session
 
 
 class DescribeCertificate(DescribeSource):
@@ -84,19 +84,17 @@ class CertificateDeleteAction(BaseAction):
     )
 
     def process(self, certificates):
-        return self._process_with_futures(self.process_cert, certificates)
+        client = local_session(self.manager.session_factory).client('acm')
+        for cert in certificates:
+            self.process_cert(client, cert)
 
-    def process_cert(self, cert):
+    def process_cert(self, client, cert):
         try:
             self.manager.retry(
-                self.client.delete_certificate, CertificateArn=cert['CertificateArn']
-            )
-            self.results.ok(cert)
-        except self.client.exceptions.ResourceNotFoundException as e:
-            self.results.skip(cert, e)
+                client.delete_certificate, CertificateArn=cert['CertificateArn'])
+        except client.exceptions.ResourceNotFoundException:
             pass
-        except self.client.exceptions.ResourceInUseException as e:
+        except client.exceptions.ResourceInUseException as e:
             self.log.warning(
                 "Exception trying to delete Certificate: %s error: %s",
                 cert['CertificateArn'], e)
-            self.results.error(cert, e)

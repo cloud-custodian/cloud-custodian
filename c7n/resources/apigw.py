@@ -115,7 +115,9 @@ class UpdateAccount(BaseAction):
         required=['patch'])
 
     def process(self, resources):
-        self.client.update_account(patchOperations=self.data['patch'])
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        client.update_account(patchOperations=self.data['patch'])
 
 
 class ApiDescribeSource(query.DescribeSource):
@@ -205,14 +207,12 @@ class UpdateApi(BaseAction):
         required=['patch'])
 
     def process(self, resources):
-        return self._process_with_futures(self.process_resource, resources)
-
-    def process_resource(self, resource):
-        self.manager.retry(
-            self.client.update_rest_api,
-            restApiId=resource['id'],
-            patchOperations=self.data['patch'])
-        self.results.ok(resource)
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for r in resources:
+            client.update_rest_api(
+                restApiId=r['id'],
+                patchOperations=self.data['patch'])
 
 
 @RestApi.action_registry.register('delete')
@@ -237,16 +237,13 @@ class DeleteApi(BaseAction):
     schema = type_schema('delete')
 
     def process(self, resources):
-        return self._process_with_futures(self.process_resource, resources)
-
-    def process_resource(self, resource):
-        try:
-            self.manager.retry(
-                self.client.delete_rest_api,
-                restApiId=resource['id'])
-            self.results.ok(resource)
-        except self.client.exceptions.NotFoundException:
-            self.results.ok(resource)
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for r in resources:
+            try:
+                client.delete_rest_api(restApiId=r['id'])
+            except client.exceptions.NotFoundException:
+                continue
 
 
 @query.sources.register('describe-rest-stage')
@@ -335,15 +332,14 @@ class UpdateStage(BaseAction):
         required=['patch'])
 
     def process(self, resources):
-        return self._process_with_futures(self.process_resource, resources)
-
-    def process_resource(self, resource):
-        self.manager.retry(
-            self.client.update_stage,
-            restApiId=resource['restApiId'],
-            stageName=resource['stageName'],
-            patchOperations=self.data['patch'])
-        self.results.ok(resource)
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for r in resources:
+            self.manager.retry(
+                client.update_stage,
+                restApiId=r['restApiId'],
+                stageName=r['stageName'],
+                patchOperations=self.data['patch'])
 
 
 @RestStage.action_registry.register('delete')
@@ -366,17 +362,15 @@ class DeleteStage(BaseAction):
     schema = utils.type_schema('delete')
 
     def process(self, resources):
-        return self._process_with_futures(self.process_resource, resources)
-
-    def process_resource(self, resource):
-        try:
-            self.manager.retry(
-                self.client.delete_stage,
-                restApiId=resource['restApiId'],
-                stageName=resource['stageName'])
-            self.results.ok(resource)
-        except self.client.exceptions.NotFoundException:
-            self.results.ok(resource)
+        client = utils.local_session(self.manager.session_factory).client('apigateway')
+        for r in resources:
+            try:
+                self.manager.retry(
+                    client.delete_stage,
+                    restApiId=r['restApiId'],
+                    stageName=r['stageName'])
+            except client.exceptions.NotFoundException:
+                pass
 
 
 @resources.register('rest-resource')
@@ -553,18 +547,16 @@ class UpdateRestIntegration(BaseAction):
         return self
 
     def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
         ops = self.data['patch']
-        return self._process_with_futures(self.process_resource, resources, ops)
-
-    def process_resource(self, resource, ops):
-        for i in resource.get(ANNOTATION_KEY_MATCHED_INTEGRATIONS, []):
-            self.manager.retry(
-                self.client.update_integration,
-                restApiId=i['restApiId'],
-                resourceId=i['resourceId'],
-                httpMethod=i['resourceHttpMethod'],
-                patchOperations=ops)
-        self.results.ok(resource)
+        for r in resources:
+            for i in r.get(ANNOTATION_KEY_MATCHED_INTEGRATIONS, []):
+                client.update_integration(
+                    restApiId=i['restApiId'],
+                    resourceId=i['resourceId'],
+                    httpMethod=i['resourceHttpMethod'],
+                    patchOperations=ops)
 
 
 @RestResource.action_registry.register('delete-integration')
@@ -589,19 +581,17 @@ class DeleteRestIntegration(BaseAction):
     schema = utils.type_schema('delete-integration')
 
     def process(self, resources):
-        return self._process_with_futures(self.process_resource, resources)
+        client = utils.local_session(self.manager.session_factory).client('apigateway')
 
-    def process_resource(self, resource):
-        for i in resource.get(ANNOTATION_KEY_MATCHED_INTEGRATIONS, []):
-            try:
-                self.manager.retry(
-                    self.client.delete_integration,
-                    restApiId=i['restApiId'],
-                    resourceId=i['resourceId'],
-                    httpMethod=i['resourceHttpMethod'])
-            except self.client.exceptions.NotFoundException:
-                pass
-        self.results.ok(resource)
+        for r in resources:
+            for i in r.get(ANNOTATION_KEY_MATCHED_INTEGRATIONS, []):
+                try:
+                    client.delete_integration(
+                        restApiId=i['restApiId'],
+                        resourceId=i['resourceId'],
+                        httpMethod=i['resourceHttpMethod'])
+                except client.exceptions.NotFoundException:
+                    continue
 
 
 @RestResource.filter_registry.register('rest-method')
@@ -726,15 +716,13 @@ class UpdateRestMethod(BaseAction):
         return self
 
     def process(self, resources):
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
         ops = self.data['patch']
-        return self._process_with_futures(self.process_resource, resources, ops)
-
-    def process_resource(self, resource, ops):
-        for m in resource.get(ANNOTATION_KEY_MATCHED_METHODS, []):
-            self.manager.retry(
-                self.client.update_method,
-                restApiId=m['restApiId'],
-                resourceId=m['resourceId'],
-                httpMethod=m['resourceHttpMethod'],
-                patchOperations=ops)
-        self.results.ok(resource)
+        for r in resources:
+            for m in r.get(ANNOTATION_KEY_MATCHED_METHODS, []):
+                client.update_method(
+                    restApiId=m['restApiId'],
+                    resourceId=m['resourceId'],
+                    httpMethod=m['httpMethod'],
+                    patchOperations=ops)

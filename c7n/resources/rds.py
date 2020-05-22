@@ -440,8 +440,8 @@ class TagTrim(tags.TagTrim):
 
     permissions = ('rds:RemoveTagsFromResource',)
 
-    def process_tag_removal(self, resource, candidates):
-        self.client.remove_tags_from_resource(ResourceName=resource['DBInstanceArn'], TagKeys=candidates)
+    def process_tag_removal(self, client, resource, candidates):
+        client.remove_tags_from_resource(ResourceName=resource['DBInstanceArn'], TagKeys=candidates)
 
 
 START_STOP_ELIGIBLE_ENGINES = {

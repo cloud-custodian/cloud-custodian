@@ -739,7 +739,17 @@ class BucketActionBase(BaseAction):
         }
 
     def process(self, buckets):
-        return self._process_with_futures(self.process_bucket, buckets)
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            results = []
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error('error modifying bucket:%s\n%s',
+                                   b['Name'], f.exception())
+                results += filter(None, [f.result()])
+            return results
 
 
 class BucketFilterBase(Filter):
@@ -1117,14 +1127,12 @@ class DeleteBucketNotification(BucketActionBase):
     def process_bucket(self, bucket):
         n = bucket['Notification']
         if not n:
-            self.results.skip(bucket, "no notification config")
             return
 
         statement_ids = self.data.get('statement_ids')
         if statement_ids == 'matched':
             statement_ids = bucket.get(BucketNotificationFilter.annotation_key, ())
         if not statement_ids:
-            self.results.skip(bucket, "no matched statements")
             return
 
         cfg = defaultdict(list)
@@ -1138,7 +1146,6 @@ class DeleteBucketNotification(BucketActionBase):
         client.put_bucket_notification_configuration(
             Bucket=bucket['Name'],
             NotificationConfiguration=cfg)
-        self.results.ok(bucket)
 
 
 @actions.register('no-op')
@@ -1230,7 +1237,6 @@ class SetPolicyStatement(BucketActionBase):
                 target_statements.pop(s['Sid'])
 
         if not target_statements:
-            self.results.skip(bucket, "all statements already exist")
             return
 
         bucket_statements.extend(target_statements.values())
@@ -1238,12 +1244,11 @@ class SetPolicyStatement(BucketActionBase):
 
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         s3.put_bucket_policy(Bucket=bucket['Name'], Policy=policy)
-        self.results.ok(bucket)
         return {'Name': bucket['Name'], 'Policy': policy}
 
 
 @actions.register('remove-statements')
-class RemovePolicyStatement(BucketActionBase, RemovePolicyBase):
+class RemovePolicyStatement(RemovePolicyBase):
     """Action to remove policy statements from S3 buckets
 
     :example:
@@ -1265,10 +1270,23 @@ class RemovePolicyStatement(BucketActionBase, RemovePolicyBase):
 
     permissions = ("s3:PutBucketPolicy", "s3:DeleteBucketPolicy")
 
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            results = []
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    b = futures[f]
+                    self.log.error('error modifying bucket:%s\n%s',
+                                   b['Name'], f.exception())
+                results += filter(None, [f.result()])
+            return results
+
     def process_bucket(self, bucket):
         p = bucket.get('Policy')
         if p is None:
-            self.results.skip(bucket, "bucket policy is empty")
             return
 
         p = json.loads(p)
@@ -1277,7 +1295,6 @@ class RemovePolicyStatement(BucketActionBase, RemovePolicyBase):
             p, bucket, CrossAccountAccessFilter.annotation_key)
 
         if not found:
-            self.results.skip(bucket, "no cross-account statements found")
             return
 
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
@@ -1286,7 +1303,6 @@ class RemovePolicyStatement(BucketActionBase, RemovePolicyBase):
             s3.delete_bucket_policy(Bucket=bucket['Name'])
         else:
             s3.put_bucket_policy(Bucket=bucket['Name'], Policy=json.dumps(p))
-        self.results.ok(bucket)
         return {'Name': bucket['Name'], 'State': 'PolicyRemoved', 'Statements': found}
 
 
@@ -1321,13 +1337,25 @@ class SetBucketReplicationConfig(BucketActionBase):
         state={'type': 'string', 'enum': ['enable', 'disable', 'remove']})
     permissions = ("s3:GetReplicationConfiguration", "s3:PutReplicationConfiguration")
 
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            errors = []
+            for future in as_completed(futures):
+                bucket = futures[future]
+                try:
+                    future.result()
+                except ClientError as e:
+                    errors.append("Message: %s Bucket: %s", e, bucket['Name'])
+            if errors:
+                raise Exception('\n'.join(map(str, errors)))
+
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         state = self.data.get('state')
         if state is not None:
             if state == 'remove':
                 s3.delete_bucket_replication(Bucket=bucket['Name'])
-                self.results.ok(bucket)
                 return {'Name': bucket['Name'], 'State': 'ReplicationConfigRemoved'}
             if state in ('enable', 'disable'):
                 config = s3.get_bucket_replication(Bucket=bucket['Name'])
@@ -1337,9 +1365,7 @@ class SetBucketReplicationConfig(BucketActionBase):
                     Bucket=bucket['Name'],
                     ReplicationConfiguration=config['ReplicationConfiguration']
                 )
-                self.results.ok(bucket)
                 return {'Name': bucket['Name'], 'State': 'ReplicationConfigUpdated'}
-        self.results.skip(bucket, "replication state not specified")
 
 
 @filters.register('check-public-block')
@@ -1461,6 +1487,12 @@ class SetPublicBlock(BucketActionBase):
     keys = FilterPublicBlock.keys
     annotation_key = FilterPublicBlock.annotation_key
 
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
+            for future in as_completed(futures):
+                future.result()
+
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         config = dict(bucket.get(self.annotation_key, {key: False for key in self.keys}))
@@ -1481,7 +1513,6 @@ class SetPublicBlock(BucketActionBase):
                 config[key] = self.data.get('state', True)
         s3.put_public_access_block(
             Bucket=bucket['Name'], PublicAccessBlockConfiguration=config)
-        self.results.ok(bucket)
 
 
 @actions.register('toggle-versioning')
@@ -1515,37 +1546,33 @@ class ToggleVersioning(BucketActionBase):
         enabled={'type': 'boolean'})
     permissions = ("s3:PutBucketVersioning",)
 
-    def process_bucket(self, bucket):
-        # missing setting implies disabled
-        if 'Versioning' not in bucket or not bucket['Versioning']:
-            bucket['Versioning'] = {'Status': 'Suspended'}
-        if self.data.get('enabled', True):
-            if bucket['Versioning']['Status'] == 'Suspended':
-                self.process_versioning(bucket, 'Enabled')
-            else:
-                self.results.skip(bucket, "versioning already enabled")
-        else:
-            if bucket['Versioning']['Status'] == 'Enabled':
-                self.process_versioning(bucket, 'Enabled')
-            else:
-                self.results.skip(bucket, "versioning already disabled")
-
     def process_versioning(self, resource, state):
-        s3 = bucket_client(local_session(self.manager.session_factory), resource)
+        client = bucket_client(
+            local_session(self.manager.session_factory), resource)
         try:
-            s3.put_bucket_versioning(
+            client.put_bucket_versioning(
                 Bucket=resource['Name'],
-                VersioningConfiguration={'Status': state}
-            )
-            self.results.ok(resource)
+                VersioningConfiguration={
+                    'Status': state})
         except ClientError as e:
-            if e.response['Error']['Code'] == 'AccessDenied':
-                log.warning(
-                    "Access Denied Bucket:%s while put bucket versioning" % resource['Name'])
-            else:
+            if e.response['Error']['Code'] != 'AccessDenied':
                 log.error(
                     "Unable to put bucket versioning on bucket %s: %s" % resource['Name'], e)
-            self.results.error(resource, e)
+                raise
+            log.warning(
+                "Access Denied Bucket:%s while put bucket versioning" % resource['Name'])
+
+    # mfa delete enablement looks like it needs the serial and a current token.
+    def process(self, resources):
+        enabled = self.data.get('enabled', True)
+        for r in resources:
+            if 'Versioning' not in r or not r['Versioning']:
+                r['Versioning'] = {'Status': 'Suspended'}
+            if enabled and (
+                    r['Versioning']['Status'] == 'Suspended'):
+                self.process_versioning(r, 'Enabled')
+            if not enabled and r['Versioning']['Status'] == 'Enabled':
+                self.process_versioning(r, 'Suspended')
 
 
 @actions.register('toggle-logging')
@@ -1606,17 +1633,8 @@ class ToggleLogging(BucketActionBase):
         session = local_session(self.manager.session_factory)
         account_name = get_account_alias_from_sts(session)
 
-        def apply_logging(bucket, config):
-            try:
-                client = bucket_client(session, r)
-                client.put_bucket_logging(
-                    Bucket=bucket['Name'], BucketLoggingStatus=config
-                )
-                self.results.ok(bucket)
-            except ClientError as e:
-                self.results.error(bucket, e)
-
         for r in resources:
+            client = bucket_client(session, r)
             is_logging = bool(r.get('Logging'))
 
             if enabled:
@@ -1634,15 +1652,14 @@ class ToggleLogging(BucketActionBase):
                     'TargetPrefix': data.get('target_prefix', r['Name'] + '/')
                 }
                 if not is_logging or r.get('Logging') != config:
-                    apply_logging(r, {'LoggingEnabled': config})
-                    self.results.ok(r)
-                else:
-                    self.results.skip(r, "logging config is correct")
-            else:
-                if is_logging:
-                    apply_logging(r, {})
-                else:
-                    self.results.skip(r, "logging config is already disabled")
+                    client.put_bucket_logging(
+                        Bucket=r['Name'],
+                        BucketLoggingStatus={'LoggingEnabled': config}
+                    )
+
+            elif not enabled and is_logging:
+                client.put_bucket_logging(
+                    Bucket=r['Name'], BucketLoggingStatus={})
 
 
 @actions.register('attach-encrypt')
@@ -1681,6 +1698,10 @@ class AttachLambdaEncrypt(BucketActionBase):
         "lambda:*",
     )
 
+    def __init__(self, data=None, manager=None):
+        self.data = data or {}
+        self.manager = manager
+
     def validate(self):
         if (not getattr(self.manager.config, 'dryrun', True) and
                 not self.data.get('role', self.manager.config.assume_role)):
@@ -1717,26 +1738,36 @@ class AttachLambdaEncrypt(BucketActionBase):
             lambda_mgr.publish(func)
             region_funcs[r] = func
 
-        return self._process_with_futures(
-            self.process_bucket,
-            buckets,
-            topic_arn,
-            account_id,
-            region_funcs,
-            region_sessions
-        )
+        with self.executor_factory(max_workers=3) as w:
+            results = []
+            futures = []
+            for b in buckets:
+                region = get_region(b)
+                futures.append(
+                    w.submit(
+                        self.process_bucket,
+                        region_funcs[region],
+                        b,
+                        topic_arn,
+                        account_id,
+                        region_sessions[region]
+                    ))
+            for f in as_completed(futures):
+                if f.exception():
+                    log.exception(
+                        "Error attaching lambda-encrypt %s" % (f.exception()))
+                results.append(f.result())
+            return list(filter(None, results))
 
-    def process_bucket(self, bucket, topic, account_id, funcs, sessions):
+    def process_bucket(self, func, bucket, topic, account_id, session_factory):
         from c7n.mu import BucketSNSNotification, BucketLambdaNotification
-        region = get_region(bucket)
         if topic:
             topic = None if topic == 'default' else topic
-            source = BucketSNSNotification(sessions[region], bucket, topic)
+            source = BucketSNSNotification(session_factory, bucket, topic)
         else:
             source = BucketLambdaNotification(
-                {'account_s3': account_id}, sessions[region], bucket)
-        self.results.ok(bucket)
-        return source.add(funcs[region])
+                {'account_s3': account_id}, session_factory, bucket)
+        return source.add(func)
 
 
 @actions.register('encryption-policy')
@@ -1761,6 +1792,16 @@ class EncryptionRequiredPolicy(BucketActionBase):
 
     permissions = ("s3:GetBucketPolicy", "s3:PutBucketPolicy")
     schema = type_schema('encryption-policy')
+
+    def __init__(self, data=None, manager=None):
+        self.data = data or {}
+        self.manager = manager
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            results = w.map(self.process_bucket, buckets)
+            results = list(filter(None, list(results)))
+            return results
 
     def process_bucket(self, b):
         p = b['Policy']
@@ -1804,9 +1845,7 @@ class EncryptionRequiredPolicy(BucketActionBase):
             s3.put_bucket_policy(
                 Bucket=b['Name'],
                 Policy=json.dumps(p))
-            self.results.ok(b)
         except ClientError as e:
-            self.results.error(b, e.response['Error']['Message'])
             if e.response['Error']['Code'] == 'NoSuchBucket':
                 return
             self.log.exception(
@@ -1910,8 +1949,30 @@ class ScanBucket(BucketActionBase):
             keys.extend(key_set.get(ck, []))
         return keys
 
-    def _exception_hook(self, bucket, e):
-        self.denied_buckets.add(bucket['Name'])
+    def process(self, buckets):
+        results = self._process_with_futures(self.process_bucket, buckets)
+        self.write_denied_buckets_file()
+        return results
+
+    def _process_with_futures(self, helper, buckets, max_workers=3):
+        results = []
+        with self.executor_factory(max_workers) as w:
+            futures = {}
+            for b in buckets:
+                futures[w.submit(helper, b)] = b
+            for f in as_completed(futures):
+                if f.exception():
+                    b = futures[f]
+                    self.log.error(
+                        "Error on bucket:%s region:%s policy:%s error: %s",
+                        b['Name'], b.get('Location', 'unknown'),
+                        self.manager.data.get('name'), f.exception())
+                    self.denied_buckets.add(b['Name'])
+                    continue
+                result = f.result()
+                if result:
+                    results.append(result)
+        return results
 
     def write_denied_buckets_file(self):
         if (self.denied_buckets and
@@ -2411,6 +2472,10 @@ class DeleteGlobalGrants(BucketActionBase):
 
     permissions = ('s3:PutBucketAcl',)
 
+    def process(self, buckets):
+        with self.executor_factory(max_workers=5) as w:
+            return list(filter(None, list(w.map(self.process_bucket, buckets))))
+
     def process_bucket(self, b):
         grantees = self.data.get(
             'grantees', [
@@ -2442,11 +2507,14 @@ class DeleteGlobalGrants(BucketActionBase):
         log.info({'Owner': acl['Owner'], 'Grants': new_grants})
 
         c = bucket_client(self.manager.session_factory(), b)
-        c.put_bucket_acl(
-            Bucket=b['Name'],
-            AccessControlPolicy={
-                'Owner': acl['Owner'], 'Grants': new_grants})
-        self.results.ok(b)
+        try:
+            c.put_bucket_acl(
+                Bucket=b['Name'],
+                AccessControlPolicy={
+                    'Owner': acl['Owner'], 'Grants': new_grants})
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchBucket':
+                return
         return b
 
 
@@ -2519,7 +2587,8 @@ class RemoveBucketTag(RemoveTag):
     """
 
     def process_resource_set(self, client, resource_set, tags):
-        modify_bucket_tags(self.manager.session_factory, resource_set, remove_tags=tags)
+        modify_bucket_tags(
+            self.manager.session_factory, resource_set, remove_tags=tags)
 
 
 @filters.register('data-events')
@@ -2984,12 +3053,28 @@ class Lifecycle(BucketActionBase):
 
     permissions = ('s3:GetLifecycleConfiguration', 's3:PutLifecycleConfiguration')
 
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+            results = []
+
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+
+            for future in as_completed(futures):
+                if future.exception():
+                    bucket = futures[future]
+                    self.log.error('error modifying bucket lifecycle: %s\n%s',
+                                   bucket['Name'], future.exception())
+                results += filter(None, [future.result()])
+
+            return results
+
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
 
         if 'get_bucket_lifecycle_configuration' in bucket.get('c7n:DeniedMethods', []):
             log.warning("Access Denied Bucket:%s while reading lifecycle" % bucket['Name'])
-            self.results.error(bucket, "access denied reading lifecycle")
             return
 
         # Adjust the existing lifecycle by adding/deleting/overwriting rules as necessary
@@ -3015,17 +3100,17 @@ class Lifecycle(BucketActionBase):
             else:
                 s3.put_bucket_lifecycle_configuration(
                     Bucket=bucket['Name'], LifecycleConfiguration={'Rules': config})
-            self.results.ok(bucket)
         except ClientError as e:
-            self.results.error(bucket, e.response['Error']['Message'])
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning("Access Denied Bucket:%s while applying lifecycle" % bucket['Name'])
+            else:
+                raise e
 
 
 class KMSKeyResolverMixin:
     """Builds a dictionary of region specific ARNs"""
 
     def __init__(self, data, manager=None):
-        # required for chaining inits when inheriting multiple class
-        super(KMSKeyResolverMixin, self).__init__(data, manager)
         self.arns = dict()
         self.data = data
         self.manager = manager
@@ -3228,13 +3313,18 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
     def process(self, buckets):
         if self.data.get('enabled', True):
             self.resolve_keys(buckets)
-        return self._process_with_futures(self.process_bucket, buckets)
+
+        with self.executor_factory(max_workers=3) as w:
+            futures = {w.submit(self.process_bucket, b): b for b in buckets}
+            for future in as_completed(futures):
+                if future.exception():
+                    self.log.error('Message: %s Bucket: %s', future.exception(),
+                                   futures[future]['Name'])
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
         if not self.data.get('enabled', True):
             s3.delete_bucket_encryption(Bucket=bucket['Name'])
-            self.results.ok(bucket)
             return
         algo = self.data.get('crypto', 'AES256')
         config = {'Rules': [
@@ -3251,4 +3341,3 @@ class SetBucketEncryption(KMSKeyResolverMixin, BucketActionBase):
             Bucket=bucket['Name'],
             ServerSideEncryptionConfiguration=config
         )
-        self.results.ok(bucket)
