@@ -1698,10 +1698,6 @@ class AttachLambdaEncrypt(BucketActionBase):
         "lambda:*",
     )
 
-    def __init__(self, data=None, manager=None):
-        self.data = data or {}
-        self.manager = manager
-
     def validate(self):
         if (not getattr(self.manager.config, 'dryrun', True) and
                 not self.data.get('role', self.manager.config.assume_role)):
@@ -1792,10 +1788,6 @@ class EncryptionRequiredPolicy(BucketActionBase):
 
     permissions = ("s3:GetBucketPolicy", "s3:PutBucketPolicy")
     schema = type_schema('encryption-policy')
-
-    def __init__(self, data=None, manager=None):
-        self.data = data or {}
-        self.manager = manager
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
@@ -3111,6 +3103,8 @@ class KMSKeyResolverMixin:
     """Builds a dictionary of region specific ARNs"""
 
     def __init__(self, data, manager=None):
+        # required for chaining inits when inheriting multiple class
+        super(KMSKeyResolverMixin, self).__init__(data, manager)
         self.arns = dict()
         self.data = data
         self.manager = manager
