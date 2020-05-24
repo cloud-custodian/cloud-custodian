@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "LabelingJobSummaryList": [
+            {
+                "LabelingJobName": "test",
+                "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 18,
+                    "minute": 18,
+                    "second": 54,
+                    "microsecond": 966000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 18,
+                    "minute": 24,
+                    "second": 34,
+                    "microsecond": 992000
+                },
+                "LabelingJobStatus": "Completed",
+                "LabelCounters": {
+                    "TotalLabeled": 0,
+                    "HumanLabeled": 0,
+                    "MachineLabeled": 0,
+                    "FailedNonRetryableError": 1,
+                    "Unlabeled": 0
+                },
+                "WorkteamArn": "arn:aws:sagemaker:us-east-1:644160558196:workteam/private-crowd/test",
+                "PreHumanTaskLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:PRE-ImageMultiClass",
+                "AnnotationConsolidationLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:ACS-ImageMultiClass",
+                "LabelingJobOutput": {
+                    "OutputDatasetS3Uri": "s3://c7n-sagemaker-test/testout/test/manifests/output/output.manifest",
+                    "FinalActiveLearningModelArn": ""
+                },
+                "InputConfig": {
+                    "DataSource": {
+                        "S3DataSource": {
+                            "ManifestS3Uri": "s3://c7n-sagemaker-test/test-in.json"
+                        }
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

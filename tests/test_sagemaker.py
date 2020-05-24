@@ -525,6 +525,103 @@ class TestSagemakerTransformJob(BaseTest):
         self.assertEqual(len(tags), 0)
 
 
+class TestSagemakerLabelingJob(BaseTest):
+
+    def test_sagemaker_labeling_job_query(self):
+        session_factory = self.replay_flight_data("test_sagemaker_labeling_job_query")
+        p = self.load_policy(
+            {
+                "name": "query-labeling-jobs",
+                "resource": "sagemaker-labeling-job",
+                "query": [{"StatusEquals": "Completed"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_stop_labeling_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_labeling_job_stop")
+        client = session_factory(region="us-east-1").client("sagemaker")
+        p = self.load_policy(
+            {
+                "name": "stop-labeling-job",
+                "resource": "sagemaker-labeling-job",
+                "filters": [{"LabelingJobName": "test-clone"}],
+                "actions": [{"type": "stop"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        job = client.describe_labeling_job(
+            LabelingJobName=resources[0]["LabelingJobName"]
+        )
+        self.assertEqual(job["LabelingJobStatus"], "Stopping")
+
+    def test_tag_labeling_job(self):
+        session_factory = self.replay_flight_data("test_sagemaker_labeling_job_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-transform-job",
+                "resource": "sagemaker-labeling-job",
+                "filters": [
+                    {"LabelingJobName": "test"},
+                    {"tag:JobTag": "absent"}],
+                "actions": [{"type": "tag", "key": "JobTag", "value": "JobTagValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["LabelingJobArn"])["Tags"]
+        self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["JobTag", "JobTagValue"])
+
+    def test_untag_labeling_job(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_labeling_job_remove_tag"
+        )
+        p = self.load_policy(
+            {
+                "name": "remove-labeling-job-tag",
+                "resource": "sagemaker-labeling-job",
+                "filters": [
+                    {"LabelingJobName": "test"},
+                    {"tag:JobTag": "JobTagValue"}],
+                "actions": [{"type": "remove-tag", "tags": ["JobTag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        client = session_factory(region="us-east-1").client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["LabelingJobArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_sagemaker_labeling_job_kms_alias(self):
+        session_factory = self.record_flight_data("test_sagemaker_labeling_job_kms_key_filter")
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                "name": "sagemaker-labeling-job-alias",
+                "resource": "aws.sagemaker-labeling-job",
+                "filters": [
+                    {"LabelingJobName": "test-clone-kms-clone"},
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/skunk/trails",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertTrue(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['OutputConfig']['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
 class TestSagemakerEndpoint(BaseTest):
 
     def test_sagemaker_endpoints(self):

@@ -17,7 +17,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.kms import KmsRelatedFilter
 
@@ -138,6 +138,25 @@ class SagemakerTransformJob(QueryResourceManager):
             return j
 
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
+
+
+@resources.register('sagemaker-labeling-job')
+class SagemakerLabelingJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        arn_type = "labeling-job"
+        service = 'sagemaker'
+        enum_spec = ('list_labeling_jobs', 'LabelingJobSummaryList', None)
+        detail_spec = (
+            'describe_labeling_job', 'LabelingJobName', 'LabelingJobName', None)
+        arn = id = 'LabelingJobArn'
+        name = 'LabelingJobName'
+        date = 'CreationTime'
+        filter_name = 'LabelingJobArn'
+        universal_taggable = object()        
+        permission_augment = ('sagemaker:DescribeLabelingJob', 'sagemaker:ListTags')
+
+    augment = universal_augment
 
 
 class QueryFilter:
@@ -577,7 +596,7 @@ class NotebookSubnetFilter(SubnetFilter):
 @SagemakerEndpointConfig.filter_registry.register('kms-key')
 class NotebookKmsFilter(KmsRelatedFilter):
     """
-    Filter a resource by its associcated kms key and optionally the aliasname
+    Filter a resource by its associated kms key and optionally the aliasname
     of the kms key by using 'c7n:AliasName'
 
     :example:
@@ -601,6 +620,28 @@ class NotebookKmsFilter(KmsRelatedFilter):
                 value: "alias/aws/sagemaker"
     """
     RelatedIdsExpression = "KmsKeyId"
+
+
+@SagemakerLabelingJob.filter_registry.register('kms-key')
+class LabelingJobKmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associated kms key and optionally the aliasname
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sagemaker-labelling-job-kms-key-filters
+            resource: aws.sagemaker-labeling-job
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: "^(alias/aws/sagemaker)"
+                op: regex
+    """
+    RelatedIdsExpression = "OutputConfig.KmsKeyId"
 
 
 @Model.action_registry.register('delete')
@@ -657,6 +698,34 @@ class SagemakerJobStop(BaseAction):
         for j in jobs:
             try:
                 client.stop_training_job(TrainingJobName=j['TrainingJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerLabelingJob.action_registry.register('stop')
+class SagemakerLabelingJobStop(SagemakerJobStop):
+    """Stops a SageMaker labeling job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-labeling-job
+            resource: aws.sagemaker-labeling-job
+            filters:
+              - LabelingJobName: label-job-10
+            actions:
+              - stop
+    """
+    permissions = ('sagemaker:StopLabelingJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_labeling_job(LabelingJobName=j['LabelingJobName'])
             except client.exceptions.ResourceNotFound:
                 pass
 
