@@ -610,7 +610,7 @@ class TestSagemakerLabelingJob(BaseTest):
                     {
                         "type": "kms-key",
                         "key": "c7n:AliasName",
-                        "value": "sagemaker",
+                        "value": "alias/sagemaker",
                     }
                 ]
             },

@@ -160,7 +160,6 @@ class SagemakerLabelingJob(QueryResourceManager):
         universal_taggable = object()        
         permission_augment = ('sagemaker:DescribeLabelingJob', 'sagemaker:ListTags')
 
-
     source_mapping = {
         'describe': DescribeJob
     }
