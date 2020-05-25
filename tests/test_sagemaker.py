@@ -600,18 +600,17 @@ class TestSagemakerLabelingJob(BaseTest):
         self.assertEqual(len(tags), 0)
 
     def test_sagemaker_labeling_job_kms_alias(self):
-        session_factory = self.record_flight_data("test_sagemaker_labeling_job_kms_key_filter")
+        session_factory = self.replay_flight_data("test_sagemaker_labeling_job_kms_key_filter")
         kms = session_factory().client('kms')
         p = self.load_policy(
             {
                 "name": "sagemaker-labeling-job-alias",
                 "resource": "aws.sagemaker-labeling-job",
                 "filters": [
-                    {"LabelingJobName": "test-clone-kms-clone"},
                     {
                         "type": "kms-key",
                         "key": "c7n:AliasName",
-                        "value": "alias/skunk/trails",
+                        "value": "alias/sagemaker",
                     }
                 ]
             },

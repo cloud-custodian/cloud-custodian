@@ -15,7 +15,7 @@
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
@@ -139,6 +139,10 @@ class SagemakerTransformJob(QueryResourceManager):
 
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
 
+class DescribeJob(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 @resources.register('sagemaker-labeling-job')
 class SagemakerLabelingJob(QueryResourceManager):
@@ -152,11 +156,13 @@ class SagemakerLabelingJob(QueryResourceManager):
         arn = id = 'LabelingJobArn'
         name = 'LabelingJobName'
         date = 'CreationTime'
-        filter_name = 'LabelingJobArn'
         universal_taggable = object()        
         permission_augment = ('sagemaker:DescribeLabelingJob', 'sagemaker:ListTags')
 
-    augment = universal_augment
+
+    source_mapping = {
+        'describe': DescribeJob
+    }
 
 
 class QueryFilter:
@@ -594,6 +600,7 @@ class NotebookSubnetFilter(SubnetFilter):
 
 @NotebookInstance.filter_registry.register('kms-key')
 @SagemakerEndpointConfig.filter_registry.register('kms-key')
+@SagemakerLabelingJob.filter_registry.register('kms-key')
 class NotebookKmsFilter(KmsRelatedFilter):
     """
     Filter a resource by its associated kms key and optionally the aliasname

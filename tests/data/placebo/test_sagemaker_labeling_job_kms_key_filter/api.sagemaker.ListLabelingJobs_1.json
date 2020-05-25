@@ -3,6 +3,98 @@
     "data": {
         "LabelingJobSummaryList": [
             {
+                "LabelingJobName": "test-clone-kms-2",
+                "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test-clone-kms-2",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 20,
+                    "minute": 0,
+                    "second": 56,
+                    "microsecond": 782000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 20,
+                    "minute": 6,
+                    "second": 39,
+                    "microsecond": 339000
+                },
+                "LabelingJobStatus": "Completed",
+                "LabelCounters": {
+                    "TotalLabeled": 0,
+                    "HumanLabeled": 0,
+                    "MachineLabeled": 0,
+                    "FailedNonRetryableError": 1,
+                    "Unlabeled": 0
+                },
+                "WorkteamArn": "arn:aws:sagemaker:us-east-1:644160558196:workteam/private-crowd/test",
+                "PreHumanTaskLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:PRE-ImageMultiClass",
+                "AnnotationConsolidationLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:ACS-ImageMultiClass",
+                "LabelingJobOutput": {
+                    "OutputDatasetS3Uri": "s3://c7n-sagemaker-test/testout/test-clone-kms-2/manifests/output/output.manifest",
+                    "FinalActiveLearningModelArn": ""
+                },
+                "InputConfig": {
+                    "DataSource": {
+                        "S3DataSource": {
+                            "ManifestS3Uri": "s3://c7n-sagemaker-test/test-in.json"
+                        }
+                    }
+                }
+            },
+            {
+                "LabelingJobName": "test-clone-kms-clone",
+                "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test-clone-kms-clone",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 19,
+                    "minute": 57,
+                    "second": 25,
+                    "microsecond": 777000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 20,
+                    "minute": 3,
+                    "second": 37,
+                    "microsecond": 74000
+                },
+                "LabelingJobStatus": "Completed",
+                "LabelCounters": {
+                    "TotalLabeled": 0,
+                    "HumanLabeled": 0,
+                    "MachineLabeled": 0,
+                    "FailedNonRetryableError": 1,
+                    "Unlabeled": 0
+                },
+                "WorkteamArn": "arn:aws:sagemaker:us-east-1:644160558196:workteam/private-crowd/test",
+                "PreHumanTaskLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:PRE-ImageMultiClass",
+                "AnnotationConsolidationLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:ACS-ImageMultiClass",
+                "LabelingJobOutput": {
+                    "OutputDatasetS3Uri": "s3://c7n-sagemaker-test/testout/test-clone-kms-clone/manifests/output/output.manifest",
+                    "FinalActiveLearningModelArn": ""
+                },
+                "InputConfig": {
+                    "DataSource": {
+                        "S3DataSource": {
+                            "ManifestS3Uri": "s3://c7n-sagemaker-test/test-in.json"
+                        }
+                    }
+                }
+            },
+            {
                 "LabelingJobName": "test-clone-kms",
                 "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test-clone-kms",
                 "CreationTime": {
@@ -21,21 +113,117 @@
                     "month": 5,
                     "day": 24,
                     "hour": 19,
-                    "minute": 51,
-                    "second": 37,
-                    "microsecond": 338000
+                    "minute": 55,
+                    "second": 22,
+                    "microsecond": 89000
                 },
-                "LabelingJobStatus": "InProgress",
+                "LabelingJobStatus": "Stopped",
+                "LabelCounters": {
+                    "TotalLabeled": 0,
+                    "HumanLabeled": 0,
+                    "MachineLabeled": 0,
+                    "FailedNonRetryableError": 1,
+                    "Unlabeled": 0
+                },
+                "WorkteamArn": "arn:aws:sagemaker:us-east-1:644160558196:workteam/private-crowd/test",
+                "PreHumanTaskLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:PRE-ImageMultiClass",
+                "AnnotationConsolidationLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:ACS-ImageMultiClass",
+                "LabelingJobOutput": {
+                    "OutputDatasetS3Uri": "s3://c7n-sagemaker-test/testout/test-clone-kms/manifests/output/output.manifest",
+                    "FinalActiveLearningModelArn": ""
+                },
+                "InputConfig": {
+                    "DataSource": {
+                        "S3DataSource": {
+                            "ManifestS3Uri": "s3://c7n-sagemaker-test/test-in.json"
+                        }
+                    }
+                }
+            },
+            {
+                "LabelingJobName": "test-clone",
+                "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test-clone",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 19,
+                    "minute": 6,
+                    "second": 8,
+                    "microsecond": 617000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 19,
+                    "minute": 6,
+                    "second": 17,
+                    "microsecond": 61000
+                },
+                "LabelingJobStatus": "Stopped",
                 "LabelCounters": {
                     "TotalLabeled": 0,
                     "HumanLabeled": 0,
                     "MachineLabeled": 0,
                     "FailedNonRetryableError": 0,
-                    "Unlabeled": 1
+                    "Unlabeled": 0
                 },
                 "WorkteamArn": "arn:aws:sagemaker:us-east-1:644160558196:workteam/private-crowd/test",
                 "PreHumanTaskLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:PRE-ImageMultiClass",
                 "AnnotationConsolidationLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:ACS-ImageMultiClass",
+                "LabelingJobOutput": {
+                    "OutputDatasetS3Uri": "s3://c7n-sagemaker-test/testout/test-clone/manifests/output/output.manifest",
+                    "FinalActiveLearningModelArn": ""
+                },
+                "InputConfig": {
+                    "DataSource": {
+                        "S3DataSource": {
+                            "ManifestS3Uri": "s3://c7n-sagemaker-test/test-in.json"
+                        }
+                    }
+                }
+            },
+            {
+                "LabelingJobName": "test",
+                "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 18,
+                    "minute": 18,
+                    "second": 54,
+                    "microsecond": 966000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 18,
+                    "minute": 24,
+                    "second": 34,
+                    "microsecond": 992000
+                },
+                "LabelingJobStatus": "Completed",
+                "LabelCounters": {
+                    "TotalLabeled": 0,
+                    "HumanLabeled": 0,
+                    "MachineLabeled": 0,
+                    "FailedNonRetryableError": 1,
+                    "Unlabeled": 0
+                },
+                "WorkteamArn": "arn:aws:sagemaker:us-east-1:644160558196:workteam/private-crowd/test",
+                "PreHumanTaskLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:PRE-ImageMultiClass",
+                "AnnotationConsolidationLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:ACS-ImageMultiClass",
+                "LabelingJobOutput": {
+                    "OutputDatasetS3Uri": "s3://c7n-sagemaker-test/testout/test/manifests/output/output.manifest",
+                    "FinalActiveLearningModelArn": ""
+                },
                 "InputConfig": {
                     "DataSource": {
                         "S3DataSource": {

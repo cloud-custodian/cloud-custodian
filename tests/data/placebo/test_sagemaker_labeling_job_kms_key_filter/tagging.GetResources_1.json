@@ -2,7 +2,12 @@
     "status_code": 200,
     "data": {
         "PaginationToken": "",
-        "ResourceTagMappingList": [],
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test",
+                "Tags": []
+            }
+        ],
         "ResponseMetadata": {}
     }
 }

@@ -3,27 +3,27 @@
     "data": {
         "LabelingJobSummaryList": [
             {
-                "LabelingJobName": "test",
-                "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test",
+                "LabelingJobName": "test-clone-kms-2",
+                "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test-clone-kms-2",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 5,
                     "day": 24,
-                    "hour": 18,
-                    "minute": 18,
-                    "second": 54,
-                    "microsecond": 966000
+                    "hour": 20,
+                    "minute": 0,
+                    "second": 56,
+                    "microsecond": 782000
                 },
                 "LastModifiedTime": {
                     "__class__": "datetime",
                     "year": 2020,
                     "month": 5,
                     "day": 24,
-                    "hour": 18,
-                    "minute": 24,
-                    "second": 34,
-                    "microsecond": 992000
+                    "hour": 20,
+                    "minute": 6,
+                    "second": 39,
+                    "microsecond": 339000
                 },
                 "LabelingJobStatus": "Completed",
                 "LabelCounters": {
@@ -37,7 +37,7 @@
                 "PreHumanTaskLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:PRE-ImageMultiClass",
                 "AnnotationConsolidationLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:ACS-ImageMultiClass",
                 "LabelingJobOutput": {
-                    "OutputDatasetS3Uri": "s3://c7n-sagemaker-test/testout/test/manifests/output/output.manifest",
+                    "OutputDatasetS3Uri": "s3://c7n-sagemaker-test/testout/test-clone-kms-2/manifests/output/output.manifest",
                     "FinalActiveLearningModelArn": ""
                 },
                 "InputConfig": {

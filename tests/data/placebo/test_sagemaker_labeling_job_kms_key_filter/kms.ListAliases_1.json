@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/sagemaker",
+                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/sagemaker",
+                "TargetKeyId": "75d1e7ba-f9c5-46b9-97bc-28e6c834aa49"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

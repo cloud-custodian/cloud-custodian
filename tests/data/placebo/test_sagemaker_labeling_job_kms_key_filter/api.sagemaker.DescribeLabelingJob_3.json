@@ -1,0 +1,83 @@
+{
+    "status_code": 200,
+    "data": {
+        "LabelingJobStatus": "Stopped",
+        "LabelCounters": {
+            "TotalLabeled": 0,
+            "HumanLabeled": 0,
+            "MachineLabeled": 0,
+            "FailedNonRetryableError": 1,
+            "Unlabeled": 0
+        },
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 5,
+            "day": 24,
+            "hour": 19,
+            "minute": 49,
+            "second": 34,
+            "microsecond": 179000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 5,
+            "day": 24,
+            "hour": 19,
+            "minute": 55,
+            "second": 22,
+            "microsecond": 89000
+        },
+        "JobReferenceCode": "6441605581962HzoulFXvgTcC8Wz",
+        "LabelingJobName": "test-clone-kms",
+        "LabelingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test-clone-kms",
+        "LabelAttributeName": "test-clone-kms",
+        "InputConfig": {
+            "DataSource": {
+                "S3DataSource": {
+                    "ManifestS3Uri": "s3://c7n-sagemaker-test/test-in.json"
+                }
+            },
+            "DataAttributes": {
+                "ContentClassifiers": []
+            }
+        },
+        "OutputConfig": {
+            "S3OutputPath": "s3://c7n-sagemaker-test/testout",
+            "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49"
+        },
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20181024T130482",
+        "LabelCategoryConfigS3Uri": "s3://c7n-sagemaker-test/testout/test-clone-kms/annotation-tool/data.json",
+        "StoppingConditions": {
+            "MaxPercentageOfInputDatasetLabeled": 100
+        },
+        "HumanTaskConfig": {
+            "WorkteamArn": "arn:aws:sagemaker:us-east-1:644160558196:workteam/private-crowd/test",
+            "UiConfig": {
+                "UiTemplateS3Uri": "s3://c7n-sagemaker-test/testout/test-clone-kms/annotation-tool/template.liquid"
+            },
+            "PreHumanTaskLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:PRE-ImageMultiClass",
+            "TaskKeywords": [
+                "Images",
+                "categorization",
+                "classification"
+            ],
+            "TaskTitle": "Image Classification (Single Label): test",
+            "TaskDescription": "Categorize images into specific classes",
+            "NumberOfHumanWorkersPerDataObject": 1,
+            "TaskTimeLimitInSeconds": 300,
+            "TaskAvailabilityLifetimeInSeconds": 864000,
+            "MaxConcurrentTaskCount": 1000,
+            "AnnotationConsolidationConfig": {
+                "AnnotationConsolidationLambdaArn": "arn:aws:lambda:us-east-1:644160558196:function:ACS-ImageMultiClass"
+            }
+        },
+        "Tags": [],
+        "LabelingJobOutput": {
+            "OutputDatasetS3Uri": "s3://c7n-sagemaker-test/testout/test-clone-kms/manifests/output/output.manifest",
+            "FinalActiveLearningModelArn": ""
+        },
+        "ResponseMetadata": {}
+    }
+}
