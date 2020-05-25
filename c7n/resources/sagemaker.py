@@ -144,6 +144,7 @@ class DescribeJob(DescribeSource):
     def augment(self, resources):
         return universal_augment(self.manager, resources)
 
+
 @resources.register('sagemaker-labeling-job')
 class SagemakerLabelingJob(QueryResourceManager):
 
