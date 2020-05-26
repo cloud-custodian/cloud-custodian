@@ -53,7 +53,7 @@ class RelatedResourceFilter(ValueFilter):
         related_ids = self.get_related_ids(resources)
         model = resource_manager.get_model()
         if len(related_ids) < self.FetchThreshold:
-            related = resource_manager.get_resources(list(related_ids))
+            related = resource_manager.get_resources(list(filter(None, related_ids)))
         else:
             related = resource_manager.resources()
         return {r[model.id]: r for r in related

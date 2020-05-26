@@ -142,7 +142,7 @@ class SagemakerTransformJob(QueryResourceManager):
 class DescribeJob(DescribeSource):
 
     def augment(self, resources):
-        return universal_augment(self.manager, resources)
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('sagemaker-labeling-job')
@@ -600,7 +600,6 @@ class NotebookSubnetFilter(SubnetFilter):
 
 @NotebookInstance.filter_registry.register('kms-key')
 @SagemakerEndpointConfig.filter_registry.register('kms-key')
-@SagemakerLabelingJob.filter_registry.register('kms-key')
 class NotebookKmsFilter(KmsRelatedFilter):
     """
     Filter a resource by its associated kms key and optionally the aliasname
