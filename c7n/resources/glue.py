@@ -214,19 +214,31 @@ class UpdateGlueCrawler(BaseAction):
 
     schema = type_schema(
         'update-crawler',
-        attributes={'type': 'object'},
-        required=('attributes',))
+        required=['attributes'],
+        attributes={
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                'Role': {'type': 'string'},
+                'DatabaseName': {'type': 'string'},
+                'Schedule': {'type': 'string'},
+                'Configuration': {'type': 'string'},
+                'CrawlerSecurityConfiguration': {'type': 'string'},
+                'TablePrefix': {'type': 'string'},
+                'Classifier': {'type': 'array', 'items': {'type': 'string'}},
+                'SchemaChangePolicy': {
+                    'type': 'object',
+                    'additionalProperties': False,
+                    'properties': {
+                        'UpdateBehavior': {'type': 'string', 'enum': ['LOG', 'UPDATE_IN_DATABASE']},
+                        'DeleteBehavior': {
+                            'type': 'string', 'enum': ['LOG', 'UPDATE_IN_DATABASE', 'DEPRECATE_IN_DATABASE']}
+                    }
+                }
+            }
+        })
 
     permissions = ('glue:UpdateCrawler',)
-    shape = 'UpdateCrawlerRequest'
-
-    def validate(self):
-        attrs = dict(self.data['attributes'])
-        if 'Name' in attrs:
-            raise PolicyValidationError(
-                "Can't include Crawler name in update-crawler action")
-        attrs['Name'] = 'PolicyValidation'
-        return shape_validate(attrs, self.shape, 'glue')
 
     def process(self, crawlers):
         client = local_session(self.manager.session_factory).client('glue')
