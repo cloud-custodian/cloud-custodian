@@ -726,10 +726,13 @@ class SagemakerLabelingJobStop(SagemakerJobStop):
               - stop
     """
     permissions = ('sagemaker:StopLabelingJob',)
+    valid_origin_states = ('InProgress',)
 
     def process(self, jobs):
+        jobs = self.filter_resources(jobs, 'LabelingJobStatus', self.valid_origin_states)
+        if not len(jobs):
+            return
         client = local_session(self.manager.session_factory).client('sagemaker')
-
         for j in jobs:
             try:
                 client.stop_labeling_job(LabelingJobName=j['LabelingJobName'])
