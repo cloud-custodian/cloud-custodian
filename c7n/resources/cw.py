@@ -271,7 +271,7 @@ class LastWriteDays(Filter):
             limit=3).get('logStreams')
         group['streams'] = streams
         if not streams:
-            last_timestamp = group['creationTime']
+            last_timestamp = group['creationTime'] * 1000.0
         elif streams[0]['storedBytes'] == 0:
             last_timestamp = streams[0]['creationTime']
         else:
