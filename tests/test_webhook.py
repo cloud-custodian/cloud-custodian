@@ -90,23 +90,23 @@ class WebhookTest(BaseTest):
     def test_process_batch(self, request_mock):
         resources = [
             {
-                "name": "test_name",
+                "InstanceId": "test1_name",
                 "value": "test_value"
             },
             {
-                "name": "test_name",
+                "InstanceId": "test2_name",
                 "value": "test_value"
             },
             {
-                "name": "test_name",
+                "InstanceId": "test3_name",
                 "value": "test_value"
             },
             {
-                "name": "test_name",
+                "InstanceId": "test4_name",
                 "value": "test_value"
             },
             {
-                "name": "test_name",
+                "InstanceId": "test5_name",
                 "value": "test_value"
             }
         ]
@@ -116,19 +116,24 @@ class WebhookTest(BaseTest):
             "batch": True,
             "batch-size": 2,
             "query-params": {
-                "foo": "resources[0].name"
+                "foo": "resources[0].InstanceId"
             }
         }
 
         wh = Webhook(data=data, manager=self._get_manager())
-        wh.process(resources)
+        results = wh.wrap_process(resources)
+
+        # all should have succeeded
+        self.assertEqual(results.metrics["ok"], 5)
+        self.assertEqual(results.metrics["error"], 0)
+
         req = request_mock.call_args[1]
 
         # 5 resources with max batch size 2 == 3 calls
         self.assertEqual(3, len(request_mock.call_args_list))
 
         # Check out one of the calls in detail
-        self.assertEqual("http://foo.com?foo=test_name", req['url'])
+        self.assertEqual("http://foo.com?foo=test5_name", req['url'])
         self.assertEqual("POST", req['method'])
         self.assertEqual({}, req['headers'])
 
@@ -136,7 +141,7 @@ class WebhookTest(BaseTest):
     def test_process_batch_body(self, request_mock):
         resources = [
             {
-                "name": "test_name",
+                "InstanceId": "test_name",
                 "value": "test_value"
             }
         ]
@@ -144,13 +149,13 @@ class WebhookTest(BaseTest):
         data = {
             "url": "http://foo.com",
             "batch": True,
-            "body": "resources[].name",
+            "body": "resources[].InstanceId",
             "body-size": 10,
             "headers": {
                 "test": "'header'"
             },
             "query-params": {
-                "foo": "resources[0].name"
+                "foo": "resources[0].InstanceId"
             }
         }
 
@@ -170,7 +175,7 @@ class WebhookTest(BaseTest):
         current = datetime.datetime.utcnow()
         resources = [
             {
-                "name": "test1",
+                "InstanceId": "test1",
                 "value": current
             },
         ]
@@ -192,11 +197,11 @@ class WebhookTest(BaseTest):
     def test_process_no_batch(self, request_mock):
         resources = [
             {
-                "name": "test1",
+                "InstanceId": "test1",
                 "value": "test_value"
             },
             {
-                "name": "test2",
+                "InstanceId": "test2",
                 "value": "test_value"
             }
         ]
@@ -204,7 +209,7 @@ class WebhookTest(BaseTest):
         data = {
             "url": "http://foo.com",
             "query-params": {
-                "foo": "resource.name"
+                "foo": "resource.InstanceId"
             }
         }
 
@@ -220,11 +225,11 @@ class WebhookTest(BaseTest):
     def test_process_existing_query_string(self, request_mock):
         resources = [
             {
-                "name": "test1",
+                "InstanceId": "test1",
                 "value": "test_value"
             },
             {
-                "name": "test2",
+                "InstanceId": "test2",
                 "value": "test_value"
             }
         ]
@@ -232,7 +237,7 @@ class WebhookTest(BaseTest):
         data = {
             "url": "http://foo.com?existing=test",
             "query-params": {
-                "foo": "resource.name"
+                "foo": "resource.InstanceId"
             }
         }
 
@@ -251,11 +256,11 @@ class WebhookTest(BaseTest):
     def test_process_policy_metadata(self, request_mock):
         resources = [
             {
-                "name": "test1",
+                "InstanceId": "test1",
                 "value": "test_value"
             },
             {
-                "name": "test2",
+                "InstanceId": "test2",
                 "value": "test_value"
             }
         ]
@@ -283,7 +288,7 @@ class WebhookTest(BaseTest):
                              clear=True):
             resources = [
                 {
-                    "name": "test_name",
+                    "InstanceId": "test_name",
                     "value": "test_value"
                 }
             ]

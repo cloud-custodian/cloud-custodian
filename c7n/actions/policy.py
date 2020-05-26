@@ -97,6 +97,7 @@ class ModifyPolicyBase(BaseAction):
     )
 
     def __init__(self, data=None, manager=None):
+        super(ModifyPolicyBase, self).__init__(data, manager)
         if manager is not None:
             config_args = {
                 'account_id': manager.config.account_id,
