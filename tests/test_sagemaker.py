@@ -622,6 +622,7 @@ class TestSagemakerLabelingJob(BaseTest):
         aliases = kms.list_aliases(KeyId=resources[0]['OutputConfig']['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/sagemaker')
 
+
 class TestSagemakerEndpoint(BaseTest):
 
     def test_sagemaker_endpoints(self):

@@ -139,6 +139,7 @@ class SagemakerTransformJob(QueryResourceManager):
 
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
 
+
 class DescribeJob(DescribeSource):
 
     def augment(self, resources):
@@ -157,7 +158,7 @@ class SagemakerLabelingJob(QueryResourceManager):
         arn = id = 'LabelingJobArn'
         name = 'LabelingJobName'
         date = 'CreationTime'
-        universal_taggable = object()        
+        universal_taggable = object()
         permission_augment = ('sagemaker:DescribeLabelingJob', 'sagemaker:ListTags')
 
     source_mapping = {

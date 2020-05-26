@@ -144,7 +144,7 @@ ResourceMap = {
     "aws.sagemaker-model": "c7n.resources.sagemaker.Model",
     "aws.sagemaker-notebook": "c7n.resources.sagemaker.NotebookInstance",
     "aws.sagemaker-transform-job": "c7n.resources.sagemaker.SagemakerTransformJob",
-    "aws.sagemaker-labeling-job": "c7n.resources.sagemaker.SagemakerLabelingJob",    
+    "aws.sagemaker-labeling-job": "c7n.resources.sagemaker.SagemakerLabelingJob",
     "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
     "aws.security-group": "c7n.resources.vpc.SecurityGroup",
     "aws.shield-attack": "c7n.resources.shield.ShieldAttack",
