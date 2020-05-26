@@ -5,7 +5,12 @@
         "ResourceTagMappingList": [
             {
                 "ResourceARN": "arn:aws:sagemaker:us-east-1:644160558196:labeling-job/test",
-                "Tags": []
+                "Tags": [
+                    {
+                        "Key": "JobTag",
+                        "Value": "JobTagValue"
+                    }
+                ]
             }
         ],
         "ResponseMetadata": {}
